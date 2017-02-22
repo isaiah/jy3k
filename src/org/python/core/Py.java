@@ -402,8 +402,8 @@ public final class Py {
                 value = value.__findattr__("code");
             }
             Py.getSystemState().callExitFunc();
-            if (value instanceof PyInteger) {
-                System.exit(((PyInteger) value).getValue());
+            if (value instanceof PyLong) {
+                System.exit(((PyLong) value).getValue().intValue());
             } else {
                 if (value != Py.None) {
                     try {
@@ -467,8 +467,8 @@ public final class Py {
             int start,
             int end, String reason) {
         return new PyException(Py.UnicodeTranslateError, new PyTuple(new PyBytes(object),
-                new PyInteger(start),
-                new PyInteger(end),
+                new PyLong(start),
+                new PyLong(end),
                 new PyUnicode(reason)));
     }
     public static PyObject UnicodeDecodeError;
@@ -1900,8 +1900,8 @@ public final class Py {
     }
 
     public static byte py2byte(PyObject o) {
-        if (o instanceof PyInteger) {
-            return (byte) ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return ((PyLong) o).getValue().byteValueExact();
         }
         Object i = o.__tojava__(Byte.TYPE);
         if (i == null || i == Py.NoConversion) {
@@ -1911,8 +1911,8 @@ public final class Py {
     }
 
     public static short py2short(PyObject o) {
-        if (o instanceof PyInteger) {
-            return (short) ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return ((PyLong) o).getValue().shortValueExact();
         }
         Object i = o.__tojava__(Short.TYPE);
         if (i == null || i == Py.NoConversion) {
@@ -1926,9 +1926,7 @@ public final class Py {
     }
 
     public static int py2int(PyObject o, String msg) {
-        if (o instanceof PyInteger) {
-            return ((PyInteger) o).getValue();
-        } else if (o instanceof PyLong) {
+        if (o instanceof PyLong) {
             return ((PyLong) o).getValue().intValue();
         }
         Object obj = o.__tojava__(Integer.TYPE);
@@ -1939,8 +1937,8 @@ public final class Py {
     }
 
     public static long py2long(PyObject o) {
-        if (o instanceof PyInteger) {
-            return ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return ((PyLong) o).getValue().longValue();
         }
         Object i = o.__tojava__(Long.TYPE);
         if (i == null || i == Py.NoConversion) {
@@ -1953,8 +1951,8 @@ public final class Py {
         if (o instanceof PyFloat) {
             return (float) ((PyFloat) o).getValue();
         }
-        if (o instanceof PyInteger) {
-            return ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return ((PyLong) o).getValue().floatValue();
         }
         Object i = o.__tojava__(Float.TYPE);
         if (i == null || i == Py.NoConversion) {
@@ -1967,8 +1965,8 @@ public final class Py {
         if (o instanceof PyFloat) {
             return ((PyFloat) o).getValue();
         }
-        if (o instanceof PyInteger) {
-            return ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return ((PyLong) o).getValue().doubleValue();
         }
         Object i = o.__tojava__(Double.TYPE);
         if (i == null || i == Py.NoConversion) {
@@ -1989,8 +1987,8 @@ public final class Py {
             }
             return s.toString().charAt(0);
         }
-        if (o instanceof PyInteger) {
-            return (char) ((PyInteger) o).getValue();
+        if (o instanceof PyLong) {
+            return (char) ((PyLong) o).getValue().byteValue();
         }
         Object i = o.__tojava__(Character.TYPE);
         if (i == null || i == Py.NoConversion) {
