@@ -74,22 +74,22 @@ public class PyBoolean extends PyLong {
             return Boolean.valueOf(getBooleanValue());
         }
         if (c == Integer.TYPE || c == Number.class || c == Integer.class) {
-            return Integer.valueOf(getIntValue());
+            return Integer.valueOf(asInt());
         }
         if (c == Byte.TYPE || c == Byte.class) {
-            return Byte.valueOf((byte)(getIntValue()));
+            return Byte.valueOf((byte)(asInt()));
         }
         if (c == Short.TYPE || c == Short.class) {
-            return Short.valueOf((short)(getIntValue()));
+            return Short.valueOf((short)(asInt()));
         }
         if (c == Long.TYPE || c == Long.class) {
-            return Long.valueOf(getIntValue());
+            return Long.valueOf(asInt());
         }
         if (c == Float.TYPE || c == Float.class) {
-            return Float.valueOf(getIntValue());
+            return Float.valueOf(asInt());
         }
         if (c == Double.TYPE || c == Double.class) {
-            return Double.valueOf(getIntValue());
+            return Double.valueOf(asInt());
         }
         return super.__tojava__(c);
     }
@@ -104,7 +104,7 @@ public class PyBoolean extends PyLong {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() & ((PyBoolean) right).getBooleanValue());
     	} else if (right instanceof PyLong) {
-            return new PyLong(getIntValue() & ((PyLong)right).getIntValue());
+            return new PyLong(asInt() & ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -120,7 +120,7 @@ public class PyBoolean extends PyLong {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() ^ ((PyBoolean) right).getBooleanValue());
     	} else if (right instanceof PyLong) {
-            return new PyLong(getIntValue() ^ ((PyLong)right).getIntValue());
+            return new PyLong(asInt() ^ ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -136,7 +136,7 @@ public class PyBoolean extends PyLong {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() | ((PyBoolean) right).getBooleanValue());
     	} else if (right instanceof PyLong) {
-            return new PyLong(getIntValue() | ((PyLong)right).getIntValue());
+            return new PyLong(asInt() | ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -159,7 +159,7 @@ public class PyBoolean extends PyLong {
 
     @ExposedMethod(doc = BuiltinDocs.bool___pos___doc)
     final PyObject bool___pos__() {
-        return Py.newInteger(getIntValue());
+        return Py.newInteger(asInt());
     }
 
     @Override
@@ -169,6 +169,6 @@ public class PyBoolean extends PyLong {
 
     @ExposedMethod(doc = BuiltinDocs.bool___abs___doc)
     final PyObject bool___abs__() {
-        return Py.newInteger(getIntValue());
+        return Py.newInteger(asInt());
     }
 }

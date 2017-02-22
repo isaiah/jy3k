@@ -438,9 +438,7 @@ final class StringFormatter {
                         PyObject argAsNumber = asNumber(arg);
 
                         // We have to check what we got back.
-                        if (argAsNumber instanceof PyInteger) {
-                            fi.format(((PyInteger)argAsNumber).getValue());
-                        } else if (argAsNumber instanceof PyLong) {
+                        if (argAsNumber instanceof PyLong) {
                             fi.format(((PyLong)argAsNumber).getValue());
                         } else {
                             // It couldn't be converted, raise the error here

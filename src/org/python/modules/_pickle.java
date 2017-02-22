@@ -950,7 +950,7 @@ public class _pickle implements ClassDictInit {
 
         final private void save_int(PyObject object) {
             if (protocol > 0) {
-                int l = ((PyLong)object).getIntValue();
+                int l = ((PyLong)object).asInt();
                 char i1 = (char)( l         & 0xFF);
                 char i2 = (char)((l >>> 8 ) & 0xFF);
                 char i3 = (char)((l >>> 16) & 0xFF);
@@ -980,7 +980,7 @@ public class _pickle implements ClassDictInit {
         }
 
         private void save_bool(PyObject object) {
-            int value = ((PyBoolean)object).getValue();
+            int value = object.asInt();
             if(protocol >= 2) {
                 file.write(value != 0 ? NEWTRUE : NEWFALSE);
             } else {
@@ -1258,7 +1258,7 @@ public class _pickle implements ClassDictInit {
                 PyTuple extKey = new PyTuple(module, name);
                 PyObject extCode = extension_registry.get(extKey);
                 if(extCode != Py.None) {
-                    int code = ((PyLong)extCode).getIntValue();
+                    int code = ((PyLong)extCode).asInt();
                     if(code <= 0xFF) {
                         file.write(EXT1);
                         file.write((char)code);

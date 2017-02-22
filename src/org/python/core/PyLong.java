@@ -37,10 +37,6 @@ public class PyLong extends PyObject {
 
     private final BigInteger value;
 
-    public int getIntValue() {
-        return value.intValue();
-    }
-
     public BigInteger getValue() {
         return value;
     }
@@ -418,8 +414,6 @@ public class PyLong extends PyObject {
     final Object long___coerce_ex__(PyObject other) {
         if (other instanceof PyLong) {
             return other;
-        } else if (other instanceof PyInteger) {
-            return Py.newLong(((PyInteger)other).getValue());
         } else {
             return Py.None;
         }
@@ -432,8 +426,6 @@ public class PyLong extends PyObject {
     private static final BigInteger coerce(PyObject other) {
         if (other instanceof PyLong) {
             return ((PyLong)other).getValue();
-        } else if (other instanceof PyInteger) {
-            return BigInteger.valueOf(((PyInteger)other).getValue());
         } else {
             throw Py.TypeError("xxx");
         }
@@ -770,9 +762,7 @@ public class PyLong extends PyObject {
 
     private static final int coerceInt(PyObject other) {
         if (other instanceof PyLong) {
-            return ((PyLong)other).asInt();
-        } else if (other instanceof PyInteger) {
-            return ((PyInteger)other).getValue();
+            return (other).asInt();
         } else {
             throw Py.TypeError("xxx");
         }
@@ -971,9 +961,6 @@ public class PyLong extends PyObject {
     }
 
     private int long_compare(PyObject other) {
-        if (other instanceof PyInteger) {
-            return value.compareTo(BigInteger.valueOf(((PyInteger) other).getValue()));
-        }
         if (other instanceof PyLong) {
             return value.compareTo(((PyLong) other).getValue());
         }

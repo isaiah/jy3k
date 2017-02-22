@@ -368,8 +368,6 @@ public class PyComplex extends PyObject {
             return other;
         } else if (other instanceof PyFloat) {
             return new PyComplex(((PyFloat)other).getValue(), 0);
-        } else if (other instanceof PyInteger) {
-            return new PyComplex(((PyInteger)other).getValue(), 0);
         } else if (other instanceof PyLong) {
             return new PyComplex(((PyLong)other).doubleValue(), 0);
         }
@@ -386,8 +384,6 @@ public class PyComplex extends PyObject {
             return (PyComplex)other;
         } else if (other instanceof PyFloat) {
             return new PyComplex(((PyFloat)other).getValue(), 0);
-        } else if (other instanceof PyInteger) {
-            return new PyComplex(((PyInteger)other).getValue(), 0);
         } else if (other instanceof PyLong) {
             return new PyComplex(((PyLong)other).doubleValue(), 0);
         }
