@@ -694,7 +694,7 @@ public class PyObject implements Serializable {
      * @see #__finditem__(PyObject)
      **/
     public PyObject __finditem__(int key) {
-        return __finditem__(new PyInteger(key));
+        return __finditem__(new PyLong(key));
     }
 
     /**
@@ -804,7 +804,7 @@ public class PyObject implements Serializable {
      * @see #__setitem__(PyObject, PyObject)
      **/
     public void __setitem__(int key, PyObject value) {
-        __setitem__(new PyInteger(key), value);
+        __setitem__(new PyLong(key), value);
     }
 
     /**
@@ -3851,7 +3851,7 @@ public class PyObject implements Serializable {
         } else {
             PyObject copyreg = __builtin__.__import__("copyreg", null, null, Py.EmptyTuple);
             PyObject copyreg_reduce = copyreg.__findattr__("_reduce_ex");
-            res = copyreg_reduce.__call__(this, new PyInteger(proto));
+            res = copyreg_reduce.__call__(this, new PyLong(proto));
         }
         return res;
     }

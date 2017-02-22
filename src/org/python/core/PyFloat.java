@@ -248,13 +248,11 @@ public class PyFloat extends PyObject {
             // we're infinity: our magnitude exceeds any finite
             // integer, so it doesn't matter which int we compare i
             // with. If NaN, similarly.
-            if (other instanceof PyInteger || other instanceof PyLong) {
+            if (other instanceof PyLong) {
                 j = 0.0;
             } else {
                 return Py.NotImplemented;
             }
-        } else if (other instanceof PyInteger) {
-            j = ((PyInteger)other).getValue();
         } else if (other instanceof PyLong) {
             BigDecimal v = new BigDecimal(getValue());
             BigDecimal w = new BigDecimal(((PyLong) other).getValue());
@@ -420,8 +418,6 @@ public class PyFloat extends PyObject {
     final Object float___coerce_ex__(PyObject other) {
         if (other instanceof PyFloat) {
             return other;
-        } else if (other instanceof PyInteger) {
-            return new PyFloat((double)((PyInteger)other).getValue());
         } else if (other instanceof PyLong) {
             return new PyFloat(((PyLong)other).doubleValue());
         } else {
@@ -430,14 +426,12 @@ public class PyFloat extends PyObject {
     }
 
     private static boolean canCoerce(PyObject other) {
-        return other instanceof PyFloat || other instanceof PyInteger || other instanceof PyLong;
+        return other instanceof PyFloat || other instanceof PyLong;
     }
 
     private static double coerce(PyObject other) {
         if (other instanceof PyFloat) {
             return ((PyFloat)other).getValue();
-        } else if (other instanceof PyInteger) {
-            return ((PyInteger)other).getValue();
         } else if (other instanceof PyLong) {
             return ((PyLong)other).doubleValue();
         } else {
@@ -837,8 +831,6 @@ public class PyFloat extends PyObject {
             throw Py.OverflowError("cannot convert float infinity to integer");
         }
         if (value < Integer.MAX_VALUE) {
-            return new PyInteger((int)value);
-        } else if (value < Long.MAX_VALUE) {
             return new PyLong((long)value);
         }
         BigDecimal d = new BigDecimal(value);
@@ -911,7 +903,7 @@ public class PyFloat extends PyObject {
     }
 
     /**
-     * Common code for PyFloat, {@link PyInteger} and {@link PyLong} to prepare a
+     * Common code for PyFloat and {@link PyLong} to prepare a
      * {@link FloatFormatter} from a parsed specification. The object returned has format method
      * {@link FloatFormatter#format(double)}.
      *

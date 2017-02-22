@@ -142,7 +142,7 @@ public class ClassicPyObjectAdapter extends ExtensiblePyObjectAdapter {
         }
 
         public PyObject adapt(Object o) {
-            return new PyInteger(((Number)o).intValue());
+            return new PyLong(((Number)o).intValue());
         }
 
     }

@@ -37,6 +37,10 @@ public class PyLong extends PyObject {
 
     private final BigInteger value;
 
+    public int getIntValue() {
+        return value.intValue();
+    }
+
     public BigInteger getValue() {
         return value;
     }

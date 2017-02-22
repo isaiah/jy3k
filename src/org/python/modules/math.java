@@ -375,7 +375,7 @@ public class math implements ClassDictInit {
                 break;
         }
 
-        return new PyTuple(new PyFloat(mantissa), new PyInteger(exponent));
+        return new PyTuple(new PyFloat(mantissa), new PyLong(exponent));
     }
 
     public static PyObject trunc(PyObject number) {

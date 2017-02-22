@@ -23,7 +23,6 @@ import org.python.core.PyException;
 import org.python.core.PyFile;
 import org.python.core.PyFloat;
 import org.python.core.PyFunction;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyModule;
@@ -456,7 +455,7 @@ public class _pickle implements ClassDictInit {
 
     private static PyType FunctionType = PyType.fromClass(PyFunction.class);
 
-    private static PyType IntType = PyType.fromClass(PyInteger.class);
+    private static PyType IntType = PyType.fromClass(PyLong.class);
 
     private static PyType ListType = PyType.fromClass(PyList.class);
 
@@ -951,7 +950,7 @@ public class _pickle implements ClassDictInit {
 
         final private void save_int(PyObject object) {
             if (protocol > 0) {
-                int l = ((PyInteger)object).getValue();
+                int l = ((PyLong)object).getIntValue();
                 char i1 = (char)( l         & 0xFF);
                 char i2 = (char)((l >>> 8 ) & 0xFF);
                 char i3 = (char)((l >>> 16) & 0xFF);
@@ -1259,7 +1258,7 @@ public class _pickle implements ClassDictInit {
                 PyTuple extKey = new PyTuple(module, name);
                 PyObject extCode = extension_registry.get(extKey);
                 if(extCode != Py.None) {
-                    int code = ((PyInteger)extCode).getValue();
+                    int code = ((PyLong)extCode).getIntValue();
                     if(code <= 0xFF) {
                         file.write(EXT1);
                         file.write((char)code);
@@ -1692,7 +1691,7 @@ public class _pickle implements ClassDictInit {
 
         final private void load_binint() {
             int x = read_binint();
-            push(new PyInteger(x));
+            push(new PyLong(x));
         }
 
         private int read_binint() {
@@ -1706,12 +1705,12 @@ public class _pickle implements ClassDictInit {
 
         final private void load_binint1() {
             int val = file.read(1).charAt(0);
-            push(new PyInteger(val));
+            push(new PyLong(val));
         }
 
         final private void load_binint2() {
             int val = read_binint2();
-            push(new PyInteger(val));
+            push(new PyLong(val));
         }
 
         private int read_binint2() {
