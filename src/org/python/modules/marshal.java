@@ -13,7 +13,6 @@ import org.python.core.PyComplex;
 import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyFrozenSet;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PySet;
@@ -152,9 +151,6 @@ public class marshal implements ClassDictInit {
                 write_byte(TYPE_FALSE);
             } else if (v == Py.True) {
                 write_byte(TYPE_TRUE);
-            } else if (v instanceof PyInteger) {
-                write_byte(TYPE_INT);
-                write_int(((PyInteger) v).asInt());
             } else if (v instanceof PyLong) {
                 write_byte(TYPE_LONG);
                 write_long(((PyLong) v).getValue());

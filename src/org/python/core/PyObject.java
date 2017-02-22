@@ -1623,7 +1623,7 @@ public class PyObject implements Serializable {
      * Should only be overridden by numeric objects that can be
      * reasonably coerced into a python long.
      *
-     * @return a PyLong or PyInteger corresponding to the value of this object.
+     * @return a PyLong corresponding to the value of this object.
      **/
     public PyObject __int__() {
         throw Py.AttributeError("__int__");
@@ -1727,7 +1727,7 @@ public class PyObject implements Serializable {
     /**
      * Equivalent to the standard Python __index__ method.
      *
-     * @return a PyInteger or PyLong
+     * @return a PyLong
      * @throws a Py.TypeError if not supported
      **/
     public PyObject __index__() {
@@ -3874,7 +3874,7 @@ public class PyObject implements Serializable {
      * override __reduce_ex__ in the base-class, even if __reduce_ex__ was
      * called with an argument.
      *
-     * @param arg PyInteger specifying reduce algorithm (method without this
+     * @param arg int specifying reduce algorithm (method without this
      * argument defaults to 0).
      * @return a tuple of (class, tuple)
      */
@@ -4063,7 +4063,7 @@ public class PyObject implements Serializable {
             }
             throw pye;
         }
-        if (!(intObj instanceof PyInteger || intObj instanceof PyLong)) {
+        if (!(intObj instanceof PyLong)) {
             // Shouldn't happen except with buggy builtin types
             throw Py.TypeError("nb_int should return int object");
         }
@@ -4089,7 +4089,7 @@ public class PyObject implements Serializable {
             }
             throw pye;
         }
-        if (!(longObj instanceof PyLong || longObj instanceof PyInteger)) {
+        if (!(longObj instanceof PyLong)) {
             // Shouldn't happen except with buggy builtin types
             throw Py.TypeError("integer conversion failed");
         }

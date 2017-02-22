@@ -19,7 +19,6 @@ import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PySequence;
@@ -167,11 +166,8 @@ public class MatchObject extends PyObject implements Traverseproc {
 
         if (pattern.groupindex != null) {
             index = pattern.groupindex.__finditem__(index);
-            if (index != null) {
-                if (index instanceof PyInteger)
-                    return ((PyInteger) index).getValue();
-                if (index instanceof PyLong)
-                    return ((PyLong) index).getValue().intValue();
+            if (index != null && index instanceof PyLong) {
+                return ((PyLong) index).getValue().intValue();
             }
         }
         return i;

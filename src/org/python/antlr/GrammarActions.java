@@ -48,7 +48,6 @@ import org.python.antlr.base.stmt;
 import org.python.core.Py;
 import org.python.core.PyComplex;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;

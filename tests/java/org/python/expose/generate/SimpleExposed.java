@@ -1,9 +1,9 @@
 package org.python.expose.generate;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
+import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.ThreadState;
 import org.python.expose.ExposedClassMethod;
@@ -87,7 +87,7 @@ public class SimpleExposed extends PyObject {
 
     @ExposedMethod(defaults = "1")
     public PyObject defaultToOne(int arg) {
-        return new PyInteger(arg);
+        return new PyLong(arg);
     }
 
     @ExposedMethod(defaults = {"a", "1", "2", "3"})

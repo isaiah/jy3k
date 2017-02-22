@@ -4,7 +4,6 @@ package org.python.modules.thread;
 import org.python.core.FunctionThread;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;

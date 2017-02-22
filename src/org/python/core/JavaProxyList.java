@@ -261,7 +261,7 @@ class JavaProxyList {
             int result;
             if (cmp != null && cmp != Py.None) {
                 PyObject pyresult = cmp.__call__(o1.key, o2.key);
-                if (pyresult instanceof PyInteger || pyresult instanceof PyLong) {
+                if (pyresult instanceof PyLong) {
                     return pyresult.asInt();
                 } else {
                     throw Py.TypeError(

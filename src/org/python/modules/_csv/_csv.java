@@ -3,12 +3,10 @@ package org.python.modules._csv;
 
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyUnicode;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;

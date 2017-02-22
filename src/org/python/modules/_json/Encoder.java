@@ -5,7 +5,6 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -109,7 +108,7 @@ public class Encoder extends PyObject implements Traverseproc {
             rval.append(new PyBytes("false"));
         } else if (obj instanceof PyBytes) {
             rval.append(encode_string(obj));
-        } else if (obj instanceof PyInteger || obj instanceof PyLong) {
+        } else if (obj instanceof PyLong) {
             rval.append(obj.__str__());
         } else if (obj instanceof PyFloat) {
             rval.append(encode_float(obj));
@@ -153,7 +152,7 @@ public class Encoder extends PyObject implements Traverseproc {
                 kstr = (PyUnicode) key;
             } else if (key instanceof PyFloat) {
                 kstr = encode_float(key);
-            } else if (key instanceof PyInteger || key instanceof PyLong) {
+            } else if (key instanceof PyLong) {
                 kstr = key.__str__();
             } else if (key == Py.True) {
                 kstr = new PyUnicode("true");

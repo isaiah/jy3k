@@ -4,7 +4,6 @@ package org.python.core.stringlib;
 import java.math.BigInteger;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyBytes;
@@ -623,11 +622,7 @@ public class IntegerFormatter extends InternalFormat.Formatter {
     public static PyUnicode formatNumber(PyObject number, Spec spec) {
         number = number.__index__();
         IntegerFormatter f = new IntegerFormatter(spec);
-        if (number instanceof PyInteger) {
-            f.format(((PyInteger)number).getValue());
-        } else {
-            f.format(((PyLong)number).getValue());
-        }
+        f.format(((PyLong)number).getValue());
         return new PyUnicode(f.getResult());
     }
 

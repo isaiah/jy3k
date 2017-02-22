@@ -3,7 +3,6 @@ package org.python.modules.jffi;
 
 import org.python.core.Py;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;

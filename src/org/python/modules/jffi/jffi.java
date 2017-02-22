@@ -4,7 +4,6 @@ package org.python.modules.jffi;
 import com.kenai.jffi.Library;
 import org.python.core.ClassDictInit;
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 
@@ -63,8 +62,6 @@ public class jffi implements ClassDictInit  {
             return ((Pointer) obj).getMemory().getAddress();
         } else if (obj instanceof CData) {
             return ((CData) obj).getReferenceMemory().getAddress();
-        } else if (obj instanceof PyInteger) {
-            return obj.asInt();
         } else if (obj instanceof PyLong) {
             return ((PyLong) obj).asLong(0);
         } else {

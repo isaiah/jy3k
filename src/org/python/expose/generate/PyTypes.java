@@ -9,7 +9,6 @@ import org.python.core.PyBuiltinMethodNarrow;
 import org.python.core.PyDataDescr;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyModule;
 import org.python.core.PyNewWrapper;

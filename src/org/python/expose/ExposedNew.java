@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.python.core.PyInteger;
+import org.python.core.PyLong;
 
 /**
  * <p>
@@ -17,7 +17,7 @@ import org.python.core.PyInteger;
  subtype, PyObject[] args, String[] keywords</code>. In this case, the method has full
  * responsibility for creating and initting the object and will be invoked for every subtype of this
  * exposed type. Essentially it's for object instantiation that must be called for every instance of
- * that object. See {@link PyInteger#int_new} for an example of this type of ExposedNew.
+ * that object. See {@link PyLong#long___new__} for an example of this type of ExposedNew.
  *<p>
  * In the second form, the method must be an instance method that takes the standard Jython call
  * arguments, <code>PyObject[] args, String[] keywords</code>. In this case, the basic new

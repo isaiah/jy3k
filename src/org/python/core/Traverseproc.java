@@ -103,7 +103,7 @@ import org.python.modules.gc;
  * </pre>
  * If the class neither contains {@code PyObject}-references, nor extends some
  * {@code Traverseproc}-implementing class, it is recommended to be annotated
- * {@link org.python.core.Untraversable}. {@link org.python.core.PyInteger} is
+ * {@link org.python.core.Untraversable}. {@link org.python.core.PyLong} is
  * an example for this:<br><br>
  * <pre>
  * {@literal @}Untraversable

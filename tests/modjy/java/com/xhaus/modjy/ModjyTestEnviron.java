@@ -21,7 +21,7 @@
 package com.xhaus.modjy;
 
 import org.python.core.PyDictionary;
-import org.python.core.PyInteger;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 
@@ -221,8 +221,8 @@ public class ModjyTestEnviron extends ModjyTestBase {
     public void testMandatoryWSGIVars_WSGIVersion() throws Exception {
         PyObject result = doEnvVarTest("wsgi.version");
         assertTrue("'wsgi.version' != PyTuple", result instanceof org.python.core.PyTuple);
-        assertEquals("'wsgi.version[0]' != '1'", ((PyInteger)result.__getitem__(0)).getValue(), 1);
-        assertEquals("'wsgi.version[1]' != '0'", ((PyInteger)result.__getitem__(1)).getValue(), 0);
+        assertEquals("'wsgi.version[0]' != '1'", ((PyLong)result.__getitem__(0)).getValue(), 1);
+        assertEquals("'wsgi.version[1]' != '0'", ((PyLong)result.__getitem__(1)).getValue(), 0);
     }
 
     public void testMandatoryWSGIVars_URLScheme_HTTP() throws Exception {

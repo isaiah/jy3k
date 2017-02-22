@@ -12,7 +12,6 @@ import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
