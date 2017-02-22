@@ -315,7 +315,7 @@ public class PyByteArrayTest extends BaseBytesTest {
         BaseBytes a = getInstance(aRef);
         for (int i = 0; i < MEDIUM; i++) {
             int b = aRef[i] ^ 0x55; // != a[i]
-            PyInteger pyb = new PyInteger(b);
+            PyLong pyb = new PyLong(b);
             a.__setitem__(i, pyb);
             int ai = a.pyget(i).asInt();
             if (verbose >= 3) {
@@ -327,7 +327,7 @@ public class PyByteArrayTest extends BaseBytesTest {
         // Check ValueError Exceptions generated
         int[] badValue = {256, Integer.MAX_VALUE, -1, -2, -100, -0x10000, Integer.MIN_VALUE};
         for (int i : badValue) {
-            PyInteger b = new PyInteger(i);
+            PyLong b = new PyLong(i);
             try {
                 a.__setitem__(0, b);
                 fail("Exception not thrown for __setitem__(" + 0 + ", " + b + ")");
@@ -340,7 +340,7 @@ public class PyByteArrayTest extends BaseBytesTest {
         }
 
         // Check IndexError Exceptions generated
-        PyInteger x = new PyInteger(10);
+        PyLong x = new PyLong(10);
         for (int i : new int[] {-1 - MEDIUM, -100 - MEDIUM, MEDIUM, MEDIUM + 1}) {
             try {
                 a.__setitem__(i, x);

@@ -58,9 +58,9 @@ public class GCTestHelper {
     public static PyObject reflectionTraverseTestField() {
         PyReflectionTraversed result = new PyReflectionTraversed();
         result.referent1 = new PyList();
-        result.refArray[0] = new PyInteger(244);
+        result.refArray[0] = new PyLong(244);
         result.refArray[1] = new PyBytes("test1");
-        result.refArray[2] = new PyInteger(333);
+        result.refArray[2] = new PyLong(333);
         result.refList.add(new PyFloat(0.7));
         result.referent2 = result;
         return result;
@@ -69,9 +69,9 @@ public class GCTestHelper {
     public static PyObject reflectionTraverseTestList() {
         PyReflectionTraversed result = new PyReflectionTraversed();
         result.referent1 = new PyList();
-        result.refArray[0] = new PyInteger(245);
+        result.refArray[0] = new PyLong(245);
         result.refArray[1] = new PyBytes("test2");
-        result.refArray[2] = new PyInteger(334);
+        result.refArray[2] = new PyLong(334);
         result.refList.add(new PyFloat(0.71));
         result.refList.add(result);
         return result;
@@ -80,7 +80,7 @@ public class GCTestHelper {
     public static PyObject reflectionTraverseTestArray() {
         PyReflectionTraversed result = new PyReflectionTraversed();
         result.referent1 = new PyList();
-        result.refArray[0] = new PyInteger(246);
+        result.refArray[0] = new PyLong(246);
         result.refArray[1] = new PyBytes("test3");
         result.refArray[2] = result;
         result.refList.add(new PyFloat(0.72));
@@ -90,9 +90,9 @@ public class GCTestHelper {
     public static PyObject reflectionTraverseTestPyList() {
         PyReflectionTraversed result = new PyReflectionTraversed();
         result.referent1 = new PyList();
-        result.refArray[0] = new PyInteger(247);
+        result.refArray[0] = new PyLong(247);
         result.refArray[1] = new PyBytes("test4");
-        result.refArray[2] = new PyInteger(335);
+        result.refArray[2] = new PyLong(335);
         result.refList.add(new PyFloat(0.73));
         result.refList.add(new PyFloat(-0.73));
         PyList pl = new PyList();
@@ -106,9 +106,9 @@ public class GCTestHelper {
     public static PyObject reflectionTraverseTestCycle() {
         PyReflectionTraversed result = new PyReflectionTraversed();
         result.referent1 = new PyList();
-        result.refArray[0] = new PyInteger(248);
+        result.refArray[0] = new PyLong(248);
         result.refArray[1] = new PyBytes("test6");
-        result.refArray[2] = new PyInteger(336);
+        result.refArray[2] = new PyLong(336);
         result.refList.add(new PyFloat(0.74));
         result.refList.add(result.refList);
         return result;

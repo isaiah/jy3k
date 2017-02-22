@@ -8,19 +8,14 @@ public class WrappedIntegerTest extends TestCase {
 
     // Simulate the use case where you want to expose some (possibly mutable)
     // java int field to an interpreter without having to set the value to a new
-    // PyInteger each time it changes.
+    // PyLong each time it changes.
     @SuppressWarnings("serial")
-    static class WrappedInteger extends PyInteger {
+    static class WrappedInteger extends PyLong {
         public WrappedInteger() {
             super(0);
         }
 
         private int mutableValue;
-
-        @Override
-        public int getValue() {
-            return mutableValue;
-        }
 
         public void setMutableValue(final int newValue) {
             mutableValue = newValue;
@@ -43,10 +38,10 @@ public class WrappedIntegerTest extends TestCase {
 
     public void testAdd() {
         interp.exec("c = a + b");
-        assertEquals(new PyInteger(30), interp.get("c"));
+        assertEquals(new PyLong(30), interp.get("c"));
         b.setMutableValue(18);
         interp.exec("c = a + b");
-        assertEquals(new PyInteger(31), interp.get("c"));
+        assertEquals(new PyLong(31), interp.get("c"));
     }
 
     public void testDiv() {
@@ -56,6 +51,6 @@ public class WrappedIntegerTest extends TestCase {
 
     public void testMod() {
         interp.exec("c = b % a");
-        assertEquals(new PyInteger(4), interp.get("c"));
+        assertEquals(new PyLong(4), interp.get("c"));
     }
 }
