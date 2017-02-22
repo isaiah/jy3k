@@ -32,7 +32,7 @@ public class FilelikeInputStream extends InputStream {
             return 0;
         }
         String result = ((PyBytes) filelike.__getattr__("read")
-                .__call__(new PyInteger(len))).getString();
+                .__call__(new PyLong(len))).getString();
         if(result.length() == 0) {
             return -1;
         }

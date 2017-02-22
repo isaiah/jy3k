@@ -1,14 +1,6 @@
 package org.python.modules;
 
-import org.python.core.Py;
-import org.python.core.PyBytes;
-import org.python.core.PyFile;
-import org.python.core.PyInteger;
-import org.python.core.PyObject;
-import org.python.core.PyType;
-import org.python.core.__builtin__;
-import org.python.core.Traverseproc;
-import org.python.core.Visitproc;
+import org.python.core.*;
 
 // XXX - add support for StringIO, not just cStringIO
 
@@ -141,7 +133,7 @@ public class PyIOFileFactory {
         }
 
         public String read(int len) {
-            return read.__call__(new PyInteger(len)).toString();
+            return read.__call__(new PyLong(len)).toString();
         }
 
         public String readlineNoNl() {

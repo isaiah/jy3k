@@ -101,7 +101,7 @@ public class _thread {
 
     @ExposedFunction
     public static void exit_thread() {
-        throw new PyException(Py.SystemExit, new PyInteger(0));
+        throw new PyException(Py.SystemExit, new PyLong(0));
     }
 
     @ExposedFunction

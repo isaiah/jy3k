@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 import org.python.core.buffer.BaseBuffer;
@@ -1591,11 +1592,12 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
                 throw Py.OverflowError("value too large for " + type.getName());
             }
         } else if (type == Long.TYPE) {
-            if (isSigned() && value instanceof PyInteger) {
-                if (((PyInteger)value).getValue() < 0) {
-                    throw Py.OverflowError("value too small for " + type.getName());
-                }
-            } else if (value instanceof PyLong) {
+            if (value instanceof PyLong) {
+//                if (isSigned()) {
+//                    if (((PyLong) value).getValue().compareTo(BigInteger.ZERO) < 0) {
+//                        throw Py.OverflowError("value too small for " + type.getName());
+//                    }
+//                }
                 ((PyLong)value).getLong(isSigned() ? 0 : Long.MIN_VALUE, Long.MAX_VALUE);
             } else {
                 Object o;
