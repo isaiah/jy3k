@@ -41,6 +41,10 @@ public class PyLong extends PyObject {
         return value;
     }
 
+    public PyLong(PyType subType, int v) {
+        this(subType, toBigInteger(v));
+    }
+
     public PyLong(PyType subType, BigInteger v) {
         super(subType);
         value = v;
@@ -51,6 +55,10 @@ public class PyLong extends PyObject {
     }
 
     public PyLong(double v) {
+        this(toBigInteger(v));
+    }
+
+    public PyLong(int v) {
         this(toBigInteger(v));
     }
 
@@ -155,12 +163,7 @@ public class PyLong extends PyObject {
     private static PyObject longSubtypeNew(PyNewWrapper new_, boolean init, PyType subtype,
             PyObject[] args, String[] keywords) {
         PyObject tmp = long___new__(new_, init, TYPE, args, keywords);
-        if (tmp instanceof PyInteger) {
-            int intValue = ((PyInteger)tmp).getValue();
-            return new PyLongDerived(subtype, BigInteger.valueOf(intValue));
-        } else {
-            return new PyLongDerived(subtype, ((PyLong)tmp).getValue());
-        }
+        return new PyLongDerived(subtype, ((PyLong)tmp).getValue());
     }
 
     /**

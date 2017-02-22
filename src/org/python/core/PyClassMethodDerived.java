@@ -690,7 +690,7 @@ public class PyClassMethodDerived extends PyClassMethod implements Slotted,Final
         PyObject impl=self_type.lookup("__int__");
         if (impl!=null) {
             PyObject res=impl.__get__(this,self_type).__call__();
-            if (res instanceof PyLong||res instanceof PyInteger)
+            if (res instanceof PyLong)
                 return res;
             throw Py.TypeError("__int__"+" returned non-"+"long"+" (type "+res.getType().fastGetName()+")");
         }
@@ -702,12 +702,9 @@ public class PyClassMethodDerived extends PyClassMethod implements Slotted,Final
         PyObject impl=self_type.lookup("__hash__");
         if (impl!=null) {
             PyObject res=impl.__get__(this,self_type).__call__();
-            if (res instanceof PyInteger) {
-                return((PyInteger)res).getValue();
-            } else
-                if (res instanceof PyLong) {
-                    return((PyLong)res).getValue().intValue();
-                }
+            if (res instanceof PyLong) {
+                return((PyLong)res).getValue().intValue();
+            }
             throw Py.TypeError("__hash__ should return a int");
         }
         if (self_type.lookup("__eq__")!=null) {
@@ -745,7 +742,7 @@ public class PyClassMethodDerived extends PyClassMethod implements Slotted,Final
         PyObject impl=self_type.lookup("__len__");
         if (impl!=null) {
             PyObject res=impl.__get__(this,self_type).__call__();
-            if (res instanceof PyInteger||res instanceof PyLong) {
+            if (res instanceof PyLong) {
                 return res.asInt();
             }
             throw Py.TypeError(String.format("'%s' object cannot be interpreted as an integer",getType().fastGetName()));
@@ -792,7 +789,7 @@ public class PyClassMethodDerived extends PyClassMethod implements Slotted,Final
         PyObject impl=self_type.lookup("__getitem__");
         if (impl!=null)
             try {
-                return impl.__get__(this,self_type).__call__(new PyInteger(key));
+                return impl.__get__(this,self_type).__call__(new PyLong(key));
             } catch (PyException exc) {
                 if (exc.match(Py.LookupError))
                     return null;
@@ -951,7 +948,7 @@ public class PyClassMethodDerived extends PyClassMethod implements Slotted,Final
         PyObject impl=self_type.lookup("__index__");
         if (impl!=null) {
             PyObject res=impl.__get__(this,self_type).__call__();
-            if (res instanceof PyInteger||res instanceof PyLong) {
+            if (res instanceof PyLong) {
                 return res;
             }
             throw Py.TypeError(String.format("__index__ returned non-(int,long) (type %s)",res.getType().fastGetName()));

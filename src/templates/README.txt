@@ -9,16 +9,16 @@ Example: creating a derivable version of int
 
 from the file int.derived:
 
-  base_class: PyInteger
+  base_class: PyLong
   want_dict: true
   ctr: int v
   incl: object
 
 from mappings, the relevant entry (please keep sorted):
 
-  int.derived:org.python.core.PyIntegerDerived
+  int.derived:org.python.core.PyLongDerived
 
-To generate the source of the class, src/org/python/core/PyInteger.java:
+To generate the source of the class, src/org/python/core/PyLong.java:
 
   python gderived.py int.derived
 

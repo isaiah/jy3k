@@ -46,9 +46,8 @@ enumerate.derived:org.python.core.PyEnumerateDerived
 file.derived:org.python.core.PyFileDerived
 float.derived:org.python.core.PyFloatDerived
 frozenset.derived:org.python.core.PyFrozenSetDerived
-int.derived:org.python.core.PyIntegerDerived
+int.derived:org.python.core.PyLongDerived
 list.derived:org.python.core.PyListDerived
-long.derived:org.python.core.PyLongDerived
 local.derived:org.python.modules.thread.PyLocalDerived
 module.derived:org.python.core.PyModuleDerived
 object.derived:org.python.core.PyObjectDerived
