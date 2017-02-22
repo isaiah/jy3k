@@ -177,6 +177,7 @@ symbol.py
 sysconfig.py
 tabnanny.py
 telnetlib.py
+threading.py
 this.py
 textwrap.py
 tempfile.py
