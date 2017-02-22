@@ -85,7 +85,7 @@ public class _io implements ClassDictInit {
     private static final int _DEFAULT_BUFFER_SIZE = IOBase.DEFAULT_BUFFER_SIZE;
 
     /** Default buffer size for export. */
-    public static final PyInteger DEFAULT_BUFFER_SIZE = new PyInteger(_DEFAULT_BUFFER_SIZE);
+    public static final PyLong DEFAULT_BUFFER_SIZE = new PyLong(_DEFAULT_BUFFER_SIZE);
 
     /**
      * Open file and return a stream. Raise IOError upon failure. This is a port to Java of the

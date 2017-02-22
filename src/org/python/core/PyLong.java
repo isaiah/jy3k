@@ -30,20 +30,10 @@ public class PyLong extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(PyLong.class);
 
-    public static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
-    public static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+    public static final BigInteger MIN_INT = BigInteger.valueOf(Long.MIN_VALUE);
+    public static final BigInteger MAX_INT = BigInteger.valueOf(Long.MAX_VALUE);
     public static final BigInteger MAX_ULONG = BigInteger.valueOf(1).shiftLeft(64)
             .subtract(BigInteger.valueOf(1));
-
-    /** @deprecated Use MIN_INT instead. */
-    @Deprecated
-    public static final BigInteger minLong = MIN_LONG;
-    /** @deprecated Use MAX_INT instead. */
-    @Deprecated
-    public static final BigInteger maxLong = MAX_LONG;
-    /** @deprecated Use MAX_ULONG instead. */
-    @Deprecated
-    public static final BigInteger maxULong = MAX_ULONG;
 
     private final BigInteger value;
 
@@ -350,7 +340,7 @@ public class PyLong extends PyObject {
     }
 
     public long getLong(long min, long max, String overflowMsg) {
-        if (getValue().compareTo(MAX_LONG) <= 0 && getValue().compareTo(MIN_LONG) >= 0) {
+        if (getValue().compareTo(MAX_INT) <= 0 && getValue().compareTo(MIN_INT) >= 0) {
             long v = getValue().longValue();
             if (v >= min && v <= max) {
                 return v;
@@ -1089,7 +1079,7 @@ public class PyLong extends PyObject {
         InternalFormat.Formatter f;
 
         // Try to make an integer formatter from the specification
-        IntegerFormatter fi = PyInteger.prepareFormatter(spec);
+        IntegerFormatter fi = PyLong.prepareFormatter(spec);
         if (fi != null) {
             // Bytes mode if formatSpec argument is not unicode.
             fi.setBytes(!(formatSpec instanceof PyUnicode));
@@ -1124,8 +1114,8 @@ public class PyLong extends PyObject {
 
     @Override
     public int asIndex(PyObject err) {
-        boolean tooLow = getValue().compareTo(PyInteger.MIN_INT) < 0;
-        boolean tooHigh = getValue().compareTo(PyInteger.MAX_INT) > 0;
+        boolean tooLow = getValue().compareTo(PyLong.MIN_INT) < 0;
+        boolean tooHigh = getValue().compareTo(PyLong.MAX_INT) > 0;
         if (tooLow || tooHigh) {
             if (err != null) {
                 throw new PyException(err, "cannot fit 'long' into an index-sized integer");
@@ -1133,6 +1123,55 @@ public class PyLong extends PyObject {
             return tooLow ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         }
         return (int)getValue().longValue();
+    }
+
+    /**
+     * Prepare an IntegerFormatter. This object has an
+     * overloaded format method {@link IntegerFormatter#format(int)} and
+     * {@link IntegerFormatter#format(BigInteger)} to support the two types.
+     *
+     * @param spec a parsed PEP-3101 format specification.
+     * @return a formatter ready to use, or null if the type is not an integer format type.
+     * @throws PyException(ValueError) if the specification is faulty.
+     */
+    @SuppressWarnings("fallthrough")
+    static IntegerFormatter prepareFormatter(Spec spec) throws PyException {
+
+        // Slight differences between format types
+        switch (spec.type) {
+            case 'c':
+                // Character data: specific prohibitions.
+                if (Spec.specified(spec.sign)) {
+                    throw IntegerFormatter.signNotAllowed("integer", spec.type);
+                } else if (spec.alternate) {
+                    throw IntegerFormatter.alternateFormNotAllowed("integer", spec.type);
+                }
+                // Fall through
+
+            case 'x':
+            case 'X':
+            case 'o':
+            case 'b':
+            case 'n':
+                if (spec.grouping) {
+                    throw IntegerFormatter.notAllowed("Grouping", "integer", spec.type);
+                }
+                // Fall through
+
+            case Spec.NONE:
+            case 'd':
+                // Check for disallowed parts of the specification
+                if (Spec.specified(spec.precision)) {
+                    throw IntegerFormatter.precisionNotAllowed("integer");
+                }
+                // spec may be incomplete. The defaults are those commonly used for numeric formats.
+                spec = spec.withDefaults(Spec.NUMERIC);
+                // Get a formatter for the spec.
+                return new IntegerFormatter(spec);
+
+            default:
+                return null;
+        }
     }
 
     @Override

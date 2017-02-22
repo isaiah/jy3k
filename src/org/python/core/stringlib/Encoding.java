@@ -1593,26 +1593,6 @@ public class Encoding {
         return bi;
     }
 
-    public static final int atoi(CharSequence s, int base) {
-        if ((base != 0 && base < 2) || (base > 36)) {
-            throw Py.ValueError("invalid base for atoi()");
-        }
-
-        try {
-            BigInteger bi = asciiToBigInteger(s, base, false);
-            if (bi.compareTo(PyInteger.MAX_INT) > 0 || bi.compareTo(PyInteger.MIN_INT) < 0) {
-                throw Py.OverflowError("long int too large to convert to int");
-            }
-            return bi.intValue();
-        } catch (NumberFormatException exc) {
-            throw Py.ValueError("invalid literal for int() with base " + base + ": '" + s
-                    + "'");
-        } catch (StringIndexOutOfBoundsException exc) {
-            throw Py.ValueError("invalid literal for int() with base " + base + ": '" + s
-                    + "'");
-        }
-    }
-
     /**
      * Convert this PyBytes to a floating-point value according to Python rules.
      *

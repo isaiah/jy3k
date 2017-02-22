@@ -535,10 +535,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.atol(getString(), base);
     }
 
-    public PyLong atoi(int base) {
-        return new PyLong(Encoding.atoi(getString(), base));
-    }
-
     public double atof() {
         return Encoding.atof(getString());
     }
