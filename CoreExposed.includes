@@ -141,6 +141,8 @@ org/python/modules/sre/PatternObject.class
 org/python/modules/sre/ScannerObject.class
 org/python/modules/subprocess/PyCompletedProcess.class
 org/python/modules/subprocess/PyPopen.class
+org/python/modules/sys/FloatInfo.class
+org/python/modules/sys/IntInfo.class
 org/python/modules/thread/PyLocal.class
 org/python/modules/time/PyTimeTuple.class
 org/python/modules/unicodedata/UCD.class
