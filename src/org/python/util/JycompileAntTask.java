@@ -37,7 +37,7 @@ public class JycompileAntTask extends GlobMatchingTask {
     private void filter(File[] files) {
         for (File src : files) {
             if (src.isDirectory()) {
-                if (!src.toPath().endsWith(imp.CACHEDIR) && !src.toPath().endsWith("test")) {
+                if (!src.toPath().endsWith(imp.CACHEDIR) && !src.toPath().endsWith("test") && !src.toPath().endsWith("tests")) {
                     filter(src.listFiles());
                 }
                 continue;
