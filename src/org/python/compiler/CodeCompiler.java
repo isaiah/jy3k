@@ -2876,6 +2876,46 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public Object visitJoinedStr(JoinedStr node) throws Exception {
+        java.util.List<expr> values = node.getInternalValues();
+        int array = code.getLocal(ci(PyUnicode[].class));
+        int n = values.size();
+        code.iconst(n);
+        code.anewarray(p(PyUnicode.class));
+        code.astore(array);
+
+        for (int i = 0; i < values.size(); i++) {
+            visit(values.get(i));
+            code.aload(array);
+            code.swap();
+            code.iconst(i);
+            code.swap();
+            code.aastore();
+        }
+        code.aload(array);
+        code.invokestatic(p(Py.class), "buildString", sig(PyObject.class, PyUnicode[].class));
+        return null;
+    }
+
+    @Override
+    public Object visitFormattedValue(FormattedValue node) throws Exception {
+        visit(node.getInternalValue());
+        int conversion = node.getInternalConversion();
+        if (conversion == 'r') {
+            code.invokevirtual(p(PyObject.class), "__repr__", sig(PyUnicode.class));
+        } else {
+            code.invokevirtual(p(PyObject.class), "__str__", sig(PyUnicode.class));
+        }
+        expr formatSpec = node.getInternalFormat_spec();
+        if (formatSpec != null) {
+            visit(formatSpec);
+            code.invokevirtual(p(PyObject.class), "__format__", sig(PyObject.class, PyObject.class));
+            code.checkcast(p(PyUnicode.class));
+        }
+        return null;
+    }
+
+    @Override
     public Object visitBytes(Bytes node) throws Exception {
         module.constant(node).get(code);
         return null;

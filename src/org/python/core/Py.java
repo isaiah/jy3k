@@ -2089,6 +2089,11 @@ public final class Py {
      */
     private static ExtensiblePyObjectAdapter adapter;
 
+    /** concat an array of strings, used by byte compiler */
+    public static PyObject buildString(PyUnicode[] strs) {
+        return EmptyUnicode.join(new PyTuple(strs));
+    }
+
     // XXX: The following two makeClass overrides are *only* for the
     // old compiler, they should be removed when the newcompiler hits
     public static PyObject makeClass(String name, PyObject[] bases, PyObject metaclass, PyCode code) {

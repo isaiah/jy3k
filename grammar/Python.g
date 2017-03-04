@@ -1965,12 +1965,7 @@ atom
        }
      | (S+=STRING)+
        {
-           Object str = actions.extractStrings($S, encoding, unicodeLiterals);
-           if (str instanceof String) {
-               etype = new Bytes(actions.extractStringToken($S), (String) str);
-           } else {
-               etype = new Str(actions.extractStringToken($S), str);
-           }
+           etype = actions.parsestrplus($S, encoding);
        }
      ;
 
@@ -2565,7 +2560,7 @@ NAME : LETTER ( LETTER | DIGITS)*
  *  should make us exit loop not continue.
  */
 STRING
-    :   ('r'|'u'|'b'|'ur'|'br'|'R'|'U'|'B'|'UR'|'BR'|'uR'|'Ur'|'Br'|'bR'|'rb'|'rB'|'Rb'|'RB')?
+    :   ('r'|'u'|'b'|'ur'|'br'|'R'|'U'|'B'|'UR'|'BR'|'uR'|'Ur'|'Br'|'bR'|'rb'|'rB'|'Rb'|'RB'|'f'|'F'|'fr'|'fR'|'Fr'|'FR'|'rf'|'rF'|'Rf'|'RF')?
         (   '\'\'\'' (options {greedy=false;}:TRIAPOS)* '\'\'\''
         |   '"""' (options {greedy=false;}:TRIQUOTE)* '"""'
         |   '"' (ESC|~('\\'|'\n'|'"'))* '"'
