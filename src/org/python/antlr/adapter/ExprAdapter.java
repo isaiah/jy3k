@@ -10,7 +10,6 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -21,7 +20,7 @@ public class ExprAdapter implements AstAdapter {
         if (o instanceof expr) {
             return o;
         }
-        if (o instanceof PyInteger || o instanceof PyLong || o instanceof PyFloat || o instanceof PyComplex) {
+        if (o instanceof PyLong || o instanceof PyFloat || o instanceof PyComplex) {
             return new Num(o);
         }
         if (o instanceof PyBytes || o instanceof PyUnicode) {

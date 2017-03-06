@@ -20,7 +20,7 @@ import org.python.util.PythonInterpreter;
  * <li>construction of a correct internal buffer through the init methods</li>.
  * <li>access methods for immutable types (such as {@link PySequence#getslice(int, int, int)}</li>.
  * <li>access methods for mutable types throw Exceptions</li>.
- * <li>the java.util.List<PyInteger> interface</li>.
+ * <li>the java.util.List<PyLong> interface</li>.
  * </ul>
  * From this list the test currently lacks testing deletion, testing the List API and memoryview.
  * <p>
@@ -139,18 +139,18 @@ public class BaseBytesTest extends TestCase {
     }
 
     /**
-     * Compare expected List<PyInteger> and result array in their entirety.
+     * Compare expected List<PyLong> and result array in their entirety.
      *
      * @param expected
      * @param result
      */
-    static void checkInts(List<PyInteger> expected, BaseBytes result) {
+    static void checkInts(List<PyLong> expected, BaseBytes result) {
         // Size must be the same
         assertEquals("size", expected.size(), result.size());
         // And each element
         for (int i = 0; i < result.size; i++) {
-            PyInteger res = result.pyget(i);
-            PyInteger exp = expected.get(i);
+            PyLong res = result.pyget(i);
+            PyLong exp = expected.get(i);
             // System.out.printf("    expected[%2d]=%3d  b[%2d]=%3d\n",
             // i, exp.asInt(), i, res.asInt());
             assertEquals("element value", exp, res);
@@ -158,12 +158,12 @@ public class BaseBytesTest extends TestCase {
     }
 
     /**
-     * Compare expected List<PyInteger> and result object in their entirety.
+     * Compare expected List<PyLong> and result object in their entirety.
      *
      * @param expected
      * @param result
      */
-    static void checkInts(List<PyInteger> expected, PyObject result) {
+    static void checkInts(List<PyLong> expected, PyObject result) {
         checkInts(expected, (BaseBytes)result);
     }
 
@@ -179,7 +179,7 @@ public class BaseBytesTest extends TestCase {
         for (int b : source) {
             switch (choose++) {
                 case 0:
-                    PyInteger i = new PyInteger(b);
+                    PyLong i = new PyLong(b);
                     list.add(i);
                     break;
 
@@ -276,7 +276,7 @@ public class BaseBytesTest extends TestCase {
     public void testInit_PyObject() {
         // A scary set of objects
         final PyObject[] brantub =
-                {null, new PyInteger(5), new PyBytes("\u00A0\u00A1\u00A2\u00A3\u00A4"),
+                {null, new PyLong(5), new PyBytes("\u00A0\u00A1\u00A2\u00A3\u00A4"),
                         getInstance(new int[] {180, 190, 200}), new PyRange(1, 301, 50)};
         // The array contents we should obtain
         final int[][] prize =
@@ -301,7 +301,7 @@ public class BaseBytesTest extends TestCase {
         // Need interpreter for Exceptions to be formed properly
         interp = new PythonInterpreter();
         // A scary set of objects
-        final PyObject[] brantub = {Py.None, new PyInteger(-1), //
+        final PyObject[] brantub = {Py.None, new PyLong(-1), //
                 new PyLong(0x80000000L), //
                 new PyRange(3, -2, -1), //
                 new PyRange(250, 257) //
@@ -338,14 +338,14 @@ public class BaseBytesTest extends TestCase {
         int[] aRef = randomInts(random, MEDIUM);
         BaseBytes a = getInstance(aRef);
         for (int i = 0; i < MEDIUM; i++) {
-            PyInteger r = a.pyget(i);
+            PyLong r = a.pyget(i);
             // System.out.printf("    aRef[%2d]=%3d  r=%3d\n", i, aRef[i], r.asInt());
             assertEquals(aRef[i], r.asInt());
         }
         // Check IndexError Exceptions generated
         for (int i : new int[] {-1, -100, MEDIUM, MEDIUM + 1}) {
             try {
-                PyInteger r = a.pyget(i);
+                PyLong r = a.pyget(i);
                 fail("Exception not thrown for pyget(" + i + ") =" + r);
             } catch (PyException pye) {
                 assertEquals(Py.IndexError, pye.type);
@@ -365,7 +365,7 @@ public class BaseBytesTest extends TestCase {
         final int L = ver.length();
         int[] aRef = toInts(ver);
         BaseBytes a = getInstance(aRef);
-        List<PyInteger> bList = new ArrayList<PyInteger>(L);
+        List<PyLong> bList = new ArrayList<PyLong>(L);
 
         final int[] posStart = new int[] {0, 1, 18, L - 8, L - 1};
         final int[] negStart = new int[] {0, 3, 16, L - 10, L - 1};
@@ -379,7 +379,7 @@ public class BaseBytesTest extends TestCase {
                     bList.clear();
                     for (int i = start; i < stop; i += step) {
                         // System.out.printf("    (%d,%d,%d) i=%d\n", start, stop, step, i);
-                        bList.add(new PyInteger(aRef[i]));
+                        bList.add(new PyLong(aRef[i]));
                     }
                     // Generate test result
                     // System.out.printf("    getslice(%d,%d,%d)\n", start, stop, step);
@@ -400,7 +400,7 @@ public class BaseBytesTest extends TestCase {
                     bList.clear();
                     for (int i = start; i > stop; i += step) {
                         // System.out.printf("    (%d,%d,%d) i=%d\n", start, stop, step, i);
-                        bList.add(new PyInteger(aRef[i]));
+                        bList.add(new PyLong(aRef[i]));
                     }
                     // Generate test result
                     // System.out.printf("    getslice(%d,%d,%d)\n", start, stop, step);
@@ -447,7 +447,7 @@ public class BaseBytesTest extends TestCase {
         int[] aRef = toInts("This immutable type seems to allow modifications.");
         BaseBytes a = getInstance(aRef);
         int start = a.size() / 2;
-        PyInteger x = new PyInteger('x');
+        PyLong x = new PyLong('x');
 
         try {
             a.pyset(start, x);

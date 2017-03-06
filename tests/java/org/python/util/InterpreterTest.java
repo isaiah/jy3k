@@ -8,7 +8,7 @@ import org.python.core.Console;
 import org.python.core.PlainConsole;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
-import org.python.core.PyInteger;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 
@@ -34,7 +34,7 @@ public class InterpreterTest extends TestCase {
                 public void run() {
                     PythonInterpreter interp = new PythonInterpreter();
                     interp.exec("import sys");
-                    interp.set("a", new PyInteger(41));
+                    interp.set("a", new PyLong(41));
                     int set = Py.tojava(interp.get("a"), Integer.class);
                     assertEquals(41, set);
                     interp.exec("x = 'hello ' + 'goodbye'");
@@ -60,7 +60,7 @@ public class InterpreterTest extends TestCase {
                     "        return self.val");
         PyObject blahClass = interp.get("Blah");
         int base = 42;
-        PyObject blahInstance = blahClass.__call__(new PyInteger(base));
+        PyObject blahInstance = blahClass.__call__(new PyLong(base));
         for (int i = 0; i < 4; i++) {
             assertEquals(++base, blahInstance.invoke("incval").__tojava__(Integer.class));
         }

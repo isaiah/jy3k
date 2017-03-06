@@ -2,7 +2,7 @@ package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyInteger;
+import org.python.core.PyLong;
 import org.python.core.PyIterator;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
@@ -40,7 +40,7 @@ public class islice extends PyIterator {
      */
     public islice(PyObject iterable, PyObject stopObj) {
         super();
-        islice___init__(iterable, new PyInteger(0), stopObj, new PyInteger(1));
+        islice___init__(iterable, new PyLong(0), stopObj, new PyLong(1));
     }
 
     /**
@@ -49,7 +49,7 @@ public class islice extends PyIterator {
     public islice(PyObject iterable, PyObject start,
                                     PyObject stopObj) {
         super();
-        islice___init__(iterable, start, stopObj, new PyInteger(1));
+        islice___init__(iterable, start, stopObj, new PyLong(1));
     }
 
     @ExposedNew
@@ -61,13 +61,13 @@ public class islice extends PyIterator {
         PyObject iterable = ap.getPyObject(0);
         if (args.length == 2) {
             PyObject stopObj = ap.getPyObject(1);
-            islice___init__(iterable, new PyInteger(0), stopObj, new PyInteger(1));
+            islice___init__(iterable, new PyLong(0), stopObj, new PyLong(1));
         }
         else {
             PyObject startObj = ap.getPyObject(1);
             PyObject stopObj = ap.getPyObject(2);
             if (args.length == 3) {
-                islice___init__(iterable, startObj, stopObj, new PyInteger(1));
+                islice___init__(iterable, startObj, stopObj, new PyLong(1));
             }
             else {
                 PyObject stepObj = ap.getPyObject(3);

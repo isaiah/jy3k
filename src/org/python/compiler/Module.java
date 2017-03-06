@@ -23,7 +23,6 @@ import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyFrame;
 import org.python.core.PyFunctionTable;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyRunnable;
@@ -39,39 +38,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import static org.python.util.CodegenUtils.*;
-
-class PyIntegerConstant extends Constant implements ClassConstants, Opcodes {
-
-    final int value;
-
-    PyIntegerConstant(int value) {
-        this.value = value;
-    }
-
-    @Override
-    void get(Code c) throws IOException {
-        c.iconst(value);  // it would be nice if we knew we didn't have to box next
-        c.invokestatic(p(Py.class), "newInteger", sig(PyInteger.class, Integer.TYPE));
-    }
-
-    @Override
-    void put(Code c) throws IOException {}
-
-    @Override
-    public int hashCode() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof PyIntegerConstant) {
-            return ((PyIntegerConstant)o).value == value;
-        } else {
-            return false;
-        }
-    }
-}
-
 
 class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
 
@@ -522,10 +488,6 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         throw new RuntimeException("unexpected constant: " + node.toString());
     }
 
-    Constant integerConstant(int value) {
-        return findConstant(new PyIntegerConstant(value));
-    }
-
     Constant floatConstant(double value) {
         return findConstant(new PyFloatConstant(value));
     }
@@ -755,9 +717,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     public void emitNum(Num node, Code code) throws Exception {
-        if (node.getInternalN() instanceof PyInteger) {
-            integerConstant(((PyInteger)node.getInternalN()).getValue()).get(code);
-        } else if (node.getInternalN() instanceof PyLong) {
+        if (node.getInternalN() instanceof PyLong) {
             longConstant(((PyObject)node.getInternalN()).__str__().toString()).get(code);
         } else if (node.getInternalN() instanceof PyFloat) {
             floatConstant(((PyFloat)node.getInternalN()).getValue()).get(code);

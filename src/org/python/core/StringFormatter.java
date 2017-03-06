@@ -114,16 +114,16 @@ final class StringFormatter {
     }
 
     /**
-     * Return the argument as either a {@link PyInteger} or a {@link PyLong} according to its
+     * Return the argument as either a a {@link PyLong} according to its
      * <code>__int__</code> method, or its <code>__int__</code> method. If the argument has neither
      * method, or both raise an exception, we return the argument itself. The caller must check the
      * return type.
      *
      * @param arg to convert
-     * @return PyInteger or PyLong if possible
+     * @return PyLong if possible
      */
     private PyObject asNumber(PyObject arg) {
-        if (arg instanceof PyInteger || arg instanceof PyLong) {
+        if (arg instanceof PyLong) {
             // arg is already acceptable
             return arg;
 
@@ -438,9 +438,7 @@ final class StringFormatter {
                         PyObject argAsNumber = asNumber(arg);
 
                         // We have to check what we got back.
-                        if (argAsNumber instanceof PyInteger) {
-                            fi.format(((PyInteger)argAsNumber).getValue());
-                        } else if (argAsNumber instanceof PyLong) {
+                        if (argAsNumber instanceof PyLong) {
                             fi.format(((PyLong)argAsNumber).getValue());
                         } else {
                             // It couldn't be converted, raise the error here

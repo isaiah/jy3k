@@ -426,7 +426,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      * of exactly that many elements (or convertible to such a sequence).
      * <p>
      * When assigning from a sequence type or iterator, the sequence may contain arbitrary
-     * {@link PyObject}s, but acceptable ones are {@link PyInteger}, {@link PyLong} or
+     * {@link PyObject}s, but acceptable ones are {@link PyLong} or
      * {@link PyBytes} of length 1. If any one of them proves unsuitable for assignment to a Python
      * <code>bytearray</code> element, an exception is thrown and this <code>bytearray</code> is
      * unchanged.
@@ -964,7 +964,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
 
     /**
      * Append a single element to the end of the array, equivalent to:
-     * <code>s[len(s):len(s)] = o</code>. The argument must be a PyInteger, PyLong or string of
+     * <code>s[len(s):len(s)] = o</code>. The argument must be a PyLong or string of
      * length 1.
      *
      * @param element the item to append.
@@ -1554,9 +1554,9 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     /**
      * Remove and return the last element in the byte array.
      *
-     * @return PyInteger representing the value
+     * @return PyLong representing the value
      */
-    public PyInteger pop() {
+    public PyLong pop() {
         return bytearray_pop(-1);
     }
 
@@ -1564,14 +1564,14 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      * Remove and return the <code>n</code>th byte element in the array.
      *
      * @param i the index of the byte to remove and return.
-     * @return PyInteger representing the value
+     * @return PyLong representing the value
      */
-    public PyInteger pop(int i) {
+    public PyLong pop(int i) {
         return bytearray_pop(i);
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.bytearray_pop_doc)
-    final synchronized PyInteger bytearray_pop(int i) {
+    final synchronized PyLong bytearray_pop(int i) {
         if (size == 0) {
             throw Py.IndexError("pop from empty list");
         } else {
@@ -1592,7 +1592,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     /**
      * Remove the first occurrence of an element from the array, equivalent to:
      * <code>del s[s.index(x)]</code>, although x must be convertable to a single byte value. The
-     * argument must be a PyInteger, PyLong or string of length 1.
+     * argument must be a PyLong or string of length 1.
      *
      * @param o the value to remove from the list.
      * @throws PyException ValueError if o not found in <code>bytearray</code>

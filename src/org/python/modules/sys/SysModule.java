@@ -22,6 +22,8 @@ public class SysModule {
     @ModuleInit
     public static final void classDictInit(PyObject dict) {
         dict.__setitem__("hash_info", new HashInfo());
+        dict.__setitem__("int_info", new IntInfo());
+        dict.__setitem__("float_info", new FloatInfo());
     }
 
     @ExposedFunction(names = "exc_info", doc = BuiltinDocs.sys_exc_info_doc)

@@ -80,129 +80,129 @@ public class StringFormatTest extends TestCase {
     }
 
     /**
-     * Test the IntegerFormatter returned by {@link PyInteger#prepareFormat}. This is based on the
-     * original <code>testFormatIntOrLong</code> which tested <code>PyInteger.formatIntOrLong</code>
+     * Test the IntegerFormatter returned by {@link PyLong#prepareFormat}. This is based on the
+     * original <code>testFormatIntOrLong</code> which tested <code>PyLong.formatIntOrLong</code>
      * .
      */
     public void testPrepareFormatter() {
         int v = 123;
         IntegerFormatter f;
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("d"));
         assertEquals("123", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("o"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("o"));
         assertEquals("173", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("x"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("x"));
         assertEquals("7b", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("X"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("X"));
         assertEquals("7B", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("b"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("b"));
         assertEquals("1111011", f.format(v).pad().getResult());
 
         int v2 = 1234567890;
-        f = PyInteger.prepareFormatter(InternalFormat.fromText(",d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText(",d"));
         assertEquals("1,234,567,890", f.format(v2).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("#o"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("#o"));
         assertEquals("0o173", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("#X"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("#X"));
         assertEquals("0X7B", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         assertEquals("{", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("+d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("+d"));
         assertEquals("+123", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText(" d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText(" d"));
         assertEquals(" 123", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("5"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("5"));
         assertEquals("  123", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("^6"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("^6"));
         assertEquals(" 123  ", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("~<5"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("~<5"));
         assertEquals("123~~", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("0=+6"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("0=+6"));
         assertEquals("+00123", f.format(v).pad().getResult());
 
         assertValueError("0=+6.1", "Precision not allowed in integer format specifier");
         assertValueError("+c", "Sign not allowed with integer format specifier 'c'");
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         f.setBytes(true);
         assertOverflowError(256, f, "%c arg not in range(0x100)");
         assertOverflowError(-1, f, "%c arg not in range(0x100)");
         assertOverflowError(0x110000, f, "%c arg not in range(0x100)");
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         assertOverflowError(0x110000, f, "%c arg not in range(0x110000)");
         assertOverflowError(-1, f, "%c arg not in range(0x110000)");
     }
 
     /**
-     * Test the IntegerFormatter returned by {@link PyInteger#prepareFormat}. This is based on the
-     * original <code>testFormatIntOrLong</code> which tested <code>PyInteger.formatIntOrLong</code>
+     * Test the IntegerFormatter returned by {@link PyLong#prepareFormat}. This is based on the
+     * original <code>testFormatIntOrLong</code> which tested <code>PyLong.formatIntOrLong</code>
      * .
      */
     public void testPrepareFormatterLong() {
         BigInteger v = BigInteger.valueOf(123);
         IntegerFormatter f;
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("d"));
         assertEquals("123", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("o"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("o"));
         assertEquals("173", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("x"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("x"));
         assertEquals("7b", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("X"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("X"));
         assertEquals("7B", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("b"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("b"));
         assertEquals("1111011", f.format(v).pad().getResult());
 
         BigInteger v2 = BigInteger.valueOf(1234567890);
-        f = PyInteger.prepareFormatter(InternalFormat.fromText(",d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText(",d"));
         assertEquals("1,234,567,890", f.format(v2).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("#o"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("#o"));
         assertEquals("0o173", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("#X"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("#X"));
         assertEquals("0X7B", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         assertEquals("{", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("+d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("+d"));
         assertEquals("+123", f.format(v).pad().getResult());
-        f = PyInteger.prepareFormatter(InternalFormat.fromText(" d"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText(" d"));
         assertEquals(" 123", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("5"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("5"));
         assertEquals("  123", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("^6"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("^6"));
         assertEquals(" 123  ", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("~<5"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("~<5"));
         assertEquals("123~~", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("0=+6"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("0=+6"));
         assertEquals("+00123", f.format(v).pad().getResult());
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         f.setBytes(true);
         assertOverflowError(BigInteger.valueOf(256), f, "%c arg not in range(0x100)");
         assertOverflowError(BigInteger.valueOf(-1), f, "%c arg not in range(0x100)");
         assertOverflowError(BigInteger.valueOf(0x110000), f, "%c arg not in range(0x100)");
 
-        f = PyInteger.prepareFormatter(InternalFormat.fromText("c"));
+        f = PyLong.prepareFormatter(InternalFormat.fromText("c"));
         assertOverflowError(BigInteger.valueOf(0x110000), f, "%c arg not in range(0x110000)");
         assertOverflowError(BigInteger.valueOf(-1), f, "%c arg not in range(0x110000)");
     }
 
     private void assertValueError(String formatSpec, String expected) {
         try {
-            IntegerFormatter f = PyInteger.prepareFormatter(InternalFormat.fromText(formatSpec));
+            IntegerFormatter f = PyLong.prepareFormatter(InternalFormat.fromText(formatSpec));
             // f.format(123).pad().getResult();
             fail("ValueError not thrown, expected: " + expected);
         } catch (PyException pye) {
@@ -211,7 +211,7 @@ public class StringFormatTest extends TestCase {
     }
 
     private void assertOverflowError(int v, IntegerFormatter f, String expected) {
-        // Test with Java int for PyInteger
+        // Test with Java int for PyLong
         try {
             f.format(v).pad().getResult();
             fail("OverflowError not thrown, expected: " + expected);

@@ -4,7 +4,6 @@ package org.python.modules.jffi;
 import java.math.BigInteger;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 
@@ -102,8 +101,8 @@ final class Util {
         if (l instanceof PyLong) {
             return ((PyLong) l).getValue().longValue();
 
-        } else if (l instanceof PyInteger) {
-            return ((PyInteger) l).getValue();
+        } else if (l instanceof PyLong) {
+            return ((PyLong) l).getValue().intValue();
         }
 
         throw Py.TypeError("invalid __int__() result");
@@ -119,8 +118,6 @@ final class Util {
     static final DirectMemory getMemoryForAddress(PyObject address) {
         if (address instanceof Pointer) {
             return ((Pointer) address).getMemory();
-        } else if (address instanceof PyInteger) {
-            return new NativeMemory(address.asInt());
         } else if (address instanceof PyLong) {
             return new NativeMemory(((PyLong) address).getValue().longValue());
         }
@@ -132,10 +129,7 @@ final class Util {
     }
 
     public static int intValue(PyObject parameter) {
-        if (parameter instanceof PyInteger) {
-            return ((PyInteger) parameter).getValue();
-
-        } else if (parameter instanceof PyLong) {
+        if (parameter instanceof PyLong) {
             return ((PyLong) parameter).getValue().intValue();
 
         } else if (parameter instanceof ScalarCData) {
@@ -147,10 +141,7 @@ final class Util {
     }
 
     public static long longValue(PyObject parameter) {
-        if (parameter instanceof PyInteger) {
-            return ((PyInteger) parameter).getValue();
-
-        } else if (parameter instanceof PyLong) {
+        if (parameter instanceof PyLong) {
             return ((PyLong) parameter).getValue().longValue();
 
         } else if (parameter instanceof ScalarCData) {

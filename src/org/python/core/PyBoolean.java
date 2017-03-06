@@ -12,7 +12,7 @@ import org.python.expose.MethodType;
  */
 @Untraversable
 @ExposedType(name = "bool", isBaseType = false, doc = BuiltinDocs.bool_doc)
-public class PyBoolean extends PyInteger {
+public class PyBoolean extends PyLong {
 
     public static final PyType TYPE = PyType.fromClass(PyBoolean.class);
 
@@ -20,11 +20,6 @@ public class PyBoolean extends PyInteger {
 
     public boolean getBooleanValue() {
         return value;
-    }
-
-    @Override
-    public int getValue() {
-        return getBooleanValue() ? 1 : 0;
     }
 
     public PyBoolean(boolean value) {
@@ -79,22 +74,22 @@ public class PyBoolean extends PyInteger {
             return Boolean.valueOf(getBooleanValue());
         }
         if (c == Integer.TYPE || c == Number.class || c == Integer.class) {
-            return Integer.valueOf(getValue());
+            return Integer.valueOf(asInt());
         }
         if (c == Byte.TYPE || c == Byte.class) {
-            return Byte.valueOf((byte)(getValue()));
+            return Byte.valueOf((byte)(asInt()));
         }
         if (c == Short.TYPE || c == Short.class) {
-            return Short.valueOf((short)(getValue()));
+            return Short.valueOf((short)(asInt()));
         }
         if (c == Long.TYPE || c == Long.class) {
-            return Long.valueOf(getValue());
+            return Long.valueOf(asInt());
         }
         if (c == Float.TYPE || c == Float.class) {
-            return Float.valueOf(getValue());
+            return Float.valueOf(asInt());
         }
         if (c == Double.TYPE || c == Double.class) {
-            return Double.valueOf(getValue());
+            return Double.valueOf(asInt());
         }
         return super.__tojava__(c);
     }
@@ -108,8 +103,8 @@ public class PyBoolean extends PyInteger {
     final PyObject bool___and__(PyObject right) {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() & ((PyBoolean) right).getBooleanValue());
-    	} else if (right instanceof PyInteger) {
-            return Py.newInteger(getValue() & ((PyInteger)right).getValue());
+    	} else if (right instanceof PyLong) {
+            return new PyLong(asInt() & ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -124,8 +119,8 @@ public class PyBoolean extends PyInteger {
     final PyObject bool___xor__(PyObject right) {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() ^ ((PyBoolean) right).getBooleanValue());
-    	} else if (right instanceof PyInteger) {
-            return Py.newInteger(getValue() ^ ((PyInteger)right).getValue());
+    	} else if (right instanceof PyLong) {
+            return new PyLong(asInt() ^ ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -140,8 +135,8 @@ public class PyBoolean extends PyInteger {
     final PyObject bool___or__(PyObject right) {
     	if (right instanceof PyBoolean) {
 	        return Py.newBoolean(getBooleanValue() | ((PyBoolean) right).getBooleanValue());
-    	} else if (right instanceof PyInteger) {
-            return Py.newInteger(getValue() | ((PyInteger)right).getValue());
+    	} else if (right instanceof PyLong) {
+            return new PyLong(asInt() | ((PyLong)right).asInt());
         } else {
 	    	return null;
 	    }
@@ -164,7 +159,7 @@ public class PyBoolean extends PyInteger {
 
     @ExposedMethod(doc = BuiltinDocs.bool___pos___doc)
     final PyObject bool___pos__() {
-        return Py.newInteger(getValue());
+        return Py.newInteger(asInt());
     }
 
     @Override
@@ -174,6 +169,6 @@ public class PyBoolean extends PyInteger {
 
     @ExposedMethod(doc = BuiltinDocs.bool___abs___doc)
     final PyObject bool___abs__() {
-        return Py.newInteger(getValue());
+        return Py.newInteger(asInt());
     }
 }

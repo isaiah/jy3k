@@ -10,7 +10,6 @@ import java.util.Random;
 
 import org.python.core.Py;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -38,7 +37,7 @@ public class PyRandom extends PyObject {
     protected Random javaRandom = new Random();
 
     /**
-     * Sets the seed of the internal number generated to seed. If seed is a PyInteger or PyLong, it
+     * Sets the seed of the internal number generated to seed. If seed is a PyLong, it
      * uses the value, else it uses the hash function of PyObject
      */
     @ExposedMethod(defaults = "null")
@@ -50,8 +49,6 @@ public class PyRandom extends PyObject {
         if (seed instanceof PyLong) {
             PyLong max = new PyLong(Long.MAX_VALUE);
             n = seed.__mod__(max).asLong();
-        } else if (seed instanceof PyInteger) {
-            n = seed.asLong();
         } else {
             n = seed.hashCode();
         }
@@ -64,7 +61,7 @@ public class PyRandom extends PyObject {
 
     @ExposedMethod
     final void Random_jumpahead(PyObject arg0) {
-        if (!(arg0 instanceof PyInteger || arg0 instanceof PyLong)) {
+        if (!(arg0 instanceof PyLong)) {
             throw Py.TypeError(String.format("jumpahead requires an integer, not '%s'",
                                              arg0.getType().fastGetName()));
         }
@@ -107,9 +104,9 @@ public class PyRandom extends PyObject {
             ObjectOutputStream oout=new ObjectOutputStream(bout);
             oout.writeObject(this.javaRandom);
             byte b[]=bout.toByteArray();
-            PyInteger retarr[]=new PyInteger[b.length];
+            PyLong retarr[]=new PyLong[b.length];
             for (int i=0;i<b.length;i++) {
-                retarr[i]=new PyInteger(b[i]);
+                retarr[i]=new PyLong(b[i]);
             }
             PyTuple ret=new PyTuple(retarr);
             return ret;

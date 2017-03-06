@@ -12,7 +12,6 @@ import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
@@ -1591,26 +1590,6 @@ public class Encoding {
             bi = new BigInteger(s.toString(), base);
         }
         return bi;
-    }
-
-    public static final int atoi(CharSequence s, int base) {
-        if ((base != 0 && base < 2) || (base > 36)) {
-            throw Py.ValueError("invalid base for atoi()");
-        }
-
-        try {
-            BigInteger bi = asciiToBigInteger(s, base, false);
-            if (bi.compareTo(PyInteger.MAX_INT) > 0 || bi.compareTo(PyInteger.MIN_INT) < 0) {
-                throw Py.OverflowError("long int too large to convert to int");
-            }
-            return bi.intValue();
-        } catch (NumberFormatException exc) {
-            throw Py.ValueError("invalid literal for int() with base " + base + ": '" + s
-                    + "'");
-        } catch (StringIndexOutOfBoundsException exc) {
-            throw Py.ValueError("invalid literal for int() with base " + base + ": '" + s
-                    + "'");
-        }
     }
 
     /**

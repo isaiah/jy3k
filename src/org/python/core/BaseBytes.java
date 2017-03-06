@@ -15,7 +15,7 @@ import java.util.ListIterator;
  * most of the Java API, including Java {@link List} behaviour. Attempts to modify the contents
  * through this API will throw a <code>TypeError</code> if the actual type of the object is not
  * mutable. It is possible for a Java client to treat this class as a
- * <code>List&lt;PyInteger></code>, obtaining equivalent functionality to the Python interface in a
+ * <code>List&lt;PyLong></code>, obtaining equivalent functionality to the Python interface in a
  * Java paradigm.
  * <p>
  * Subclasses must define (from {@link PySequence}):
@@ -51,7 +51,7 @@ import java.util.ListIterator;
  * methods for more information.
  */
 @Untraversable
-public abstract class BaseBytes extends PySequence implements List<PyInteger> {
+public abstract class BaseBytes extends PySequence implements List<PyLong> {
 
     /**
      * Constructs a zero-length <code>BaseBytes</code> of explicitly-specified sub-type.
@@ -581,14 +581,14 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
     }
 
     /**
-     * Check that the value of an PyInteger is suitable for storage in a (Python) byte array, and
+     * Check that the value of an PyLong is suitable for storage in a (Python) byte array, and
      * convert it to the Java byte value that can be stored there. (Java bytes run -128..127 whereas
      * Python bytes run 0..255.)
      *
      * @param value to convert.
      * @throws PyException (ValueError) if value<0 or value>255
      */
-    protected static final byte byteCheck(PyInteger value) throws PyException {
+    protected static final byte byteCheck(PyLong value) throws PyException {
         return byteCheck(value.asInt());
     }
 
@@ -597,7 +597,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * and convert it to the Java byte value that can be stored there. (Java bytes run -128..127
      * whereas Python bytes run 0..255.) Acceptable types are:
      * <ul>
-     * <li>PyInteger in range 0 to 255 inclusive</li>
+     * <li>PyLong in range 0 to 255 inclusive</li>
      * <li>PyLong in range 0 to 255 inclusive</li>
      * <li>Any type having an __index__() method, in range 0 to 255 inclusive</li>
      * <li>PyBytes of length 1</li>
@@ -679,8 +679,8 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * ============================================================================================
      */
     @Override
-    protected PyInteger pyget(int index) {
-        return new PyInteger(intAt(index));
+    protected PyLong pyget(int index) {
+        return new PyLong(intAt(index));
     }
 
     /*
@@ -3700,7 +3700,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
 
     /*
      * ============================================================================================
-     * API for java.util.List<PyInteger>
+     * API for java.util.List<PyLong>
      * ============================================================================================
      */
 
@@ -3708,10 +3708,10 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * Access to the byte array as a {@link java.util.List}. The List interface supplied by
      * BaseBytes delegates to this object.
      */
-    protected final List<PyInteger> listDelegate = new AbstractList<PyInteger>() {
+    protected final List<PyLong> listDelegate = new AbstractList<PyLong>() {
 
         @Override
-        public PyInteger get(int index) {
+        public PyLong get(int index) {
             // Not using __getitem__ as it applies Python index semantics to e.g. b[-1].
             indexCheck(index);
             return pyget(index);
@@ -3733,10 +3733,10 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
          * @throws PyException (ValueError) if element<0 or element>255
          */
         @Override
-        public PyInteger set(int index, PyInteger element) throws PyException {
+        public PyLong set(int index, PyLong element) throws PyException {
             // Not using __setitem__ as it applies Python index semantics to e.g. b[-1].
             indexCheck(index);
-            PyInteger result = pyget(index);
+            PyLong result = pyget(index);
             pyset(index, element);      // TypeError if immutable
             return result;
         }
@@ -3751,7 +3751,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
          * @throws PyException (TypeError) if the owning concrete subclass is immutable
          */
         @Override
-        public void add(int index, PyInteger element) throws PyException {
+        public void add(int index, PyLong element) throws PyException {
             // Not using __setitem__ as it applies Python index semantics to e.g. b[-1].
             indexCheck(index);
             pyinsert(index, element);          // TypeError if immutable
@@ -3766,10 +3766,10 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
          * @throws PyException (IndexError) if the index is outside the array bounds
          */
         @Override
-        public PyInteger remove(int index) {
+        public PyLong remove(int index) {
             // Not using __delitem__ as it applies Python index semantics to e.g. b[-1].
             indexCheck(index);
-            PyInteger result = pyget(index);
+            PyLong result = pyget(index);
             del(index);      // TypeError if immutable
             return result;
         }
@@ -3796,7 +3796,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
 
     /**
      * Returns true if this list contains the specified value. More formally, returns true if and
-     * only if this list contains at least one integer e such that o.equals(PyInteger(e)).
+     * only if this list contains at least one integer e such that o.equals(PyLong(e)).
      */
     @Override
     public boolean contains(Object o) {
@@ -3807,7 +3807,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#iterator()
      */
     @Override
-    public Iterator<PyInteger> iterator() {
+    public Iterator<PyLong> iterator() {
         return listDelegate.iterator();
     }
 
@@ -3831,7 +3831,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#add(java.lang.Object)
      */
     @Override
-    public boolean add(PyInteger o) {
+    public boolean add(PyLong o) {
         return listDelegate.add(o);
     }
 
@@ -3855,7 +3855,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#addAll(java.util.Collection)
      */
     @Override
-    public boolean addAll(Collection<? extends PyInteger> c) {
+    public boolean addAll(Collection<? extends PyLong> c) {
         return listDelegate.addAll(c);
     }
 
@@ -3863,7 +3863,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#addAll(int, java.util.Collection)
      */
     @Override
-    public boolean addAll(int index, Collection<? extends PyInteger> c) {
+    public boolean addAll(int index, Collection<? extends PyLong> c) {
         return listDelegate.addAll(index, c);
     }
 
@@ -3896,7 +3896,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * the case where <code>other</code> is a <code>PyObject</code>, the comparison used is the
      * standard Python <code>==</code> operation through <code>PyObject</code>. When
      * <code>other</code> is not a <code>PyObject</code>, this object acts as a
-     * <code>List&lt;PyInteger></code>.
+     * <code>List&lt;PyLong></code>.
      *
      * @see java.util.List#equals(java.lang.Object)
      *
@@ -3927,7 +3927,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#get(int)
      */
     @Override
-    public PyInteger get(int index) {
+    public PyLong get(int index) {
         return listDelegate.get(index);
     }
 
@@ -3935,7 +3935,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#set(int, java.lang.Object)
      */
     @Override
-    public PyInteger set(int index, PyInteger element) {
+    public PyLong set(int index, PyLong element) {
         return listDelegate.set(index, element);
     }
 
@@ -3943,7 +3943,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#add(int, java.lang.Object)
      */
     @Override
-    public void add(int index, PyInteger element) {
+    public void add(int index, PyLong element) {
         listDelegate.add(index, element);
     }
 
@@ -3951,7 +3951,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#remove(int)
      */
     @Override
-    public PyInteger remove(int index) {
+    public PyLong remove(int index) {
         return listDelegate.remove(index);
     }
 
@@ -3975,7 +3975,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#listIterator()
      */
     @Override
-    public ListIterator<PyInteger> listIterator() {
+    public ListIterator<PyLong> listIterator() {
         return listDelegate.listIterator();
     }
 
@@ -3983,7 +3983,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#listIterator(int)
      */
     @Override
-    public ListIterator<PyInteger> listIterator(int index) {
+    public ListIterator<PyLong> listIterator(int index) {
         return listDelegate.listIterator(index);
     }
 
@@ -3991,7 +3991,7 @@ public abstract class BaseBytes extends PySequence implements List<PyInteger> {
      * @see java.util.List#subList(int, int)
      */
     @Override
-    public List<PyInteger> subList(int fromIndex, int toIndex) {
+    public List<PyLong> subList(int fromIndex, int toIndex) {
         return listDelegate.subList(fromIndex, toIndex);
     }
 

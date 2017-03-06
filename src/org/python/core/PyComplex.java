@@ -256,7 +256,7 @@ public class PyComplex extends PyObject {
         } else if (other instanceof PyFloat) {
             PyFloat f = ((PyFloat)other);
             equal = (this.imag == 0.0 && this.real == f.getValue());
-        } else if (other instanceof PyInteger || other instanceof PyLong) {
+        } else if (other instanceof PyLong) {
             if (this.imag == 0.0) {
                 // The imaginary part is zero: other object primitive might equal the real part.
                 double r = this.real;
@@ -368,8 +368,6 @@ public class PyComplex extends PyObject {
             return other;
         } else if (other instanceof PyFloat) {
             return new PyComplex(((PyFloat)other).getValue(), 0);
-        } else if (other instanceof PyInteger) {
-            return new PyComplex(((PyInteger)other).getValue(), 0);
         } else if (other instanceof PyLong) {
             return new PyComplex(((PyLong)other).doubleValue(), 0);
         }
@@ -377,7 +375,7 @@ public class PyComplex extends PyObject {
     }
 
     private final boolean canCoerce(PyObject other) {
-        return other instanceof PyComplex || other instanceof PyFloat || other instanceof PyInteger
+        return other instanceof PyComplex || other instanceof PyFloat
                 || other instanceof PyLong;
     }
 
@@ -386,8 +384,6 @@ public class PyComplex extends PyObject {
             return (PyComplex)other;
         } else if (other instanceof PyFloat) {
             return new PyComplex(((PyFloat)other).getValue(), 0);
-        } else if (other instanceof PyInteger) {
-            return new PyComplex(((PyInteger)other).getValue(), 0);
         } else if (other instanceof PyLong) {
             return new PyComplex(((PyLong)other).doubleValue(), 0);
         }

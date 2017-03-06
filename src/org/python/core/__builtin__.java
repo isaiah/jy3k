@@ -923,13 +923,13 @@ public class __builtin__ {
     }
 
     /**
-     * Return number of items in range (lo, hi, step), when arguments are PyInteger or
+     * Return number of items in range (lo, hi, step), when arguments are
      * PyLong objects. step > 0 required. Return a value < 0 if & only if the true value
      * is too large to fit in an int, or there is an error.
      *
-     * @param lo PyInteger or PyLong value
-     * @param hi PyInteger or PyLong value
-     * @param step PyInteger or PyLong value (> 0)
+     * @param lo PyLong value
+     * @param hi PyLong value
+     * @param step PyLong value (> 0)
      * @return int length of range
      */
     private static int getLenOfRangeLongs(PyObject lo, PyObject hi, PyObject step) {
@@ -953,7 +953,7 @@ public class __builtin__ {
      * type's __int__ method if it is defined.
      */
     private static PyObject getRangeLongArgument(PyObject arg, String name) {
-        if (arg instanceof PyInteger || arg instanceof PyLong) {
+        if (arg instanceof PyLong) {
             return arg;
         }
 
@@ -965,7 +965,7 @@ public class __builtin__ {
         }
 
         PyObject intObj = arg.__int__();
-        if (intObj instanceof PyInteger || intObj instanceof PyLong) {
+        if (intObj instanceof PyLong) {
             return intObj;
         }
         throw Py.TypeError("__int__ should return int object");

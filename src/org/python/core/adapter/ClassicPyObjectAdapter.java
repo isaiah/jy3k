@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import org.python.core.Py;
 import org.python.core.PyArray;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyJavaType;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
@@ -142,7 +141,7 @@ public class ClassicPyObjectAdapter extends ExtensiblePyObjectAdapter {
         }
 
         public PyObject adapt(Object o) {
-            return new PyInteger(((Number)o).intValue());
+            return new PyLong(((Number)o).intValue());
         }
 
     }

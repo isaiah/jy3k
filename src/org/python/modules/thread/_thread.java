@@ -4,7 +4,6 @@ package org.python.modules.thread;
 import org.python.core.FunctionThread;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -101,7 +100,7 @@ public class _thread {
 
     @ExposedFunction
     public static void exit_thread() {
-        throw new PyException(Py.SystemExit, new PyInteger(0));
+        throw new PyException(Py.SystemExit, new PyLong(0));
     }
 
     @ExposedFunction

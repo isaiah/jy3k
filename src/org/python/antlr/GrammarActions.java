@@ -48,7 +48,6 @@ import org.python.antlr.base.stmt;
 import org.python.core.Py;
 import org.python.core.PyComplex;
 import org.python.core.PyFloat;
-import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;
@@ -625,13 +624,7 @@ public class GrammarActions {
     expr negate(PythonTree t, expr o) {
         if (o instanceof Num) {
             Num num = (Num)o;
-            if (num.getInternalN() instanceof PyInteger) {
-                int v = ((PyInteger)num.getInternalN()).getValue();
-                if (v >= 0) {
-                    num.setN(new PyInteger(-v));
-                    return num;
-                }
-            } else if (num.getInternalN() instanceof PyLong) {
+            if (num.getInternalN() instanceof PyLong) {
                 BigInteger v = ((PyLong)num.getInternalN()).getValue();
                 if (v.compareTo(BigInteger.ZERO) == 1) {
                     num.setN(new PyLong(v.negate()));
