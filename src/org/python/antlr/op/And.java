@@ -6,7 +6,6 @@ import org.python.antlr.base.boolop;
 import org.python.antlr.PythonTree;
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.core.PyString;
 import org.python.core.PyUnicode;
 import org.python.core.PyType;
 import org.python.expose.ExposedGet;
