@@ -1,56 +1,12 @@
 package org.python.antlr;
 
 import org.antlr.runtime.Token;
-import org.python.antlr.ast.AsyncFor;
-import org.python.antlr.ast.AsyncFunctionDef;
-import org.python.antlr.ast.AsyncWith;
-import org.python.antlr.ast.Attribute;
-import org.python.antlr.ast.BinOp;
-import org.python.antlr.ast.BoolOp;
-import org.python.antlr.ast.Call;
-import org.python.antlr.ast.ClassDef;
-import org.python.antlr.ast.Context;
-import org.python.antlr.ast.DictComp;
-import org.python.antlr.ast.ExtSlice;
-import org.python.antlr.ast.For;
-import org.python.antlr.ast.FunctionDef;
-import org.python.antlr.ast.GeneratorExp;
-import org.python.antlr.ast.IfExp;
-import org.python.antlr.ast.Index;
-import org.python.antlr.ast.Lambda;
-import org.python.antlr.ast.ListComp;
-import org.python.antlr.ast.Name;
-import org.python.antlr.ast.Num;
-import org.python.antlr.ast.SetComp;
-import org.python.antlr.ast.Slice;
-import org.python.antlr.ast.Str;
-import org.python.antlr.ast.TryExcept;
-import org.python.antlr.ast.TryFinally;
-import org.python.antlr.ast.Tuple;
-import org.python.antlr.ast.UnaryOp;
-import org.python.antlr.ast.While;
-import org.python.antlr.ast.With;
-import org.python.antlr.ast.Yield;
-import org.python.antlr.ast.alias;
-import org.python.antlr.ast.arg;
-import org.python.antlr.ast.arguments;
-import org.python.antlr.ast.boolopType;
-import org.python.antlr.ast.cmpopType;
-import org.python.antlr.ast.expr_contextType;
-import org.python.antlr.ast.keyword;
-import org.python.antlr.ast.operatorType;
-import org.python.antlr.ast.unaryopType;
-import org.python.antlr.ast.withitem;
+import org.python.antlr.ast.*;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
-import org.python.core.Py;
-import org.python.core.PyComplex;
-import org.python.core.PyFloat;
-import org.python.core.PyLong;
-import org.python.core.PyUnicode;
-import org.python.core.codecs;
+import org.python.core.*;
 import org.python.core.stringlib.Encoding;
 import org.python.core.util.StringUtil;
 
@@ -492,99 +448,129 @@ public class GrammarActions {
         return Py.newInteger((int) l);
     }
 
-    class StringPair {
-        private String s;
-        private boolean unicode;
-
-        StringPair(String s, boolean unicode) {
-            this.s = s;
-            this.unicode = unicode;
-        }
-        String getString() {
-            return s;
-        }
-
-        boolean isUnicode() {
-            return unicode;
-        }
-    }
-
-    Object extractStrings(List s, String encoding, boolean unicodeLiterals) {
-        boolean ustring = false;
+    expr parsestrplus(List s, String encoding) {
+        boolean bytesmode = false;
+        String bytesStr = null;
+        FstringParser state = new FstringParser(extractStringToken(s));
         Token last = null;
-        StringBuffer sb = new StringBuffer();
-        Iterator iter = s.iterator();
-        while (iter.hasNext()) {
+        int i = 0;
+        for (Iterator iter = s.iterator(); iter.hasNext(); i++) {
+            boolean this_bytesmode = false;
             last = (Token)iter.next();
-            StringPair sp = extractString(last, encoding, unicodeLiterals);
-            if (sp.isUnicode()) {
-                ustring = true;
+            ParseStrResult ret = parsestr(last);
+            this_bytesmode = ret.bytesmode;
+            /* Check that we're not mixing bytes with unicode. */
+            if (i != 0 && bytesmode != this_bytesmode) {
+                // TODO ast error "cannot mix bytes and nonbytes literals"
+                throw new RuntimeException("cannot mix bytes and nonbytes literals");
             }
-            sb.append(sp.getString());
+            bytesmode = this_bytesmode;
+            if (ret.fstr != null) {
+                assert(ret.s == null && !bytesmode);
+                /* This is an f-string. Parse and concatenate it. */
+                state.concatFstring(ret.fstr, ret.fstrlen, 0, ret.rawmode);
+            } else {
+                /* A string or byte string. */
+                if (bytesmode) {
+                    /* For bytes, concat as we go. */
+                    if (i == 0) {
+                        /* First time, just remember this value. */
+                        bytesStr = ret.s;
+                    } else {
+                        bytesStr += ret.s;
+                    }
+                } else {
+                    /* This is a regular string. Concatenate it. */
+                    state.concat(ret.s);
+                }
+            }
         }
-        if (ustring) {
-            return new PyUnicode(sb.toString(), false);
+
+        if (bytesmode) {
+            return new Bytes(extractStringToken(s), bytesStr);
         }
-        return sb.toString();
+
+        return state.finish();
     }
 
-    StringPair extractString(Token t, String encoding, boolean unicodeLiterals) {
-        String string = t.getText();
-        char quoteChar = string.charAt(0);
+    class ParseStrResult {
+        boolean bytesmode;
+        boolean rawmode;
+        String s;
+        String fstr;
+        int fstrlen;
+    }
+
+    ParseStrResult parsestr(Token t) {
+        int len;
+        String s = t.getText();
         int start = 0;
-        int end;
-        boolean ustring = unicodeLiterals;
-
-        if (quoteChar == 'u' || quoteChar == 'U') {
-            ustring = true;
-            start++;
-        }
-        if (quoteChar == 'b' || quoteChar == 'B') {
-            // In 2.x this is just a str, and the parser prevents a 'u' and a
-            // 'b' in the same identifier, so just advance start.
-            ustring = false;
-            start++;
-        }
-        quoteChar = string.charAt(start);
-        boolean raw = false;
-        if (quoteChar == 'r' || quoteChar == 'R') {
-            raw = true;
-            start++;
-        }
-        int quotes = 3;
-        if (string.length() - start == 2) {
-            quotes = 1;
-        }
-        if (string.charAt(start) != string.charAt(start+1)) {
-            quotes = 1;
-        }
-
-        start = quotes + start;
-        end = string.length() - quotes;
-        // string is properly decoded according to the source encoding
-        // XXX: No need to re-encode when the encoding is iso-8859-1, but ParserFacade
-        // needs to normalize the encoding name
-        if (!ustring && encoding != null) {
-            // The parser used a non-latin encoding: re-encode chars to bytes.
-            Charset cs = Charset.forName(encoding);
-            ByteBuffer decoded = cs.encode(string.substring(start, end));
-            string = StringUtil.fromBytes(decoded);
-            if (!raw) {
-                // Handle escapes in non-raw strs
-                string = Encoding.decode_UnicodeEscape(string, 0, string.length(), "strict", ustring);
+        char quoteChar = s.charAt(start);
+        ParseStrResult ret = new ParseStrResult();
+        boolean fmode = false;
+        ret.bytesmode = false;
+        ret.rawmode = false;
+        if (Character.isAlphabetic(quoteChar)) {
+            while (!ret.bytesmode || !ret.rawmode) {
+                if (quoteChar == 'b' || quoteChar == 'B') {
+                    quoteChar = s.charAt(++start);
+                    ret.bytesmode = true;
+                } else if (quoteChar == 'u' || quoteChar == 'U') {
+                    quoteChar = s.charAt(++start);
+                } else if (quoteChar == 'r' || quoteChar == 'R') {
+                    quoteChar = s.charAt(++start);
+                    ret.rawmode = true;
+                } else if (quoteChar == 'f' || quoteChar == 'F') {
+                    quoteChar = s.charAt(++start);
+                    fmode = true;
+                } else {
+                    break;
+                }
             }
-        } else if (raw) {
-            // Raw bytes
-            string = string.substring(start, end);
-//            if (ustring) {
-//                // Raw unicode: handle unicode escapes
-//                string = codecs.PyUnicode_DecodeRawUnicodeEscape(string, "strict");
-//            }
-        } else {
-            // Plain unicode: already decoded, just handle escapes
-            string = Encoding.decode_UnicodeEscape(string, start, end, "strict", ustring);
         }
-        return new StringPair(string, ustring);
+
+        if (fmode && ret.bytesmode) {
+            throw new RuntimeException("f with b mode");
+        }
+        if (quoteChar != '\'' && quoteChar != '"') {
+            throw new RuntimeException("parsestr error: " + quoteChar);
+        }
+        // skip the leading quote char
+        start++;
+        len = s.length();
+        if (s.charAt(--len) != quoteChar) {
+            throw new RuntimeException("invalid str");
+        }
+        if (s.length() > 4 && s.charAt(start) == quoteChar && s.charAt(start + 1) == quoteChar) {
+            /* A triple quoted string. We've already skipped one quote at
+            the start and one at the end of the string. Now skip the
+            two at the start. */
+            start += 2;
+            /* And check that the last two match. */
+            if (s.charAt(--len) != quoteChar || s.charAt(--len) != quoteChar) {
+                throw new RuntimeException("invalid triple quote str");
+            }
+        }
+
+        if (fmode) {
+            /* Just return the bytes. The caller will parse the resulting string. */
+            ret.fstr = s.substring(start, len);
+            ret.fstrlen = len;
+            return ret;
+        }
+        // Not an f-string
+        // avoid invoking escape decoding routines if possible
+        ret.rawmode = ret.rawmode || s.indexOf('\\') == -1;
+        ret.s = s.substring(start, len);
+        if (ret.bytesmode) {
+            // TODO disallow non-ASCII characters.
+            if (!ret.rawmode) {
+                ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", true);
+            }
+        } else if (!ret.rawmode) {
+            ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", true);
+        }
+        return ret;
     }
 
     Token extractStringToken(List s) {

@@ -479,8 +479,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
                 return complexConstant(((PyComplex)n).imag);
             }
         } else if (node instanceof Str) {
-            PyUnicode s = (PyUnicode)((Str) node).getInternalS();
-            return unicodeConstant(s.asString());
+            String s = (String) ((Str) node).getInternalS();
+            return unicodeConstant(s);
         } else if (node instanceof Bytes) {
             String s = ((Bytes) node).getInternalS();
             return stringConstant(s);
@@ -727,12 +727,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     public void emitStr(Str node, Code code) throws Exception {
-        PyObject s = (PyObject) node.getInternalS();
-        if (s instanceof PyUnicode) {
-            unicodeConstant(s.asString()).get(code);
-        } else {
-            stringConstant(s.asString()).get(code);
-        }
+        String s = (String) node.getInternalS();
+        unicodeConstant(s).get(code);
     }
 
     public boolean emitPrimitiveArraySetters(java.util.List<? extends PythonTree> nodes, Code code)
