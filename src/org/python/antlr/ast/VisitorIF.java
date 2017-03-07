@@ -13,6 +13,7 @@ public interface VisitorIF<R> {
     public R visitDelete(Delete node) throws Exception;
     public R visitAssign(Assign node) throws Exception;
     public R visitAugAssign(AugAssign node) throws Exception;
+    public R visitAnnAssign(AnnAssign node) throws Exception;
     public R visitFor(For node) throws Exception;
     public R visitAsyncFor(AsyncFor node) throws Exception;
     public R visitWhile(While node) throws Exception;
