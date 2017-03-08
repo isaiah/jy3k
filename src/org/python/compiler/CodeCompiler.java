@@ -1818,6 +1818,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public Object visitAnnAssign(AnnAssign node) throws Exception {
+        if (node.getInternalValue() != null) {
+            setline(node);
+            visit(node.getInternalValue());
+            set(node.getInternalTarget());
+        }
+        return null;
+    }
+
+    @Override
     public Object visitAugAssign(AugAssign node) throws Exception {
         setline(node);
 

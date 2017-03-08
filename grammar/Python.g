@@ -93,6 +93,7 @@ import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncFunctionDef;
 import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
@@ -771,7 +772,17 @@ star_expr
     }
     ;
 
-//expr_stmt: testlist_star_expr (augassign (yield_expr|testlist) |
+// annassign: ':' test ['=' test]
+annassign
+  returns [expr anno, expr value]
+  : COLON ann=test[expr_contextType.Load] (ASSIGN val=test[expr_contextType.Load])?
+      {
+          $anno = actions.castExpr($ann.tree);
+          $value = actions.castExpr($val.tree);
+      }
+  ;
+
+//expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
 //                     ('=' (yield_expr|testlist_star_expr))*)
 expr_stmt
 @init {
@@ -811,10 +822,14 @@ expr_stmt
             }
           )
         )
+    | (testlist_star_expr[null] annassign) => lhs=testlist_star_expr[expr_contextType.Store] ann=annassign
+        {
+            stype = new AnnAssign($lhs.tree, actions.castExpr($lhs.tree), $ann.anno, $ann.value, 1);
+        }
     | lhs=testlist_star_expr[expr_contextType.Load]
-      {
-          stype = new Expr($lhs.start, actions.castExpr($lhs.tree));
-      }
+        {
+            stype = new Expr($lhs.start, actions.castExpr($lhs.tree));
+        }
     )
     ;
 

@@ -115,12 +115,8 @@ public class AstAdapters {
         return (stmt)stmtAdapter.py2ast(o);
     }
 
-    //XXX: Unnecessary but needs to be fixed in the code generation of asdl_antlr.py
-    public static Object py2string(Object o) {
-        if (o instanceof PyBytes) {
-            return o;
-        }
-        return null;
+    public static String py2string(PyObject o) {
+        return o.toString();
     }
 
     public static operatorType py2operator(Object o) {
