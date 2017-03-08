@@ -340,6 +340,10 @@ public class AstAdapters {
         return new PyUnicode(c);
     }
 
+    public static PyUnicode string2py(String c) {
+        return new PyUnicode(c);
+    }
+
     public static String py2constant(PyObject obj) {
         return obj.toString();
     }

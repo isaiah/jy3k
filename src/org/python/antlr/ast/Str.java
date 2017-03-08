@@ -30,13 +30,13 @@ import java.util.ArrayList;
 @ExposedType(name = "_ast.Str", base = expr.class)
 public class Str extends expr {
 public static final PyType TYPE = PyType.fromClass(Str.class);
-    private Object s;
-    public Object getInternalS() {
+    private String s;
+    public String getInternalS() {
         return s;
     }
     @ExposedGet(name = "s")
     public PyObject getS() {
-        return (PyObject)s;
+        return AstAdapters.string2py(s);
     }
     @ExposedSet(name = "s")
     public void setS(PyObject s) {
@@ -82,17 +82,17 @@ public static final PyType TYPE = PyType.fromClass(Str.class);
         setS(s);
     }
 
-    public Str(Token token, Object s) {
+    public Str(Token token, String s) {
         super(token);
         this.s = s;
     }
 
-    public Str(Integer ttype, Token token, Object s) {
+    public Str(Integer ttype, Token token, String s) {
         super(ttype, token);
         this.s = s;
     }
 
-    public Str(PythonTree tree, Object s) {
+    public Str(PythonTree tree, String s) {
         super(tree);
         this.s = s;
     }
