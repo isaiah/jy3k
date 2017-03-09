@@ -1959,13 +1959,9 @@ atom
             etype = new Name($NAME, $NAME.text, $expr::ctype);
        }
      | INT
-       {
-           etype = new Num($INT, actions.makeInt($INT));
-       }
-     | LONGINT
-       {
-           etype = new Num($LONGINT, actions.makeInt($LONGINT));
-       }
+        {
+            etype = new Num($INT, actions.makeInt($INT));
+        }
      | FLOAT
        {
            etype = new Num($FLOAT, actions.makeFloat($FLOAT));
@@ -2534,10 +2530,6 @@ FLOAT
     :   '.' DIGITS (Exponent)?
     |   DIGITS '.' Exponent
     |   DIGITS ('.' (DIGITS (Exponent)?)? | Exponent)
-    ;
-
-LONGINT
-    :   INT ('l'|'L')
     ;
 
 fragment
