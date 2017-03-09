@@ -598,7 +598,7 @@ class JavaVisitor(EmitVisitor):
             if str(field.type) == 'identifier':
                 self.emit("if (%s == null) return Py.None;" % field.name, depth+1)
                 self.emit("return new PyUnicode(%s);" % field.name, depth+1)
-            elif str(field.type) == 'string' or str(field.type) == 'object':
+            elif str(field.type) == 'object':
                 self.emit("return (PyObject)%s;" % field.name, depth+1)
             elif str(field.type) == 'bool':
                 self.emit("if (%s) return Py.True;" % field.name, depth+1)
@@ -628,7 +628,7 @@ class JavaVisitor(EmitVisitor):
         'identifier' : 'String',
         'constant' : 'String',
         'singleton' : 'String',
-        'string' : 'Object',
+        'string' : 'String',
         'object' : 'Object', # was PyObject
 
         #Below are for enums
