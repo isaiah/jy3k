@@ -187,6 +187,7 @@ trace.py
 traceback.py
 tty.py
 types.py
+typing.py
 tzparse.py
 unicodedata.py
 urllib/*.py
