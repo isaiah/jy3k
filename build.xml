@@ -72,8 +72,8 @@
   <target name="full-build" depends="full-check, installer" description="a full build with hg checkout" />
 
   <target name="needed-check" unless="full-build">
-    <uptodate property="antlr.notneeded" targetfile="${gensrc.dir}/org/python/antlr/PythonParser.java">
-      <srcfiles dir="grammar" includes="*.g" />
+    <uptodate property="org.python.antlr.notneeded" targetfile="${gensrc.dir}/org/python/antlr/PythonParser.java">
+      <srcfiles dir="grammar" includes="Python.g4" />
       <!--
       <srcfiles dir="${basedir}/src/org/python/compiler" includes="CodeCompiler.java" />
       -->
@@ -152,7 +152,7 @@
           <pathelement path="${oracle.jar}" />
           <pathelement path="${extlibs.dir}/mysql-connector-java-5.1.6.jar" />
           <pathelement path="${extlibs.dir}/postgresql-8.3-603.jdbc4.jar" />
-          <pathelement path="${extlibs.dir}/antlr-3.4-complete.jar" />
+          <pathelement path="${extlibs.dir}/antlr-4.6-complete.jar" />
           <pathelement path="${extlibs.dir}/commons-compress-1.9.jar"/>
           <pathelement path="${extlibs.dir}/asm-5.1.jar" />
           <pathelement path="${extlibs.dir}/asm-commons-5.1.jar" />
@@ -462,16 +462,15 @@
       </target>
 
       <target name="antlr_gen" depends="prepare-output" unless="antlr.notneeded">
-        <java classname="org.antlr.Tool" failonerror="true" fork="true" dir="${jython.base.dir}">
+        <java classname="org.antlr.v4.Tool" failonerror="true" fork="true" dir="${jython.base.dir}">
           <jvmarg value="-Xmx512m"/>
-          <arg value="-Xconversiontimeout"/>
-          <arg value="2000"/>
-          <arg value="-fo"/>
+          <arg value="-o"/>
           <arg path="${work.dir}/build/gensrc/org/python/antlr"/>
-          <arg value="-lib"/>
-          <arg path="${work.dir}/build/gensrc/org/python/antlr"/>
-          <arg file="${jython.base.dir}/grammar/Python.g"/>
+          <arg file="${jython.base.dir}/grammar/Python.g4"/>
+          <arg value="-visitor"/>
+          <!-- <arg value="-debug"/>
           <arg file="${jython.base.dir}/grammar/PythonPartial.g"/>
+          -->
           <classpath refid="main.classpath"/>
         </java>
 
@@ -549,7 +548,7 @@
         </fileset>
       </copy>
       <!-- grammar must now be up to date -->
-      <property name="antlr.notneeded" value="true" />
+      <property name="org.python.antlr.notneeded" value="true" />
 
       <copy todir="${compile.dir}/META-INF/services">
         <fileset dir="${source.dir}/META-INF/services" />
@@ -597,8 +596,8 @@
       <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
       <jarjar destfile="${dist.dir}/${jython.deploy.jar}">
         <zipfileset src="${dist.dir}/${jython.dev.jar}"/>
-        <zipfileset src="extlibs/antlr-runtime-3.4.jar"/>
-        <rule pattern="org.antlr.runtime.**" result="org.python.antlr.runtime.@1"/>
+        <zipfileset src="extlibs/antlr-4.6-complete.jar"/>
+        <rule pattern="org.org.python.antlr.v4.runtime.**" result="org.python.org.python.antlr.v4.runtime.@1"/>
         <zipfileset src="extlibs/asm-5.1.jar"/>
         <zipfileset src="extlibs/asm-commons-5.1.jar"/>
         <zipfileset src="extlibs/asm-util-5.1.jar"/>
@@ -908,7 +907,7 @@
           <exclude name="${jython.javadoc.jar}"/>
           <exclude name="${jython.sources.jar}"/>
           <exclude name="callbacker_test.jar"/>
-          <exclude name="extlibs/antlr-runtime*.jar" />
+          <exclude name="extlibs/antlr-4.6*.jar" />
           <exclude name="extlibs/asm*.jar" />
           <exclude name="extlibs/jarjar*.jar" />
           <exclude name="extlibs/junit*.jar" />
