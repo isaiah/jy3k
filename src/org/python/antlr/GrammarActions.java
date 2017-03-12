@@ -1,6 +1,7 @@
 package org.python.antlr;
 
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.ast.*;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
@@ -168,8 +169,8 @@ public class GrammarActions {
                 Object o = exprs.get(i);
                 if (o instanceof expr) {
                     result.add((expr)o);
-                } else if (o instanceof PythonParser.test_return) {
-                    result.add((expr)((PythonParser.test_return)o).tree);
+                } else if (o instanceof PythonParser.TestContext) {
+//                    result.add((expr)((PythonParser.TestContext)o).testExpr);
                 }
             }
         }
@@ -200,8 +201,8 @@ public class GrammarActions {
     stmt castStmt(Object o) {
         if (o instanceof stmt) {
             return (stmt)o;
-        } else if (o instanceof PythonParser.stmt_return) {
-            return (stmt)((PythonParser.stmt_return)o).tree;
+//        } else if (o instanceof PythonParser.stmt_return) {
+//            return (stmt)((PythonParser.stmt_return)o).tree;
         } else if (o instanceof PythonTree) {
             return errorHandler.errorStmt((PythonTree)o);
         }
@@ -400,52 +401,22 @@ public class GrammarActions {
         return keywords;
     }
 
-    Object makeFloat(Token t) {
+    Object makeFloat(TerminalNode t) {
         return Py.newFloat(Double.valueOf(t.getText()));
     }
 
-    Object makeComplex(Token t) {
+    Object makeComplex(TerminalNode t) {
         String s = t.getText();
         s = s.substring(0, s.length() - 1);
         return Py.newImaginary(Double.valueOf(s));
     }
 
-    //XXX: needs to handle NumberFormatException (on input like 0b2) and needs
-    //     a better long guard than ndigits > 11 (this is much to short for
-    //     binary for example)
-    Object makeInt(Token t) {
-        String s = t.getText();
-        int radix = 10;
-        if (s.startsWith("0x") || s.startsWith("0X")) {
-            radix = 16;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0o") || s.startsWith("0O")) {
-            radix = 8;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0b") || s.startsWith("0B")) {
-            radix = 2;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0")) {
-            radix = 8;
-        }
-        if (s.endsWith("L") || s.endsWith("l")) {
-            s = s.substring(0, s.length()-1);
-            return Py.newLong(new BigInteger(s, radix));
-        }
-        int ndigits = s.length();
-        int i=0;
-        while (i < ndigits && s.charAt(i) == '0') {
-            i++;
-        }
-        if ((ndigits - i) > 11) {
-            return Py.newLong(new BigInteger(s, radix));
-        }
+    Object makeInt(TerminalNode t, int radix) {
+        return new PyLong(new BigInteger(t.getText().substring(2), radix));
+    }
 
-        long l = Long.valueOf(s, radix).longValue();
-        if (l > 0xffffffffl || (l > Integer.MAX_VALUE)) {
-            return Py.newLong(new BigInteger(s, radix));
-        }
-        return Py.newInteger((int) l);
+    Object makeDecimal(TerminalNode t) {
+        return new PyLong(new BigInteger(t.getText(), 10));
     }
 
     expr parsestrplus(List s, String encoding) {

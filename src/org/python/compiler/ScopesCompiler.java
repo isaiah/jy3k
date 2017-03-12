@@ -8,7 +8,6 @@ import org.python.antlr.PythonTree;
 import org.python.antlr.ast.*;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
-import org.python.core.ParserFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -337,6 +336,15 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     @Override
     public Object visitBytes(Bytes b) throws Exception {
         cur.addConst(b);
+        return null;
+    }
+
+    @Override
+    public Object visitAnnAssign(AnnAssign node) throws Exception {
+        if (cur.isClassScope()) {
+            // TODO collect the types here, and evaluate them in the class scope
+            cur.addUsed("__annotations__");
+        }
         return null;
     }
 

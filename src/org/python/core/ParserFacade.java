@@ -1,14 +1,12 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.python.antlr.BaseParser;
 import org.python.antlr.NoCloseReaderStream;
 import org.python.antlr.ParseException;
-import org.python.antlr.PythonPartialLexer;
-import org.python.antlr.PythonPartialParser;
-import org.python.antlr.PythonTokenSource;
 import org.python.antlr.PythonTree;
 import org.python.antlr.base.mod;
 import org.python.core.io.StreamIO;
@@ -155,7 +153,7 @@ public class ParserFacade {
                                  // reader, for the benefit of fixParseError and
                                  // validPartialSentence
         if (kind != null) {
-            CharStream cs = new NoCloseReaderStream(reader);
+            CharStream cs = new ANTLRInputStream(reader);
             BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
             return kind.dispatch(parser);
         } else {
@@ -222,7 +220,7 @@ public class ParserFacade {
             return parseOnly(reader, kind, filename, cflags);
         } catch (Throwable t) {
             PyException p = fixParseError(reader, t, filename);
-            if (reader != null && validPartialSentence(reader, kind, filename)) {
+            if (reader != null) { //&& validPartialSentence(reader, kind, filename)) {
                 return null;
             }
             throw p;
@@ -231,32 +229,32 @@ public class ParserFacade {
         }
     }
 
-    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
-        PythonPartialLexer lexer = null;
-        PythonTokenSource indentedSource = null;
-        try {
-            bufreader.reset();
-            CharStream cs = new NoCloseReaderStream(bufreader);
-            lexer = new PythonPartialLexer(cs);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            indentedSource = new PythonTokenSource(tokens, filename, kind == CompileMode.single);
-            tokens = new CommonTokenStream(indentedSource);
-            PythonPartialParser parser = new PythonPartialParser(tokens);
-            switch (kind) {
-            case single:
-                parser.single_input();
-                break;
-            case eval:
-                parser.eval_input();
-                break;
-            default:
-                return false;
-            }
-        } catch (Exception e) {
-            return indentedSource.isIndented() || lexer.eofWhileNested;
-        }
-        return true;
-    }
+//    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
+//        PythonPartialLexer lexer = null;
+//        PythonTokenSource indentedSource = null;
+//        try {
+//            bufreader.reset();
+//            CharStream cs = new NoCloseReaderStream(bufreader);
+//            lexer = new PythonPartialLexer(cs);
+//            CommonTokenStream tokens = new CommonTokenStream(lexer);
+//            indentedSource = new PythonTokenSource(tokens, filename, kind == CompileMode.single);
+//            tokens = new CommonTokenStream(indentedSource);
+//            PythonPartialParser parser = new PythonPartialParser(tokens);
+//            switch (kind) {
+//            case single:
+//                parser.single_input();
+//                break;
+//            case eval:
+//                parser.eval_input();
+//                break;
+//            default:
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            return indentedSource.isIndented() || lexer.eofWhileNested;
+//        }
+//        return true;
+//    }
 
     public static class ExpectedEncodingBufferedReader extends BufferedReader {
 

@@ -1,7 +1,7 @@
 // Hand copied from stmt.
 // XXX: autogenerate this.
 package org.python.antlr.base;
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
 import org.python.antlr.AST;
 import org.python.antlr.PythonTree;
 import org.python.core.PyBytes;
