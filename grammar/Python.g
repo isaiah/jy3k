@@ -1958,17 +1958,17 @@ atom
        {
             etype = new Name($NAME, $NAME.text, $expr::ctype);
        }
-     | INT
+     | integer
         {
-            etype = new Num($INT, actions.makeInt($INT));
+            etype = $integer.etype;
         }
-     | FLOAT
+     | FLOAT_NUMBER
        {
-           etype = new Num($FLOAT, actions.makeFloat($FLOAT));
+           etype = new Num($FLOAT_NUMBER, actions.makeFloat($FLOAT_NUMBER));
        }
-     | COMPLEX
+     | IMAG_NUMBER
        {
-           etype = new Num($COMPLEX, actions.makeComplex($COMPLEX));
+           etype = new Num($IMAG_NUMBER, actions.makeComplex($IMAG_NUMBER));
        }
      | d=DOT DOT DOT
        {
@@ -2393,6 +2393,26 @@ yield_arg
         $isYieldFrom = false;
     }
     ;
+/// integer        ::=  decimalinteger | octinteger | hexinteger | bininteger
+integer
+returns [expr etype]
+ : DECIMAL_INTEGER
+ {
+    $etype = new Num($DECIMAL_INTEGER, actions.makeInt($DECIMAL_INTEGER));
+ }
+ | OCT_INTEGER
+ {
+    $etype = new Num($OCT_INTEGER, actions.makeInt($OCT_INTEGER));
+ }
+ | HEX_INTEGER
+ {
+    $etype = new Num($HEX_INTEGER, actions.makeInt($HEX_INTEGER));
+ }
+ | BIN_INTEGER
+ {
+    $etype = new Num($BIN_INTEGER, actions.makeInt($BIN_INTEGER));
+ }
+ ;
 
 //START OF LEXER RULES
 AS        : 'as' ;
@@ -2526,32 +2546,91 @@ OR : 'or' ;
 
 NOT : 'not' ;
 
-FLOAT
-    :   '.' DIGITS (Exponent)?
-    |   DIGITS '.' Exponent
-    |   DIGITS ('.' (DIGITS (Exponent)?)? | Exponent)
-    ;
+/// decimalinteger ::=  nonzerodigit digit* | "0"+
+DECIMAL_INTEGER
+ : NON_ZERO_DIGIT DIGIT*
+ | '0'+
+ ;
 
-fragment
-Exponent
-    :    ('e' | 'E') ( '+' | '-' )? DIGITS
-    ;
+/// octinteger     ::=  "0" ("o" | "O") octdigit+
+OCT_INTEGER
+ : '0' ('o' | 'O') OCT_DIGIT+
+ ;
 
-INT :   // Hex
-        '0' ('x' | 'X') ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
-    |   // Octal
-        '0' ('o' | 'O') ( '0' .. '7' )*
-    |   '0'  ( '0' .. '7' )*
-    |   // Binary
-        '0' ('b' | 'B') ( '0' .. '1' )*
-    |   // Decimal
-        '1'..'9' DIGITS*
-;
+/// hexinteger     ::=  "0" ("x" | "X") hexdigit+
+HEX_INTEGER
+ : '0' ('x'|'X') HEX_DIGIT+
+ ;
 
-COMPLEX
-    :   DIGITS+ ('j'|'J')
-    |   FLOAT ('j'|'J')
-    ;
+/// bininteger     ::=  "0" ("b" | "B") bindigit+
+BIN_INTEGER
+ : '0' ('b'|'B') BIN_DIGIT+
+ ;
+
+/// floatnumber   ::=  pointfloat | exponentfloat
+FLOAT_NUMBER
+ : POINT_FLOAT
+ | EXPONENT_FLOAT
+ ;
+
+/// imagnumber ::=  (floatnumber | intpart) ("j" | "J")
+IMAG_NUMBER
+ : FLOAT_NUMBER ('j'|'J')
+ | INT_PART ('j'|'J')
+ ;
+
+/// nonzerodigit   ::=  "1"..."9"
+fragment NON_ZERO_DIGIT
+ : ('1' .. '9')
+ ;
+
+/// digit          ::=  "0"..."9"
+fragment DIGIT
+ : ('0' .. '9')
+ ;
+
+/// octdigit       ::=  "0"..."7"
+fragment OCT_DIGIT
+ : ('0' .. '7')
+ ;
+
+/// hexdigit       ::=  digit | "a"..."f" | "A"..."F"
+fragment HEX_DIGIT
+ : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+ ;
+
+/// bindigit       ::=  "0" | "1"
+fragment BIN_DIGIT
+ : ('0'|'1')
+ ;
+
+
+/// pointfloat    ::=  [intpart] fraction | intpart "."
+fragment POINT_FLOAT
+ : INT_PART? FRACTION
+ | INT_PART '.'
+ ;
+
+/// exponentfloat ::=  (intpart | pointfloat) exponent
+fragment EXPONENT_FLOAT
+ : ( INT_PART | POINT_FLOAT ) EXPONENT
+ ;
+
+/// intpart       ::=  digit+
+fragment INT_PART
+ : DIGIT+
+ ;
+
+/// fraction      ::=  "." digit+
+fragment FRACTION
+ : '.' DIGIT+
+ ;
+
+/// exponent      ::=  ("e" | "E") ["+" | "-"] digit+
+fragment EXPONENT
+ : ('e' | 'E') ('+' | '-')? DIGIT+
+ ;
+
 
 fragment
 DIGITS : ( '0' .. '9' )+ ;
