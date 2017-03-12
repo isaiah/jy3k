@@ -419,15 +419,15 @@ public class GrammarActions {
         return new PyLong(new BigInteger(t.getText(), 10));
     }
 
-    expr parsestrplus(List s, String encoding) {
+    expr parsestrplus(List<PythonParser.StrContext> s) {
         boolean bytesmode = false;
         String bytesStr = null;
         FstringParser state = new FstringParser(extractStringToken(s));
-        Token last = null;
+        PythonParser.StrContext last = null;
         int i = 0;
-        for (Iterator iter = s.iterator(); iter.hasNext(); i++) {
+        for (Iterator<PythonParser.StrContext> iter = s.iterator(); iter.hasNext(); i++) {
             boolean this_bytesmode = false;
-            last = (Token)iter.next();
+            last = iter.next();
             ParseStrResult ret = parsestr(last);
             this_bytesmode = ret.bytesmode;
             /* Check that we're not mixing bytes with unicode. */
@@ -472,7 +472,7 @@ public class GrammarActions {
         int fstrlen;
     }
 
-    ParseStrResult parsestr(Token t) {
+    ParseStrResult parsestr(PythonParser.StrContext t) {
         int len;
         String s = t.getText();
         int start = 0;
@@ -544,8 +544,8 @@ public class GrammarActions {
         return ret;
     }
 
-    Token extractStringToken(List s) {
-        return (Token)s.get(0);
+    Token extractStringToken(List<PythonParser.StrContext> s) {
+        return s.get(0).getStart();
         //return (Token)s.get(s.size() - 1);
     }
 

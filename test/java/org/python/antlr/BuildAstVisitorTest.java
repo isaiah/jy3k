@@ -48,6 +48,15 @@ public class BuildAstVisitorTest {
                 {"1.1", "Num"},
                 {"2.1j", "Num"},
                 {"...", "Ellipsis"},
+                {"None", "NameConstant"},
+                {"True", "NameConstant"},
+                {"False", "NameConstant"},
+                {"a", "Name"},
+                {"'str'", "Str"},
+                {"yield a", "Yield"},
+                {"yield from a", "YieldFrom"},
+                {"return", "Return"},
+                {"return a", "Return"},
         });
     }
 }

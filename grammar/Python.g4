@@ -570,8 +570,8 @@ atom
  | '{' dictorsetmaker? '}'
  | NAME
  | number
- | str+
- | '...'
+ | string=str+
+ | ellipsis='...'
  | NONE
  | TRUE
  | FALSE

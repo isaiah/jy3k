@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.python.antlr.ast.*;
+import org.python.antlr.base.expr;
 
 /**
  * Created by isaiah on 3/10/17.
@@ -31,14 +32,67 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitNumber(PythonParser.NumberContext ctx) {
         if (ctx.FLOAT_NUMBER() != null) {
             return new Num(ctx.FLOAT_NUMBER(), actions.makeFloat(ctx.FLOAT_NUMBER()));
-        }
-        if (ctx.IMAG_NUMBER() != null) {
+        } else if (ctx.IMAG_NUMBER() != null) {
             return new Num(ctx.IMAG_NUMBER(), actions.makeComplex(ctx.IMAG_NUMBER()));
-        }
-        if (ctx.integer() != null) {
+        } else if (ctx.integer() != null) {
             return visit(ctx.integer());
         }
         return super.visitNumber(ctx);
+    }
+
+    @Override
+    public PythonTree visitAtom(PythonParser.AtomContext ctx) {
+        if (ctx.number() != null) {
+            return visit(ctx.number());
+        } else if (ctx.yield_expr() != null) {
+            return visit(ctx.yield_expr());
+        } else if (ctx.NAME() != null) {
+            return new Name(ctx.NAME(), ctx.getText(), expr_contextType.Load);
+        } else if (ctx.ellipsis != null) {
+            return new Ellipsis(ctx.ellipsis);
+        } else if (ctx.TRUE() != null) {
+            return new NameConstant(ctx.TRUE(), ctx.getText());
+        } else if (ctx.FALSE() != null) {
+            return new NameConstant(ctx.FALSE(), ctx.getText());
+        } else if (ctx.NONE() != null) {
+            return new NameConstant(ctx.NONE(), ctx.getText());
+        } else if (ctx.str() != null) {
+            return actions.parsestrplus(ctx.str());
+        }
+        return super.visitAtom(ctx);
+    }
+
+    @Override
+    public PythonTree visitReturn_stmt(PythonParser.Return_stmtContext ctx) {
+        if (ctx.testlist() != null) {
+            return new Return(ctx.getStart(), (expr) visit(ctx.testlist()));
+        }
+        return new Return(ctx.getStart(), null);
+    }
+
+    @Override
+    public PythonTree visitYield_stmt(PythonParser.Yield_stmtContext ctx) {
+        return visit(ctx.yield_expr());
+    }
+
+    @Override
+    public PythonTree visitYield_expr(PythonParser.Yield_exprContext ctx) {
+        PythonParser.Yield_argContext arg = ctx.yield_arg();
+        if (arg != null && arg.FROM() != null) {
+            return new YieldFrom(ctx.getStart(), (expr) visit(arg));
+        } else {
+            return new Yield(ctx.getStart(), (expr) visit(arg));
+        }
+    }
+
+    @Override
+    public PythonTree visitYield_arg(PythonParser.Yield_argContext ctx) {
+        if (ctx.test() != null) {
+            return visit(ctx.test());
+        } else if (ctx.testlist() != null) {
+            return visit(ctx.testlist());
+        }
+        return super.visitYield_arg(ctx);
     }
 
     public static void main(String[] args) {
