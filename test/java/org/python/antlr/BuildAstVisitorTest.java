@@ -57,6 +57,10 @@ public class BuildAstVisitorTest {
                 {"yield from a", "YieldFrom"},
                 {"return", "Return"},
                 {"return a", "Return"},
+                {"continue", "Continue"},
+                {"break", "Break"},
+                {"del a", "Delete"},
+                {"pass", "Pass"},
         });
     }
 }
