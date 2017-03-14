@@ -161,7 +161,7 @@ eval_input
 
 /// decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
 decorator
- : '@' dotted_name ( '(' arglist? ')' )? NEWLINE
+ : AT dotted_name ( OPEN_PAREN arglist? CLOSE_PAREN )? NEWLINE
  ;
 
 /// decorators: decorator+
@@ -171,17 +171,21 @@ decorators
 
 /// decorated: decorators (classdef | funcdef)
 decorated
- : decorators ( classdef | funcdef )
+ : decorators ( classdef | funcdef | async_funcdef )
  ;
 
+/// async_funcdef: ASYNC funcdef
+async_funcdef
+ : ASYNC funcdef
+ ;
 /// funcdef: 'def' NAME parameters ['->' test] ':' suite
 funcdef
- : DEF NAME parameters ( '->' test )? ':' suite
+ : DEF NAME parameters ( ARROW test )? COLON suite
  ;
 
 /// parameters: '(' [typedargslist] ')'
 parameters
- : '(' typedargslist? ')'
+ : OPEN_PAREN typedargslist? CLOSE_PAREN
  ;
 
 /// typedargslist: (tfpdef ['=' test] (',' tfpdef ['=' test])* [','
@@ -192,13 +196,13 @@ typedargslist
                                                             | '**' tfpdef
                                                             )?
                                                       )?
- | '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
- | '**' tfpdef
+ | STAR tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
+ | POWER tfpdef
  ;
 
 /// tfpdef: NAME [':' test]
 tfpdef
- : NAME ( ':' test )?
+ : NAME ( COLON test )?
  ;
 
 /// varargslist: (vfpdef ['=' test] (',' vfpdef ['=' test])* [','
@@ -226,7 +230,7 @@ stmt
 
 /// simple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE
 simple_stmt
- : small_stmt ( ';' small_stmt )* ';'? NEWLINE
+ : small_stmt ( SEMI_COLON small_stmt )* SEMI_COLON? NEWLINE
  ;
 
 /// small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
@@ -242,35 +246,40 @@ small_stmt
  | assert_stmt
  ;
 
-/// expr_stmt: testlist_star_expr (augassign (yield_expr|testlist) |
+/// expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
 ///                      ('=' (yield_expr|testlist_star_expr))*)
 expr_stmt
- : testlist_star_expr ( augassign ( yield_expr | testlist)
-                      | ( '=' ( yield_expr| testlist_star_expr ) )*
+ : testlist_star_expr ( annassign | augassign ( yield_expr | testlist)
+                      | ( ASSIGN ( yield_expr| testlist_star_expr ) )*
                       )
+ ;
+
+/// annassign: ':' test ['=' test]
+annassign
+ : test (ASSIGN test)?
  ;
 
 /// testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']
 testlist_star_expr
- : ( test | star_expr ) ( ',' ( test |  star_expr ) )* ','?
+ : ( test | star_expr ) ( COMMA ( test |  star_expr ) )* COMMA?
  ;
 
 /// augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
 ///             '<<=' | '>>=' | '**=' | '//=')
 augassign
- : '+='
- | '-='
- | '*='
- | '@=' // PEP 465
- | '/='
- | '%='
- | '&='
- | '|='
- | '^='
- | '<<='
- | '>>='
- | '**='
- | '//='
+ : ADD_ASSIGN
+ | SUB_ASSIGN
+ | MULT_ASSIGN
+ | AT_ASSIGN // PEP 465
+ | DIV_ASSIGN
+ | MOD_ASSIGN
+ | AND_ASSIGN
+ | OR_ASSIGN
+ | XOR_ASSIGN
+ | LEFT_SHIFT_ASSIGN
+ | RIGHT_SHIFT_ASSIGN
+ | POWER_ASSIGN
+ | IDIV_ASSIGN
  ;
 
 /// del_stmt: 'del' exprlist
@@ -332,11 +341,11 @@ import_name
 /// import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
 ///               'import' ('*' | '(' import_as_names ')' | import_as_names))
 import_from
- : FROM ( ( '.' | '...' )* dotted_name
-        | ('.' | '...')+
+ : FROM ( ( DOT | ELLIPSIS )* dotted_name
+        | (DOT | ELLIPSIS)+
         )
-   IMPORT ( '*'
-          | '(' import_as_names ')'
+   IMPORT ( STAR
+          | OPEN_PAREN import_as_names CLOSE_PAREN
           | import_as_names
           )
  ;
@@ -353,35 +362,35 @@ dotted_as_name
 
 /// import_as_names: import_as_name (',' import_as_name)* [',']
 import_as_names
- : import_as_name ( ',' import_as_name )* ','?
+ : import_as_name ( COMMA import_as_name )* COMMA?
  ;
 
 /// dotted_as_names: dotted_as_name (',' dotted_as_name)*
 dotted_as_names
- : dotted_as_name ( ',' dotted_as_name )*
+ : dotted_as_name ( COMMA dotted_as_name )*
  ;
 
 /// dotted_name: NAME ('.' NAME)*
 dotted_name
- : NAME ( '.' NAME )*
+ : NAME ( DOT NAME )*
  ;
 
 /// global_stmt: 'global' NAME (',' NAME)*
 global_stmt
- : GLOBAL NAME ( ',' NAME )*
+ : GLOBAL NAME ( COMMA NAME )*
  ;
 
 /// nonlocal_stmt: 'nonlocal' NAME (',' NAME)*
 nonlocal_stmt
- : NONLOCAL NAME ( ',' NAME )*
+ : NONLOCAL NAME ( COMMA NAME )*
  ;
 
 /// assert_stmt: 'assert' test [',' test]
 assert_stmt
- : ASSERT test ( ',' test )?
+ : ASSERT test ( COMMA test )?
  ;
 
-/// compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated
+/// compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt
 compound_stmt
  : if_stmt
  | while_stmt
@@ -391,21 +400,30 @@ compound_stmt
  | funcdef
  | classdef
  | decorated
+ | async_stmt
+ ;
+
+/// async_stmt: ASYNC (funcdef | with_stmt | for_stmt)
+async_stmt
+ : ASYNC ( funcdef
+         | with_stmt
+         | for_stmt
+         )
  ;
 
 /// if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
 if_stmt
- : IF test ':' suite ( ELIF test ':' suite )* ( ELSE ':' suite )?
+ : IF test COLON suite ( ELIF test COLON suite )* ( ELSE COLON suite )?
  ;
 
 /// while_stmt: 'while' test ':' suite ['else' ':' suite]
 while_stmt
- : WHILE test ':' suite ( ELSE ':' suite )?
+ : WHILE test COLON s1=suite ( ELSE COLON s2=suite )?
  ;
 
 /// for_stmt: 'for' exprlist 'in' testlist ':' suite ['else' ':' suite]
 for_stmt
- : FOR exprlist IN testlist ':' suite ( ELSE ':' suite )?
+ : FOR exprlist IN testlist COLON s1=suite ( ELSE COLON s2=suite )?
  ;
 
 /// try_stmt: ('try' ':' suite
@@ -481,9 +499,9 @@ not_test
  | comparison
  ;
 
-/// comparison: star_expr (comp_op star_expr)*
+/// comparison: expr (comp_op expr)*
 comparison
- : star_expr ( comp_op star_expr )*
+ : expr ( comp_op expr )*
  ;
 
 /// # <> isn't actually a valid comparison operator in Python. It's here for the
@@ -503,9 +521,9 @@ comp_op
  | IS NOT
  ;
 
-/// star_expr: ['*'] expr
+/// star_expr: '*' expr
 star_expr
- : '*'? expr
+ : STAR expr
  ;
 
 /// expr: xor_expr ('|' xor_expr)*
@@ -525,49 +543,53 @@ and_expr
 
 /// shift_expr: arith_expr (('<<'|'>>') arith_expr)*
 shift_expr
- : arith_expr ( '<<' arith_expr
-              | '>>' arith_expr
+ : arith_expr ( LEFT_SHIFT arith_expr
+              | RIGHT_SHIFT arith_expr
               )*
  ;
 
 /// arith_expr: term (('+'|'-') term)*
 arith_expr
- : term ( '+' term
-        | '-' term
+ : term ( ops+=ADD term
+        | ops+=MINUS term
         )*
  ;
 
 /// term: factor (('*'|'/'|'%'|'//') factor)*
 term
- : factor ( '*' factor
-          | '/' factor
-          | '%' factor
-          | '//' factor
-          | '@' factor // PEP 465
+ : factor ( ops+=STAR factor
+          | ops+=DIV factor
+          | ops+=MOD factor
+          | ops+=IDIV factor
+          | ops+=AT factor // PEP 465
           )*
  ;
 
 /// factor: ('+'|'-'|'~') factor | power
 factor
- : '+' factor
- | '-' factor
- | '~' factor
+ : op=(ADD | MINUS | NOT_OP) factor
  | power
  ;
 
 /// power: atom trailer* ['**' factor]
 power
- : atom trailer* ( '**' factor )?
+ : AWAIT? atom trailer* ( POWER factor )?
  ;
+
+/// atom_expr: [AWAIT] atom trailer*
+// FIXME: do we need?
+//atom_expr
+// : AWAIT? atom trailer*
+// ;
 
 /// atom: ('(' [yield_expr|testlist_comp] ')' |
 ///        '[' [testlist_comp] ']' |
 ///        '{' [dictorsetmaker] '}' |
 ///        NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False')
 atom
- : '(' ( yield_expr | testlist_comp )? ')'
- | '[' testlist_comp? ']'
- | '{' dictorsetmaker? '}'
+ : OPEN_PAREN ( yield_expr | testlist_comp )? CLOSE_PAREN
+ | OPEN_BRACK testlist_comp? CLOSE_BRACK
+ | OPEN_BRACE dictorsetmaker? CLOSE_BRACE
  | NAME
  | number
  | string=str+
@@ -577,39 +599,40 @@ atom
  | FALSE
  ;
 
-/// testlist_comp: test ( comp_for | (',' test)* [','] )
+/// testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* [','] )
 testlist_comp
- : test ( comp_for
-        | ( ',' test )* ','?
-        )
+ : (t+=test|s+=star_expr) ( comp_for
+                    | (COMMA (t+=test|s+=star_expr))* COMMA?
+                    )
  ;
 
 /// trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
 trailer
- : '(' arglist? ')'
- | '[' subscriptlist ']'
- | '.' NAME
+ : OPEN_PAREN arglist? CLOSE_PAREN
+ | OPEN_BRACK subscriptlist CLOSE_BRACK
+ | DOT NAME
  ;
 
 /// subscriptlist: subscript (',' subscript)* [',']
 subscriptlist
- : subscript ( ',' subscript )* ','?
+ : subscript ( COMMA subscript )* COMMA?
  ;
 
 /// subscript: test | [test] ':' [test] [sliceop]
 subscript
  : test
- | test? ':' test? sliceop?
+ | lower=test? COLON upper=test? sliceop?
  ;
 
 /// sliceop: ':' [test]
 sliceop
- : ':' test?
+ : COLON test?
  ;
 
 /// exprlist: star_expr (',' star_expr)* [',']
+/// exprlist: (expr|star_expr) (',' (expr|star_expr))* [',']
 exprlist
- : star_expr ( ',' star_expr )* ','?
+ : (expr | star_expr) ( COMMA (expr | star_expr) )* COMMA?
  ;
 
 /// testlist: test (',' test)* [',']
@@ -617,15 +640,18 @@ testlist
  : test ( ',' test )* ','?
  ;
 
-/// dictorsetmaker: ( (test ':' test (comp_for | (',' test ':' test)* [','])) |
-///                   (test (comp_for | (',' test)* [','])) )
+/// dictorsetmaker: ( ((test ':' test | '**' expr)
+///                    (comp_for | (',' (test ':' test | '**' expr))* [','])) |
+///                   ((test | star_expr)
+///                    (comp_for | (',' (test | star_expr))* [','])) )
 dictorsetmaker
- : test ':' test ( comp_for
-                 | ( ',' test ':' test )* ','?
-                 )
- | test ( comp_for
-        | ( ',' test )* ','?
-        )
+ : ((test COLON test | POWER expr) ( comp_for
+                 | ( COMMA (test COLON test | POWER expr ))* COMMA?
+                 ))
+ | (( test|star_expr)
+        ( comp_for
+        | (COMMA (test|star_expr))* COMMA?
+        ))
  ;
 
 /// classdef: 'class' NAME ['(' [arglist] ')'] ':' suite
@@ -633,22 +659,28 @@ classdef
  : CLASS NAME ( '(' arglist? ')' )? ':' suite
  ;
 
-/// arglist: (argument ',')* (argument [',']
-///                          |'*' test (',' argument)* [',' '**' test]
-///                          |'**' test)
+///arglist: argument (',' argument)*  [',']
 arglist
- : ( argument ',' )* ( argument ','?
-                     | '*' test ( ',' argument )* ( ',' '**' test )?
-                     | '**' test
-                     )
- ;
+ : argument ( COMMA argument )* COMMA?;
 
 /// # The reason that keywords are test nodes instead of NAME is that using NAME
 /// # results in an ambiguity. ast.c makes sure it's a NAME.
-/// argument: test [comp_for] | test '=' test  # Really [keyword '='] test
+/// # "test '=' test" is really "keyword '=' test", but we have no such token.
+/// # These need to be in a single rule to avoid grammar that is ambiguous
+/// # to our LL(1) parser. Even though 'test' includes '*expr' in star_expr,
+/// # we explicitly match '*' here, too, to give it proper precedence.
+/// # Illegal combinations and orderings are blocked in ast.c:
+/// # multiple (test comp_for) arguments are blocked; keyword unpackings
+/// # that precede iterable unpackings are blocked; etc.
+/// argument: ( test [comp_for] |
+///             test '=' test |
+///             '**' test |
+///             '*' test )
 argument
  : test comp_for?
- | test '=' test
+ | key=test ASSIGN val=test
+ | POWER test
+ | STAR test
  ;
 
 /// comp_iter: comp_for | comp_if
@@ -701,6 +733,8 @@ integer
  * lexer rules
  */
 
+ASYNC: 'async';
+AWAIT: 'await';
 DEF : 'def';
 RETURN : 'return';
 RAISE : 'raise';
