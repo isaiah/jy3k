@@ -645,12 +645,13 @@ testlist
 ///                   ((test | star_expr)
 ///                    (comp_for | (',' (test | star_expr))* [','])) )
 dictorsetmaker
- : ((test COLON test | POWER expr) ( comp_for
-                 | ( COMMA (test COLON test | POWER expr ))* COMMA?
-                 ))
- | (( test|star_expr)
+ : ((keys+=test COLON vals+=test | POWER dicts+=expr)
         ( comp_for
-        | (COMMA (test|star_expr))* COMMA?
+        | ( COMMA (keys+=test COLON vals+=test | POWER dicts+=expr ))* COMMA?
+        ))
+ | (( t+=test|s+=star_expr )
+        ( comp_for
+        | (COMMA (t+=test|s+=star_expr))* COMMA?
         ))
  ;
 

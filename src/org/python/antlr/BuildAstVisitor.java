@@ -209,6 +209,45 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitDictorsetmaker(PythonParser.DictorsetmakerContext ctx) {
+        if (!ctx.COLON().isEmpty()) {
+            if (ctx.comp_for() != null) {
+                /** Dict comprehension */
+                expr key = (expr) visit(ctx.test(0));
+                expr val = (expr) visit(ctx.test(1));
+                return new DictComp(ctx.getStart(), key, val, visit_Comp_for(ctx.comp_for()));
+            }
+            /** Dict */
+            java.util.List<expr> keys = new ArrayList<>();
+            java.util.List<expr> vals = new ArrayList<>();
+            for (PythonParser.TestContext testContext : ctx.keys) {
+                keys.add((expr) visit(testContext));
+            }
+            for (PythonParser.TestContext testContext : ctx.vals) {
+                vals.add((expr) visit(testContext));
+            }
+            for (PythonParser.ExprContext exprContext : ctx.dicts) {
+                vals.add((expr) visit(exprContext));
+            }
+            return new Dict(ctx.getStart(), keys, vals);
+        }
+        if (ctx.comp_for() != null) {
+            /** Set comprehension */
+            expr elt = (expr) visit(ctx.test(0));
+            return new SetComp(ctx.getStart(), elt, visit_Comp_for(ctx.comp_for()));
+        }
+        /** Set */
+        java.util.List<expr> elts = new ArrayList<>();
+        for (PythonParser.TestContext testContext : ctx.test()) {
+            elts.add((expr) visit(testContext));
+        }
+        for (PythonParser.Star_exprContext star_exprContext : ctx.star_expr()) {
+            elts.add((expr) visit(star_exprContext));
+        }
+        return new Set(ctx.getStart(), elts);
+    }
+
+    @Override
     public PythonTree visitAtom(PythonParser.AtomContext ctx) {
         Testlist_compResult testlistCompResult = visit_Testlist_comp(ctx.testlist_comp());
         if (ctx.OPEN_PAREN() != null) {
@@ -221,6 +260,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
             return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
+        } else if (ctx.OPEN_BRACE() != null) {
+            return visit(ctx.dictorsetmaker());
         } else if (ctx.number() != null) {
             return visit(ctx.number());
         } else if (ctx.yield_expr() != null) {
