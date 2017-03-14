@@ -91,22 +91,22 @@ public class GrammarActions {
         return result;
     }
 
-    List<String> makeNames(List names) {
+    List<String> makeNames(List<TerminalNode> names) {
         List<String> s = new ArrayList<String>();
         for(int i=0;i<names.size();i++) {
-            s.add(((Token)names.get(i)).getText());
+            s.add(names.get(i).getText());
         }
         return s;
     }
 
-    Name makeNameNode(Token t) {
+    Name makeNameNode(TerminalNode t) {
         if (t == null) {
             return null;
         }
         return new Name(t, t.getText(), expr_contextType.Load);
     }
 
-    List<Name> makeNameNodes(List<Token> names) {
+    List<Name> makeNameNodes(List<TerminalNode> names) {
         List<Name> s = new ArrayList<Name>();
         for (int i=0; i<names.size(); i++) {
             s.add(makeNameNode(names.get(i)));
@@ -231,8 +231,7 @@ public class GrammarActions {
         expr current = new Name(nameToken, nameToken.getText(), expr_contextType.Load);
         for (Object o: attrs) {
             Token t = (Token)o;
-            current = new Attribute(t, current, cantBeNoneName(t),
-                expr_contextType.Load);
+            current = new Attribute(t, current, t.getText(), expr_contextType.Load);
         }
         return current;
     }
@@ -313,15 +312,14 @@ public class GrammarActions {
 
     stmt makeAsyncFuncdef(Token t, Object def) {
         FunctionDef func = (FunctionDef) castStmt(def);
-        return new AsyncFunctionDef(t, func.getInternalNameNode(), func.getInternalArgs(),
-                func.getInternalBody(), func.getInternalReturnNode());
+        return new AsyncFunctionDef(t, func.getInternalName(), func.getInternalArgs(),
+                func.getInternalBody(), func.getInternalDecorator_list(), func.getInternalReturns());
     }
 
     stmt makeFuncdef(Token t, Token nameToken, arguments args, List funcStatements, expr returnNode) {
         if (nameToken == null) {
             return errorHandler.errorStmt(new PythonTree(t));
         }
-        Name n = cantBeNoneName(nameToken);
         arguments a = args;
         if (a == null) {
             a = new arguments(t, new ArrayList<arg>(), (arg)null,
@@ -329,7 +327,7 @@ public class GrammarActions {
                     new ArrayList<arg>(), new ArrayList<expr>(), (arg) null, new ArrayList<expr>());
         }
         List<stmt> s = castStmts(funcStatements);
-        return new FunctionDef(t, n, a, s, returnNode);
+        return new FunctionDef(t, nameToken.getText(), a, s, null, returnNode);
     }
 
     List<expr> makeAssignTargets(expr lhs, List rhs) {

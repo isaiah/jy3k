@@ -37,6 +37,8 @@ tokens { INDENT, DEDENT }
 
 @header {
 package org.python.antlr;
+
+import org.python.antlr.ast.cmpopType;
 }
 
 @lexer::members {
@@ -413,7 +415,7 @@ async_stmt
 
 /// if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
 if_stmt
- : IF test COLON suite ( ELIF test COLON suite )* ( ELSE COLON suite )?
+ : IF test COLON suite ( ELIF elif+=test COLON elbody+=suite )* ( ELSE COLON elsebody=suite )?
  ;
 
 /// while_stmt: 'while' test ':' suite ['else' ':' suite]
@@ -475,12 +477,12 @@ test_nocond
 
 /// lambdef: 'lambda' [varargslist] ':' test
 lambdef
- : LAMBDA varargslist? ':' test
+ : LAMBDA varargslist? COLON test
  ;
 
 /// lambdef_nocond: 'lambda' [varargslist] ':' test_nocond
 lambdef_nocond
- : LAMBDA varargslist? ':' test_nocond
+ : LAMBDA varargslist? COLON test_nocond
  ;
 
 /// or_test: and_test ('or' and_test)*
@@ -508,17 +510,51 @@ comparison
 /// # sake of a __future__ import described in PEP 401
 /// comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
 comp_op
- : '<'
- | '>'
- | '=='
- | '>='
- | '<='
- | '<>'
- | '!='
+  returns [cmpopType op]
+ : LESS_THAN
+   {
+     $op = cmpopType.Lt;
+   }
+ | GREATER_THAN
+   {
+     $op = cmpopType.Gt;
+   }
+ | EQUALS
+   {
+     $op = cmpopType.Eq;
+   }
+ | GT_EQ
+   {
+     $op = cmpopType.GtE;
+   }
+ | LT_EQ
+   {
+     $op = cmpopType.LtE;
+   }
+ | NOT_EQ_1
+   {
+     $op = cmpopType.NotEq;
+   }
+ | NOT_EQ_2
+   {
+     $op = cmpopType.NotEq;
+   }
  | IN
+   {
+     $op = cmpopType.In;
+   }
  | NOT IN
+   {
+     $op = cmpopType.NotIn;
+   }
  | IS
+   {
+     $op = cmpopType.Is;
+   }
  | IS NOT
+   {
+     $op = cmpopType.IsNot;
+   }
  ;
 
 /// star_expr: '*' expr
@@ -528,23 +564,23 @@ star_expr
 
 /// expr: xor_expr ('|' xor_expr)*
 expr
- : xor_expr ( '|' xor_expr )*
+ : xor_expr ( OR_OP xor_expr )*
  ;
 
 /// xor_expr: and_expr ('^' and_expr)*
 xor_expr
- : and_expr ( '^' and_expr )*
+ : and_expr ( XOR and_expr )*
  ;
 
 /// and_expr: shift_expr ('&' shift_expr)*
 and_expr
- : shift_expr ( '&' shift_expr )*
+ : shift_expr ( AND_OP shift_expr )*
  ;
 
 /// shift_expr: arith_expr (('<<'|'>>') arith_expr)*
 shift_expr
- : arith_expr ( LEFT_SHIFT arith_expr
-              | RIGHT_SHIFT arith_expr
+ : arith_expr ( ops+=LEFT_SHIFT arith_expr
+              | ops+=RIGHT_SHIFT arith_expr
               )*
  ;
 

@@ -10,6 +10,7 @@ import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,41 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     private GrammarActions actions = new GrammarActions();
     private expr_contextType exprContextType = expr_contextType.Load;
 
+    @Override
+    public PythonTree visitIf_stmt(PythonParser.If_stmtContext ctx) {
+        java.util.List<stmt> orelse = null;
+        int i = ctx.test().size();
+        if (ctx.suite().size() > i) {
+            orelse = visit_Suite(ctx.suite(i));
+        }
+        for (; i > 1; i--) {
+            PythonParser.TestContext testContext = ctx.test(i);
+            orelse = Arrays.asList(new If(testContext.getStart(), (expr) visit(testContext), visit_Suite(ctx.suite(i)), orelse));
+        }
+        return new If(ctx.getStart(), (expr) visit(ctx.test(0)), visit_Suite(ctx.suite(0)), orelse);
+    }
+
+    @Override
+    public PythonTree visitTest(PythonParser.TestContext ctx) {
+        if (ctx.lambdef() != null) {
+            return visit(ctx.lambdef());
+        }
+        if (ctx.IF() != null) {
+            return new IfExp(ctx.getStart(), (expr) visit(ctx.or_test(1)),
+                    (expr) visit(ctx.or_test(0)), (expr) visit(ctx.test()));
+        }
+        return visit(ctx.or_test(0));
+    }
+
+    @Override
+    public PythonTree visitLambdef(PythonParser.LambdefContext ctx) {
+        return new Lambda(ctx.getStart(), (arguments) visit(ctx.varargslist()), (expr) visit(ctx.test()));
+    }
+
+    @Override
+    public PythonTree visitLambdef_nocond(PythonParser.Lambdef_nocondContext ctx) {
+        return new Lambda(ctx.getStart(), (arguments) visit(ctx.varargslist()), (expr) visit(ctx.test_nocond()));
+    }
 
     @Override
     public PythonTree visitArgument(PythonParser.ArgumentContext ctx) {
@@ -236,6 +272,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitAssert_stmt(PythonParser.Assert_stmtContext ctx) {
+        expr msg = null;
+        if (ctx.test().size() > 1) {
+            msg = (expr) visit(ctx.test(1));
+        }
+        return new Assert(ctx.getStart(), (expr) visit(ctx.test(0)), msg);
+    }
+
+    @Override
     public PythonTree visitNonlocal_stmt(PythonParser.Nonlocal_stmtContext ctx) {
         return new Nonlocal(ctx.getStart(), actions.makeNames(ctx.NAME()));
     }
@@ -275,30 +320,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return visit(ctx.integer());
         }
         return super.visitNumber(ctx);
-    }
-
-    class Testlist_compResult {
-        java.util.List<expr> exprs;
-        java.util.List<comprehension> comps;
-
-        public Testlist_compResult() {
-            exprs = new ArrayList<>();
-        }
-    }
-
-    private Testlist_compResult visit_Testlist_comp(PythonParser.Testlist_compContext ctx) {
-        if (ctx == null) return null;
-        Testlist_compResult ret = new Testlist_compResult();
-        for (PythonParser.TestContext testContext : ctx.t) {
-            ret.exprs.add((expr) visit(testContext));
-        }
-        for (PythonParser.Star_exprContext star_exprContext : ctx.s) {
-            ret.exprs.add((expr) visit(star_exprContext));
-        }
-        if (ctx.comp_for() != null) {
-            ret.comps = visit_Comp_for(ctx.comp_for());
-        }
-        return ret;
     }
 
     @Override
@@ -376,13 +397,34 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitImport_from(PythonParser.Import_fromContext ctx) {
+        int lvl = ctx.DOT().size();
+        lvl += ctx.ELLIPSIS().size() * 3;
+        if (ctx.STAR() != null) {
+            alias star = new alias(ctx.getStart(), "*", null);
+            return new ImportFrom(ctx.getStart(), visit_Dotted_name(ctx.dotted_name()), Arrays.asList(star), lvl);
+        }
+        return new ImportFrom(ctx.getStart(), visit_Dotted_name(ctx.dotted_name()),
+                visit_Import_as_names(ctx.import_as_names()), lvl);
+    }
+
+    @Override
+    public PythonTree visitImport_as_name(PythonParser.Import_as_nameContext ctx) {
+        String asName = null;
+        if (ctx.NAME().size() > 1) {
+            asName = ctx.NAME(1).getText();
+        }
+        return new alias(ctx.getStart(), ctx.NAME(0).getText(), asName);
+    }
+
+    @Override
     public PythonTree visitImport_name(PythonParser.Import_nameContext ctx) {
         return new Import(ctx.getStart(), visit_Dotted_as_names(ctx.dotted_as_names()));
     }
 
     @Override
     public PythonTree visitDotted_as_name(PythonParser.Dotted_as_nameContext ctx) {
-        return new alias(visit(ctx.dotted_name()), actions.makeNameNode(ctx.NAME()));
+        return new alias(ctx.getStart(), visit_Dotted_name(ctx.dotted_name()), ctx.NAME().getText());
     }
 
     @Override
@@ -486,6 +528,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return suite;
     }
 
+    class Testlist_compResult {
+        java.util.List<expr> exprs;
+        java.util.List<comprehension> comps;
+
+        public Testlist_compResult() {
+            exprs = new ArrayList<>();
+        }
+    }
+
     class ArglistResult {
         java.util.List<expr> args;
         java.util.List<keyword> keywords;
@@ -564,6 +615,39 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return new ExtSlice(ctx.getStart(), dims);
         }
         return (slice) visit(ctx.subscript(0));
+    }
+
+    private String visit_Dotted_name(PythonParser.Dotted_nameContext ctx) {
+        /**
+         *  When import from relative path without specifying the module
+         */
+        if (ctx == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(ctx.NAME(0).getText());
+        ctx.NAME().stream().skip(1).forEach((name) -> sb.append(".").append(name.getText()));
+        return sb.toString();
+    }
+
+    private Testlist_compResult visit_Testlist_comp(PythonParser.Testlist_compContext ctx) {
+        if (ctx == null) return null;
+        Testlist_compResult ret = new Testlist_compResult();
+        for (PythonParser.TestContext testContext : ctx.t) {
+            ret.exprs.add((expr) visit(testContext));
+        }
+        for (PythonParser.Star_exprContext star_exprContext : ctx.s) {
+            ret.exprs.add((expr) visit(star_exprContext));
+        }
+        if (ctx.comp_for() != null) {
+            ret.comps = visit_Comp_for(ctx.comp_for());
+        }
+        return ret;
+    }
+
+    private java.util.List<alias> visit_Import_as_names(PythonParser.Import_as_namesContext ctx) {
+        return ctx.import_as_name().stream()
+                .map(import_as_nameContext -> (alias) visit(import_as_nameContext))
+                .collect(Collectors.toList());
     }
 
     public static void main(String[] args) {

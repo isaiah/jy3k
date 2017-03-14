@@ -128,7 +128,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
         List<stmt> body = node.getInternalBody();
-        expr return_ = node.getInternalReturnNode();
+        expr return_ = node.getInternalReturns();
         return compileFunction(name, args, decs, body, node, return_);
     }
 
@@ -138,7 +138,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
         List<stmt> body = node.getInternalBody();
-        expr return_ = node.getInternalReturnNode();
+        expr return_ = node.getInternalReturns();
         return compileFunction(name, args, decs, body, node, return_);
     }
 
