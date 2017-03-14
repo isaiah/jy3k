@@ -375,47 +375,4 @@ public class arguments extends PythonTree {
         }
     }
 
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        if (args != null) {
-            for (PyObject ob: args) {
-                if (ob != null) {
-                    retVal = visit.visit(ob, arg);
-                    if (retVal != 0) {
-                        return retVal;
-                    }
-                }
-            }
-        }
-        if (defaults != null) {
-            for (PyObject ob: defaults) {
-                if (ob != null) {
-                    retVal = visit.visit(ob, arg);
-                    if (retVal != 0) {
-                        return retVal;
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        if (ob == null) {
-            return false;
-        } else if (args != null && args.contains(ob)) {
-            return true;
-        } else if (defaults != null && defaults.contains(ob)) {
-            return true;
-        } else {
-            return super.refersDirectlyTo(ob);
-        }
-    }
 }

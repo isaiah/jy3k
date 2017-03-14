@@ -162,15 +162,4 @@ public class keyword extends PythonTree {
         }
     }
 
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        return value != null ? visit.visit(value,  arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (ob == value || super.refersDirectlyTo(ob));
-    }
 }

@@ -248,32 +248,4 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         col_offset = num;
     }
 
-    // Support for indexer below
-
-    private java.util.List<Name> moduleNames;
-    public java.util.List<Name> getInternalModuleNames() {
-        return moduleNames;
-    }
-    public ImportFrom(Token token,
-                      String module, java.util.List<Name> moduleNames,
-                      java.util.List<alias> names, Integer level) {
-        super(token);
-        this.module = module;
-        this.names = names;
-        if (names == null) {
-            this.names = new ArrayList<alias>();
-        }
-        for(PythonTree t : this.names) {
-            addChild(t);
-        }
-        this.moduleNames = moduleNames;
-        if (moduleNames == null) {
-            this.moduleNames = new ArrayList<Name>();
-        }
-        for(PythonTree t : this.moduleNames) {
-            addChild(t);
-        }
-        this.level = level;
-    }
-    // End indexer support
 }

@@ -171,16 +171,4 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
         col_offset = num;
     }
 
-    // Support for indexer below
-
-    private java.util.List<Name> nameNodes;
-    public java.util.List<Name> getInternalNameNodes() {
-        return nameNodes;
-    }
-    public Nonlocal(Token token, java.util.List<String> names, java.util.List<Name> nameNodes) {
-        super(token);
-        this.names = names;
-        this.nameNodes = nameNodes;
-    }
-    // End indexer support
 }

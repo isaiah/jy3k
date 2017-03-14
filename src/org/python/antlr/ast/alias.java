@@ -157,29 +157,4 @@ public class alias extends PythonTree {
         }
     }
 
-    // Support for indexer below
-
-    private java.util.List<Name> nameNodes;
-    public java.util.List<Name> getInternalNameNodes() {
-        return nameNodes;
-    }
-    private Name asnameNode;
-    public Name getInternalAsnameNode() {
-        return asnameNode;
-    }
-    // [import] name [as asname]
-    public alias(Name name, Name asname) {
-        this(java.util.Arrays.asList(new Name[]{name}), asname);
-    }
-
-    // [import] ...foo.bar.baz [as asname]
-    public alias(java.util.List<Name> nameNodes, Name asname) {
-        this.nameNodes = nameNodes;
-        this.name = dottedNameListToString(nameNodes);
-        if (asname != null) {
-            this.asnameNode = asname;
-            this.asname = asname.getInternalId();
-        }
-    }
-    // End indexer support
 }
