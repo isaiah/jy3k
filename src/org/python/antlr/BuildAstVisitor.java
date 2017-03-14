@@ -6,8 +6,11 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.python.antlr.ast.*;
 import org.python.antlr.base.expr;
+import org.python.antlr.base.slice;
+import org.python.antlr.base.stmt;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 /**
  * Created by isaiah on 3/10/17.
@@ -15,6 +18,144 @@ import java.util.ArrayList;
 public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     private GrammarActions actions = new GrammarActions();
     private expr_contextType exprContextType = expr_contextType.Load;
+
+
+    @Override
+    public PythonTree visitArgument(PythonParser.ArgumentContext ctx) {
+        if (ctx.ASSIGN() != null) {
+            return new keyword(ctx.getStart(), ctx.key.getText(), (expr) visit(ctx.val));
+        } else if (ctx.POWER() != null) {
+            return new keyword(ctx.getStart(), null, (expr) visit(ctx.test(0)));
+        } else if (ctx.STAR() != null) {
+            return new Starred(ctx.getStart(), (expr) visit(ctx.test(0)), expr_contextType.Load);
+        } else {
+            expr elt = (expr) visit(ctx.test(0));
+            if (ctx.comp_for() != null) {
+                return new GeneratorExp(ctx.getStart(), elt, visit_Comp_for(ctx.comp_for()));
+            }
+            return elt;
+        }
+    }
+
+    @Override
+    public PythonTree visitSubscript(PythonParser.SubscriptContext ctx) {
+        if (ctx.COLON() == null) {
+            return new Index(ctx.getStart(), (expr) visit(ctx.test(0)));
+        }
+        return new Slice(ctx.getStart(), (expr) visit(ctx.lower), (expr) visit(ctx.upper), (expr) visit(ctx.sliceop()));
+    }
+
+    @Override
+    public PythonTree visitSliceop(PythonParser.SliceopContext ctx) {
+        return visit(ctx.test());
+    }
+
+    @Override
+    public PythonTree visitPower(PythonParser.PowerContext ctx) {
+        expr left = (expr) visit(ctx.atom());
+        for (PythonParser.TrailerContext trailerCtx : ctx.trailer()) {
+            if (trailerCtx.OPEN_PAREN() != null) {
+                ArglistResult arglistResult = visit_Arglist(trailerCtx.arglist());
+                left = new Call(ctx.getStart(), left, arglistResult.args, arglistResult.keywords);
+            } else if (trailerCtx.OPEN_BRACK() != null) {
+                left = new Subscript(ctx.getStart(), left, visit_Subscriptlist(trailerCtx.subscriptlist()), expr_contextType.Load);
+            } else if (trailerCtx.DOT() != null) {
+                left = new Attribute(ctx.getStart(), left, trailerCtx.NAME().getText(), expr_contextType.Load);
+            }
+        }
+        if (ctx.factor() != null) {
+            return new BinOp(ctx.getStart(), left, operatorType.Pow, (expr) visit(ctx.factor()));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitFactor(PythonParser.FactorContext ctx) {
+        if (ctx.factor() != null) {
+            unaryopType op;
+            switch (ctx.op.getType()) {
+                case PythonLexer.MINUS:
+                    op = unaryopType.USub;
+                    break;
+                case PythonLexer.NOT_OP:
+                    op = unaryopType.Invert;
+                    break;
+                default:
+                    op = unaryopType.UAdd;
+            }
+            return new UnaryOp(ctx.getStart(), op, (expr) visit(ctx.factor()));
+        }
+        return visit(ctx.power());
+    }
+
+    @Override
+    public PythonTree visitArith_expr(PythonParser.Arith_exprContext ctx) {
+        expr left = (expr) visit(ctx.term(0));
+        for (int i = 0; i < ctx.ops.size(); i++) {
+            operatorType op = ctx.ops.get(i).getType() == PythonLexer.MINUS ? operatorType.Sub : operatorType.Add;
+            left = new BinOp(ctx.getStart(), left, op, (expr) visit(ctx.term(i+1)));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitTerm(PythonParser.TermContext ctx) {
+        expr left = (expr) visit(ctx.factor(0));
+        for (int i = 0; i < ctx.ops.size(); i++) {
+            operatorType op;
+            switch(ctx.ops.get(i).getType()) {
+                case PythonLexer.DIV:
+                    op = operatorType.Div;
+                    break;
+                case PythonLexer.MOD:
+                    op = operatorType.Mod;
+                    break;
+                case PythonLexer.IDIV:
+                    op = operatorType.FloorDiv;
+                    break;
+                case PythonLexer.STAR:
+                    op = operatorType.Mult;
+                    break;
+                case PythonLexer.AT:
+                    op = operatorType.MatMult;
+                    break;
+                default:
+                    op = operatorType.UNDEFINED;
+            }
+            left = new BinOp(ctx.factor(i).getStart(), left, op, (expr) visit(ctx.factor(i+1)));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitStar_expr(PythonParser.Star_exprContext ctx) {
+        return new Starred(ctx.getStart(), (expr) visit(ctx.expr()), exprContextType);
+    }
+
+    @Override
+    public PythonTree visitFor_stmt(PythonParser.For_stmtContext ctx) {
+        return new For(ctx.getStart(), (expr) visit(ctx.exprlist()), (expr) visitTestlist(ctx.testlist()), visit_Suite(ctx.s1), visit_Suite(ctx.s2));
+    }
+
+    @Override
+    public PythonTree visitWhile_stmt(PythonParser.While_stmtContext ctx) {
+        return new While(ctx.getStart(), (expr) visit(ctx.test()), visit_Suite(ctx.s1), visit_Suite(ctx.s2));
+    }
+
+    @Override
+    public PythonTree visitNonlocal_stmt(PythonParser.Nonlocal_stmtContext ctx) {
+        return new Nonlocal(ctx.getStart(), actions.makeNames(ctx.NAME()));
+    }
+
+    @Override
+    public PythonTree visitGlobal_stmt(PythonParser.Global_stmtContext ctx) {
+        return new Global(ctx.getStart(), actions.makeNames(ctx.NAME()));
+    }
+
+    @Override
+    public PythonTree visitTfpdef(PythonParser.TfpdefContext ctx) {
+        return new arg(ctx.getStart(), ctx.NAME().getText(), (expr) visit(ctx.test()));
+    }
 
     @Override
     public PythonTree visitInteger(PythonParser.IntegerContext ctx) {
@@ -43,9 +184,44 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return super.visitNumber(ctx);
     }
 
+    class Testlist_compResult {
+        java.util.List<expr> exprs;
+        java.util.List<comprehension> comps;
+
+        public Testlist_compResult() {
+            exprs = new ArrayList<>();
+        }
+    }
+
+    private Testlist_compResult visit_Testlist_comp(PythonParser.Testlist_compContext ctx) {
+        if (ctx == null) return null;
+        Testlist_compResult ret = new Testlist_compResult();
+        for (PythonParser.TestContext testContext : ctx.t) {
+            ret.exprs.add((expr) visit(testContext));
+        }
+        for (PythonParser.Star_exprContext star_exprContext : ctx.s) {
+            ret.exprs.add((expr) visit(star_exprContext));
+        }
+        if (ctx.comp_for() != null) {
+            ret.comps = visit_Comp_for(ctx.comp_for());
+        }
+        return ret;
+    }
+
     @Override
     public PythonTree visitAtom(PythonParser.AtomContext ctx) {
-        if (ctx.number() != null) {
+        Testlist_compResult testlistCompResult = visit_Testlist_comp(ctx.testlist_comp());
+        if (ctx.OPEN_PAREN() != null) {
+            if (testlistCompResult.comps != null) {
+                return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+            }
+            return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
+        } else if (ctx.OPEN_BRACK() != null) {
+            if (testlistCompResult.comps != null) {
+                return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+            }
+            return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
+        } else if (ctx.number() != null) {
             return visit(ctx.number());
         } else if (ctx.yield_expr() != null) {
             return visit(ctx.yield_expr());
@@ -65,22 +241,20 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return super.visitAtom(ctx);
     }
 
-    public java.util.List<expr> visitExpr_list(PythonParser.ExprlistContext ctx) {
-        java.util.List<expr> elts = new ArrayList<>();
-        for (PythonParser.Star_exprContext starExpr : ctx.star_expr()) {
-            elts.add((expr) visit(starExpr));
-        }
-        return elts;
+    @Override
+    public PythonTree visitImport_name(PythonParser.Import_nameContext ctx) {
+        return new Import(ctx.getStart(), visit_Dotted_as_names(ctx.dotted_as_names()));
     }
 
-    interface Handle {
-        PythonTree visit();
+    @Override
+    public PythonTree visitDotted_as_name(PythonParser.Dotted_as_nameContext ctx) {
+        return new alias(visit(ctx.dotted_name()), actions.makeNameNode(ctx.NAME()));
     }
 
     @Override
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
         return withExprContextType(expr_contextType.Del, () ->
-            new Delete(ctx.getStart(), visitExpr_list(ctx.exprlist()))
+            new Delete(ctx.getStart(), visit_Exprlist(ctx.exprlist()))
         );
     }
 
@@ -133,12 +307,125 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     /** Temporarily change exprContextType */
-    private PythonTree withExprContextType(expr_contextType contextType, Handle handle) {
+    private PythonTree withExprContextType(expr_contextType contextType, Supplier<PythonTree> handle) {
         expr_contextType oldContextType = exprContextType;
         exprContextType = contextType;
-        PythonTree ret = handle.visit();
+        PythonTree ret = handle.get();
         exprContextType = oldContextType;
         return ret;
+    }
+
+    /** helper method */
+    private java.util.List<expr> visit_Exprlist(PythonParser.ExprlistContext ctx) {
+        java.util.List<expr> elts = new ArrayList<>();
+        for (PythonParser.Star_exprContext starExpr : ctx.star_expr()) {
+            elts.add((expr) visit(starExpr));
+        }
+        return elts;
+    }
+
+    private java.util.List<alias> visit_Dotted_as_names(PythonParser.Dotted_as_namesContext ctx) {
+        java.util.List<alias> aliases = new ArrayList<>();
+        for (PythonParser.Dotted_as_nameContext dotted : ctx.dotted_as_name()) {
+            aliases.add((alias) visit(dotted));
+        }
+        return aliases;
+    }
+
+    private java.util.List<stmt> visit_Simple_stmt(PythonParser.Simple_stmtContext ctx) {
+        java.util.List<stmt> stmts = new ArrayList<>();
+        for (PythonParser.Small_stmtContext smallStmtCtx : ctx.small_stmt()) {
+            stmts.add((stmt) visit(smallStmtCtx));
+        }
+        return stmts;
+    }
+
+    private java.util.List<stmt> visit_Suite(PythonParser.SuiteContext ctx) {
+        java.util.List<stmt> suite = new ArrayList<>();
+        if (ctx != null && ctx.simple_stmt() != null) {
+            return visit_Simple_stmt(ctx.simple_stmt());
+        }
+        return suite;
+    }
+
+    class ArglistResult {
+        java.util.List<expr> args;
+        java.util.List<keyword> keywords;
+
+        public ArglistResult() {
+            this.args = new ArrayList<>();
+            this.keywords = new ArrayList<>();
+        }
+    }
+
+    class Comp_iterResult {
+        expr ifs;
+        java.util.List<comprehension> comps;
+        Comp_iterResult iter;
+    }
+
+    // e.g. restFiles = [os.path.join(d[0], f) for d in os.walk(".") if not "_test" in d[0] for f in d[2] if f.endswith(".rst")]
+    private Comp_iterResult visit_Comp_iter(PythonParser.Comp_iterContext ctx) {
+        Comp_iterResult ret = new Comp_iterResult();
+        if (ctx.comp_for() != null) {
+            ret.comps = visit_Comp_for(ctx.comp_for());
+        } else if (ctx.comp_if() != null) {
+            ret.iter = visit_Comp_if(ctx.comp_if());
+        }
+        return ret;
+    }
+
+    private Comp_iterResult visit_Comp_if(PythonParser.Comp_ifContext ctx) {
+        Comp_iterResult ret = new Comp_iterResult();
+        ret.ifs = (expr) visit(ctx.test_nocond());
+        if (ctx.comp_iter() != null) {
+            ret.iter = visit_Comp_iter(ctx.comp_iter());
+        }
+        return ret;
+    }
+
+    private java.util.List<comprehension> visit_Comp_for(PythonParser.Comp_forContext ctx) {
+        java.util.List<comprehension> ret = new ArrayList<>();
+        expr target = (expr) visit(ctx.exprlist());
+        expr iter = (expr) visit(ctx.or_test());
+        if (ctx.comp_iter() != null) {
+            Comp_iterResult iterRet = visit_Comp_iter(ctx.comp_iter());
+            java.util.List<expr> ifs = new ArrayList<>();
+            for (; iterRet.iter != null; iterRet = iterRet.iter) {
+                if (iterRet.ifs != null) {
+                    ifs.add(iterRet.ifs);
+                }
+                if (iterRet.comps != null) {
+                    ret.addAll(iterRet.comps);
+                }
+            }
+            ret.add(new comprehension(ctx.getStart(), target, iter, ifs));
+        }
+        return ret;
+    }
+
+    private ArglistResult visit_Arglist(PythonParser.ArglistContext ctx) {
+        ArglistResult ret = new ArglistResult();
+        for (PythonParser.ArgumentContext argCtx: ctx.argument()) {
+            PythonTree arg = visit(argCtx);
+            if (arg instanceof keyword) {
+                ret.keywords.add((keyword) arg);
+            } else {
+                ret.args.add((expr) arg);
+            }
+        }
+        return ret;
+    }
+
+    private slice visit_Subscriptlist(PythonParser.SubscriptlistContext ctx) {
+        if (ctx.subscript().size() > 1) {
+            java.util.List<slice> dims = new ArrayList<>(ctx.subscript().size());
+            for (PythonParser.SubscriptContext subscriptContext : ctx.subscript()) {
+                dims.add((slice) visitSubscript(subscriptContext));
+            }
+            return new ExtSlice(ctx.getStart(), dims);
+        }
+        return (slice) visit(ctx.subscript(0));
     }
 
     public static void main(String[] args) {
