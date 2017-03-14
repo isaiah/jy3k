@@ -11,6 +11,7 @@ import org.python.antlr.base.stmt;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Created by isaiah on 3/10/17.
@@ -89,11 +90,103 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitOr_test(PythonParser.Or_testContext ctx) {
+        if (ctx.OR().isEmpty()) {
+            return visit(ctx.and_test(0));
+        }
+        java.util.List<expr> values = ctx.and_test().stream()
+                .map(and_testContext -> (expr) visit(and_testContext))
+                .collect(Collectors.toList());
+        return new BoolOp(ctx.getStart(), boolopType.Or, values);
+    }
+
+    @Override
+    public PythonTree visitAnd_test(PythonParser.And_testContext ctx) {
+        if (ctx.AND().isEmpty()) {
+            return visit(ctx.not_test(0));
+        }
+        java.util.List<expr> values = ctx.not_test().stream()
+                .map(not_testContext -> (expr) visit(not_testContext))
+                .collect(Collectors.toList());
+        return new BoolOp(ctx.getStart(), boolopType.And, values);
+    }
+
+    @Override
+    public PythonTree visitNot_test(PythonParser.Not_testContext ctx) {
+        if (ctx.NOT() != null) {
+            return new UnaryOp(ctx.getStart(), unaryopType.Not, (expr) visit(ctx.not_test()));
+        }
+        return visit(ctx.comparison());
+    }
+
+    @Override
+    public PythonTree visitComparison(PythonParser.ComparisonContext ctx) {
+        if (ctx.comp_op().isEmpty()) {
+            return visit(ctx.expr(0));
+        }
+        expr left = (expr) visit(ctx.expr(0));
+        java.util.List<expr> comparators = ctx.expr().stream()
+                .skip(1)
+                .map((exprCtx) -> (expr) visit(exprCtx))
+                .collect(Collectors.toList());
+        java.util.List<cmpopType> ops = ctx.comp_op().stream()
+                .map((opCtx) -> opCtx.op)
+                .collect(Collectors.toList());
+        return new Compare(ctx.getStart(), left, ops, comparators);
+    }
+
+    @Override
+    public PythonTree visitExpr(PythonParser.ExprContext ctx) {
+        if (ctx.OR_OP().isEmpty()) {
+            return visit(ctx.xor_expr(0));
+        }
+        expr left = (expr) visit(ctx.xor_expr(0));
+        for (int i = 1; i < ctx.xor_expr().size(); i++) {
+            left = new BinOp(ctx.getStart(), left, operatorType.BitOr, (expr) visit(ctx.xor_expr(i)));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitXor_expr(PythonParser.Xor_exprContext ctx) {
+        if (ctx.XOR().isEmpty()) {
+            return visit(ctx.and_expr(0));
+        }
+        expr left = (expr) visit(ctx.and_expr(0));
+        for (int i = 1; i < ctx.and_expr().size(); i++) {
+            left = new BinOp(ctx.getStart(), left, operatorType.BitXor, (expr) visit(ctx.and_expr(i)));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitAnd_expr(PythonParser.And_exprContext ctx) {
+        if (ctx.AND_OP().isEmpty()) {
+            return visit(ctx.shift_expr(0));
+        }
+        expr left = (expr) visit(ctx.shift_expr(0));
+        for (int i = 1; i < ctx.shift_expr().size(); i++) {
+            left = new BinOp(ctx.getStart(), left, operatorType.BitAnd, (expr) visit(ctx.shift_expr(i)));
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitShift_expr(PythonParser.Shift_exprContext ctx) {
+        expr left = (expr) visit(ctx.arith_expr(0));
+        for (int i = 0; i < ctx.ops.size(); i++) {
+            operatorType op = ctx.ops.get(i).getType() == PythonLexer.MINUS ? operatorType.Sub : operatorType.Add;
+            left = new BinOp(ctx.getStart(), left, op, (expr) visit(ctx.arith_expr(i + 1)));
+        }
+        return left;
+    }
+
+    @Override
     public PythonTree visitArith_expr(PythonParser.Arith_exprContext ctx) {
         expr left = (expr) visit(ctx.term(0));
         for (int i = 0; i < ctx.ops.size(); i++) {
             operatorType op = ctx.ops.get(i).getType() == PythonLexer.MINUS ? operatorType.Sub : operatorType.Add;
-            left = new BinOp(ctx.getStart(), left, op, (expr) visit(ctx.term(i+1)));
+            left = new BinOp(ctx.getStart(), left, op, (expr) visit(ctx.term(i + 1)));
         }
         return left;
     }
@@ -103,7 +196,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         expr left = (expr) visit(ctx.factor(0));
         for (int i = 0; i < ctx.ops.size(); i++) {
             operatorType op;
-            switch(ctx.ops.get(i).getType()) {
+            switch (ctx.ops.get(i).getType()) {
                 case PythonLexer.DIV:
                     op = operatorType.Div;
                     break;
@@ -122,7 +215,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 default:
                     op = operatorType.UNDEFINED;
             }
-            left = new BinOp(ctx.factor(i).getStart(), left, op, (expr) visit(ctx.factor(i+1)));
+            left = new BinOp(ctx.factor(i).getStart(), left, op, (expr) visit(ctx.factor(i + 1)));
         }
         return left;
     }
@@ -295,7 +388,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
         return withExprContextType(expr_contextType.Del, () ->
-            new Delete(ctx.getStart(), visit_Exprlist(ctx.exprlist()))
+                new Delete(ctx.getStart(), visit_Exprlist(ctx.exprlist()))
         );
     }
 
@@ -347,7 +440,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return super.visitYield_arg(ctx);
     }
 
-    /** Temporarily change exprContextType */
+    /**
+     * Temporarily change exprContextType
+     */
     private PythonTree withExprContextType(expr_contextType contextType, Supplier<PythonTree> handle) {
         expr_contextType oldContextType = exprContextType;
         exprContextType = contextType;
@@ -356,7 +451,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return ret;
     }
 
-    /** helper method */
+    /**
+     * helper method
+     */
     private java.util.List<expr> visit_Exprlist(PythonParser.ExprlistContext ctx) {
         java.util.List<expr> elts = new ArrayList<>();
         for (PythonParser.Star_exprContext starExpr : ctx.star_expr()) {
@@ -447,7 +544,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private ArglistResult visit_Arglist(PythonParser.ArglistContext ctx) {
         ArglistResult ret = new ArglistResult();
-        for (PythonParser.ArgumentContext argCtx: ctx.argument()) {
+        for (PythonParser.ArgumentContext argCtx : ctx.argument()) {
             PythonTree arg = visit(argCtx);
             if (arg instanceof keyword) {
                 ret.keywords.add((keyword) arg);
