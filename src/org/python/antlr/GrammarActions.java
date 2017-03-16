@@ -273,8 +273,7 @@ public class GrammarActions {
         return result;
     }
 
-    stmt makeAsyncFor(Token t, Object stmt) {
-        For forStmt = (For) castStmt(stmt);
+    stmt makeAsyncFor(Token t, For forStmt) {
         return new AsyncFor(t, forStmt.getInternalTarget(), forStmt.getInternalIter(),
                 forStmt.getInternalBody(), forStmt.getInternalOrelse());
     }
@@ -290,30 +289,9 @@ public class GrammarActions {
         return new For(t, target, iter, b, o);
     }
 
-    stmt makeTryExcept(Token t, List body, List<excepthandler> handlers, List orelse, List finBody) {
-        List<stmt> b = castStmts(body);
-        List<excepthandler> e = handlers;
-        List<stmt> o = castStmts(orelse);
-        stmt te = new TryExcept(t, b, e, o);
-        if (finBody == null) {
-            return te;
-        }
-        List<stmt> f = castStmts(finBody);
-        List<stmt> mainBody = new ArrayList<stmt>();
-        mainBody.add(te);
-        return new TryFinally(t, mainBody, f);
-    }
-
-    TryFinally makeTryFinally(Token t,  List body, List finBody) {
-        List<stmt> b = castStmts(body);
-        List<stmt> f = castStmts(finBody);
-        return new TryFinally(t, b, f);
-    }
-
-    stmt makeAsyncFuncdef(Token t, Object def) {
-        FunctionDef func = (FunctionDef) castStmt(def);
+    stmt makeAsyncFuncdef(Token t, FunctionDef func, java.util.List<expr> decoratorList) {
         return new AsyncFunctionDef(t, func.getInternalName(), func.getInternalArgs(),
-                func.getInternalBody(), func.getInternalDecorator_list(), func.getInternalReturns());
+                func.getInternalBody(), decoratorList, func.getInternalReturns());
     }
 
     stmt makeFuncdef(Token t, Token nameToken, arguments args, List funcStatements, expr returnNode) {

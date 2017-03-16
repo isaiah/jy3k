@@ -4,13 +4,17 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.ast.*;
+import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -22,15 +26,135 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     private expr_contextType exprContextType = expr_contextType.Load;
 
     @Override
+    public PythonTree visitTry_stmt(PythonParser.Try_stmtContext ctx) {
+        java.util.List<stmt> body = visit_Suite(ctx.suite(0));
+        java.util.List<excepthandler> handlers = new ArrayList<>();
+        for (int i = 0; i < ctx.except_clause().size(); i++) {
+            PythonParser.Except_clauseContext except_clauseContext = ctx.except_clause(i);
+            expr type = null;
+            if (except_clauseContext.test() != null) {
+                type = (expr) visit(except_clauseContext.test());
+            }
+            String name = null;
+            if (except_clauseContext.NAME() != null) {
+                name = except_clauseContext.NAME().getText();
+            }
+            java.util.List<stmt> handlerBody = visit_Suite(ctx.suite(i + 1));
+            excepthandler handler = new ExceptHandler(except_clauseContext.getStart(), type, name, handlerBody);
+            handlers.add(handler);
+        }
+        java.util.List<stmt> orelse = null;
+        if (ctx.ELSE() != null) {
+            orelse = visit_Suite(ctx.suite(ctx.except_clause().size() + 1));
+        }
+        java.util.List<stmt> finalBody = null;
+        if (ctx.FINALLY() != null) {
+            finalBody = visit_Suite(ctx.suite(ctx.suite().size() - 1));
+        }
+        return new Try(ctx.getStart(), body, handlers, orelse, finalBody);
+    }
+
+    @Override
+    public PythonTree visitFile_input(PythonParser.File_inputContext ctx) {
+        java.util.List<stmt> stmts = new ArrayList<>();
+        ctx.stmt().stream() .forEach(stmtContext -> stmts.addAll(visit_Stmt(stmtContext)));
+        return new Module(ctx.getStart(), stmts);
+    }
+
+    @Override
+    public PythonTree visitSingle_input(PythonParser.Single_inputContext ctx) {
+        if (ctx.compound_stmt() != null) {
+            return new Interactive(ctx.getStart(), Arrays.asList((stmt) visit(ctx.compound_stmt())));
+        }
+        return new Interactive(ctx.getStart(), visit_Simple_stmt(ctx.simple_stmt()));
+    }
+
+    @Override
+    public PythonTree visitEval_input(PythonParser.Eval_inputContext ctx) {
+        return new Expression(ctx.getStart(), (expr) visit(ctx.testlist()));
+    }
+
+    private java.util.List<stmt> visit_Stmt(PythonParser.StmtContext ctx) {
+        if (ctx.simple_stmt() != null) {
+            return visit_Simple_stmt(ctx.simple_stmt());
+        }
+        return Arrays.asList((stmt) visit(ctx.compound_stmt()));
+    }
+    @Override
+    public PythonTree visitExpr_stmt(PythonParser.Expr_stmtContext ctx) {
+        /** Augassign */
+        expr value;
+        if (ctx.augassign() != null) {
+            if (ctx.yield_expr().isEmpty()) {
+                value = (expr) visit(ctx.testlist());
+            } else {
+                value = (expr) visit(ctx.yield_expr(0));
+            }
+            exprContextType = expr_contextType.AugStore;
+            expr target = (expr) visit(ctx.testlist_star_expr(0));
+            exprContextType = expr_contextType.Load;
+            return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
+        }
+        if (ctx.annassign() != null) {
+            // TODO
+        }
+        /** Annotate assign */
+        if (ctx.ASSIGN().isEmpty()) {
+            return new Expr(ctx.getStart(), (expr) visit(ctx.testlist_star_expr(0)));
+        }
+        /** Assign */
+        int targetsSize = ctx.testlist_star_expr().size();
+        if (ctx.yield_expr().isEmpty()) {
+            targetsSize--;
+        }
+        java.util.List<expr> targets = ctx.testlist_star_expr().stream()
+                .limit(targetsSize)
+                .map(testlist_star_exprContext -> {
+                    expr e = (expr) visit(testlist_star_exprContext);
+//                    if (e instanceof Context) {
+                        ((Context) e).setContext(expr_contextType.Store);
+//                    }
+                    return e;
+                }).collect(Collectors.toList());
+        if (ctx.yield_expr().isEmpty()) {
+            value = (expr) visit(ctx.testlist_star_expr(targetsSize));
+        } else {
+            value = (expr) visit(ctx.yield_expr(0));
+        }
+        return new Assign(ctx.getStart(), targets, value);
+    }
+
+    @Override
+    public PythonTree visitTestlist_star_expr(PythonParser.Testlist_star_exprContext ctx) {
+        if (ctx.COMMA().isEmpty()) {
+            if (ctx.test().isEmpty()) {
+                return visit(ctx.star_expr(0));
+            }
+            return visit(ctx.test(0));
+        }
+        java.util.List<expr> elts = ctx.test().stream()
+                .map(testContext -> (expr) visit(testContext))
+                .collect(Collectors.toList());
+        ctx.star_expr().stream()
+                .forEach(star_exprContext -> elts.add((expr) visit(star_exprContext)));
+        return new Tuple(ctx.getStart(), elts, exprContextType);
+    }
+
+    @Override
     public PythonTree visitIf_stmt(PythonParser.If_stmtContext ctx) {
         java.util.List<stmt> orelse = null;
         int i = ctx.test().size();
         if (ctx.suite().size() > i) {
             orelse = visit_Suite(ctx.suite(i));
         }
+        i--;
         for (; i > 1; i--) {
             PythonParser.TestContext testContext = ctx.test(i);
-            orelse = Arrays.asList(new If(testContext.getStart(), (expr) visit(testContext), visit_Suite(ctx.suite(i)), orelse));
+            try {
+                orelse = Arrays.asList(new If(testContext.getStart(), (expr) visit(testContext), visit_Suite(ctx.suite(i)), orelse));
+            } catch (NullPointerException e) {
+                throw e;
+            }
         }
         return new If(ctx.getStart(), (expr) visit(ctx.test(0)), visit_Suite(ctx.suite(0)), orelse);
     }
@@ -79,7 +203,19 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.COLON() == null) {
             return new Index(ctx.getStart(), (expr) visit(ctx.test(0)));
         }
-        return new Slice(ctx.getStart(), (expr) visit(ctx.lower), (expr) visit(ctx.upper), (expr) visit(ctx.sliceop()));
+        expr lower = null;
+        expr upper = null;
+        expr step = null;
+        if (ctx.lower != null) {
+            lower = (expr) visit(ctx.lower);
+        }
+        if (ctx.upper != null) {
+            upper = (expr) visit(ctx.upper);
+        }
+        if (ctx.sliceop() != null) {
+            step = (expr) visit(ctx.sliceop());
+        }
+        return new Slice(ctx.getStart(), lower, upper, step);
     }
 
     @Override
@@ -95,9 +231,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 ArglistResult arglistResult = visit_Arglist(trailerCtx.arglist());
                 left = new Call(ctx.getStart(), left, arglistResult.args, arglistResult.keywords);
             } else if (trailerCtx.OPEN_BRACK() != null) {
-                left = new Subscript(ctx.getStart(), left, visit_Subscriptlist(trailerCtx.subscriptlist()), expr_contextType.Load);
+                left = new Subscript(ctx.getStart(), left, visit_Subscriptlist(trailerCtx.subscriptlist()), exprContextType);
             } else if (trailerCtx.DOT() != null) {
-                left = new Attribute(ctx.getStart(), left, trailerCtx.NAME().getText(), expr_contextType.Load);
+                left = new Attribute(ctx.getStart(), left, trailerCtx.NAME().getText(), exprContextType);
             }
         }
         if (ctx.factor() != null) {
@@ -262,8 +398,46 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitAsync_stmt(PythonParser.Async_stmtContext ctx) {
+        if (ctx.funcdef() != null) {
+            FunctionDef func = (FunctionDef) visit(ctx.funcdef());
+            return actions.makeAsyncFuncdef(ctx.getStart(), func, Arrays.asList());
+        }
+        if (ctx.for_stmt() != null) {
+            return actions.makeAsyncFor(ctx.getStart(), (For) visit(ctx.for_stmt()));
+        }
+        java.util.List<withitem> items = ctx.with_stmt().with_item().stream()
+                .map(with_itemContext -> (withitem) visit(with_itemContext))
+                .collect(Collectors.toList());
+        return actions.makeAsyncWith(ctx.getStart(), items, visit_Suite(ctx.with_stmt().suite()));
+    }
+
+    @Override
+    public PythonTree visitWith_stmt(PythonParser.With_stmtContext ctx) {
+        java.util.List<withitem> items = ctx.with_item().stream()
+                .map(with_itemContext -> (withitem) visit(with_itemContext))
+                .collect(Collectors.toList());
+        return new With(ctx.getStart(), items, visit_Suite(ctx.suite()));
+    }
+
+    @Override
+    public PythonTree visitWith_item(PythonParser.With_itemContext ctx) {
+        expr as = null;
+        if (ctx.expr() != null) {
+            exprContextType = expr_contextType.Store;
+            as = (expr) visit(ctx.expr());
+            exprContextType = expr_contextType.Load;
+        }
+        return new withitem(ctx.getStart(), (expr) visit(ctx.test()), as);
+    }
+
+    @Override
     public PythonTree visitFor_stmt(PythonParser.For_stmtContext ctx) {
-        return new For(ctx.getStart(), (expr) visit(ctx.exprlist()), (expr) visitTestlist(ctx.testlist()), visit_Suite(ctx.s1), visit_Suite(ctx.s2));
+        exprContextType = expr_contextType.Store;
+        expr iter = (expr) visit(ctx.exprlist());
+        exprContextType = expr_contextType.Load;
+        return new For(ctx.getStart(), iter,
+                (expr) visit(ctx.testlist()), visit_Suite(ctx.s1), visit_Suite(ctx.s2));
     }
 
     @Override
@@ -288,11 +462,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitGlobal_stmt(PythonParser.Global_stmtContext ctx) {
         return new Global(ctx.getStart(), actions.makeNames(ctx.NAME()));
-    }
-
-    @Override
-    public PythonTree visitTfpdef(PythonParser.TfpdefContext ctx) {
-        return new arg(ctx.getStart(), ctx.NAME().getText(), (expr) visit(ctx.test()));
     }
 
     @Override
@@ -329,7 +498,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 /** Dict comprehension */
                 expr key = (expr) visit(ctx.test(0));
                 expr val = (expr) visit(ctx.test(1));
-                return new DictComp(ctx.getStart(), key, val, visit_Comp_for(ctx.comp_for()));
+                java.util.List<comprehension> comps = visit_Comp_for(ctx.comp_for());
+                return new DictComp(ctx.getStart(), key, val, comps);
             }
             /** Dict */
             java.util.List<expr> keys = new ArrayList<>();
@@ -375,25 +545,206 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
             return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
         } else if (ctx.OPEN_BRACE() != null) {
+            if (ctx.dictorsetmaker() == null) {
+                return new Dict(ctx.getStart(), null, null);
+            }
             return visit(ctx.dictorsetmaker());
         } else if (ctx.number() != null) {
             return visit(ctx.number());
         } else if (ctx.yield_expr() != null) {
             return visit(ctx.yield_expr());
         } else if (ctx.NAME() != null) {
-            return new Name(ctx.NAME(), ctx.getText(), expr_contextType.Load);
+            return new Name(ctx.NAME(), ctx.getText(), exprContextType);
         } else if (ctx.ellipsis != null) {
             return new Ellipsis(ctx.ellipsis);
         } else if (ctx.TRUE() != null) {
-            return new NameConstant(ctx.TRUE(), ctx.getText());
+            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
+//            return new NameConstant(ctx.TRUE(), ctx.getText());
         } else if (ctx.FALSE() != null) {
-            return new NameConstant(ctx.FALSE(), ctx.getText());
+            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
+//            return new NameConstant(ctx.FALSE(), ctx.getText());
         } else if (ctx.NONE() != null) {
-            return new NameConstant(ctx.NONE(), ctx.getText());
+            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
+//            return new NameConstant(ctx.NONE(), ctx.getText());
         } else if (ctx.str() != null) {
             return actions.parsestrplus(ctx.str());
         }
         return super.visitAtom(ctx);
+    }
+
+    private java.util.List<expr> visit_Decorators(PythonParser.DecoratorsContext ctx) {
+        return ctx.decorator().stream()
+                .map(decoratorContext -> (expr) visit(decoratorContext))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PythonTree visitFuncdef(PythonParser.FuncdefContext ctx) {
+        return visit_Funcdef(ctx, Arrays.asList());
+    }
+
+    @Override
+    public PythonTree visitClassdef(PythonParser.ClassdefContext ctx) {
+        return visit_Class_def(ctx, Arrays.asList());
+    }
+
+    @Override
+    public PythonTree visitDecorated(PythonParser.DecoratedContext ctx) {
+        java.util.List<expr> decoratorList = visit_Decorators(ctx.decorators());
+        if (ctx.classdef() != null) {
+            return visit_Class_def(ctx.classdef(), decoratorList);
+        }
+        if (ctx.async_funcdef() != null) {
+            return visit_Async_funcdef(ctx.async_funcdef(), decoratorList);
+        }
+        return visit_Funcdef(ctx.funcdef(), decoratorList);
+    }
+
+    @Override
+    public PythonTree visitDecorator(PythonParser.DecoratorContext ctx) {
+        if (ctx.OPEN_PAREN() != null) {
+            ArglistResult arglistResult = visit_Arglist(ctx.arglist());
+            return new Call(ctx.getStart(), (expr) visit(ctx.dotted_name()), arglistResult.args, arglistResult.keywords);
+        }
+        return visit(ctx.dotted_name());
+    }
+
+    /** NOTE: there is a variant visit_Dotted_name what returns the joined String */
+    @Override
+    public PythonTree visitDotted_name(PythonParser.Dotted_nameContext ctx) {
+        expr current = new Name(ctx.NAME(0), ctx.NAME(0).getText(), exprContextType);
+        if (ctx.DOT().isEmpty()) {
+            return current;
+        }
+        for (int i = 1; i < ctx.NAME().size(); i++) {
+            TerminalNode nameNode = ctx.NAME(i);
+            current = new Attribute(nameNode, current, nameNode.getText(), exprContextType);
+        }
+        return current;
+    }
+
+    @Override
+    public PythonTree visitAsync_funcdef(PythonParser.Async_funcdefContext ctx) {
+        return visit_Async_funcdef(ctx, Arrays.asList());
+    }
+
+    private PythonTree visit_Async_funcdef(PythonParser.Async_funcdefContext ctx, java.util.List<expr> decoratorList) {
+        FunctionDef func = (FunctionDef) visit(ctx.funcdef());
+        return actions.makeAsyncFuncdef(ctx.getStart(), func, decoratorList);
+    }
+
+    private PythonTree visit_Funcdef(PythonParser.FuncdefContext ctx, java.util.List<expr> decoratorList) {
+        arguments args = (arguments) visit(ctx.parameters());
+        expr anno = null;
+        if (ctx.test() != null) {
+            anno = (expr) visit(ctx.test());
+        }
+        return new FunctionDef(ctx.getStart(), ctx.NAME().getText(), args, visit_Suite(ctx.suite()), decoratorList, anno);
+    }
+
+    private PythonTree visit_Class_def(PythonParser.ClassdefContext ctx, java.util.List<expr> decoratorList) {
+        ArglistResult arglistResult = visit_Arglist(ctx.arglist());
+        return new ClassDef(ctx.getStart(), ctx.NAME().getText(),
+                arglistResult.args, arglistResult.keywords, visit_Suite(ctx.suite()), decoratorList);
+    }
+
+    @Override
+    public PythonTree visitParameters(PythonParser.ParametersContext ctx) {
+        if (ctx.typedargslist() != null) {
+            return visit(ctx.typedargslist());
+        }
+        return super.visitParameters(ctx);
+    }
+
+    @Override
+    public PythonTree visitTfpdef(PythonParser.TfpdefContext ctx) {
+        expr anno = null;
+        if (ctx.test() != null) {
+            anno = (expr) visit(ctx.test());
+        }
+        return new arg(ctx.getStart(), ctx.NAME().getText(), anno);
+    }
+
+    @Override
+    public PythonTree visitTypedargslist(PythonParser.TypedargslistContext ctx) {
+        arg kwarg = null;
+        arg vararg = null;
+        java.util.List<expr> kwdefaults = new ArrayList<>(ctx.kwd.size());
+        java.util.List<expr> defaults = new ArrayList<>();
+        java.util.List<arg> args = new ArrayList<>();
+        java.util.List<arg> kwonlyargs = new ArrayList<>(ctx.kw.size());
+        if (ctx.POWER() != null) {
+            kwarg = (arg) visit(ctx.kwarg);
+        }
+        for (PythonParser.TestContext testContext : ctx.kwd) {
+            kwdefaults.add((expr) visit(testContext));
+        }
+        for (PythonParser.TfpdefContext tfpdefContext : ctx.kw) {
+            kwonlyargs.add((arg) visit(tfpdefContext));
+        }
+        if (ctx.vararg != null) {
+            vararg = (arg) visit(ctx.vararg);
+        }
+        for (PythonParser.TestContext testContext : ctx.defaults) {
+            defaults.add((expr) visit(testContext));
+        }
+        for (PythonParser.TfpdefContext tfpdefContext : ctx.args) {
+            args.add((arg) visit(tfpdefContext));
+        }
+        return new arguments(ctx.getStart(), args, vararg, kwonlyargs, kwdefaults, kwarg, defaults);
+    }
+
+    @Override
+    public PythonTree visitVfpdef(PythonParser.VfpdefContext ctx) {
+        return new arg(ctx.getStart(), ctx.NAME().getText(), null);
+    }
+
+    @Override
+    public PythonTree visitVarargslist(PythonParser.VarargslistContext ctx) {
+        arg kwarg = null;
+        arg vararg = null;
+        java.util.List<expr> kwdefaults = new ArrayList<>(ctx.kwd.size());
+        java.util.List<expr> defaults = new ArrayList<>();
+        java.util.List<arg> args = new ArrayList<>();
+        java.util.List<arg> kwonlyargs = new ArrayList<>(ctx.kw.size());
+        if (ctx.POWER() != null) {
+            exprContextType = expr_contextType.Param; // XXX
+            kwarg = (arg) visit(ctx.kwarg);
+            exprContextType = expr_contextType.Load;
+        }
+        for (PythonParser.TestContext testContext : ctx.kwd) {
+            kwdefaults.add((expr) visit(testContext));
+        }
+        exprContextType = expr_contextType.Param; // XXX
+        for (PythonParser.VfpdefContext vfpdefContext : ctx.kw) {
+            kwonlyargs.add((arg) visit(vfpdefContext));
+        }
+        if (ctx.vararg != null) {
+            vararg = (arg) visit(ctx.vararg);
+        }
+        exprContextType = expr_contextType.Load;
+        for (PythonParser.TestContext testContext : ctx.defaults) {
+            defaults.add((expr) visit(testContext));
+        }
+        exprContextType = expr_contextType.Param; // XXX
+        for (PythonParser.VfpdefContext vfpdefContext : ctx.args) {
+            args.add((arg) visit(vfpdefContext));
+        }
+        exprContextType = expr_contextType.Load;
+        return new arguments(ctx.getStart(), args, vararg, kwonlyargs, kwdefaults, kwarg, defaults);
+    }
+
+    @Override
+    public PythonTree visitRaise_stmt(PythonParser.Raise_stmtContext ctx) {
+        expr from = null;
+        expr exc = null;
+        if (ctx.test().size() > 1) {
+            from = (expr) visit(ctx.test(1));
+        }
+        if (ctx.test().size() > 0) {
+            exc = (expr) visit(ctx.test(0));
+        }
+        return new Raise(ctx.getStart(), exc, from);
     }
 
     @Override
@@ -424,7 +775,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitDotted_as_name(PythonParser.Dotted_as_nameContext ctx) {
-        return new alias(ctx.getStart(), visit_Dotted_name(ctx.dotted_name()), ctx.NAME().getText());
+        String as = null;
+        if (ctx.NAME() != null) {
+            as = ctx.NAME().getText();
+        }
+        return new alias(ctx.getStart(), visit_Dotted_name(ctx.dotted_name()), as);
     }
 
     @Override
@@ -458,8 +813,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitTestlist(PythonParser.TestlistContext ctx) {
+        java.util.List<expr> exprs = ctx.test().stream()
+                .map(testContext -> (expr) visit(testContext))
+                .collect(Collectors.toList());
+        if (exprs.size() == 1) return exprs.get(0);
+        return new Tuple(ctx.getStart(), exprs, exprContextType);
+    }
+
+    @Override
     public PythonTree visitYield_stmt(PythonParser.Yield_stmtContext ctx) {
-        return visit(ctx.yield_expr());
+        return new Expr(ctx.getStart(), (expr) visit(ctx.yield_expr()));
     }
 
     @Override
@@ -485,12 +849,24 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     /**
      * Temporarily change exprContextType
      */
+    private void withExprContextType(expr_contextType contextType, Runnable handle) {
+        expr_contextType oldContextType = exprContextType;
+        exprContextType = contextType;
+        try {
+            handle.run();
+        } finally {
+            exprContextType = oldContextType;
+        }
+    }
+
     private PythonTree withExprContextType(expr_contextType contextType, Supplier<PythonTree> handle) {
         expr_contextType oldContextType = exprContextType;
         exprContextType = contextType;
-        PythonTree ret = handle.get();
-        exprContextType = oldContextType;
-        return ret;
+        try {
+            return handle.get();
+        } finally {
+            exprContextType = oldContextType;
+        }
     }
 
     /**
@@ -521,11 +897,13 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     private java.util.List<stmt> visit_Suite(PythonParser.SuiteContext ctx) {
-        java.util.List<stmt> suite = new ArrayList<>();
-        if (ctx != null && ctx.simple_stmt() != null) {
+        if (ctx == null) return null;
+        if (ctx.simple_stmt() != null) {
             return visit_Simple_stmt(ctx.simple_stmt());
         }
-        return suite;
+        return ctx.stmt().stream()
+                .flatMap(stmtContext -> visit_Stmt(stmtContext).stream())
+                .collect(Collectors.toList());
     }
 
     class Testlist_compResult {
@@ -575,11 +953,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private java.util.List<comprehension> visit_Comp_for(PythonParser.Comp_forContext ctx) {
         java.util.List<comprehension> ret = new ArrayList<>();
-        expr target = (expr) visit(ctx.exprlist());
+        expr target = (expr) withExprContextType(expr_contextType.Store, () -> visit(ctx.exprlist()));
         expr iter = (expr) visit(ctx.or_test());
+        java.util.List<expr> ifs = new ArrayList<>();
         if (ctx.comp_iter() != null) {
             Comp_iterResult iterRet = visit_Comp_iter(ctx.comp_iter());
-            java.util.List<expr> ifs = new ArrayList<>();
             for (; iterRet.iter != null; iterRet = iterRet.iter) {
                 if (iterRet.ifs != null) {
                     ifs.add(iterRet.ifs);
@@ -588,13 +966,14 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                     ret.addAll(iterRet.comps);
                 }
             }
-            ret.add(new comprehension(ctx.getStart(), target, iter, ifs));
         }
+        ret.add(new comprehension(ctx.getStart(), target, iter, ifs));
         return ret;
     }
 
     private ArglistResult visit_Arglist(PythonParser.ArglistContext ctx) {
         ArglistResult ret = new ArglistResult();
+        if (ctx == null) return ret;
         for (PythonParser.ArgumentContext argCtx : ctx.argument()) {
             PythonTree arg = visit(argCtx);
             if (arg instanceof keyword) {
@@ -622,16 +1001,16 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
          *  When import from relative path without specifying the module
          */
         if (ctx == null) {
-            return null;
+            return "";
         }
-        StringBuilder sb = new StringBuilder(ctx.NAME(0).getText());
-        ctx.NAME().stream().skip(1).forEach((name) -> sb.append(".").append(name.getText()));
-        return sb.toString();
+        return ctx.NAME().stream()
+                .map((name) -> name.getText())
+                .collect(Collectors.joining("."));
     }
 
     private Testlist_compResult visit_Testlist_comp(PythonParser.Testlist_compContext ctx) {
-        if (ctx == null) return null;
         Testlist_compResult ret = new Testlist_compResult();
+        if (ctx == null) return ret;
         for (PythonParser.TestContext testContext : ctx.t) {
             ret.exprs.add((expr) visit(testContext));
         }
@@ -650,16 +1029,22 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 .collect(Collectors.toList());
     }
 
-    public static void main(String[] args) {
-        String program = "1.1";
+    public static void main(String[] args) throws IOException {
+        String module = "encodings";
+        File src = new File("/tmp/foo.py");
+        byte[] bytes = org.python.core.imp.compileSource(module, src);
+//        InputStream program = new FileInputStream("/tmp/foo.py");
+//        String program = "def foo(x):\n  return x + 1\n";
         BuildAstVisitor v = new BuildAstVisitor();
-
-        ANTLRInputStream inputStream = new ANTLRInputStream(program);
+//
+        ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
         PythonLexer lexer = new PythonLexer(inputStream);
         TokenStream tokens = new CommonTokenStream(lexer);
         PythonParser parser = new PythonParser(tokens);
-        ParseTree ctx = parser.single_input();
+        ParseTree ctx = parser.file_input();
         PythonTree ast = v.visit(ctx);
         System.out.println(ast);
+        FileOutputStream out = new FileOutputStream("/tmp/foo.class");
+        out.write(bytes);
     }
 }
