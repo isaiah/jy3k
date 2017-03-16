@@ -39,6 +39,7 @@ tokens { INDENT, DEDENT }
 package org.python.antlr;
 
 import org.python.antlr.ast.cmpopType;
+import org.python.antlr.ast.operatorType;
 }
 
 @lexer::members {
@@ -194,12 +195,12 @@ parameters
 ///                ['*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef]]
 ///              |  '*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef)
 typedargslist
- : tfpdef ( '=' test )? ( ',' tfpdef ( '=' test )? )* ( ',' ( '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
-                                                            | '**' tfpdef
+ : args+=tfpdef ( '=' defaults+=test )? ( ',' args+=tfpdef ( '=' defaults+=test )? )* ( ',' ( '*' vararg=tfpdef? ( ',' kw+=tfpdef ( '=' kwd+=test )? )* ( ',' '**' kwarg=tfpdef )?
+                                                            | '**' kwarg=tfpdef
                                                             )?
                                                       )?
- | STAR tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
- | POWER tfpdef
+ | STAR vararg=tfpdef? ( ',' kw+=tfpdef ( '=' kwd+=test )? )* ( ',' '**' kwarg=tfpdef )?
+ | POWER kwarg=tfpdef
  ;
 
 /// tfpdef: NAME [':' test]
@@ -211,12 +212,12 @@ tfpdef
 ///       ['*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef]]
 ///     |  '*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef)
 varargslist
- : vfpdef ( '=' test )? ( ',' vfpdef ( '=' test )? )* ( ',' ( '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )?
-                                                            | '**' vfpdef
+ : args+=vfpdef ( '=' defaults+=test )? ( ',' args+=vfpdef ( '=' defaults+=test )? )* ( ',' ( STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' POWER kwarg=vfpdef )?
+                                                            | POWER kwarg=vfpdef
                                                             )?
                                                       )?
- | '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )?
- | '**' vfpdef
+ | STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' POWER kwarg=vfpdef )?
+ | POWER kwarg=vfpdef
  ;
 
 /// vfpdef: NAME
@@ -251,8 +252,8 @@ small_stmt
 /// expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
 ///                      ('=' (yield_expr|testlist_star_expr))*)
 expr_stmt
- : testlist_star_expr ( annassign | augassign ( yield_expr | testlist)
-                      | ( ASSIGN ( yield_expr| testlist_star_expr ) )*
+ : testlist_star_expr ( annassign | augassign ( yield_expr | testlist )
+                      | ( ASSIGN ( yield_expr | testlist_star_expr ) )*
                       )
  ;
 
@@ -269,19 +270,33 @@ testlist_star_expr
 /// augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
 ///             '<<=' | '>>=' | '**=' | '//=')
 augassign
+ returns [operatorType op]
  : ADD_ASSIGN
+  { $op = operatorType.Add; }
  | SUB_ASSIGN
+  { $op = operatorType.Sub; }
  | MULT_ASSIGN
+  { $op = operatorType.Mult; }
  | AT_ASSIGN // PEP 465
+  { $op = operatorType.MatMult; }
  | DIV_ASSIGN
+  { $op = operatorType.Div; }
  | MOD_ASSIGN
+  { $op = operatorType.Mod; }
  | AND_ASSIGN
+  { $op = operatorType.BitAnd; }
  | OR_ASSIGN
+  { $op = operatorType.BitOr; }
  | XOR_ASSIGN
+  { $op = operatorType.BitXor; }
  | LEFT_SHIFT_ASSIGN
+  { $op = operatorType.LShift; }
  | RIGHT_SHIFT_ASSIGN
+  { $op = operatorType.RShift; }
  | POWER_ASSIGN
+  { $op = operatorType.Pow; }
  | IDIV_ASSIGN
+  { $op = operatorType.FloorDiv; }
  ;
 
 /// del_stmt: 'del' exprlist
@@ -665,7 +680,6 @@ sliceop
  : COLON test?
  ;
 
-/// exprlist: star_expr (',' star_expr)* [',']
 /// exprlist: (expr|star_expr) (',' (expr|star_expr))* [',']
 exprlist
  : (expr | star_expr) ( COMMA (expr | star_expr) )* COMMA?
