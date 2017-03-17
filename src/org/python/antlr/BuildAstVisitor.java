@@ -91,9 +91,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             } else {
                 value = (expr) visit(ctx.yield_expr(0));
             }
-            exprContextType = expr_contextType.AugStore;
             expr target = (expr) visit(ctx.testlist_star_expr(0));
-            exprContextType = expr_contextType.Load;
+            ((Context) target).setContext(expr_contextType.AugStore);
             return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
         }
         if (ctx.annassign() != null) {
