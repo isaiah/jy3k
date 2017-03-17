@@ -1,5 +1,6 @@
 package org.python.antlr;
 
+import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
@@ -111,9 +112,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 .limit(targetsSize)
                 .map(testlist_star_exprContext -> {
                     expr e = (expr) visit(testlist_star_exprContext);
-//                    if (e instanceof Context) {
-                        ((Context) e).setContext(expr_contextType.Store);
-//                    }
+                    recursiveSetContextType(e, expr_contextType.Store);
                     return e;
                 }).collect(Collectors.toList());
         if (ctx.yield_expr().isEmpty()) {
@@ -173,7 +172,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitLambdef(PythonParser.LambdefContext ctx) {
-        return new Lambda(ctx.getStart(), (arguments) visit(ctx.varargslist()), (expr) visit(ctx.test()));
+        arguments args = null;
+        if (ctx.varargslist() != null) {
+            args = (arguments) visit(ctx.varargslist());
+        }
+        return new Lambda(ctx.getStart(), args, (expr) visit(ctx.test()));
     }
 
     @Override
@@ -224,7 +227,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
-    public PythonTree visitPower(PythonParser.PowerContext ctx) {
+    public PythonTree visitAtom_expr(PythonParser.Atom_exprContext ctx) {
         expr left = (expr) visit(ctx.atom());
         for (PythonParser.TrailerContext trailerCtx : ctx.trailer()) {
             if (trailerCtx.OPEN_PAREN() != null) {
@@ -233,9 +236,18 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             } else if (trailerCtx.OPEN_BRACK() != null) {
                 left = new Subscript(ctx.getStart(), left, visit_Subscriptlist(trailerCtx.subscriptlist()), exprContextType);
             } else if (trailerCtx.DOT() != null) {
-                left = new Attribute(ctx.getStart(), left, trailerCtx.NAME().getText(), exprContextType);
+                left = new Attribute(ctx.getStart(), left, trailerCtx.attr().getText(), exprContextType);
             }
         }
+        if (ctx.AWAIT() != null) {
+            return new Await(ctx.AWAIT(), left);
+        }
+        return left;
+    }
+
+    @Override
+    public PythonTree visitPower(PythonParser.PowerContext ctx) {
+        expr left = (expr) visit(ctx.atom_expr());
         if (ctx.factor() != null) {
             return new BinOp(ctx.getStart(), left, operatorType.Pow, (expr) visit(ctx.factor()));
         }
@@ -535,8 +547,13 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitAtom(PythonParser.AtomContext ctx) {
         Testlist_compResult testlistCompResult = visit_Testlist_comp(ctx.testlist_comp());
         if (ctx.OPEN_PAREN() != null) {
-            if (testlistCompResult.comps != null) {
-                return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+            if (ctx.yield_expr() != null) {
+                return visit(ctx.yield_expr());
+            } else if (testlistCompResult.exprs.size() == 1) {
+                if (testlistCompResult.comps != null) {
+                    return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+                }
+                return testlistCompResult.exprs.get(0);
             }
             return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
         } else if (ctx.OPEN_BRACK() != null) {
@@ -829,11 +846,13 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitYield_expr(PythonParser.Yield_exprContext ctx) {
         PythonParser.Yield_argContext arg = ctx.yield_arg();
-        if (arg != null && arg.FROM() != null) {
-            return new YieldFrom(ctx.getStart(), (expr) visit(arg));
-        } else {
+        if (arg != null) {
+            if (arg.FROM() != null) {
+                return new YieldFrom(ctx.getStart(), (expr) visit(arg));
+            }
             return new Yield(ctx.getStart(), (expr) visit(arg));
         }
+        return new Yield(ctx.getStart(), null);
     }
 
     @Override
@@ -1029,7 +1048,22 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 .collect(Collectors.toList());
     }
 
-    public static void main(String[] args) throws IOException {
+    private void recursiveSetContextType(expr e, expr_contextType context) {
+        if (e instanceof Context) {
+            ((Context) e).setContext(context);
+            if (e instanceof Tuple) {
+                ((Tuple) e).getInternalElts().forEach(elt -> recursiveSetContextType(elt, context));
+            } else if (e instanceof Starred) {
+                recursiveSetContextType(((Starred) e).getInternalValue(), context);
+            } else if (e instanceof List) {
+                ((List) e).getInternalElts().forEach(elt -> recursiveSetContextType(elt, context));
+            }
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+//        TestRig rig = new TestRig(new String[]{"org.python.antlr.Python", "file_input", "/tmp/foo.py", "-tree"});
+//        rig.process();
         String module = "encodings";
         File src = new File("/tmp/foo.py");
         byte[] bytes = org.python.core.imp.compileSource(module, src);
