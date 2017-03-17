@@ -27,6 +27,11 @@ public class PyFastSequenceIter extends PyIterator {
         return super.next();
     }
 
+    @ExposedMethod(doc = BuiltinDocs.list_iterator___iter___doc)
+    final PyObject fastsequenceiterator___iter__() {
+        return this;
+    }
+
     @Override
     public PyObject __next__() {
         if (seq == null) {
