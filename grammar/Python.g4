@@ -684,7 +684,7 @@ atom
  | OPEN_BRACE dictorsetmaker? CLOSE_BRACE
  | NAME
  | number
- | string=str+
+ | str+
  | ellipsis='...'
  | NONE
  | TRUE
