@@ -146,7 +146,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             orelse = visit_Suite(ctx.suite(i));
         }
         i--;
-        for (; i > 1; i--) {
+        for (; i > 0; i--) {
             PythonParser.TestContext testContext = ctx.test(i);
             try {
                 orelse = Arrays.asList(new If(testContext.getStart(), (expr) visit(testContext), visit_Suite(ctx.suite(i)), orelse));
@@ -800,9 +800,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
-        return withExprContextType(expr_contextType.Del, () ->
-                new Delete(ctx.getStart(), visit_Exprlist(ctx.exprlist()))
-        );
+        java.util.List<expr> exprs = visit_Exprlist(ctx.exprlist());
+        exprs.stream().forEach(expr -> ((Context) expr).setContext(expr_contextType.Del));
+        return new Delete(ctx.getStart(), exprs);
     }
 
     @Override
