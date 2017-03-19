@@ -829,6 +829,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     @Override
+    public PythonTree visitExprlist(PythonParser.ExprlistContext ctx) {
+        java.util.List<expr> elts = visit_Exprlist(ctx);
+        if (elts.size() == 1) {
+            return elts.get(0);
+        }
+        return new Tuple(ctx.getStart(), elts, exprContextType);
+    }
+
+    @Override
     public PythonTree visitTestlist(PythonParser.TestlistContext ctx) {
         java.util.List<expr> exprs = ctx.test().stream()
                 .map(testContext -> (expr) visit(testContext))
@@ -892,6 +901,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
      */
     private java.util.List<expr> visit_Exprlist(PythonParser.ExprlistContext ctx) {
         java.util.List<expr> elts = new ArrayList<>();
+        for (PythonParser.ExprContext exprContext : ctx.expr()) {
+            elts.add((expr) visit(exprContext));
+        }
         for (PythonParser.Star_exprContext starExpr : ctx.star_expr()) {
             elts.add((expr) visit(starExpr));
         }
@@ -976,9 +988,10 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         java.util.List<expr> ifs = new ArrayList<>();
         if (ctx.comp_iter() != null) {
             Comp_iterResult iterRet = visit_Comp_iter(ctx.comp_iter());
-            for (; iterRet.iter != null; iterRet = iterRet.iter) {
+            for (; iterRet != null; iterRet = iterRet.iter) {
                 if (iterRet.ifs != null) {
                     ifs.add(iterRet.ifs);
+                    iterRet.ifs = null;
                 }
                 if (iterRet.comps != null) {
                     ret.addAll(iterRet.comps);
