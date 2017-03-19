@@ -191,15 +191,18 @@ parameters
  : OPEN_PAREN typedargslist? CLOSE_PAREN
  ;
 
-/// typedargslist: (tfpdef ['=' test] (',' tfpdef ['=' test])* [','
-///                ['*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef]]
-///              |  '*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef)
+/// typedargslist: (tfpdef ['=' test] (',' tfpdef ['=' test])* [',' [
+///         '*' [tfpdef] (',' tfpdef ['=' test])* [',' ['**' tfpdef [',']]]
+///       | '**' tfpdef [',']]]
+///   | '*' [tfpdef] (',' tfpdef ['=' test])* [',' ['**' tfpdef [',']]]
+///   | '**' tfpdef [','])
+
 typedargslist
- : args+=tfpdef ( '=' defaults+=test )? ( ',' args+=tfpdef ( '=' defaults+=test )? )* ( ',' ( '*' vararg=tfpdef? ( ',' kw+=tfpdef ( '=' kwd+=test )? )* ( ',' '**' kwarg=tfpdef )?
-                                                            | '**' kwarg=tfpdef
-                                                            )?
-                                                      )?
- | STAR vararg=tfpdef? ( ',' kw+=tfpdef ( '=' kwd+=test )? )* ( ',' '**' kwarg=tfpdef )?
+ : args+=tfpdef ( ASSIGN defaults+=test )? ( COMMA args+=tfpdef ( ASSIGN defaults+=test )? )*
+                  ( COMMA ( STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA POWER kwarg=tfpdef )?
+                          | POWER kwarg=tfpdef )?
+                  )?
+ | STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA POWER kwarg=tfpdef )?
  | POWER kwarg=tfpdef
  ;
 
@@ -391,6 +394,45 @@ dotted_as_names
 dotted_name
  : NAME ( DOT NAME )*
  ;
+
+//not in CPython's Grammar file
+//attr is here for Java  compatibility.  A Java foo.getIf() can be called from Jython as foo.if
+//     so we need to support any keyword as an attribute.
+attr
+    : NAME
+    | AND
+    | AS
+    | ASSERT
+    | ASYNC
+    | AWAIT
+    | BREAK
+    | CLASS
+    | CONTINUE
+    | DEF
+    | DEL
+    | ELIF
+    | EXCEPT
+    | FINALLY
+    | FROM
+    | FOR
+    | GLOBAL
+    | IF
+    | IMPORT
+    | IN
+    | IS
+    | LAMBDA
+    | NONLOCAL
+    | NOT
+    | OR
+    | ELSE
+    | PASS
+    | RAISE
+    | RETURN
+    | TRY
+    | WHILE
+    | WITH
+    | YIELD
+    ;
 
 /// global_stmt: 'global' NAME (',' NAME)*
 global_stmt
@@ -624,14 +666,13 @@ factor
 
 /// power: atom trailer* ['**' factor]
 power
- : AWAIT? atom trailer* ( POWER factor )?
+ : atom_expr ( POWER factor )?
  ;
 
 /// atom_expr: [AWAIT] atom trailer*
-// FIXME: do we need?
-//atom_expr
-// : AWAIT? atom trailer*
-// ;
+atom_expr
+ : AWAIT? atom trailer*
+ ;
 
 /// atom: ('(' [yield_expr|testlist_comp] ')' |
 ///        '[' [testlist_comp] ']' |
@@ -661,7 +702,7 @@ testlist_comp
 trailer
  : OPEN_PAREN arglist? CLOSE_PAREN
  | OPEN_BRACK subscriptlist CLOSE_BRACK
- | DOT NAME
+ | DOT attr
  ;
 
 /// subscriptlist: subscript (',' subscript)* [',']
