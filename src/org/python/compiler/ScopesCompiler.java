@@ -149,8 +149,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         ac.addAnnotation("return", return_);
 
         List<expr> defaults = ac.getDefaults();
-        for (int i = 0; i < defaults.size(); i++) {
-            visit(defaults.get(i));
+        if (defaults != null) {
+            for (int i = 0; i < defaults.size(); i++) {
+                visit(defaults.get(i));
+            }
         }
 
         for (int i = decs.size() - 1; i >= 0; i--) {
@@ -185,8 +187,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         ac.visitArgs(node.getInternalArgs());
 
         List<? extends PythonTree> defaults = ac.getDefaults();
-        for (int i = 0; i < defaults.size(); i++) {
-            visit(defaults.get(i));
+        if (defaults != null) {
+            for (int i = 0; i < defaults.size(); i++) {
+                visit(defaults.get(i));
+            }
         }
 
         beginScope("<lambda>", FUNCSCOPE, node, ac);
@@ -203,8 +207,12 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     public void suite(List<stmt> stmts) throws Exception {
-        for (int i = 0; i < stmts.size(); i++)
-            visit(stmts.get(i));
+        if (stmts == null) return;
+        for (int i = 0; i < stmts.size(); i++) {
+            if (stmts.get(i) != null) {
+                visit(stmts.get(i));
+            }
+        }
     }
 
     @Override
