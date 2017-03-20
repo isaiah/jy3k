@@ -15,6 +15,7 @@ import org.python.antlr.base.stmt;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -504,12 +505,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitDictorsetmaker(PythonParser.DictorsetmakerContext ctx) {
+        java.util.List<comprehension> comps = null;
+        if (ctx.comp_for() != null) {
+            comps = visit_Comp_for(ctx.comp_for());
+            Collections.reverse(comps);
+        }
+
         if (!ctx.COLON().isEmpty()) {
             if (ctx.comp_for() != null) {
                 /** Dict comprehension */
                 expr key = (expr) visit(ctx.test(0));
                 expr val = (expr) visit(ctx.test(1));
-                java.util.List<comprehension> comps = visit_Comp_for(ctx.comp_for());
                 return new DictComp(ctx.getStart(), key, val, comps);
             }
             /** Dict */
@@ -529,7 +535,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.comp_for() != null) {
             /** Set comprehension */
             expr elt = (expr) visit(ctx.test(0));
-            return new SetComp(ctx.getStart(), elt, visit_Comp_for(ctx.comp_for()));
+            return new SetComp(ctx.getStart(), elt, comps);
         }
         /** Set */
         java.util.List<expr> elts = new ArrayList<>();
@@ -548,15 +554,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.OPEN_PAREN() != null) {
             if (ctx.yield_expr() != null) {
                 return visit(ctx.yield_expr());
-            } else if (testlistCompResult.exprs.size() == 1) {
-                if (testlistCompResult.comps != null) {
-                    return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
-                }
-                return testlistCompResult.exprs.get(0);
+            } else if (ctx.testlist_comp() == null || !ctx.testlist_comp().COMMA().isEmpty()) {
+                return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
             }
-            return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
+            //else if (testlistCompResult.exprs.size() == 1) {
+            if (testlistCompResult.comps != null) {
+                return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+            }
+            return testlistCompResult.exprs.get(0);
         } else if (ctx.OPEN_BRACK() != null) {
             if (testlistCompResult.comps != null) {
+                Collections.reverse(testlistCompResult.comps);
                 return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
             return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
