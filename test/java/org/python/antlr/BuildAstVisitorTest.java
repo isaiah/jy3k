@@ -37,7 +37,7 @@ public class BuildAstVisitorTest {
 
     @Test
     public void testBuildAst() {
-        Assert.assertEquals(expectedAst, parse(program).toString());
+        Assert.assertEquals(expectedAst, parse(program).toStringTree());
     }
 
     @Parameterized.Parameters
@@ -61,6 +61,44 @@ public class BuildAstVisitorTest {
                 {"break", "Break"},
                 {"del a", "Delete"},
                 {"pass", "Pass"},
+                {"import foo.bar as xxx", "Import"},
+                {"global a", "Global"},
+                {"nonlocal a", "Nonlocal"},
+                {"assert True, 'not true'", "Assert"},
+//                {"while 1:\n  pass\n\n", "While"},
+//                {"for x in a:\n   pass\n\n", "For"},
+                {"2 + 3", "BinOp"},
+                {"2 - 3", "BinOp"},
+                {"2 * 3", "BinOp"},
+                {"2 / 3", "BinOp"},
+                {"2 % 3", "BinOp"},
+                {"2 @ 3", "BinOp"},
+                {"2 + 3 * 4", "BinOp"},
+                {"2 ** 4", "BinOp"},
+                {"foo(1)", "Call"},
+                {"foo[1]", "Subscript"},
+                {"foo.bar", "Attribute"},
+                {"[x, y]", "List"},
+                {"(x, y)", "Tuple"},
+                {"[x for x in y]", "ListComp"},
+                {"(x for x in y)", "GeneratorExp"},
+                {"{1,2}", "Set"},
+                {"{1, *a}", "Set"},
+                {"{x for x in y}", "SetComp"},
+                {"{foo: bar}", "Dict"},
+                {"{foo: bar, **quzz}", "Dict"},
+                {"{foo: bar for foo, bar in a}", "DictComp"},
+                {"True and False", "BoolOp"},
+                {"a not in b", "Compare"},
+                {"a > b", "Compare"},
+                {"lambda a: a.split", "Lambda"},
+                {"1 if 1 else 0", "IfExp"},
+                {"1if 1else 0", "IfExp"},
+//                {"if 1:\n  x\nelse:\n  y\n", "IfExp"},
+                {"from a import b", "ImportFrom"},
+                {"from a import b as c", "ImportFrom"},
+                {"from .. import b", "ImportFrom"},
+                {"raise a from b", "Raise"},
         });
     }
 }
