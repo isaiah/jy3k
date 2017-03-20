@@ -398,12 +398,10 @@ public class GrammarActions {
     expr parsestrplus(List<PythonParser.StrContext> s) {
         boolean bytesmode = false;
         String bytesStr = null;
-        FstringParser state = new FstringParser(extractStringToken(s));
-        PythonParser.StrContext last = null;
+        FstringParser state = new FstringParser(s.get(0).getStart());
         int i = 0;
-        for (Iterator<PythonParser.StrContext> iter = s.iterator(); iter.hasNext(); i++) {
+        for (PythonParser.StrContext last : s) {
             boolean this_bytesmode = false;
-            last = iter.next();
             ParseStrResult ret = parsestr(last);
             this_bytesmode = ret.bytesmode;
             /* Check that we're not mixing bytes with unicode. */
