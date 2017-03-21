@@ -1,5 +1,6 @@
 package org.python.antlr;
 
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
@@ -32,6 +33,7 @@ public class BaseParser {
 
     protected PythonParser setupParser(boolean single) {
         PythonLexer lexer = new PythonLexer(charStream);
+        lexer.single = single;
 //        lexer.setErrorHandler(errorHandler);
 //        lexer.single = single;
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -60,6 +62,7 @@ public class BaseParser {
         mod tree = null;
         PythonParser parser = setupParser(true);
         try {
+            parser.setErrorHandler(new BailErrorStrategy());
             PythonParser.Single_inputContext r = parser.single_input();
             tree = (mod) new BuildAstVisitor().visit(r);
         } catch (RecognitionException e) {

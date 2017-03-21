@@ -48,10 +48,13 @@ import org.python.antlr.ast.operatorType;
   private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
 
   // The stack that keeps track of the indentation level.
-  private java.util.Stack<Integer> indents = new java.util.Stack<>();
+  public java.util.Stack<Integer> indents = new java.util.Stack<>();
 
   // The amount of opened braces, brackets and parenthesis.
   private int opened = 0;
+
+  public boolean single = false;
+  private int newlines = 0;
 
   // The most recently produced token.
   private Token lastToken = null;
@@ -869,8 +872,10 @@ NEWLINE
      String newLine = getText().replaceAll("[^\r\n]+", "");
      String spaces = getText().replaceAll("[\r\n]+", "");
      int next = _input.LA(1);
-
      if (opened > 0 || next == '\r' || next == '\n' || next == '#') {
+       if(next == '\r' || next == '\n') {
+          newlines++;
+       }
        // If we're inside a list or on a blank line, ignore all indents,
        // dedents and line breaks.
        skip();
@@ -894,6 +899,10 @@ NEWLINE
          while(!indents.isEmpty() && indents.peek() > indent) {
            this.emit(createDedent());
            indents.pop();
+         }
+         if (indents.isEmpty() && this.single && newlines >= 1) {
+            newlines = 0;
+            emit(commonToken(NEWLINE, newLine));
          }
        }
      }

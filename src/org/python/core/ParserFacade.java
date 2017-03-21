@@ -1,13 +1,10 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.python.antlr.BaseParser;
-import org.python.antlr.NoCloseReaderStream;
-import org.python.antlr.ParseException;
-import org.python.antlr.PythonTree;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.python.antlr.*;
 import org.python.antlr.base.mod;
 import org.python.core.io.StreamIO;
 import org.python.core.io.TextIOInputStream;
@@ -75,22 +72,19 @@ public class ParserFacade {
             }
         }
 
-        if (t instanceof ParseException) {
-            ParseException e = (ParseException)t;
-            PythonTree node = (PythonTree)e.node;
-            int line, col;
-            if (node != null) {
-                line = node.getLine();
-                col = node.getCharPositionInLine();
-            } else {
-                line = e.line;
-                col = e.charPositionInLine;
+        if (t instanceof ParseCancellationException) {
+            int line = 0, col = 0;
+            if (t.getCause() instanceof InputMismatchException) {
+                Token tok = ((InputMismatchException) t.getCause()).getOffendingToken();
+                line = tok.getLine();
+                col = tok.getCharPositionInLine();
             }
+
             String text= getLine(reader, line);
-            String msg = e.getMessage();
-            if (e.getType() == Py.IndentationError) {
-                return new PyIndentationError(msg, line, col, text, filename);
-            }
+            String msg = t.getMessage();
+//            if (e.getType() == Py.IndentationError) {
+//                return new PyIndentationError(msg, line, col, text, filename);
+//            }
             return new PySyntaxError(msg, line, col, text, filename);
         } else if (t instanceof CharacterCodingException) {
             String msg;
@@ -219,42 +213,46 @@ public class ParserFacade {
             reader = prepBufReader(string, cflags, filename);
             return parseOnly(reader, kind, filename, cflags);
         } catch (Throwable t) {
-            PyException p = fixParseError(reader, t, filename);
-            if (reader != null) { //&& validPartialSentence(reader, kind, filename)) {
+            try {
+                reader = prepBufReader(string, cflags, filename);
+            } catch (IOException e) {
+            }
+            if (reader != null && validPartialSentence(reader, kind, filename)) {
                 return null;
             }
+            PyException p = fixParseError(reader, t, filename);
             throw p;
         } finally {
             close(reader);
         }
     }
 
-//    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
-//        PythonPartialLexer lexer = null;
-//        PythonTokenSource indentedSource = null;
-//        try {
+    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
+        PythonLexer lexer = null;
+        try {
 //            bufreader.reset();
-//            CharStream cs = new NoCloseReaderStream(bufreader);
-//            lexer = new PythonPartialLexer(cs);
-//            CommonTokenStream tokens = new CommonTokenStream(lexer);
-//            indentedSource = new PythonTokenSource(tokens, filename, kind == CompileMode.single);
-//            tokens = new CommonTokenStream(indentedSource);
-//            PythonPartialParser parser = new PythonPartialParser(tokens);
-//            switch (kind) {
-//            case single:
-//                parser.single_input();
-//                break;
-//            case eval:
-//                parser.eval_input();
-//                break;
-//            default:
-//                return false;
-//            }
-//        } catch (Exception e) {
-//            return indentedSource.isIndented() || lexer.eofWhileNested;
-//        }
-//        return true;
-//    }
+            CharStream cs = new NoCloseReaderStream(bufreader);
+            lexer = new PythonLexer(cs);
+            lexer.single = true;
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            PythonParser parser = new PythonParser(tokens);
+            parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+            parser.setErrorHandler(new BailErrorStrategy());
+            switch (kind) {
+            case single:
+                parser.single_input();
+                break;
+            case eval:
+                parser.eval_input();
+                break;
+            default:
+                return false;
+            }
+        } catch (Exception e) {
+            return !lexer.indents.isEmpty() || lexer._input.LA(1) == PythonParser.EOF;
+        }
+        return true;
+    }
 
     public static class ExpectedEncodingBufferedReader extends BufferedReader {
 

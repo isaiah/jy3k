@@ -23,7 +23,7 @@ import java.util.Collection;
 public class BuildAstVisitorTest {
 
     public PythonTree parse(String program) {
-        ANTLRInputStream inputStream = new ANTLRInputStream(program);
+        ANTLRInputStream inputStream = new ANTLRInputStream(program + "\n");
         PythonLexer lexer = new PythonLexer(inputStream);
         lexer.single = true;
         TokenStream tokens = new CommonTokenStream(lexer);
