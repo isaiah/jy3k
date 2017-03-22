@@ -29,11 +29,11 @@ package org.python.antlr;
 
 import java.io.*;
 
-import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
 
 //This is the same as ANTLRReaderStream except it does not close the Reader.
 //Used for interactive mode where we may need to parse twice.
-public class NoCloseReaderStream extends ANTLRStringStream {
+public class NoCloseReaderStream extends ANTLRInputStream {
 	public static final int READ_BUFFER_SIZE = 1024;
 	public static final int INITIAL_BUFFER_SIZE = 1024;
 

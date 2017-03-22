@@ -1,6 +1,7 @@
 package org.python.antlr;
 
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.ast.*;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
@@ -90,22 +91,22 @@ public class GrammarActions {
         return result;
     }
 
-    List<String> makeNames(List names) {
+    List<String> makeNames(List<TerminalNode> names) {
         List<String> s = new ArrayList<String>();
         for(int i=0;i<names.size();i++) {
-            s.add(((Token)names.get(i)).getText());
+            s.add(names.get(i).getText());
         }
         return s;
     }
 
-    Name makeNameNode(Token t) {
+    Name makeNameNode(TerminalNode t) {
         if (t == null) {
             return null;
         }
         return new Name(t, t.getText(), expr_contextType.Load);
     }
 
-    List<Name> makeNameNodes(List<Token> names) {
+    List<Name> makeNameNodes(List<TerminalNode> names) {
         List<Name> s = new ArrayList<Name>();
         for (int i=0; i<names.size(); i++) {
             s.add(makeNameNode(names.get(i)));
@@ -168,8 +169,8 @@ public class GrammarActions {
                 Object o = exprs.get(i);
                 if (o instanceof expr) {
                     result.add((expr)o);
-                } else if (o instanceof PythonParser.test_return) {
-                    result.add((expr)((PythonParser.test_return)o).tree);
+                } else if (o instanceof PythonParser.TestContext) {
+//                    result.add((expr)((PythonParser.TestContext)o).testExpr);
                 }
             }
         }
@@ -200,8 +201,8 @@ public class GrammarActions {
     stmt castStmt(Object o) {
         if (o instanceof stmt) {
             return (stmt)o;
-        } else if (o instanceof PythonParser.stmt_return) {
-            return (stmt)((PythonParser.stmt_return)o).tree;
+//        } else if (o instanceof PythonParser.stmt_return) {
+//            return (stmt)((PythonParser.stmt_return)o).tree;
         } else if (o instanceof PythonTree) {
             return errorHandler.errorStmt((PythonTree)o);
         }
@@ -230,8 +231,7 @@ public class GrammarActions {
         expr current = new Name(nameToken, nameToken.getText(), expr_contextType.Load);
         for (Object o: attrs) {
             Token t = (Token)o;
-            current = new Attribute(t, current, cantBeNoneName(t),
-                expr_contextType.Load);
+            current = new Attribute(t, current, t.getText(), expr_contextType.Load);
         }
         return current;
     }
@@ -273,8 +273,7 @@ public class GrammarActions {
         return result;
     }
 
-    stmt makeAsyncFor(Token t, Object stmt) {
-        For forStmt = (For) castStmt(stmt);
+    stmt makeAsyncFor(Token t, For forStmt) {
         return new AsyncFor(t, forStmt.getInternalTarget(), forStmt.getInternalIter(),
                 forStmt.getInternalBody(), forStmt.getInternalOrelse());
     }
@@ -290,37 +289,15 @@ public class GrammarActions {
         return new For(t, target, iter, b, o);
     }
 
-    stmt makeTryExcept(Token t, List body, List<excepthandler> handlers, List orelse, List finBody) {
-        List<stmt> b = castStmts(body);
-        List<excepthandler> e = handlers;
-        List<stmt> o = castStmts(orelse);
-        stmt te = new TryExcept(t, b, e, o);
-        if (finBody == null) {
-            return te;
-        }
-        List<stmt> f = castStmts(finBody);
-        List<stmt> mainBody = new ArrayList<stmt>();
-        mainBody.add(te);
-        return new TryFinally(t, mainBody, f);
-    }
-
-    TryFinally makeTryFinally(Token t,  List body, List finBody) {
-        List<stmt> b = castStmts(body);
-        List<stmt> f = castStmts(finBody);
-        return new TryFinally(t, b, f);
-    }
-
-    stmt makeAsyncFuncdef(Token t, Object def) {
-        FunctionDef func = (FunctionDef) castStmt(def);
-        return new AsyncFunctionDef(t, func.getInternalNameNode(), func.getInternalArgs(),
-                func.getInternalBody(), func.getInternalReturnNode());
+    stmt makeAsyncFuncdef(Token t, FunctionDef func, java.util.List<expr> decoratorList) {
+        return new AsyncFunctionDef(t, func.getInternalName(), func.getInternalArgs(),
+                func.getInternalBody(), decoratorList, func.getInternalReturns());
     }
 
     stmt makeFuncdef(Token t, Token nameToken, arguments args, List funcStatements, expr returnNode) {
         if (nameToken == null) {
             return errorHandler.errorStmt(new PythonTree(t));
         }
-        Name n = cantBeNoneName(nameToken);
         arguments a = args;
         if (a == null) {
             a = new arguments(t, new ArrayList<arg>(), (arg)null,
@@ -328,7 +305,7 @@ public class GrammarActions {
                     new ArrayList<arg>(), new ArrayList<expr>(), (arg) null, new ArrayList<expr>());
         }
         List<stmt> s = castStmts(funcStatements);
-        return new FunctionDef(t, n, a, s, returnNode);
+        return new FunctionDef(t, nameToken.getText(), a, s, null, returnNode);
     }
 
     List<expr> makeAssignTargets(expr lhs, List rhs) {
@@ -400,63 +377,31 @@ public class GrammarActions {
         return keywords;
     }
 
-    Object makeFloat(Token t) {
+    Object makeFloat(TerminalNode t) {
         return Py.newFloat(Double.valueOf(t.getText()));
     }
 
-    Object makeComplex(Token t) {
+    Object makeComplex(TerminalNode t) {
         String s = t.getText();
         s = s.substring(0, s.length() - 1);
         return Py.newImaginary(Double.valueOf(s));
     }
 
-    //XXX: needs to handle NumberFormatException (on input like 0b2) and needs
-    //     a better long guard than ndigits > 11 (this is much to short for
-    //     binary for example)
-    Object makeInt(Token t) {
-        String s = t.getText();
-        int radix = 10;
-        if (s.startsWith("0x") || s.startsWith("0X")) {
-            radix = 16;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0o") || s.startsWith("0O")) {
-            radix = 8;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0b") || s.startsWith("0B")) {
-            radix = 2;
-            s = s.substring(2, s.length());
-        } else if (s.startsWith("0")) {
-            radix = 8;
-        }
-        if (s.endsWith("L") || s.endsWith("l")) {
-            s = s.substring(0, s.length()-1);
-            return Py.newLong(new BigInteger(s, radix));
-        }
-        int ndigits = s.length();
-        int i=0;
-        while (i < ndigits && s.charAt(i) == '0') {
-            i++;
-        }
-        if ((ndigits - i) > 11) {
-            return Py.newLong(new BigInteger(s, radix));
-        }
-
-        long l = Long.valueOf(s, radix).longValue();
-        if (l > 0xffffffffl || (l > Integer.MAX_VALUE)) {
-            return Py.newLong(new BigInteger(s, radix));
-        }
-        return Py.newInteger((int) l);
+    Object makeInt(TerminalNode t, int radix) {
+        return new PyLong(new BigInteger(t.getText().substring(2), radix));
     }
 
-    expr parsestrplus(List s, String encoding) {
+    Object makeDecimal(TerminalNode t) {
+        return new PyLong(new BigInteger(t.getText(), 10));
+    }
+
+    expr parsestrplus(List<PythonParser.StrContext> s) {
         boolean bytesmode = false;
         String bytesStr = null;
-        FstringParser state = new FstringParser(extractStringToken(s));
-        Token last = null;
+        FstringParser state = new FstringParser(s.get(0).getStart());
         int i = 0;
-        for (Iterator iter = s.iterator(); iter.hasNext(); i++) {
+        for (PythonParser.StrContext last : s) {
             boolean this_bytesmode = false;
-            last = (Token)iter.next();
             ParseStrResult ret = parsestr(last);
             this_bytesmode = ret.bytesmode;
             /* Check that we're not mixing bytes with unicode. */
@@ -501,7 +446,7 @@ public class GrammarActions {
         int fstrlen;
     }
 
-    ParseStrResult parsestr(Token t) {
+    ParseStrResult parsestr(PythonParser.StrContext t) {
         int len;
         String s = t.getText();
         int start = 0;
@@ -573,8 +518,8 @@ public class GrammarActions {
         return ret;
     }
 
-    Token extractStringToken(List s) {
-        return (Token)s.get(0);
+    Token extractStringToken(List<PythonParser.StrContext> s) {
+        return s.get(0).getStart();
         //return (Token)s.get(s.size() - 1);
     }
 

@@ -143,7 +143,8 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
         if (name == "__file__") {
             if (__file__ != null) return new PyUnicode(__file__);
 
-            return Py.None;
+//            return Py.None;
+            throw Py.AttributeError("__file__");
         }
 
         if (name.equals("__path__")) {

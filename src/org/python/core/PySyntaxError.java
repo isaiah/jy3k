@@ -29,6 +29,7 @@ public class PySyntaxError extends PyException {
         if (text == null) {
             text = "";
         }
+        if (s==null) s = "";
         if (INVALID_SYNTAX.matcher(s).matches()) {
             s = "invalid syntax";
         }

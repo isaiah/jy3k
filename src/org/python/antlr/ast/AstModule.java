@@ -74,8 +74,7 @@ public class AstModule {
         dict.__setitem__("Str", Str.TYPE);
         dict.__setitem__("Subscript", Subscript.TYPE);
         dict.__setitem__("Suite", Suite.TYPE);
-        dict.__setitem__("TryExcept", TryExcept.TYPE);
-        dict.__setitem__("TryFinally", TryFinally.TYPE);
+        dict.__setitem__("Try", Try.TYPE);
         dict.__setitem__("Tuple", Tuple.TYPE);
         dict.__setitem__("UnaryOp", UnaryOp.TYPE);
         dict.__setitem__("While", While.TYPE);

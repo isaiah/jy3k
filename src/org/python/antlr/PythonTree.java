@@ -1,9 +1,10 @@
 package org.python.antlr;
 
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonTree;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
@@ -19,7 +20,7 @@ public class PythonTree extends AST implements Traverseproc {
     public boolean from_future_checked = false;
     private int charStartIndex = -1;
     private int charStopIndex = -1;
-    private CommonTree node;
+    private TerminalNode node;
 
     /** Who is the parent node of this node; if null, implies node is root */
     private PythonTree parent;
@@ -33,8 +34,12 @@ public class PythonTree extends AST implements Traverseproc {
         node = new CommonTree();
     }
 
+    public PythonTree(TerminalNode t) {
+        node = t;
+    }
+
     public PythonTree(Token t) {
-        node = new CommonTree(t);
+        node = new TerminalNodeImpl(t);
     }
 
     public PythonTree(int ttype, Token t) {
@@ -45,21 +50,21 @@ public class PythonTree extends AST implements Traverseproc {
         c.setChannel(t.getChannel());
         c.setStartIndex(((CommonToken)t).getStartIndex());
         c.setStopIndex(((CommonToken)t).getStopIndex());
-        node = new CommonTree(c);
+        node = new TerminalNodeImpl(c);
     }
 
     public PythonTree(PythonTree tree) {
-        node = new CommonTree(tree.getNode());
+        node = tree.getNode();
         charStartIndex = tree.getCharStartIndex();
         charStopIndex = tree.getCharStopIndex();
     }
     
-    public CommonTree getNode() {
+    public TerminalNode getNode() {
         return node;
     }
 
     public Token getToken() {
-        return node.getToken();
+        return node.getSymbol();
     }
 
     public PythonTree dupNode() {
@@ -67,11 +72,11 @@ public class PythonTree extends AST implements Traverseproc {
     }
 
     public boolean isNil() {
-        return node.isNil();
+        return node instanceof CommonTree;
     }
 
     public int getAntlrType() {
-        return node.getType();
+        return getToken().getType();
     }
 
     public String getText() {
@@ -79,17 +84,17 @@ public class PythonTree extends AST implements Traverseproc {
     }
 
     public int getLine() {
-        if (node.getToken()==null || node.getToken().getLine()==0) {
+        if (node.getSymbol()==null || node.getSymbol().getLine()==0) {
             if ( getChildCount()>0 ) {
                 return getChild(0).getLine();
             }
             return 1;
         }
-        return node.getToken().getLine();
+        return node.getSymbol().getLine();
     }
 
     public int getCharPositionInLine() {
-        Token token = node.getToken();
+        Token token = getToken();
         if (token==null || token.getCharPositionInLine()==-1) {
             if (getChildCount()>0) {
                 return getChild(0).getCharPositionInLine();
@@ -106,26 +111,18 @@ public class PythonTree extends AST implements Traverseproc {
     }
 
     public int getTokenStartIndex() {
-        return node.getTokenStartIndex();
-    }
-
-    public void setTokenStartIndex(int index) {
-        node.setTokenStartIndex(index);
+        return getToken().getStartIndex();
     }
 
     public int getTokenStopIndex() {
-        return node.getTokenStopIndex();
-    }
-
-    public void setTokenStopIndex(int index) {
-        node.setTokenStopIndex(index);
+        return getToken().getStopIndex();
     }
 
     public int getCharStartIndex() {
-        if (charStartIndex == -1 && node.getToken() != null) {
-            return ((CommonToken)node.getToken()).getStartIndex();
+        if (charStartIndex == -1 && getToken() != null) {
+            return (getToken()).getStartIndex();
         }
-        return charStartIndex ;
+        return charStartIndex;
     }
 
     public void setCharStartIndex(int index) {
@@ -143,8 +140,8 @@ public class PythonTree extends AST implements Traverseproc {
      */
     public int getCharStopIndex() {
 
-        if (charStopIndex == -1 && node.getToken() != null) {
-            return ((CommonToken)node.getToken()).getStopIndex() + 1;
+        if (charStopIndex == -1 && getToken() != null) {
+            return getToken().getStopIndex() + 1;
         }
         return charStopIndex;
     }
@@ -153,20 +150,12 @@ public class PythonTree extends AST implements Traverseproc {
         charStopIndex = index;
     }
 
-    public int getChildIndex() {
-        return node.getChildIndex();
-    }
-
     public PythonTree getParent() {
         return parent;
     }
 
     public void setParent(PythonTree t) {
         this.parent = t;
-    }
-
-    public void setChildIndex(int index) {
-        node.setChildIndex(index);
     }
 
     /**
@@ -203,14 +192,14 @@ public class PythonTree extends AST implements Traverseproc {
         if (isNil()) {
             return "None";
         }
-        if ( getAntlrType()==Token.INVALID_TOKEN_TYPE ) {
+        if ( getAntlrType()==Token.INVALID_TYPE) {
             return "<errornode>";
         }
-        if ( node.getToken()==null ) {
+        if ( getToken()==null ) {
             return null;
         }
 
-        return node.getToken().getText() + "(" + this.getLine() + "," + this.getCharPositionInLine() + ")";
+        return getToken().getText() + "(" + this.getLine() + "," + this.getCharPositionInLine() + ")";
     }
 
     public String toStringTree() {
@@ -330,7 +319,6 @@ public class PythonTree extends AST implements Traverseproc {
                         this.children.add(c);
                         // handle double-link stuff for each child of nil root
                         c.setParent(this);
-                        c.setChildIndex(children.size()-1);
                     }
                 }
                 else {
@@ -347,7 +335,6 @@ public class PythonTree extends AST implements Traverseproc {
             }
             children.add(t);
             childTree.setParent(this);
-            childTree.setChildIndex(children.size()-1);
         }
     }
 
@@ -371,7 +358,6 @@ public class PythonTree extends AST implements Traverseproc {
         }
         children.set(i, t);
         t.setParent(this);
-        t.setChildIndex(i);
     }
     
     public Object deleteChild(int i) {
@@ -415,7 +401,6 @@ public class PythonTree extends AST implements Traverseproc {
                 PythonTree child = newChildren.get(j);
                 children.set(i, child);
                 child.setParent(this);
-                child.setChildIndex(i);
                 j++;
             }
         }
@@ -458,7 +443,6 @@ public class PythonTree extends AST implements Traverseproc {
         int n = getChildCount();
         for (int c = offset; c < n; c++) {
             PythonTree child = getChild(c);
-            child.setChildIndex(c);
             child.setParent(this);
         }
     }

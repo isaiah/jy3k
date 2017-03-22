@@ -95,7 +95,8 @@ public class Future {
 
     public static void checkFromFuture(ImportFrom node) throws Exception {
         if (node.from_future_checked) return;
-        if (node.getInternalModule().equals(FutureFeature.MODULE_NAME)) {
+        String module = node.getInternalModule();
+        if (module != null && module.equals(FutureFeature.MODULE_NAME)) {
             throw new ParseException("from __future__ imports must occur "
                     + "at the beginning of the file", node);
         }

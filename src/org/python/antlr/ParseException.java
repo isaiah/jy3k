@@ -3,7 +3,7 @@ package org.python.antlr;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import org.antlr.runtime.*;
+import org.antlr.v4.runtime.*;
 
 public class ParseException extends RuntimeException {
 	public transient IntStream input;
@@ -42,14 +42,9 @@ public class ParseException extends RuntimeException {
 
     public ParseException(String message, RecognitionException r) {
         super(message);
-        this.input = r.input;
-        this.index = r.index;
-        this.token = r.token;
-        this.node = r.node;
-        this.c = r.c;
-        this.line = r.line;
-        this.charPositionInLine = r.charPositionInLine;
-        this.approximateLineInfo = r.approximateLineInfo;
+        this.input = r.getInputStream();
+        this.index = r.getOffendingState();
+        this.token = r.getOffendingToken();
     }
 
     public void setType(PyObject t) {

@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -1438,7 +1438,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public void exceptionTest(int exc, Label end_of_exceptions, TryExcept node, int index)
+    public void exceptionTest(int exc, Label end_of_exceptions, Try node, int index)
             throws Exception {
         for (int i = 0; i < node.getInternalHandlers().size(); i++) {
             ExceptHandler handler = (ExceptHandler)node.getInternalHandlers().get(i);
@@ -1473,8 +1473,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.athrow();
     }
 
-    @Override
-    public Object visitTryFinally(TryFinally node) throws Exception {
+//    @Override
+    private Object visitTryExcept(Try node) throws Exception {
+        if (node.getInternalFinalbody() == null) {
+            return visitTryExcept(node);
+        }
         Label start = new Label();
         Label end = new Label();
         Label handlerStart = new Label();
@@ -1529,8 +1532,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.freeLocal(excLocal);
 
         inFinally.addExceptionHandlers(handlerStart);
+        return visitTryExcept(node);
         // According to any JVM verifiers, this code block might not return
-        return null;
+//        return null;
     }
 
     private void inlineFinally(ExceptionHandler handler) throws Exception {
@@ -1574,7 +1578,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitTryExcept(TryExcept node) throws Exception {
+    public Object visitTry(Try node) throws Exception {
         Label start = new Label();
         Label end = new Label();
         Label handler_start = new Label();
@@ -1814,6 +1818,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 break;
         }
         code.invokevirtual(p(PyObject.class), name, sig(PyObject.class));
+        return null;
+    }
+
+    @Override
+    public Object visitAnnAssign(AnnAssign node) throws Exception {
+        if (node.getInternalValue() != null) {
+            setline(node);
+            visit(node.getInternalValue());
+            set(node.getInternalTarget());
+        }
         return null;
     }
 
@@ -3450,8 +3464,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         public void finalBody(CodeCompiler compiler) throws Exception {
-            if (node instanceof TryFinally) {
-                suite(((TryFinally)node).getInternalFinalbody());
+            if (node instanceof Try) {
+                suite(((Try)node).getInternalFinalbody());
             }
         }
     }

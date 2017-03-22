@@ -1,6 +1,6 @@
 package org.python.antlr;
 
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
 import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.JoinedStr;

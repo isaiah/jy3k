@@ -63,6 +63,9 @@ public class ArgListCompiler extends Visitor
     }
 
     public void visitArgs(arguments args) throws Exception {
+        if (args == null) {
+            return;
+        }
         List<arg> argslist = args.getInternalArgs();
         String name;
         for (int i = 0; i < argslist.size(); i++) {
@@ -94,7 +97,7 @@ public class ArgListCompiler extends Visitor
         }
 
         List<expr> kwdefaults = args.getInternalKw_defaults();
-        for (int i = 0; i < kwonlyargcount; i++) {
+        for (int i = 0; i < kwdefaults.size(); i++) {
             expr kwDefault = kwdefaults.get(i);
             if (kwDefault != null) {
                 kw_defaults.put(kwonlyargs.get(i).getInternalArg(), kwDefault);

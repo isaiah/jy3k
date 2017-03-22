@@ -8,7 +8,6 @@ import org.python.antlr.PythonTree;
 import org.python.antlr.ast.*;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
-import org.python.core.ParserFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,7 +128,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
         List<stmt> body = node.getInternalBody();
-        expr return_ = node.getInternalReturnNode();
+        expr return_ = node.getInternalReturns();
         return compileFunction(name, args, decs, body, node, return_);
     }
 
@@ -139,7 +138,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
         List<stmt> body = node.getInternalBody();
-        expr return_ = node.getInternalReturnNode();
+        expr return_ = node.getInternalReturns();
         return compileFunction(name, args, decs, body, node, return_);
     }
 
@@ -150,8 +149,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         ac.addAnnotation("return", return_);
 
         List<expr> defaults = ac.getDefaults();
-        for (int i = 0; i < defaults.size(); i++) {
-            visit(defaults.get(i));
+        if (defaults != null) {
+            for (int i = 0; i < defaults.size(); i++) {
+                visit(defaults.get(i));
+            }
         }
 
         for (int i = decs.size() - 1; i >= 0; i--) {
@@ -186,8 +187,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         ac.visitArgs(node.getInternalArgs());
 
         List<? extends PythonTree> defaults = ac.getDefaults();
-        for (int i = 0; i < defaults.size(); i++) {
-            visit(defaults.get(i));
+        if (defaults != null) {
+            for (int i = 0; i < defaults.size(); i++) {
+                visit(defaults.get(i));
+            }
         }
 
         beginScope("<lambda>", FUNCSCOPE, node, ac);
@@ -204,8 +207,12 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     public void suite(List<stmt> stmts) throws Exception {
-        for (int i = 0; i < stmts.size(); i++)
-            visit(stmts.get(i));
+        if (stmts == null) return;
+        for (int i = 0; i < stmts.size(); i++) {
+            if (stmts.get(i) != null) {
+                visit(stmts.get(i));
+            }
+        }
     }
 
     @Override
@@ -337,6 +344,15 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     @Override
     public Object visitBytes(Bytes b) throws Exception {
         cur.addConst(b);
+        return null;
+    }
+
+    @Override
+    public Object visitAnnAssign(AnnAssign node) throws Exception {
+        if (cur.isClassScope()) {
+            // TODO collect the types here, and evaluate them in the class scope
+            cur.addUsed("__annotations__");
+        }
         return null;
     }
 

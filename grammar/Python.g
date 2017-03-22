@@ -93,6 +93,7 @@ import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncFunctionDef;
 import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
@@ -771,7 +772,17 @@ star_expr
     }
     ;
 
-//expr_stmt: testlist_star_expr (augassign (yield_expr|testlist) |
+// annassign: ':' test ['=' test]
+annassign
+  returns [expr anno, expr value]
+  : COLON ann=test[expr_contextType.Load] (ASSIGN val=test[expr_contextType.Load])?
+      {
+          $anno = actions.castExpr($ann.tree);
+          $value = actions.castExpr($val.tree);
+      }
+  ;
+
+//expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
 //                     ('=' (yield_expr|testlist_star_expr))*)
 expr_stmt
 @init {
@@ -811,10 +822,14 @@ expr_stmt
             }
           )
         )
+    | (testlist_star_expr[null] annassign) => lhs=testlist_star_expr[expr_contextType.Store] ann=annassign
+        {
+            stype = new AnnAssign($lhs.tree, actions.castExpr($lhs.tree), $ann.anno, $ann.value, 1);
+        }
     | lhs=testlist_star_expr[expr_contextType.Load]
-      {
-          stype = new Expr($lhs.start, actions.castExpr($lhs.tree));
-      }
+        {
+            stype = new Expr($lhs.start, actions.castExpr($lhs.tree));
+        }
     )
     ;
 
@@ -1943,21 +1958,17 @@ atom
        {
             etype = new Name($NAME, $NAME.text, $expr::ctype);
        }
-     | INT
+     | integer
+        {
+            etype = $integer.etype;
+        }
+     | FLOAT_NUMBER
        {
-           etype = new Num($INT, actions.makeInt($INT));
+           etype = new Num($FLOAT_NUMBER, actions.makeFloat($FLOAT_NUMBER));
        }
-     | LONGINT
+     | IMAG_NUMBER
        {
-           etype = new Num($LONGINT, actions.makeInt($LONGINT));
-       }
-     | FLOAT
-       {
-           etype = new Num($FLOAT, actions.makeFloat($FLOAT));
-       }
-     | COMPLEX
-       {
-           etype = new Num($COMPLEX, actions.makeComplex($COMPLEX));
+           etype = new Num($IMAG_NUMBER, actions.makeComplex($IMAG_NUMBER));
        }
      | d=DOT DOT DOT
        {
@@ -2382,6 +2393,26 @@ yield_arg
         $isYieldFrom = false;
     }
     ;
+/// integer        ::=  decimalinteger | octinteger | hexinteger | bininteger
+integer
+returns [expr etype]
+ : DECIMAL_INTEGER
+ {
+    $etype = new Num($DECIMAL_INTEGER, actions.makeInt($DECIMAL_INTEGER));
+ }
+ | OCT_INTEGER
+ {
+    $etype = new Num($OCT_INTEGER, actions.makeInt($OCT_INTEGER));
+ }
+ | HEX_INTEGER
+ {
+    $etype = new Num($HEX_INTEGER, actions.makeInt($HEX_INTEGER));
+ }
+ | BIN_INTEGER
+ {
+    $etype = new Num($BIN_INTEGER, actions.makeInt($BIN_INTEGER));
+ }
+ ;
 
 //START OF LEXER RULES
 AS        : 'as' ;
@@ -2515,36 +2546,91 @@ OR : 'or' ;
 
 NOT : 'not' ;
 
-FLOAT
-    :   '.' DIGITS (Exponent)?
-    |   DIGITS '.' Exponent
-    |   DIGITS ('.' (DIGITS (Exponent)?)? | Exponent)
-    ;
+/// decimalinteger ::=  nonzerodigit digit* | "0"+
+DECIMAL_INTEGER
+ : NON_ZERO_DIGIT DIGIT*
+ | '0'+
+ ;
 
-LONGINT
-    :   INT ('l'|'L')
-    ;
+/// octinteger     ::=  "0" ("o" | "O") octdigit+
+OCT_INTEGER
+ : '0' ('o' | 'O') OCT_DIGIT+
+ ;
 
-fragment
-Exponent
-    :    ('e' | 'E') ( '+' | '-' )? DIGITS
-    ;
+/// hexinteger     ::=  "0" ("x" | "X") hexdigit+
+HEX_INTEGER
+ : '0' ('x'|'X') HEX_DIGIT+
+ ;
 
-INT :   // Hex
-        '0' ('x' | 'X') ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
-    |   // Octal
-        '0' ('o' | 'O') ( '0' .. '7' )*
-    |   '0'  ( '0' .. '7' )*
-    |   // Binary
-        '0' ('b' | 'B') ( '0' .. '1' )*
-    |   // Decimal
-        '1'..'9' DIGITS*
-;
+/// bininteger     ::=  "0" ("b" | "B") bindigit+
+BIN_INTEGER
+ : '0' ('b'|'B') BIN_DIGIT+
+ ;
 
-COMPLEX
-    :   DIGITS+ ('j'|'J')
-    |   FLOAT ('j'|'J')
-    ;
+/// floatnumber   ::=  pointfloat | exponentfloat
+FLOAT_NUMBER
+ : POINT_FLOAT
+ | EXPONENT_FLOAT
+ ;
+
+/// imagnumber ::=  (floatnumber | intpart) ("j" | "J")
+IMAG_NUMBER
+ : FLOAT_NUMBER ('j'|'J')
+ | INT_PART ('j'|'J')
+ ;
+
+/// nonzerodigit   ::=  "1"..."9"
+fragment NON_ZERO_DIGIT
+ : ('1' .. '9')
+ ;
+
+/// digit          ::=  "0"..."9"
+fragment DIGIT
+ : ('0' .. '9')
+ ;
+
+/// octdigit       ::=  "0"..."7"
+fragment OCT_DIGIT
+ : ('0' .. '7')
+ ;
+
+/// hexdigit       ::=  digit | "a"..."f" | "A"..."F"
+fragment HEX_DIGIT
+ : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+ ;
+
+/// bindigit       ::=  "0" | "1"
+fragment BIN_DIGIT
+ : ('0'|'1')
+ ;
+
+
+/// pointfloat    ::=  [intpart] fraction | intpart "."
+fragment POINT_FLOAT
+ : INT_PART? FRACTION
+ | INT_PART '.'
+ ;
+
+/// exponentfloat ::=  (intpart | pointfloat) exponent
+fragment EXPONENT_FLOAT
+ : ( INT_PART | POINT_FLOAT ) EXPONENT
+ ;
+
+/// intpart       ::=  digit+
+fragment INT_PART
+ : DIGIT+
+ ;
+
+/// fraction      ::=  "." digit+
+fragment FRACTION
+ : '.' DIGIT+
+ ;
+
+/// exponent      ::=  ("e" | "E") ["+" | "-"] digit+
+fragment EXPONENT
+ : ('e' | 'E') ('+' | '-')? DIGIT+
+ ;
+
 
 fragment
 DIGITS : ( '0' .. '9' )+ ;
