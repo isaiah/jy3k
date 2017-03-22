@@ -72,7 +72,7 @@
   <target name="full-build" depends="full-check, installer" description="a full build with hg checkout" />
 
   <target name="needed-check" unless="full-build">
-    <uptodate property="org.python.antlr.notneeded" targetfile="${gensrc.dir}/org/python/antlr/PythonParser.java">
+    <uptodate property="antlr.notneeded" targetfile="${gensrc.dir}/org/python/antlr/PythonParser.java">
       <srcfiles dir="grammar" includes="Python.g4" />
       <!--
       <srcfiles dir="${basedir}/src/org/python/compiler" includes="CodeCompiler.java" />
@@ -548,7 +548,7 @@
         </fileset>
       </copy>
       <!-- grammar must now be up to date -->
-      <property name="org.python.antlr.notneeded" value="true" />
+      <property name="antlr.notneeded" value="true" />
 
       <copy todir="${compile.dir}/META-INF/services">
         <fileset dir="${source.dir}/META-INF/services" />
@@ -596,8 +596,8 @@
       <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
       <jarjar destfile="${dist.dir}/${jython.deploy.jar}">
         <zipfileset src="${dist.dir}/${jython.dev.jar}"/>
-        <zipfileset src="extlibs/antlr-4.6-complete.jar"/>
-        <rule pattern="org.org.python.antlr.v4.runtime.**" result="org.python.org.python.antlr.v4.runtime.@1"/>
+        <zipfileset src="extlibs/antlr4-runtime-4.6.jar"/>
+        <rule pattern="org.antlr.v4.runtime.**" result="org.python.antlr.v4.runtime.@1"/>
         <zipfileset src="extlibs/asm-5.1.jar"/>
         <zipfileset src="extlibs/asm-commons-5.1.jar"/>
         <zipfileset src="extlibs/asm-util-5.1.jar"/>
@@ -907,7 +907,7 @@
           <exclude name="${jython.javadoc.jar}"/>
           <exclude name="${jython.sources.jar}"/>
           <exclude name="callbacker_test.jar"/>
-          <exclude name="extlibs/antlr-4.6*.jar" />
+          <exclude name="extlibs/antlr4-runtime-4.6.jar" />
           <exclude name="extlibs/asm*.jar" />
           <exclude name="extlibs/jarjar*.jar" />
           <exclude name="extlibs/junit*.jar" />
