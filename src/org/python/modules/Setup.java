@@ -81,6 +81,7 @@ public class Setup {
             "binascii",
             "faulthandler:org.python.modules.FaultHandler",
             "itertools:org.python.modules.itertools.itertools",
+            "parser:org.python.modules.parser.ParserModule",
             "posix:org.python.modules.posix.PosixModule",
             "subprocess:org.python.modules.subprocess.SubprocessModule",
             "sys:org.python.modules.sys.SysModule",

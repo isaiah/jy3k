@@ -132,6 +132,7 @@ org/python/modules/_weakref/ReferenceType.class
 org/python/modules/operator$PyAttrGetter.class
 org/python/modules/operator$PyItemGetter.class
 org/python/modules/operator$PyMethodCaller.class
+org/python/modules/parser/PySTType.class
 org/python/modules/posix/PyDirEntry.class
 org/python/modules/posix/PyScandirIterator.class
 org/python/modules/posix/PyStatResult.class
