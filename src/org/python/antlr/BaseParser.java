@@ -76,6 +76,7 @@ public class BaseParser {
     public mod parseModule() {
         mod tree = null;
         PythonParser parser = setupParser(false);
+        parser.setErrorHandler(new BailErrorStrategy());
         try {
             PythonParser.File_inputContext r = parser.file_input();
             tree = (mod) new BuildAstVisitor().visit(r);

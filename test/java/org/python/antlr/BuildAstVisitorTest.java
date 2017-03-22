@@ -55,6 +55,7 @@ public class BuildAstVisitorTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
+                {"rb'\\s+'", "Bytes(s=\\s+,)"},
                 {"1", "Num(n=1,)"},
                 {"0x11", "Num(n=17,)"},
                 {"1.1", "Num(n=1.1,)"},

@@ -924,6 +924,7 @@ STRING_LITERAL
 /// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR"
 BYTES_LITERAL
  : [bB] [rR]? ( SHORT_BYTES | LONG_BYTES )
+ | [rR]? [bB] ( SHORT_BYTES | LONG_BYTES )
  ;
 
 /// decimalinteger ::=  nonzerodigit digit* | "0"+
@@ -1147,7 +1148,7 @@ fragment BYTES_ESCAPE_SEQ
  ;
 
 fragment SPACES
- : [ \t]+
+ : [ \t\u000C]+
  ;
 
 fragment COMMENT
