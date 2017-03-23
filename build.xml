@@ -736,6 +736,7 @@
 
       <target name="copy-javalib" unless="full-build">
         <copy todir="${dist.dir}/javalib">
+          <fileset dir="extlibs" />
           <fileset dir="${extlibs.dir}">
             <exclude name="profile.properties"/>
           </fileset>
