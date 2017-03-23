@@ -97,7 +97,10 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
         }
         if (ctx.annassign() != null) {
-            // TODO
+            expr target = (expr) visit(ctx.testlist_star_expr(0));
+            ((Context) target).setContext(expr_contextType.Store);
+            AnnassignResult annassignResult = visit_Annassign(ctx.annassign());
+            return new AnnAssign(ctx.getStart(), target, annassignResult.anno, annassignResult.value, 1);
         }
         /** Annotate assign */
         if (ctx.ASSIGN().isEmpty()) {
@@ -967,6 +970,20 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         expr ifs;
         java.util.List<comprehension> comps;
         Comp_iterResult iter;
+    }
+
+    class AnnassignResult {
+        expr anno;
+        expr value;
+    }
+
+    private AnnassignResult visit_Annassign(PythonParser.AnnassignContext ctx) {
+        AnnassignResult ret = new AnnassignResult();
+        ret.anno = (expr) visit(ctx.test(0));
+        if (ctx.ASSIGN() != null) {
+            ret.value = (expr) visit(ctx.test(1));
+        }
+        return ret;
     }
 
     // e.g. restFiles = [os.path.join(d[0], f) for d in os.walk(".") if not "_test" in d[0] for f in d[2] if f.endswith(".rst")]

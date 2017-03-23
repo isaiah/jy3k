@@ -199,14 +199,13 @@ parameters
 ///       | '**' tfpdef [',']]]
 ///   | '*' [tfpdef] (',' tfpdef ['=' test])* [',' ['**' tfpdef [',']]]
 ///   | '**' tfpdef [','])
-
 typedargslist
  : args+=tfpdef ( ASSIGN defaults+=test )? ( COMMA args+=tfpdef ( ASSIGN defaults+=test )? )*
-                  ( COMMA ( STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA POWER kwarg=tfpdef )?
-                          | POWER kwarg=tfpdef )?
+                  ( COMMA ( STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA (POWER kwarg=tfpdef COMMA? )? )?
+                          | POWER kwarg=tfpdef COMMA? )?
                   )?
- | STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA POWER kwarg=tfpdef )?
- | POWER kwarg=tfpdef
+ | STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA ( POWER kwarg=tfpdef COMMA? )? )?
+ | POWER kwarg=tfpdef COMMA?
  ;
 
 /// tfpdef: NAME [':' test]
@@ -214,16 +213,19 @@ tfpdef
  : NAME ( COLON test )?
  ;
 
-/// varargslist: (vfpdef ['=' test] (',' vfpdef ['=' test])* [','
-///       ['*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef]]
-///     |  '*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef)
+/// varargslist: (vfpdef ['=' test] (',' vfpdef ['=' test])* [',' [
+///         '*' [vfpdef] (',' vfpdef ['=' test])* [',' ['**' vfpdef [',']]]
+///       | '**' vfpdef [',']]]
+///   | '*' [vfpdef] (',' vfpdef ['=' test])* [',' ['**' vfpdef [',']]]
+///   | '**' vfpdef [',']
+/// )
 varargslist
- : args+=vfpdef ( '=' defaults+=test )? ( ',' args+=vfpdef ( '=' defaults+=test )? )* ( ',' ( STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' POWER kwarg=vfpdef )?
+ : args+=vfpdef ( '=' defaults+=test )? ( ',' args+=vfpdef ( '=' defaults+=test )? )* ( ',' ( STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' ( POWER kwarg=vfpdef COMMA? )? )?
                                                             | POWER kwarg=vfpdef
-                                                            )?
+                                                           COMMA? )?
                                                       )?
- | STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' POWER kwarg=vfpdef )?
- | POWER kwarg=vfpdef
+ | STAR vararg=vfpdef? ( ',' kw+=vfpdef ( '=' kwd+=test )? )* ( ',' ( POWER kwarg=vfpdef COMMA? )? )?
+ | POWER kwarg=vfpdef COMMA?
  ;
 
 /// vfpdef: NAME
@@ -265,7 +267,7 @@ expr_stmt
 
 /// annassign: ':' test ['=' test]
 annassign
- : test (ASSIGN test)?
+ : COLON test (ASSIGN test)?
  ;
 
 /// testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']

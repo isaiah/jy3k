@@ -353,7 +353,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
             // TODO collect the types here, and evaluate them in the class scope
             cur.addUsed("__annotations__");
         }
-        return null;
+        return super.visitAnnAssign(node);
     }
 
 

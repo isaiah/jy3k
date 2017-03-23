@@ -1,9 +1,6 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import com.google.common.base.Joiner;
-import org.python.core.stringlib.IntegerFormatter;
-import org.python.core.stringlib.InternalFormat;
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedDelete;
 import org.python.expose.ExposedGet;
