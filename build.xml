@@ -1,7 +1,11 @@
 <!-- Copyright 2000 Dj Walker-Morgan -->
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="jython" default="developer-build" basedir=".">
   <target name="resolve">
-    <ivy:retrieve />
+    <ivy:resolve/>
+    <ivy:retrieve sync="true" type="jar,bundle"/>
+    <ivy:cachepath pathid="main.classpath" conf="compile"/>
+    <ivy:cachepath pathid="default.classpath" conf="default"/>
+    <ivy:cachepath pathid="test.classpath" conf="test"/>
   </target>
 
   <target name="usage" description="print usage hints (-emacs removes [echo] prefix)">
@@ -80,7 +84,7 @@
     </uptodate>
   </target>
 
-  <target name="init">
+  <target name="init" depends="resolve">
     <property file="${user.home}/ant.properties" />
     <property file="${basedir}/ant.properties" />
 
@@ -134,7 +138,7 @@
         <property name="python.lib" value="${jython.base.dir}/lib-python/3.5.1" />
         <property name="bugtests.dir" value="${jython.base.dir}/bugtests" />
         <property name="templates.lazy" value="true" />
-        <property name="extlibs.dir" value="${jython.base.dir}/extlibs" />
+        <property name="extlibs.dir" value="${jython.base.dir}/lib" />
         <property name="output.dir" value="${work.dir}/build" />
         <property name="compile.dir" value="${output.dir}/classes" />
         <property name="exposed.dir" value="${output.dir}/exposed" />
@@ -146,71 +150,9 @@
 
 
         <!-- classpaths -->
-        <path id="main.classpath">
-          <pathelement path="${extlibs.dir}/servlet-api-2.5.jar" />
-          <pathelement path="${informix.jar}" />
-          <pathelement path="${oracle.jar}" />
-          <pathelement path="${extlibs.dir}/mysql-connector-java-5.1.6.jar" />
-          <pathelement path="${extlibs.dir}/postgresql-8.3-603.jdbc4.jar" />
-          <pathelement path="${extlibs.dir}/antlr-4.6-complete.jar" />
-          <pathelement path="${extlibs.dir}/commons-compress-1.9.jar"/>
-          <pathelement path="${extlibs.dir}/asm-5.1.jar" />
-          <pathelement path="${extlibs.dir}/asm-commons-5.1.jar" />
-          <pathelement path="${extlibs.dir}/asm-tree-5.1.jar" />
-          <pathelement path="${extlibs.dir}/asm-util-5.1.jar" />
-          <pathelement path="${extlibs.dir}/guava-18.0.jar" />
-          <pathelement path="${extlibs.dir}/icu4j-57.1.jar" />
-          <pathelement path="${extlibs.dir}/jffi-arm-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-Darwin.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-i386-FreeBSD.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-i386-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-i386-OpenBSD.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-i386-SunOS.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-i386-Windows.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-ppc-AIX.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-ppc-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-ppc64-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-s390x-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-sparc-SunOS.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-sparcv9-SunOS.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-x86_64-FreeBSD.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-x86_64-Linux.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-x86_64-OpenBSD.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-x86_64-SunOS.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-x86_64-Windows.jar"/>
-          <pathelement path="${extlibs.dir}/jffi-1.2.12.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-ffi-2.0.9.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-enxio-0.12.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-netdb-1.1.5.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-posix-3.0.29.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-process-0.2-SNAPSHOT.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-constants-0.9.2.jar"/>
-          <pathelement path="${extlibs.dir}/jnr-unixsocket-0.12.jar"/>
-          <pathelement path="${extlibs.dir}/jline-2.12.1.jar"/>
-          <pathelement path="${extlibs.dir}/jzlib-1.1.3.jar"/>
-          <pathelement path="${extlibs.dir}/netty-buffer-4.0.25.Final.jar"/>
-          <pathelement path="${extlibs.dir}/netty-codec-4.0.25.Final.jar"/>
-          <pathelement path="${extlibs.dir}/netty-common-4.0.25.Final.jar"/>
-          <pathelement path="${extlibs.dir}/netty-handler--4.0.25.Final.jar"/>
-          <pathelement path="${extlibs.dir}/netty-transport-4.0.25.Final.jar"/>
-        </path>
-
         <available property="informix.present" classname="com.informix.jdbc.IfxDriver" classpath="${informix.jar}" />
         <available property="oracle.present" classname="oracle.jdbc.driver.OracleDriver" classpath="${oracle.jar}" />
 
-        <path id="test.classpath">
-          <path refid="main.classpath"/>
-          <pathelement path="${extlibs.dir}/asm-commons-5.1.jar" />
-          <pathelement path="${extlibs.dir}/asm-util-5.1.jar" />
-          <pathelement path="${extlibs.dir}/hamcrest-core-1.3.jar" />
-          <pathelement path="${extlibs.dir}/junit-4.12.jar" />
-          <!--
-          <pathelement path="${extlibs.dir}/hamcrest-core-1.3.jar" />
-          -->
-          <pathelement path="${exposed.dir}" />
-          <pathelement path="${compile.dir}" />
-          <pathelement path="${cpptasks.jar.dir}" />
-        </path>
         <property name="jython.dev.jar" value="jython-dev.jar" />
         <property name="jython.deploy.jar" value="jython.jar" />
         <property name="jython.standalone.jar" value="jython-standalone.jar" />
@@ -468,10 +410,7 @@
           <arg path="${work.dir}/build/gensrc/org/python/antlr"/>
           <arg file="${jython.base.dir}/grammar/Python.g4"/>
           <arg value="-visitor"/>
-          <!-- <arg value="-debug"/>
-          <arg file="${jython.base.dir}/grammar/PythonPartial.g"/>
-          -->
-          <classpath refid="main.classpath"/>
+          <classpath refid="default.classpath"/>
         </java>
 
         <!-- copy the .tokens to /grammar, for usage in ANTLRWorks -->
@@ -494,6 +433,7 @@
         nowarn="${nowarn}"
         memoryMaximumSize="1024m"
         fork="true"
+        includeantruntime="true"
         encoding="UTF-8">
         <compilerarg line="${javac.Xlint}"/>
         <src path="${source.dir}"/>
@@ -596,63 +536,13 @@
       <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
       <jarjar destfile="${dist.dir}/${jython.deploy.jar}">
         <zipfileset src="${dist.dir}/${jython.dev.jar}"/>
-        <zipfileset src="extlibs/antlr4-runtime-4.6.jar"/>
-        <rule pattern="org.antlr.v4.runtime.**" result="org.python.antlr.v4.runtime.@1"/>
-        <zipfileset src="extlibs/asm-5.1.jar"/>
-        <zipfileset src="extlibs/asm-commons-5.1.jar"/>
-        <zipfileset src="extlibs/asm-util-5.1.jar"/>
-        <rule pattern="org.objectweb.asm.**" result="org.python.objectweb.asm.@1"/>
-        <zipfileset src="extlibs/bcpkix-jdk15on-150.jar" excludes="META-INF/**"/>
-        <rule pattern="org.bouncycastle.**" result="org.python.bouncycastle.@1"/>
-        <zipfileset src="extlibs/bcprov-jdk15on-150.jar" excludes="META-INF/**"/>
-        <rule pattern="org.bouncycastle.**" result="org.python.bouncycastle.@1"/>
-        <zipfileset src="extlibs/commons-compress-1.9.jar"/>
-        <rule pattern="org.apache.**" result="org.python.apache.@1"/>
-        <zipfileset src="extlibs/guava-18.0.jar"/>
-        <rule pattern="com.google.**" result="org.python.google.@1"/>
-        <zipfileset src="extlibs/icu4j-57.1.jar"/>
-        <rule pattern="com.ibm.icu.**" result="org.python.icu.@1"/>
-        <zipfileset src="extlibs/netty-buffer-4.0.25.Final.jar" excludes="META-INF/**"/>
-        <rule pattern="io.netty.**" result="org.python.netty.@1"/>
-        <zipfileset src="extlibs/netty-codec-4.0.25.Final.jar" excludes="META-INF/**"/>
-        <rule pattern="io.netty.**" result="org.python.netty.@1"/>
-        <zipfileset src="extlibs/netty-common-4.0.25.Final.jar" excludes="META-INF/**"/>
-        <rule pattern="io.netty.**" result="org.python.netty.@1"/>
-        <zipfileset src="extlibs/netty-handler-4.0.25.Final.jar" excludes="META-INF/**"/>
-        <rule pattern="io.netty.**" result="org.python.netty.@1"/>
-        <zipfileset src="extlibs/netty-transport-4.0.25.Final.jar" excludes="META-INF/**"/>
-        <rule pattern="io.netty.**" result="org.python.netty.@1"/>
-        <zipfileset src="extlibs/jffi-arm-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-Darwin.jar"/>
-        <zipfileset src="extlibs/jffi-i386-FreeBSD.jar"/>
-        <zipfileset src="extlibs/jffi-i386-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-i386-OpenBSD.jar"/>
-        <zipfileset src="extlibs/jffi-i386-SunOS.jar"/>
-        <zipfileset src="extlibs/jffi-i386-Windows.jar"/>
-        <zipfileset src="extlibs/jffi-ppc-AIX.jar"/>
-        <zipfileset src="extlibs/jffi-ppc-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-ppc64-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-s390x-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-sparc-SunOS.jar"/>
-        <zipfileset src="extlibs/jffi-sparcv9-SunOS.jar"/>
-        <zipfileset src="extlibs/jffi-x86_64-FreeBSD.jar"/>
-        <zipfileset src="extlibs/jffi-x86_64-Linux.jar"/>
-        <zipfileset src="extlibs/jffi-x86_64-OpenBSD.jar"/>
-        <zipfileset src="extlibs/jffi-x86_64-SunOS.jar"/>
-        <zipfileset src="extlibs/jffi-x86_64-Windows.jar"/>
-        <zipfileset src="extlibs/jffi-1.2.12.jar"/>
-        <zipfileset src="${extlibs.dir}/jnr-ffi-2.0.9.jar"/>
-        <zipfileset src="${extlibs.dir}/jnr-netdb-1.1.5.jar"/>
-        <zipfileset src="${extlibs.dir}/jnr-posix-3.0.29.jar"/>
-        <zipfileset src="${extlibs.dir}/jnr-constants-0.9.2.jar"/>
-        <zipfileset src="extlibs/xml-apis-2.11.0.jar" excludes="META-INF/services/*"/>
-        <zipfileset src="extlibs/xercesImpl-2.11.0.jar" excludes="META-INF/services/*"/>
+        <zipfileset dir="lib/">
+          <include name="*.jar"/>
+        </zipfileset>
         <rule pattern="org.apache.xml.**" result="org.python.apache.xml.@1"/>
         <rule pattern="org.apache.xerces.**" result="org.python.apache.xerces.@1"/>
         <rule pattern="org.apache.wml.**" result="org.python.apache.wml.@1"/>
         <rule pattern="org.apache.html.**" result="org.python.apache.html.@1"/>
-        <zipfileset src="extlibs/jline-2.12.1.jar"/>
-        <rule pattern="jline.**" result="org.python.jline.@1"/>
         <manifest>
           <attribute name="Main-Class" value="org.python.util.jython" />
           <attribute name="Built-By" value="${user.name}" />
@@ -788,14 +678,7 @@
             <include name="grammar/*.g" />
             <include name="tests/java/**/*.java" />
             <include name="CoreExposed.includes" />
-            <include name="extlibs/**/*.jar" />
-
-            <!-- don't distribute jdbc jars -->
-            <exclude name="extlibs/mysql-connector-java-5.1.6.jar" />
-            <exclude name="extlibs/postgresql-8.3-603.jdbc4.jar" />
-            <exclude name="extlibs/ifxjdbc.jar" />
-            <exclude name="extlibs/ojdbc14.jar" />
-
+            <include name="lib/**/*.jar" />
           </fileset>
         </copy>
 
@@ -853,7 +736,7 @@
 
       <target name="copy-javalib" unless="full-build">
         <copy todir="${dist.dir}/javalib">
-          <fileset dir="${jython.base.dir}/extlibs">
+          <fileset dir="${extlibs.dir}">
             <exclude name="profile.properties"/>
           </fileset>
           <fileset dir="${work.dir}/build">
@@ -907,13 +790,13 @@
           <exclude name="${jython.javadoc.jar}"/>
           <exclude name="${jython.sources.jar}"/>
           <exclude name="callbacker_test.jar"/>
-          <exclude name="extlibs/antlr4-runtime-4.6.jar" />
-          <exclude name="extlibs/asm*.jar" />
-          <exclude name="extlibs/jarjar*.jar" />
-          <exclude name="extlibs/junit*.jar" />
-          <exclude name="extlibs/hamcrest-core*.jar" />
-          <exclude name="extlibs/servlet-api*.jar" />
-          <exclude name="extlibs/xerces*.jar" />
+          <exclude name="lib/antlr4-runtime-4.6.jar" />
+          <exclude name="lib/asm*.jar" />
+          <exclude name="lib/jarjar*.jar" />
+          <exclude name="lib/junit*.jar" />
+          <exclude name="lib/hamcrest-core*.jar" />
+          <exclude name="lib/servlet-api*.jar" />
+          <exclude name="lib/xerces*.jar" />
         </fileset>
         <manifest>
           <attribute name="Main-Class" value="org.python.util.install.Installation" />
@@ -1122,5 +1005,4 @@ classpath="${dist.dir}/${jython.dev.jar}${path.separator}classes"
       <target name="check-bugtest-config">
         <available property="have_bugtest_config" file="${bugtests.dir}/support_config.py"/>
       </target>
-
     </project>
