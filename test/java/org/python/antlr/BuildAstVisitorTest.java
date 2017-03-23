@@ -1,5 +1,7 @@
 package org.python.antlr;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -9,7 +11,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.Interactive;
 
@@ -19,7 +20,7 @@ import java.util.Collection;
 /**
  * Created by isaiah on 3/11/17.
  */
-@RunWith(Parameterized.class)
+@RunWith(JUnitParamsRunner.class)
 public class BuildAstVisitorTest {
 
     public PythonTree parse(String program) {
@@ -39,21 +40,13 @@ public class BuildAstVisitorTest {
         return expr;
     }
 
-    private String program;
-    private String expectedAst;
-
-    public BuildAstVisitorTest(String program, String ast) {
-        this.program = program;
-        this.expectedAst = ast;
-    }
-
     @Test
-    public void testBuildAst() {
+    @Parameters(method = "data")
+    public void testBuildAst(String program, String expectedAst) {
         Assert.assertEquals(expectedAst, parse(program).toStringTree());
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
+    public Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
                 {"rb'\\s+'", "Bytes(s=\\s+,)"},
                 {"1", "Num(n=1,)"},
@@ -105,6 +98,9 @@ public class BuildAstVisitorTest {
                 {"a not in b", "Compare(left=Name(id=a,ctx=Load,),ops=[NotIn],comparators=[Name],)"},
                 {"a > b", "Compare(left=Name(id=a,ctx=Load,),ops=[Gt],comparators=[Name],)"},
                 {"lambda a: a.split", "Lambda(args=arguments(args=[arg],vararg=null,kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=Attribute(value=Name(id=a,ctx=Load,),attr=split,ctx=Load,),)"},
+                {"lambda a,: a.split", "Lambda(args=arguments(args=[arg],vararg=null,kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=Attribute(value=Name(id=a,ctx=Load,),attr=split,ctx=Load,),)"},
+                {"lambda *arg,: 0", "Lambda(args=arguments(args=[],vararg=arg(arg=arg,annotation=null,),kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=Num(n=0,),)"},
+                {"lambda a, *arg,: 0", "Lambda(args=arguments(args=[arg],vararg=arg(arg=arg,annotation=null,),kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=Num(n=0,),)"},
                 {"1 if 1 else 0", "IfExp(test=Num(n=1,),body=Num(n=1,),orelse=Num(n=0,),)"},
                 {"1if 1else 0", "IfExp(test=Num(n=1,),body=Num(n=1,),orelse=Num(n=0,),)"},
                 {"if 1:\n  x\nelse:\n  y\n\n", "If(test=Num(n=1,),body=[Expr],orelse=[Expr],)"},
@@ -112,7 +108,10 @@ public class BuildAstVisitorTest {
                 {"from a import b as c", "ImportFrom(module=a,names=[alias],level=0,)"},
                 {"from .. import b", "ImportFrom(module=,names=[alias],level=2,)"},
                 {"raise a from b", "Raise(exc=Name(id=a,ctx=Load,),cause=Name(id=b,ctx=Load,),)"},
-                {"def foo():\n  pass\n\n", "FunctionDef(name=foo,args=null,body=[Pass],decorator_list=[],returns=null,)"}
+                {"def foo():\n  pass\n\n", "FunctionDef(name=foo,args=null,body=[Pass],decorator_list=[],returns=null,)"},
+                {"def foo(a,):\n  pass\n\n", "FunctionDef(name=foo,args=arguments(args=[arg],vararg=null,kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=[Pass],decorator_list=[],returns=null,)"},
+                {"def foo(*a,):\n  pass\n\n", "FunctionDef(name=foo,args=arguments(args=[],vararg=arg(arg=a,annotation=null,),kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=[Pass],decorator_list=[],returns=null,)"},
+                {"a: str = 1", "AnnAssign(target=Name(id=a,ctx=Store,),annotation=Name(id=str,ctx=Load,),value=Num(n=1,),simple=1,)"},
         });
     }
 }
