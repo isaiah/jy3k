@@ -32,11 +32,7 @@ import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** Builtin types that are used to setup PyObject.
  *
@@ -2096,34 +2092,34 @@ public final class Py {
 
     // XXX: The following two makeClass overrides are *only* for the
     // old compiler, they should be removed when the newcompiler hits
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject metaclass, PyCode code) {
-        return makeClass(name, name, bases, metaclass, code, null);
+    public static PyObject makeClass(String name, PyObject[] bases, PyObject kwargs, PyCode code) {
+        return makeClass(name, name, bases, kwargs, code, null);
     }
 
-    public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject metaclass, PyCode code) {
-        return makeClass(name, qualname, bases, metaclass, code, null);
+    public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject kwargs, PyCode code) {
+        return makeClass(name, qualname, bases, kwargs, code, null);
     }
 
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject metaclass, PyCode code,
+    public static PyObject makeClass(String name, PyObject[] bases, PyObject kwargs, PyCode code,
                                      PyObject[] closure_cells) {
-        return makeClass(name, name, bases, metaclass, code, closure_cells);
+        return makeClass(name, name, bases, kwargs, code, closure_cells);
     }
 
-    public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject metaclass, PyCode code,
+    public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject kwargs, PyCode code,
                                      PyObject[] closure_cells) {
         ThreadState state = getThreadState();
         PyObject dict = code.call(state, Py.EmptyObjects, Py.NoKeywords,
                 state.frame.f_globals, Py.EmptyObjects, new PyDictionary(), new PyTuple(closure_cells));
         dict.__setitem__("__qualname__", new PyUnicode(qualname));
-        return makeClass(name, bases, dict, metaclass);
+        return makeClass(name, bases, dict, kwargs);
     }
     public static PyObject makeClass(String name, PyObject base, PyObject dict) {
         return makeClass(name, base, dict, null);
     }
 
-    public static PyObject makeClass(String name, PyObject base, PyObject dict, PyObject metaclass) {
+    public static PyObject makeClass(String name, PyObject base, PyObject dict, PyObject kwargs) {
         PyObject[] bases = base == null ? EmptyObjects : new PyObject[] {base};
-        return makeClass(name, bases, dict, metaclass);
+        return makeClass(name, bases, dict, kwargs);
     }
 
     /**
@@ -2144,13 +2140,12 @@ public final class Py {
      * @param name
      * @param bases
      * @param dict
-     * @param metaclass
+     * @param kwargs
      * @return
      */
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject dict, PyObject metaclass) {
+    public static PyObject makeClass(String name, PyObject[] bases, PyObject dict, PyObject kwargs) {
         // arguments unpack
         // As a result of the __class__ variable scoping, the bases will always be packed by the wrapper function
-        // FIXME pass the keywords parameters in directly, instead of cherry-pick metaclass
         List<PyObject> expandBases = new ArrayList<>();
         for (PyObject base : bases) {
             if (base instanceof PyType) {
@@ -2174,12 +2169,16 @@ public final class Py {
         bases = new PyObject[expandBases.size()];
         expandBases.toArray(bases);
 
-        if (metaclass instanceof PyDictionary) {
-            metaclass = metaclass.__finditem__("metaclass");
-            // in case of kwarg
-            if (metaclass != null && metaclass instanceof PyDictionary) {
-                metaclass = metaclass.__finditem__("metaclass");
+        PyObject metaclass = null;
+        if (kwargs != null && kwargs.__bool__()) {
+            metaclass = kwargs.__finditem__("metaclass");
+            if (metaclass != null) {
+                kwargs.__delitem__("metaclass");
             }
+//            // in case of kwarg
+//            if (metaclass != null && metaclass instanceof PyDictionary) {
+//                metaclass = metaclass.__finditem__("metaclass");
+//            }
         }
 
         if (metaclass == null) {
@@ -2208,6 +2207,21 @@ public final class Py {
         }
 
         try {
+            if (kwargs != null && kwargs.__bool__()) {
+                int kwargsLen = kwargs.__len__();
+                PyObject[] args = new PyObject[kwargsLen + 3];
+                args[0] = clsname;
+                args[1] = basesArray;
+                args[2] = dict;
+                String[] keywords = new String[kwargsLen];
+                int i = 3;
+                for (Object key: ((PyDictionary) kwargs).keySet()) {
+                    String keyStr = key.toString();
+                    keywords[i - 3] = keyStr;
+                    args[i++] = kwargs.__finditem__(keyStr);
+                }
+                return metaclass.__call__(args, keywords);
+            }
             return metaclass.__call__(clsname, basesArray, dict);
         } catch (PyException pye) {
             if (!pye.match(TypeError)) {
@@ -2461,6 +2475,11 @@ public final class Py {
             return true;
         }
 
+        /* We know what type's __instancecheck__ does. */
+        if (cls == PyType.TYPE) {
+            return recursiveIsInstance(inst, cls);
+        }
+
         if (cls instanceof PyTuple) {
             for (PyObject item : cls.asIterable()) {
                 if (isInstance(inst, item)) {
@@ -2502,7 +2521,7 @@ public final class Py {
             return false;
         }
         
-        checkClass(cls, "isinstance() arg 2 must be a class, type, or tuple of classes and types");
+//        checkClass(cls, "isinstance() arg 4 must be a class, type, or tuple of classes and types");
         PyObject instCls = inst.__findattr__("__class__");
         if (instCls == null) {
             return false;

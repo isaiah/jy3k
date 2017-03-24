@@ -2628,11 +2628,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             // get the original parameters
             java.util.List<expr> actualArgs = node.getInternalBases();
             java.util.List<String> kwargs = new ArrayList<>();
-            if (node.getInternalKeywords() != null && node.getInternalKeywords().size() > 0) {
-                // Assume only keywords parameter is the metaclass
-                actualArgs.add(node.getInternalKeywords().get(0).getInternalValue());
-                kwargs.add("metaclass");
-            }
+            node.getInternalKeywords().stream().forEach(kw -> {
+                actualArgs.add(kw.getInternalValue());
+                kwargs.add(kw.getInternalArg());
+            });
 
             java.util.List<stmt> bod = new ArrayList<stmt>();
             String vararg = "__(args)__";
@@ -2700,8 +2699,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.ldc(scope.qualname);
 
         code.aload(baseArray);
-        if (node.getInternalKeywords() != null && node.getInternalKeywords().size() > 0) {
-            // Assume only keywords parameter is the metaclass
+        if (node.getInternalKeywords().size() != 0) {
             visit(node.getInternalKeywords().get(0).getInternalValue());
         } else {
             code.aconst_null();
