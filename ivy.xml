@@ -14,6 +14,7 @@
 
     <dependency org="org.antlr" name="antlr4-runtime" rev="4.6"/>
     <dependency org="org.antlr" name="antlr4" rev="4.6"/>
+    <dependency org="org.jruby.joni" name="joni" rev="2.1.11"/>
     <dependency org="org.ow2.asm" name="asm" rev="5.1"/>
     <dependency org="org.ow2.asm" name="asm-commons" rev="5.1"/>
     <dependency org="org.ow2.asm" name="asm-tree" rev="5.1"/>
