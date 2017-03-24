@@ -13,7 +13,9 @@ import org.python.antlr.ast.Name;
 import org.python.antlr.ast.VisitorIF;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PythonTree extends AST implements Traverseproc {
 
@@ -232,6 +234,14 @@ public class PythonTree extends AST implements Traverseproc {
     protected String dumpThis(Object o) {
         if (o instanceof PythonTree) {
             return ((PythonTree)o).toStringTree();
+        }
+        if (o instanceof Collection) {
+            return (String) ((Collection) o).stream().map(el -> {
+                if (el instanceof PythonTree) {
+                    return ((PythonTree) el).toStringTree();
+                }
+                return el.toString();
+            }).collect(Collectors.joining(",", "[", "]"));
         }
         return String.valueOf(o);
     }
