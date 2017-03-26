@@ -246,6 +246,10 @@ public final class Regex {
         return nameFind(name, nameP, nameEnd);
     }
 
+    public int nameToBackrefNumber(byte[] name, Region region) {
+        return nameToBackrefNumber(name, 0, name.length, region);
+    }
+
     public int nameToBackrefNumber(byte[]name, int nameP, int nameEnd, Region region) {
         NameEntry e = nameToGroupNumbers(name, nameP, nameEnd);
         if (e == null) throw new ValueException(ErrorMessages.ERR_UNDEFINED_NAME_REFERENCE,

@@ -72,6 +72,7 @@ public class Setup {
             "_multiprocessing:org.python.modules._multiprocessing._multiprocessing",
             "_posixsubprocess",
             "_sre",
+            "_sre_compile:org.python.modules.sre._sre_compile",
             "_string",
             "_types",
             "_thread:org.python.modules.thread._thread",
