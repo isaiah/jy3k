@@ -448,6 +448,10 @@ class Parser extends Lexer {
                     }
                 } // USE_NAMED_GROUP
                 break;
+            case 'P':
+                /** named capture, Python specific */
+                /** fallthough */
+                fetch();
             case '<':  /* look behind (?<=...), (?<!...) */
                 fetch();
                 if (c == '=') {
