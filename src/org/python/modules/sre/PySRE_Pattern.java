@@ -17,14 +17,23 @@ public class PySRE_Pattern extends PyObject {
 
     protected Regex reg;
 
-    public PySRE_Pattern(String s) {
+    @ExposedGet
+    public PyObject flags;
+
+    @ExposedGet
+    public PyObject pattern;
+
+    public PySRE_Pattern(PyObject s, PyObject flags) {
         super(TYPE);
-        reg = new Regex(s.getBytes());
+        if (flags == null) flags = Py.None;
+        this.flags = flags;
+        this.reg = new Regex(getString(s).getBytes());
+        this.pattern = s;
     }
 
     @ExposedMethod
     public PyObject SRE_Pattern_match(PyObject s) {
-        String str = ((PyUnicode) s).getString();
+        String str = getString(s);
         Matcher m = reg.matcher(str.getBytes());
         int result = m.match(0, str.length(), Option.DEFAULT);
         if (result == -1) {
@@ -35,7 +44,7 @@ public class PySRE_Pattern extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Pattern_search(PyObject s) {
-        String str = ((PyUnicode) s).getString();
+        String str = getString(s);
         Matcher m = reg.matcher(str.getBytes());
         int result = m.search(0, str.length(), Option.DEFAULT);
         if (result == -1) {
@@ -163,5 +172,12 @@ public class PySRE_Pattern extends PyObject {
             map.put(new PyUnicode(new String(entry.name, entry.nameP, entry.nameEnd - entry.nameP)), new PyLong(entry.getBackRefs()[0]));
         }
         return new PyDictionary(map);
+    }
+
+    private String getString(PyObject s) {
+        if (s instanceof PyBytes) {
+            return ((PyBytes) s).getString();
+        }
+        return ((PyUnicode) s).getString();
     }
 }
