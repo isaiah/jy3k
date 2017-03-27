@@ -3,14 +3,10 @@ package org.python.modules.sre;
 import org.python.core.*;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
-import org.python.internal.joni.Matcher;
-import org.python.internal.joni.Option;
-import org.python.internal.joni.Regex;
+import org.python.internal.joni.*;
 import org.python.expose.ExposedType;
-import org.python.internal.joni.Region;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by isaiah on 3/24/17.
@@ -113,5 +109,20 @@ public class PySRE_Pattern extends PyObject {
             pos = ++result;
         }
         return new PyList(list);
+    }
+
+    @ExposedGet(name = "groups")
+    public PyObject SRE_Pattern_groups() {
+        return new PyLong(reg.numberOfCaptures());
+    }
+
+    @ExposedGet(name = "groupindex")
+    public PyObject SRE_Pattern_groupindex() {
+        Map<PyObject, PyObject> map = new HashMap<>();
+        for (Iterator<NameEntry> iter = reg.namedBackrefIterator(); iter.hasNext();) {
+            NameEntry entry = iter.next();
+            map.put(new PyUnicode(new String(entry.name, entry.nameP, entry.nameEnd - entry.nameP)), new PyLong(entry.getBackRefs()[0]));
+        }
+        return new PyDictionary(map);
     }
 }
