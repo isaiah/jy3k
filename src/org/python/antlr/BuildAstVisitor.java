@@ -448,9 +448,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitFor_stmt(PythonParser.For_stmtContext ctx) {
-        exprContextType = expr_contextType.Store;
         expr iter = (expr) visit(ctx.exprlist());
-        exprContextType = expr_contextType.Load;
+        recursiveSetContextType(iter, expr_contextType.Store);
         return new For(ctx.getStart(), iter,
                 (expr) visit(ctx.testlist()), visit_Suite(ctx.s1), visit_Suite(ctx.s2));
     }
