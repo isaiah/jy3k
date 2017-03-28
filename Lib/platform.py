@@ -113,12 +113,12 @@ __copyright__ = """
 
 __version__ = '1.0.7'
 
-import sys,string,os,re
+import sys,os,re
 
 ### Globals & Constants
 if sys.platform.startswith("java"):
     from java.lang import System
-    from org.python.core.Py import newString
+    from org.python.core.Py import newUnicode
 
 # Determine the platform's /dev/null device
 try:
@@ -214,7 +214,7 @@ def _dist_try_harder(distname,version,id):
             else:
                 continue
             if tag == 'MIN_DIST_VERSION':
-                version = string.strip(value)
+                version = value.strip()
             elif tag == 'DIST_IDENT':
                 values = value.split('-')
                 id = values[2]
@@ -466,7 +466,7 @@ def _norm_version(version, build=''):
         strings = l
     else:
         strings = list(map(str,ints))
-    version = string.join(strings[:3],'.')
+    version = '.'.join(strings[:3])
     return version
 
 _ver_output = re.compile(r'(?:([\w ]+) ([\w.]+) '
@@ -520,7 +520,7 @@ def _syscmd_ver(system='', release='', version='',
         return system,release,version
 
     # Parse the output
-    info = string.strip(info)
+    info = info.strip()
     m = _ver_output.match(info)
     if m is not None:
         system,release,version = m.groups()
@@ -829,7 +829,7 @@ def _java_getprop(name,default):
         value = System.getProperty(name)
         if value is None:
             return default
-        return newString(value)
+        return newUnicode(value)
     except AttributeError:
         return default
 
@@ -897,7 +897,7 @@ def system_alias(system,release,version):
             else:
                 major = major - 3
                 l[0] = str(major)
-                release = string.join(l,'.')
+                release = '.'.join(l)
         if release < '6':
             system = 'Solaris'
         else:
@@ -928,28 +928,26 @@ def _platform(*args):
         compatible format e.g. "system-version-machine".
     """
     # Format the platform string
-    platform = string.join(
-        list(map(string.strip,
-            list(filter(len, args)))),
-        '-')
+    platform = '-'.join(
+            list(map(lambda s: s.strip(),
+                list(filter(len, args)))))
 
     # Cleanup some possible filename obstacles...
-    replace = string.replace
-    platform = replace(platform,' ','_')
-    platform = replace(platform,'/','-')
-    platform = replace(platform,'\\','-')
-    platform = replace(platform,':','-')
-    platform = replace(platform,';','-')
-    platform = replace(platform,'"','-')
-    platform = replace(platform,'(','-')
-    platform = replace(platform,')','-')
+    platform = platform.replace(' ','_')
+    platform = platform.replace('/','-')
+    platform = platform.replace('\\','-')
+    platform = platform.replace(':','-')
+    platform = platform.replace(';','-')
+    platform = platform.replace('"','-')
+    platform = platform.replace('(','-')
+    platform = platform.replace(')','-')
 
     # No need to report 'unknown' information...
-    platform = replace(platform,'unknown','')
+    platform = platform.replace('unknown','')
 
     # Fold '--'s and remove trailing '-'
     while True:
-        cleaned = replace(platform,'--','-')
+        cleaned = platform.replace('--','-')
         if cleaned == platform:
             break
         platform = cleaned
@@ -1516,7 +1514,7 @@ def python_version_tuple():
         will always include the patchlevel (it defaults to 0).
 
     """
-    return tuple(string.split(_sys_version()[1], '.'))
+    return tuple(_sys_version()[1].split('.'))
 
 def python_branch():
 
