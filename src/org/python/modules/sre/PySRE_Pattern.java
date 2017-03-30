@@ -1,12 +1,30 @@
 package org.python.modules.sre;
 
-import org.python.core.*;
+import org.python.core.ArgParser;
+import org.python.core.Py;
+import org.python.core.PyBytes;
+import org.python.core.PyCallIter;
+import org.python.core.PyDictionary;
+import org.python.core.PyException;
+import org.python.core.PyList;
+import org.python.core.PyLong;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+import org.python.core.PyType;
+import org.python.core.PyUnicode;
+import org.python.core.imp;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
-import org.python.internal.joni.*;
 import org.python.expose.ExposedType;
+import org.python.internal.regex.Matcher;
+import org.python.internal.regex.Pattern;
+import org.python.internal.regex.PatternSyntaxException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by isaiah on 3/24/17.
@@ -15,7 +33,7 @@ import java.util.*;
 public class PySRE_Pattern extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PySRE_Pattern.class);
 
-    protected Regex reg;
+    protected Pattern reg;
 
     @ExposedGet
     public PyObject flags;
@@ -23,20 +41,28 @@ public class PySRE_Pattern extends PyObject {
     @ExposedGet
     public PyObject pattern;
 
+
     public PySRE_Pattern(PyObject s, PyObject flags) {
         super(TYPE);
         if (flags == null) flags = Py.None;
         this.flags = flags;
-        this.reg = new Regex(getString(s).getBytes());
+        String pattern = getString(s);
+        try {
+            this.reg = Pattern.compile(pattern, flags.asInt());
+        } catch (PatternSyntaxException e) {
+            PyType error;
+            PyObject re = imp.importName("re", true);
+            error = (PyType) re.__getattr__("error");
+            throw new PyException(error, new PyTuple(new PyUnicode(e.getMessage()), new PyUnicode(pattern)));
+        }
         this.pattern = s;
     }
 
     @ExposedMethod
     public PyObject SRE_Pattern_match(PyObject s) {
         String str = getString(s);
-        Matcher m = reg.matcher(str.getBytes());
-        int result = m.match(0, str.length(), Option.DEFAULT);
-        if (result == -1) {
+        Matcher m = reg.matcher(str);
+        if (!m.matches()) {
             return Py.None;
         }
         return new PySRE_Match(m, str, this);
@@ -45,9 +71,8 @@ public class PySRE_Pattern extends PyObject {
     @ExposedMethod
     public PyObject SRE_Pattern_search(PyObject s) {
         String str = getString(s);
-        Matcher m = reg.matcher(str.getBytes());
-        int result = m.search(0, str.length(), Option.DEFAULT);
-        if (result == -1) {
+        Matcher m = reg.matcher(str);
+        if (!m.find()) {
             return Py.None;
         }
         return new PySRE_Match(m, str, this);
@@ -67,15 +92,13 @@ public class PySRE_Pattern extends PyObject {
         ArgParser ap = new ArgParser("finditer", args, keywords, "string", "pos", "endpos");
         String s = ap.getString(0);
         List<PyObject> list = new ArrayList<>();
-        Matcher matcher = reg.matcher(s.getBytes());
-        for (int pos = 0; pos < s.length();) {
-            int result = matcher.search(pos, s.length(), Option.DEFAULT);
-            if (result == -1) {
+        Matcher matcher = reg.matcher(s);
+        for (int pos = 0; pos < s.length(); ) {
+            if (!matcher.find(pos)) {
                 break;
             }
-            pos = ++result;
-            Region region = matcher.getRegion();
-            list.add(new PyUnicode(s.substring(region.beg[0], region.end[0])));
+            pos = matcher.end() + 1;
+            list.add(new PyUnicode(matcher.group()));
         }
         return new PyList(list);
     }
@@ -86,40 +109,19 @@ public class PySRE_Pattern extends PyObject {
         String s = ap.getString(0);
         int pos = ap.getInt(1, 0);
         int endpos = ap.getInt(2, s.length());
-        Matcher matcher = reg.matcher(s.getBytes());
-         int result = matcher.match(pos, endpos, Option.DEFAULT);
-        if (result < endpos - 1) {
-            return Py.None;
+        Matcher matcher = reg.matcher(s);
+        if (matcher.matches() && matcher.hitEnd()) {
+            return new PySRE_Match(matcher, s, this);
         }
-        return new PySRE_Match(matcher, s, this);
+        return Py.None;
     }
 
     @ExposedMethod
     public PyObject SRE_Pattern_split(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("split", args, keywords, "string", "maxsplit");
         String s = ap.getString(0);
-        List<PyObject> list = new ArrayList<>();
-        Matcher matcher = reg.matcher(s.getBytes());
-        for (int pos = 0; pos < s.length();) {
-            int result = matcher.search(pos, s.length(), Option.DEFAULT);
-            if (result == -1) {
-                list.add(new PyUnicode(s.substring(pos)));
-                break;
-            }
-
-            Region region = matcher.getEagerRegion();
-            if (region.beg[0] != pos) {
-                list.add(new PyUnicode(s.substring(pos, region.beg[0])));
-                pos = region.end[0];
-            } else {
-                pos++;
-            }
-
-            for (int i = 1; i < region.beg.length; i++) {
-                list.add(new PyUnicode(s.substring(region.beg[i], region.end[i])));
-            }
-        }
-        return new PyList(list);
+        int limit = ap.getInt(1, 0);
+        return new PyList(Arrays.asList(reg.split(s, limit)));
     }
 
     @ExposedMethod
@@ -134,18 +136,16 @@ public class PySRE_Pattern extends PyObject {
             replacement = ap.getString(0);
         }
         StringBuilder sb = new StringBuilder();
-        Matcher matcher = reg.matcher(s.getBytes());
-        for (int pos = 0; pos < s.length();) {
-            int result = matcher.search(pos, s.length(), Option.DEFAULT);
-            if (result == -1) {
+        Matcher matcher = reg.matcher(s);
+        for (int pos = 1; pos < s.length(); ) {
+            if (!matcher.find(pos)) {
                 sb.append(s.substring(pos));
                 break;
             }
 
-            Region region = matcher.getEagerRegion();
-            if (region.beg[0] != pos) {
-                sb.append(s.substring(pos, region.beg[0]));
-                pos = region.end[0];
+            if (matcher.start() != pos) {
+                sb.append(s.substring(pos, matcher.start()));
+                pos = matcher.end();
             } else {
                 pos++;
             }
@@ -161,16 +161,16 @@ public class PySRE_Pattern extends PyObject {
 
     @ExposedGet(name = "groups")
     public PyObject SRE_Pattern_groups() {
-        return new PyLong(reg.numberOfCaptures());
+        return new PyLong(reg.groupCount());
     }
 
     @ExposedGet(name = "groupindex")
     public PyObject SRE_Pattern_groupindex() {
         Map<PyObject, PyObject> map = new HashMap<>();
-        for (Iterator<NameEntry> iter = reg.namedBackrefIterator(); iter.hasNext();) {
-            NameEntry entry = iter.next();
-            map.put(new PyUnicode(new String(entry.name, entry.nameP, entry.nameEnd - entry.nameP)), new PyLong(entry.getBackRefs()[0]));
-        }
+        Map<String, Integer> groups = reg.namedGroups();
+        groups.keySet().stream().forEach(name -> {
+            map.put(new PyUnicode(name), new PyLong(groups.get(name)));
+        });
         return new PyDictionary(map);
     }
 
@@ -179,5 +179,10 @@ public class PySRE_Pattern extends PyObject {
             return ((PyBytes) s).getString();
         }
         return ((PyUnicode) s).getString();
+    }
+
+    private PyObject call(String module, String function, PyObject... args) {
+        PyObject sre = imp.importName(module, true);
+        return sre.invoke(function, args);
     }
 }

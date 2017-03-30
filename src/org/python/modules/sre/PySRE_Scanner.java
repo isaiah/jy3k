@@ -6,8 +6,7 @@ import org.python.core.PyType;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedType;
-import org.python.internal.joni.Matcher;
-import org.python.internal.joni.Option;
+import org.python.internal.regex.Matcher;
 
 /**
  * Created by isaiah on 3/26/17.
@@ -25,18 +24,17 @@ public class PySRE_Scanner extends PyObject {
 
     public PySRE_Scanner(PySRE_Pattern pattern, String s, int pos) {
         this.pattern = pattern;
-        this.matcher = pattern.reg.matcher(s.getBytes());
+        this.matcher = pattern.reg.matcher(s);
         this.pos = pos;
         this.string = s;
     }
 
     @ExposedMethod
     public PyObject SRE_Scanner_search() {
-        int result = matcher.search(pos, string.length(), Option.DEFAULT);
-        if (result == -1) {
+        if (!matcher.find(pos)) {
             return Py.None;
         }
-        this.pos = ++result;
+        this.pos = matcher.end() + 1;
         return new PySRE_Match(this.matcher, string, pattern);
     }
 

@@ -9,8 +9,7 @@ import org.python.core.PyUnicode;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedType;
-import org.python.internal.joni.Matcher;
-import org.python.internal.joni.Region;
+import org.python.internal.regex.Matcher;
 
 /**
  * Created by isaiah on 3/24/17.
@@ -33,13 +32,10 @@ public class PySRE_Match extends PyObject {
 
     private Matcher matcher;
 
-    private Region region;
-
     public PySRE_Match(Matcher matcher, String str, PySRE_Pattern pattern) {
         this.matcher = matcher;
         this.pattern = pattern;
         this.str = str;
-        this.region = matcher.getEagerRegion();
         this.pos = 0;
         this.endpos = str.length() - 1;
     }
@@ -47,20 +43,20 @@ public class PySRE_Match extends PyObject {
     @ExposedMethod
     public PyObject SRE_Match_start(PyObject[] args, String[] keywords) {
         int index = getIndex(args);
-        return new PyLong(region.beg[index]);
+        return new PyLong(matcher.start(index));
     }
 
     @ExposedMethod
     public PyObject SRE_Match_end(PyObject[] args, String[] keywords) {
         int index = getIndex(args[0]);
-        return new PyLong(region.end[index]);
+        return new PyLong(matcher.end(index));
     }
 
     public PyObject group(int index) {
-        if (region.beg[index] == -1) {
-            return Py.None;
+        if (index > matcher.groupCount()) {
+            throw Py.IndexError("no such group");
         }
-        return new PyUnicode(str.substring(region.beg[index], region.end[index]));
+        return new PyUnicode(matcher.group(index));
     }
 
     @ExposedMethod
@@ -80,8 +76,8 @@ public class PySRE_Match extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Match_groups() {
-        PyObject[] grps = new PyObject[region.beg.length - 1];
-        for (int i = 1; i < region.beg.length; i++) {
+        PyObject[] grps = new PyObject[matcher.groupCount() - 1];
+        for (int i = 1; i < matcher.groupCount(); i++) {
             grps[i - 1] = group(i);
         }
         return new PyTuple(grps);
@@ -89,9 +85,9 @@ public class PySRE_Match extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Match_regs() {
-        PyObject[] regs = new PyObject[region.beg.length];
+        PyObject[] regs = new PyObject[matcher.groupCount()];
         for(int i = 0; i < regs.length; i++) {
-            regs[i] = new PyTuple(new PyLong(region.beg[i]), new PyLong(region.end[i]));
+            regs[i] = new PyTuple(new PyLong(matcher.start(i)), new PyLong(matcher.end(i)));
         }
         return new PyTuple(regs);
     }
@@ -99,13 +95,13 @@ public class PySRE_Match extends PyObject {
     @ExposedMethod
     public PyObject SRE_Match_span(PyObject[] args, String[] keywords) {
         int index = getIndex(args);
-        return new PyTuple(new PyLong(region.beg[index]), new PyLong(region.end[index]));
+        return new PyTuple(new PyLong(matcher.start()), new PyLong(matcher.end()));
     }
 
     private int getIndex(PyObject arg) {
         if (arg instanceof PyUnicode) {
-            byte[] name = ((PyUnicode) arg).getString().getBytes();
-            return pattern.reg.nameToBackrefNumber(name, region);
+            String name = ((PyUnicode) arg).getString();
+            return matcher.getMatchedGroupIndex(name);
         }
         return arg.asIndex();
     }
