@@ -383,7 +383,7 @@ public class PyFileIO extends PyRawIOBase {
         // Close this object to further input (also calls flush)
         super.close();
         // Now close downstream (if required to)
-        if (closefd) {
+        if (closefd && ioDelegate != null) {
             ioDelegate.close();
         }
         // This saves us doing two tests for each action (when the file is open)
@@ -401,11 +401,12 @@ public class PyFileIO extends PyRawIOBase {
         if (__closed) {
             throw closedValueError();
         }
-        if (!seekableKnown) {
-            seekable = ioDelegate.seek(0, 1) >= 0;  // Trial seek
-            seekableKnown = true;
-        }
-        return seekable;
+        return false;
+//        if (!seekableKnown) {
+//            seekable = ioDelegate.seek(0, 1) >= 0;  // Trial seek
+//            seekableKnown = true;
+//        }
+//        return seekable;
     }
 
     @Override
