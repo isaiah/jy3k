@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1999, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1999, 2013, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  *
@@ -26,15 +26,11 @@
 package org.python.internal.regex;
 
 import java.text.Normalizer;
-import java.text.Normalizer.Form;
 import java.util.Locale;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
@@ -92,42 +88,40 @@ import java.util.stream.StreamSupport;
  *
  * <tr><td valign="top" headers="construct characters"><i>x</i></td>
  *     <td headers="matches">The character <i>x</i></td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \\}</td>
+ * <tr><td valign="top" headers="construct characters"><tt>\\</tt></td>
  *     <td headers="matches">The backslash character</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \0}<i>n</i></td>
- *     <td headers="matches">The character with octal value {@code 0}<i>n</i>
- *         (0&nbsp;{@code <=}&nbsp;<i>n</i>&nbsp;{@code <=}&nbsp;7)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \0}<i>nn</i></td>
- *     <td headers="matches">The character with octal value {@code 0}<i>nn</i>
- *         (0&nbsp;{@code <=}&nbsp;<i>n</i>&nbsp;{@code <=}&nbsp;7)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \0}<i>mnn</i></td>
- *     <td headers="matches">The character with octal value {@code 0}<i>mnn</i>
- *         (0&nbsp;{@code <=}&nbsp;<i>m</i>&nbsp;{@code <=}&nbsp;3,
- *         0&nbsp;{@code <=}&nbsp;<i>n</i>&nbsp;{@code <=}&nbsp;7)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \x}<i>hh</i></td>
- *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;{@code 0x}<i>hh</i></td></tr>
- * <tr><td valign="top" headers="construct characters"><code>&#92;u</code><i>hhhh</i></td>
- *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;{@code 0x}<i>hhhh</i></td></tr>
- * <tr><td valign="top" headers="construct characters"><code>&#92;x</code><i>{h...h}</i></td>
- *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;{@code 0x}<i>h...h</i>
+ * <tr><td valign="top" headers="construct characters"><tt>\0</tt><i>n</i></td>
+ *     <td headers="matches">The character with octal value <tt>0</tt><i>n</i>
+ *         (0&nbsp;<tt>&lt;=</tt>&nbsp;<i>n</i>&nbsp;<tt>&lt;=</tt>&nbsp;7)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\0</tt><i>nn</i></td>
+ *     <td headers="matches">The character with octal value <tt>0</tt><i>nn</i>
+ *         (0&nbsp;<tt>&lt;=</tt>&nbsp;<i>n</i>&nbsp;<tt>&lt;=</tt>&nbsp;7)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\0</tt><i>mnn</i></td>
+ *     <td headers="matches">The character with octal value <tt>0</tt><i>mnn</i>
+ *         (0&nbsp;<tt>&lt;=</tt>&nbsp;<i>m</i>&nbsp;<tt>&lt;=</tt>&nbsp;3,
+ *         0&nbsp;<tt>&lt;=</tt>&nbsp;<i>n</i>&nbsp;<tt>&lt;=</tt>&nbsp;7)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\x</tt><i>hh</i></td>
+ *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;<tt>0x</tt><i>hh</i></td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>&#92;u</tt><i>hhhh</i></td>
+ *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;<tt>0x</tt><i>hhhh</i></td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>&#92;x</tt><i>{h...h}</i></td>
+ *     <td headers="matches">The character with hexadecimal&nbsp;value&nbsp;<tt>0x</tt><i>h...h</i>
  *         ({@link java.lang.Character#MIN_CODE_POINT Character.MIN_CODE_POINT}
- *         &nbsp;&lt;=&nbsp;{@code 0x}<i>h...h</i>&nbsp;&lt;=&nbsp;
+ *         &nbsp;&lt;=&nbsp;<tt>0x</tt><i>h...h</i>&nbsp;&lt;=&nbsp;
  *          {@link java.lang.Character#MAX_CODE_POINT Character.MAX_CODE_POINT})</td></tr>
- * <tr><td valign="top" headers="construct characters"><code>&#92;N{</code><i>name</i><code>}</code></td>
- *     <td headers="matches">The character with Unicode character name <i>'name'</i></td></tr>
- * <tr><td valign="top" headers="matches">{@code \t}</td>
- *     <td headers="matches">The tab character (<code>'&#92;u0009'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \n}</td>
- *     <td headers="matches">The newline (line feed) character (<code>'&#92;u000A'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \r}</td>
- *     <td headers="matches">The carriage-return character (<code>'&#92;u000D'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \f}</td>
- *     <td headers="matches">The form-feed character (<code>'&#92;u000C'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \a}</td>
- *     <td headers="matches">The alert (bell) character (<code>'&#92;u0007'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \e}</td>
- *     <td headers="matches">The escape character (<code>'&#92;u001B'</code>)</td></tr>
- * <tr><td valign="top" headers="construct characters">{@code \c}<i>x</i></td>
+ * <tr><td valign="top" headers="matches"><tt>\t</tt></td>
+ *     <td headers="matches">The tab character (<tt>'&#92;u0009'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\n</tt></td>
+ *     <td headers="matches">The newline (line feed) character (<tt>'&#92;u000A'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\r</tt></td>
+ *     <td headers="matches">The carriage-return character (<tt>'&#92;u000D'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\f</tt></td>
+ *     <td headers="matches">The form-feed character (<tt>'&#92;u000C'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\a</tt></td>
+ *     <td headers="matches">The alert (bell) character (<tt>'&#92;u0007'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\e</tt></td>
+ *     <td headers="matches">The escape character (<tt>'&#92;u001B'</tt>)</td></tr>
+ * <tr><td valign="top" headers="construct characters"><tt>\c</tt><i>x</i></td>
  *     <td headers="matches">The control character corresponding to <i>x</i></td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
@@ -155,30 +149,30 @@ import java.util.stream.StreamSupport;
  *
  * <tr align="left"><th colspan="2" id="predef">Predefined character classes</th></tr>
  *
- * <tr><td valign="top" headers="construct predef">{@code .}</td>
+ * <tr><td valign="top" headers="construct predef"><tt>.</tt></td>
  *     <td headers="matches">Any character (may or may not match <a href="#lt">line terminators</a>)</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \d}</td>
- *     <td headers="matches">A digit: {@code [0-9]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \D}</td>
- *     <td headers="matches">A non-digit: {@code [^0-9]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \h}</td>
+ * <tr><td valign="top" headers="construct predef"><tt>\d</tt></td>
+ *     <td headers="matches">A digit: <tt>[0-9]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\D</tt></td>
+ *     <td headers="matches">A non-digit: <tt>[^0-9]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\h</tt></td>
  *     <td headers="matches">A horizontal whitespace character:
- *     <code>[ \t\xA0&#92;u1680&#92;u180e&#92;u2000-&#92;u200a&#92;u202f&#92;u205f&#92;u3000]</code></td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \H}</td>
- *     <td headers="matches">A non-horizontal whitespace character: {@code [^\h]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \s}</td>
- *     <td headers="matches">A whitespace character: {@code [ \t\n\x0B\f\r]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \S}</td>
- *     <td headers="matches">A non-whitespace character: {@code [^\s]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \v}</td>
- *     <td headers="matches">A vertical whitespace character: <code>[\n\x0B\f\r\x85&#92;u2028&#92;u2029]</code>
+ *     <tt>[ \t\xA0&#92;u1680&#92;u180e&#92;u2000-&#92;u200a&#92;u202f&#92;u205f&#92;u3000]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\H</tt></td>
+ *     <td headers="matches">A non-horizontal whitespace character: <tt>[^\h]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\s</tt></td>
+ *     <td headers="matches">A whitespace character: <tt>[ \t\n\x0B\f\r]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\S</tt></td>
+ *     <td headers="matches">A non-whitespace character: <tt>[^\s]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\v</tt></td>
+ *     <td headers="matches">A vertical whitespace character: <tt>[\n\x0B\f\r\x85&#92;u2028&#92;u2029]</tt>
  *     </td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \V}</td>
- *     <td headers="matches">A non-vertical whitespace character: {@code [^\v]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \w}</td>
- *     <td headers="matches">A word character: {@code [a-zA-Z_0-9]}</td></tr>
- * <tr><td valign="top" headers="construct predef">{@code \W}</td>
- *     <td headers="matches">A non-word character: {@code [^\w]}</td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\V</tt></td>
+ *     <td headers="matches">A non-vertical whitespace character: <tt>[^\v]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\w</tt></td>
+ *     <td headers="matches">A word character: <tt>[a-zA-Z_0-9]</tt></td></tr>
+ * <tr><td valign="top" headers="construct predef"><tt>\W</tt></td>
+ *     <td headers="matches">A non-word character: <tt>[^\w]</tt></td></tr>
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="posix"><b>POSIX character classes (US-ASCII only)</b></th></tr>
  *
@@ -214,13 +208,13 @@ import java.util.stream.StreamSupport;
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2">java.lang.Character classes (simple <a href="#jcc">java character type</a>)</th></tr>
  *
- * <tr><td valign="top">{@code \p{javaLowerCase}}</td>
+ * <tr><td valign="top"><tt>\p{javaLowerCase}</tt></td>
  *     <td>Equivalent to java.lang.Character.isLowerCase()</td></tr>
- * <tr><td valign="top">{@code \p{javaUpperCase}}</td>
+ * <tr><td valign="top"><tt>\p{javaUpperCase}</tt></td>
  *     <td>Equivalent to java.lang.Character.isUpperCase()</td></tr>
- * <tr><td valign="top">{@code \p{javaWhitespace}}</td>
+ * <tr><td valign="top"><tt>\p{javaWhitespace}</tt></td>
  *     <td>Equivalent to java.lang.Character.isWhitespace()</td></tr>
- * <tr><td valign="top">{@code \p{javaMirrored}}</td>
+ * <tr><td valign="top"><tt>\p{javaMirrored}</tt></td>
  *     <td>Equivalent to java.lang.Character.isMirrored()</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
@@ -243,84 +237,77 @@ import java.util.stream.StreamSupport;
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="bounds">Boundary matchers</th></tr>
  *
- * <tr><td valign="top" headers="construct bounds">{@code ^}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>^</tt></td>
  *     <td headers="matches">The beginning of a line</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code $}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>$</tt></td>
  *     <td headers="matches">The end of a line</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \b}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\b</tt></td>
  *     <td headers="matches">A word boundary</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \b{g}}</td>
- *     <td headers="matches">A Unicode extended grapheme cluster boundary</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \B}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\B</tt></td>
  *     <td headers="matches">A non-word boundary</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \A}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\A</tt></td>
  *     <td headers="matches">The beginning of the input</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \G}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\G</tt></td>
  *     <td headers="matches">The end of the previous match</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \Z}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\Z</tt></td>
  *     <td headers="matches">The end of the input but for the final
  *         <a href="#lt">terminator</a>, if&nbsp;any</td></tr>
- * <tr><td valign="top" headers="construct bounds">{@code \z}</td>
+ * <tr><td valign="top" headers="construct bounds"><tt>\z</tt></td>
  *     <td headers="matches">The end of the input</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="lineending">Linebreak matcher</th></tr>
- * <tr><td valign="top" headers="construct lineending">{@code \R}</td>
+ * <tr><td valign="top" headers="construct lineending"><tt>\R</tt></td>
  *     <td headers="matches">Any Unicode linebreak sequence, is equivalent to
- *     <code>&#92;u000D&#92;u000A|[&#92;u000A&#92;u000B&#92;u000C&#92;u000D&#92;u0085&#92;u2028&#92;u2029]
- *     </code></td></tr>
- *
- * <tr><th>&nbsp;</th></tr>
- * <tr align="left"><th colspan="2" id="grapheme">Unicode Extended Grapheme matcher</th></tr>
- * <tr><td valign="top" headers="construct grapheme">{@code \X}</td>
- *     <td headers="matches">Any Unicode extended grapheme cluster</td></tr>
+ *     <tt>&#92;u000D&#92;u000A|[&#92;u000A&#92;u000B&#92;u000C&#92;u000D&#92;u0085&#92;u2028&#92;u2029]
+ *     </tt></td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="greedy">Greedy quantifiers</th></tr>
  *
- * <tr><td valign="top" headers="construct greedy"><i>X</i>{@code ?}</td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>?</tt></td>
  *     <td headers="matches"><i>X</i>, once or not at all</td></tr>
- * <tr><td valign="top" headers="construct greedy"><i>X</i>{@code *}</td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>*</tt></td>
  *     <td headers="matches"><i>X</i>, zero or more times</td></tr>
- * <tr><td valign="top" headers="construct greedy"><i>X</i>{@code +}</td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>+</tt></td>
  *     <td headers="matches"><i>X</i>, one or more times</td></tr>
- * <tr><td valign="top" headers="construct greedy"><i>X</i><code>{</code><i>n</i><code>}</code></td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>{</tt><i>n</i><tt>}</tt></td>
  *     <td headers="matches"><i>X</i>, exactly <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct greedy"><i>X</i><code>{</code><i>n</i>{@code ,}}</td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>{</tt><i>n</i><tt>,}</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct greedy"><i>X</i><code>{</code><i>n</i>{@code ,}<i>m</i><code>}</code></td>
+ * <tr><td valign="top" headers="construct greedy"><i>X</i><tt>{</tt><i>n</i><tt>,</tt><i>m</i><tt>}</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> but not more than <i>m</i> times</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="reluc">Reluctant quantifiers</th></tr>
  *
- * <tr><td valign="top" headers="construct reluc"><i>X</i>{@code ??}</td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>??</tt></td>
  *     <td headers="matches"><i>X</i>, once or not at all</td></tr>
- * <tr><td valign="top" headers="construct reluc"><i>X</i>{@code *?}</td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>*?</tt></td>
  *     <td headers="matches"><i>X</i>, zero or more times</td></tr>
- * <tr><td valign="top" headers="construct reluc"><i>X</i>{@code +?}</td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>+?</tt></td>
  *     <td headers="matches"><i>X</i>, one or more times</td></tr>
- * <tr><td valign="top" headers="construct reluc"><i>X</i><code>{</code><i>n</i><code>}?</code></td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>{</tt><i>n</i><tt>}?</tt></td>
  *     <td headers="matches"><i>X</i>, exactly <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct reluc"><i>X</i><code>{</code><i>n</i><code>,}?</code></td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>{</tt><i>n</i><tt>,}?</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct reluc"><i>X</i><code>{</code><i>n</i>{@code ,}<i>m</i><code>}?</code></td>
+ * <tr><td valign="top" headers="construct reluc"><i>X</i><tt>{</tt><i>n</i><tt>,</tt><i>m</i><tt>}?</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> but not more than <i>m</i> times</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="poss">Possessive quantifiers</th></tr>
  *
- * <tr><td valign="top" headers="construct poss"><i>X</i>{@code ?+}</td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>?+</tt></td>
  *     <td headers="matches"><i>X</i>, once or not at all</td></tr>
- * <tr><td valign="top" headers="construct poss"><i>X</i>{@code *+}</td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>*+</tt></td>
  *     <td headers="matches"><i>X</i>, zero or more times</td></tr>
- * <tr><td valign="top" headers="construct poss"><i>X</i>{@code ++}</td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>++</tt></td>
  *     <td headers="matches"><i>X</i>, one or more times</td></tr>
- * <tr><td valign="top" headers="construct poss"><i>X</i><code>{</code><i>n</i><code>}+</code></td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>{</tt><i>n</i><tt>}+</tt></td>
  *     <td headers="matches"><i>X</i>, exactly <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct poss"><i>X</i><code>{</code><i>n</i><code>,}+</code></td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>{</tt><i>n</i><tt>,}+</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> times</td></tr>
- * <tr><td valign="top" headers="construct poss"><i>X</i><code>{</code><i>n</i>{@code ,}<i>m</i><code>}+</code></td>
+ * <tr><td valign="top" headers="construct poss"><i>X</i><tt>{</tt><i>n</i><tt>,</tt><i>m</i><tt>}+</tt></td>
  *     <td headers="matches"><i>X</i>, at least <i>n</i> but not more than <i>m</i> times</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
@@ -328,59 +315,59 @@ import java.util.stream.StreamSupport;
  *
  * <tr><td valign="top" headers="construct logical"><i>XY</i></td>
  *     <td headers="matches"><i>X</i> followed by <i>Y</i></td></tr>
- * <tr><td valign="top" headers="construct logical"><i>X</i>{@code |}<i>Y</i></td>
+ * <tr><td valign="top" headers="construct logical"><i>X</i><tt>|</tt><i>Y</i></td>
  *     <td headers="matches">Either <i>X</i> or <i>Y</i></td></tr>
- * <tr><td valign="top" headers="construct logical">{@code (}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct logical"><tt>(</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches">X, as a <a href="#cg">capturing group</a></td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="backref">Back references</th></tr>
  *
- * <tr><td valign="bottom" headers="construct backref">{@code \}<i>n</i></td>
+ * <tr><td valign="bottom" headers="construct backref"><tt>\</tt><i>n</i></td>
  *     <td valign="bottom" headers="matches">Whatever the <i>n</i><sup>th</sup>
  *     <a href="#cg">capturing group</a> matched</td></tr>
  *
- * <tr><td valign="bottom" headers="construct backref">{@code \}<i>k</i>&lt;<i>name</i>&gt;</td>
+ * <tr><td valign="bottom" headers="construct backref"><tt>\</tt><i>k</i>&lt;<i>name</i>&gt;</td>
  *     <td valign="bottom" headers="matches">Whatever the
  *     <a href="#groupname">named-capturing group</a> "name" matched</td></tr>
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="quot">Quotation</th></tr>
  *
- * <tr><td valign="top" headers="construct quot">{@code \}</td>
+ * <tr><td valign="top" headers="construct quot"><tt>\</tt></td>
  *     <td headers="matches">Nothing, but quotes the following character</td></tr>
- * <tr><td valign="top" headers="construct quot">{@code \Q}</td>
- *     <td headers="matches">Nothing, but quotes all characters until {@code \E}</td></tr>
- * <tr><td valign="top" headers="construct quot">{@code \E}</td>
- *     <td headers="matches">Nothing, but ends quoting started by {@code \Q}</td></tr>
+ * <tr><td valign="top" headers="construct quot"><tt>\Q</tt></td>
+ *     <td headers="matches">Nothing, but quotes all characters until <tt>\E</tt></td></tr>
+ * <tr><td valign="top" headers="construct quot"><tt>\E</tt></td>
+ *     <td headers="matches">Nothing, but ends quoting started by <tt>\Q</tt></td></tr>
  *     <!-- Metachars: !$()*+.<>?[\]^{|} -->
  *
  * <tr><th>&nbsp;</th></tr>
  * <tr align="left"><th colspan="2" id="special">Special constructs (named-capturing and non-capturing)</th></tr>
  *
- * <tr><td valign="top" headers="construct special"><code>(?&lt;<a href="#groupname">name</a>&gt;</code><i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?&lt;<a href="#groupname">name</a>&gt;</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, as a named-capturing group</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?:}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?:</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, as a non-capturing group</td></tr>
- * <tr><td valign="top" headers="construct special"><code>(?idmsuxU-idmsuxU)&nbsp;</code></td>
+ * <tr><td valign="top" headers="construct special"><tt>(?idmsuxU-idmsuxU)&nbsp;</tt></td>
  *     <td headers="matches">Nothing, but turns match flags <a href="#CASE_INSENSITIVE">i</a>
  * <a href="#UNIX_LINES">d</a> <a href="#MULTILINE">m</a> <a href="#DOTALL">s</a>
  * <a href="#UNICODE_CASE">u</a> <a href="#COMMENTS">x</a> <a href="#UNICODE_CHARACTER_CLASS">U</a>
  * on - off</td></tr>
- * <tr><td valign="top" headers="construct special"><code>(?idmsux-idmsux:</code><i>X</i>{@code )}&nbsp;&nbsp;</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?idmsux-idmsux:</tt><i>X</i><tt>)</tt>&nbsp;&nbsp;</td>
  *     <td headers="matches"><i>X</i>, as a <a href="#cg">non-capturing group</a> with the
  *         given flags <a href="#CASE_INSENSITIVE">i</a> <a href="#UNIX_LINES">d</a>
  * <a href="#MULTILINE">m</a> <a href="#DOTALL">s</a> <a href="#UNICODE_CASE">u</a >
  * <a href="#COMMENTS">x</a> on - off</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?=}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?=</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, via zero-width positive lookahead</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?!}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?!</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, via zero-width negative lookahead</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?<=}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?&lt;=</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, via zero-width positive lookbehind</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?<!}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?&lt;!</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, via zero-width negative lookbehind</td></tr>
- * <tr><td valign="top" headers="construct special">{@code (?>}<i>X</i>{@code )}</td>
+ * <tr><td valign="top" headers="construct special"><tt>(?&gt;</tt><i>X</i><tt>)</tt></td>
  *     <td headers="matches"><i>X</i>, as an independent, non-capturing group</td></tr>
  *
  * </table>
@@ -390,10 +377,10 @@ import java.util.stream.StreamSupport;
  *
  * <h3><a name="bs">Backslashes, escapes, and quoting</a></h3>
  *
- * <p> The backslash character ({@code '\'}) serves to introduce escaped
+ * <p> The backslash character (<tt>'\'</tt>) serves to introduce escaped
  * constructs, as defined in the table above, as well as to quote characters
  * that otherwise would be interpreted as unescaped constructs.  Thus the
- * expression {@code \\} matches a single backslash and <code>\{</code> matches a
+ * expression <tt>\\</tt> matches a single backslash and <tt>\{</tt> matches a
  * left brace.
  *
  * <p> It is an error to use a backslash prior to any alphabetic character that
@@ -409,18 +396,18 @@ import java.util.stream.StreamSupport;
  * It is therefore necessary to double backslashes in string
  * literals that represent regular expressions to protect them from
  * interpretation by the Java bytecode compiler.  The string literal
- * <code>"&#92;b"</code>, for example, matches a single backspace character when
- * interpreted as a regular expression, while {@code "\\b"} matches a
- * word boundary.  The string literal {@code "\(hello\)"} is illegal
+ * <tt>"&#92;b"</tt>, for example, matches a single backspace character when
+ * interpreted as a regular expression, while <tt>"&#92;&#92;b"</tt> matches a
+ * word boundary.  The string literal <tt>"&#92;(hello&#92;)"</tt> is illegal
  * and leads to a compile-time error; in order to match the string
- * {@code (hello)} the string literal {@code "\\(hello\\)"}
+ * <tt>(hello)</tt> the string literal <tt>"&#92;&#92;(hello&#92;&#92;)"</tt>
  * must be used.
  *
  * <h3><a name="cc">Character Classes</a></h3>
  *
  *    <p> Character classes may appear within other character classes, and
  *    may be composed by the union operator (implicit) and the intersection
- *    operator ({@code &&}).
+ *    operator (<tt>&amp;&amp;</tt>).
  *    The union operator denotes a class that contains every character that is
  *    in at least one of its operand classes.  The intersection operator
  *    denotes a class that contains every character that is in both of its
@@ -433,16 +420,16 @@ import java.util.stream.StreamSupport;
  *                 summary="Precedence of character class operators.">
  *      <tr><th>1&nbsp;&nbsp;&nbsp;&nbsp;</th>
  *        <td>Literal escape&nbsp;&nbsp;&nbsp;&nbsp;</td>
- *        <td>{@code \x}</td></tr>
+ *        <td><tt>\x</tt></td></tr>
  *     <tr><th>2&nbsp;&nbsp;&nbsp;&nbsp;</th>
  *        <td>Grouping</td>
- *        <td>{@code [...]}</td></tr>
+ *        <td><tt>[...]</tt></td></tr>
  *     <tr><th>3&nbsp;&nbsp;&nbsp;&nbsp;</th>
  *        <td>Range</td>
- *        <td>{@code a-z}</td></tr>
+ *        <td><tt>a-z</tt></td></tr>
  *      <tr><th>4&nbsp;&nbsp;&nbsp;&nbsp;</th>
  *        <td>Union</td>
- *        <td>{@code [a-e][i-u]}</td></tr>
+ *        <td><tt>[a-e][i-u]</tt></td></tr>
  *      <tr><th>5&nbsp;&nbsp;&nbsp;&nbsp;</th>
  *        <td>Intersection</td>
  *        <td>{@code [a-z&&[aeiou]]}</td></tr>
@@ -450,8 +437,8 @@ import java.util.stream.StreamSupport;
  *
  *    <p> Note that a different set of metacharacters are in effect inside
  *    a character class than outside a character class. For instance, the
- *    regular expression {@code .} loses its special meaning inside a
- *    character class, while the expression {@code -} becomes a range
+ *    regular expression <tt>.</tt> loses its special meaning inside a
+ *    character class, while the expression <tt>-</tt> becomes a range
  *    forming metacharacter.
  *
  * <h3><a name="lt">Line terminators</a></h3>
@@ -462,49 +449,49 @@ import java.util.stream.StreamSupport;
  *
  * <ul>
  *
- *   <li> A newline (line feed) character&nbsp;({@code '\n'}),
+ *   <li> A newline (line feed) character&nbsp;(<tt>'\n'</tt>),
  *
  *   <li> A carriage-return character followed immediately by a newline
- *   character&nbsp;({@code "\r\n"}),
+ *   character&nbsp;(<tt>"\r\n"</tt>),
  *
- *   <li> A standalone carriage-return character&nbsp;({@code '\r'}),
+ *   <li> A standalone carriage-return character&nbsp;(<tt>'\r'</tt>),
  *
- *   <li> A next-line character&nbsp;(<code>'&#92;u0085'</code>),
+ *   <li> A next-line character&nbsp;(<tt>'&#92;u0085'</tt>),
  *
- *   <li> A line-separator character&nbsp;(<code>'&#92;u2028'</code>), or
+ *   <li> A line-separator character&nbsp;(<tt>'&#92;u2028'</tt>), or
  *
- *   <li> A paragraph-separator character&nbsp;(<code>'&#92;u2029'</code>).
+ *   <li> A paragraph-separator character&nbsp;(<tt>'&#92;u2029</tt>).
  *
  * </ul>
  * <p>If {@link #UNIX_LINES} mode is activated, then the only line terminators
  * recognized are newline characters.
  *
- * <p> The regular expression {@code .} matches any character except a line
+ * <p> The regular expression <tt>.</tt> matches any character except a line
  * terminator unless the {@link #DOTALL} flag is specified.
  *
- * <p> By default, the regular expressions {@code ^} and {@code $} ignore
+ * <p> By default, the regular expressions <tt>^</tt> and <tt>$</tt> ignore
  * line terminators and only match at the beginning and the end, respectively,
  * of the entire input sequence. If {@link #MULTILINE} mode is activated then
- * {@code ^} matches at the beginning of input and after any line terminator
- * except at the end of input. When in {@link #MULTILINE} mode {@code $}
+ * <tt>^</tt> matches at the beginning of input and after any line terminator
+ * except at the end of input. When in {@link #MULTILINE} mode <tt>$</tt>
  * matches just before a line terminator or the end of the input sequence.
  *
  * <h3><a name="cg">Groups and capturing</a></h3>
  *
  * <h4><a name="gnumber">Group number</a></h4>
  * <p> Capturing groups are numbered by counting their opening parentheses from
- * left to right.  In the expression {@code ((A)(B(C)))}, for example, there
+ * left to right.  In the expression <tt>((A)(B(C)))</tt>, for example, there
  * are four such groups: </p>
  *
  * <blockquote><table cellpadding=1 cellspacing=0 summary="Capturing group numberings">
  * <tr><th>1&nbsp;&nbsp;&nbsp;&nbsp;</th>
- *     <td>{@code ((A)(B(C)))}</td></tr>
+ *     <td><tt>((A)(B(C)))</tt></td></tr>
  * <tr><th>2&nbsp;&nbsp;&nbsp;&nbsp;</th>
- *     <td>{@code (A)}</td></tr>
+ *     <td><tt>(A)</tt></td></tr>
  * <tr><th>3&nbsp;&nbsp;&nbsp;&nbsp;</th>
- *     <td>{@code (B(C))}</td></tr>
+ *     <td><tt>(B(C))</tt></td></tr>
  * <tr><th>4&nbsp;&nbsp;&nbsp;&nbsp;</th>
- *     <td>{@code (C)}</td></tr>
+ *     <td><tt>(C)</tt></td></tr>
  * </table></blockquote>
  *
  * <p> Group zero always stands for the entire expression.
@@ -515,31 +502,31 @@ import java.util.stream.StreamSupport;
  * may also be retrieved from the matcher once the match operation is complete.
  *
  * <h4><a name="groupname">Group name</a></h4>
- * <p>A capturing group can also be assigned a "name", a {@code named-capturing group},
+ * <p>A capturing group can also be assigned a "name", a <tt>named-capturing group</tt>,
  * and then be back-referenced later by the "name". Group names are composed of
- * the following characters. The first character must be a {@code letter}.
+ * the following characters. The first character must be a <tt>letter</tt>.
  *
  * <ul>
- *   <li> The uppercase letters {@code 'A'} through {@code 'Z'}
- *        (<code>'&#92;u0041'</code>&nbsp;through&nbsp;<code>'&#92;u005a'</code>),
- *   <li> The lowercase letters {@code 'a'} through {@code 'z'}
- *        (<code>'&#92;u0061'</code>&nbsp;through&nbsp;<code>'&#92;u007a'</code>),
- *   <li> The digits {@code '0'} through {@code '9'}
- *        (<code>'&#92;u0030'</code>&nbsp;through&nbsp;<code>'&#92;u0039'</code>),
+ *   <li> The uppercase letters <tt>'A'</tt> through <tt>'Z'</tt>
+ *        (<tt>'&#92;u0041'</tt>&nbsp;through&nbsp;<tt>'&#92;u005a'</tt>),
+ *   <li> The lowercase letters <tt>'a'</tt> through <tt>'z'</tt>
+ *        (<tt>'&#92;u0061'</tt>&nbsp;through&nbsp;<tt>'&#92;u007a'</tt>),
+ *   <li> The digits <tt>'0'</tt> through <tt>'9'</tt>
+ *        (<tt>'&#92;u0030'</tt>&nbsp;through&nbsp;<tt>'&#92;u0039'</tt>),
  * </ul>
  *
- * <p> A {@code named-capturing group} is still numbered as described in
+ * <p> A <tt>named-capturing group</tt> is still numbered as described in
  * <a href="#gnumber">Group number</a>.
  *
  * <p> The captured input associated with a group is always the subsequence
  * that the group most recently matched.  If a group is evaluated a second time
  * because of quantification then its previously-captured value, if any, will
  * be retained if the second evaluation fails.  Matching the string
- * {@code "aba"} against the expression {@code (a(b)?)+}, for example, leaves
- * group two set to {@code "b"}.  All captured input is discarded at the
+ * <tt>"aba"</tt> against the expression <tt>(a(b)?)+</tt>, for example, leaves
+ * group two set to <tt>"b"</tt>.  All captured input is discarded at the
  * beginning of each match.
  *
- * <p> Groups beginning with {@code (?} are either pure, <i>non-capturing</i> groups
+ * <p> Groups beginning with <tt>(?</tt> are either pure, <i>non-capturing</i> groups
  * that do not capture text and do not count towards the group total, or
  * <i>named-capturing</i> group.
  *
@@ -550,35 +537,26 @@ import java.util.stream.StreamSupport;
  * Standard #18: Unicode Regular Expression</i></a>, plus RL2.1
  * Canonical Equivalents.
  * <p>
- * <b>Unicode escape sequences</b> such as <code>&#92;u2014</code> in Java source code
+ * <b>Unicode escape sequences</b> such as <tt>&#92;u2014</tt> in Java source code
  * are processed as described in section 3.3 of
  * <cite>The Java&trade; Language Specification</cite>.
  * Such escape sequences are also implemented directly by the regular-expression
  * parser so that Unicode escapes can be used in expressions that are read from
- * files or from the keyboard.  Thus the strings <code>"&#92;u2014"</code> and
- * {@code "\\u2014"}, while not equal, compile into the same pattern, which
- * matches the character with hexadecimal value {@code 0x2014}.
+ * files or from the keyboard.  Thus the strings <tt>"&#92;u2014"</tt> and
+ * <tt>"\\u2014"</tt>, while not equal, compile into the same pattern, which
+ * matches the character with hexadecimal value <tt>0x2014</tt>.
  * <p>
- * A Unicode character can also be represented by using its <b>Hex notation</b>
- * (hexadecimal code point value) directly as described in construct
- * <code>&#92;x{...}</code>, for example a supplementary character U+2011F can be
- * specified as <code>&#92;x{2011F}</code>, instead of two consecutive Unicode escape
- * sequences of the surrogate pair <code>&#92;uD840</code><code>&#92;uDD1F</code>.
- * <p>
- * <b>Unicode character names</b> are supported by the named character construct
- * <code>\N{</code>...<code>}</code>, for example, <code>\N{WHITE SMILING FACE}</code>
- * specifies character <code>&#92;u263A</code>. The character names supported
- * by this class are the valid Unicode character names matched by
- * {@link java.lang.Character#codePointOf(String) Character.codePointOf(name)}.
- * <p>
- * <a href="http://www.unicode.org/reports/tr18/#Default_Grapheme_Clusters">
- * <b>Unicode extended grapheme clusters</b></a> are supported by the grapheme
- * cluster matcher {@code \X} and the corresponding boundary matcher {@code \b{g}}.
+ * A Unicode character can also be represented in a regular-expression by
+ * using its <b>Hex notation</b>(hexadecimal code point value) directly as described in construct
+ * <tt>&#92;x{...}</tt>, for example a supplementary character U+2011F
+ * can be specified as <tt>&#92;x{2011F}</tt>, instead of two consecutive
+ * Unicode escape sequences of the surrogate pair
+ * <tt>&#92;uD840</tt><tt>&#92;uDD1F</tt>.
  * <p>
  * Unicode scripts, blocks, categories and binary properties are written with
- * the {@code \p} and {@code \P} constructs as in Perl.
- * <code>\p{</code><i>prop</i><code>}</code> matches if
- * the input has the property <i>prop</i>, while <code>\P{</code><i>prop</i><code>}</code>
+ * the <tt>\p</tt> and <tt>\P</tt> constructs as in Perl.
+ * <tt>\p{</tt><i>prop</i><tt>}</tt> matches if
+ * the input has the property <i>prop</i>, while <tt>\P{</tt><i>prop</i><tt>}</tt>
  * does not match if the input has that property.
  * <p>
  * Scripts, blocks, categories and binary properties can be used both inside
@@ -587,9 +565,9 @@ import java.util.stream.StreamSupport;
  * <p>
  * <b><a name="usc">Scripts</a></b> are specified either with the prefix {@code Is}, as in
  * {@code IsHiragana}, or by using  the {@code script} keyword (or its short
- * form {@code sc}) as in {@code script=Hiragana} or {@code sc=Hiragana}.
+ * form {@code sc})as in {@code script=Hiragana} or {@code sc=Hiragana}.
  * <p>
- * The script names supported by {@code Pattern} are the valid script names
+ * The script names supported by <code>Pattern</code> are the valid script names
  * accepted and defined by
  * {@link java.lang.Character.UnicodeScript#forName(String) UnicodeScript.forName}.
  *
@@ -598,7 +576,7 @@ import java.util.stream.StreamSupport;
  * {@code InMongolian}, or by using the keyword {@code block} (or its short
  * form {@code blk}) as in {@code block=Mongolian} or {@code blk=Mongolian}.
  * <p>
- * The block names supported by {@code Pattern} are the valid block names
+ * The block names supported by <code>Pattern</code> are the valid block names
  * accepted and defined by
  * {@link java.lang.Character.UnicodeBlock#forName(String) UnicodeBlock.forName}.
  * <p>
@@ -617,7 +595,7 @@ import java.util.stream.StreamSupport;
  * <p>
  *
  * <b><a name="ubpc">Binary properties</a></b> are specified with the prefix {@code Is}, as in
- * {@code IsAlphabetic}. The supported binary properties by {@code Pattern}
+ * {@code IsAlphabetic}. The supported binary properties by <code>Pattern</code>
  * are
  * <ul>
  *   <li> Alphabetic
@@ -647,78 +625,88 @@ import java.util.stream.StreamSupport;
  * <th align="left" id="predef_classes">Classes</th>
  * <th align="left" id="predef_matches">Matches</th>
  *</tr>
- * <tr><td>{@code \p{Lower}}</td>
- *     <td>A lowercase character:{@code \p{IsLowercase}}</td></tr>
- * <tr><td>{@code \p{Upper}}</td>
- *     <td>An uppercase character:{@code \p{IsUppercase}}</td></tr>
- * <tr><td>{@code \p{ASCII}}</td>
- *     <td>All ASCII:{@code [\x00-\x7F]}</td></tr>
- * <tr><td>{@code \p{Alpha}}</td>
- *     <td>An alphabetic character:{@code \p{IsAlphabetic}}</td></tr>
- * <tr><td>{@code \p{Digit}}</td>
- *     <td>A decimal digit character:{@code p{IsDigit}}</td></tr>
- * <tr><td>{@code \p{Alnum}}</td>
- *     <td>An alphanumeric character:{@code [\p{IsAlphabetic}\p{IsDigit}]}</td></tr>
- * <tr><td>{@code \p{Punct}}</td>
- *     <td>A punctuation character:{@code p{IsPunctuation}}</td></tr>
- * <tr><td>{@code \p{Graph}}</td>
- *     <td>A visible character: {@code [^\p{IsWhite_Space}\p{gc=Cc}\p{gc=Cs}\p{gc=Cn}]}</td></tr>
- * <tr><td>{@code \p{Print}}</td>
+ * <tr><td><tt>\p{Lower}</tt></td>
+ *     <td>A lowercase character:<tt>\p{IsLowercase}</tt></td></tr>
+ * <tr><td><tt>\p{Upper}</tt></td>
+ *     <td>An uppercase character:<tt>\p{IsUppercase}</tt></td></tr>
+ * <tr><td><tt>\p{ASCII}</tt></td>
+ *     <td>All ASCII:<tt>[\x00-\x7F]</tt></td></tr>
+ * <tr><td><tt>\p{Alpha}</tt></td>
+ *     <td>An alphabetic character:<tt>\p{IsAlphabetic}</tt></td></tr>
+ * <tr><td><tt>\p{Digit}</tt></td>
+ *     <td>A decimal digit character:<tt>p{IsDigit}</tt></td></tr>
+ * <tr><td><tt>\p{Alnum}</tt></td>
+ *     <td>An alphanumeric character:<tt>[\p{IsAlphabetic}\p{IsDigit}]</tt></td></tr>
+ * <tr><td><tt>\p{Punct}</tt></td>
+ *     <td>A punctuation character:<tt>p{IsPunctuation}</tt></td></tr>
+ * <tr><td><tt>\p{Graph}</tt></td>
+ *     <td>A visible character: <tt>[^\p{IsWhite_Space}\p{gc=Cc}\p{gc=Cs}\p{gc=Cn}]</tt></td></tr>
+ * <tr><td><tt>\p{Print}</tt></td>
  *     <td>A printable character: {@code [\p{Graph}\p{Blank}&&[^\p{Cntrl}]]}</td></tr>
- * <tr><td>{@code \p{Blank}}</td>
+ * <tr><td><tt>\p{Blank}</tt></td>
  *     <td>A space or a tab: {@code [\p{IsWhite_Space}&&[^\p{gc=Zl}\p{gc=Zp}\x0a\x0b\x0c\x0d\x85]]}</td></tr>
- * <tr><td>{@code \p{Cntrl}}</td>
- *     <td>A control character: {@code \p{gc=Cc}}</td></tr>
- * <tr><td>{@code \p{XDigit}}</td>
- *     <td>A hexadecimal digit: {@code [\p{gc=Nd}\p{IsHex_Digit}]}</td></tr>
- * <tr><td>{@code \p{Space}}</td>
- *     <td>A whitespace character:{@code \p{IsWhite_Space}}</td></tr>
- * <tr><td>{@code \d}</td>
- *     <td>A digit: {@code \p{IsDigit}}</td></tr>
- * <tr><td>{@code \D}</td>
- *     <td>A non-digit: {@code [^\d]}</td></tr>
- * <tr><td>{@code \s}</td>
- *     <td>A whitespace character: {@code \p{IsWhite_Space}}</td></tr>
- * <tr><td>{@code \S}</td>
- *     <td>A non-whitespace character: {@code [^\s]}</td></tr>
- * <tr><td>{@code \w}</td>
- *     <td>A word character: {@code [\p{Alpha}\p{gc=Mn}\p{gc=Me}\p{gc=Mc}\p{Digit}\p{gc=Pc}\p{IsJoin_Control}]}</td></tr>
- * <tr><td>{@code \W}</td>
- *     <td>A non-word character: {@code [^\w]}</td></tr>
+ * <tr><td><tt>\p{Cntrl}</tt></td>
+ *     <td>A control character: <tt>\p{gc=Cc}</tt></td></tr>
+ * <tr><td><tt>\p{XDigit}</tt></td>
+ *     <td>A hexadecimal digit: <tt>[\p{gc=Nd}\p{IsHex_Digit}]</tt></td></tr>
+ * <tr><td><tt>\p{Space}</tt></td>
+ *     <td>A whitespace character:<tt>\p{IsWhite_Space}</tt></td></tr>
+ * <tr><td><tt>\d</tt></td>
+ *     <td>A digit: <tt>\p{IsDigit}</tt></td></tr>
+ * <tr><td><tt>\D</tt></td>
+ *     <td>A non-digit: <tt>[^\d]</tt></td></tr>
+ * <tr><td><tt>\s</tt></td>
+ *     <td>A whitespace character: <tt>\p{IsWhite_Space}</tt></td></tr>
+ * <tr><td><tt>\S</tt></td>
+ *     <td>A non-whitespace character: <tt>[^\s]</tt></td></tr>
+ * <tr><td><tt>\w</tt></td>
+ *     <td>A word character: <tt>[\p{Alpha}\p{gc=Mn}\p{gc=Me}\p{gc=Mc}\p{Digit}\p{gc=Pc}\p{IsJoin_Control}]</tt></td></tr>
+ * <tr><td><tt>\W</tt></td>
+ *     <td>A non-word character: <tt>[^\w]</tt></td></tr>
  * </table>
  * <p>
  * <a name="jcc">
  * Categories that behave like the java.lang.Character
  * boolean is<i>methodname</i> methods (except for the deprecated ones) are
- * available through the same <code>\p{</code><i>prop</i><code>}</code> syntax where
- * the specified property has the name <code>java<i>methodname</i></code></a>.
+ * available through the same <tt>\p{</tt><i>prop</i><tt>}</tt> syntax where
+ * the specified property has the name <tt>java<i>methodname</i></tt></a>.
  *
  * <h3> Comparison to Perl 5 </h3>
  *
- * <p>The {@code Pattern} engine performs traditional NFA-based matching
+ * <p>The <code>Pattern</code> engine performs traditional NFA-based matching
  * with ordered alternation as occurs in Perl 5.
  *
  * <p> Perl constructs not supported by this class: </p>
  *
  * <ul>
- *    <li><p> The backreference constructs, <code>\g{</code><i>n</i><code>}</code> for
+ *    <li><p> Predefined character classes (Unicode character)
+ *    <p><tt>\X&nbsp;&nbsp;&nbsp;&nbsp;</tt>Match Unicode
+ *    <a href="http://www.unicode.org/reports/tr18/#Default_Grapheme_Clusters">
+ *    <i>extended grapheme cluster</i></a>
+ *    </p></li>
+ *
+ *    <li><p> The backreference constructs, <tt>\g{</tt><i>n</i><tt>}</tt> for
  *    the <i>n</i><sup>th</sup><a href="#cg">capturing group</a> and
- *    <code>\g{</code><i>name</i><code>}</code> for
+ *    <tt>\g{</tt><i>name</i><tt>}</tt> for
  *    <a href="#groupname">named-capturing group</a>.
  *    </p></li>
  *
- *    <li><p> The conditional constructs
- *    {@code (?(}<i>condition</i>{@code )}<i>X</i>{@code )} and
- *    {@code (?(}<i>condition</i>{@code )}<i>X</i>{@code |}<i>Y</i>{@code )},
+ *    <li><p> The named character construct, <tt>\N{</tt><i>name</i><tt>}</tt>
+ *    for a Unicode character by its name.
  *    </p></li>
  *
- *    <li><p> The embedded code constructs <code>(?{</code><i>code</i><code>})</code>
- *    and <code>(??{</code><i>code</i><code>})</code>,</p></li>
+ *    <li><p> The conditional constructs
+ *    <tt>(?(</tt><i>condition</i><tt>)</tt><i>X</i><tt>)</tt> and
+ *    <tt>(?(</tt><i>condition</i><tt>)</tt><i>X</i><tt>|</tt><i>Y</i><tt>)</tt>,
+ *    </p></li>
  *
- *    <li><p> The embedded comment syntax {@code (?#comment)}, and </p></li>
+ *    <li><p> The embedded code constructs <tt>(?{</tt><i>code</i><tt>})</tt>
+ *    and <tt>(??{</tt><i>code</i><tt>})</tt>,</p></li>
  *
- *    <li><p> The preprocessing operations {@code \l} <code>&#92;u</code>,
- *    {@code \L}, and {@code \U}.  </p></li>
+ *    <li><p> The embedded comment syntax <tt>(?#comment)</tt>, and </p></li>
+ *
+ *    <li><p> The preprocessing operations <tt>\l</tt> <tt>&#92;u</tt>,
+ *    <tt>\L</tt>, and <tt>\U</tt>.  </p></li>
  *
  * </ul>
  *
@@ -735,19 +723,19 @@ import java.util.stream.StreamSupport;
  *
  * <ul>
  *
- *    <li><p> In Perl, {@code \1} through {@code \9} are always interpreted
- *    as back references; a backslash-escaped number greater than {@code 9} is
+ *    <li><p> In Perl, <tt>\1</tt> through <tt>\9</tt> are always interpreted
+ *    as back references; a backslash-escaped number greater than <tt>9</tt> is
  *    treated as a back reference if at least that many subexpressions exist,
  *    otherwise it is interpreted, if possible, as an octal escape.  In this
  *    class octal escapes must always begin with a zero. In this class,
- *    {@code \1} through {@code \9} are always interpreted as back
+ *    <tt>\1</tt> through <tt>\9</tt> are always interpreted as back
  *    references, and a larger number is accepted as a back reference if at
  *    least that many subexpressions exist at that point in the regular
  *    expression, otherwise the parser will drop digits until the number is
  *    smaller or equal to the existing number of groups or it is one digit.
  *    </p></li>
  *
- *    <li><p> Perl uses the {@code g} flag to request a match that resumes
+ *    <li><p> Perl uses the <tt>g</tt> flag to request a match that resumes
  *    where the last match left off.  This functionality is provided implicitly
  *    by the {@link Matcher} class: Repeated invocations of the {@link
  *    Matcher#find find} method will resume where the last match left off,
@@ -798,11 +786,11 @@ public final class Pattern
     /**
      * Enables Unix lines mode.
      *
-     * <p> In this mode, only the {@code '\n'} line terminator is recognized
-     * in the behavior of {@code .}, {@code ^}, and {@code $}.
+     * <p> In this mode, only the <tt>'\n'</tt> line terminator is recognized
+     * in the behavior of <tt>.</tt>, <tt>^</tt>, and <tt>$</tt>.
      *
      * <p> Unix lines mode can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?d)}.
+     * expression&nbsp;<tt>(?d)</tt>.
      */
     public static final int UNIX_LINES = 0x01;
 
@@ -815,7 +803,7 @@ public final class Pattern
      * #UNICODE_CASE} flag in conjunction with this flag.
      *
      * <p> Case-insensitive matching can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?i)}.
+     * expression&nbsp;<tt>(?i)</tt>.
      *
      * <p> Specifying this flag may impose a slight performance penalty.  </p>
      */
@@ -825,23 +813,23 @@ public final class Pattern
      * Permits whitespace and comments in pattern.
      *
      * <p> In this mode, whitespace is ignored, and embedded comments starting
-     * with {@code #} are ignored until the end of a line.
+     * with <tt>#</tt> are ignored until the end of a line.
      *
      * <p> Comments mode can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?x)}.
+     * expression&nbsp;<tt>(?x)</tt>.
      */
     public static final int COMMENTS = 0x04;
 
     /**
      * Enables multiline mode.
      *
-     * <p> In multiline mode the expressions {@code ^} and {@code $} match
+     * <p> In multiline mode the expressions <tt>^</tt> and <tt>$</tt> match
      * just after or just before, respectively, a line terminator or the end of
      * the input sequence.  By default these expressions only match at the
      * beginning and the end of the entire input sequence.
      *
      * <p> Multiline mode can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?m)}.  </p>
+     * expression&nbsp;<tt>(?m)</tt>.  </p>
      */
     public static final int MULTILINE = 0x08;
 
@@ -865,12 +853,12 @@ public final class Pattern
     /**
      * Enables dotall mode.
      *
-     * <p> In dotall mode, the expression {@code .} matches any character,
+     * <p> In dotall mode, the expression <tt>.</tt> matches any character,
      * including a line terminator.  By default this expression does not match
      * line terminators.
      *
      * <p> Dotall mode can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?s)}.  (The {@code s} is a mnemonic for
+     * expression&nbsp;<tt>(?s)</tt>.  (The <tt>s</tt> is a mnemonic for
      * "single-line" mode, which is what this is called in Perl.)  </p>
      */
     public static final int DOTALL = 0x20;
@@ -885,7 +873,7 @@ public final class Pattern
      * matched.
      *
      * <p> Unicode-aware case folding can also be enabled via the embedded flag
-     * expression&nbsp;{@code (?u)}.
+     * expression&nbsp;<tt>(?u)</tt>.
      *
      * <p> Specifying this flag may impose a performance penalty.  </p>
      */
@@ -896,8 +884,8 @@ public final class Pattern
      *
      * <p> When this flag is specified then two characters will be considered
      * to match if, and only if, their full canonical decompositions match.
-     * The expression <code>"a&#92;u030A"</code>, for example, will match the
-     * string <code>"&#92;u00E5"</code> when this flag is specified.  By default,
+     * The expression <tt>"a&#92;u030A"</tt>, for example, will match the
+     * string <tt>"&#92;u00E5"</tt> when this flag is specified.  By default,
      * matching does not take canonical equivalence into account.
      *
      * <p> There is no embedded flag character for enabling canonical
@@ -919,7 +907,7 @@ public final class Pattern
      * <i>Annex C: Compatibility Properties</i>.
      * <p>
      * The UNICODE_CHARACTER_CLASS mode can also be enabled via the embedded
-     * flag expression&nbsp;{@code (?U)}.
+     * flag expression&nbsp;<tt>(?U)</tt>.
      * <p>
      * The flag implies UNICODE_CASE, that is, it enables Unicode-aware case
      * folding.
@@ -928,13 +916,6 @@ public final class Pattern
      * @since 1.7
      */
     public static final int UNICODE_CHARACTER_CLASS = 0x100;
-
-    /**
-     * Contains all possible flags for compile(regex, flags).
-     */
-    private static final int ALL_FLAGS = CASE_INSENSITIVE | MULTILINE |
-            DOTALL | UNICODE_CASE | CANON_EQ | UNIX_LINES | LITERAL |
-            UNICODE_CHARACTER_CLASS | COMMENTS;
 
     /* Pattern has only two serialized components: The pattern string
      * and the flags, which are all that is needed to recompile the pattern
@@ -962,7 +943,7 @@ public final class Pattern
      * Boolean indicating this Pattern is compiled; this is necessary in order
      * to lazily compile deserialized Patterns.
      */
-    private transient volatile boolean compiled;
+    private transient volatile boolean compiled = false;
 
     /**
      * The normalized pattern string.
@@ -988,11 +969,6 @@ public final class Pattern
     transient int[] buffer;
 
     /**
-     * A temporary storage used for predicate for double return.
-     */
-    transient CharPredicate predicate;
-
-    /**
      * Map the "name" of the "named capturing group" to its group id
      * node.
      */
@@ -1002,24 +978,6 @@ public final class Pattern
      * Temporary storage used while parsing group references.
      */
     transient GroupHead[] groupNodes;
-
-    /**
-     * Temporary storage used to store the top level closure nodes.
-     */
-    transient List<Node> topClosureNodes;
-
-    /**
-     * The number of top greedy closure nodes in this Pattern. Used by
-     * matchers to allocate storage needed for a IntHashSet to keep the
-     * beginning pos {@code i} of all failed match.
-     */
-    transient int localTCNCount;
-
-    /*
-     * Turn off the stop-exponential-backtracking optimization if there
-     * is a group ref in the pattern.
-     */
-    transient boolean hasGroupRef;
 
     /**
      * Temporary null terminated code point array used by pattern compiling.
@@ -1053,7 +1011,7 @@ public final class Pattern
      * If the Start node might possibly match supplementary characters.
      * It is set to true during compiling if
      * (1) There is supplementary char in pattern, or
-     * (2) There is complement node of a "family" CharProperty
+     * (2) There is complement node of Category or Block
      */
     private transient boolean hasSupplementary;
 
@@ -1087,7 +1045,7 @@ public final class Pattern
      * @return the given regular expression compiled into a pattern with the given flags
      * @throws  IllegalArgumentException
      *          If bit values other than those corresponding to the defined
-     *          match flags are set in {@code flags}
+     *          match flags are set in <tt>flags</tt>
      *
      * @throws  PatternSyntaxException
      *          If the expression's syntax is invalid
@@ -1137,23 +1095,6 @@ public final class Pattern
     }
 
     /**
-     * Returns the number of capturing groups in this pattern.
-     *
-     * <p> Group zero denotes the entire pattern by convention. It is not
-     * included in this count.
-     *
-     * <p> Any non-negative integer smaller than or equal to the value
-     * returned by this method is guaranteed to be a valid group index for
-     * this matcher.  </p>
-     *
-     * @return The number of capturing groups in this pattern
-     */
-
-    public int groupCount() {
-        return capturingGroupCount - 1;
-    }
-
-    /**
      * Returns this pattern's match flags.
      *
      * @return  The match flags specified when this pattern was compiled
@@ -1195,6 +1136,22 @@ public final class Pattern
     }
 
     /**
+     * Returns the number of capturing groups in this matcher's pattern.
+     *
+     * <p> Group zero denotes the entire pattern by convention. It is not
+     * included in this count.
+     *
+     * <p> Any non-negative integer smaller than or equal to the value
+     * returned by this method is guaranteed to be a valid group index for
+     * this matcher.  </p>
+     *
+     * @return The number of capturing groups in this matcher's pattern
+     */
+    public int groupCount() {
+        return capturingGroupCount - 1;
+    }
+
+    /**
      * Splits the given input sequence around matches of this pattern.
      *
      * <p> The array returned by this method contains each substring of the
@@ -1210,7 +1167,7 @@ public final class Pattern
      * of the resulting array. A zero-width match at the beginning however
      * never produces such empty leading substring.
      *
-     * <p> The {@code limit} parameter controls the number of times the
+     * <p> The <tt>limit</tt> parameter controls the number of times the
      * pattern is applied and therefore affects the length of the resulting
      * array.  If the limit <i>n</i> is greater than zero then the pattern
      * will be applied at most <i>n</i>&nbsp;-&nbsp;1 times, the array's
@@ -1221,7 +1178,7 @@ public final class Pattern
      * the pattern will be applied as many times as possible, the array can
      * have any length, and trailing empty strings will be discarded.
      *
-     * <p> The input {@code "boo:and:foo"}, for example, yields the following
+     * <p> The input <tt>"boo:and:foo"</tt>, for example, yields the following
      * results with these parameters:
      *
      * <blockquote><table cellpadding=1 cellspacing=0
@@ -1231,22 +1188,22 @@ public final class Pattern
      *     <th align="left"><i>Result&nbsp;&nbsp;&nbsp;&nbsp;</i></th></tr>
      * <tr><td align=center>:</td>
      *     <td align=center>2</td>
-     *     <td>{@code { "boo", "and:foo" }}</td></tr>
+     *     <td><tt>{ "boo", "and:foo" }</tt></td></tr>
      * <tr><td align=center>:</td>
      *     <td align=center>5</td>
-     *     <td>{@code { "boo", "and", "foo" }}</td></tr>
+     *     <td><tt>{ "boo", "and", "foo" }</tt></td></tr>
      * <tr><td align=center>:</td>
      *     <td align=center>-2</td>
-     *     <td>{@code { "boo", "and", "foo" }}</td></tr>
+     *     <td><tt>{ "boo", "and", "foo" }</tt></td></tr>
      * <tr><td align=center>o</td>
      *     <td align=center>5</td>
-     *     <td>{@code { "b", "", ":and:f", "", "" }}</td></tr>
+     *     <td><tt>{ "b", "", ":and:f", "", "" }</tt></td></tr>
      * <tr><td align=center>o</td>
      *     <td align=center>-2</td>
-     *     <td>{@code { "b", "", ":and:f", "", "" }}</td></tr>
+     *     <td><tt>{ "b", "", ":and:f", "", "" }</tt></td></tr>
      * <tr><td align=center>o</td>
      *     <td align=center>0</td>
-     *     <td>{@code { "b", "", ":and:f" }}</td></tr>
+     *     <td><tt>{ "b", "", ":and:f" }</tt></td></tr>
      * </table></blockquote>
      *
      * @param  input
@@ -1308,7 +1265,7 @@ public final class Pattern
      * sequence and a limit argument of zero.  Trailing empty strings are
      * therefore not included in the resulting array. </p>
      *
-     * <p> The input {@code "boo:and:foo"}, for example, yields the following
+     * <p> The input <tt>"boo:and:foo"</tt>, for example, yields the following
      * results with these expressions:
      *
      * <blockquote><table cellpadding=1 cellspacing=0
@@ -1316,9 +1273,9 @@ public final class Pattern
      * <tr><th align="left"><i>Regex&nbsp;&nbsp;&nbsp;&nbsp;</i></th>
      *     <th align="left"><i>Result</i></th></tr>
      * <tr><td align=center>:</td>
-     *     <td>{@code { "boo", "and", "foo" }}</td></tr>
+     *     <td><tt>{ "boo", "and", "foo" }</tt></td></tr>
      * <tr><td align=center>o</td>
-     *     <td>{@code { "b", "", ":and:f" }}</td></tr>
+     *     <td><tt>{ "b", "", ":and:f" }</tt></td></tr>
      * </table></blockquote>
      *
      *
@@ -1333,12 +1290,12 @@ public final class Pattern
     }
 
     /**
-     * Returns a literal pattern {@code String} for the specified
-     * {@code String}.
+     * Returns a literal pattern <code>String</code> for the specified
+     * <code>String</code>.
      *
-     * <p>This method produces a {@code String} that can be used to
-     * create a {@code Pattern} that would match the string
-     * {@code s} as if it were a literal pattern.</p> Metacharacters
+     * <p>This method produces a <code>String</code> that can be used to
+     * create a <code>Pattern</code> that would match the string
+     * <code>s</code> as if it were a literal pattern.</p> Metacharacters
      * or escape sequences in the input sequence will be given no special
      * meaning.
      *
@@ -1351,22 +1308,18 @@ public final class Pattern
         if (slashEIndex == -1)
             return "\\Q" + s + "\\E";
 
-        int lenHint = s.length();
-        lenHint = (lenHint < Integer.MAX_VALUE - 8 - lenHint) ?
-                (lenHint << 1) : (Integer.MAX_VALUE - 8);
-
-        StringBuilder sb = new StringBuilder(lenHint);
+        StringBuilder sb = new StringBuilder(s.length() * 2);
         sb.append("\\Q");
+        slashEIndex = 0;
         int current = 0;
-        do {
-            sb.append(s, current, slashEIndex)
-                    .append("\\E\\\\E\\Q");
+        while ((slashEIndex = s.indexOf("\\E", current)) != -1) {
+            sb.append(s.substring(current, slashEIndex));
             current = slashEIndex + 2;
-        } while ((slashEIndex = s.indexOf("\\E", current)) != -1);
-
-        return sb.append(s, current, s.length())
-                .append("\\E")
-                .toString();
+            sb.append("\\E\\\\E\\Q");
+        }
+        sb.append(s.substring(current, s.length()));
+        sb.append("\\E");
+        return sb.toString();
     }
 
     /**
@@ -1382,9 +1335,9 @@ public final class Pattern
         // Initialize counts
         capturingGroupCount = 1;
         localCount = 0;
-        localTCNCount = 0;
 
         // if length > 0, the Pattern is lazily compiled
+        compiled = false;
         if (pattern.length() == 0) {
             root = new Start(lastAccept);
             matchRoot = lastAccept;
@@ -1399,10 +1352,6 @@ public final class Pattern
      * only a Start node and a LastNode node.
      */
     private Pattern(String p, int f) {
-        if ((f & ~ALL_FLAGS) != 0) {
-            throw new IllegalArgumentException("Unknown flag 0x"
-                                               + Integer.toHexString(f));
-        }
         pattern = p;
         flags = f;
 
@@ -1413,7 +1362,6 @@ public final class Pattern
         // Reset group index count
         capturingGroupCount = 1;
         localCount = 0;
-        localTCNCount = 0;
 
         if (pattern.length() > 0) {
             compile();
@@ -1424,114 +1372,104 @@ public final class Pattern
     }
 
     /**
-     * The pattern is converted to normalized form ({@link
-     * java.text.Normalizer.Form.NFC NFC}, canonical decomposition,
-     * followed by canonical composition for the character class
-     * part, and {@link java.text.Normalizer.Form.NFD NFD},
-     * canonical decomposition) for the rest), and then a pure
-     * group is constructed to match canonical equivalences of the
-     * characters.
+     * The pattern is converted to normalizedD form and then a pure group
+     * is constructed to match canonical equivalences of the characters.
      */
-    private static String normalize(String pattern) {
-        int plen = pattern.length();
-        StringBuilder pbuf = new StringBuilder(plen);
-        char last = 0;
-        int lastStart = 0;
-        char cc = 0;
-        for (int i = 0; i < plen;) {
-            char c = pattern.charAt(i);
-            if (cc == 0 &&    // top level
-                c == '\\' && i + 1 < plen && pattern.charAt(i + 1) == '\\') {
-                i += 2; last = 0;
-                continue;
-            }
-            if (c == '[' && last != '\\') {
-                if (cc == 0) {
-                    if (lastStart < i)
-                        normalizeSlice(pattern, lastStart, i, pbuf);
-                    lastStart = i;
+    private void normalize() {
+        boolean inCharClass = false;
+        int lastCodePoint = -1;
+
+        // Convert pattern into normalizedD form
+        normalizedPattern = Normalizer.normalize(pattern, Normalizer.Form.NFD);
+        patternLength = normalizedPattern.length();
+
+        // Modify pattern to match canonical equivalences
+        StringBuilder newPattern = new StringBuilder(patternLength);
+        for(int i=0; i<patternLength; ) {
+            int c = normalizedPattern.codePointAt(i);
+            StringBuilder sequenceBuffer;
+            if ((Character.getType(c) == Character.NON_SPACING_MARK)
+                && (lastCodePoint != -1)) {
+                sequenceBuffer = new StringBuilder();
+                sequenceBuffer.appendCodePoint(lastCodePoint);
+                sequenceBuffer.appendCodePoint(c);
+                while(Character.getType(c) == Character.NON_SPACING_MARK) {
+                    i += Character.charCount(c);
+                    if (i >= patternLength)
+                        break;
+                    c = normalizedPattern.codePointAt(i);
+                    sequenceBuffer.appendCodePoint(c);
                 }
-                cc++;
-            } else if (c == ']' && last != '\\') {
-                cc--;
-                if (cc == 0) {
-                    normalizeClazz(pattern, lastStart, i + 1, pbuf);
-                    lastStart = i + 1;
-                }
+                String ea = produceEquivalentAlternation(
+                                               sequenceBuffer.toString());
+                newPattern.setLength(newPattern.length()-Character.charCount(lastCodePoint));
+                newPattern.append("(?:").append(ea).append(")");
+            } else if (c == '[' && lastCodePoint != '\\') {
+                i = normalizeCharClass(newPattern, i);
+            } else {
+                newPattern.appendCodePoint(c);
             }
-            last = c;
-            i++;
+            lastCodePoint = c;
+            i += Character.charCount(c);
         }
-        assert (cc == 0);
-        if (lastStart < plen)
-            normalizeSlice(pattern, lastStart, plen, pbuf);
-        return pbuf.toString();
+        normalizedPattern = newPattern.toString();
     }
 
-    private static void normalizeSlice(String src, int off, int limit,
-                                       StringBuilder dst)
-    {
-        int len = src.length();
-        int off0 = off;
-        while (off < limit && ASCII.isAscii(src.charAt(off))) {
-            off++;
-        }
-        if (off == limit) {
-            dst.append(src, off0, limit);
-            return;
-        }
-        off--;
-        if (off < off0)
-            off = off0;
-        else
-            dst.append(src, off0, off);
-        while (off < limit) {
-            int ch0 = src.codePointAt(off);
-            if (".$|()[]{}^?*+\\".indexOf(ch0) != -1) {
-                dst.append((char)ch0);
-                off++;
-                continue;
-            }
-            int j = off + Character.charCount(ch0);
-            int ch1;
-            while (j < limit) {
-                ch1 = src.codePointAt(j);
-                if (Grapheme.isBoundary(ch0, ch1))
-                    break;
-                ch0 = ch1;
-                j += Character.charCount(ch1);
-            }
-            String seq = src.substring(off, j);
-            String nfd = Normalizer.normalize(seq, Normalizer.Form.NFD);
-            off = j;
-            if (nfd.length() > 1) {
-                ch0 = nfd.codePointAt(0);
-                ch1 = nfd.codePointAt(Character.charCount(ch0));
-                if (Character.getType(ch1) == Character.NON_SPACING_MARK) {
-                    Set<String> altns = new LinkedHashSet<>();
-                    altns.add(seq);
-                    produceEquivalentAlternation(nfd, altns);
-                    dst.append("(?:");
-                    altns.forEach( s -> dst.append(s).append('|'));
-                    dst.delete(dst.length() - 1, dst.length());
-                    dst.append(")");
-                    continue;
-                }
-            }
-            String nfc = Normalizer.normalize(seq, Normalizer.Form.NFC);
-            if (!seq.equals(nfc) && !nfd.equals(nfc))
-                dst.append("(?:" + seq + "|" + nfd  + "|" + nfc + ")");
-            else if (!seq.equals(nfd))
-                dst.append("(?:" + seq + "|" + nfd + ")");
-            else
-                dst.append(seq);
-        }
-    }
+    /**
+     * Complete the character class being parsed and add a set
+     * of alternations to it that will match the canonical equivalences
+     * of the characters within the class.
+     */
+    private int normalizeCharClass(StringBuilder newPattern, int i) {
+        StringBuilder charClass = new StringBuilder();
+        StringBuilder eq = null;
+        int lastCodePoint = -1;
+        String result;
 
-    private static void normalizeClazz(String src, int off, int limit,
-                                       StringBuilder dst)
-    {
-        dst.append(Normalizer.normalize(src.substring(off, limit), Form.NFC));
+        i++;
+        charClass.append("[");
+        while(true) {
+            int c = normalizedPattern.codePointAt(i);
+            StringBuilder sequenceBuffer;
+
+            if (c == ']' && lastCodePoint != '\\') {
+                charClass.append((char)c);
+                break;
+            } else if (Character.getType(c) == Character.NON_SPACING_MARK) {
+                sequenceBuffer = new StringBuilder();
+                sequenceBuffer.appendCodePoint(lastCodePoint);
+                while(Character.getType(c) == Character.NON_SPACING_MARK) {
+                    sequenceBuffer.appendCodePoint(c);
+                    i += Character.charCount(c);
+                    if (i >= normalizedPattern.length())
+                        break;
+                    c = normalizedPattern.codePointAt(i);
+                }
+                String ea = produceEquivalentAlternation(
+                                                  sequenceBuffer.toString());
+
+                charClass.setLength(charClass.length()-Character.charCount(lastCodePoint));
+                if (eq == null)
+                    eq = new StringBuilder();
+                eq.append('|');
+                eq.append(ea);
+            } else {
+                charClass.appendCodePoint(c);
+                i++;
+            }
+            if (i == normalizedPattern.length())
+                throw error("Unclosed character class");
+            lastCodePoint = c;
+        }
+
+        if (eq != null) {
+            result = "(?:"+charClass.toString()+eq.toString()+")";
+        } else {
+            result = charClass.toString();
+        }
+
+        newPattern.append(result);
+        return i;
     }
 
     /**
@@ -1539,26 +1477,28 @@ public final class Pattern
      * combining marks that follow it, produce the alternation that will
      * match all canonical equivalences of that sequence.
      */
-    private static void produceEquivalentAlternation(String src,
-                                                     Set<String> dst)
-    {
-        int len = countChars(src, 0, 1);
-        if (src.length() == len) {
-            dst.add(src);  // source has one character.
-            return;
-        }
-        String base = src.substring(0,len);
-        String combiningMarks = src.substring(len);
+    private String produceEquivalentAlternation(String source) {
+        int len = countChars(source, 0, 1);
+        if (source.length() == len)
+            // source has one character.
+            return source;
+
+        String base = source.substring(0,len);
+        String combiningMarks = source.substring(len);
+
         String[] perms = producePermutations(combiningMarks);
+        StringBuilder result = new StringBuilder(source);
+
         // Add combined permutations
-        for(int x = 0; x < perms.length; x++) {
+        for(int x=0; x<perms.length; x++) {
             String next = base + perms[x];
-            dst.add(next);
+            if (x>0)
+                result.append("|"+next);
             next = composeOneStep(next);
-            if (next != null) {
-                produceEquivalentAlternation(next, dst);
-            }
+            if (next != null)
+                result.append("|"+produceEquivalentAlternation(next));
         }
+        return result.toString();
     }
 
     /**
@@ -1570,7 +1510,7 @@ public final class Pattern
      * possibilities must be removed because they are not canonically
      * equivalent.
      */
-    private static String[] producePermutations(String input) {
+    private String[] producePermutations(String input) {
         if (input.length() == countChars(input, 0, 1))
             return new String[] {input};
 
@@ -1610,6 +1550,7 @@ public final class Pattern
         // offset maintains the index in code units.
 loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             len = countChars(input, offset, 1);
+            boolean skip = false;
             for(int y=x-1; y>=0; y--) {
                 if (combClass[y] == combClass[x]) {
                     continue loop;
@@ -1620,15 +1561,16 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             String[] subResult = producePermutations(otherChars);
 
             String prefix = input.substring(offset, offset+len);
-            for (String sre : subResult)
-                temp[index++] = prefix + sre;
+            for(int y=0; y<subResult.length; y++)
+                temp[index++] =  prefix + subResult[y];
         }
         String[] result = new String[index];
-        System.arraycopy(temp, 0, result, 0, index);
+        for (int x=0; x<index; x++)
+            result[x] = temp[x];
         return result;
     }
 
-    private static int getClass(int c) {
+    private int getClass(int c) {
         return sun.text.Normalizer.getCombiningClass(c);
     }
 
@@ -1639,10 +1581,11 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * combining mark followed by the remaining combining marks. Returns
      * null if the first two characters cannot be further composed.
      */
-    private static String composeOneStep(String input) {
+    private String composeOneStep(String input) {
         int len = countChars(input, 0, 2);
         String firstTwoCharacters = input.substring(0, len);
         String result = Normalizer.normalize(firstTwoCharacters, Normalizer.Form.NFC);
+
         if (result.equals(firstTwoCharacters))
             return null;
         else {
@@ -1729,7 +1672,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     private void compile() {
         // Handle canonical equivalences
         if (has(CANON_EQ) && !has(LITERAL)) {
-            normalizedPattern = normalize(pattern);
+            normalize();
         } else {
             normalizedPattern = pattern;
         }
@@ -1759,7 +1702,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         buffer = new int[32];
         groupNodes = new GroupHead[10];
         namedGroups = null;
-        topClosureNodes = new ArrayList<>(10);
 
         if (has(LITERAL)) {
             // Literal pattern handling
@@ -1790,34 +1732,56 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             root = hasSupplementary ? new StartS(matchRoot) : new Start(matchRoot);
         }
 
-        // Optimize the greedy Loop to prevent exponential backtracking, IF there
-        // is no group ref in this pattern. With a non-negative localTCNCount value,
-        // the greedy type Loop, Curly will skip the backtracking for any starting
-        // position "i" that failed in the past.
-        if (!hasGroupRef) {
-            for (Node node : topClosureNodes) {
-                if (node instanceof Loop) {
-                    // non-deterministic-greedy-group
-                    ((Loop)node).posIndex = localTCNCount++;
-                }
-            }
-        }
-
         // Release temporary storage
         temp = null;
         buffer = null;
         groupNodes = null;
         patternLength = 0;
         compiled = true;
-        topClosureNodes = null;
     }
 
     public Map<String, Integer> namedGroups() {
-        Map<String, Integer> groups = namedGroups;
-        if (groups == null) {
-            namedGroups = groups = new HashMap<>(2);
-        }
-        return groups;
+        if (namedGroups == null)
+            namedGroups = new HashMap<>(2);
+        return namedGroups;
+    }
+
+    /**
+     * Used to print out a subtree of the Pattern to help with debugging.
+     */
+    private static void printObjectTree(Node node) {
+        while(node != null) {
+            if (node instanceof Prolog) {
+                System.out.println(node);
+                printObjectTree(((Prolog)node).loop);
+                System.out.println("**** end contents prolog loop");
+            } else if (node instanceof Loop) {
+                System.out.println(node);
+                printObjectTree(((Loop)node).body);
+                System.out.println("**** end contents Loop body");
+            } else if (node instanceof Curly) {
+                System.out.println(node);
+                printObjectTree(((Curly)node).atom);
+                System.out.println("**** end contents Curly body");
+            } else if (node instanceof GroupCurly) {
+                System.out.println(node);
+                printObjectTree(((GroupCurly)node).atom);
+                System.out.println("**** end contents GroupCurly body");
+            } else if (node instanceof GroupTail) {
+                System.out.println(node);
+                System.out.println("Tail next is "+node.next);
+                return;
+            } else {
+                System.out.println(node);
+            }
+            node = node.next;
+            if (node != null)
+                System.out.println("->next:");
+            if (node == Pattern.accept) {
+                System.out.println("Accept Node");
+                node = null;
+            }
+       }
     }
 
     /**
@@ -2112,10 +2076,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 tail = root;
                 continue;
             case '[':
-                if (has(CANON_EQ) && !has(LITERAL))
-                    node = new NFCCharProperty(clazz(true));
-                else
-                    node = newCharProperty(clazz(true));
+                node = clazz(true);
                 break;
             case '\\':
                 ch = nextEscaped();
@@ -2128,11 +2089,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                     } else {
                         oneLetter = false;
                     }
-                    // node = newCharProperty(family(oneLetter, comp));
-                    if (has(CANON_EQ) && !has(LITERAL))
-                        node = new NFCCharProperty(family(oneLetter, comp));
-                    else
-                        node = newCharProperty(family(oneLetter, comp));
+                    node = family(oneLetter, comp);
                 } else {
                     unread();
                     node = atom();
@@ -2159,12 +2116,12 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             case '.':
                 next();
                 if (has(DOTALL)) {
-                    node = new CharProperty(ALL());
+                    node = new All();
                 } else {
-                    if (has(UNIX_LINES)) {
-                        node = new CharProperty(UNIXDOT());
-                    } else {
-                        node = new CharProperty(DOT());
+                    if (has(UNIX_LINES))
+                        node = new UnixDot();
+                    else {
+                        node = new Dot();
                     }
                 }
                 break;
@@ -2191,12 +2148,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             }
 
             node = closure(node);
-            /* save the top dot-greedy nodes (.*, .+) as well
-            if (node instanceof GreedyCharProperty &&
-                ((GreedyCharProperty)node).cp instanceof Dot) {
-                topClosureNodes.add(node);
-            }
-            */
+
             if (head == null) {
                 head = tail = node;
             } else {
@@ -2254,10 +2206,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                             unread();
                         else
                             oneLetter = false;
-                        if (has(CANON_EQ) && !has(LITERAL))
-                            return new NFCCharProperty(family(oneLetter, comp));
-                        else
-                            return newCharProperty(family(oneLetter, comp));
+                        return family(oneLetter, comp);
                     }
                 }
                 unread();
@@ -2295,7 +2244,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             break;
         }
         if (first == 1) {
-            return newCharProperty(single(buffer[0]));
+            return newSingle(buffer[0]);
         } else {
             return newSlice(buffer, first, hasSupplementary);
         }
@@ -2346,7 +2295,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 break;
             }
         }
-        hasGroupRef = true;
         if (has(CASE_INSENSITIVE))
             return new CIBackRef(refNum, has(UNICODE_CASE));
         else
@@ -2391,13 +2339,9 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         case 'C':
             break;
         case 'D':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.DIGIT() : CharPredicates.ASCII_DIGIT();
-                predicate = predicate.negate();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.DIGIT).complement()
+                               : new Ctype(ASCII.DIGIT).complement();
             return -1;
         case 'E':
         case 'F':
@@ -2407,20 +2351,14 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             if (create) root = new LastMatch();
             return -1;
         case 'H':
-            if (create) {
-                predicate = HorizWS().negate();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = new HorizWS().complement();
             return -1;
         case 'I':
         case 'J':
         case 'K':
         case 'L':
         case 'M':
-            break;
         case 'N':
-            return N();
         case 'O':
         case 'P':
         case 'Q':
@@ -2430,39 +2368,22 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             if (create) root = new LineEnding();
             return -1;
         case 'S':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.WHITE_SPACE() : CharPredicates.ASCII_SPACE();
-                predicate = predicate.negate();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.WHITE_SPACE).complement()
+                               : new Ctype(ASCII.SPACE).complement();
             return -1;
         case 'T':
         case 'U':
             break;
         case 'V':
-            if (create) {
-                predicate = VertWS().negate();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = new VertWS().complement();
             return -1;
         case 'W':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.WORD() : CharPredicates.ASCII_WORD();
-                predicate = predicate.negate();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.WORD).complement()
+                               : new Ctype(ASCII.WORD).complement();
             return -1;
         case 'X':
-            if (inclass) break;
-            if (create) {
-                root = new XGrapheme();
-            }
-            return -1;
         case 'Y':
             break;
         case 'Z':
@@ -2478,29 +2399,14 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             return '\007';
         case 'b':
             if (inclass) break;
-            if (create) {
-                if (peek() == '{') {
-                    if (skip() == 'g') {
-                        if (read() == '}') {
-                            root = new GraphemeBound();
-                            return -1;
-                        }
-                        break;  // error missing trailing }
-                    }
-                    unread(); unread();
-                }
-                root = new Bound(Bound.BOTH, has(UNICODE_CHARACTER_CLASS));
-            }
+            if (create) root = new Bound(Bound.BOTH, has(UNICODE_CHARACTER_CLASS));
             return -1;
         case 'c':
             return c();
         case 'd':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.DIGIT() : CharPredicates.ASCII_DIGIT();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.DIGIT)
+                               : new Ctype(ASCII.DIGIT);
             return -1;
         case 'e':
             return '\033';
@@ -2509,11 +2415,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         case 'g':
             break;
         case 'h':
-            if (create) {
-                predicate = HorizWS();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = new HorizWS();
             return -1;
         case 'i':
         case 'j':
@@ -2527,7 +2429,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             if (!namedGroups().containsKey(name))
                 throw error("(named capturing group <"+ name+"> does not exit");
             if (create) {
-                hasGroupRef = true;
                 if (has(CASE_INSENSITIVE))
                     root = new CIBackRef(namedGroups().get(name), has(UNICODE_CASE));
                 else
@@ -2546,12 +2447,9 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         case 'r':
             return '\r';
         case 's':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.WHITE_SPACE() : CharPredicates.ASCII_SPACE();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.WHITE_SPACE)
+                               : new Ctype(ASCII.SPACE);
             return -1;
         case 't':
             return '\t';
@@ -2568,19 +2466,12 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             // compatibility concern '\013'/0x0B is returned if isrange.
             if (isrange)
                 return '\013';
-            if (create) {
-                predicate = VertWS();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = new VertWS();
             return -1;
         case 'w':
-            if (create) {
-                predicate = has(UNICODE_CHARACTER_CLASS) ?
-                            CharPredicates.WORD() : CharPredicates.ASCII_WORD();
-                if (!inclass)
-                    root = newCharProperty(predicate);
-            }
+            if (create) root = has(UNICODE_CHARACTER_CLASS)
+                               ? new Utype(UnicodeProp.WORD)
+                               : new Ctype(ASCII.WORD);
             return -1;
         case 'x':
             return x();
@@ -2603,66 +2494,63 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * is true except for the case of [abc&&def] where def is a separate
      * right hand node with "understood" brackets.
      */
-    private CharPredicate clazz(boolean consume) {
-        CharPredicate prev = null;
-        CharPredicate curr = null;
+    private CharProperty clazz(boolean consume) {
+        CharProperty prev = null;
+        CharProperty node = null;
         BitClass bits = new BitClass();
-        BmpCharPredicate bitsP = ch -> ch < 256 && bits.bits[ch];
-
-        boolean isNeg = false;
-        boolean hasBits = false;
+        boolean include = true;
+        boolean firstInClass = true;
         int ch = next();
-
-        // Negates if first char in a class, otherwise literal
-        if (ch == '^' && temp[cursor-1] == '[') {
-            ch = next();
-            isNeg = true;
-        }
         for (;;) {
             switch (ch) {
+                case '^':
+                    // Negates if first char in a class, otherwise literal
+                    if (firstInClass) {
+                        if (temp[cursor-1] != '[')
+                            break;
+                        ch = next();
+                        include = !include;
+                        continue;
+                    } else {
+                        // ^ not first in class, treat as literal
+                        break;
+                    }
                 case '[':
-                    curr = clazz(true);
+                    firstInClass = false;
+                    node = clazz(true);
                     if (prev == null)
-                        prev = curr;
+                        prev = node;
                     else
-                        prev = prev.union(curr);
+                        prev = union(prev, node);
                     ch = peek();
                     continue;
                 case '&':
+                    firstInClass = false;
                     ch = next();
                     if (ch == '&') {
                         ch = next();
-                        CharPredicate right = null;
+                        CharProperty rightNode = null;
                         while (ch != ']' && ch != '&') {
                             if (ch == '[') {
-                                if (right == null)
-                                    right = clazz(true);
+                                if (rightNode == null)
+                                    rightNode = clazz(true);
                                 else
-                                    right = right.union(clazz(true));
+                                    rightNode = union(rightNode, clazz(true));
                             } else { // abc&&def
                                 unread();
-                                right = clazz(false);
+                                rightNode = clazz(false);
                             }
                             ch = peek();
                         }
-                        if (hasBits) {
-                            // bits used, union has high precedence
-                            if (prev == null) {
-                                prev = curr = bitsP;
-                            } else {
-                                prev = prev.union(bitsP);
-                            }
-                            hasBits = false;
-                        }
-                        if (right != null)
-                            curr = right;
+                        if (rightNode != null)
+                            node = rightNode;
                         if (prev == null) {
-                            if (right == null)
+                            if (rightNode == null)
                                 throw error("Bad class syntax");
                             else
-                                prev = right;
+                                prev = rightNode;
                         } else {
-                            prev = prev.and(curr);
+                            prev = intersection(prev, node);
                         }
                     } else {
                         // treat as a literal &
@@ -2671,39 +2559,43 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                     }
                     continue;
                 case 0:
+                    firstInClass = false;
                     if (cursor >= patternLength)
                         throw error("Unclosed character class");
                     break;
                 case ']':
-                    if (prev != null || hasBits) {
+                    firstInClass = false;
+                    if (prev != null) {
                         if (consume)
                             next();
-                        if (prev == null)
-                            prev = bitsP;
-                        else if (hasBits)
-                            prev = prev.union(bitsP);
-                        if (isNeg)
-                            return prev.negate();
                         return prev;
                     }
                     break;
                 default:
+                    firstInClass = false;
                     break;
             }
-            curr = range(bits);
-            if (curr == null) {    // the bits used
-                hasBits = true;
+            node = range(bits);
+            if (include) {
+                if (prev == null) {
+                    prev = node;
+                } else {
+                    if (prev != node)
+                        prev = union(prev, node);
+                }
             } else {
-                if (prev == null)
-                    prev = curr;
-                else if (prev != curr)
-                    prev = prev.union(curr);
+                if (prev == null) {
+                    prev = node.complement();
+                } else {
+                    if (prev != node)
+                        prev = setDifference(prev, node);
+                }
             }
             ch = peek();
         }
     }
 
-    private CharPredicate bitsOrSingle(BitClass bits, int ch) {
+    private CharProperty bitsOrSingle(BitClass bits, int ch) {
         /* Bits can only handle codepoints in [u+0000-u+00ff] range.
            Use "single" node instead of bits when dealing with unicode
            case folding for codepoints listed below.
@@ -2721,49 +2613,23 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
            (6)AngstromSign u+212b
               toLowerCase(u+212b) ==> u+00e5
         */
+        int d;
         if (ch < 256 &&
             !(has(CASE_INSENSITIVE) && has(UNICODE_CASE) &&
               (ch == 0xff || ch == 0xb5 ||
-               ch == 0x49 || ch == 0x69 ||    //I and i
-               ch == 0x53 || ch == 0x73 ||    //S and s
-               ch == 0x4b || ch == 0x6b ||    //K and k
-               ch == 0xc5 || ch == 0xe5))) {  //A+ring
-            bits.add(ch, flags());
-            return null;
-        }
-        return single(ch);
-    }
-
-    /**
-     *  Returns a suitably optimized, single character predicate
-     */
-    private CharPredicate single(final int ch) {
-        if (has(CASE_INSENSITIVE)) {
-            int lower, upper;
-            if (has(UNICODE_CASE)) {
-                upper = Character.toUpperCase(ch);
-                lower = Character.toLowerCase(upper);
-                // Unicode case insensitive matches
-                if (upper != lower)
-                    return SingleU(lower);
-            } else if (ASCII.isAscii(ch)) {
-                lower = ASCII.toLower(ch);
-                upper = ASCII.toUpper(ch);
-                // Case insensitive matches a given BMP character
-                if (lower != upper)
-                    return SingleI(lower, upper);
-            }
-        }
-        if (isSupplementary(ch))
-            return SingleS(ch);
-        return Single(ch);  // Match a given BMP character
+               ch == 0x49 || ch == 0x69 ||  //I and i
+               ch == 0x53 || ch == 0x73 ||  //S and s
+               ch == 0x4b || ch == 0x6b ||  //K and k
+               ch == 0xc5 || ch == 0xe5)))  //A+ring
+            return bits.add(ch, flags());
+        return newSingle(ch);
     }
 
     /**
      * Parse a single character or a character range in a character class
      * and return its representative node.
      */
-    private CharPredicate range(BitClass bits) {
+    private CharProperty range(BitClass bits) {
         int ch = peek();
         if (ch == '\\') {
             ch = nextEscaped();
@@ -2782,7 +2648,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 unread();
                 ch = escape(true, true, isrange);
                 if (ch == -1)
-                    return predicate;
+                    return (CharProperty) root;
             }
         } else {
             next();
@@ -2804,13 +2670,10 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                     if (m < ch) {
                         throw error("Illegal character range");
                     }
-                    if (has(CASE_INSENSITIVE)) {
-                        if (has(UNICODE_CASE))
-                            return CIRangeU(ch, m);
-                        return CIRange(ch, m);
-                    } else {
-                        return Range(ch, m);
-                    }
+                    if (has(CASE_INSENSITIVE))
+                        return caseInsensitiveRangeFor(ch, m);
+                    else
+                        return rangeFor(ch, m);
                 }
             }
             return bitsOrSingle(bits, ch);
@@ -2821,10 +2684,12 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     /**
      * Parses a Unicode character family and returns its representative node.
      */
-    private CharPredicate family(boolean singleLetter, boolean isComplement) {
+    private CharProperty family(boolean singleLetter,
+                                boolean maybeComplement)
+    {
         next();
         String name;
-        CharPredicate p = null;
+        CharProperty node = null;
 
         if (singleLetter) {
             int c = temp[cursor];
@@ -2853,65 +2718,84 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             // property construct \p{name=value}
             String value = name.substring(i + 1);
             name = name.substring(0, i).toLowerCase(Locale.ENGLISH);
-            switch (name) {
-                case "sc":
-                case "script":
-                    p = CharPredicates.forUnicodeScript(value);
-                    break;
-                case "blk":
-                case "block":
-                    p = CharPredicates.forUnicodeBlock(value);
-                    break;
-                case "gc":
-                case "general_category":
-                    p = CharPredicates.forProperty(value);
-                    break;
-                default:
-                    break;
-            }
-            if (p == null)
+            if ("sc".equals(name) || "script".equals(name)) {
+                node = unicodeScriptPropertyFor(value);
+            } else if ("blk".equals(name) || "block".equals(name)) {
+                node = unicodeBlockPropertyFor(value);
+            } else if ("gc".equals(name) || "general_category".equals(name)) {
+                node = charPropertyNodeFor(value);
+            } else {
                 throw error("Unknown Unicode property {name=<" + name + ">, "
                              + "value=<" + value + ">}");
-
+            }
         } else {
             if (name.startsWith("In")) {
-                // \p{InBlockName}
-                p = CharPredicates.forUnicodeBlock(name.substring(2));
+                // \p{inBlockName}
+                node = unicodeBlockPropertyFor(name.substring(2));
             } else if (name.startsWith("Is")) {
-                // \p{IsGeneralCategory} and \p{IsScriptName}
+                // \p{isGeneralCategory} and \p{isScriptName}
                 name = name.substring(2);
-                p = CharPredicates.forUnicodeProperty(name);
-                if (p == null)
-                    p = CharPredicates.forProperty(name);
-                if (p == null)
-                    p = CharPredicates.forUnicodeScript(name);
+                UnicodeProp uprop = UnicodeProp.forName(name);
+                if (uprop != null)
+                    node = new Utype(uprop);
+                if (node == null)
+                    node = CharPropertyNames.charPropertyFor(name);
+                if (node == null)
+                    node = unicodeScriptPropertyFor(name);
             } else {
                 if (has(UNICODE_CHARACTER_CLASS)) {
-                    p = CharPredicates.forPOSIXName(name);
+                    UnicodeProp uprop = UnicodeProp.forPOSIXName(name);
+                    if (uprop != null)
+                        node = new Utype(uprop);
                 }
-                if (p == null)
-                    p = CharPredicates.forProperty(name);
+                if (node == null)
+                    node = charPropertyNodeFor(name);
             }
-            if (p == null)
-                throw error("Unknown character property name {In/Is" + name + "}");
         }
-        if (isComplement) {
-            // it might be too expensive to detect if a complement of
-            // CharProperty can match "certain" supplementary. So just
-            // go with StartS.
-            hasSupplementary = true;
-            p = p.negate();
+        if (maybeComplement) {
+            if (node instanceof Category || node instanceof Block)
+                hasSupplementary = true;
+            node = node.complement();
         }
-        return p;
+        return node;
     }
 
-    private CharProperty newCharProperty(CharPredicate p) {
+
+    /**
+     * Returns a CharProperty matching all characters belong to
+     * a UnicodeScript.
+     */
+    private CharProperty unicodeScriptPropertyFor(String name) {
+        final Character.UnicodeScript script;
+        try {
+            script = Character.UnicodeScript.forName(name);
+        } catch (IllegalArgumentException iae) {
+            throw error("Unknown character script name {" + name + "}");
+        }
+        return new Script(script);
+    }
+
+    /**
+     * Returns a CharProperty matching all characters in a UnicodeBlock.
+     */
+    private CharProperty unicodeBlockPropertyFor(String name) {
+        final Character.UnicodeBlock block;
+        try {
+            block = Character.UnicodeBlock.forName(name);
+        } catch (IllegalArgumentException iae) {
+            throw error("Unknown character block name {" + name + "}");
+        }
+        return new Block(block);
+    }
+
+    /**
+     * Returns a CharProperty matching all characters in a named property.
+     */
+    private CharProperty charPropertyNodeFor(String name) {
+        CharProperty p = CharPropertyNames.charPropertyFor(name);
         if (p == null)
-            return null;
-        if (p instanceof BmpCharPredicate)
-            return new BmpCharProperty((BmpCharPredicate)p);
-        else
-            return new CharProperty(p);
+            throw error("Unknown character property name {" + name + "}");
+        return p;
     }
 
     /**
@@ -2942,85 +2826,85 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         Node head = null;
         Node tail = null;
         int save = flags;
-        int saveTCNCount = topClosureNodes.size();
         root = null;
         int ch = next();
         if (ch == '?') {
             ch = skip();
             switch (ch) {
-                case ':':   //  (?:xxx) pure group
-                    head = createGroup(true);
-                    tail = root;
-                    head.next = expr(tail);
-                    break;
-                case '=':   // (?=xxx) and (?!xxx) lookahead
-                case '!':
-                    head = createGroup(true);
-                    tail = root;
-                    head.next = expr(tail);
-                    if (ch == '=') {
-                        head = tail = new Pos(head);
-                    } else {
-                        head = tail = new Neg(head);
-                    }
-                    break;
-                case '>':   // (?>xxx)  independent group
-                    head = createGroup(true);
-                    tail = root;
-                    head.next = expr(tail);
-                    head = tail = new Ques(head, Qtype.INDEPENDENT);
-                    break;
-                case 'P':
-                    ch = read();
-                    if (ch == '<') { // (?<xxx)  look behind
-                        ch = read();
-                        if (ASCII.isLower(ch) || ASCII.isUpper(ch)) {
-                            // named captured group
-                            String name = groupname(ch);
-                            if (namedGroups().containsKey(name))
-                                throw error("Named capturing group <" + name
-                                        + "> is already defined");
-                            capturingGroup = true;
-                            head = createGroup(false);
-                            tail = root;
-                            namedGroups().put(name, capturingGroupCount - 1);
-                            head.next = expr(tail);
-                            break;
-                        }
-                        int start = cursor;
-                        head = createGroup(true);
-                        tail = root;
-                        head.next = expr(tail);
-                        tail.next = lookbehindEnd;
-                        TreeInfo info = new TreeInfo();
-                        head.study(info);
-                        if (info.maxValid == false) {
-                            throw error("Look-behind group does not have "
-                                    + "an obvious maximum length");
-                        }
-                        boolean hasSupplementary = findSupplementary(start, patternLength);
-                        if (ch == '=') {
-                            head = tail = (hasSupplementary ?
-                                    new BehindS(head, info.maxLength,
-                                            info.minLength) :
-                                    new Behind(head, info.maxLength,
-                                            info.minLength));
-                        } else if (ch == '!') {
-                            head = tail = (hasSupplementary ?
-                                    new NotBehindS(head, info.maxLength,
-                                            info.minLength) :
-                                    new NotBehind(head, info.maxLength,
-                                            info.minLength));
-                        } else {
-                            throw error("Unknown look-behind group");
-                        }
-                        // clear all top-closure-nodes inside lookbehind
-                        if (saveTCNCount < topClosureNodes.size())
-                            topClosureNodes.subList(saveTCNCount, topClosureNodes.size()).clear();
+            case ':':   //  (?:xxx) pure group
+                head = createGroup(true);
+                tail = root;
+                head.next = expr(tail);
+                break;
+            case '=':   // (?=xxx) and (?!xxx) lookahead
+            case '!':
+                head = createGroup(true);
+                tail = root;
+                head.next = expr(tail);
+                if (ch == '=') {
+                    head = tail = new Pos(head);
                 } else {
-                    throw error("Unknown extention ?P" + ch);
+                    head = tail = new Neg(head);
                 }
                 break;
+            case '>':   // (?>xxx)  independent group
+                head = createGroup(true);
+                tail = root;
+                head.next = expr(tail);
+                head = tail = new Ques(head, INDEPENDENT);
+                break;
+            case '<': // (?<xxx) look behinds
+                ch = read();
+                int start = cursor;
+                head = createGroup(true);
+                tail = root;
+                head.next = expr(tail);
+                tail.next = lookbehindEnd;
+                TreeInfo info = new TreeInfo();
+                head.study(info);
+                if (info.maxValid == false) {
+                    throw error("Look-behind group does not have "
+                            + "an obvious maximum length");
+                }
+                boolean hasSupplementary = findSupplementary(start, patternLength);
+                if (ch == '=') {
+                    head = tail = (hasSupplementary ?
+                            new BehindS(head, info.maxLength,
+                                    info.minLength) :
+                            new Behind(head, info.maxLength,
+                                    info.minLength));
+                } else if (ch == '!') {
+                    head = tail = (hasSupplementary ?
+                            new NotBehindS(head, info.maxLength,
+                                    info.minLength) :
+                            new NotBehind(head, info.maxLength,
+                                    info.minLength));
+                } else {
+                    throw error("Unknown look-behind group");
+                }
+                break;
+            case 'P':   // (?P<xxx)  named capture
+                ch = read();
+                if (ch == '<') {
+                    ch = read();
+                    if (ASCII.isLower(ch) || ASCII.isUpper(ch)) {
+                        // named captured group
+                        String name = groupname(ch);
+                        if (namedGroups().containsKey(name))
+                            throw error("Named capturing group <" + name
+                                    + "> is already defined");
+                        capturingGroup = true;
+                        head = createGroup(false);
+                        tail = root;
+                        namedGroups().put(name, capturingGroupCount - 1);
+                        head.next = expr(tail);
+                        break;
+                    } else {
+                        throw error("Unknown look-behind group");
+                    }
+                } else {
+                    throw error("Wrong pattern ?P" + ch);
+                }
             case '$':
             case '@':
                 throw error("Unknown group type");
@@ -3060,20 +2944,15 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             return node;    // Dual return
         }
 
-        // have group closure, clear all inner closure nodes from the
-        // top list (no backtracking stopper optimization for inner
-        if (saveTCNCount < topClosureNodes.size())
-            topClosureNodes.subList(saveTCNCount, topClosureNodes.size()).clear();
-
         if (node instanceof Ques) {
             Ques ques = (Ques) node;
-            if (ques.type == Qtype.POSSESSIVE) {
+            if (ques.type == POSSESSIVE) {
                 root = node;
                 return node;
             }
             tail.next = new BranchConn();
             tail = tail.next;
-            if (ques.type == Qtype.GREEDY) {
+            if (ques.type == GREEDY) {
                 head = new Branch(head, null, tail);
             } else { // Reluctant quantifier
                 head = new Branch(null, head, tail);
@@ -3082,7 +2961,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             return head;
         } else if (node instanceof Curly) {
             Curly curly = (Curly) node;
-            if (curly.type == Qtype.POSSESSIVE) {
+            if (curly.type == POSSESSIVE) {
                 root = node;
                 return node;
             }
@@ -3099,14 +2978,10 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             } else { // Non-deterministic
                 int temp = ((GroupHead) head).localIndex;
                 Loop loop;
-                if (curly.type == Qtype.GREEDY) {
+                if (curly.type == GREEDY)
                     loop = new Loop(this.localCount, temp);
-                    // add the max_reps greedy to the top-closure-node list
-                    if (curly.cmax == MAX_REPS)
-                        topClosureNodes.add(loop);
-                } else {  // Reluctant Curly
+                else  // Reluctant Curly
                     loop = new LazyLoop(this.localCount, temp);
-                }
                 Prolog prolog = new Prolog(loop);
                 this.localCount += 1;
                 loop.cmin = curly.cmin;
@@ -3132,10 +3007,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             groupIndex = capturingGroupCount++;
         GroupHead head = new GroupHead(localIndex);
         root = new GroupTail(localIndex, groupIndex);
-
-        // for debug/print only, head.match does NOT need the "tail" info
-        head.tail = (GroupTail)root;
-
         if (!anonymous && groupIndex < 10)
             groupNodes[groupIndex] = head;
         return head;
@@ -3215,7 +3086,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 break;
             case 'U':
                 flags &= ~(UNICODE_CHARACTER_CLASS | UNICODE_CASE);
-                break;
             default:
                 return;
             }
@@ -3225,26 +3095,13 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
 
     static final int MAX_REPS   = 0x7FFFFFFF;
 
-    static enum Qtype {
-        GREEDY, LAZY, POSSESSIVE, INDEPENDENT
-    }
+    static final int GREEDY     = 0;
 
-    private Node curly(Node prev, int cmin) {
-        int ch = next();
-        if (ch == '?') {
-            next();
-            return new Curly(prev, cmin, MAX_REPS, Qtype.LAZY);
-        } else if (ch == '+') {
-            next();
-            return new Curly(prev, cmin, MAX_REPS, Qtype.POSSESSIVE);
-        }
-        if (prev instanceof BmpCharProperty) {
-            return new BmpCharPropertyGreedy((BmpCharProperty)prev, cmin);
-        } else if (prev instanceof CharProperty) {
-            return new CharPropertyGreedy((CharProperty)prev, cmin);
-        }
-        return new Curly(prev, cmin, MAX_REPS, Qtype.GREEDY);
-    }
+    static final int LAZY       = 1;
+
+    static final int POSSESSIVE = 2;
+
+    static final int INDEPENDENT = 3;
 
     /**
      * Processes repetition. If the next character peeked is a quantifier
@@ -3259,16 +3116,32 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             ch = next();
             if (ch == '?') {
                 next();
-                return new Ques(prev, Qtype.LAZY);
+                return new Ques(prev, LAZY);
             } else if (ch == '+') {
                 next();
-                return new Ques(prev, Qtype.POSSESSIVE);
+                return new Ques(prev, POSSESSIVE);
             }
-            return new Ques(prev, Qtype.GREEDY);
+            return new Ques(prev, GREEDY);
         case '*':
-            return curly(prev, 0);
+            ch = next();
+            if (ch == '?') {
+                next();
+                return new Curly(prev, 0, MAX_REPS, LAZY);
+            } else if (ch == '+') {
+                next();
+                return new Curly(prev, 0, MAX_REPS, POSSESSIVE);
+            }
+            return new Curly(prev, 0, MAX_REPS, GREEDY);
         case '+':
-            return curly(prev, 1);
+            ch = next();
+            if (ch == '?') {
+                next();
+                return new Curly(prev, 1, MAX_REPS, LAZY);
+            } else if (ch == '+') {
+                next();
+                return new Curly(prev, 1, MAX_REPS, POSSESSIVE);
+            }
+            return new Curly(prev, 1, MAX_REPS, GREEDY);
         case '{':
             ch = temp[cursor+1];
             if (ASCII.isDigit(ch)) {
@@ -3297,12 +3170,12 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 ch = peek();
                 if (ch == '?') {
                     next();
-                    curly = new Curly(prev, cmin, cmax, Qtype.LAZY);
+                    curly = new Curly(prev, cmin, cmax, LAZY);
                 } else if (ch == '+') {
                     next();
-                    curly = new Curly(prev, cmin, cmax, Qtype.POSSESSIVE);
+                    curly = new Curly(prev, cmin, cmax, POSSESSIVE);
                 } else {
-                    curly = new Curly(prev, cmin, cmax, Qtype.GREEDY);
+                    curly = new Curly(prev, cmin, cmax, GREEDY);
                 }
                 return curly;
             } else {
@@ -3405,25 +3278,10 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         return n;
     }
 
-    private int N() {
-        if (read() == '{') {
-            int i = cursor;
-            while (cursor < patternLength && read() != '}') {}
-            if (cursor > patternLength)
-                throw error("Unclosed character name escape sequence");
-            String name = new String(temp, i, cursor - i - 1);
-            try {
-                return Character.codePointOf(name);
-            } catch (IllegalArgumentException x) {
-                throw error("Unknown character name [" + name + "]");
-            }
-        }
-        throw error("Illegal character name escape sequence");
-    }
-
     //
     // Utility methods for code point support
     //
+
     private static final int countChars(CharSequence seq, int index,
                                         int lengthInCodePoints) {
         // optimization
@@ -3479,15 +3337,10 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      *  never matches values above Latin-1, and a complemented BitClass always
      *  matches values above Latin-1.
      */
-    static final class BitClass extends BmpCharProperty {
+    private static final class BitClass extends BmpCharProperty {
         final boolean[] bits;
-        BitClass() {
-            this(new boolean[256]);
-        }
-        private BitClass(boolean[] bits) {
-            super( ch -> ch < 256 && bits[ch]);
-            this.bits = bits;
-        }
+        BitClass() { bits = new boolean[256]; }
+        private BitClass(boolean[] bits) { this.bits = bits; }
         BitClass add(int c, int flags) {
             assert c >= 0 && c <= 255;
             if ((flags & CASE_INSENSITIVE) != 0) {
@@ -3502,6 +3355,32 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             bits[c] = true;
             return this;
         }
+        boolean isSatisfiedBy(int ch) {
+            return ch < 256 && bits[ch];
+        }
+    }
+
+    /**
+     *  Returns a suitably optimized, single character matcher.
+     */
+    private CharProperty newSingle(final int ch) {
+        if (has(CASE_INSENSITIVE)) {
+            int lower, upper;
+            if (has(UNICODE_CASE)) {
+                upper = Character.toUpperCase(ch);
+                lower = Character.toLowerCase(upper);
+                if (upper != lower)
+                    return new SingleU(lower);
+            } else if (ASCII.isAscii(ch)) {
+                lower = ASCII.toLower(ch);
+                upper = ASCII.toUpper(ch);
+                if (lower != upper)
+                    return new SingleI(lower, upper);
+            }
+        }
+        if (isSupplementary(ch))
+            return new SingleS(ch);    // Match a given Unicode character
+        return new Single(ch);         // Match a given BMP character
     }
 
     /**
@@ -3909,17 +3788,18 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * Abstract node class to match one character satisfying some
      * boolean property.
      */
-    static class CharProperty extends Node {
-        CharPredicate predicate;
-
-        CharProperty (CharPredicate predicate) {
-            this.predicate = predicate;
+    private static abstract class CharProperty extends Node {
+        abstract boolean isSatisfiedBy(int ch);
+        CharProperty complement() {
+            return new CharProperty() {
+                    boolean isSatisfiedBy(int ch) {
+                        return ! CharProperty.this.isSatisfiedBy(ch);}};
         }
         boolean match(Matcher matcher, int i, CharSequence seq) {
             if (i < matcher.to) {
                 int ch = Character.codePointAt(seq, i);
-                return predicate.is(ch) &&
-                       next.match(matcher, i + Character.charCount(ch), seq);
+                return isSatisfiedBy(ch)
+                    && next.match(matcher, i+Character.charCount(ch), seq);
             } else {
                 matcher.hitEnd = true;
                 return false;
@@ -3936,14 +3816,11 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * Optimized version of CharProperty that works only for
      * properties never satisfied by Supplementary characters.
      */
-    private static class BmpCharProperty extends CharProperty {
-        BmpCharProperty (BmpCharPredicate predicate) {
-            super(predicate);
-        }
+    private static abstract class BmpCharProperty extends CharProperty {
         boolean match(Matcher matcher, int i, CharSequence seq) {
             if (i < matcher.to) {
-                return predicate.is(seq.charAt(i)) &&
-                       next.match(matcher, i + 1, seq);
+                return isSatisfiedBy(seq.charAt(i))
+                    && next.match(matcher, i+1, seq);
             } else {
                 matcher.hitEnd = true;
                 return false;
@@ -3951,109 +3828,135 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         }
     }
 
-    private static class NFCCharProperty extends Node {
-        CharPredicate predicate;
-        NFCCharProperty (CharPredicate predicate) {
-            this.predicate = predicate;
-        }
-
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            if (i < matcher.to) {
-                int ch0 = Character.codePointAt(seq, i);
-                int n = Character.charCount(ch0);
-                int j = i + n;
-                while (j < matcher.to) {
-                    int ch1 = Character.codePointAt(seq, j);
-                    if (Grapheme.isBoundary(ch0, ch1))
-                        break;
-                    ch0 = ch1;
-                    j += Character.charCount(ch1);
-                }
-                if (i + n == j) {    // single, assume nfc cp
-                    if (predicate.is(ch0))
-                        return next.match(matcher, j, seq);
-                } else {
-                    while (i + n < j) {
-                        String nfc = Normalizer.normalize(
-                            seq.toString().substring(i, j), Normalizer.Form.NFC);
-                        if (nfc.codePointCount(0, nfc.length()) == 1) {
-                            if (predicate.is(nfc.codePointAt(0)) &&
-                                next.match(matcher, j, seq)) {
-                                return true;
-                            }
-                        }
-
-                        ch0 = Character.codePointBefore(seq, j);
-                        j -= Character.charCount(ch0);
-                    }
-                }
-                if (j < matcher.to)
-                    return false;
-            }
-            matcher.hitEnd = true;
-            return false;
-        }
-
-        boolean study(TreeInfo info) {
-            info.minLength++;
-            info.deterministic = false;
-            return next.study(info);
+    /**
+     * Node class that matches a Supplementary Unicode character
+     */
+    static final class SingleS extends CharProperty {
+        final int c;
+        SingleS(int c) { this.c = c; }
+        boolean isSatisfiedBy(int ch) {
+            return ch == c;
         }
     }
 
     /**
-     * Node class that matches an unicode extended grapheme cluster
+     * Optimization -- matches a given BMP character
      */
-    static class XGrapheme extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            if (i < matcher.to) {
-                int ch0 = Character.codePointAt(seq, i);
-                    i += Character.charCount(ch0);
-                while (i < matcher.to) {
-                    int ch1 = Character.codePointAt(seq, i);
-                    if (Grapheme.isBoundary(ch0, ch1))
-                        break;
-                    ch0 = ch1;
-                    i += Character.charCount(ch1);
-                }
-                return next.match(matcher, i, seq);
-            }
-            matcher.hitEnd = true;
-            return false;
-        }
-
-        boolean study(TreeInfo info) {
-            info.minLength++;
-            info.deterministic = false;
-            return next.study(info);
+    static final class Single extends BmpCharProperty {
+        final int c;
+        Single(int c) { this.c = c; }
+        boolean isSatisfiedBy(int ch) {
+            return ch == c;
         }
     }
 
     /**
-     * Node class that handles grapheme boundaries
+     * Case insensitive matches a given BMP character
      */
-    static class GraphemeBound extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            int startIndex = matcher.from;
-            int endIndex = matcher.to;
-            if (matcher.transparentBounds) {
-                startIndex = 0;
-                endIndex = matcher.getTextLength();
-            }
-            if (i == startIndex) {
-                return next.match(matcher, i, seq);
-            }
-            if (i < endIndex) {
-                if (Character.isSurrogatePair(seq.charAt(i-1), seq.charAt(i)) ||
-                    !Grapheme.isBoundary(Character.codePointBefore(seq, i),
-                                         Character.codePointAt(seq, i))) {
-                    return false;
-                }
-            } else {
-                matcher.hitEnd = true;
-                matcher.requireEnd = true;
-            }
-            return next.match(matcher, i, seq);
+    static final class SingleI extends BmpCharProperty {
+        final int lower;
+        final int upper;
+        SingleI(int lower, int upper) {
+            this.lower = lower;
+            this.upper = upper;
+        }
+        boolean isSatisfiedBy(int ch) {
+            return ch == lower || ch == upper;
+        }
+    }
+
+    /**
+     * Unicode case insensitive matches a given Unicode character
+     */
+    static final class SingleU extends CharProperty {
+        final int lower;
+        SingleU(int lower) {
+            this.lower = lower;
+        }
+        boolean isSatisfiedBy(int ch) {
+            return lower == ch ||
+                lower == Character.toLowerCase(Character.toUpperCase(ch));
+        }
+    }
+
+    /**
+     * Node class that matches a Unicode block.
+     */
+    static final class Block extends CharProperty {
+        final Character.UnicodeBlock block;
+        Block(Character.UnicodeBlock block) {
+            this.block = block;
+        }
+        boolean isSatisfiedBy(int ch) {
+            return block == Character.UnicodeBlock.of(ch);
+        }
+    }
+
+    /**
+     * Node class that matches a Unicode script
+     */
+    static final class Script extends CharProperty {
+        final Character.UnicodeScript script;
+        Script(Character.UnicodeScript script) {
+            this.script = script;
+        }
+        boolean isSatisfiedBy(int ch) {
+            return script == Character.UnicodeScript.of(ch);
+        }
+    }
+
+    /**
+     * Node class that matches a Unicode category.
+     */
+    static final class Category extends CharProperty {
+        final int typeMask;
+        Category(int typeMask) { this.typeMask = typeMask; }
+        boolean isSatisfiedBy(int ch) {
+            return (typeMask & (1 << Character.getType(ch))) != 0;
+        }
+    }
+
+    /**
+     * Node class that matches a Unicode "type"
+     */
+    static final class Utype extends CharProperty {
+        final UnicodeProp uprop;
+        Utype(UnicodeProp uprop) { this.uprop = uprop; }
+        boolean isSatisfiedBy(int ch) {
+            return uprop.is(ch);
+        }
+    }
+
+    /**
+     * Node class that matches a POSIX type.
+     */
+    static final class Ctype extends BmpCharProperty {
+        final int ctype;
+        Ctype(int ctype) { this.ctype = ctype; }
+        boolean isSatisfiedBy(int ch) {
+            return ch < 128 && ASCII.isType(ch, ctype);
+        }
+    }
+
+    /**
+     * Node class that matches a Perl vertical whitespace
+     */
+    static final class VertWS extends BmpCharProperty {
+        boolean isSatisfiedBy(int cp) {
+            return (cp >= 0x0A && cp <= 0x0D) ||
+                   cp == 0x85 || cp == 0x2028 || cp == 0x2029;
+        }
+    }
+
+    /**
+     * Node class that matches a Perl horizontal whitespace
+     */
+    static final class HorizWS extends BmpCharProperty {
+        boolean isSatisfiedBy(int cp) {
+            return cp == 0x09 || cp == 0x20 || cp == 0xa0 ||
+                   cp == 0x1680 || cp == 0x180e ||
+                   cp >= 0x2000 && cp <= 0x200a ||
+                   cp == 0x202f || cp == 0x205f || cp == 0x3000;
         }
     }
 
@@ -4076,7 +3979,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * Node class for a case sensitive/BMP-only sequence of literal
      * characters.
      */
-    static class Slice extends SliceNode {
+    static final class Slice extends SliceNode {
         Slice(int[] buf) {
             super(buf);
         }
@@ -4149,7 +4052,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      * Node class for a case sensitive sequence of literal characters
      * including supplementary characters.
      */
-    static final class SliceS extends Slice {
+    static final class SliceS extends SliceNode {
         SliceS(int[] buf) {
             super(buf);
         }
@@ -4219,13 +4122,81 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         }
     }
 
+    private static boolean inRange(int lower, int ch, int upper) {
+        return lower <= ch && ch <= upper;
+    }
+
+    /**
+     * Returns node for matching characters within an explicit value range.
+     */
+    private static CharProperty rangeFor(final int lower,
+                                         final int upper) {
+        return new CharProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return inRange(lower, ch, upper);}};
+    }
+
+    /**
+     * Returns node for matching characters within an explicit value
+     * range in a case insensitive manner.
+     */
+    private CharProperty caseInsensitiveRangeFor(final int lower,
+                                                 final int upper) {
+        if (has(UNICODE_CASE))
+            return new CharProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    if (inRange(lower, ch, upper))
+                        return true;
+                    int up = Character.toUpperCase(ch);
+                    return inRange(lower, up, upper) ||
+                           inRange(lower, Character.toLowerCase(up), upper);}};
+        return new CharProperty() {
+            boolean isSatisfiedBy(int ch) {
+                return inRange(lower, ch, upper) ||
+                    ASCII.isAscii(ch) &&
+                        (inRange(lower, ASCII.toUpper(ch), upper) ||
+                         inRange(lower, ASCII.toLower(ch), upper));
+            }};
+    }
+
+    /**
+     * Implements the Unicode category ALL and the dot metacharacter when
+     * in dotall mode.
+     */
+    static final class All extends CharProperty {
+        boolean isSatisfiedBy(int ch) {
+            return true;
+        }
+    }
+
+    /**
+     * Node class for the dot metacharacter when dotall is not enabled.
+     */
+    static final class Dot extends CharProperty {
+        boolean isSatisfiedBy(int ch) {
+            return (ch != '\n' && ch != '\r'
+                    && (ch|1) != '\u2029'
+                    && ch != '\u0085');
+        }
+    }
+
+    /**
+     * Node class for the dot metacharacter when dotall is not enabled
+     * but UNIX_LINES is enabled.
+     */
+    static final class UnixDot extends CharProperty {
+        boolean isSatisfiedBy(int ch) {
+            return ch != '\n';
+        }
+    }
+
     /**
      * The 0 or 1 quantifier. This one class implements all three types.
      */
     static final class Ques extends Node {
         Node atom;
-        Qtype type;
-        Ques(Node node, Qtype type) {
+        int type;
+        Ques(Node node, int type) {
             this.atom = node;
             this.type = type;
         }
@@ -4245,7 +4216,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
             }
         }
         boolean study(TreeInfo info) {
-            if (type != Qtype.INDEPENDENT) {
+            if (type != INDEPENDENT) {
                 int minL = info.minLength;
                 atom.study(info);
                 info.minLength = minL;
@@ -4259,90 +4230,17 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     }
 
     /**
-     * Handles the greedy style repetition with the minimum either be
-     * 0 or 1 and the maximum be MAX_REPS, for * and + quantifier.
-     */
-    static class CharPropertyGreedy extends Node {
-        final CharPredicate predicate;
-        final int cmin;
-
-        CharPropertyGreedy(CharProperty cp, int cmin) {
-            this.predicate = cp.predicate;
-            this.cmin = cmin;
-        }
-        boolean match(Matcher matcher, int i,  CharSequence seq) {
-            int n = 0;
-            int to = matcher.to;
-            // greedy, all the way down
-            while (i < to) {
-                int ch = Character.codePointAt(seq, i);
-                if (!predicate.is(ch))
-                   break;
-                i += Character.charCount(ch);
-                n++;
-            }
-            if (i >= to) {
-                matcher.hitEnd = true;
-            }
-            while (n >= cmin) {
-                if (next.match(matcher, i, seq))
-                    return true;
-                if (n == cmin)
-                    return false;
-                 // backing off if match fails
-                int ch = Character.codePointBefore(seq, i);
-                i -= Character.charCount(ch);
-                n--;
-            }
-            return false;
-        }
-
-        boolean study(TreeInfo info) {
-            info.minLength += cmin;
-            if (info.maxValid) {
-                info.maxLength += MAX_REPS;
-            }
-            info.deterministic = false;
-            return next.study(info);
-        }
-    }
-
-    static final class BmpCharPropertyGreedy extends CharPropertyGreedy {
-
-        BmpCharPropertyGreedy(BmpCharProperty bcp, int cmin) {
-            super(bcp, cmin);
-        }
-
-        boolean match(Matcher matcher, int i,  CharSequence seq) {
-            int n = 0;
-            int to = matcher.to;
-            while (i < to && predicate.is(seq.charAt(i))) {
-                i++; n++;
-            }
-            if (i >= to) {
-                matcher.hitEnd = true;
-            }
-            while (n >= cmin) {
-                if (next.match(matcher, i, seq))
-                    return true;
-                i--; n--;  // backing off if match fails
-            }
-            return false;
-        }
-    }
-
-    /**
      * Handles the curly-brace style repetition with a specified minimum and
      * maximum occurrences. The * quantifier is handled as a special case.
      * This class handles the three types.
      */
     static final class Curly extends Node {
         Node atom;
-        Qtype type;
+        int type;
         int cmin;
         int cmax;
 
-        Curly(Node node, int cmin, int cmax, Qtype type) {
+        Curly(Node node, int cmin, int cmax, int type) {
             this.atom = node;
             this.type = type;
             this.cmin = cmin;
@@ -4357,9 +4255,9 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 }
                 return false;
             }
-            if (type == Qtype.GREEDY)
+            if (type == GREEDY)
                 return match0(matcher, i, j, seq);
-            else if (type == Qtype.LAZY)
+            else if (type == LAZY)
                 return match1(matcher, i, j, seq);
             else
                 return match2(matcher, i, j, seq);
@@ -4481,14 +4379,14 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     static final class GroupCurly extends Node {
         Node atom;
-        Qtype type;
+        int type;
         int cmin;
         int cmax;
         int localIndex;
         int groupIndex;
         boolean capture;
 
-        GroupCurly(Node node, int cmin, int cmax, Qtype type, int local,
+        GroupCurly(Node node, int cmin, int cmax, int type, int local,
                    int group, boolean capture) {
             this.atom = node;
             this.type = type;
@@ -4528,9 +4426,9 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 }
             }
             if (ret) {
-                if (type == Qtype.GREEDY) {
+                if (type == GREEDY) {
                     ret = match0(matcher, i, cmin, seq);
-                } else if (type == Qtype.LAZY) {
+                } else if (type == LAZY) {
                     ret = match1(matcher, i, cmin, seq);
                 } else {
                     ret = match2(matcher, i, cmin, seq);
@@ -4776,7 +4674,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     static final class GroupHead extends Node {
         int localIndex;
-        GroupTail tail;    // for debug/print only, match does not need to know
         GroupHead(int localCount) {
             localIndex = localCount;
         }
@@ -4884,11 +4781,9 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         int countIndex; // local count index in matcher locals
         int beginIndex; // group beginning index
         int cmin, cmax;
-        int posIndex;
         Loop(int countIndex, int beginIndex) {
             this.countIndex = countIndex;
             this.beginIndex = beginIndex;
-            this.posIndex = -1;
         }
         boolean match(Matcher matcher, int i, CharSequence seq) {
             // Avoid infinite loop in zero-length case.
@@ -4911,25 +4806,14 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                 // This block is for after we have the minimum
                 // iterations required for the loop to match
                 if (count < cmax) {
-                    // Let's check if we have already tried and failed
-                    // at this starting position "i" in the past.
-                    // If yes, then just return false wihtout trying
-                    // again, to stop the exponential backtracking.
-                    if (posIndex != -1 &&
-                        matcher.localsPos[posIndex].contains(i)) {
-                        return next.match(matcher, i, seq);
-                    }
                     matcher.locals[countIndex] = count + 1;
                     boolean b = body.match(matcher, i, seq);
                     // If match failed we must backtrack, so
                     // the loop count should NOT be incremented
-                    if (b)
+                    if (!b)
+                        matcher.locals[countIndex] = count;
+                    else
                         return true;
-                    matcher.locals[countIndex] = count;
-                    // save the failed position
-                    if (posIndex != -1) {
-                        matcher.localsPos[posIndex].add(i);
-                    }
                 }
             }
             return next.match(matcher, i, seq);
@@ -4937,9 +4821,6 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         boolean matchInit(Matcher matcher, int i, CharSequence seq) {
             int save = matcher.locals[countIndex];
             boolean ret = false;
-            if (posIndex != -1 && matcher.localsPos[posIndex] == null) {
-                matcher.localsPos[posIndex] = new IntHashSet();
-            }
             if (0 < cmin) {
                 matcher.locals[countIndex] = 1;
                 ret = body.match(matcher, i, seq);
@@ -5386,6 +5267,36 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     }
 
     /**
+     * Returns the set union of two CharProperty nodes.
+     */
+    private static CharProperty union(final CharProperty lhs,
+                                      final CharProperty rhs) {
+        return new CharProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return lhs.isSatisfiedBy(ch) || rhs.isSatisfiedBy(ch);}};
+    }
+
+    /**
+     * Returns the set intersection of two CharProperty nodes.
+     */
+    private static CharProperty intersection(final CharProperty lhs,
+                                             final CharProperty rhs) {
+        return new CharProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return lhs.isSatisfiedBy(ch) && rhs.isSatisfiedBy(ch);}};
+    }
+
+    /**
+     * Returns the set difference of two CharProperty nodes.
+     */
+    private static CharProperty setDifference(final CharProperty lhs,
+                                              final CharProperty rhs) {
+        return new CharProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return ! rhs.isSatisfiedBy(ch) && lhs.isSatisfiedBy(ch);}};
+    }
+
+    /**
      * Handles word boundaries. Includes a field to allow this one class to
      * deal with the different types of word boundaries we can match. The word
      * characters include underscores, letters, and digits. Non spacing marks
@@ -5405,7 +5316,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         }
 
         boolean isWord(int ch) {
-            return useUWORD ? CharPredicates.WORD().is(ch)
+            return useUWORD ? UnicodeProp.WORD.is(ch)
                             : (ch == '_' || Character.isLetterOrDigit(ch));
         }
 
@@ -5611,8 +5522,8 @@ NEXT:       while (i <= last) {
 
         BnMS(int[] src, int[] lastOcc, int[] optoSft, Node next) {
             super(src, lastOcc, optoSft, next);
-            for (int cp : buffer) {
-                lengthInChars += Character.charCount(cp);
+            for (int x = 0; x < buffer.length; x++) {
+                lengthInChars += Character.charCount(buffer[x]);
             }
         }
         boolean match(Matcher matcher, int i, CharSequence seq) {
@@ -5651,166 +5562,214 @@ NEXT:       while (i <= last) {
         }
     }
 
-    @FunctionalInterface
-    static interface CharPredicate {
-        boolean is(int ch);
-
-        default CharPredicate and(CharPredicate p) {
-            return ch -> is(ch) && p.is(ch);
-        }
-        default CharPredicate union(CharPredicate p) {
-            return ch -> is(ch) || p.is(ch);
-        }
-        default CharPredicate union(CharPredicate p1,
-                                    CharPredicate p2 ) {
-            return ch -> is(ch) || p1.is(ch) || p2.is(ch);
-        }
-        default CharPredicate negate() {
-            return ch -> !is(ch);
-        }
-    }
-
-    static interface BmpCharPredicate extends CharPredicate {
-
-        default CharPredicate and(CharPredicate p) {
-            if(p instanceof BmpCharPredicate)
-                return (BmpCharPredicate)(ch -> is(ch) && p.is(ch));
-            return ch -> is(ch) && p.is(ch);
-        }
-        default CharPredicate union(CharPredicate p) {
-            if (p instanceof BmpCharPredicate)
-                return (BmpCharPredicate)(ch -> is(ch) || p.is(ch));
-            return ch -> is(ch) || p.is(ch);
-        }
-        static CharPredicate union(CharPredicate... predicates) {
-            CharPredicate cp = ch -> {
-                for (CharPredicate p : predicates) {
-                    if (!p.is(ch))
-                        return false;
-                }
-                return true;
-            };
-            for (CharPredicate p : predicates) {
-                if (! (p instanceof BmpCharPredicate))
-                    return cp;
-            }
-            return (BmpCharPredicate)cp;
-        }
-    }
-
-    /**
-     * matches a Perl vertical whitespace
-     */
-    static BmpCharPredicate VertWS() {
-        return cp -> (cp >= 0x0A && cp <= 0x0D) ||
-            cp == 0x85 || cp == 0x2028 || cp == 0x2029;
-    }
-
-    /**
-     * matches a Perl horizontal whitespace
-     */
-    static BmpCharPredicate HorizWS() {
-        return cp ->
-            cp == 0x09 || cp == 0x20 || cp == 0xa0 || cp == 0x1680 ||
-            cp == 0x180e || cp >= 0x2000 && cp <= 0x200a ||  cp == 0x202f ||
-            cp == 0x205f || cp == 0x3000;
-    }
-
-    /**
-     *  for the Unicode category ALL and the dot metacharacter when
-     *  in dotall mode.
-     */
-    static CharPredicate ALL() {
-        return ch -> true;
-    }
-
-    /**
-     * for the dot metacharacter when dotall is not enabled.
-     */
-    static CharPredicate DOT() {
-        return ch ->
-            (ch != '\n' && ch != '\r'
-            && (ch|1) != '\u2029'
-            && ch != '\u0085');
-    }
-
-    /**
-     *  the dot metacharacter when dotall is not enabled but UNIX_LINES is enabled.
-     */
-    static CharPredicate UNIXDOT() {
-        return ch ->  ch != '\n';
-    }
-
-    /**
-     * Indicate that matches a Supplementary Unicode character
-     */
-    static CharPredicate SingleS(int c) {
-        return ch -> ch == c;
-    }
-
-    /**
-     * A bmp/optimized predicate of single
-     */
-    static BmpCharPredicate Single(int c) {
-        return ch -> ch == c;
-    }
-
-    /**
-     * Case insensitive matches a given BMP character
-     */
-    static BmpCharPredicate SingleI(int lower, int upper) {
-        return ch -> ch == lower || ch == upper;
-    }
-
-    /**
-     * Unicode case insensitive matches a given Unicode character
-     */
-    static CharPredicate SingleU(int lower) {
-        return ch -> lower == ch ||
-                     lower == Character.toLowerCase(Character.toUpperCase(ch));
-    }
-
-    private static boolean inRange(int lower, int ch, int upper) {
-        return lower <= ch && ch <= upper;
-    }
-
-    /**
-     * Charactrs within a explicit value range
-     */
-    static CharPredicate Range(int lower, int upper) {
-        if (upper < Character.MIN_HIGH_SURROGATE ||
-            lower > Character.MAX_HIGH_SURROGATE &&
-            upper < Character.MIN_SUPPLEMENTARY_CODE_POINT)
-            return (BmpCharPredicate)(ch -> inRange(lower, ch, upper));
-        return ch -> inRange(lower, ch, upper);
-    }
-
-   /**
-    * Charactrs within a explicit value range in a case insensitive manner.
-    */
-    static CharPredicate CIRange(int lower, int upper) {
-        return ch -> inRange(lower, ch, upper) ||
-                     ASCII.isAscii(ch) &&
-                     (inRange(lower, ASCII.toUpper(ch), upper) ||
-                      inRange(lower, ASCII.toLower(ch), upper));
-    }
-
-    static CharPredicate CIRangeU(int lower, int upper) {
-        return ch -> {
-            if (inRange(lower, ch, upper))
-                return true;
-            int up = Character.toUpperCase(ch);
-            return inRange(lower, up, upper) ||
-                   inRange(lower, Character.toLowerCase(up), upper);
-        };
-    }
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
     /**
      *  This must be the very first initializer.
      */
-    static final Node accept = new Node();
+    static Node accept = new Node();
 
-    static final Node lastAccept = new LastNode();
+    static Node lastAccept = new LastNode();
+
+    private static class CharPropertyNames {
+
+        static CharProperty charPropertyFor(String name) {
+            CharPropertyFactory m = map.get(name);
+            return m == null ? null : m.make();
+        }
+
+        private static abstract class CharPropertyFactory {
+            abstract CharProperty make();
+        }
+
+        private static void defCategory(String name,
+                                        final int typeMask) {
+            map.put(name, new CharPropertyFactory() {
+                    CharProperty make() { return new Category(typeMask);}});
+        }
+
+        private static void defRange(String name,
+                                     final int lower, final int upper) {
+            map.put(name, new CharPropertyFactory() {
+                    CharProperty make() { return rangeFor(lower, upper);}});
+        }
+
+        private static void defCtype(String name,
+                                     final int ctype) {
+            map.put(name, new CharPropertyFactory() {
+                    CharProperty make() { return new Ctype(ctype);}});
+        }
+
+        private static abstract class CloneableProperty
+            extends CharProperty implements Cloneable
+        {
+            public CloneableProperty clone() {
+                try {
+                    return (CloneableProperty) super.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new AssertionError(e);
+                }
+            }
+        }
+
+        private static void defClone(String name,
+                                     final CloneableProperty p) {
+            map.put(name, new CharPropertyFactory() {
+                    CharProperty make() { return p.clone();}});
+        }
+
+        private static final HashMap<String, CharPropertyFactory> map
+            = new HashMap<>();
+
+        static {
+            // Unicode character property aliases, defined in
+            // http://www.unicode.org/Public/UNIDATA/PropertyValueAliases.txt
+            defCategory("Cn", 1<<Character.UNASSIGNED);
+            defCategory("Lu", 1<<Character.UPPERCASE_LETTER);
+            defCategory("Ll", 1<<Character.LOWERCASE_LETTER);
+            defCategory("Lt", 1<<Character.TITLECASE_LETTER);
+            defCategory("Lm", 1<<Character.MODIFIER_LETTER);
+            defCategory("Lo", 1<<Character.OTHER_LETTER);
+            defCategory("Mn", 1<<Character.NON_SPACING_MARK);
+            defCategory("Me", 1<<Character.ENCLOSING_MARK);
+            defCategory("Mc", 1<<Character.COMBINING_SPACING_MARK);
+            defCategory("Nd", 1<<Character.DECIMAL_DIGIT_NUMBER);
+            defCategory("Nl", 1<<Character.LETTER_NUMBER);
+            defCategory("No", 1<<Character.OTHER_NUMBER);
+            defCategory("Zs", 1<<Character.SPACE_SEPARATOR);
+            defCategory("Zl", 1<<Character.LINE_SEPARATOR);
+            defCategory("Zp", 1<<Character.PARAGRAPH_SEPARATOR);
+            defCategory("Cc", 1<<Character.CONTROL);
+            defCategory("Cf", 1<<Character.FORMAT);
+            defCategory("Co", 1<<Character.PRIVATE_USE);
+            defCategory("Cs", 1<<Character.SURROGATE);
+            defCategory("Pd", 1<<Character.DASH_PUNCTUATION);
+            defCategory("Ps", 1<<Character.START_PUNCTUATION);
+            defCategory("Pe", 1<<Character.END_PUNCTUATION);
+            defCategory("Pc", 1<<Character.CONNECTOR_PUNCTUATION);
+            defCategory("Po", 1<<Character.OTHER_PUNCTUATION);
+            defCategory("Sm", 1<<Character.MATH_SYMBOL);
+            defCategory("Sc", 1<<Character.CURRENCY_SYMBOL);
+            defCategory("Sk", 1<<Character.MODIFIER_SYMBOL);
+            defCategory("So", 1<<Character.OTHER_SYMBOL);
+            defCategory("Pi", 1<<Character.INITIAL_QUOTE_PUNCTUATION);
+            defCategory("Pf", 1<<Character.FINAL_QUOTE_PUNCTUATION);
+            defCategory("L", ((1<<Character.UPPERCASE_LETTER) |
+                              (1<<Character.LOWERCASE_LETTER) |
+                              (1<<Character.TITLECASE_LETTER) |
+                              (1<<Character.MODIFIER_LETTER)  |
+                              (1<<Character.OTHER_LETTER)));
+            defCategory("M", ((1<<Character.NON_SPACING_MARK) |
+                              (1<<Character.ENCLOSING_MARK)   |
+                              (1<<Character.COMBINING_SPACING_MARK)));
+            defCategory("N", ((1<<Character.DECIMAL_DIGIT_NUMBER) |
+                              (1<<Character.LETTER_NUMBER)        |
+                              (1<<Character.OTHER_NUMBER)));
+            defCategory("Z", ((1<<Character.SPACE_SEPARATOR) |
+                              (1<<Character.LINE_SEPARATOR)  |
+                              (1<<Character.PARAGRAPH_SEPARATOR)));
+            defCategory("C", ((1<<Character.CONTROL)     |
+                              (1<<Character.FORMAT)      |
+                              (1<<Character.PRIVATE_USE) |
+                              (1<<Character.SURROGATE))); // Other
+            defCategory("P", ((1<<Character.DASH_PUNCTUATION)      |
+                              (1<<Character.START_PUNCTUATION)     |
+                              (1<<Character.END_PUNCTUATION)       |
+                              (1<<Character.CONNECTOR_PUNCTUATION) |
+                              (1<<Character.OTHER_PUNCTUATION)     |
+                              (1<<Character.INITIAL_QUOTE_PUNCTUATION) |
+                              (1<<Character.FINAL_QUOTE_PUNCTUATION)));
+            defCategory("S", ((1<<Character.MATH_SYMBOL)     |
+                              (1<<Character.CURRENCY_SYMBOL) |
+                              (1<<Character.MODIFIER_SYMBOL) |
+                              (1<<Character.OTHER_SYMBOL)));
+            defCategory("LC", ((1<<Character.UPPERCASE_LETTER) |
+                               (1<<Character.LOWERCASE_LETTER) |
+                               (1<<Character.TITLECASE_LETTER)));
+            defCategory("LD", ((1<<Character.UPPERCASE_LETTER) |
+                               (1<<Character.LOWERCASE_LETTER) |
+                               (1<<Character.TITLECASE_LETTER) |
+                               (1<<Character.MODIFIER_LETTER)  |
+                               (1<<Character.OTHER_LETTER)     |
+                               (1<<Character.DECIMAL_DIGIT_NUMBER)));
+            defRange("L1", 0x00, 0xFF); // Latin-1
+            map.put("all", new CharPropertyFactory() {
+                    CharProperty make() { return new All(); }});
+
+            // Posix regular expression character classes, defined in
+            // http://www.unix.org/onlinepubs/009695399/basedefs/xbd_chap09.html
+            defRange("ASCII", 0x00, 0x7F);   // ASCII
+            defCtype("Alnum", ASCII.ALNUM);  // Alphanumeric characters
+            defCtype("Alpha", ASCII.ALPHA);  // Alphabetic characters
+            defCtype("Blank", ASCII.BLANK);  // Space and tab characters
+            defCtype("Cntrl", ASCII.CNTRL);  // Control characters
+            defRange("Digit", '0', '9');     // Numeric characters
+            defCtype("Graph", ASCII.GRAPH);  // printable and visible
+            defRange("Lower", 'a', 'z');     // Lower-case alphabetic
+            defRange("Print", 0x20, 0x7E);   // Printable characters
+            defCtype("Punct", ASCII.PUNCT);  // Punctuation characters
+            defCtype("Space", ASCII.SPACE);  // Space characters
+            defRange("Upper", 'A', 'Z');     // Upper-case alphabetic
+            defCtype("XDigit",ASCII.XDIGIT); // hexadecimal digits
+
+            // Java character properties, defined by methods in Character.java
+            defClone("javaLowerCase", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isLowerCase(ch);}});
+            defClone("javaUpperCase", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isUpperCase(ch);}});
+            defClone("javaAlphabetic", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isAlphabetic(ch);}});
+            defClone("javaIdeographic", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isIdeographic(ch);}});
+            defClone("javaTitleCase", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isTitleCase(ch);}});
+            defClone("javaDigit", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isDigit(ch);}});
+            defClone("javaDefined", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isDefined(ch);}});
+            defClone("javaLetter", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isLetter(ch);}});
+            defClone("javaLetterOrDigit", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isLetterOrDigit(ch);}});
+            defClone("javaJavaIdentifierStart", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isJavaIdentifierStart(ch);}});
+            defClone("javaJavaIdentifierPart", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isJavaIdentifierPart(ch);}});
+            defClone("javaUnicodeIdentifierStart", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isUnicodeIdentifierStart(ch);}});
+            defClone("javaUnicodeIdentifierPart", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isUnicodeIdentifierPart(ch);}});
+            defClone("javaIdentifierIgnorable", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isIdentifierIgnorable(ch);}});
+            defClone("javaSpaceChar", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isSpaceChar(ch);}});
+            defClone("javaWhitespace", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isWhitespace(ch);}});
+            defClone("javaISOControl", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isISOControl(ch);}});
+            defClone("javaMirrored", new CloneableProperty() {
+                boolean isSatisfiedBy(int ch) {
+                    return Character.isMirrored(ch);}});
+        }
+    }
 
     /**
      * Creates a predicate which can be used to match a string.
@@ -5856,7 +5815,7 @@ NEXT:       while (i <= last) {
      */
     public Stream<String> splitAsStream(final CharSequence input) {
         class MatcherIterator implements Iterator<String> {
-            private Matcher matcher;
+            private final Matcher matcher;
             // The start position of the next sub-sequence of input
             // when current == input.length there are no more elements
             private int current;
@@ -5864,6 +5823,10 @@ NEXT:       while (i <= last) {
             private String nextElement;
             // > 0 if there are N next empty elements
             private int emptyElementCount;
+
+            MatcherIterator() {
+                this.matcher = matcher(input);
+            }
 
             public String next() {
                 if (!hasNext())
@@ -5880,13 +5843,6 @@ NEXT:       while (i <= last) {
             }
 
             public boolean hasNext() {
-                if (matcher == null) {
-                    matcher = matcher(input);
-                    // If the input is an empty string then the result can only be a
-                    // stream of the input.  Induce that by setting the empty
-                    // element count to 1
-                    emptyElementCount = input.length() == 0 ? 1 : 0;
-                }
                 if (nextElement != null || emptyElementCount > 0)
                     return true;
 

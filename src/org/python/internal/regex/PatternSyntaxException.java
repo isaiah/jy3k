@@ -57,7 +57,7 @@ public class PatternSyntaxException
      *
      * @param  index
      *         The approximate index in the pattern of the error,
-     *         or {@code -1} if the index is not known
+     *         or <tt>-1</tt> if the index is not known
      */
     public PatternSyntaxException(String desc, String regex, int index) {
         this.desc = desc;
@@ -69,7 +69,7 @@ public class PatternSyntaxException
      * Retrieves the error index.
      *
      * @return  The approximate index in the pattern of the error,
-     *         or {@code -1} if the index is not known
+     *         or <tt>-1</tt> if the index is not known
      */
     public int getIndex() {
         return index;
@@ -94,7 +94,8 @@ public class PatternSyntaxException
     }
 
     private static final String nl =
-            GetPropertyAction.privilegedGetProperty("line.separator");
+        java.security.AccessController
+            .doPrivileged(new GetPropertyAction("line.separator"));
 
     /**
      * Returns a multi-line string containing the description of the syntax
@@ -104,7 +105,7 @@ public class PatternSyntaxException
      * @return  The full detail message
      */
     public String getMessage() {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         sb.append(desc);
         if (index >= 0) {
             sb.append(" near index ");
