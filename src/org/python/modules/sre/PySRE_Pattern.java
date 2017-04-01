@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by isaiah on 3/24/17.
@@ -47,11 +48,19 @@ public class PySRE_Pattern extends PyObject {
         if (flags == null) flags = Py.None;
         this.flags = flags;
         String pattern = getString(s);
+        int flag = flags.asInt();
+        int javaFlags = 0;
+        if ((flag & SRE_STATE.SRE_FLAG_VERBOSE) != 0) {
+            javaFlags |= Pattern.COMMENTS;
+        }
+        if ((flag & SRE_STATE.SRE_FLAG_IGNORECASE) != 0) {
+            javaFlags |= Pattern.CASE_INSENSITIVE;
+        }
         try {
-            this.reg = Pattern.compile(pattern, flags.asInt());
+            this.reg = Pattern.compile(pattern, javaFlags);
         } catch (PatternSyntaxException e) {
             PyType error;
-            PyObject re = imp.importName("re", true);
+            PyObject re = imp.importName("sre_constants", true);
             error = (PyType) re.__getattr__("error");
             throw new PyException(error, new PyTuple(new PyUnicode(e.getMessage()), new PyUnicode(pattern)));
         }
@@ -62,7 +71,7 @@ public class PySRE_Pattern extends PyObject {
     public PyObject SRE_Pattern_match(PyObject s) {
         String str = getString(s);
         Matcher m = reg.matcher(str);
-        if (!m.matches()) {
+        if (!m.lookingAt()) {
             return Py.None;
         }
         return new PySRE_Match(m, str, this);
@@ -110,7 +119,7 @@ public class PySRE_Pattern extends PyObject {
         int pos = ap.getInt(1, 0);
         int endpos = ap.getInt(2, s.length());
         Matcher matcher = reg.matcher(s);
-        if (matcher.matches() && matcher.hitEnd()) {
+        if (matcher.matches()) {
             return new PySRE_Match(matcher, s, this);
         }
         return Py.None;
@@ -121,7 +130,25 @@ public class PySRE_Pattern extends PyObject {
         ArgParser ap = new ArgParser("split", args, keywords, "string", "maxsplit");
         String s = ap.getString(0);
         int limit = ap.getInt(1, 0);
-        return new PyList(Arrays.asList(reg.split(s, limit)));
+        List<String> list = new ArrayList<>();
+        Matcher matcher = reg.matcher(s);
+        for (int pos = 0, i = 0; pos < s.length(); i++) {
+            if (!matcher.find(pos) || (limit > 0 && i > limit)) {
+                list.add(s.substring(pos));
+                break;
+            }
+            list.add(s.substring(pos, matcher.start()));
+            for (int j = 0; j < matcher.groupCount(); j++) {
+                list.add(matcher.group(j));
+            }
+            pos = matcher.end();
+        }
+        return new PyList(list.stream().map(ret -> {
+            if (args[0] instanceof PyBytes) {
+                return new PyBytes(ret);
+            }
+            return new PyUnicode(ret);
+        }).collect(Collectors.toList()));
     }
 
     @ExposedMethod
@@ -134,15 +161,21 @@ public class PySRE_Pattern extends PyObject {
         String replacement = null;
         if (!replCallable) {
             replacement = ap.getString(0);
+            if (replacement.indexOf('\\') >= 0) {
+                filter = call("re", "subx", this, filter);
+                replCallable = filter.isCallable();
+                if (replCallable) {
+                    replacement = filter.toString();
+                }
+            }
         }
         StringBuilder sb = new StringBuilder();
         Matcher matcher = reg.matcher(s);
-        for (int pos = 1; pos < s.length(); ) {
-            if (!matcher.find(pos)) {
+        for (int pos = 0, i = 0; pos < s.length(); i++) {
+            if (!matcher.find(pos) || (count > 0 && i > count)) {
                 sb.append(s.substring(pos));
                 break;
             }
-
             if (matcher.start() != pos) {
                 sb.append(s.substring(pos, matcher.start()));
                 pos = matcher.end();
@@ -155,6 +188,9 @@ public class PySRE_Pattern extends PyObject {
                 replacement = ((PyUnicode) filter.__call__(match)).getString();
             }
             sb.append(replacement);
+        }
+        if (args[1] instanceof PyBytes) {
+            return new PyBytes(sb);
         }
         return new PyUnicode(sb);
     }
