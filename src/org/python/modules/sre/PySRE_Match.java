@@ -1,6 +1,7 @@
 package org.python.modules.sre;
 
 import org.python.core.Py;
+import org.python.core.PyBytes;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -22,22 +23,25 @@ public class PySRE_Match extends PyObject {
     public PySRE_Pattern pattern;
 
     @ExposedGet(name="string")
-    public String str;
+    public PyObject str;
 
     @ExposedGet
     public int pos;
 
     @ExposedGet
-    public int endpos;
+    public int endpos() {
+        return matcher.end();
+    }
 
     private Matcher matcher;
+    private boolean isByte;
 
-    public PySRE_Match(Matcher matcher, String str, PySRE_Pattern pattern) {
+    public PySRE_Match(Matcher matcher, PyObject str, PySRE_Pattern pattern) {
         this.matcher = matcher;
         this.pattern = pattern;
         this.str = str;
         this.pos = 0;
-        this.endpos = str.length() - 1;
+        this.isByte = str instanceof PyBytes;
     }
 
     @ExposedMethod
@@ -55,6 +59,9 @@ public class PySRE_Match extends PyObject {
     public PyObject group(int index) {
         if (index > matcher.groupCount()) {
             throw Py.IndexError("no such group");
+        }
+        if (isByte) {
+            return new PyBytes(matcher.group(index));
         }
         return new PyUnicode(matcher.group(index));
     }
@@ -76,9 +83,9 @@ public class PySRE_Match extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Match_groups() {
-        PyObject[] grps = new PyObject[matcher.groupCount() - 1];
-        for (int i = 1; i < matcher.groupCount(); i++) {
-            grps[i - 1] = group(i);
+        PyObject[] grps = new PyObject[matcher.groupCount()];
+        for (int i = 0; i < matcher.groupCount(); i++) {
+            grps[i] = group(i);
         }
         return new PyTuple(grps);
     }
@@ -96,6 +103,12 @@ public class PySRE_Match extends PyObject {
     public PyObject SRE_Match_span(PyObject[] args, String[] keywords) {
         int index = getIndex(args);
         return new PyTuple(new PyLong(matcher.start()), new PyLong(matcher.end()));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<%s object; span=%s, match=%s>", getType().fastGetName(),
+                SRE_Match_span(Py.EmptyObjects, Py.NoKeywords), SRE_Match_group(Py.EmptyObjects, Py.NoKeywords));
     }
 
     private int getIndex(PyObject arg) {

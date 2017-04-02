@@ -74,7 +74,7 @@ public class PySRE_Pattern extends PyObject {
         if (!m.lookingAt()) {
             return Py.None;
         }
-        return new PySRE_Match(m, str, this);
+        return new PySRE_Match(m, s, this);
     }
 
     @ExposedMethod
@@ -84,7 +84,7 @@ public class PySRE_Pattern extends PyObject {
         if (!m.find()) {
             return Py.None;
         }
-        return new PySRE_Match(m, str, this);
+        return new PySRE_Match(m, s, this);
     }
 
     @ExposedMethod
@@ -100,6 +100,7 @@ public class PySRE_Pattern extends PyObject {
     public PyObject SRE_Pattern_findall(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("finditer", args, keywords, "string", "pos", "endpos");
         String s = ap.getString(0);
+        boolean isByte = args[0] instanceof PyBytes;
         List<PyObject> list = new ArrayList<>();
         Matcher matcher = reg.matcher(s);
         for (int pos = 0; pos < s.length(); ) {
@@ -107,7 +108,20 @@ public class PySRE_Pattern extends PyObject {
                 break;
             }
             pos = matcher.end() + 1;
-            list.add(new PyUnicode(matcher.group()));
+            switch (matcher.groupCount()) {
+                case 0:
+                    list.add(wrap(matcher.group(), isByte));
+                    break;
+                case 1:
+                    list.add(wrap(matcher.group(1), isByte));
+                    break;
+                default:
+                    PyObject[] objs = new PyObject[matcher.groupCount()];
+                    for (int i = 1; i <= objs.length; i++) {
+                        objs[i] = wrap(matcher.group(i), isByte);
+                    }
+                    list.add(new PyTuple(objs));
+            }
         }
         return new PyList(list);
     }
@@ -120,7 +134,7 @@ public class PySRE_Pattern extends PyObject {
         int endpos = ap.getInt(2, s.length());
         Matcher matcher = reg.matcher(s);
         if (matcher.matches()) {
-            return new PySRE_Match(matcher, s, this);
+            return new PySRE_Match(matcher, args[0], this);
         }
         return Py.None;
     }
@@ -162,7 +176,7 @@ public class PySRE_Pattern extends PyObject {
         if (!replCallable) {
             replacement = ap.getString(0);
             if (replacement.indexOf('\\') >= 0) {
-                filter = call("re", "subx", this, filter);
+                filter = call("re", "_subx", this, filter);
                 replCallable = filter.isCallable();
                 if (replCallable) {
                     replacement = filter.toString();
@@ -171,7 +185,7 @@ public class PySRE_Pattern extends PyObject {
         }
         StringBuilder sb = new StringBuilder();
         Matcher matcher = reg.matcher(s);
-        for (int pos = 0, i = 0; pos < s.length(); i++) {
+        for (int pos = 0, i = 1; pos < s.length(); i++) {
             if (!matcher.find(pos) || (count > 0 && i > count)) {
                 sb.append(s.substring(pos));
                 break;
@@ -184,7 +198,7 @@ public class PySRE_Pattern extends PyObject {
             }
 
             if (replCallable) {
-                PyObject match = new PySRE_Match(matcher, s, this);
+                PyObject match = new PySRE_Match(matcher, args[1], this);
                 replacement = ((PyUnicode) filter.__call__(match)).getString();
             }
             sb.append(replacement);
@@ -220,5 +234,9 @@ public class PySRE_Pattern extends PyObject {
     private PyObject call(String module, String function, PyObject... args) {
         PyObject sre = imp.importName(module, true);
         return sre.invoke(function, args);
+    }
+
+    private PyObject wrap(String s, boolean isByte) {
+        return isByte ? new PyBytes(s) : new PyUnicode(s);
     }
 }
