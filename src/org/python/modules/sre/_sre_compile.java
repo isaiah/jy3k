@@ -16,7 +16,6 @@ public class _sre_compile {
     @ExposedFunction
     public static PyObject compile(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("compile", args, keywords, "pattern", "flags");
-        String str;
         PyObject flags = ap.getPyObject(1, Py.Zero);
         PyObject s = ap.getPyObject(0);
         return new PySRE_Pattern(s, flags);
