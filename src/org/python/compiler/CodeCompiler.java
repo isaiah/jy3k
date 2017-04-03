@@ -3400,10 +3400,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.dup();
         loadFrame();
         code.invokevirtual(p(PyException.class), "tracebackHere", sig(Void.TYPE, PyFrame.class));
+        popException(); // pop before reraise
         code.athrow();
 
         code.label(label_catch_end);
-//        popException();
+        popException(); // pop to swallow the exception
         code.label(label_end);
         code.freeLocal(mgr_tmp);
 
