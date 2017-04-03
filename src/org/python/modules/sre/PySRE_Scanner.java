@@ -1,8 +1,10 @@
 package org.python.modules.sre;
 
 import org.python.core.Py;
+import org.python.core.PyBytes;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedType;
@@ -20,11 +22,11 @@ public class PySRE_Scanner extends PyObject {
 
     private Matcher matcher;
     private int pos;
-    private String string;
+    private PyObject string;
 
-    public PySRE_Scanner(PySRE_Pattern pattern, String s, int pos) {
+    public PySRE_Scanner(PySRE_Pattern pattern, PyObject s, int pos) {
         this.pattern = pattern;
-        this.matcher = pattern.reg.matcher(s);
+        this.matcher = pattern.reg.matcher(getString(s));
         this.pos = pos;
         this.string = s;
     }
@@ -42,4 +44,12 @@ public class PySRE_Scanner extends PyObject {
     public PyObject SRE_Scanner_match() {
         return Py.None;
     }
+
+    private String getString(PyObject s) {
+        if (s instanceof PyBytes) {
+            return ((PyBytes) s).getString();
+        }
+        return ((PyUnicode) s).getString();
+    }
+
 }

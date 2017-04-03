@@ -17,6 +17,7 @@
 package org.python.modules.sre;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
 import org.python.core.*;
@@ -476,7 +477,7 @@ public class PatternObject extends PyObject implements Traverseproc {
             flagItems.add(String.format("0x%x", flags));
         }
         if (flagItems.size() > 0) {
-            String flagsResult = Joiner.on("|").join(flagItems);
+            String flagsResult = flagItems.stream().collect(Collectors.joining("|"));
             return new PyUnicode(String.format("re.compile(%.200s, %s)", pattern.__repr__(), flagsResult));
         }
         return new PyUnicode(String.format("re.compile(%.200s)", pattern.__repr__()));

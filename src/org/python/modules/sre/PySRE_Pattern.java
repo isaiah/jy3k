@@ -21,11 +21,12 @@ import org.python.internal.regex.Pattern;
 import org.python.internal.regex.PatternSyntaxException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.python.modules.sre.SRE_STATE.*;
 
 /**
  * Created by isaiah on 3/24/17.
@@ -53,7 +54,7 @@ public class PySRE_Pattern extends PyObject {
         if ((flag & SRE_STATE.SRE_FLAG_VERBOSE) != 0) {
             javaFlags |= Pattern.COMMENTS;
         }
-        if ((flag & SRE_STATE.SRE_FLAG_IGNORECASE) != 0) {
+        if ((flag & SRE_FLAG_IGNORECASE) != 0) {
             javaFlags |= Pattern.CASE_INSENSITIVE;
         }
         try {
@@ -91,7 +92,7 @@ public class PySRE_Pattern extends PyObject {
     public PyObject SRE_Pattern_finditer(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("finditer", args, keywords, "string", "pos", "endpos");
         String s = ap.getString(0);
-        PySRE_Scanner scanner = new PySRE_Scanner(this, s, 0);
+        PySRE_Scanner scanner = new PySRE_Scanner(this, args[0], 0);
         PyObject callable = scanner.__findattr__("search");
         return new PyCallIter(callable, Py.None);
     }
@@ -147,7 +148,7 @@ public class PySRE_Pattern extends PyObject {
         List<String> list = new ArrayList<>();
         Matcher matcher = reg.matcher(s);
         for (int pos = 0, i = 0; pos < s.length(); i++) {
-            if (!matcher.find(pos) || (limit > 0 && i > limit)) {
+            if (!matcher.find(pos) || (limit > 0 && i >= limit)) {
                 list.add(s.substring(pos));
                 break;
             }
@@ -224,6 +225,36 @@ public class PySRE_Pattern extends PyObject {
         return new PyDictionary(map);
     }
 
+    @Override
+    public PyUnicode __repr__() {
+        return SRE_Pattern___repr__();
+    }
+
+    @ExposedMethod
+    public PyUnicode SRE_Pattern___repr__() {
+        int flags = this.flags.asInt();
+//        if (!isBytes && (flags & (SRE_FLAG_LOCALE|SRE_FLAG_UNICODE| SRE_FLAG_ASCII)) == SRE_FLAG_UNICODE) {
+//            flags &= ~SRE_FLAG_UNICODE;
+//        }
+        List<String> flagItems = new ArrayList<>();
+        for (FlagName flagName : flagNames) {
+            if ((flags & flagName.value) > 0) {
+                flagItems.add(flagName.name);
+                flags &= ~flagName.value;
+            }
+        }
+
+        if (flags > 0) {
+            flagItems.add(String.format("0x%x", flags));
+        }
+        if (flagItems.size() > 0) {
+            String flagsResult = flagItems.stream().collect(Collectors.joining("|"));
+            return new PyUnicode(String.format("re.compile(%.200s, %s)", pattern.__repr__(), flagsResult));
+        }
+        return new PyUnicode(String.format("re.compile(%.200s)", pattern.__repr__()));
+    }
+
+
     private String getString(PyObject s) {
         if (s instanceof PyBytes) {
             return ((PyBytes) s).getString();
@@ -238,5 +269,26 @@ public class PySRE_Pattern extends PyObject {
 
     private PyObject wrap(String s, boolean isByte) {
         return isByte ? new PyBytes(s) : new PyUnicode(s);
+    }
+        private static FlagName[] flagNames = {
+            new FlagName("re.TEMPLATE", SRE_FLAG_TEMPLATE),
+            new FlagName("re.IGNORECASE", SRE_FLAG_IGNORECASE),
+            new FlagName("re.LOCALE", SRE_FLAG_LOCALE),
+            new FlagName("re.MULTILINE", SRE_FLAG_MULTILINE),
+            new FlagName("re.DOTALL", SRE_FLAG_DOTALL),
+            new FlagName("re.UNICODE", SRE_FLAG_UNICODE),
+            new FlagName("re.VERBOSE", SRE_FLAG_VERBOSE),
+            new FlagName("re.DEBUG", SRE_FLAG_DEBUG),
+            new FlagName("re.ASCII", SRE_FLAG_ASCII),
+    };
+
+    static class FlagName {
+        String name;
+        int value;
+
+        FlagName(String n, int v) {
+            name = n;
+            value = v;
+        }
     }
 }
