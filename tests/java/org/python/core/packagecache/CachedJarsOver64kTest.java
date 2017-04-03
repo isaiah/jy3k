@@ -56,7 +56,7 @@ public class CachedJarsOver64kTest extends TestCase {
             return null;
         }
         @Override
-        public Class<?> findClass(String pkg, String name, String reason) { return null; }
+        public Class<?> findClass(String pkg, String name, String reason, ClassLoader cl) { return null; }
         @Override
         public boolean packageExists(String pkg, String name) { return false; }
     }
