@@ -27,10 +27,10 @@ public abstract class PackageManager extends Object {
         this.topLevelPackage = new PyJavaPackage("", this);
     }
 
-    abstract public Class findClass(String pkg, String name, String reason);
+    abstract public Class findClass(String pkg, String name, String reason, ClassLoader cl);
 
     public Class findClass(String pkg, String name) {
-        return findClass(pkg, name, "java class");
+        return findClass(pkg, name, "java class", null);
     }
 
     public void notifyPackageImport(String pkg, String name) {
@@ -157,14 +157,13 @@ public abstract class PackageManager extends Object {
      * @param jarfile involved jarfile; can be null
      * @return created/updated package
      */
-    public PyJavaPackage makeJavaPackage(String name, String classes,
-            String jarfile) {
+    public PyJavaPackage makeJavaPackage(String name, String jarfile, ClassLoader cl) {
         PyJavaPackage p = this.topLevelPackage;
         if (name.length() != 0)
-            p = p.addPackage(name, jarfile);
+            p = p.addPackage(name, jarfile, cl);
 
-        if (classes != null)
-            p.addPlaceholders(classes);
+//        if (classes != null)
+//            p.addPlaceholders(classes);
 
         return p;
     }

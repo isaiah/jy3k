@@ -20,6 +20,8 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessControlException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -159,7 +161,7 @@ public abstract class CachedJarsPackageManager extends PackageManager {
     }
     
     // Extract all of the packages in a single jarfile
-    private Map<String, String> getZipPackages(InputStream jarin) throws IOException {
+    private Collection<String> getZipPackages(InputStream jarin) throws IOException {
         Map<String, List<String>[]> zipPackages = Generic.map();
 
         ZipInputStream zip = new ZipInputStream(jarin);
@@ -170,18 +172,19 @@ public abstract class CachedJarsPackageManager extends PackageManager {
             zip.closeEntry();
         }
 
+        return zipPackages.keySet();
         // Turn each vector into a comma-separated String
-        Map<String, String> transformed = Generic.map();
-        for (Entry<String,List<String>[]> kv : zipPackages.entrySet()) {
-            List<String>[] vec = kv.getValue();
-            String classes = listToString(vec[0]);
-            if (vec[1].size() > 0) {
-                classes += '@' + listToString(vec[1]);
-            }
-            transformed.put(kv.getKey(), classes);
-        }
-
-        return transformed;
+//        Map<String, String> transformed = Generic.map();
+//        for (Entry<String,List<String>[]> kv : zipPackages.entrySet()) {
+//            List<String>[] vec = kv.getValue();
+//            String classes = listToString(vec[0]);
+//            if (vec[1].size() > 0) {
+//                classes += '@' + listToString(vec[1]);
+//            }
+//            transformed.put(kv.getKey(), classes);
+//        }
+//
+//        return transformed;
     }
 
     /**
@@ -251,7 +254,7 @@ public abstract class CachedJarsPackageManager extends PackageManager {
                 return;
             }
 
-            Map<String, String> zipPackages = null;
+            Collection<String> zipPackages = null;
 
             long mtime = 0;
             String jarcanon = null;
@@ -339,24 +342,31 @@ public abstract class CachedJarsPackageManager extends PackageManager {
 
     }
 
-    private void addPackages(Map<String,String> zipPackages, String jarfile) {
-        for (Entry<String,String> entry : zipPackages.entrySet()) {
-            String pkg = entry.getKey();
-            String classes = entry.getValue();
+    protected void addPackages(Collection<String> zipPackages, String jarfile) {
+        addPackages(zipPackages, jarfile, null);
+    }
 
-            int idx = classes.indexOf('@');
-            if (idx >= 0 && Options.respectJavaAccessibility) {
-                classes = classes.substring(0, idx);
-            }
-
-            makeJavaPackage(pkg, classes, jarfile);
-        }
+    protected void addPackages(Collection<String> zipPackages, String jarfile, ClassLoader cl) {
+        zipPackages.stream().forEach(pkg -> {
+            makeJavaPackage(pkg, jarfile, cl);
+        });
+//        for (Entry<String,String> entry : zipPackages.entrySet()) {
+//            String pkg = entry.getKey();
+//            String classes = entry.getValue();
+//
+//            int idx = classes.indexOf('@');
+//            if (idx >= 0 && Options.respectJavaAccessibility) {
+//                classes = classes.substring(0, idx);
+//            }
+//
+//            makeJavaPackage(pkg, jarfile, null);
+//        }
     }
 
     // Read in cache file storing package info for a single .jar
     // Return null and delete this cachefile if it is invalid
     @SuppressWarnings("empty-statement")
-    private Map<String, String> readCacheFile(JarXEntry entry, String jarcanon) {
+    private Collection<String> readCacheFile(JarXEntry entry, String jarcanon) {
         String cachefile = entry.cachefile;
         long mtime = entry.mtime;
 
@@ -373,20 +383,11 @@ public abstract class CachedJarsPackageManager extends PackageManager {
                 deleteCacheFile(cachefile);
                 return null;
             }
-            Map<String, String> packs = Generic.map();
+            List<String> packs = new ArrayList<>();
             try {
                 while (true) {
                     String packageName = istream.readUTF();
-                    String classes = istream.readUTF();
-                    // XXX: Handle multiple chunks of classes and concatenate them
-                    // together. Multiple chunks were added in 2.5.2 (for #1595) in this
-                    // way to maintain compatibility with the pre 2.5.2 format. In the
-                    // future we should consider changing the cache format to prepend a
-                    // count of chunks to avoid this check
-                    if (packs.containsKey(packageName)) {
-                        classes = packs.get(packageName) + classes;
-                    }
-                    packs.put(packageName, classes);
+                    packs.add(packageName);
                 }
             } catch (EOFException eof) {
                 //ignore
@@ -409,33 +410,17 @@ public abstract class CachedJarsPackageManager extends PackageManager {
 
     // Write a cache file storing package info for a single .jar
     private void writeCacheFile(JarXEntry entry, String jarcanon,
-            Map<String,String> zipPackages, boolean brandNew) {
-        DataOutputStream ostream = null;
-        try {
-            ostream = outCreateCacheFile(entry, brandNew);
+            Collection<String> zipPackages, boolean brandNew) {
+        try (final DataOutputStream ostream = outCreateCacheFile(entry, brandNew)) {
             ostream.writeUTF(jarcanon);
             ostream.writeLong(entry.mtime);
             comment("rewriting cachefile for '" + jarcanon + "'");
 
-            for (Entry<String,String> kv : zipPackages.entrySet()) {
-                String classes = kv.getValue();
-                // Make sure each package is not larger than 64k
-                for (String part : splitString(classes, 65535)) {
-                    // For each chunk, write the package name followed by the classes. 
-                    ostream.writeUTF(kv.getKey());
-                    ostream.writeUTF(part);
-                }
+            for (String zipPackage : zipPackages) {
+                ostream.writeUTF(zipPackage);
             }
         } catch (IOException ioe) {
             warning("can't write cache file for '" + jarcanon + "'");
-        } finally {
-            if (ostream != null) {
-                try {
-                    ostream.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-            }
         }
     }
 

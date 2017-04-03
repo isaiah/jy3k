@@ -28,6 +28,8 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
      */
     public PackageManager __mgr__;
 
+    public ClassLoader classLoader;
+
     public PyJavaPackage(String name) {
         this(name, null, null);
     }
@@ -57,10 +59,10 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
     }
 
     public PyJavaPackage addPackage(String name) {
-        return addPackage(name, null);
+        return addPackage(name, null, null);
     }
 
-    public PyJavaPackage addPackage(String name, String jarfile) {
+    public PyJavaPackage addPackage(String name, String jarfile, ClassLoader cl) {
         int dot = name.indexOf('.');
         String firstName=name;
         String lastName=null;
@@ -75,13 +77,14 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
                            firstName : __name__+'.'+firstName;
             p = new PyJavaPackage(pname, __mgr__, jarfile);
             __dict__.__setitem__(firstName, p);
+            p.classLoader = cl;
         } else {
             // this code is ok here, because this is not needed for
             // a top level package
             if (jarfile == null || !jarfile.equals(p.__file__))
                 p.__file__ = null;
         }
-        if (lastName != null) return p.addPackage(lastName, jarfile);
+        if (lastName != null) return p.addPackage(lastName, jarfile, cl);
         else return p;
     }
 
@@ -134,7 +137,7 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
             return addPackage(name);
         }
 
-        Class<?> c = __mgr__.findClass(__name__,name);
+        Class<?> c = __mgr__.findClass(__name__,name, "java class", classLoader);
         if (c != null) return addClass(name,c);
 
         if (name == "__name__") return new PyUnicode(__name__);

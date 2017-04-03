@@ -1026,8 +1026,10 @@ public final class Py {
      * @return the loaded class
      * @throws ClassNotFoundException if the class wasn't found by the class loader
      */
-    private static Class<?> findClassInternal(String name, String reason) throws ClassNotFoundException {
-        ClassLoader classLoader = Py.getSystemState().getClassLoader();
+    private static Class<?> findClassInternal(String name, String reason, ClassLoader classLoader) throws ClassNotFoundException {
+        if (classLoader == null) {
+            classLoader = Py.getSystemState().getClassLoader();
+        }
         if (classLoader != null) {
             if (reason != null) {
                 writeDebug("import", "trying " + name + " as " + reason +
@@ -1080,7 +1082,7 @@ public final class Py {
      */
     public static Class<?> findClass(String name) {
         try {
-            return findClassInternal(name, null);
+            return findClassInternal(name, null, null);
         } catch (ClassNotFoundException e) {
             //             e.printStackTrace();
             return null;
@@ -1105,8 +1107,12 @@ public final class Py {
      * occurred when the class is found but can't be loaded.
      */
     public static Class<?> findClassEx(String name, String reason) {
+        return findClassEx(name, reason, null);
+    }
+
+    public static Class<?> findClassEx(String name, String reason, ClassLoader cl) {
         try {            
-            return findClassInternal(name, reason);
+            return findClassInternal(name, reason, cl);
         } catch (ClassNotFoundException e) {
             return null;
         } catch (IllegalArgumentException e) {

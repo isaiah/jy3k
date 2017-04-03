@@ -8,6 +8,9 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PySystemState;
 
+import java.lang.reflect.Layer;
+import java.lang.reflect.Module;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.io.*;
@@ -79,6 +82,26 @@ public class SysPackageManager extends PathPackageManager {
         }
     }
 
+    private void findRuntimeModules() {
+        Module module = SysPackageManager.class.getModule();
+        Layer layer = module.getLayer();
+        if (layer == null) {
+            layer = Layer.boot();
+        }
+
+        doLayer(layer);
+    }
+
+    private void doLayer(Layer layer) {
+        if (layer != null) {
+            for (Module m : layer.modules()) {
+                if (!m.isNamed()) continue;
+                addPackages(Arrays.asList(m.getPackages()), m.getName(), m.getClassLoader());
+            }
+            layer.parents().stream().forEach(this::doLayer);
+        }
+    }
+
     private void findAllPackages(Properties registry) {
         String paths = registry.getProperty("python.packages.paths",
                 "java.class.path,sun.boot.class.path");
@@ -95,6 +118,7 @@ public class SysPackageManager extends PathPackageManager {
             }
             addClassPath(tmp);
         }
+        findRuntimeModules();
 
         tok = new StringTokenizer(directories, ",");
         while (tok.hasMoreTokens()) {
@@ -126,11 +150,11 @@ public class SysPackageManager extends PathPackageManager {
         return c;
     }
 
-    public Class findClass(String pkg, String name, String reason) {
+    public Class findClass(String pkg, String name, String reason, ClassLoader cl) {
         if (pkg != null && pkg.length() > 0) {
             name = pkg + '.' + name;
         }
-        return Py.findClassEx(name, reason);
+        return Py.findClassEx(name, reason, cl);
     }
 
     public PyList doDir(PyJavaPackage jpkg, boolean instantiate,
