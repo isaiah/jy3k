@@ -246,8 +246,12 @@ public class PyTableCode extends PyBaseCode
         // Restore previously defined exception
 //        ts.exceptions.poll();
 //        ts.exceptions.addFirst(previous_exception);
-        while(ts.exceptions.size() > exceptionsLength) {
-            ts.exceptions.pop();
+        if (exceptionsLength == 0) {
+            ts.exceptions.clear();
+        } else {
+            while (ts.exceptions.size() > exceptionsLength) {
+                ts.exceptions.pop();
+            }
         }
 
 
