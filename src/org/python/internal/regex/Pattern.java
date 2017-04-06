@@ -25,6 +25,8 @@
 
 package org.python.internal.regex;
 
+import com.ibm.icu.lang.UCharacter;
+
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Locale;
@@ -1628,7 +1630,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
     }
 
     private static int getClass(int c) {
-        return sun.text.Normalizer.getCombiningClass(c);
+        return UCharacter.getCombiningClass(c);
     }
 
     /**
