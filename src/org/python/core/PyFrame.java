@@ -268,18 +268,13 @@ public class PyFrame extends PyObject implements Traverseproc {
     public PyObject getname(String index) {
         PyObject ret;
         if (f_locals == null || f_locals == f_globals) {
-            ret = doGetglobal(index);
-        } else {
-            ret = f_locals.__finditem__(index);
-            if (ret != null) {
-                return ret;
-            }
-            ret = doGetglobal(index);
+            return getglobal(index);
         }
+        ret = f_locals.__finditem__(index);
         if (ret != null) {
             return ret;
         }
-        throw Py.NameError(String.format(NAME_ERROR_MSG, index));
+        return getglobal(index);
     }
 
     public PyObject getglobal(String index) {
