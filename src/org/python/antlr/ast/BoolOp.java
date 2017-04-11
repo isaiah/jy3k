@@ -48,6 +48,9 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
     public java.util.List<expr> getInternalValues() {
         return values;
     }
+    public void setInternalValues(java.util.List<expr> values) {
+        this.values = values;
+    }
     @ExposedGet(name = "values")
     public PyObject getValues() {
         return new AstList(values, AstAdapters.exprAdapter);

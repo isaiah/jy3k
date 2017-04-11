@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     public java.util.List<stmt> getInternalBody() {
         return body;
     }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return new AstList(body, AstAdapters.stmtAdapter);
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     private java.util.List<excepthandler> handlers;
     public java.util.List<excepthandler> getInternalHandlers() {
         return handlers;
+    }
+    public void setInternalHandlers(java.util.List<excepthandler> handlers) {
+        this.handlers = handlers;
     }
     @ExposedGet(name = "handlers")
     public PyObject getHandlers() {
@@ -61,6 +67,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     public java.util.List<stmt> getInternalOrelse() {
         return orelse;
     }
+    public void setInternalOrelse(java.util.List<stmt> orelse) {
+        this.orelse = orelse;
+    }
     @ExposedGet(name = "orelse")
     public PyObject getOrelse() {
         return new AstList(orelse, AstAdapters.stmtAdapter);
@@ -73,6 +82,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     private java.util.List<stmt> finalbody;
     public java.util.List<stmt> getInternalFinalbody() {
         return finalbody;
+    }
+    public void setInternalFinalbody(java.util.List<stmt> finalbody) {
+        this.finalbody = finalbody;
     }
     @ExposedGet(name = "finalbody")
     public PyObject getFinalbody() {

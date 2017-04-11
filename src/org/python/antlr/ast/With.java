@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(With.class);
     public java.util.List<withitem> getInternalItems() {
         return items;
     }
+    public void setInternalItems(java.util.List<withitem> items) {
+        this.items = items;
+    }
     @ExposedGet(name = "items")
     public PyObject getItems() {
         return new AstList(items, AstAdapters.withitemAdapter);
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(With.class);
     private java.util.List<stmt> body;
     public java.util.List<stmt> getInternalBody() {
         return body;
+    }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
     }
     @ExposedGet(name = "body")
     public PyObject getBody() {

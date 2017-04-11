@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
     public java.util.List<slice> getInternalDims() {
         return dims;
     }
+    public void setInternalDims(java.util.List<slice> dims) {
+        this.dims = dims;
+    }
     @ExposedGet(name = "dims")
     public PyObject getDims() {
         return new AstList(dims, AstAdapters.sliceAdapter);

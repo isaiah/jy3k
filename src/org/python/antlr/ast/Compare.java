@@ -48,6 +48,9 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     public java.util.List<cmpopType> getInternalOps() {
         return ops;
     }
+    public void setInternalOps(java.util.List<cmpopType> ops) {
+        this.ops = ops;
+    }
     @ExposedGet(name = "ops")
     public PyObject getOps() {
         return new AstList(ops, AstAdapters.cmpopAdapter);
@@ -60,6 +63,9 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     private java.util.List<expr> comparators;
     public java.util.List<expr> getInternalComparators() {
         return comparators;
+    }
+    public void setInternalComparators(java.util.List<expr> comparators) {
+        this.comparators = comparators;
     }
     @ExposedGet(name = "comparators")
     public PyObject getComparators() {

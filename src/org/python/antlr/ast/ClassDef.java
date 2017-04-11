@@ -49,6 +49,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     public java.util.List<expr> getInternalBases() {
         return bases;
     }
+    public void setInternalBases(java.util.List<expr> bases) {
+        this.bases = bases;
+    }
     @ExposedGet(name = "bases")
     public PyObject getBases() {
         return new AstList(bases, AstAdapters.exprAdapter);
@@ -61,6 +64,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     private java.util.List<keyword> keywords;
     public java.util.List<keyword> getInternalKeywords() {
         return keywords;
+    }
+    public void setInternalKeywords(java.util.List<keyword> keywords) {
+        this.keywords = keywords;
     }
     @ExposedGet(name = "keywords")
     public PyObject getKeywords() {
@@ -75,6 +81,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     public java.util.List<stmt> getInternalBody() {
         return body;
     }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return new AstList(body, AstAdapters.stmtAdapter);
@@ -87,6 +96,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     private java.util.List<expr> decorator_list;
     public java.util.List<expr> getInternalDecorator_list() {
         return decorator_list;
+    }
+    public void setInternalDecorator_list(java.util.List<expr> decorator_list) {
+        this.decorator_list = decorator_list;
     }
     @ExposedGet(name = "decorator_list")
     public PyObject getDecorator_list() {

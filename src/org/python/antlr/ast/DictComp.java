@@ -61,6 +61,9 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     public java.util.List<comprehension> getInternalGenerators() {
         return generators;
     }
+    public void setInternalGenerators(java.util.List<comprehension> generators) {
+        this.generators = generators;
+    }
     @ExposedGet(name = "generators")
     public PyObject getGenerators() {
         return new AstList(generators, AstAdapters.comprehensionAdapter);

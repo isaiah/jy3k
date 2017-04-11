@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
     public java.util.List<expr> getInternalKeys() {
         return keys;
     }
+    public void setInternalKeys(java.util.List<expr> keys) {
+        this.keys = keys;
+    }
     @ExposedGet(name = "keys")
     public PyObject getKeys() {
         return new AstList(keys, AstAdapters.exprAdapter);
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
     private java.util.List<expr> values;
     public java.util.List<expr> getInternalValues() {
         return values;
+    }
+    public void setInternalValues(java.util.List<expr> values) {
+        this.values = values;
     }
     @ExposedGet(name = "values")
     public PyObject getValues() {

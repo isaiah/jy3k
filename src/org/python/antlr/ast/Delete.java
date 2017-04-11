@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
     public java.util.List<expr> getInternalTargets() {
         return targets;
     }
+    public void setInternalTargets(java.util.List<expr> targets) {
+        this.targets = targets;
+    }
     @ExposedGet(name = "targets")
     public PyObject getTargets() {
         return new AstList(targets, AstAdapters.exprAdapter);

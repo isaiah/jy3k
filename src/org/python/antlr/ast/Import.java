@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
     public java.util.List<alias> getInternalNames() {
         return names;
     }
+    public void setInternalNames(java.util.List<alias> names) {
+        this.names = names;
+    }
     @ExposedGet(name = "names")
     public PyObject getNames() {
         return new AstList(names, AstAdapters.aliasAdapter);

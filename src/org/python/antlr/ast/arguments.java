@@ -35,6 +35,9 @@ public class arguments extends PythonTree {
     public java.util.List<arg> getInternalArgs() {
         return args;
     }
+    public void setInternalArgs(java.util.List<arg> args) {
+        this.args = args;
+    }
     @ExposedGet(name = "args")
     public PyObject getArgs() {
         return new AstList(args, AstAdapters.argAdapter);
@@ -61,6 +64,9 @@ public class arguments extends PythonTree {
     public java.util.List<arg> getInternalKwonlyargs() {
         return kwonlyargs;
     }
+    public void setInternalKwonlyargs(java.util.List<arg> kwonlyargs) {
+        this.kwonlyargs = kwonlyargs;
+    }
     @ExposedGet(name = "kwonlyargs")
     public PyObject getKwonlyargs() {
         return new AstList(kwonlyargs, AstAdapters.argAdapter);
@@ -73,6 +79,9 @@ public class arguments extends PythonTree {
     private java.util.List<expr> kw_defaults;
     public java.util.List<expr> getInternalKw_defaults() {
         return kw_defaults;
+    }
+    public void setInternalKw_defaults(java.util.List<expr> kw_defaults) {
+        this.kw_defaults = kw_defaults;
     }
     @ExposedGet(name = "kw_defaults")
     public PyObject getKw_defaults() {
@@ -99,6 +108,9 @@ public class arguments extends PythonTree {
     private java.util.List<expr> defaults;
     public java.util.List<expr> getInternalDefaults() {
         return defaults;
+    }
+    public void setInternalDefaults(java.util.List<expr> defaults) {
+        this.defaults = defaults;
     }
     @ExposedGet(name = "defaults")
     public PyObject getDefaults() {

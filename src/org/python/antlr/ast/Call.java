@@ -48,6 +48,9 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     public java.util.List<expr> getInternalArgs() {
         return args;
     }
+    public void setInternalArgs(java.util.List<expr> args) {
+        this.args = args;
+    }
     @ExposedGet(name = "args")
     public PyObject getArgs() {
         return new AstList(args, AstAdapters.exprAdapter);
@@ -60,6 +63,9 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     private java.util.List<keyword> keywords;
     public java.util.List<keyword> getInternalKeywords() {
         return keywords;
+    }
+    public void setInternalKeywords(java.util.List<keyword> keywords) {
+        this.keywords = keywords;
     }
     @ExposedGet(name = "keywords")
     public PyObject getKeywords() {

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Suite.class);
     public java.util.List<stmt> getInternalBody() {
         return body;
     }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return new AstList(body, AstAdapters.stmtAdapter);

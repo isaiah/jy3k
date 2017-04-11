@@ -48,6 +48,9 @@ public static final PyType TYPE = PyType.fromClass(If.class);
     public java.util.List<stmt> getInternalBody() {
         return body;
     }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return new AstList(body, AstAdapters.stmtAdapter);
@@ -60,6 +63,9 @@ public static final PyType TYPE = PyType.fromClass(If.class);
     private java.util.List<stmt> orelse;
     public java.util.List<stmt> getInternalOrelse() {
         return orelse;
+    }
+    public void setInternalOrelse(java.util.List<stmt> orelse) {
+        this.orelse = orelse;
     }
     @ExposedGet(name = "orelse")
     public PyObject getOrelse() {

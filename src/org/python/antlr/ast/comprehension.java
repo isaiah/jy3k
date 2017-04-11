@@ -61,6 +61,9 @@ public class comprehension extends PythonTree {
     public java.util.List<expr> getInternalIfs() {
         return ifs;
     }
+    public void setInternalIfs(java.util.List<expr> ifs) {
+        this.ifs = ifs;
+    }
     @ExposedGet(name = "ifs")
     public PyObject getIfs() {
         return new AstList(ifs, AstAdapters.exprAdapter);

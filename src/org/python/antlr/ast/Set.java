@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
     public java.util.List<expr> getInternalElts() {
         return elts;
     }
+    public void setInternalElts(java.util.List<expr> elts) {
+        this.elts = elts;
+    }
     @ExposedGet(name = "elts")
     public PyObject getElts() {
         return new AstList(elts, AstAdapters.exprAdapter);

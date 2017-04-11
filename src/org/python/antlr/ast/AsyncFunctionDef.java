@@ -62,6 +62,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     public java.util.List<stmt> getInternalBody() {
         return body;
     }
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return new AstList(body, AstAdapters.stmtAdapter);
@@ -74,6 +77,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     private java.util.List<expr> decorator_list;
     public java.util.List<expr> getInternalDecorator_list() {
         return decorator_list;
+    }
+    public void setInternalDecorator_list(java.util.List<expr> decorator_list) {
+        this.decorator_list = decorator_list;
     }
     @ExposedGet(name = "decorator_list")
     public PyObject getDecorator_list() {
