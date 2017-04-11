@@ -278,54 +278,18 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
 
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
-        String outer = "<outer" + node.getInternalName() + ">";
-        String clsname = node.getInternalName();
-//        String inner = "<inner" + clsname +">";
-        String inner = clsname;
-        Name innerName = new Name(node.getToken(), inner, expr_contextType.Store);
-        def(outer);
-        String vararg = "__(args)__";
-        String kwarg = "__(kw)__";
-        List<stmt> bod = new ArrayList<>();
-        bod.add(node);
-        Assign assign = new Assign(node.getToken(), Arrays.<expr>asList(new Name(node.getToken(), "__class__", expr_contextType.Store)), innerName);
-        bod.add(assign);
-        Return _ret = new Return(node.getToken(), innerName);
-        bod.add(_ret);
-
-        arguments args = new arguments(node, new ArrayList<arg>(),
-                new arg(node, vararg, null), new ArrayList<arg>(), new ArrayList<expr>(),
-                new arg(node, kwarg, null), new ArrayList<expr>());
-        FunctionDef funcdef = new FunctionDef(node.getToken(), outer, args, bod, new ArrayList<expr>(), null);
-
-        ArgListCompiler ac = new ArgListCompiler();
-        ac.visitArgs(args);
-
-        int n = node.getInternalBases().size();
-        for (int i = 0; i < n; i++) {
-            visit(node.getInternalBases().get(i));
-        }
-        beginScope(outer, FUNCSCOPE, funcdef, ac);
-        cur.addParam(vararg);
-        cur.addParam(kwarg);
-        cur.markFromParam();
-
         List<expr> decs = node.getInternalDecorator_list();
         for (int i = decs.size() - 1; i >= 0; i--) {
             visit(decs.get(i));
         }
-        def(inner);
-
-        beginScope(inner, CLASSSCOPE, node, null);
-        cur.needs_class_closure = true;
+        def(node.getInternalName());
+        int n = node.getInternalBases().size();
+        for (int i = 0; i < n; i++) {
+            visit(node.getInternalBases().get(i));
+        }
+        beginScope(node.getInternalName(), CLASSSCOPE, node, null);
         suite(node.getInternalBody());
         endScope();
-
-        def("__class__");
-        visit(_ret);
-        endScope();
-        def(clsname);
-
         return null;
     }
 

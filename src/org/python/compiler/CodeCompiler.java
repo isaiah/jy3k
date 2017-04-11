@@ -2005,9 +2005,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         }
 
-        for (int i = 0; i < node.getInternalKeywords().size(); i++) {
-            String key = node.getInternalKeywords().get(i).getInternalArg();
-            expr value = node.getInternalKeywords().get(i).getInternalValue();
+        java.util.List<keyword> keywords = node.getInternalKeywords();
+        for (int i = 0; i < keywords.size(); i++) {
+            String key = keywords.get(i).getInternalArg();
+            expr value = keywords.get(i).getInternalValue();
             if (key == null) {
                 kwargs.add(value);
             } else {
@@ -2602,114 +2603,41 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
         ScopeInfo scope = module.getScopeInfo(node);
-        String clsName = node.getInternalName();
-        String inner = clsName;
-
+        String name = getName(node.getInternalName());
         setline(node);
-        if (scope.needs_class_closure) {
-            scope.needs_class_closure = false;
-//            inner = "<inner" + clsName + ">";
-            String outer = scope.scope_name;
-            code.new_(p(PyFunction.class));
-            code.dup();
-            loadFrame();
-            code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-
-            int emptyArray = makeArray(new ArrayList<expr>());
-            code.aload(emptyArray);
-
-            code.new_(p(PyDictionary.class));
-            code.dup();
-            code.invokespecial(p(PyDictionary.class), "<init>",
-                    sig(Void.TYPE));
-
-            node.setName(new PyUnicode(inner));
-
-            // get the original parameters
-            java.util.List<expr> actualArgs = node.getInternalBases();
-            java.util.List<String> kwargs = new ArrayList<>();
-            node.getInternalKeywords().stream().forEach(kw -> {
-                actualArgs.add(kw.getInternalValue());
-                kwargs.add(kw.getInternalArg());
-            });
-
-            java.util.List<stmt> bod = new ArrayList<stmt>();
-            String vararg = "__(args)__";
-            String kwarg = "__(kw)__";
-            // replace inner class parameters
-            Starred starred = new Starred(node.getToken(), new Name(node.getToken(), vararg, expr_contextType.Load), expr_contextType.Load);
-            node.setBases(new PyList(new PyObject[]{starred}));
-            keyword kw = new keyword(node.getToken(), null, new Name(node.getToken(), kwarg, expr_contextType.Load));
-            node.setKeywords(new PyList(new PyObject[]{kw}));
-            bod.add(node);
-
-            Name innerName = new Name(node, inner, expr_contextType.Load);
-            Assign assign = new Assign(node, Arrays.<expr>asList(new Name(node, "__class__", expr_contextType.Store)),
-                    innerName);
-            bod.add(assign);
-            Return _ret = new Return(node.getToken(), innerName);
-            bod.add(_ret);
-            arguments args = new arguments(node, new ArrayList<arg>(),
-                    new arg(node, vararg, null), new ArrayList<arg>(), new ArrayList<expr>(),
-                    new arg(node, kwarg, null), new ArrayList<expr>());
-            FunctionDef funcdef = new FunctionDef(node.getToken(), outer, args, bod, new ArrayList<expr>(), null);
-
-            ScopeInfo funcScope = scope.up;
-            funcScope.setup_closure();
-            funcScope.dump();
-
-            module.codeConstant(new Suite(funcdef, bod), outer, true, className, false, false,
-                    node.getLine(), funcScope, cflags).get(code);
-
-            code.aconst_null();
-            if (!makeClosure(funcScope)) {
-                code.invokespecial(p(PyFunction.class), "<init>",
-                        sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class));
-            } else {
-                code.invokespecial(
-                        p(PyFunction.class),
-                        "<init>",
-                        sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class,
-                                PyObject[].class));
-            }
-
-            int genExp = storeTop();
-
-            code.aload(genExp);
-            code.freeLocal(genExp);
-            loadThreadState();
-
-            int baseArray = makeArray(actualArgs);
-            int kwArray = makeStrings(code, kwargs);
-
-            code.aload(baseArray);
-            code.aload(kwArray);
-
-            code.invokevirtual(p(PyObject.class), "__call__",
-                    sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
-            set(new Name(node, clsName, expr_contextType.Store));
-            freeArray(emptyArray);
-
-            return null;
-        }
 
         int baseArray = makeArray(node.getInternalBases());
 
-        code.ldc(inner);
+        code.ldc(name);
         code.ldc(scope.qualname);
 
         code.aload(baseArray);
-        if (node.getInternalKeywords().size() != 0) {
+        java.util.List<String> keys = new ArrayList<>();
+        java.util.List<expr> values = new ArrayList<>();
+        java.util.List<keyword> keywords = node.getInternalKeywords();
+        if (keywords.size() == 1 && keywords.get(0).getInternalArg() == null) {
+            /** when the class closure is created, unwrap the kwarg */
             visit(node.getInternalKeywords().get(0).getInternalValue());
         } else {
-            code.aconst_null();
+            for (int i = 0; i < keywords.size(); i++) {
+                keys.add(keywords.get(i).getInternalArg());
+                values.add(keywords.get(i).getInternalValue());
+            }
+            int argArray = makeArray(values);
+            int strArray = makeStrings(code, keys);
+            code.aload(strArray);
+            code.aload(argArray);
+            code.invokestatic(p(PyDictionary.class), "fromKV",
+                    sig(PyDictionary.class, String[].class, PyObject[].class));
+
+            code.freeLocal(strArray);
         }
 
         scope.setup_closure();
         scope.dump();
         // Make code object out of suite
 
-        module.codeConstant(new Suite(node, node.getInternalBody()), inner, false, inner,
+        module.codeConstant(new Suite(node, node.getInternalBody()), name, false, name,
                 getDocStr(node.getInternalBody()), true, false, node.getLine(), scope, cflags).get(
                 code);
 
@@ -2728,7 +2656,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         applyDecorators(node.getInternalDecorator_list());
 
         // Assign this new class to the given name
-        set(new Name(node, inner, expr_contextType.Store));
+        set(new Name(node, node.getInternalName(), expr_contextType.Store));
         freeArray(baseArray);
         return null;
     }

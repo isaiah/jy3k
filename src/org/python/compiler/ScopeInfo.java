@@ -17,7 +17,6 @@ public class ScopeInfo extends Object implements ScopeConstants {
     public String scope_name;
     public int level;
     public int func_level;
-    public boolean needs_class_closure;
     public boolean async;
     public String qualname;
 

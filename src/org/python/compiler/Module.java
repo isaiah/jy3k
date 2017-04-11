@@ -705,6 +705,10 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         if (cflags == null) {
             cflags = new CompilerFlags();
         }
+
+        ClassClosureGenerator classClosure = new ClassClosureGenerator();
+        classClosure.visit(node);
+
         module.futures.preprocessFutures(node, cflags);
         new ScopesCompiler(module, module.scopes).parse(node);
 

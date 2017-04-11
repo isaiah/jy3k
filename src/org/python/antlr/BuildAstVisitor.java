@@ -11,11 +11,13 @@ import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
+import org.python.compiler.ClassClosureGenerator;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -65,10 +67,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitSingle_input(PythonParser.Single_inputContext ctx) {
+        /**
+         *  Experimental, the body will be modified if it's necessary to create a class closure,
+         *  linked list is more efficient for that
+         */
+        java.util.List<stmt> body = new LinkedList<>();
         if (ctx.compound_stmt() != null) {
-            return new Interactive(ctx.getStart(), Arrays.asList((stmt) visit(ctx.compound_stmt())));
+            body.add((stmt) visit(ctx.compound_stmt()));
+        } else {
+            body = visit_Simple_stmt(ctx.simple_stmt());
         }
-        return new Interactive(ctx.getStart(), visit_Simple_stmt(ctx.simple_stmt()));
+        return new Interactive(ctx.getStart(), body);
     }
 
     @Override
@@ -1113,7 +1122,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         PythonParser parser = new PythonParser(tokens);
         ParseTree ctx = parser.file_input();
         PythonTree ast = v.visit(ctx);
-        System.out.println(ast);
+        new ClassClosureGenerator().visit(ast);
+        System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
         out.write(bytes);
     }
