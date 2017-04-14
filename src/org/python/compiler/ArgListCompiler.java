@@ -34,17 +34,17 @@ public class ArgListCompiler extends Visitor
     public ArgListCompiler() {
         arglist = keywordlist = false;
         annotations = new HashMap<>();
-        defaults = null;
-        names = new ArrayList<String>();
+        defaults = new ArrayList<>();
+        names = new ArrayList<>();
         kw_defaults = new HashMap<>();
-        fpnames = new ArrayList<String>();
-        init_code = new ArrayList<stmt>();
+        fpnames = new ArrayList<>();
+        init_code = new ArrayList<>();
     }
 
     public void reset() {
         arglist = keywordlist = false;
         annotations.clear();
-        defaults = null;
+        defaults.clear();
         names.clear();
         kw_defaults.clear();
         init_code.clear();
@@ -104,7 +104,6 @@ public class ArgListCompiler extends Visitor
             }
         }
 
-        defaults = new ArrayList<expr>();
         List<expr> internalDefaults = args.getInternalDefaults();
         for (int i = 0; i < internalDefaults.size(); i++) {
             expr val = internalDefaults.get(i);

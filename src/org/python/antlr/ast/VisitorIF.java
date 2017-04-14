@@ -31,6 +31,7 @@ public interface VisitorIF<R> {
     public R visitPass(Pass node) throws Exception;
     public R visitBreak(Break node) throws Exception;
     public R visitContinue(Continue node) throws Exception;
+    public R visitSplitNode(SplitNode node) throws Exception;
     public R visitBoolOp(BoolOp node) throws Exception;
     public R visitBinOp(BinOp node) throws Exception;
     public R visitUnaryOp(UnaryOp node) throws Exception;

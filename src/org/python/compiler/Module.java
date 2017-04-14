@@ -34,8 +34,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import static org.python.util.CodegenUtils.*;
 
@@ -419,7 +421,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     Constant mainCode;
     boolean linenumbers;
     Future futures;
-    Hashtable<PythonTree, ScopeInfo> scopes;
+    Map<PythonTree, ScopeInfo> scopes;
     List<PyCodeConstant> codes;
     long mtime;
     private int setter_count = 0;
@@ -427,7 +429,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     private final static int MAX_SETTINGS_PER_SETTER = 4096;
 
     /** The pool of Python Constants */
-    Hashtable<Constant, Constant> constants;
+    Map<Constant, Constant> constants;
 
     public Module(String name, String filename, boolean linenumbers) {
         this(name, filename, linenumbers, org.python.core.imp.NO_MTIME);
@@ -439,16 +441,16 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         this.mtime = mtime;
         classfile =
                 new ClassFile(name, p(PyFunctionTable.class), ACC_SYNCHRONIZED | ACC_PUBLIC, mtime);
-        constants = new Hashtable<Constant, Constant>();
+        constants = new HashMap<>();
         sfilename = filename;
         if (filename != null) {
             this.filename = stringConstant(filename);
         } else {
             this.filename = null;
         }
-        codes = new ArrayList<PyCodeConstant>();
+        codes = new ArrayList<>();
         futures = new Future();
-        scopes = new Hashtable<PythonTree, ScopeInfo>();
+        scopes = new HashMap<>();
     }
 
     public Module(String name) {
@@ -573,10 +575,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         classfile.addField("self", "L" + classfile.name + ";", ACC_STATIC);
         c.aload(0);
         c.putstatic(classfile.name, "self", "L" + classfile.name + ";");
-        Enumeration e = constants.elements();
 
-        while (e.hasMoreElements()) {
-            Constant constant = (Constant)e.nextElement();
+        for (Constant constant : constants.values()) {
             constant.put(c);
         }
 
@@ -706,11 +706,17 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
             cflags = new CompilerFlags();
         }
 
+        /** create class closure if necessary */
         ClassClosureGenerator classClosure = new ClassClosureGenerator();
         classClosure.visit(node);
+        /** split long functions into small SplitNode fragments */
+//        new Splitter().visit(node);
 
         module.futures.preprocessFutures(node, cflags);
+        /** create symbol table */
         new ScopesCompiler(module, module.scopes).parse(node);
+        /** convert SplitNode to function definitions */
+//        new SplitIntoFunctions(module.scopes).visit(node);
 
         // Add __doc__ if it exists
 
@@ -731,7 +737,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     public void emitStr(Str node, Code code) throws Exception {
-        String s = (String) node.getInternalS();
+        String s = node.getInternalS();
         unicodeConstant(s).get(code);
     }
 

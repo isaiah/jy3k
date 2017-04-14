@@ -12,6 +12,7 @@ import org.python.antlr.base.stmt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Stack;
 import java.util.List;
 
@@ -21,12 +22,12 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
 
     private Stack<ScopeInfo> scopes;
     private ScopeInfo cur = null;
-    private Hashtable<PythonTree,ScopeInfo> nodeScopes;
+    private Map<PythonTree,ScopeInfo> nodeScopes;
 
     private int level = 0;
     private int func_level = 0;
 
-    public ScopesCompiler(CompilationContext code_compiler, Hashtable<PythonTree,ScopeInfo> nodeScopes) {
+    public ScopesCompiler(CompilationContext code_compiler, Map<PythonTree,ScopeInfo> nodeScopes) {
         this.code_compiler = code_compiler;
         this.nodeScopes = nodeScopes;
         scopes = new Stack<ScopeInfo>();
@@ -324,16 +325,24 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     @Override
     public Object visitName(Name node) throws Exception {
         String name = node.getInternalId();
+
         if (cur.async && name.equals("await"))
             throw new ParseException("invalid syntax", node);
         if (node.getInternalCtx() == expr_contextType.Load && name.equals("super")) {
             cur.addUsed("__class__");
         }
         if (node.getInternalCtx() != expr_contextType.Load) {
+
             if (name.equals("__debug__")) {
                 code_compiler.error("can not assign to __debug__", true, node);
             }
-            cur.addBound(name);
+            if (isSplit) {
+                // temporary function bounds every variable to the enclosing function
+                scopes.peek().addBound(name);
+                cur.addUsed(name);
+            } else {
+                cur.addBound(name);
+            }
         } else {
             cur.addUsed(name);
         }
@@ -481,11 +490,25 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         return null;
     }
 
+    @Override
     public Object visitExceptHandler(ExceptHandler node) throws Exception {
         traverse(node);
         if (node.getInternalName() != null) {
             def(node.getInternalName());
         }
+        return null;
+    }
+
+    private boolean isSplit;
+    @Override
+    public Object visitSplitNode(SplitNode node) throws Exception {
+        String name = node.getInternalName();
+        def(name);
+        beginScope(name, FUNCSCOPE, node, new ArgListCompiler());
+        isSplit = true;
+        suite(node.getInternalBody());
+        isSplit = false;
+        endScope();
         return null;
     }
 }

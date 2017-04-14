@@ -28,9 +28,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@ExposedType(name = "_ast.FunctionDef", base = stmt.class)
-public class FunctionDef extends stmt {
-public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
+@ExposedType(name = "_ast.SplitNode", base = stmt.class)
+public class SplitNode extends stmt {
+public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     private String name;
     public String getInternalName() {
         return name;
@@ -43,19 +43,6 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
     @ExposedSet(name = "name")
     public void setName(PyObject name) {
         this.name = AstAdapters.py2identifier(name);
-    }
-
-    private arguments args;
-    public arguments getInternalArgs() {
-        return args;
-    }
-    @ExposedGet(name = "args")
-    public PyObject getArgs() {
-        return args;
-    }
-    @ExposedSet(name = "args")
-    public void setArgs(PyObject args) {
-        this.args = AstAdapters.py2arguments(args);
     }
 
     private java.util.List<stmt> body;
@@ -74,39 +61,22 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         this.body = AstAdapters.py2stmtList(body);
     }
 
-    private java.util.List<expr> decorator_list;
-    public java.util.List<expr> getInternalDecorator_list() {
-        return decorator_list;
+    private stmt funcdef;
+    public stmt getInternalFuncdef() {
+        return funcdef;
     }
-    public void setInternalDecorator_list(java.util.List<expr> decorator_list) {
-        this.decorator_list = decorator_list;
+    @ExposedGet(name = "funcdef")
+    public PyObject getFuncdef() {
+        return funcdef;
     }
-    @ExposedGet(name = "decorator_list")
-    public PyObject getDecorator_list() {
-        return new AstList(decorator_list, AstAdapters.exprAdapter);
-    }
-    @ExposedSet(name = "decorator_list")
-    public void setDecorator_list(PyObject decorator_list) {
-        this.decorator_list = AstAdapters.py2exprList(decorator_list);
-    }
-
-    private expr returns;
-    public expr getInternalReturns() {
-        return returns;
-    }
-    @ExposedGet(name = "returns")
-    public PyObject getReturns() {
-        return returns;
-    }
-    @ExposedSet(name = "returns")
-    public void setReturns(PyObject returns) {
-        this.returns = AstAdapters.py2expr(returns);
+    @ExposedSet(name = "funcdef")
+    public void setFuncdef(PyObject funcdef) {
+        this.funcdef = AstAdapters.py2stmt(funcdef);
     }
 
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("name"), new PyUnicode("args"), new PyUnicode("body"), new
-                      PyUnicode("decorator_list"), new PyUnicode("returns")};
+    new PyUnicode[] {new PyUnicode("name"), new PyUnicode("body"), new PyUnicode("funcdef")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -115,48 +85,41 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public FunctionDef(PyType subType) {
+    public SplitNode(PyType subType) {
         super(subType);
     }
-    public FunctionDef() {
+    public SplitNode() {
         this(TYPE);
     }
     @ExposedNew
     @ExposedMethod
-    public void FunctionDef___init__(PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("FunctionDef", args, keywords, new String[]
-            {"name", "args", "body", "decorator_list", "returns", "lineno", "col_offset"}, 5, true);
+    public void SplitNode___init__(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("SplitNode", args, keywords, new String[]
+            {"name", "body", "funcdef", "lineno", "col_offset"}, 3, true);
         setName(ap.getPyObject(0, Py.None));
-        setArgs(ap.getPyObject(1, Py.None));
-        setBody(ap.getPyObject(2, Py.None));
-        setDecorator_list(ap.getPyObject(3, Py.None));
-        setReturns(ap.getPyObject(4, Py.None));
-        int lin = ap.getInt(5, -1);
+        setBody(ap.getPyObject(1, Py.None));
+        setFuncdef(ap.getPyObject(2, Py.None));
+        int lin = ap.getInt(3, -1);
         if (lin != -1) {
             setLineno(lin);
         }
 
-        int col = ap.getInt(6, -1);
+        int col = ap.getInt(4, -1);
         if (col != -1) {
             setLineno(col);
         }
 
     }
 
-    public FunctionDef(PyObject name, PyObject args, PyObject body, PyObject decorator_list,
-    PyObject returns) {
+    public SplitNode(PyObject name, PyObject body, PyObject funcdef) {
         setName(name);
-        setArgs(args);
         setBody(body);
-        setDecorator_list(decorator_list);
-        setReturns(returns);
+        setFuncdef(funcdef);
     }
 
-    public FunctionDef(Token token, String name, arguments args, java.util.List<stmt> body,
-    java.util.List<expr> decorator_list, expr returns) {
+    public SplitNode(Token token, String name, java.util.List<stmt> body, stmt funcdef) {
         super(token);
         this.name = name;
-        this.args = args;
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<stmt>();
@@ -164,22 +127,13 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         for(PythonTree t : this.body) {
             addChild(t);
         }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
+        this.funcdef = funcdef;
     }
 
-    public FunctionDef(Integer ttype, Token token, String name, arguments args,
-    java.util.List<stmt> body, java.util.List<expr> decorator_list, expr returns) {
+    public SplitNode(Integer ttype, Token token, String name, java.util.List<stmt> body, stmt
+    funcdef) {
         super(ttype, token);
         this.name = name;
-        this.args = args;
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<stmt>();
@@ -187,22 +141,12 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         for(PythonTree t : this.body) {
             addChild(t);
         }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
+        this.funcdef = funcdef;
     }
 
-    public FunctionDef(TerminalNode node, String name, arguments args, java.util.List<stmt> body,
-    java.util.List<expr> decorator_list, expr returns) {
+    public SplitNode(TerminalNode node, String name, java.util.List<stmt> body, stmt funcdef) {
         super(node);
         this.name = name;
-        this.args = args;
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<stmt>();
@@ -210,22 +154,12 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         for(PythonTree t : this.body) {
             addChild(t);
         }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
+        this.funcdef = funcdef;
     }
 
-    public FunctionDef(PythonTree tree, String name, arguments args, java.util.List<stmt> body,
-    java.util.List<expr> decorator_list, expr returns) {
+    public SplitNode(PythonTree tree, String name, java.util.List<stmt> body, stmt funcdef) {
         super(tree);
         this.name = name;
-        this.args = args;
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<stmt>();
@@ -233,64 +167,42 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         for(PythonTree t : this.body) {
             addChild(t);
         }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
+        this.funcdef = funcdef;
     }
 
     @ExposedGet(name = "repr")
     public String toString() {
-        return "FunctionDef";
+        return "SplitNode";
     }
 
     public String toStringTree() {
-        StringBuffer sb = new StringBuffer("FunctionDef(");
+        StringBuffer sb = new StringBuffer("SplitNode(");
         sb.append("name=");
         sb.append(dumpThis(name));
-        sb.append(",");
-        sb.append("args=");
-        sb.append(dumpThis(args));
         sb.append(",");
         sb.append("body=");
         sb.append(dumpThis(body));
         sb.append(",");
-        sb.append("decorator_list=");
-        sb.append(dumpThis(decorator_list));
-        sb.append(",");
-        sb.append("returns=");
-        sb.append(dumpThis(returns));
+        sb.append("funcdef=");
+        sb.append(dumpThis(funcdef));
         sb.append(",");
         sb.append(")");
         return sb.toString();
     }
 
     public <R> R accept(VisitorIF<R> visitor) throws Exception {
-        return visitor.visitFunctionDef(this);
+        return visitor.visitSplitNode(this);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
-        if (args != null)
-            args.accept(visitor);
         if (body != null) {
             for (PythonTree t : body) {
                 if (t != null)
                     t.accept(visitor);
             }
         }
-        if (decorator_list != null) {
-            for (PythonTree t : decorator_list) {
-                if (t != null)
-                    t.accept(visitor);
-            }
-        }
-        if (returns != null)
-            returns.accept(visitor);
+        if (funcdef != null)
+            funcdef.accept(visitor);
     }
 
     public PyObject __dict__;
@@ -340,12 +252,4 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         col_offset = num;
     }
 
-
-    private boolean split;
-    public boolean isSplit() {
-        return split;
-    }
-    public void setSplit(boolean split) {
-        this.split = split;
-    }
 }
