@@ -35,9 +35,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.python.util.CodegenUtils.*;
 
@@ -539,6 +541,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.aload(0);
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
         addConstants(c);
+        addCodeInit();
+        c.return_();
     }
 
     public void addRunnable() throws IOException {
@@ -571,6 +575,16 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.areturn();
     }
 
+    void addCodeInit() throws IOException {
+        for (int i = 0; i < codes.size(); i++) {
+            PyCodeConstant pyc = codes.get(i);
+            Code c = classfile.addMethod("init" + pyc.fname,
+                    sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_FINAL);
+            pyc.put(c);
+            c.return_();
+        }
+    }
+
     void addConstants(Code c) throws IOException {
         classfile.addField("self", "L" + classfile.name + ";", ACC_STATIC);
         c.aload(0);
@@ -582,10 +596,10 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
         for (int i = 0; i < codes.size(); i++) {
             PyCodeConstant pyc = codes.get(i);
-            pyc.put(c);
+            c.aload(0); // this
+            c.aload(1); // filename
+            c.invokevirtual(classfile.name, "init" + pyc.fname, sig(Void.TYPE, String.class));
         }
-
-        c.return_();
     }
 
     public void addFunctions() throws IOException {
