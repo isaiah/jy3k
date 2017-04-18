@@ -351,7 +351,7 @@ public class Exceptions {
         PyObject strerror = self.__findattr__("strerror");
         PyObject filename = self.__findattr__("filename");
         String result;
-        if (filename.__bool__()) {
+        if (filename != null && filename.__bool__()) {
             result = String.format("[Errno %s] %s: %s", errno, strerror, filename.__repr__());
         } else if (errno.__bool__() && strerror.__bool__()) {
             result = String.format("[Errno %s] %s", errno, strerror);
