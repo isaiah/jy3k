@@ -158,8 +158,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public PyObject executable;
 
-    private String currentWorkingDir;
-
     private ClassLoader classLoader = null;
 
     private PyObject __displayhook__, __excepthook__;
@@ -228,8 +226,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
         path_importer_cache = new PyDictionary();
         path_importer_cache.__setitem__(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY), new JavaImporter());
-
-        currentWorkingDir = new File("").getAbsolutePath();
 
         dont_write_bytecode = Options.dont_write_bytecode;
         // Set up the initial standard ins and outs
@@ -532,7 +528,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
      * @param path a path String
      */
     public void setCurrentWorkingDir(String path) {
-        currentWorkingDir = path;
+        System.setProperty("user.dir", path);
     }
 
     /**
@@ -541,7 +537,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
      * @return a path String
      */
     public String getCurrentWorkingDir() {
-        return currentWorkingDir;
+        return System.getProperty("user.dir");
     }
 
     /**

@@ -632,8 +632,8 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_listdir_doc)
     public static PyList listdir(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("listdir", args, keywords, "path");
-        String path = ap.getString(0, System.getProperty("user.home"));
-        File file = absolutePath(path).toFile();
+        String path = ap.getString(0, ".");
+        File file = absoluteFile(path);
         String[] names = file.list();
 
         if (names == null) {
@@ -650,15 +650,21 @@ public class PosixModule {
         }
 
         PyList list = new PyList();
-        for (String name : names) {
-            list.append(Py.newUnicode(name));
+        if (args.length > 0 && args[0] instanceof PyBytes) {
+            for (String name : names) {
+                list.append(new PyBytes(name));
+            }
+        } else {
+            for (String name : names) {
+                list.append(new PyUnicode(name));
+            }
         }
         return list;
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_scandir_doc)
     public static PyObject scandir(PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("listdir", args, keywords, "path");
+        ArgParser ap = new ArgParser("scandir", args, keywords, "path");
         String path = ap.getString(0, System.getProperty("user.home"));
         Path p = absolutePath(path);
         List<Path> paths = new ArrayList<Path>();
@@ -948,13 +954,14 @@ public class PosixModule {
         ArgParser ap = new ArgParser("symlink", args, keywords, "src", "dst", "target_is_directory", "*", "dir_fd");
         String src = ap.getString(0);
         String dst = ap.getString(1);
-        boolean isDirectory = ap.getPyObject(2, Py.False).__bool__();
+//        boolean isDirectory = ap.getPyObject(2, Py.False).__bool__();
         PyObject dir_fd = ap.getPyObject(4, Py.None);
         if (dir_fd != Py.None) {
             throw Py.NotImplementedError("dir_fd is not supported");
         }
         try {
-            Files.createSymbolicLink(Paths.get(dst), Paths.get(src));
+            // Paths.get(dir) is bugged, it doesn't respect user.dir system property
+            Files.createSymbolicLink(new File(dst).getCanonicalFile().toPath(), new File(src).getCanonicalFile().toPath());
         } catch (FileAlreadyExistsException ex) {
             throw Py.OSError(Errno.EEXIST);
         } catch (IOException ioe) {
@@ -1219,37 +1226,15 @@ public class PosixModule {
      */
     private static Path absolutePath(PyObject pathObj) {
         String pathStr = asPath(pathObj);
-        if (pathStr.equals("")) {
-            // Returning current working directory would be wrong in our context (chdir, etc.).
-            throw Py.OSError(Errno.ENOENT, pathObj);
-        }
         return absolutePath(pathStr);
     }
 
     private static Path absolutePath(String pathStr) {
-        try {
-            Path path = Paths.get(pathStr);
-            // Relative path: augment from current working directory.
-            path = Paths.get(Py.getSystemState().getCurrentWorkingDir()).resolve(path);
-            // In case of a root different from cwd, resolve does not guarantee absolute.
-            path = path.toAbsolutePath();
-            // Strip redundant navigation a/b/../c -> a/c
-            path = path.normalize();
-            // Prevent trailing slash (possibly Java bug), except when '/' or C:\
-            pathStr = path.toString();
-            if (pathStr.endsWith(path.getFileSystem().getSeparator()) && path.getNameCount()>0) {
-                path = Paths.get(pathStr.substring(0, pathStr.length()-1));
-            }
-            return path;
-        } catch (java.nio.file.InvalidPathException ex) {
-            /*
-             * Thrown on Windows for paths like foo/bar/<test>, where <test> is the literal text,
-             * not a metavariable :) NOTE: CPython, Windows throws the Windows-specific internal
-             * error WindowsError [Error 123], but it seems excessive to duplicate this error
-             * hierarchy.
-             */
-            throw Py.OSError(Errno.EINVAL, new PyUnicode(pathStr));
-        }
+        return absoluteFile(pathStr).toPath();
+    }
+
+    private static File absoluteFile(String pathStr) {
+        return new File(pathStr).getAbsoluteFile();
     }
 
     private static PyException badFD() {
@@ -1315,17 +1300,17 @@ public class PosixModule {
             try {
                 Map<String, Object> attributes = Files.readAttributes(
                         absolutePath, "unix:*", LinkOption.NOFOLLOW_LINKS);
-                Boolean isSymbolicLink = (Boolean) attributes.get("isSymbolicLink");
-                if (isSymbolicLink != null && isSymbolicLink.booleanValue() && path.toString().endsWith("/")) {
-                    // Chase the symbolic link, but do not follow further - this is a special case for lstat
-                    Path symlink = Files.readSymbolicLink(absolutePath);
-                    symlink = absolutePath.getParent().resolve(symlink);
-                    attributes = Files.readAttributes(
-                            symlink, "unix:*", LinkOption.NOFOLLOW_LINKS);
-
-                } else {
-                    checkTrailingSlash(path, attributes);
-                }
+//                Boolean isSymbolicLink = (Boolean) attributes.get("isSymbolicLink");
+//                if (isSymbolicLink != null && isSymbolicLink.booleanValue() && path.toString().endsWith("/")) {
+//                    // Chase the symbolic link, but do not follow further - this is a special case for lstat
+//                    Path symlink = Files.readSymbolicLink(absolutePath);
+//                    symlink = absolutePath.getParent().resolve(symlink);
+//                    attributes = Files.readAttributes(
+//                            symlink, "unix:*", LinkOption.NOFOLLOW_LINKS);
+//
+//                } else {
+//                    checkTrailingSlash(path, attributes);
+//                }
                 return PyStatResult.fromUnixFileAttributes(attributes);
             } catch (NoSuchFileException ex) {
                 throw Py.OSError(Errno.ENOENT, path);
