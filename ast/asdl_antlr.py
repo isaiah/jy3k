@@ -391,6 +391,9 @@ class JavaVisitor(EmitVisitor):
             self.emit("}", depth + 1)
             self.emit("", 0)
 
+        if str(cons.name) in extra_fields:
+            self.extraFields(str(cons.name))
+
         self.emit("}", depth)
         self.close()
 
@@ -601,6 +604,12 @@ class JavaVisitor(EmitVisitor):
             str(field.name).capitalize()), depth)
         self.emit("return %s;" % field.name, depth+1)
         self.emit("}", depth)
+        if (field.seq):
+            self.emit("public void setInternal%s(%s %s) {" % (str(field.name).capitalize(),
+                self.javaType(field), field.name), depth)
+            self.emit("this.%s = %s;" % (field.name, field.name), depth+1)
+            self.emit("}", depth)
+
         self.emit('@ExposedGet(name = "%s")' % field.name, depth)
         self.emit("public PyObject get%s() {" % self.processFieldName(field.name), depth)
         if field.seq:
@@ -661,6 +670,21 @@ class JavaVisitor(EmitVisitor):
         if check_seq and field.seq:
             return "java.util.List<%s>" % jtype
         return jtype
+
+    def extraFields(self, clsname):
+        for f in extra_fields[clsname]:
+            tmpl = f"""
+    private boolean {f};
+
+    public boolean is{f.capitalize()}() {{
+        return {f};
+    }}
+
+    public void set{f.capitalize()}(boolean {f}) {{
+        this.{f} = {f};
+    }}
+            """
+            self.file.write(tmpl)
 
 class VisitorVisitor(EmitVisitor):
     def __init__(self, dir):
@@ -725,6 +749,8 @@ def main(outdir, grammar="Python.asdl"):
                         VisitorVisitor(outdir))
     c.visit(mod)
 
+# Extra fields to add to the AST nodes
+extra_fields = { "FunctionDef": ["split"] }
 
 if __name__ == "__main__":
     import sys
