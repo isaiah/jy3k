@@ -11,11 +11,17 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.__builtin__;
+import org.python.expose.ExposedConst;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
 
-public class math implements ClassDictInit {
+@ExposedModule(name = "math")
+public class math {
 
-    public static PyFloat pi = new PyFloat(Math.PI);
-    public static PyFloat e = new PyFloat(Math.E);
+    @ExposedConst
+    public static final double pi = Math.PI;
+    @ExposedConst
+    public static final double e = Math.E;
 
     private static final double ZERO = 0.0;
     private static final double MINUS_ZERO = -0.0;
@@ -33,24 +39,27 @@ public class math implements ClassDictInit {
     private static final BigInteger MIN_LONG_BIGINTEGER = new BigInteger(
             String.valueOf(Long.MIN_VALUE));
 
-    public static void classDictInit(@SuppressWarnings("unused") PyObject dict) {}
-
+    @ExposedFunction
     public static double gamma(double v) {
         return math_gamma.gamma(v);
     }
 
+    @ExposedFunction
     public static double lgamma(double v) {
         return math_gamma.lgamma(v);
     }
 
+    @ExposedFunction
     public static double erf(double v) {
         return math_erf.erf(v);
     }
 
+    @ExposedFunction
     public static double erfc(double v) {
         return math_erf.erfc(v);
     }
 
+    @ExposedFunction
     public static double expm1(double v) {
         if (Double.POSITIVE_INFINITY == v) {
             return v;
@@ -64,6 +73,7 @@ public class math implements ClassDictInit {
         return result;
     }
 
+    @ExposedFunction
     public static double acos(double v) {
         return exceptNaN(Math.acos(v), v);
     }
@@ -74,6 +84,7 @@ public class math implements ClassDictInit {
      * @param y
      * @return x such that <i>cosh x = y</i>
      */
+    @ExposedFunction
     public static double acosh(double y) {
         if (y < 1.0) {
             throw mathDomainError();
@@ -99,10 +110,12 @@ public class math implements ClassDictInit {
         }
     }
 
+    @ExposedFunction
     public static double asin(double v) {
         return exceptNaN(Math.asin(v), v);
     }
 
+    @ExposedFunction
     public static double asinh(double v) {
         if (isnan(v) || isinf(v)) {
             return v;
@@ -132,6 +145,7 @@ public class math implements ClassDictInit {
         return sign ? -temp : temp;
     }
 
+    @ExposedFunction
     public static double atan(double v) {
         return exceptNaN(Math.atan(v), v);
     }
@@ -142,6 +156,7 @@ public class math implements ClassDictInit {
      * @param y
      * @return <i>x</i> such that <i>tanh x = y</i>
      */
+    @ExposedFunction
     public static double atanh(double y) {
         double absy = Math.abs(y);
         if (absy >= 1.0) {
@@ -154,43 +169,43 @@ public class math implements ClassDictInit {
         }
     }
 
+    @ExposedFunction
     public static double atan2(double v, double w) {
         return Math.atan2(v, w);
     }
 
-    public static double ceil(PyObject v) {
-        return ceil(v.asDouble());
-    }
-
+    @ExposedFunction
     public static double ceil(double v) {
         return Math.ceil(v);
     }
 
+    @ExposedFunction
     public static double cos(double v) {
         return exceptNaN(Math.cos(v), v);
     }
 
+    @ExposedFunction
     public static double cosh(double v) {
         return exceptInf(Math.cosh(v), v);
     }
 
+    @ExposedFunction
     public static double exp(double v) {
         return exceptInf(Math.exp(v), v);
     }
 
-    public static double floor(PyObject v) {
-        return floor(v.asDouble());
-    }
-
+    @ExposedFunction
     public static double floor(double v) {
         return Math.floor(v);
     }
 
-    public static double log(PyObject v) {
-        return log(v, null);
-    }
-
-    public static double log(PyObject v, PyObject base) {
+    @ExposedFunction
+    public static double log(PyObject[] args, String[] keywords) {
+        PyObject v = args[0];
+        PyObject base = null;
+        if (args.length > 1) {
+            base = args[1];
+        }
         double doubleValue;
         if (v instanceof PyLong) {
             doubleValue = calculateLongLog((PyLong)v);
@@ -200,6 +215,7 @@ public class math implements ClassDictInit {
         return (base == null) ? doubleValue : applyLoggedBase(doubleValue, base);
     }
 
+    @ExposedFunction
     public static double pow(double v, double w) {
         if (w == ZERO) {
             return ONE;
@@ -272,6 +288,7 @@ public class math implements ClassDictInit {
         return sin(v.asDouble());
     }
 
+    @ExposedFunction
     public static double sin(double v) {
         return exceptNaN(Math.sin(v), v);
     }
@@ -280,10 +297,12 @@ public class math implements ClassDictInit {
         return sqrt(v.asDouble());
     }
 
+    @ExposedFunction
     public static double sqrt(double v) {
         return exceptNaN(Math.sqrt(v), v);
     }
 
+    @ExposedFunction
     public static double tan(double v) {
         return exceptNaN(Math.tan(v), v);
     }
@@ -300,18 +319,22 @@ public class math implements ClassDictInit {
         return log10(v.asDouble());
     }
 
+    @ExposedFunction
     public static double sinh(double v) {
         return exceptInf(Math.sinh(v), v);
     }
 
+    @ExposedFunction
     public static double tanh(double v) {
         return exceptInf(Math.tanh(v), v);
     }
 
+    @ExposedFunction
     public static double fabs(double v) {
         return Math.abs(v);
     }
 
+    @ExposedFunction
     public static double fmod(double v, double w) {
         if (isnan(v) || isnan(w)) {
             return NAN;
@@ -328,6 +351,7 @@ public class math implements ClassDictInit {
         return v % w;
     }
 
+    @ExposedFunction
     public static PyTuple modf(double v) {
         if (isnan(v)) {
             return new PyTuple(new PyFloat(v), new PyFloat(v));
@@ -344,6 +368,7 @@ public class math implements ClassDictInit {
         return new PyTuple(new PyFloat(w), new PyFloat(v));
     }
 
+    @ExposedFunction
     public static PyTuple frexp(double x) {
         int exponent;
         double mantissa;
@@ -377,10 +402,12 @@ public class math implements ClassDictInit {
         return new PyTuple(new PyFloat(mantissa), new PyLong(exponent));
     }
 
+    @ExposedFunction
     public static PyObject trunc(PyObject number) {
         return number.__getattr__("__trunc__").__call__();
     }
 
+    @ExposedFunction
     public static double ldexp(double v, PyObject wObj) {
         long w = getLong(wObj);
         if (w < Integer.MIN_VALUE) {
@@ -400,6 +427,7 @@ public class math implements ClassDictInit {
      * @param y
      * @return (x<sup>2</sup> +y<sup>2</sup>)<sup>&#189;</sup>
      */
+    @ExposedFunction
     public static double hypot(double x, double y) {
         double mag = Math.hypot(x, y);
         if (Double.isInfinite(mag) && !(Double.isInfinite(x) || Double.isInfinite(y))) {
@@ -409,15 +437,18 @@ public class math implements ClassDictInit {
         return mag;
     }
 
+    @ExposedFunction
     public static double radians(double v) {
         return Math.toRadians(v);
     }
 
+    @ExposedFunction
     public static double degrees(double v) {
         // Note that this does not raise overflow in Python: 1e307 -> inf as in Java.
         return Math.toDegrees(v);
     }
 
+    @ExposedFunction
     public static boolean isnan(double v) {
         return Double.isNaN(v);
     }
@@ -427,14 +458,17 @@ public class math implements ClassDictInit {
      *
      * @return <code>true</code> if v is positive or negative infinity
      */
+    @ExposedFunction
     public static boolean isinf(double v) {
         return Double.isInfinite(v);
     }
 
+    @ExposedFunction
     public static double copysign(double v, double w) {
         return Math.copySign(v, w);
     }
 
+    @ExposedFunction
     public static PyLong factorial(double v) {
         if (v == ZERO || v == ONE) {
             return new PyLong(1);
@@ -453,6 +487,7 @@ public class math implements ClassDictInit {
         }
     }
 
+    @ExposedFunction
     public static double log1p(double v) {
         if (v <= -1.) {
             throw mathDomainError();
@@ -461,6 +496,7 @@ public class math implements ClassDictInit {
         }
     }
 
+    @ExposedFunction
     public static double fsum(final PyObject iterable) {
         PyFloat result = (PyFloat)__builtin__.__import__("_fsum").invoke("fsum", iterable);
         return result.asDouble();
