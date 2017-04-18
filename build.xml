@@ -1,8 +1,9 @@
 <!-- Copyright 2000 Dj Walker-Morgan -->
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="jython" default="developer-build" basedir=".">
-  <target name="resolve">
-    <ivy:resolve/>
+  <target name="deps">
     <ivy:retrieve sync="true" type="jar,bundle"/>
+  </target>
+  <target name="resolve">
     <ivy:cachepath pathid="main.classpath" conf="compile"/>
     <ivy:cachepath pathid="default.classpath" conf="default"/>
     <ivy:cachepath pathid="test.classpath" conf="test"/>
