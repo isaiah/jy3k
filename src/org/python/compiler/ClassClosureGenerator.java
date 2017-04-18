@@ -22,16 +22,18 @@ import org.python.core.PyObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Create implicit __class__ closure reference if any methods in a class body refer to either __class__ or super.
  * see PEP-3135 New Super
  */
 public class ClassClosureGenerator extends Visitor {
-    private boolean inClass;
-    private boolean needsClosure;
+    private Queue<Boolean> inClass = new LinkedList<>();
+    private Queue<Boolean> needsClosure = new LinkedList<>();
 
     private List<stmt> filterClassDef(List<stmt> stmts) throws Exception {
         List<stmt> replacement = null;
@@ -80,10 +82,12 @@ public class ClassClosureGenerator extends Visitor {
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
         // TODO handle nested class
-        inClass = true;
+        inClass.add(true);
+        needsClosure.add(false);
         node.traverse(this);
-        inClass = false;
-        if (needsClosure) {
+        inClass.poll();
+        boolean thisNeedClosure = needsClosure.poll();
+        if (thisNeedClosure) {
             List<expr> bases = node.getInternalBases();
             List<keyword> keywords = node.getInternalKeywords();
             java.util.List<stmt> bod = new ArrayList<>();
@@ -111,7 +115,6 @@ public class ClassClosureGenerator extends Visitor {
             FunctionDef funcdef = new FunctionDef(node.getToken(), funcName, args, bod, new ArrayList<>(), null);
             assign = new Assign(node, Arrays.asList(new Name(node, name, expr_contextType.Store)),
                     new Call(node, outerName, bases, keywords));
-            needsClosure = false;
             return new stmt[] { funcdef, assign };
         }
         return null;
@@ -119,10 +122,11 @@ public class ClassClosureGenerator extends Visitor {
 
     @Override
     public Object visitName(Name node) throws Exception {
-        if (inClass && !needsClosure) {
+        if (!inClass.isEmpty() && inClass.peek() && !needsClosure.peek()) {
             String name = node.getInternalId();
             if (name.equals("__class__") || name.equals("super")) {
-                needsClosure = true;
+                needsClosure.poll();
+                needsClosure.add(true);
             }
         }
         return node;
