@@ -356,6 +356,10 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_close_doc)
     public static void close(PyObject fd) {
+        if (fd instanceof PyFileIO) {
+            ((PyFileIO) fd).close();
+            return;
+        }
         Object obj = fd.__tojava__(RawIOBase.class);
         if (obj != Py.NoConversion) {
             ((RawIOBase)obj).close();
@@ -1199,7 +1203,7 @@ public class PosixModule {
      * @return a String path
      */
     private static String asPath(PyObject path) {
-        if (path instanceof PyUnicode) {
+        if (path instanceof PyUnicode || path instanceof PyBytes) {
             return path.toString();
         }
         throw Py.TypeError(String.format("coercing to Unicode: need string, %s type found",
