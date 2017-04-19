@@ -1413,6 +1413,16 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         return ret;
     }
 
+    @ExposedMethod(doc = BuiltinDocs.type___instancecheck___doc)
+    public PyObject type___instancecheck__(PyObject inst) {
+        return new PyBoolean(Py.recursiveIsInstance(inst, this));
+    }
+
+    @ExposedMethod
+    public PyObject type___subclasscheck__(PyObject inst) {
+        return new PyBoolean(Py.recursiveIsSubClass(inst, this));
+    }
+
     public PyObject __findattr_ex__(String name) {
         return type___findattr_ex__(name);
     }

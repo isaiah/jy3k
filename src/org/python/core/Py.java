@@ -2619,9 +2619,13 @@ public final class Py {
      */
     private static PyObject dispatchToChecker(PyObject checkerArg, PyObject cls,
                                               String checkerName) {
-        PyObject checker = cls.__findattr__(checkerName);
+        // _PyObject_LookupSpecial
+        PyObject checker = cls.getType().lookup(checkerName);
         if (checker == null) {
             return null;
+        }
+        if (checker.implementsDescrGet()) {
+            checker = checker.__get__(cls, cls.getType());
         }
 
         return checker.__call__(checkerArg);
