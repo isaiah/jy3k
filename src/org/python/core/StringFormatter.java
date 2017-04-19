@@ -396,14 +396,22 @@ final class StringFormatter {
                     break;
                 case 's': // String: converts any object using __str__(), __unicode__() ...
                 case 'r': // ... or repr().
+                case 'a':
                     arg = getarg();
 
                     // Get hold of the actual object to display (may set needUnicode)
-                    String argAsString = spec.type == 's' ? arg.__str__().getString() : arg.__repr__().toString();
+                    PyObject argAsString;
+                    if (spec.type == 's'){
+                        argAsString = arg.__str__();
+                    } else if (spec.type == 'r') {
+                        argAsString = arg.__repr__();
+                    } else {
+                        argAsString  = __builtin__.ascii(arg);
+                    }
                     // Format the str/unicode form of the argument using this Spec.
                     f = ft = new TextFormatter(buffer, spec);
                     ft.setBytes(!needUnicode);
-                    ft.format(argAsString);
+                    ft.format(argAsString.toString());
                     break;
 
                 case 'd': // All integer formats (+case for X).

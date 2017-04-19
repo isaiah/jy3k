@@ -2306,6 +2306,9 @@ public class PyUnicode extends PySequence implements Iterable {
                     fieldObj = fieldObj.__repr__();
                 } else if ("s".equals(chunk.conversion)) {
                     fieldObj = fieldObj.__str__();
+                } else if ("a".equals(chunk.conversion)) {
+                    // a = ascii
+                    fieldObj = __builtin__.ascii(fieldObj);
                 } else if (chunk.conversion != null) {
                     throw Py.ValueError("Unknown conversion specifier " + chunk.conversion);
                 }
