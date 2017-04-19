@@ -299,6 +299,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitSliceop(PythonParser.SliceopContext ctx) {
+        if (ctx.test() == null) {
+            return null;
+        }
         return visit(ctx.test());
     }
 
