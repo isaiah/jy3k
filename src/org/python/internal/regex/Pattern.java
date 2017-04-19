@@ -1060,6 +1060,13 @@ public final class Pattern
     private transient boolean hasSupplementary;
 
     /**
+     * If currently in character class,
+     * when it's true, the space and # should be treated as it is no matter if COMMENTS flag
+     * is set or not.
+     */
+    private transient boolean inCharacterClass;
+
+    /**
      * Compiles the given regular expression into a pattern.
      *
      * @param  regex
@@ -1860,7 +1867,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     private void accept(int ch, String s) {
         int testChar = temp[cursor++];
-        if (has(COMMENTS))
+        if (has(COMMENTS) && !inCharacterClass)
             testChar = parsePastWhitespace(testChar);
         if (ch != testChar) {
             throw error(s);
@@ -1879,7 +1886,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     private int peek() {
         int ch = temp[cursor];
-        if (has(COMMENTS))
+        if (has(COMMENTS) && !inCharacterClass)
             ch = peekPastWhitespace(ch);
         return ch;
     }
@@ -1889,7 +1896,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     private int read() {
         int ch = temp[cursor++];
-        if (has(COMMENTS))
+        if (has(COMMENTS) && !inCharacterClass)
             ch = parsePastWhitespace(ch);
         return ch;
     }
@@ -1908,7 +1915,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
      */
     private int next() {
         int ch = temp[++cursor];
-        if (has(COMMENTS))
+        if (has(COMMENTS) && !inCharacterClass)
             ch = peekPastWhitespace(ch);
         return ch;
     }
@@ -2610,6 +2617,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         BitClass bits = new BitClass();
         BmpCharPredicate bitsP = ch -> ch < 256 && bits.bits[ch];
 
+        inCharacterClass = true;
         boolean isNeg = false;
         boolean hasBits = false;
         int ch = next();
@@ -2676,6 +2684,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                         throw error("Unclosed character class");
                     break;
                 case ']':
+                    inCharacterClass = false;
                     if (prev != null || hasBits) {
                         if (consume)
                             next();

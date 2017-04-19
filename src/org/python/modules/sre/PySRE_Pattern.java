@@ -51,6 +51,9 @@ public class PySRE_Pattern extends PyObject {
         String pattern = getString(s);
         int flag = flags.asInt();
         int javaFlags = 0;
+        if ((flag & SRE_STATE.SRE_FLAG_MULTILINE) != 0) {
+            javaFlags |= Pattern.MULTILINE;
+        }
         if ((flag & SRE_STATE.SRE_FLAG_VERBOSE) != 0) {
             javaFlags |= Pattern.COMMENTS;
         }
