@@ -60,6 +60,9 @@ public class PySRE_Pattern extends PyObject {
         if ((flag & SRE_FLAG_IGNORECASE) != 0) {
             javaFlags |= Pattern.CASE_INSENSITIVE;
         }
+        if ((flag & SRE_FLAG_DOTALL) != 0) {
+            javaFlags |= Pattern.DOTALL;
+        }
         try {
             this.reg = Pattern.compile(pattern, javaFlags);
         } catch (PatternSyntaxException e) {
