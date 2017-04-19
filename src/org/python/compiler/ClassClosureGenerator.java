@@ -21,6 +21,7 @@ import org.python.core.PyObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,15 +33,16 @@ import java.util.Queue;
  * see PEP-3135 New Super
  */
 public class ClassClosureGenerator extends Visitor {
-    private Queue<Boolean> inClass = new LinkedList<>();
-    private Queue<Boolean> needsClosure = new LinkedList<>();
+    private Deque<Boolean> inClass = new LinkedList<>();
+    private Deque<Boolean> needsClosure = new LinkedList<>();
 
     private List<stmt> filterClassDef(List<stmt> stmts) throws Exception {
         List<stmt> replacement = null;
         for (int i = 0; i < stmts.size(); i++) {
             stmt s = stmts.get(i);
+            Object o = visit(s);
             if (s instanceof ClassDef) {
-                stmt[] ret = (stmt[]) visit(s);
+                stmt[] ret = (stmt[]) o;
                 if (ret != null) {
                     if (replacement == null) {
                         replacement = new ArrayList<>(stmts.size() + 2);
@@ -56,6 +58,13 @@ public class ClassClosureGenerator extends Visitor {
             }
         }
         return replacement == null ? stmts : replacement;
+    }
+
+    @Override
+    public Object visitFunctionDef(FunctionDef node) throws Exception {
+        List<stmt> stmts = node.getInternalBody();
+        node.setInternalBody(filterClassDef(stmts));
+        return node;
     }
 
     @Override
@@ -81,12 +90,11 @@ public class ClassClosureGenerator extends Visitor {
 
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
-        // TODO handle nested class
-        inClass.add(true);
-        needsClosure.add(false);
-        node.traverse(this);
-        inClass.poll();
-        boolean thisNeedClosure = needsClosure.poll();
+        inClass.push(true);
+        needsClosure.push(false);
+        node.setInternalBody(filterClassDef(node.getInternalBody()));
+        inClass.pop();
+        boolean thisNeedClosure = needsClosure.pop();
         if (thisNeedClosure) {
             List<expr> bases = node.getInternalBases();
             List<keyword> keywords = node.getInternalKeywords();
@@ -125,8 +133,8 @@ public class ClassClosureGenerator extends Visitor {
         if (!inClass.isEmpty() && inClass.peek() && !needsClosure.peek()) {
             String name = node.getInternalId();
             if (name.equals("__class__") || name.equals("super")) {
-                needsClosure.poll();
-                needsClosure.add(true);
+                needsClosure.pop();
+                needsClosure.push(true);
             }
         }
         return node;
