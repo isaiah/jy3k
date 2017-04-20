@@ -36,7 +36,7 @@ public class PySRE_Scanner extends PyObject {
         if (pos >= string.__len__() || !matcher.find(pos)) {
             return Py.None;
         }
-        this.pos = matcher.end() + 1;
+        this.pos = matcher.end();
         return new PySRE_Match(this.matcher, string, pattern);
     }
 
