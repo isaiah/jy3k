@@ -200,8 +200,6 @@ public class PySRE_Pattern extends PyObject {
             if (matcher.start() != pos) {
                 sb.append(s.substring(pos, matcher.start()));
                 pos = matcher.end();
-            } else {
-                pos++;
             }
 
             if (replCallable) {
@@ -209,6 +207,11 @@ public class PySRE_Pattern extends PyObject {
                 replacement = ((PyUnicode) filter.__call__(match)).getString();
             }
             sb.append(replacement);
+            /** if the search only matches a fixed position, abort */
+            if (matcher.start() == matcher.end()) {
+                sb.append(s.substring(pos));
+                break;
+            }
         }
         if (args[1] instanceof PyBytes) {
             return new PyBytes(sb);

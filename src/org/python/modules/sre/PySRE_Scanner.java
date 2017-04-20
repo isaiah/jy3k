@@ -33,7 +33,7 @@ public class PySRE_Scanner extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Scanner_search() {
-        if (!matcher.find(pos)) {
+        if (pos >= string.__len__() || !matcher.find(pos)) {
             return Py.None;
         }
         this.pos = matcher.end() + 1;
