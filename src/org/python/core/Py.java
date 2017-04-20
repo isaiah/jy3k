@@ -2181,10 +2181,6 @@ public final class Py {
             if (metaclass != null) {
                 kwargs.__delitem__("metaclass");
             }
-//            // in case of kwarg
-//            if (metaclass != null && metaclass instanceof PyDictionary) {
-//                metaclass = metaclass.__finditem__("metaclass");
-//            }
         }
 
         if (metaclass == null) {
@@ -2206,26 +2202,31 @@ public final class Py {
         PyObject prepare =  metaclass.__findattr__("__prepare__");
         PyUnicode clsname = new PyUnicode(name);
         PyObject basesArray = new PyTuple(bases);
+        boolean isWide = kwargs != null && kwargs.__bool__();
+        int kwargsLen = isWide ? kwargs.__len__() : 0;
+        PyObject[] args = new PyObject[kwargsLen + 2];
+        args[0] = clsname;
+        args[1] = basesArray;
+        String[] keywords = new String[kwargsLen];
+        if (isWide) {
+            int i = 2;
+            for (Object key: ((PyDictionary) kwargs).keySet()) {
+                String keyStr = key.toString();
+                keywords[i - 2] = keyStr;
+                args[i++] = kwargs.__finditem__(keyStr);
+            }
+        }
         if (prepare != null) {
-            PyDictionary map = (PyDictionary) prepare.__call__(clsname, basesArray);
-            map.update(dict);
-            dict = map;
+            PyDictionary map = (PyDictionary) prepare.__call__(args, keywords);
+            ((PyDict) dict).update(map);
         }
 
         try {
-            if (kwargs != null && kwargs.__bool__()) {
-                int kwargsLen = kwargs.__len__();
-                PyObject[] args = new PyObject[kwargsLen + 3];
-                args[0] = clsname;
-                args[1] = basesArray;
-                args[2] = dict;
-                String[] keywords = new String[kwargsLen];
-                int i = 3;
-                for (Object key: ((PyDictionary) kwargs).keySet()) {
-                    String keyStr = key.toString();
-                    keywords[i - 3] = keyStr;
-                    args[i++] = kwargs.__finditem__(keyStr);
-                }
+            if (isWide) {
+                PyObject[] newArgs = new PyObject[args.length + 1];
+                System.arraycopy(args, 0, newArgs, 0, 2);
+                newArgs[2] = dict;
+                System.arraycopy(args, 2, newArgs, 3, args.length - 2);
                 return metaclass.__call__(args, keywords);
             }
             return metaclass.__call__(clsname, basesArray, dict);

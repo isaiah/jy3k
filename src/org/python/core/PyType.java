@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import org.python.expose.ExposeAsSuperclass;
+import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedDelete;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
@@ -1411,6 +1412,11 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             noAttributeError(n);
         }
         return ret;
+    }
+
+    @ExposedClassMethod(doc = BuiltinDocs.type___prepare___doc)
+    public static PyObject type___prepare__(PyType type, PyObject[] args, String[] keywords) {
+        return new PyDictionary();
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___instancecheck___doc)

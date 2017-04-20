@@ -45,9 +45,6 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
 
     @ExposedMethod
     final PyObject method_descriptor___call__(PyObject[] args, String[] kwargs) {
-        if(args.length == kwargs.length) {
-            throw Py.TypeError(name + " requires at least one argument");
-        }
         checkCallerType(args[0].getType());
         PyObject[] actualArgs = new PyObject[args.length - 1];
         System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);

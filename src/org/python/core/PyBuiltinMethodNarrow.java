@@ -1,11 +1,13 @@
 package org.python.core;
 
 public abstract class PyBuiltinMethodNarrow extends PyBuiltinMethod {
+    protected boolean isWide;
     /**
      * Creates a method for the given name that takes no arguments.
      */
     protected PyBuiltinMethodNarrow(String name) {
         this(name, 0);
+        isWide = true;
     }
 
     /**
