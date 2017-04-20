@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 // TODO: this needs proper key, value, item views
 @ExposedType(name = "stringmap", isBaseType = false)
-public class PyStringMap extends PyObject implements Traverseproc {
+public class PyStringMap extends PyObject implements Traverseproc, PyDict {
 
     /**
      * TYPE computed lazily, PyStringMap is used early in the bootstrap process and
@@ -322,6 +322,7 @@ public class PyStringMap extends PyObject implements Traverseproc {
         return new PyStringMap(table);
     }
 
+    @Override
     public void update(PyObject other) {
         stringmap_update(new PyObject[] {other}, Py.NoKeywords);
     }

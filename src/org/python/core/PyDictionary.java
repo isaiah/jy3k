@@ -26,7 +26,7 @@ import org.python.util.Generic;
  * A builtin python dictionary.
  */
 @ExposedType(name = "dict", doc = BuiltinDocs.dict_doc)
-public class PyDictionary extends PyObject implements ConcurrentMap, Traverseproc {
+public class PyDictionary extends PyObject implements ConcurrentMap, Traverseproc, PyDict {
 
     public static final PyType TYPE = PyType.fromClass(PyDictionary.class);
 
@@ -395,6 +395,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
      * Insert all the key:value pairs from <code>d</code> into
      * this dictionary.
      */
+    @Override
     public void update(PyObject other) {
         dict_update(new PyObject[]{other}, Py.NoKeywords);
     }
