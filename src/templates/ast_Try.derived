@@ -1,4 +1,4 @@
-base_class: TryExcept
+base_class: Try
 want_dict: true
 ctr
 incl: object

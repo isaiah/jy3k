@@ -111,8 +111,7 @@ ast_Slice.derived:org.python.antlr.ast.SliceDerived
 ast_Str.derived:org.python.antlr.ast.StrDerived
 ast_Subscript.derived:org.python.antlr.ast.SubscriptDerived
 ast_Suite.derived:org.python.antlr.ast.SuiteDerived
-ast_TryExcept.derived:org.python.antlr.ast.TryExceptDerived
-ast_TryFinally.derived:org.python.antlr.ast.TryFinallyDerived
+ast_Try.derived:org.python.antlr.ast.TryDerived
 ast_Tuple.derived:org.python.antlr.ast.TupleDerived
 ast_UnaryOp.derived:org.python.antlr.ast.UnaryOpDerived
 ast_While.derived:org.python.antlr.ast.WhileDerived
