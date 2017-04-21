@@ -2197,13 +2197,8 @@ public final class Py {
         return EmptyUnicode.join(new PyTuple(strs));
     }
 
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject kwargs, PyCode code,
-                                     PyObject[] closure_cells) {
-        return makeClass(name, name, bases, kwargs, code, closure_cells);
-    }
-
     public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject kwargs, PyCode code,
-                                     PyObject[] closure_cells) {
+                                     PyObject[] closure_cells, PyObject classDoc) {
         ThreadState state = getThreadState();
         bases = unpackBases(name, bases);
         PyObject metaclass = findMetaclass(bases, kwargs);
@@ -2234,6 +2229,7 @@ public final class Py {
         PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals, Py.getSystemState().getBuiltins());
         PyObject map = code.call(state, f, new PyTuple(closure_cells));
         map.__setitem__("__qualname__", new PyUnicode(qualname));
+        map.__setitem__("__doc__", classDoc);
         try {
             if (isWide) {
                 PyObject[] newArgs = new PyObject[args.length + 1];

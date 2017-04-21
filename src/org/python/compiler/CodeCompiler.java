@@ -280,7 +280,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return fast_locals && !scope.exec && !scope.from_import_star;
     }
 
-    void parse(mod node, Code code, boolean fast_locals, String className, Str classDoc,
+    void parse(mod node, Code code, boolean fast_locals, String className,
                boolean classBody, ScopeInfo scope, CompilerFlags cflags) throws Exception {
         this.fast_locals = fast_locals;
         this.className = className;
@@ -301,13 +301,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.invokevirtual(p(PyFrame.class), "setlocal",
                     sig(Void.TYPE, String.class, PyObject.class));
 
-            if (classDoc != null) {
-                loadFrame();
-                code.ldc("__doc__");
-                visit(classDoc);
-                code.invokevirtual(p(PyFrame.class), "setlocal",
-                        sig(Void.TYPE, String.class, PyObject.class));
-            }
+//            if (classDoc != null) {
+//                loadFrame();
+//                code.ldc("__doc__");
+//                visit(classDoc);
+//                code.invokevirtual(p(PyFrame.class), "setlocal",
+//                        sig(Void.TYPE, String.class, PyObject.class));
+//            }
 //            loadFrame();
 //            code.ldc("__qualname__");
 //            code.ldc(className);
@@ -2684,20 +2684,26 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         scope.setup_closure();
-        scope.dump();
+//        scope.dump();
         // Make code object out of suite
 
         module.codeConstant(new Suite(node, node.getInternalBody()), name, false, name,
-                getDocStr(node.getInternalBody()), true, false, node.getLine(), scope, cflags).get(
+                true, false, node.getLine(), scope, cflags).get(
                 code);
 
         // Make class out of name, bases, and code
         if (!makeClosure(scope)) {
             code.aconst_null();
         }
+        Str docStr = getDocStr(node.getInternalBody());
+        if (docStr != null) {
+            visit(docStr);
+        } else {
+            getNone();
+        }
         code.invokestatic(p(Py.class), "makeClass",
                 sig(PyObject.class, String.class, String.class, PyObject[].class, PyObject.class, PyCode.class,
-                        PyObject[].class));
+                        PyObject[].class, PyObject.class));
 
         applyDecorators(node.getInternalDecorator_list());
 

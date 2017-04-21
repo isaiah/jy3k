@@ -232,8 +232,7 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
     final int jy_npurecell;
     final int moreflags;
 
-    PyCodeConstant(mod tree, String name, boolean fast_locals, String className, boolean classBody,
-            boolean printResults, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
+    PyCodeConstant(mod tree, String name, boolean fast_locals, boolean classBody, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
             Module module) throws Exception {
         this.co_name = name;
         this.co_firstlineno = firstlineno;
@@ -273,10 +272,10 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
         this.name = fname;
 
         // !classdef only
-        if (!classBody) {
-            varnames = toNameAr(scope.varNames, false);
-        } else {
+        if (classBody) {
             varnames = null;
+        } else {
+            varnames = toNameAr(scope.varNames, false);
         }
 
         constants = scope.constants;
@@ -483,7 +482,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
                 return complexConstant(((PyComplex)n).imag);
             }
         } else if (node instanceof Str) {
-            String s = (String) ((Str) node).getInternalS();
+            String s = ((Str) node).getInternalS();
             return unicodeConstant(s);
         } else if (node instanceof Bytes) {
             String s = ((Bytes) node).getInternalS();
@@ -513,17 +512,10 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-            boolean classBody, boolean printResults, int firstlineno, ScopeInfo scope,
-            CompilerFlags cflags) throws Exception {
-        return codeConstant(tree, name, fast_locals, className, null, classBody, printResults,
-                firstlineno, scope, cflags);
-    }
-
-    PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-            Str classDoc, boolean classBody, boolean printResults, int firstlineno,
+            boolean classBody, boolean printResults, int firstlineno,
             ScopeInfo scope, CompilerFlags cflags) throws Exception {
-        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, className, classBody, //
-                printResults, firstlineno, scope, cflags, this);
+        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, classBody,
+                firstlineno, scope, cflags, this);
         codes.add(code);
 
         CodeCompiler compiler = new CodeCompiler(this, printResults);
@@ -531,7 +523,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         Code c = classfile.addMethod(code.fname, //
                 sig(PyObject.class, PyFrame.class, ThreadState.class), ACC_PUBLIC);
 
-        compiler.parse(tree, c, fast_locals, className, classDoc, classBody, scope, cflags);
+        compiler.parse(tree, c, fast_locals, className, classBody, scope, cflags);
         return code;
     }
 
