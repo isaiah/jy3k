@@ -177,4 +177,14 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
         col_offset = num;
     }
 
+
+    private boolean print;
+
+    public boolean isPrint() {
+        return print;
+    }
+
+    public void setPrint(boolean print) {
+        this.print = print;
+    }
 }

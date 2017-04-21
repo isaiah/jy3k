@@ -683,7 +683,7 @@ class JavaVisitor(EmitVisitor):
     public void set{f.capitalize()}(boolean {f}) {{
         this.{f} = {f};
     }}
-            """
+"""
             self.file.write(tmpl)
 
 class VisitorVisitor(EmitVisitor):
@@ -750,7 +750,7 @@ def main(outdir, grammar="Python.asdl"):
     c.visit(mod)
 
 # Extra fields to add to the AST nodes
-extra_fields = { "FunctionDef": ["split"] }
+extra_fields = { "FunctionDef": ["split"], "Expr": ["print"] }
 
 if __name__ == "__main__":
     import sys

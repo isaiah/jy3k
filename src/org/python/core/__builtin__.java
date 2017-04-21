@@ -1666,7 +1666,7 @@ class CompileFunction extends PyBuiltinFunction {
         }
 
         if (cflags.only_ast) {
-            return Py.java2py(ast);
+            return ast;
         } else {
             return Py.compile_flags(ast, filename, kind, cflags);
         }

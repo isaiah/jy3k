@@ -2225,20 +2225,24 @@ public final class Py {
         } else {
             dict = new PyDictionary();
         }
+        dict.__setitem__("__module__", state.frame.getname("__name__"));
+        dict.__setitem__("__qualname__", new PyUnicode(qualname));
+        if (classDoc != null) {
+            dict.__setitem__("__doc__", classDoc);
+        }
 
         PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals, Py.getSystemState().getBuiltins());
-        PyObject map = code.call(state, f, new PyTuple(closure_cells));
-        map.__setitem__("__qualname__", new PyUnicode(qualname));
-        map.__setitem__("__doc__", classDoc);
+        code.call(state, f, new PyTuple(closure_cells));
+
         try {
             if (isWide) {
                 PyObject[] newArgs = new PyObject[args.length + 1];
                 System.arraycopy(args, 0, newArgs, 0, 2);
-                newArgs[2] = map;
+                newArgs[2] = dict;
                 System.arraycopy(args, 2, newArgs, 3, args.length - 2);
                 return metaclass.__call__(args, keywords);
             }
-            return metaclass.__call__(clsname, basesArray, map);
+            return metaclass.__call__(clsname, basesArray, dict);
         } catch (PyException pye) {
             if (!pye.match(TypeError)) {
                 throw pye;

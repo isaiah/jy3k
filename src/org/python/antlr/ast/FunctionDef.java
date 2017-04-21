@@ -342,9 +342,11 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
 
 
     private boolean split;
+
     public boolean isSplit() {
         return split;
     }
+
     public void setSplit(boolean split) {
         this.split = split;
     }

@@ -377,7 +377,7 @@ public class imp {
             CompilerFlags cflags = new CompilerFlags();
             bufReader = ParserFacade.prepBufReader(fp, cflags, filename, false);
             node = ParserFacade.parseOnly(bufReader, CompileMode.exec, filename, cflags);
-            Module.compile(node, ofp, name + Version.PY_CACHE_TAG, filename, true, false, null, mtime);
+            Module.compile(node, ofp, name + Version.PY_CACHE_TAG, filename, true, null, mtime);
             return ofp.toByteArray();
         } catch (Throwable t) {
             throw ParserFacade.fixParseError(bufReader, t, filename);

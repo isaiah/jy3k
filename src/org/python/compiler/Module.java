@@ -232,7 +232,7 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
     final int jy_npurecell;
     final int moreflags;
 
-    PyCodeConstant(mod tree, String name, boolean fast_locals, boolean classBody, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
+    PyCodeConstant(mod tree, String name, boolean fast_locals, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
             Module module) throws Exception {
         this.co_name = name;
         this.co_firstlineno = firstlineno;
@@ -271,13 +271,8 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
         // XXX: is fname needed at all, or should we just use "name"?
         this.name = fname;
 
-        // !classdef only
-        if (classBody) {
-            varnames = null;
-        } else {
-            varnames = toNameAr(scope.varNames, false);
-        }
 
+        varnames = toNameAr(scope.varNames, false);
         constants = scope.constants;
         names = toNameAr(scope.globalNames, true);
         cellvars = toNameAr(scope.cellvars, true);
@@ -512,18 +507,17 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-            boolean classBody, boolean printResults, int firstlineno,
-            ScopeInfo scope, CompilerFlags cflags) throws Exception {
-        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, classBody,
+                                int firstlineno, ScopeInfo scope, CompilerFlags cflags) throws Exception {
+        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals,
                 firstlineno, scope, cflags, this);
         codes.add(code);
 
-        CodeCompiler compiler = new CodeCompiler(this, printResults);
+        CodeCompiler compiler = new CodeCompiler(this);
 
         Code c = classfile.addMethod(code.fname, //
                 sig(PyObject.class, PyFrame.class, ThreadState.class), ACC_PUBLIC);
 
-        compiler.parse(tree, c, fast_locals, className, classBody, scope, cflags);
+        compiler.parse(tree, c, fast_locals, className, scope, cflags);
         return code;
     }
 
@@ -699,13 +693,13 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,
-            boolean linenumbers, boolean printResults, CompilerFlags cflags) throws Exception {
-        compile(node, ostream, name, filename, linenumbers, printResults, cflags,
+            boolean linenumbers, CompilerFlags cflags) throws Exception {
+        compile(node, ostream, name, filename, linenumbers, cflags,
                 org.python.core.imp.NO_MTIME);
     }
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,
-            boolean linenumbers, boolean printResults, CompilerFlags cflags, long mtime)
+            boolean linenumbers, CompilerFlags cflags, long mtime)
             throws Exception {
         Module module = new Module(name, filename, linenumbers, mtime);
         if (cflags == null) {
@@ -725,9 +719,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
         // Add __doc__ if it exists
-
-        Constant main = module.codeConstant(node, "<module>", false, null, false, //
-                printResults, 0, module.getScopeInfo(node), cflags);
+        Constant main = module.codeConstant(node, "<module>", false, null,
+                0, module.getScopeInfo(node), cflags);
         module.mainCode = main;
         module.write(ostream);
     }

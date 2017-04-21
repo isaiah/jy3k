@@ -151,9 +151,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private int yield_count = 0;
     private Stack<String> stack = new Stack<String>();
 
-    public CodeCompiler(Module module, boolean print_results) {
+    public CodeCompiler(Module module) {
         this.module = module;
-        this.print_results = print_results;
 
         continueLabels = new Stack<Label>();
         breakLabels = new Stack<Label>();
@@ -280,8 +279,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return fast_locals && !scope.exec && !scope.from_import_star;
     }
 
-    void parse(mod node, Code code, boolean fast_locals, String className,
-               boolean classBody, ScopeInfo scope, CompilerFlags cflags) throws Exception {
+    void parse(mod node, Code code, boolean fast_locals, String className, ScopeInfo scope,
+               CompilerFlags cflags) throws Exception {
         this.fast_locals = fast_locals;
         this.className = className;
         this.code = code;
@@ -290,31 +289,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         this.tbl = scope.tbl;
 
         // BEGIN preparse
-        if (classBody) {
-            // Set the class's __module__ to __name__. fails when there's no __name__
-            loadFrame();
-            code.ldc("__module__");
-
-            loadFrame();
-            code.ldc("__name__");
-            code.invokevirtual(p(PyFrame.class), "getname", sig(PyObject.class, String.class));
-            code.invokevirtual(p(PyFrame.class), "setlocal",
-                    sig(Void.TYPE, String.class, PyObject.class));
-
-//            if (classDoc != null) {
-//                loadFrame();
-//                code.ldc("__doc__");
-//                visit(classDoc);
-//                code.invokevirtual(p(PyFrame.class), "setlocal",
-//                        sig(Void.TYPE, String.class, PyObject.class));
-//            }
-//            loadFrame();
-//            code.ldc("__qualname__");
-//            code.ldc(className);
-//            code.invokevirtual(p(PyFrame.class), "setlocal",
-//                    sig(Void.TYPE, String.class, String.class));
-        }
-
         Label genswitch = new Label();
         if (my_scope.generator) {
             code.goto_(genswitch);
@@ -348,18 +322,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         Object exit = visit(node);
+        if (exit == null) {
+            setLastI(-1);
 
-        if (classBody) {
-            loadFrame();
-            code.invokevirtual(p(PyFrame.class), "getf_locals", sig(PyObject.class));
+            getNone();
             code.areturn();
-        } else {
-            if (exit == null) {
-                setLastI(-1);
-
-                getNone();
-                code.areturn();
-            }
         }
 
         // BEGIN postparse
@@ -577,8 +544,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         scope.setup_closure();
 //        scope.dump();
-        module.codeConstant(new Suite(node, body), name, true, className, false,
-                false, node.getLine(), scope, cflags).get(code);
+        module.codeConstant(new Suite(node, body), name, true, className,
+                node.getLine(), scope, cflags).get(code);
 
         Str docStr = getDocStr(body);
         if (docStr != null) {
@@ -631,7 +598,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         setline(node);
         visit(node.getInternalValue());
 
-        if (print_results) {
+        if (node.isPrint()) {
             code.invokestatic(p(Py.class), "printResult", sig(Void.TYPE, PyObject.class));
         } else {
             code.pop();
@@ -2591,8 +2558,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         scope.setup_closure();
         scope.dump();
-        module.codeConstant(retSuite, name, true, className, false, false, node.getLine(), scope,
-                cflags).get(code);
+        module.codeConstant(retSuite, name, true, className, node.getLine(), scope, cflags).get(code);
 
         if (!makeClosure(scope)) {
             code.invokespecial(p(PyFunction.class), "<init>",
@@ -2688,8 +2654,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // Make code object out of suite
 
         module.codeConstant(new Suite(node, node.getInternalBody()), name, false, name,
-                true, false, node.getLine(), scope, cflags).get(
-                code);
+                node.getLine(), scope, cflags).get(code);
 
         // Make class out of name, bases, and code
         if (!makeClosure(scope)) {
@@ -2699,7 +2664,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (docStr != null) {
             visit(docStr);
         } else {
-            getNone();
+            code.aconst_null();
         }
         code.invokestatic(p(Py.class), "makeClass",
                 sig(PyObject.class, String.class, String.class, PyObject[].class, PyObject.class, PyCode.class,
@@ -2967,7 +2932,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         java.util.List<stmt> bod = new ArrayList<stmt>();
         bod.add(n);
-        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className, false, false,
+        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className,
                 node.getLine(), scope, cflags).get(code);
 
         code.aconst_null();
@@ -3046,7 +3011,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         java.util.List<stmt> bod = new ArrayList<stmt>();
         bod.add(n);
-        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className, false, false,
+        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className,
                 node.getLine(), scope, cflags).get(code);
 
         code.aconst_null();
