@@ -281,7 +281,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     void parse(mod node, Code code, boolean fast_locals, String className, Str classDoc,
-            boolean classBody, ScopeInfo scope, CompilerFlags cflags) throws Exception {
+               boolean classBody, ScopeInfo scope, CompilerFlags cflags) throws Exception {
         this.fast_locals = fast_locals;
         this.className = className;
         this.code = code;
@@ -308,11 +308,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.invokevirtual(p(PyFrame.class), "setlocal",
                         sig(Void.TYPE, String.class, PyObject.class));
             }
-            loadFrame();
-            code.ldc("__qualname__");
-            code.ldc(className);
-            code.invokevirtual(p(PyFrame.class), "setlocal",
-                    sig(Void.TYPE, String.class, String.class));
+//            loadFrame();
+//            code.ldc("__qualname__");
+//            code.ldc(className);
+//            code.invokevirtual(p(PyFrame.class), "setlocal",
+//                    sig(Void.TYPE, String.class, String.class));
         }
 
         Label genswitch = new Label();
@@ -481,8 +481,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Str getDocStr(java.util.List<stmt> suite) {
         if (suite.size() > 0) {
             stmt stmt = suite.get(0);
-            if (stmt instanceof Expr && ((Expr)stmt).getInternalValue() instanceof Str) {
-                return (Str)((Expr)stmt).getInternalValue();
+            if (stmt instanceof Expr && ((Expr) stmt).getInternalValue() instanceof Str) {
+                return (Str) ((Expr) stmt).getInternalValue();
             }
         }
         return null;
@@ -738,7 +738,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * 0 goto #1
      * 1 goto #2
      * 2 goto #3
-     *
+     * <p>
      * so it can return to yield from repeatly, until f_lasti is modified by the generator
      */
     @Override
@@ -1070,7 +1070,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
                 if (my_scope.contains_ns_free_vars) {
                     module.error("import * is not allowed in function '" + my_scope.scope_name
-                            + "' because it contains a nested function with free variables", true,
+                                    + "' because it contains a nested function with free variables", true,
                             node);
                 }
             }
@@ -1491,7 +1491,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public void exceptionTest(int exc, Label end_of_exceptions, Try node, int index)
             throws Exception {
         for (int i = 0; i < node.getInternalHandlers().size(); i++) {
-            ExceptHandler handler = (ExceptHandler)node.getInternalHandlers().get(i);
+            ExceptHandler handler = (ExceptHandler) node.getInternalHandlers().get(i);
 
             // setline(name);
             Label end_of_self = new Label();
@@ -1557,8 +1557,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         exceptionHandlers.pop();
 
 //        if (ret == NoExit) {
-            inlineFinally(inFinally);
-            code.goto_(finallyEnd);
+        inlineFinally(inFinally);
+        code.goto_(finallyEnd);
 //        }
 
         // Handle any Exceptions that get thrown in suite
@@ -1627,8 +1627,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-//    @Override
-     private Object visitTryExcept(Try node) throws Exception {
+    //    @Override
+    private Object visitTryExcept(Try node) throws Exception {
         Label start = new Label();
         Label end = new Label();
         Label handler_start = new Label();
@@ -2069,7 +2069,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         if (node.getInternalFunc() instanceof Attribute
                 && keys.isEmpty() && starargs.isEmpty() && kwargs.isEmpty()) {
-            return invokeNoKeywords((Attribute)node.getInternalFunc(), values);
+            return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
         }
 
         visit(node.getInternalFunc());
@@ -2353,15 +2353,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         boolean foundStarred = false;
         int count = elts.size();
         int countAfter = -1;
-        for (int i=0; i<elts.size(); i++) {
+        for (int i = 0; i < elts.size(); i++) {
             expr elt = elts.get(i);
             if (elt instanceof Starred) {
                 if (!foundStarred) {
                     if (i >= 256) {
-                            throw new ParseException("too many expressions in star-unpacking assignment", node);
+                        throw new ParseException("too many expressions in star-unpacking assignment", node);
                     }
                     count = i;
-                    countAfter = elts.size()-i-1;
+                    countAfter = elts.size() - i - 1;
                     foundStarred = true;
                 } else {
                     throw new ParseException("two starred expressions in assignment", node);
@@ -2454,7 +2454,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private void finishComp(expr node, java.util.List<expr> args,
-            java.util.List<comprehension> generators, String tmp_append) throws Exception {
+                            java.util.List<comprehension> generators, String tmp_append) throws Exception {
         set(new Name(node, tmp_append, expr_contextType.Store));
 
         stmt n = new Expr(node, new Call(node, new Name(node, tmp_append, expr_contextType.Load),
@@ -2693,15 +2693,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         // Make class out of name, bases, and code
         if (!makeClosure(scope)) {
-            code.invokestatic(p(Py.class), "makeClass",
-                    sig(PyObject.class, String.class, String.class, PyObject[].class, PyObject.class, PyCode.class));
-        } else {
-            code.invokestatic(
-                    p(Py.class),
-                    "makeClass",
-                    sig(PyObject.class, String.class, String.class, PyObject[].class, PyObject.class, PyCode.class,
-                            PyObject[].class));
+            code.aconst_null();
         }
+        code.invokestatic(p(Py.class), "makeClass",
+                sig(PyObject.class, String.class, String.class, PyObject[].class, PyObject.class, PyCode.class,
+                        PyObject[].class));
 
         applyDecorators(node.getInternalDecorator_list());
 
@@ -2811,7 +2807,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     code.invokevirtual(p(PyFrame.class), "setglobal",
                             sig(Void.TYPE, String.class, PyObject.class));
                 } else {
-                    if (syminf != null && (syminf.flags & (ScopeInfo.CELL|ScopeInfo.FREE)) != 0) {
+                    if (syminf != null && (syminf.flags & (ScopeInfo.CELL | ScopeInfo.FREE)) != 0) {
                         code.iconst(syminf.env_index);
                         code.aload(temporary);
                         code.invokevirtual(p(PyFrame.class), "setderef",
@@ -2819,10 +2815,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         return null;
                     }
                     if (!fast_locals) {
-                            code.ldc(name);
-                            code.aload(temporary);
-                            code.invokevirtual(p(PyFrame.class), "setlocal",
-                                    sig(Void.TYPE, String.class, PyObject.class));
+                        code.ldc(name);
+                        code.aload(temporary);
+                        code.invokevirtual(p(PyFrame.class), "setlocal",
+                                sig(Void.TYPE, String.class, PyObject.class));
                     } else {
                         if (syminf == null) {
                             throw new ParseException("internal compiler error", node);
@@ -2848,7 +2844,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         if (syminf == null) {
                             throw new ParseException("internal compiler error", node);
                         }
-                        if ((syminf.flags & (ScopeInfo.FREE|ScopeInfo.CELL)) != 0) {
+                        if ((syminf.flags & (ScopeInfo.FREE | ScopeInfo.CELL)) != 0) {
                             code.iconst(syminf.env_index);
                             code.invokevirtual(p(PyFrame.class), "delderef",
                                     sig(Void.TYPE, Integer.TYPE));
@@ -2918,7 +2914,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private Object visitInternalGenerators(expr node, expr elt,
-            java.util.List<comprehension> generators) throws Exception {
+                                           java.util.List<comprehension> generators) throws Exception {
         String bound_exp = "_(x)";
 
         setline(node);
@@ -3399,7 +3395,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * Data about a given exception range whether a try:finally: or a try:except:. The finally needs
      * to inline the finally block for each exit of the try: section, so we carry around that data
      * for it.
-     *
+     * <p>
      * Both of these need to stop exception coverage of an area that is either the inlined fin ally
      * of a parent try:finally: or the reentry block after a yield. Thus we keep around a set of
      * exception ranges that the catch block will eventually handle.
@@ -3410,7 +3406,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          * Each handler gets several exception ranges, this is because inlined finally exit code
          * shouldn't be covered by the exception handler of that finally block. Thus each time we
          * inline the finally code, we stop one range and then enter a new one.
-         *
+         * <p>
          * We also need to stop coverage for the recovery of the locals after a yield.
          */
         public Vector<Label> exceptionStarts = new Vector<Label>();
@@ -3418,7 +3414,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         public boolean bodyDone = false;
         public PythonTree node = null;
 
-        public ExceptionHandler() {}
+        public ExceptionHandler() {
+        }
 
         public ExceptionHandler(PythonTree n) {
             node = n;
@@ -3442,7 +3439,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         public void finalBody(CodeCompiler compiler) throws Exception {
             if (node instanceof Try) {
-                compiler.suite(((Try)node).getInternalFinalbody());
+                compiler.suite(((Try) node).getInternalFinalbody());
             }
         }
     }
