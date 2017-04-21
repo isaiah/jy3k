@@ -2,17 +2,10 @@ package org.python.antlr;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.python.antlr.ast.Expr;
-import org.python.antlr.ast.Interactive;
+import org.python.compiler.CompilerUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,27 +16,10 @@ import java.util.Collection;
 @RunWith(JUnitParamsRunner.class)
 public class BuildAstVisitorTest {
 
-    public PythonTree parse(String program) {
-        ANTLRInputStream inputStream = new ANTLRInputStream(program + "\n");
-        PythonLexer lexer = new PythonLexer(inputStream);
-        lexer.single = true;
-        TokenStream tokens = new CommonTokenStream(lexer);
-        PythonParser parser = new PythonParser(tokens);
-        parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-//        parser.setErrorHandler(new BailErrorStrategy());
-        ParseTree ctx = parser.single_input();
-        Interactive root = (Interactive) new BuildAstVisitor().visit(ctx);
-        PythonTree expr = root.getInternalBody().get(0);
-        if (expr instanceof Expr) {
-            return ((Expr) expr).getInternalValue();
-        }
-        return expr;
-    }
-
     @Test
     @Parameters(method = "data")
     public void testBuildAst(String program, String expectedAst) {
-        Assert.assertEquals(expectedAst, parse(program).toStringTree());
+        Assert.assertEquals(expectedAst, CompilerUtil.parse(program, "single").toStringTree());
     }
 
     public Collection<Object[]> data() {
@@ -112,6 +88,7 @@ public class BuildAstVisitorTest {
                 {"def foo(a,):\n  pass\n\n", "FunctionDef(name=foo,args=arguments(args=[arg],vararg=null,kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=[Pass],decorator_list=[],returns=null,)"},
                 {"def foo(*a,):\n  pass\n\n", "FunctionDef(name=foo,args=arguments(args=[],vararg=arg(arg=a,annotation=null,),kwonlyargs=[],kw_defaults=[],kwarg=null,defaults=[],),body=[Pass],decorator_list=[],returns=null,)"},
                 {"a: str = 1", "AnnAssign(target=Name(id=a,ctx=Store,),annotation=Name(id=str,ctx=Load,),value=Num(n=1,),simple=1,)"},
+                {"class Foo(a=1,b=2):\n  pass\n", "ClassDef(name=Foo,bases=[],keywords=[keyword, keyword],body=[Pass],decorator_list=[],)"},
         });
     }
 }
