@@ -88,7 +88,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public final static PyUnicode float_repr_style = Py.newUnicode("short");
 
-    public final static Class flags = Options.class;
+    public Options flags;
 
     public final static PyTuple _mercurial = new PyTuple(
             Py.newUnicode("Jython"),
@@ -102,7 +102,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             "Copyright (c) 2000-2015 Jython Developers.\n" + "All rights reserved.\n\n" +
             "Copyright (c) 2000 BeOpen.com.\n" + "All Rights Reserved.\n\n" +
             "Copyright (c) 2000 The Apache Software Foundation.\n" + "All rights reserved.\n\n" +
-            "Copyright (c) 1995-2000 Corporation for National Research Initiatives.\n"
+            "Copyright (c) 1995-2000 Corporation for National Research Initiatves.\n"
                 + "All Rights Reserved.\n\n" +
             "Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.\n"
                 + "All Rights Reserved.");
@@ -1111,7 +1111,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("executable", Py.defaultSystemState.executable);
         SysModule.setObject("exec_prefix", Py.defaultSystemState.exec_prefix);
         SysModule.setObject("exec_prefix", Py.defaultSystemState.exec_prefix);
-        SysModule.setObject("flags", Py.java2py(Py.defaultSystemState.flags));
         SysModule.setObject("implementation", Py.defaultSystemState.implementation);
         SysModule.setObject("maxsize", new PyLong(Py.defaultSystemState.maxsize));
         SysModule.setObject("meta_path", Py.defaultSystemState.meta_path);
@@ -1158,6 +1157,11 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         Py.defaultSystemState.initstdio();
         Py.defaultSystemState.initEncoding();
         return Py.defaultSystemState;
+    }
+
+    public void setFlags(Options flags) {
+        this.flags = flags;
+        SysModule.setObject("flags", flags);
     }
 
     private static PyTuple getVersionInfo() {

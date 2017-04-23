@@ -652,8 +652,6 @@ class CommandLineOptions {
                     argv[i] = args[index];
                 }
                 return true;
-            } else if (arg.startsWith("-3")) {
-                Options.py3k_warning = true;
             } else {
                 String opt = args[index];
                 if (opt.startsWith("--")) {

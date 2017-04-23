@@ -671,17 +671,6 @@ public final class Py {
         warning(ResourceWarning, message);
     }
 
-
-    public static void warnPy3k(String message) {
-        warnPy3k(message, 1);
-    }
-
-    public static void warnPy3k(String message, int stacklevel) {
-        if (Options.py3k_warning) {
-            warning(DeprecationWarning, message, stacklevel);
-        }
-    }
-
     private static PyObject warnings_mod;
 
     private static PyObject importWarnings() {

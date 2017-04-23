@@ -283,7 +283,7 @@ public class PyException extends RuntimeException implements Traverseproc
 
         if (exc instanceof PyUnicode) {
             Py.DeprecationWarning("catching of string Exceptions is deprecated");
-        } else if (Options.py3k_warning && !isExceptionClass(exc)) {
+        } else if (!isExceptionClass(exc)) {
             Py.DeprecationWarning("catching classes that don't inherit from BaseException is not "
                                   + "allowed in 3.x");
         }
