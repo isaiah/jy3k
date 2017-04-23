@@ -2240,7 +2240,7 @@ public final class Py {
                 System.arraycopy(args, 0, newArgs, 0, 2);
                 newArgs[2] = dict;
                 System.arraycopy(args, 2, newArgs, 3, args.length - 2);
-                return metaclass.__call__(args, keywords);
+                return metaclass.__call__(newArgs, keywords);
             }
             return metaclass.__call__(clsname, basesArray, dict);
         } catch (PyException pye) {
@@ -2476,7 +2476,7 @@ public final class Py {
     }
 
     public static void printResult(PyObject ret) {
-        Py.getThreadState().systemState.invoke("displayhook", ret);
+        Py.getSystemState().invoke("displayhook", ret);
     }
 
     public static final int ERROR = -1;
