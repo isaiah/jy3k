@@ -494,11 +494,11 @@ public class _pickle implements ClassDictInit {
         extension_registry = (PyDictionary)copyreg.__getattr__("_extension_registry");
         inverted_registry = (PyDictionary)copyreg.__getattr__("_inverted_registry");
 
-        PickleError = Py.makeClass("PickleError", Py.Exception, _PickleError());
-        PicklingError = Py.makeClass("PicklingError", PickleError, exceptionNamespace());
-        UnpickleableError = Py.makeClass("UnpickleableError", PicklingError, _UnpickleableError());
-        UnpicklingError = Py.makeClass("UnpicklingError", PickleError, exceptionNamespace());
-        BadPickleGet = Py.makeClass("BadPickleGet", UnpicklingError, exceptionNamespace());
+        PickleError = Py.makeClass("PickleError", _PickleError(), Py.Exception);
+        PicklingError = Py.makeClass("PicklingError", exceptionNamespace(), PickleError);
+        UnpickleableError = Py.makeClass("UnpickleableError", _UnpickleableError(), PickleError);
+        UnpicklingError = Py.makeClass("UnpicklingError", exceptionNamespace(), PickleError);
+        BadPickleGet = Py.makeClass("BadPickleGet", exceptionNamespace(), UnpicklingError);
     }
 
     public static PyObject exceptionNamespace() {

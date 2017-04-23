@@ -758,7 +758,7 @@ public class PyBytecode extends PyBaseCode implements Traverseproc {
                         PyObject methods = stack.pop();
                         PyObject bases[] = ((PySequenceList) (stack.pop())).getArray();
                         String name = stack.pop().toString();
-                        stack.push(Py.makeClass(name, bases, methods));
+                        stack.push(Py.makeClass(name, methods, bases));
                         break;
                     }
 

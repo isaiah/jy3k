@@ -42,11 +42,11 @@ public class SubprocessModule {
         PyObject superclass = exc.__finditem__("Exception");
         PyDictionary classDict = new PyDictionary();
         classDict.__setitem__("__doc__", new PyUnicode("Common base class for all non-exit exceptions."));
-        SubprocessError = Py.makeClass("SubprocessError", superclass, classDict);
+        SubprocessError = Py.makeClass("SubprocessError", classDict, superclass);
         classDict = new PyDictionary();
         classDict.__setitem__("__doc__", new PyUnicode("This exception is raised when check_returncode()" +
                 " is called on a process that exit code is non-zero"));
-        CalledProcessError = Py.makeClass("CalledProcessError", SubprocessError, classDict);
+        CalledProcessError = Py.makeClass("CalledProcessError", classDict, SubprocessError);
         dict.__setitem__("SubprocessError", SubprocessError);
         dict.__setitem__("CalledProcessError", CalledProcessError);
         dict.__setitem__("Popen", PyPopen.TYPE);

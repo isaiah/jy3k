@@ -136,10 +136,10 @@ public class binascii {
 
     public static final String __doc__ = "Conversion between binary data and ASCII";
 
-    public static final PyObject Error = Py.makeClass("Error", Py.Exception, exceptionNamespace());
+    public static final PyObject Error = Py.makeClass("Error", exceptionNamespace(), Py.Exception);
 
-    public static final PyObject Incomplete = Py.makeClass("Incomplete", Py.Exception,
-                                                           exceptionNamespace());
+    public static final PyObject Incomplete = Py.makeClass("Incomplete",
+                                                           exceptionNamespace(), Py.Exception);
     @ModuleInit
     public static void init(PyObject dict) {
         dict.__setitem__("Error", Error);

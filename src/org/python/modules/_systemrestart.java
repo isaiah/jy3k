@@ -18,12 +18,12 @@ public class _systemrestart implements ClassDictInit {
 
     public static void classDictInit(PyObject dict) {
         SystemRestart = Py.makeClass(
-                "_systemrestart.SystemRestart", Py.BaseException,
+                "_systemrestart.SystemRestart",
                 new PyStringMap() {{
                     __setitem__("__doc__",
                             Py.newString("Request to restart the interpreter. " +
                                          "(Jython-specific)"));
-                }});
+                }}, Py.BaseException);
         dict.__delitem__("classDictInit");
     }
 }

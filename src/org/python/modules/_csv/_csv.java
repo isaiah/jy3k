@@ -33,7 +33,7 @@ public class _csv {
     public static volatile int field_limit = 128 * 1024;
 
     /** _csv.Error exception. */
-    public static final PyObject Error = Py.makeClass("Error", Py.Exception, exceptionNamespace());
+    public static final PyObject Error = Py.makeClass("Error", exceptionNamespace(), Py.Exception);
     public static PyException Error(String message) {
         return new PyException(Error, message);
     }

@@ -75,7 +75,7 @@ public class _io implements ClassDictInit {
     private static PyType makeException(PyObject dict, String excname, PyObject... bases) {
         PyStringMap classDict = new PyStringMap();
         classDict.__setitem__("__module__", Py.newString("_io"));
-        PyType type = (PyType)Py.makeClass(excname, bases, classDict);
+        PyType type = (PyType)Py.makeClass(excname, classDict, bases);
         dict.__setitem__(excname, type);
         return type;
     }

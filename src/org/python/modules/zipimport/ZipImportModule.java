@@ -43,9 +43,9 @@ public class ZipImportModule {
      */
     public static void initClassExceptions(PyObject exceptions) {
         PyObject ImportError = exceptions.__finditem__("ImportError");
-        ZipImportError = Py.makeClass("zipimport.ZipImportError", ImportError,
+        ZipImportError = Py.makeClass("zipimport.ZipImportError",
                                       new PyStringMap() {{
                                           __setitem__("__module__", Py.newString("zipimport"));
-                                      }});
+                                      }}, ImportError);
     }
 }

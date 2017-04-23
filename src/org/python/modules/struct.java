@@ -259,7 +259,7 @@ public class struct implements ClassDictInit {
      * Exception raised on various occasions; argument is a
      * string describing what is wrong.
      */
-    public static final PyObject error = Py.makeClass("error", Py.Exception, exceptionNamespace());
+    public static final PyObject error = Py.makeClass("error", exceptionNamespace(), Py.Exception);
 
     public static String __doc__ =
         "Functions to convert between Python values and C structs.\n" +

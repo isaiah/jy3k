@@ -64,7 +64,7 @@ public class ZlibModule {
     @ExposedConst
     public static final String ZLIB_RUNTIME_VERSION = "1.2.8";
 
-    public static final PyObject error = Py.makeClass("zlib.error", Py.BaseException, new PyStringMap());
+    public static final PyObject error = Py.makeClass("zlib.error", new PyStringMap(), Py.BaseException);
 
     @ModuleInit
     public static void init(PyObject dict) {

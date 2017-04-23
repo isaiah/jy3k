@@ -2197,26 +2197,48 @@ public final class Py {
         return EmptyUnicode.join(new PyTuple(strs));
     }
 
+    /**
+     * Bytecode entry for Python class definition
+     * @param name
+     * @param qualname
+     * @param bases
+     * @param kwargs
+     * @param code
+     * @param closure_cells
+     * @param classDoc
+     * @return
+     */
     public static PyObject makeClass(String name, String qualname, PyObject[] bases, PyObject kwargs, PyCode code,
                                      PyObject[] closure_cells, PyObject classDoc) {
         ThreadState state = getThreadState();
         bases = unpackBases(name, bases);
-        PyObject metaclass = findMetaclass(bases, kwargs);
+        PyObject metaclass = null;
+        boolean isWide = kwargs != null && kwargs.__bool__();
+        int kwargsLen = 0;
+        if (isWide) {
+            metaclass = kwargs.__finditem__("metaclass");
+            kwargsLen = metaclass == null ? kwargs.__len__() : kwargs.__len__() - 1;
+        }
+
+        if (metaclass == null) {
+            metaclass = findMetaclass(bases);
+        }
         PyObject prepare = metaclass.__findattr__("__prepare__");
         PyUnicode clsname = new PyUnicode(name);
         PyObject basesArray = new PyTuple(bases);
-        boolean isWide = kwargs != null && kwargs.__bool__();
-        int kwargsLen = isWide ? kwargs.__len__() : 0;
         PyObject[] args = new PyObject[kwargsLen + 2];
         args[0] = clsname;
         args[1] = basesArray;
         String[] keywords = new String[kwargsLen];
         if (isWide) {
             int i = 2;
-            for (Object key : ((PyDictionary) kwargs).keySet()) {
-                String keyStr = key.toString();
+            for (Map.Entry<PyObject, PyObject> entry : ((PyDictionary) kwargs).getMap().entrySet()) {
+                String keyStr = entry.getKey().toString();
+                if ("metaclass".equals(keyStr)) {
+                    continue;
+                }
                 keywords[i - 2] = keyStr;
-                args[i++] = kwargs.__finditem__(keyStr);
+                args[i++] = entry.getValue();
             }
         }
         PyDictionary dict;
@@ -2253,17 +2275,8 @@ public final class Py {
         }
     }
 
-    public static PyObject makeClass(String name, PyObject base, PyObject dict) {
-        return makeClass(name, base, dict, null);
-    }
-
-    public static PyObject makeClass(String name, PyObject base, PyObject dict, PyObject kwargs) {
-        PyObject[] bases = base == null ? EmptyObjects : new PyObject[]{base};
-        return makeClass(name, bases, dict, kwargs);
-    }
-
     /**
-     * Create a new Python class.
+     * Create a new Python class. Java code entry
      *
      * @param name  the String name of the class
      * @param bases an array of PyObject base classes
@@ -2271,22 +2284,8 @@ public final class Py {
      *              definition
      * @return a new Python Class PyObject
      */
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject dict) {
-        return makeClass(name, bases, dict, (PyObject) null);
-    }
-
-    /**
-     * Note: it's too hard to unpack the starargs and kwargs in byte code, let's do it here instead.
-     *
-     * @param name
-     * @param bases
-     * @param dict
-     * @param kwargs
-     * @return
-     */
-    public static PyObject makeClass(String name, PyObject[] bases, PyObject dict, PyObject kwargs) {
-        bases = unpackBases(name, bases);
-        PyObject metaclass = findMetaclass(bases, kwargs);
+    public static PyObject makeClass(String name, PyObject dict, PyObject... bases) {
+        PyObject metaclass = findMetaclass(bases);
         PyUnicode clsname = new PyUnicode(name);
         PyObject basesArray = new PyTuple(bases);
         try {
@@ -2669,30 +2668,21 @@ public final class Py {
         return bases;
     }
 
-    private static PyObject findMetaclass(PyObject[] bases, PyObject kwargs) {
+    private static PyObject findMetaclass(PyObject[] bases) {
         PyObject metaclass = null;
-        if (kwargs != null && kwargs.__bool__()) {
-            metaclass = kwargs.__finditem__("metaclass");
-            if (metaclass != null) {
-                kwargs.__delitem__("metaclass");
+        // metaclass resolution
+        for (PyObject base : bases) {
+            PyObject meta = base.__findattr__("__class__");
+            if (meta == null) {
+                meta = base.getType();
+            }
+            // FIXME Py.isSubclass running to stackoverflow if both parameters are the same
+            if (metaclass == null || (meta != metaclass && Py.isSubClass(meta, metaclass))) {
+                metaclass = meta;
             }
         }
-
         if (metaclass == null) {
-            // metaclass resolution
-            for (PyObject base : bases) {
-                PyObject meta = base.__findattr__("__class__");
-                if (meta == null) {
-                    meta = base.getType();
-                }
-                // FIXME Py.isSubclass running to stackoverflow if both parameters are the same
-                if (metaclass == null || (meta != metaclass && Py.isSubClass(meta, metaclass))) {
-                    metaclass = meta;
-                }
-            }
-            if (metaclass == null) {
-                metaclass = PyType.TYPE;
-            }
+            metaclass = PyType.TYPE;
         }
         return metaclass;
     }
