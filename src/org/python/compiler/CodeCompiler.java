@@ -2635,9 +2635,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             /** when the class closure is created, unwrap the kwarg */
             visit(node.getInternalKeywords().get(0).getInternalValue());
         } else {
+            expr kwarg = null;
             for (int i = 0; i < keywords.size(); i++) {
-                keys.add(keywords.get(i).getInternalArg());
-                values.add(keywords.get(i).getInternalValue());
+                keyword kw = keywords.get(i);
+                if (kw.getInternalArg() == null) {
+                    kwarg = kw.getInternalValue();
+                    break;
+                }
+                keys.add(kw.getInternalArg());
+                values.add(kw.getInternalValue());
             }
             int argArray = makeArray(values);
             int strArray = makeStrings(code, keys);
@@ -2647,6 +2653,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     sig(PyDictionary.class, String[].class, PyObject[].class));
 
             code.freeLocal(strArray);
+            if (kwarg != null) {
+                code.dup();
+                visit(kwarg);
+                code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
+            }
         }
 
         scope.setup_closure();
