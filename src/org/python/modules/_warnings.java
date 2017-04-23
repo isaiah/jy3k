@@ -179,6 +179,7 @@ public class _warnings {
         PyObject showFunc = getWarningsAttr("_showwarnmsg", source != null);
         if (showFunc == null) {
             showWarning(filename, lineno_obj, text, category, sourceline);
+            return true;
         }
         if (!showFunc.isCallable()) {
             throw Py.TypeError("warnings._showwarnmsg() must be set to a callable");
