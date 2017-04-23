@@ -510,7 +510,7 @@ public class GrammarActions {
         if (ret.bytesmode) {
             // TODO disallow non-ASCII characters.
             if (!ret.rawmode) {
-                ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", true);
+                ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", false);
             }
         } else if (!ret.rawmode) {
             ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", true);
