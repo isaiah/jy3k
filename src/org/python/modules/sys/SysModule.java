@@ -1,6 +1,7 @@
 package org.python.modules.sys;
 
 import org.python.core.BuiltinDocs;
+import org.python.core.Options;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
@@ -105,6 +106,23 @@ public class SysModule {
     public static PyObject getObject(String name) {
         PyObject sysdict = Py.getSystemState().sysdict;
         return sysdict.__getitem__(name);
+    }
+
+    public static Flags makeFlags() {
+        Flags flags = new Flags();
+        flags.debug = 0; //Options.debug;
+        flags.dont_write_bytecode = Options.dont_write_bytecode ? 1 : 0;
+        flags.bytes_warning = Options.bytes_warning;
+        flags.inspect = 0; //Options.inspect;
+        flags.interactive = 0; //Options.interactive;
+        flags.isolated = 0; // Options.isolated;
+        flags.optimize = Options.optimize;
+        flags.no_site = Options.no_site ? 1 : 0;
+        flags.no_user_site = Options.no_user_site ? 1 : 0;
+        flags.quiet = 0; // Options.quite;
+        flags.verbose = Options.verbose;
+        flags.ignore_environment = Options.ignore_environment ? 1 : 0;
+        return flags;
     }
 
     @ExposedFunction

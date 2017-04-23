@@ -88,8 +88,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public final static PyUnicode float_repr_style = Py.newUnicode("short");
 
-    public Options flags;
-
     public final static PyTuple _mercurial = new PyTuple(
             Py.newUnicode("Jython"),
             Py.newUnicode(Version.getHGIdentifier()),
@@ -195,12 +193,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             new ReferenceQueue<PySystemState>();
     private static final ConcurrentMap<WeakReference<PySystemState>, PySystemStateCloser> sysClosers =
             Generic.concurrentMap();
-
-    // float_info
-    public static final PyObject float_info = FloatInfo.getInfo();
-
-    // long_info
-    public static final PyObject long_info = LongInfo.getInfo();
 
     public PySystemState() {
         initialize();
@@ -1135,6 +1127,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("__displayhook__", Py.defaultSystemState.__displayhook__);
         SysModule.setObject("excepthook", Py.defaultSystemState.__excepthook__);
         SysModule.setObject("__excepthook__", Py.defaultSystemState.__excepthook__);
+        SysModule.setObject("flags", SysModule.makeFlags());
         // end init sys
 
         // Make sure that Exception classes have been loaded
@@ -1157,11 +1150,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         Py.defaultSystemState.initstdio();
         Py.defaultSystemState.initEncoding();
         return Py.defaultSystemState;
-    }
-
-    public void setFlags(Options flags) {
-        this.flags = flags;
-        SysModule.setObject("flags", flags);
     }
 
     private static PyTuple getVersionInfo() {
@@ -1962,163 +1950,3 @@ class PyAttributeDeleted extends PyObject {
     }
 }
 
-
-@ExposedType(name = "sys.float_info", isBaseType = false)
-class FloatInfo extends PyTuple {
-
-    @ExposedGet
-    public PyObject max, max_exp, max_10_exp, min, min_exp, min_10_exp, dig, mant_dig, epsilon,
-            radix, rounds;
-
-    public static final PyType TYPE = PyType.fromClass(FloatInfo.class);
-
-    private FloatInfo(PyObject... vals) {
-        super(TYPE, vals);
-
-        max = vals[0];
-        max_exp = vals[1];
-        max_10_exp = vals[2];
-        min = vals[3];
-        min_exp = vals[4];
-        min_10_exp = vals[5];
-        dig = vals[6];
-        mant_dig = vals[7];
-        epsilon = vals[8];
-        radix = vals[9];
-        rounds = vals[10];
-    }
-
-    static public FloatInfo getInfo() {
-        // max_10_exp, dig and epsilon taken from ssj library Num class
-        // min_10_exp, mant_dig, radix and rounds by ɲeuroburɳ (bit.ly/Iwo2LT)
-        return new FloatInfo( //
-                Py.newFloat(Double.MAX_VALUE),       // DBL_MAX
-                Py.newLong(Double.MAX_EXPONENT),     // DBL_MAX_EXP
-                Py.newLong(308),                     // DBL_MIN_10_EXP
-                Py.newFloat(Double.MIN_VALUE),       // DBL_MIN
-                Py.newLong(Double.MIN_EXPONENT),     // DBL_MIN_EXP
-                Py.newLong(-307),                    // DBL_MIN_10_EXP
-                Py.newLong(10),                      // DBL_DIG
-                Py.newLong(53),                      // DBL_MANT_DIG
-                Py.newFloat(2.2204460492503131e-16), // DBL_EPSILON
-                Py.newLong(2),                       // FLT_RADIX
-                Py.newLong(1)                        // FLT_ROUNDS
-        );
-    }
-
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (max != null) {
-            retVal = visit.visit(max, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (max_exp != null) {
-            retVal = visit.visit(max_exp, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (max_10_exp != null) {
-            retVal = visit.visit(max_10_exp, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (min != null) {
-            retVal = visit.visit(min, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (min_exp != null) {
-            retVal = visit.visit(min_exp, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (min_10_exp != null) {
-            retVal = visit.visit(min_10_exp, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (dig != null) {
-            retVal = visit.visit(dig, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (mant_dig != null) {
-            retVal = visit.visit(mant_dig, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (epsilon != null) {
-            retVal = visit.visit(epsilon, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (radix != null) {
-            retVal = visit.visit(radix, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        return rounds == null ? 0 : visit.visit(rounds, arg);
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (ob == max || ob == max_exp || ob == max_10_exp || ob == min
-            || ob == min_exp || ob == min_10_exp || ob == dig
-            || ob == mant_dig || ob == epsilon || ob == radix || ob == rounds);
-    }
-}
-
-
-@ExposedType(name = "sys.long_info", isBaseType = false)
-class LongInfo extends PyTuple {
-
-    @ExposedGet
-    public PyObject bits_per_digit, sizeof_digit;
-
-    public static final PyType TYPE = PyType.fromClass(LongInfo.class);
-
-    private LongInfo(PyObject... vals) {
-        super(TYPE, vals);
-
-        bits_per_digit = vals[0];
-        sizeof_digit = vals[1];
-    }
-
-    // XXX: I've cheated and just used the values that CPython gives me for my
-    // local Ubuntu system. I'm not sure that they are correct.
-    static public LongInfo getInfo() {
-        return new LongInfo(Py.newLong(30), Py.newLong(4));
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (bits_per_digit != null) {
-            retVal = visit.visit(bits_per_digit, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        return sizeof_digit == null ? 0 : visit.visit(sizeof_digit, arg);
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (ob == bits_per_digit || ob == sizeof_digit);
-    }
-}
