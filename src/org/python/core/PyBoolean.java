@@ -39,6 +39,11 @@ public class PyBoolean extends PyLong {
     }
 
     @Override
+    public PyUnicode __str__() {
+        return new PyUnicode(toString());
+    }
+
+    @Override
     public String toString() {
         return bool_toString();
     }
