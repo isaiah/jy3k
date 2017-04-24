@@ -8,6 +8,8 @@ import jnr.constants.platform.Errno;
 import jnr.posix.POSIX;
 import jnr.posix.POSIXFactory;
 import jnr.posix.util.Platform;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.python.antlr.base.mod;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
@@ -334,6 +336,11 @@ public final class Py {
     }
 
     public static PyObject SyntaxError;
+
+    public static PyException SyntaxError(ParserRuleContext ctx, String msg, String filename) {
+        Token tok = ctx.getStart();
+        return new PySyntaxError(msg, tok.getLine(), tok.getCharPositionInLine(), tok.getText(), filename);
+    }
 
     public static PyException SyntaxError(String message) {
         return new PyException(Py.SyntaxError, message);

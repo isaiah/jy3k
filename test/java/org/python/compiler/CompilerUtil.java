@@ -26,7 +26,7 @@ public class CompilerUtil {
         parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 //        parser.setErrorHandler(new BailErrorStrategy());
         ParseTree ctx;
-        PythonVisitor<PythonTree> visitor = new BuildAstVisitor();
+        PythonVisitor<PythonTree> visitor = new BuildAstVisitor("test");
         switch(mode) {
             case "single":
                 ctx = parser.single_input();

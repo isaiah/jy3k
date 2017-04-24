@@ -18,14 +18,12 @@ public class PySyntaxError extends PyException {
     int column;
     String text;
     String filename;
+    String msg;
 
 
-    public PySyntaxError(String s, int line, int column, String text,
-                         String filename)
+    public PySyntaxError(String s, int line, int column, String text, String filename)
     {
         super(Py.SyntaxError);
-        //XXX: null text causes Java error, though I bet I'm not supposed to
-        //     get null text.
         if (text == null) {
             text = "";
         }
@@ -44,5 +42,18 @@ public class PySyntaxError extends PyException {
         this.column = column;
         this.text = text;
         this.filename = filename;
+        this.msg = s;
+    }
+
+    public PyException setFilename(String filename) {
+        this.filename = filename;
+        PyObject[] tmp = new PyObject[] {
+            new PyUnicode(filename), new PyLong(lineno),
+            new PyLong(column), new PyUnicode(text)
+        };
+
+        this.value = new PyTuple(new PyUnicode(msg), new PyTuple(tmp));
+
+        return this;
     }
 }

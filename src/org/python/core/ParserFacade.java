@@ -40,6 +40,9 @@ public class ParserFacade {
     private ParserFacade() {}
 
     public static PyException fixParseError(Throwable t, String filename) {
+        if (t instanceof PySyntaxError) {
+            return (PySyntaxError) t;
+        }
         if (t instanceof ParseCancellationException) {
             int line = 0, col = 0;
             Throwable cause = t.getCause();
@@ -188,6 +191,9 @@ public class ParserFacade {
         try {
             reader = prepBufReader(string, cflags, filename);
             return parseOnly(reader, kind, filename, cflags);
+        } catch (PySyntaxError e) {
+            /** This is thrown from AST builder, don't need fixing */
+            throw e;
         } catch (Throwable t) {
             try {
                 reader = prepBufReader(string, cflags, filename);

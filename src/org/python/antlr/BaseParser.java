@@ -50,7 +50,7 @@ public class BaseParser {
         PythonParser parser = setupParser(false);
         try {
             PythonParser.Eval_inputContext r = parser.eval_input();
-            tree = (mod) new BuildAstVisitor().visit(r);
+            tree = (mod) new BuildAstVisitor(filename).visit(r);
         } catch (RecognitionException e) {
             //XXX: this can't happen.  Need to strip the throws from antlr
             //     generated code.
@@ -64,7 +64,7 @@ public class BaseParser {
         try {
             parser.setErrorHandler(new BailErrorStrategy());
             PythonParser.Single_inputContext r = parser.single_input();
-            tree = (mod) new BuildAstVisitor().visit(r);
+            tree = (mod) new BuildAstVisitor(filename).visit(r);
         } catch (RecognitionException e) {
             //I am only throwing ParseExceptions, but "throws RecognitionException" still gets
             //into the generated code.
@@ -79,7 +79,7 @@ public class BaseParser {
         parser.setErrorHandler(new BailErrorStrategy());
         try {
             PythonParser.File_inputContext r = parser.file_input();
-            tree = (mod) new BuildAstVisitor().visit(r);
+            tree = (mod) new BuildAstVisitor(filename).visit(r);
         } catch (RecognitionException e) {
             //XXX: this can't happen.  Need to strip the throws from antlr
             //     generated code.

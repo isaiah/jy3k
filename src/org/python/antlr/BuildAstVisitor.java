@@ -75,6 +75,7 @@ import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.compiler.ClassClosureGenerator;
+import org.python.core.Py;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,8 +91,13 @@ import java.util.stream.Collectors;
  * Created by isaiah on 3/10/17.
  */
 public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
+    private String filename;
     private GrammarActions actions = new GrammarActions();
     private expr_contextType exprContextType = expr_contextType.Load;
+
+    public BuildAstVisitor(String filename) {
+        this.filename = filename;
+    }
 
     @Override
     public PythonTree visitTry_stmt(PythonParser.Try_stmtContext ctx) {
@@ -125,7 +131,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitFile_input(PythonParser.File_inputContext ctx) {
         java.util.List<stmt> stmts = new ArrayList<>();
-        ctx.stmt().stream() .forEach(stmtContext -> stmts.addAll(visit_Stmt(stmtContext)));
+        ctx.stmt().stream().forEach(stmtContext -> stmts.addAll(visit_Stmt(stmtContext)));
         return new Module(ctx.getStart(), stmts);
     }
 
@@ -155,6 +161,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         }
         return Arrays.asList((stmt) visit(ctx.compound_stmt()));
     }
+
     @Override
     public PythonTree visitExpr_stmt(PythonParser.Expr_stmtContext ctx) {
         /** Augassign */
@@ -188,6 +195,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 .limit(targetsSize)
                 .map(testlist_star_exprContext -> {
                     expr e = (expr) visit(testlist_star_exprContext);
+                    if (e instanceof Call) {
+                        throw Py.SyntaxError(testlist_star_exprContext, "can't assign to function call", filename);
+                    }
                     recursiveSetContextType(e, expr_contextType.Store);
                     return e;
                 }).collect(Collectors.toList());
@@ -711,7 +721,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return visit(ctx.dotted_name());
     }
 
-    /** NOTE: there is a variant visit_Dotted_name what returns the joined String */
+    /**
+     * NOTE: there is a variant visit_Dotted_name what returns the joined String
+     */
     @Override
     public PythonTree visitDotted_name(PythonParser.Dotted_nameContext ctx) {
         expr current = new Name(ctx.NAME(0), ctx.NAME(0).getText(), exprContextType);
@@ -887,7 +899,12 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
         java.util.List<expr> exprs = visit_Exprlist(ctx.exprlist());
-        exprs.stream().forEach(expr -> ((Context) expr).setContext(expr_contextType.Del));
+        exprs.stream().forEach(expr -> {
+            if (expr instanceof Call) {
+                throw Py.SyntaxError(ctx, "can't delete function call", filename);
+            }
+            ((Context) expr).setContext(expr_contextType.Del);
+        });
         return new Delete(ctx.getStart(), exprs);
     }
 
@@ -1104,13 +1121,33 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private ArglistResult visit_Arglist(PythonParser.ArglistContext ctx) {
         ArglistResult ret = new ArglistResult();
+        int ndoublestars = 0, nkeywords = 0, nargs = 0;
+
         if (ctx == null) return ret;
         for (PythonParser.ArgumentContext argCtx : ctx.argument()) {
             PythonTree arg = visit(argCtx);
             if (arg instanceof keyword) {
-                ret.keywords.add((keyword) arg);
+                keyword kw = (keyword) arg;
+                ret.keywords.add(kw);
+                if (kw.getInternalArg() == null) {
+                    ndoublestars++;
+                } else {
+                    nkeywords++;
+                }
             } else {
                 ret.args.add((expr) arg);
+                nargs++;
+                if (ndoublestars > 0) {
+                    if (arg instanceof Starred) {
+                        throw Py.SyntaxError(ctx, "iterable argument unpacking follows keyword argument unpacking", filename);
+                    } else {
+                        throw Py.SyntaxError(ctx, "positional argument follows keyword argument unpacking", filename);
+                    }
+                } else if (nkeywords > 0) {
+                    if (!(arg instanceof Starred)) {
+                        throw Py.SyntaxError(ctx, "positional argument follows keyword argument", filename);
+                    }
+                }
             }
         }
         return ret;
@@ -1181,7 +1218,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         byte[] bytes = org.python.core.imp.compileSource(module, src);
 //        InputStream program = new FileInputStream("/tmp/foo.py");
 //        String program = "def foo(x):\n  return x + 1\n";
-        BuildAstVisitor v = new BuildAstVisitor();
+        BuildAstVisitor v = new BuildAstVisitor("<string>");
 //
         ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
         PythonLexer lexer = new PythonLexer(inputStream);
