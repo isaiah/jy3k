@@ -20,6 +20,9 @@ public class PyNotImplemented extends PySingleton implements Serializable
     @ExposedNew
     final static PyObject NotImplemented_new(PyNewWrapper new_, boolean init, PyType subtype,
             PyObject[] args, String[] keywords) {
+        if (args.length > 0) {
+            throw Py.TypeError("NoneType takes no arguments");
+        }
         return INST;
     }
 

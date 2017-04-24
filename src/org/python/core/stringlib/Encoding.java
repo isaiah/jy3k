@@ -1807,14 +1807,16 @@ public class Encoding {
         }
     }
 
-    public static String encode_UnicodeEscapeAsASCII(String str) {
+    public static String encode_UnicodeEscapeAsASCII(String str, boolean quoted) {
         int size = str.length();
         StringBuilder v = new StringBuilder(str.length());
 
         char quote = 0;
 
-        quote = str.indexOf('\'') >= 0 && str.indexOf('"') == -1 ? '"' : '\'';
-        v.append(quote);
+        if (quoted) {
+            quote = str.indexOf('\'') >= 0 && str.indexOf('"') == -1 ? '"' : '\'';
+            v.append(quote);
+        }
 
         for (int i = 0; size-- > 0; ) {
             char ch = str.charAt(i++);
@@ -1872,7 +1874,9 @@ public class Encoding {
                 v.append(ch);
             }
         }
-        v.append(quote);
+        if (quoted) {
+            v.append(quote);
+        }
         return v.toString();
     }
 }

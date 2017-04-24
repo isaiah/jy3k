@@ -1600,7 +1600,7 @@ public class PyObject implements Serializable {
     @ExposedMethod(doc = BuiltinDocs.object___format___doc)
     final PyObject object___format__(PyObject formatSpec) {
         if (formatSpec != null && formatSpec instanceof PyUnicode && !((PyUnicode)formatSpec).getString().isEmpty()) {
-            Py.warning(Py.PendingDeprecationWarning, "object.__format__ with a non-empty format string is deprecated");
+            throw Py.TypeError(String.format("unsupported format string passed to %s.__format__", getType().getName()));
         }
         return __str__().__format__(formatSpec);
     }

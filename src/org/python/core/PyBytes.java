@@ -324,7 +324,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @ExposedMethod(doc = BuiltinDocs.bytes___repr___doc)
     final PyUnicode bytes___repr__() {
-        return new PyUnicode("b" + Encoding.encode_UnicodeEscapeAsASCII(getString()));
+        return new PyUnicode("b" + Encoding.encode_UnicodeEscapeAsASCII(getString(), true));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___getitem___doc)

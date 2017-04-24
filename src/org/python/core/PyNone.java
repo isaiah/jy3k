@@ -28,6 +28,9 @@ public class PyNone extends PyObject implements Serializable {
     @ExposedNew
     final static PyObject NoneType_new(PyNewWrapper new_, boolean init, PyType subtype,
             PyObject[] args, String[] keywords) {
+        if (args.length > 0) {
+            throw Py.TypeError("NoneType takes no arguments");
+        }
         return INST;
     }
 

@@ -2547,6 +2547,9 @@ public final class Py {
             }
             return false;
         }
+        if (!(cls instanceof PyType)) {
+            throw Py.TypeError("isinstance() arg 2 must be a type or tuple of types");
+        }
 
         PyObject checkerResult;
         if ((checkerResult = dispatchToChecker(inst, cls, "__instancecheck__")) != null) {

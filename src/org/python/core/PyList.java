@@ -721,6 +721,9 @@ public class PyList extends PySequenceList implements List {
     }
 
     public void sort(PyObject key, PyObject reverse) {
+        if (!(reverse instanceof PyLong)) {
+            throw Py.TypeError(String.format("an integer is required (got type %s)", reverse.getType().fastGetName()));
+        }
         boolean bReverse = reverse.__bool__();
         if (key == Py.None || key == null) {
             sort(bReverse);

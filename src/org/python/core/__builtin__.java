@@ -404,7 +404,7 @@ public class __builtin__ {
     }
 
     public static PyObject ascii(PyObject obj) {
-        return new PyUnicode(Encoding.encode_UnicodeEscapeAsASCII(obj.toString()));
+        return new PyUnicode(Encoding.encode_UnicodeEscapeAsASCII(obj.toString(), false));
     }
 
     public static boolean callable(PyObject obj) {
@@ -650,14 +650,13 @@ public class __builtin__ {
     public static boolean hasattr(PyObject obj, PyObject nameObj) {
         String name = asName(nameObj, "hasattr");
         try {
-            return obj.__findattr__(name) != null;
+            return obj.__findattr_ex__(name) != null;
         } catch (PyException pye) {
-            if (pye.match(Py.KeyboardInterrupt) || pye.match(Py.SystemExit)) {
-                throw pye;
+            if (pye.match(Py.AttributeError)) {
+                return false;
             }
-            //Otherwise swallow exception.
+            throw pye;
         }
-        return false;
     }
 
     public static PyLong hash(PyObject o) {
@@ -1085,8 +1084,14 @@ public class __builtin__ {
     }
 
     public static PyObject sum(PyObject seq, PyObject result) {
-        if (result instanceof PyBytes) {
+        if (result instanceof PyUnicode) {
             throw Py.TypeError("sum() can't sum strings [use ''.join(seq) instead]");
+        }
+        if (result instanceof PyBytes) {
+            throw Py.TypeError("sum() can't sum bytes [use b''.join(seq) instead]");
+        }
+        if (result instanceof PyByteArray) {
+            throw Py.TypeError("sum() can't sum bytearray [use b''.join(seq) instead]");
         }
         for (PyObject item : seq.asIterable()) {
             result = result._add(item);
@@ -1233,7 +1238,7 @@ public class __builtin__ {
      */
     private static String asName(PyObject name, String function) {
         if (name instanceof PyUnicode) {
-            return ((PyUnicode)name).toString().intern();
+            return ((PyUnicode)name).getString().intern();
         }
         throw Py.TypeError(function + "(): attribute name must be string");
     }
@@ -1295,7 +1300,7 @@ class SortedFunction extends PyBuiltinFunction {
         ArgParser ap = new ArgParser("sorted", args, kwds,
                                      new String[] {"iterable", "key", "reverse"}, 0);
         PyObject key = ap.getPyObject(1, Py.None);
-        PyObject reverse = ap.getPyObject(2, Py.None);
+        PyObject reverse = ap.getPyObject(2, Py.Zero);
         seq.sort(key, reverse);
         return seq;
     }
@@ -1358,7 +1363,7 @@ class FormatFunction extends PyBuiltinFunctionNarrow {
 
     @Override
     public PyObject __call__(PyObject arg1) {
-        return __call__(arg1, Py.EmptyByte);
+        return __call__(arg1, Py.EmptyUnicode);
     }
 
     @Override
