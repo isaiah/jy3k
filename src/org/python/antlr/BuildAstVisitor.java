@@ -438,7 +438,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitShift_expr(PythonParser.Shift_exprContext ctx) {
         expr left = (expr) visit(ctx.arith_expr(0));
         for (int i = 0; i < ctx.ops.size(); i++) {
-            operatorType op = ctx.ops.get(i).getType() == PythonLexer.MINUS ? operatorType.Sub : operatorType.Add;
+            operatorType op = ctx.ops.get(i).getType() == PythonLexer.LEFT_SHIFT ? operatorType.LShift : operatorType.RShift;
             left = new BinOp(ctx.getStart(), left, op, (expr) visit(ctx.arith_expr(i + 1)));
         }
         return left;
