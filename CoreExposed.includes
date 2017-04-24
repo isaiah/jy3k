@@ -47,6 +47,7 @@ org/python/core/PyModuleDef.class
 org/python/core/PyNone.class
 org/python/core/PyObject.class
 org/python/core/PyProperty.class
+org/python/core/PySequenceIter.class
 org/python/core/PySet.class
 org/python/core/PySlice.class
 org/python/core/PySlot.class
@@ -59,6 +60,7 @@ org/python/core/PyTuple.class
 org/python/core/PyType.class
 org/python/core/PyUnicode.class
 org/python/core/PyRange.class
+org/python/core/PyXRangeIter.class
 org/python/core/stringlib/MarkupIterator.class
 org/python/core/stringlib/FieldNameIterator.class
 org/python/modules/PyStruct.class
@@ -137,15 +139,13 @@ org/python/modules/posix/PyDirEntry.class
 org/python/modules/posix/PyScandirIterator.class
 org/python/modules/posix/PyStatResult.class
 org/python/modules/random/PyRandom.class
-org/python/modules/sre/MatchObject.class
-org/python/modules/sre/PatternObject.class
-org/python/modules/sre/ScannerObject.class
 org/python/modules/sre/PySRE_Match.class
 org/python/modules/sre/PySRE_Pattern.class
 org/python/modules/sre/PySRE_Scanner.class
 org/python/modules/subprocess/PyCompletedProcess.class
 org/python/modules/subprocess/PyPopen.class
 org/python/modules/sys/FloatInfo.class
+org/python/modules/sys/Flags.class
 org/python/modules/sys/IntInfo.class
 org/python/modules/thread/PyLocal.class
 org/python/modules/time/PyTimeTuple.class

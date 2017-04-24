@@ -316,7 +316,6 @@ public class __builtin__ {
         dict.__setitem__("isinstance", new BuiltinFunctions("isinstance", 10, 2));
         dict.__setitem__("len", new BuiltinFunctions("len", 1, 1));
         dict.__setitem__("ord", new BuiltinFunctions("ord", 3, 1));
-//        dict.__setitem__("range", new BuiltinFunctions("range", 2, 1, 3));
         dict.__setitem__("sum", new BuiltinFunctions("sum", 12, 1, 2));
 //        dict.__setitem__("unichr", new BuiltinFunctions("unichr", 6, 1));
         dict.__setitem__("delattr", new BuiltinFunctions("delattr", 15, 2));

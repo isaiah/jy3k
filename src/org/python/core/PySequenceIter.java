@@ -1,9 +1,13 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
+import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedType;
+
 /**
  * General sequence iterator.
  */
+@ExposedType(name = "sequence_iter")
 public class PySequenceIter extends PyIterator {
 
     private PyObject seq;
@@ -12,6 +16,11 @@ public class PySequenceIter extends PyIterator {
 
     public PySequenceIter(PyObject seq) {
         this.seq = seq;
+    }
+
+    @ExposedMethod
+    public PyObject sequence_iter___next__() {
+        return super.next();
     }
 
     public PyObject __next__() {
