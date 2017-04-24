@@ -114,7 +114,7 @@ public class SysModule {
         flags.dont_write_bytecode = Options.dont_write_bytecode ? 1 : 0;
         flags.bytes_warning = Options.bytes_warning;
         flags.inspect = 0; //Options.inspect;
-        flags.interactive = 0; //Options.interactive;
+        flags.interactive = 1; //Options.interactive;
         flags.isolated = 0; // Options.isolated;
         flags.optimize = Options.optimize;
         flags.no_site = Options.no_site ? 1 : 0;
