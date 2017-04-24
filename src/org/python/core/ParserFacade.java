@@ -3,6 +3,9 @@ package org.python.core;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.python.antlr.*;
 import org.python.antlr.base.mod;
@@ -36,66 +39,39 @@ public class ParserFacade {
     private static int MARK_LIMIT = 100000;
     private ParserFacade() {}
 
-    private static String getLine(ExpectedEncodingBufferedReader reader, int line) {
-        if (reader == null) {
-            return "";
-        }
-        String text = null;
-        try {
-            for (int i = 0; i < line; i++) {
-                text = reader.readLine();
-            }
-            if (text == null) {
-                return text;
-            }
-            if (reader.encoding != null) {
-                // The parser used a non-latin encoding: re-encode chars to bytes.
-                Charset cs = Charset.forName(reader.encoding);
-                ByteBuffer decoded = cs.encode(text);
-                text = StringUtil.fromBytes(decoded);
-            }
-            return text + "\n";
-        } catch (IOException ioe) {
-        }
-        return text;
-    }
-
-    // if reader != null, reset it
-    public static PyException fixParseError(ExpectedEncodingBufferedReader reader,
-                                            Throwable t,
-                                            String filename) {
-        if (reader != null) {
-            try {
-                reader.reset();
-            } catch (IOException e) {
-//                reader = null;
-            }
-        }
-
+    public static PyException fixParseError(Throwable t, String filename) {
         if (t instanceof ParseCancellationException) {
             int line = 0, col = 0;
-            if (t.getCause() instanceof InputMismatchException) {
-                Token tok = ((InputMismatchException) t.getCause()).getOffendingToken();
+            Throwable cause = t.getCause();
+            boolean indentationError = false;
+            String msg = null;
+            String text = "";
+            if (cause instanceof InputMismatchException) {
+                Token tok = ((InputMismatchException) cause).getOffendingToken();
                 line = tok.getLine();
                 col = tok.getCharPositionInLine();
+                int tokType = tok.getType();
+                indentationError = tokType == PythonParser.INDENT || tokType == PythonParser.DEDENT;
+                text = tok.getText();
+                if (indentationError) {
+                    msg = "unexpected indent";
+                } else {
+                    IntervalSet toks = ((InputMismatchException) cause).getExpectedTokens();
+                    indentationError = toks.contains(PythonParser.INDENT);
+                    if (indentationError) {
+                        msg = "expected an indented block";
+                    }
+                }
             }
-
-            String text= getLine(reader, line);
-            String msg = t.getMessage();
-//            if (e.getType() == Py.IndentationError) {
-//                return new PyIndentationError(msg, line, col, text, filename);
-//            }
+            if (msg == null) {
+                msg = t.getMessage();
+            }
+            if (indentationError) {
+                return new PyIndentationError(msg, line, col, text, filename);
+            }
             return new PySyntaxError(msg, line, col, text, filename);
         } else if (t instanceof CharacterCodingException) {
-            String msg;
-            if (reader.encoding == null) {
-                msg = "Non-ASCII character in file '" + filename + "', but no encoding declared"
-                        + "; see http://www.python.org/peps/pep-0263.html for details";
-            } else {
-                msg = "Illegal character in file '" + filename + "' for encoding '"
-                        + reader.encoding + "'";
-            }
-            throw Py.SyntaxError(msg);
+            throw Py.SyntaxError(t.getMessage());
         } else {
             return Py.JavaError(t);
         }
@@ -125,7 +101,7 @@ public class ParserFacade {
                 bufReader.reset();
                 return parse(bufReader, CompileMode.exec, filename, cflags);
             } catch (Throwable tt) {
-                throw fixParseError(bufReader, tt, filename);
+                throw fixParseError(tt, filename);
             }
         }
     }
@@ -164,7 +140,7 @@ public class ParserFacade {
             bufReader = prepBufReader(reader, cflags, filename);
             return parseOnly(bufReader, kind, filename, cflags );
         } catch (Throwable t) {
-            throw fixParseError(bufReader, t, filename);
+            throw fixParseError(t, filename);
         } finally {
             close(bufReader);
         }
@@ -181,7 +157,7 @@ public class ParserFacade {
             bufReader = prepBufReader(stream, cflags, filename, false);
             return parseOnly(bufReader, kind, filename, cflags );
         } catch (Throwable t) {
-            throw fixParseError(bufReader, t, filename);
+            throw fixParseError(t, filename);
         } finally {
             close(bufReader);
         }
@@ -196,7 +172,7 @@ public class ParserFacade {
             bufReader = prepBufReader(string, cflags, filename);
             return parseOnly(bufReader, kind, filename, cflags);
         } catch (Throwable t) {
-            throw fixParseError(bufReader, t, filename);
+            throw fixParseError(t, filename);
         } finally {
             close(bufReader);
         }
@@ -220,7 +196,7 @@ public class ParserFacade {
             if (reader != null && validPartialSentence(reader, kind, filename)) {
                 return null;
             }
-            PyException p = fixParseError(reader, t, filename);
+            PyException p = fixParseError(t, filename);
             throw p;
         } finally {
             close(reader);

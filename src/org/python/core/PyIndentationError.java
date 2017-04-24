@@ -19,11 +19,11 @@ public class PyIndentationError extends PyException {
     {
         super(Py.IndentationError);
         PyObject[] tmp = new PyObject[] {
-            new PyBytes(filename), new PyLong(line),
-            new PyLong(column), new PyBytes(text)
+            new PyUnicode(filename), new PyLong(line),
+            new PyLong(column), new PyUnicode(text)
         };
 
-        this.value = new PyTuple(new PyBytes(s), new PyTuple(tmp));
+        this.value = new PyTuple(new PyUnicode(s), new PyTuple(tmp));
 
         this.lineno = line;
         this.column = column;

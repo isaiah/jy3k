@@ -203,8 +203,6 @@ public class PyException extends RuntimeException implements Traverseproc
             if (value instanceof PyBaseException) {
                 traceback.tb_next = ((PyBaseException) value).__traceback__;
                 ((PyBaseException) value).__traceback__ = traceback;
-            } else {
-                System.out.println("foo");
             }
         }
         // finally blocks immediately tracebackHere: so they toggle isReRaise to skip the
