@@ -888,19 +888,20 @@ NEWLINE
        int indent = getIndentationCount(spaces);
        int previous = indents.isEmpty() ? 0 : indents.peek();
 
-       if (indent == previous) {
-         // skip indents of the same size as the present indent-size
-         skip();
-       }
-       else if (indent > previous) {
+       if (indent > previous) {
          indents.push(indent);
          emit(commonToken(PythonParser.INDENT, spaces));
        }
        else {
-         // Possibly emit more than 1 DEDENT token.
-         while(!indents.isEmpty() && indents.peek() > indent) {
-           this.emit(createDedent());
-           indents.pop();
+         if (indent == previous) {
+           // skip indents of the same size as the present indent-size
+           skip();
+         } else {
+          // Possibly emit more than 1 DEDENT token.
+           while(!indents.isEmpty() && indents.peek() > indent) {
+             this.emit(createDedent());
+             indents.pop();
+           }
          }
          if (indents.isEmpty() && this.single && newlines >= 1) {
             newlines = 0;
