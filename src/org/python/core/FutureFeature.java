@@ -30,7 +30,12 @@ public enum FutureFeature implements Pragma {
     /**
      * Enables unicode literals.
      */
-//    unicode_literals(CodeFlag.CO_FUTURE_UNICODE_LITERALS),
+    unicode_literals(CodeFlag.CO_FUTURE_UNICODE_LITERALS),
+
+    /**
+     * PEP-479 Change StopIteration handling in inside generators
+     */
+    generator_stop(CodeFlag.CO_FUTURE_GENERATOR_STOP),
     /**
      * Use braces for block delimiters instead of indentation.
      */
