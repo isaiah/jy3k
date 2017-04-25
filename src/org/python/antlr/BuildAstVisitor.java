@@ -525,9 +525,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitWith_item(PythonParser.With_itemContext ctx) {
         expr as = null;
         if (ctx.expr() != null) {
-            exprContextType = expr_contextType.Store;
             as = (expr) visit(ctx.expr());
-            exprContextType = expr_contextType.Load;
+            recursiveSetContextType(as, expr_contextType.Store);
         }
         return new withitem(ctx.getStart(), (expr) visit(ctx.test()), as);
     }
