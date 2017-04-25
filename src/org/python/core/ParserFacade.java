@@ -67,7 +67,7 @@ public class ParserFacade {
                 }
             }
             if (msg == null) {
-                msg = t.getMessage();
+                msg = "invalid token";
             }
             if (indentationError) {
                 return new PyIndentationError(msg, line, col, text, filename);

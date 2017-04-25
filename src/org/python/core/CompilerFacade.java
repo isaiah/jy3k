@@ -43,7 +43,7 @@ public class CompilerFacade {
                     linenumbers, cflags);
             return bundle.loadCode();
         } catch (Throwable t) {
-            throw ParserFacade.fixParseError(null, t, filename);
+            throw ParserFacade.fixParseError(t, filename);
         }
     }
 }

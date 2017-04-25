@@ -380,7 +380,7 @@ public class imp {
             Module.compile(node, ofp, name + Version.PY_CACHE_TAG, filename, true, null, mtime);
             return ofp.toByteArray();
         } catch (Throwable t) {
-            throw ParserFacade.fixParseError(bufReader, t, filename);
+            throw ParserFacade.fixParseError(t, filename);
         } finally {
             try {
                 bufReader.close();
