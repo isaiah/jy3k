@@ -40,6 +40,7 @@ public class BaseParser {
 //        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename, single);
 //        tokens = new CommonTokenStream(tokens);
         PythonParser parser = new PythonParser(tokens);
+        parser.setErrorHandler(new BailErrorStrategy());
 //        parser.setErrorHandler(errorHandler);
 //        parser.setTreeAdaptor(new PythonTreeAdaptor());
         return parser;
