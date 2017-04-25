@@ -518,7 +518,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         java.util.List<withitem> items = ctx.with_item().stream()
                 .map(with_itemContext -> (withitem) visit(with_itemContext))
                 .collect(Collectors.toList());
-        return new With(ctx.getStart(), items, visit_Suite(ctx.suite()));
+        return actions.makeWith(ctx.getStart(), items, visit_Suite(ctx.suite()));
     }
 
     @Override
