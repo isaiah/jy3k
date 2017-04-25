@@ -338,7 +338,9 @@ public final class Py {
     public static PyObject SyntaxError;
 
     public static PyException SyntaxError(ParserRuleContext ctx, String msg, String filename) {
-        Token tok = ctx.getStart();
+        return SyntaxError(ctx.getStart(), msg, filename);
+    }
+    public static PyException SyntaxError(Token tok, String msg, String filename) {
         return new PySyntaxError(msg, tok.getLine(), tok.getCharPositionInLine(), tok.getText(), filename);
     }
 

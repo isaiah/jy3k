@@ -86,6 +86,7 @@ import org.python.core.CompilerFlags;
 import org.python.core.ContextGuard;
 import org.python.core.ContextManager;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyCode;
 import org.python.core.PyCoroutine;
 import org.python.core.PyDictionary;
@@ -2721,7 +2722,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitNameConstant(NameConstant node) throws Exception {
         String name = node.getInternalValue();
-        code.getstatic(p(Py.class), name, ci(PyObject.class));
+        if (!name.equals("None")) {
+            loadFrame();
+            emitGetGlobal(name);
+        } else {
+            getNone();
+        }
         return null;
     }
 

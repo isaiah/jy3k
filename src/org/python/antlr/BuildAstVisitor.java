@@ -42,6 +42,7 @@ import org.python.antlr.ast.List;
 import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
+import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Nonlocal;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Pass;
@@ -195,9 +196,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 .limit(targetsSize)
                 .map(testlist_star_exprContext -> {
                     expr e = (expr) visit(testlist_star_exprContext);
-                    if (e instanceof Call) {
-                        throw Py.SyntaxError(testlist_star_exprContext, "can't assign to function call", filename);
-                    }
                     recursiveSetContextType(e, expr_contextType.Store);
                     return e;
                 }).collect(Collectors.toList());
@@ -669,14 +667,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         } else if (ctx.ellipsis != null) {
             return new Ellipsis(ctx.ellipsis);
         } else if (ctx.TRUE() != null) {
-            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
-//            return new NameConstant(ctx.TRUE(), ctx.getText());
+            return new NameConstant(ctx.TRUE(), ctx.getText());
         } else if (ctx.FALSE() != null) {
-            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
-//            return new NameConstant(ctx.FALSE(), ctx.getText());
+            return new NameConstant(ctx.FALSE(), ctx.getText());
         } else if (ctx.NONE() != null) {
-            return new Name(ctx.getStart(), ctx.getText(), expr_contextType.Load);
-//            return new NameConstant(ctx.NONE(), ctx.getText());
+            return new NameConstant(ctx.NONE(), ctx.getText());
         } else if (ctx.str() != null) {
             return actions.parsestrplus(ctx.str());
         }
@@ -1197,10 +1192,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     private void recursiveSetContextType(expr e, expr_contextType context) {
+         if (e instanceof NameConstant) {
+            throw Py.SyntaxError(e.getToken(), "can't assign to keyword", filename);
+        } else if (e instanceof Call) {
+            throw Py.SyntaxError(e.getToken(), "can't assign to function call", filename);
+        }
         if (e instanceof Context) {
             ((Context) e).setContext(context);
             if (e instanceof Tuple) {
-                ((Tuple) e).getInternalElts().forEach(elt -> recursiveSetContextType(elt, context));
+                ((Tuple) e).getInternalElts().forEach(elt -> {
+                    recursiveSetContextType(elt, context);
+                });
             } else if (e instanceof Starred) {
                 recursiveSetContextType(((Starred) e).getInternalValue(), context);
             } else if (e instanceof List) {
