@@ -62,8 +62,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                                                               + "int")));
             case 1:
                 return Py.newLong(__builtin__.len(arg1));
-            case 2:
-                return __builtin__.range(arg1);
             case 3:
                 return Py.newLong(__builtin__.ord(arg1));
             case 5:
@@ -123,18 +121,10 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     @Override
     public PyObject __call__(PyObject arg1, PyObject arg2) {
         switch (this.index) {
-            case 2:
-                return __builtin__.range(arg1, arg2);
-//            case 6:
-//                return Py.newLong(__builtin__.cmp(arg1, arg2));
-//            case 9:
-//                return __builtin__.apply(arg1, arg2);
             case 10:
                 return Py.newBoolean(__builtin__.isinstance(arg1, arg2));
             case 12:
                 return __builtin__.sum(arg1, arg2);
-//            case 13:
-//                return __builtin__.coerce(arg1, arg2);
             case 15:
                 __builtin__.delattr(arg1, arg2);
                 return Py.None;
@@ -177,8 +167,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     @Override
     public PyObject __call__(PyObject arg1, PyObject arg2, PyObject arg3) {
         switch (this.index) {
-            case 2:
-                return __builtin__.range(arg1, arg2, arg3);
             case 9:
                 try {
                     if (arg3 instanceof PyStringMap) {
@@ -883,90 +871,6 @@ public class __builtin__ {
         throw Py.TypeError(String.format("unsupported operand type(s) for pow(): '%.100s', "
                                          + "'%.100s', '%.100s'", x.getType().fastGetName(),
                                          y.getType().fastGetName(), z.getType().fastGetName()));
-    }
-
-    public static PyObject range(PyObject n) {
-        return range(Py.Zero, n, Py.One);
-    }
-
-    public static PyObject range(PyObject start, PyObject stop) {
-        return range(start, stop, Py.One);
-    }
-
-    public static PyObject range(PyObject ilow, PyObject ihigh, PyObject istep) {
-        ilow = getRangeLongArgument(ilow, "start");
-        ihigh = getRangeLongArgument(ihigh, "end");
-        istep = getRangeLongArgument(istep, "step");
-
-        int n;
-        int cmpResult = istep._cmp(Py.Zero);
-        if (cmpResult == 0) {
-            throw Py.ValueError("range() step argument must not be zero");
-        }
-        if (cmpResult > 0) {
-            n = getLenOfRangeLongs(ilow, ihigh, istep);
-        } else {
-            n = getLenOfRangeLongs(ihigh, ilow, istep.__neg__());
-        }
-        if (n < 0) {
-            throw Py.OverflowError("range() result has too many items");
-        }
-
-        PyObject[] range = new PyObject[n];
-        for (int i = 0; i < n; i++) {
-            range[i] = ilow;
-            ilow = ilow._add(istep);
-        }
-        return new PyList(range);
-    }
-
-    /**
-     * Return number of items in range (lo, hi, step), when arguments are
-     * PyLong objects. step > 0 required. Return a value < 0 if & only if the true value
-     * is too large to fit in an int, or there is an error.
-     *
-     * @param lo PyLong value
-     * @param hi PyLong value
-     * @param step PyLong value (> 0)
-     * @return int length of range
-     */
-    private static int getLenOfRangeLongs(PyObject lo, PyObject hi, PyObject step) {
-        // if (lo >= hi), return length of 0
-        if (lo._cmp(hi) >= 0) {
-            return 0;
-        }
-        try {
-            // See PyRange.getLenOfRange for the primitive version
-            PyObject diff = hi._sub(lo)._sub(Py.One);
-            PyObject n = diff.__floordiv__(step).__add__(Py.One);
-            return n.asInt();
-        } catch (PyException pye) {
-            return -1;
-        }
-    }
-
-    /**
-     * Helper function for handleRangeLongs. If arg is int or long object, returns it.  If
-     * arg is float, raises type error. As a last resort, creates a new int by calling arg
-     * type's __int__ method if it is defined.
-     */
-    private static PyObject getRangeLongArgument(PyObject arg, String name) {
-        if (arg instanceof PyLong) {
-            return arg;
-        }
-
-        // isNumberType is roughly arg.__findattr__("__int__") != null. Equiv. to
-        // CPython's type.nb_init != null
-        if (arg instanceof PyFloat || !arg.isNumberType()) {
-            throw Py.TypeError(String.format("range() integer %s argument expected, got %s.",
-                                             name, arg.getType().fastGetName()));
-        }
-
-        PyObject intObj = arg.__int__();
-        if (intObj instanceof PyLong) {
-            return intObj;
-        }
-        throw Py.TypeError("__int__ should return int object");
     }
 
     private static PyBytes readline(PyObject file) {
