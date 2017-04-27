@@ -37,10 +37,6 @@ public class PyLong extends PyObject {
 
     private final BigInteger value;
 
-    public BigInteger getValue() {
-        return value;
-    }
-
     public PyLong(PyType subType, int v) {
         this(subType, toBigInteger(v));
     }
@@ -218,6 +214,183 @@ public class PyLong extends PyObject {
         }
     }
 
+    private static final double scaledDoubleValue(BigInteger val, int[] exp) {
+        double x = 0;
+        int signum = val.signum();
+        byte[] digits;
+
+        if (signum >= 0) {
+            digits = val.toByteArray();
+        } else {
+            digits = val.negate().toByteArray();
+        }
+
+        int count = 8;
+        int i = 0;
+
+        if (digits[0] == 0) {
+            i++;
+            count++;
+        }
+        count = count <= digits.length ? count : digits.length;
+
+        while (i < count) {
+            x = x * 256 + (digits[i] & 0xff);
+            i++;
+        }
+        exp[0] = digits.length - i;
+        return signum * x;
+    }
+
+    private static final boolean canCoerce(PyObject other) {
+        return other instanceof PyLong;
+    }
+
+    private static final BigInteger coerce(PyObject other) {
+        if (other instanceof PyLong) {
+            return ((PyLong) other).getValue();
+        } else {
+            throw Py.TypeError("xxx");
+        }
+    }
+
+    private static final PyFloat true_divide(BigInteger a, BigInteger b) {
+        int[] ae = new int[1];
+        int[] be = new int[1];
+        double ad, bd;
+
+        ad = scaledDoubleValue(a, ae);
+        bd = scaledDoubleValue(b, be);
+
+        if (bd == 0) {
+            throw Py.ZeroDivisionError("division by zero");
+        }
+
+        ad /= bd;
+        int aexp = ae[0] - be[0];
+
+        if (aexp > Integer.MAX_VALUE / 8) {
+            throw Py.OverflowError("long/long too large for a float");
+        } else if (aexp < -(Integer.MAX_VALUE / 8)) {
+            return PyFloat.ZERO;
+        }
+
+        ad = ad * Math.pow(2.0, aexp * 8);
+
+        if (Double.isInfinite(ad)) {
+            throw Py.OverflowError("long/long too large for a float");
+        }
+
+        return new PyFloat(ad);
+    }
+
+    public static PyObject _pow(BigInteger value, BigInteger y, PyObject modulo, PyObject left,
+                                PyObject right) {
+        if (y.compareTo(BigInteger.ZERO) < 0) {
+            if (value.compareTo(BigInteger.ZERO) != 0) {
+                return left.__float__().__pow__(right, modulo);
+            } else {
+                throw Py.ZeroDivisionError("zero to a negative power");
+            }
+        }
+        if (modulo == null) {
+            return Py.newLong(value.pow(y.intValue()));
+        } else {
+            // This whole thing can be trivially rewritten after bugs
+            // in modPow are fixed by SUN
+
+            BigInteger z = coerce(modulo);
+            // Clear up some special cases right away
+            if (z.equals(BigInteger.ZERO)) {
+                throw Py.ValueError("pow(x, y, z) with z == 0");
+            }
+            if (z.abs().equals(BigInteger.ONE)) {
+                return Py.newLong(0);
+            }
+
+            if (z.compareTo(BigInteger.valueOf(0)) <= 0) {
+                // Handle negative modulo specially
+                // if (z.compareTo(BigInteger.valueOf(0)) == 0) {
+                // throw Py.ValueError("pow(x, y, z) with z == 0");
+                // }
+                y = value.modPow(y, z.negate());
+                if (y.compareTo(BigInteger.valueOf(0)) > 0) {
+                    return Py.newLong(z.add(y));
+                } else {
+                    return Py.newLong(y);
+                }
+                // return __pow__(right).__mod__(modulo);
+            } else {
+                // XXX: 1.1 no longer supported so review this.
+                // This is buggy in SUN's jdk1.1.5
+                // Extra __mod__ improves things slightly
+                return Py.newLong(value.modPow(y, z));
+                // return __pow__(right).__mod__(modulo);
+            }
+        }
+    }
+
+    private static final int coerceInt(PyObject other) {
+        if (other instanceof PyLong) {
+            return (other).asInt();
+        } else {
+            throw Py.TypeError("xxx");
+        }
+    }
+
+    /**
+     * Prepare an IntegerFormatter. This object has an
+     * overloaded format method {@link IntegerFormatter#format(int)} and
+     * {@link IntegerFormatter#format(BigInteger)} to support the two types.
+     *
+     * @param spec a parsed PEP-3101 format specification.
+     * @return a formatter ready to use, or null if the type is not an integer format type.
+     * @throws PyException(ValueError) if the specification is faulty.
+     */
+    @SuppressWarnings("fallthrough")
+    static IntegerFormatter prepareFormatter(Spec spec) throws PyException {
+
+        // Slight differences between format types
+        switch (spec.type) {
+            case 'c':
+                // Character data: specific prohibitions.
+                if (Spec.specified(spec.sign)) {
+                    throw IntegerFormatter.signNotAllowed("integer", spec.type);
+                } else if (spec.alternate) {
+                    throw IntegerFormatter.alternateFormNotAllowed("integer", spec.type);
+                }
+                // Fall through
+
+            case 'x':
+            case 'X':
+            case 'o':
+            case 'b':
+            case 'n':
+                if (spec.grouping) {
+                    throw IntegerFormatter.notAllowed("Grouping", "integer", spec.type);
+                }
+                // Fall through
+
+            case Spec.NONE:
+            case 'd':
+                // Check for disallowed parts of the specification
+                if (Spec.specified(spec.precision)) {
+                    throw IntegerFormatter.precisionNotAllowed("integer");
+                }
+                // spec may be incomplete. The defaults are those commonly used for numeric formats.
+                spec = spec.withDefaults(Spec.NUMERIC);
+                // Get a formatter for the spec.
+                return new IntegerFormatter(spec);
+
+            default:
+                return null;
+        }
+    }
+
+    public BigInteger getValue() {
+        return value;
+    }
+
     public PyObject to_bytes(int length, String byteorder) {
         return int_to_bytes(length, byteorder, false);
     }
@@ -306,34 +479,6 @@ public class PyLong extends PyObject {
         return v;
     }
 
-    private static final double scaledDoubleValue(BigInteger val, int[] exp) {
-        double x = 0;
-        int signum = val.signum();
-        byte[] digits;
-
-        if (signum >= 0) {
-            digits = val.toByteArray();
-        } else {
-            digits = val.negate().toByteArray();
-        }
-
-        int count = 8;
-        int i = 0;
-
-        if (digits[0] == 0) {
-            i++;
-            count++;
-        }
-        count = count <= digits.length ? count : digits.length;
-
-        while (i < count) {
-            x = x * 256 + (digits[i] & 0xff);
-            i++;
-        }
-        exp[0] = digits.length - i;
-        return signum * x;
-    }
-
     public double scaledDoubleValue(int[] exp) {
         return scaledDoubleValue(getValue(), exp);
     }
@@ -343,13 +488,17 @@ public class PyLong extends PyObject {
     }
 
     public long getLong(long min, long max, String overflowMsg) {
-        if (getValue().compareTo(MAX_INT) <= 0 && getValue().compareTo(MIN_INT) >= 0) {
+        if (!isOverflow()) {
             long v = getValue().longValue();
             if (v >= min && v <= max) {
                 return v;
             }
         }
         throw Py.OverflowError(overflowMsg);
+    }
+
+    public boolean isOverflow() {
+        return getValue().compareTo(MAX_INT) >= 0 && getValue().compareTo(MIN_INT) <= 0;
     }
 
     @Override
@@ -416,18 +565,6 @@ public class PyLong extends PyObject {
             return other;
         } else {
             return Py.None;
-        }
-    }
-
-    private static final boolean canCoerce(PyObject other) {
-        return other instanceof PyLong;
-    }
-
-    private static final BigInteger coerce(PyObject other) {
-        if (other instanceof PyLong) {
-            return ((PyLong)other).getValue();
-        } else {
-            throw Py.TypeError("xxx");
         }
     }
 
@@ -560,36 +697,6 @@ public class PyLong extends PyObject {
         return Py.newLong(divide(coerce(left), getValue()));
     }
 
-    private static final PyFloat true_divide(BigInteger a, BigInteger b) {
-        int[] ae = new int[1];
-        int[] be = new int[1];
-        double ad, bd;
-
-        ad = scaledDoubleValue(a, ae);
-        bd = scaledDoubleValue(b, be);
-
-        if (bd == 0) {
-            throw Py.ZeroDivisionError("division by zero");
-        }
-
-        ad /= bd;
-        int aexp = ae[0] - be[0];
-
-        if (aexp > Integer.MAX_VALUE / 8) {
-            throw Py.OverflowError("long/long too large for a float");
-        } else if (aexp < -(Integer.MAX_VALUE / 8)) {
-            return PyFloat.ZERO;
-        }
-
-        ad = ad * Math.pow(2.0, aexp * 8);
-
-        if (Double.isInfinite(ad)) {
-            throw Py.OverflowError("long/long too large for a float");
-        }
-
-        return new PyFloat(ad);
-    }
-
     @Override
     public PyObject __truediv__(PyObject right) {
         return int___truediv__(right);
@@ -712,60 +819,6 @@ public class PyLong extends PyObject {
         }
 
         return _pow(coerce(left), getValue(), null, left, this);
-    }
-
-    public static PyObject _pow(BigInteger value, BigInteger y, PyObject modulo, PyObject left,
-            PyObject right) {
-        if (y.compareTo(BigInteger.ZERO) < 0) {
-            if (value.compareTo(BigInteger.ZERO) != 0) {
-                return left.__float__().__pow__(right, modulo);
-            } else {
-                throw Py.ZeroDivisionError("zero to a negative power");
-            }
-        }
-        if (modulo == null) {
-            return Py.newLong(value.pow(y.intValue()));
-        } else {
-            // This whole thing can be trivially rewritten after bugs
-            // in modPow are fixed by SUN
-
-            BigInteger z = coerce(modulo);
-            // Clear up some special cases right away
-            if (z.equals(BigInteger.ZERO)) {
-                throw Py.ValueError("pow(x, y, z) with z == 0");
-            }
-            if (z.abs().equals(BigInteger.ONE)) {
-                return Py.newLong(0);
-            }
-
-            if (z.compareTo(BigInteger.valueOf(0)) <= 0) {
-                // Handle negative modulo specially
-                // if (z.compareTo(BigInteger.valueOf(0)) == 0) {
-                // throw Py.ValueError("pow(x, y, z) with z == 0");
-                // }
-                y = value.modPow(y, z.negate());
-                if (y.compareTo(BigInteger.valueOf(0)) > 0) {
-                    return Py.newLong(z.add(y));
-                } else {
-                    return Py.newLong(y);
-                }
-                // return __pow__(right).__mod__(modulo);
-            } else {
-                // XXX: 1.1 no longer supported so review this.
-                // This is buggy in SUN's jdk1.1.5
-                // Extra __mod__ improves things slightly
-                return Py.newLong(value.modPow(y, z));
-                // return __pow__(right).__mod__(modulo);
-            }
-        }
-    }
-
-    private static final int coerceInt(PyObject other) {
-        if (other instanceof PyLong) {
-            return (other).asInt();
-        } else {
-            throw Py.TypeError("xxx");
-        }
     }
 
     @Override
@@ -1117,55 +1170,6 @@ public class PyLong extends PyObject {
             return tooLow ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         }
         return (int)getValue().longValue();
-    }
-
-    /**
-     * Prepare an IntegerFormatter. This object has an
-     * overloaded format method {@link IntegerFormatter#format(int)} and
-     * {@link IntegerFormatter#format(BigInteger)} to support the two types.
-     *
-     * @param spec a parsed PEP-3101 format specification.
-     * @return a formatter ready to use, or null if the type is not an integer format type.
-     * @throws PyException(ValueError) if the specification is faulty.
-     */
-    @SuppressWarnings("fallthrough")
-    static IntegerFormatter prepareFormatter(Spec spec) throws PyException {
-
-        // Slight differences between format types
-        switch (spec.type) {
-            case 'c':
-                // Character data: specific prohibitions.
-                if (Spec.specified(spec.sign)) {
-                    throw IntegerFormatter.signNotAllowed("integer", spec.type);
-                } else if (spec.alternate) {
-                    throw IntegerFormatter.alternateFormNotAllowed("integer", spec.type);
-                }
-                // Fall through
-
-            case 'x':
-            case 'X':
-            case 'o':
-            case 'b':
-            case 'n':
-                if (spec.grouping) {
-                    throw IntegerFormatter.notAllowed("Grouping", "integer", spec.type);
-                }
-                // Fall through
-
-            case Spec.NONE:
-            case 'd':
-                // Check for disallowed parts of the specification
-                if (Spec.specified(spec.precision)) {
-                    throw IntegerFormatter.precisionNotAllowed("integer");
-                }
-                // spec may be incomplete. The defaults are those commonly used for numeric formats.
-                spec = spec.withDefaults(Spec.NUMERIC);
-                // Get a formatter for the spec.
-                return new IntegerFormatter(spec);
-
-            default:
-                return null;
-        }
     }
 
     @Override

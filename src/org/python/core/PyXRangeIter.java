@@ -9,11 +9,7 @@ import org.python.expose.ExposedType;
  */
 @ExposedType(name = "range_iterator", base = PyObject.class, isBaseType = false)
 public class PyXRangeIter extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(PyXRangeIter.class);
-    static {
-        TYPE.setName("range_iterator");
-    }
 
     private long index;
     private long start;

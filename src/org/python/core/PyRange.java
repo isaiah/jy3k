@@ -5,6 +5,7 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,10 +21,11 @@ public class PyRange extends PySequence {
 
     public static final PyType TYPE = PyType.fromClass(PyRange.class);
 
-    private final long start;
-    private final long step;
-    private final long stop;
-    private final long len;
+    private final BigInteger start;
+    private final BigInteger step;
+    private final BigInteger stop;
+    private final BigInteger len;
+    private final boolean extraLong;
 
     public PyRange(long ihigh) {
         this(0, ihigh, 1);
@@ -50,10 +52,27 @@ public class PyRange extends PySequence {
         if (n < 0) {
             throw Py.OverflowError("range() result has too many items");
         }
+        start = BigInteger.valueOf(ilow);
+        len = BigInteger.valueOf(n);
+        step = BigInteger.valueOf(istep);
+        stop = BigInteger.valueOf(ihigh);
+        extraLong = false;
+    }
+
+    public PyRange(PyType type, BigInteger ilow, BigInteger ihigh, BigInteger istep) {
+        super(type);
+        BigInteger n;
+        BigInteger listep = istep;
+        if (listep.compareTo(BigInteger.ZERO) > 0) {
+            n = ihigh.subtract(ilow).divide(istep);
+        } else {
+            n = ilow.subtract(ihigh).divide(istep);
+        }
         start = ilow;
-        len = n;
+        len = n.add(BigInteger.ONE);
         step = istep;
         stop = ihigh;
+        extraLong = true;
     }
 
     @ExposedNew
@@ -67,13 +86,24 @@ public class PyRange extends PySequence {
         long ihigh;
         int istep = 1;
         if (args.length == 1) {
+            PyObject highObj = args[0];
+            if (highObj instanceof PyLong && ((PyLong) highObj).isOverflow()) {
+                return new PyRange(subtype, BigInteger.ZERO, ((PyLong) highObj).getValue(), BigInteger.ONE);
+            }
             ihigh = ap.getLong(0);
         } else {
-            ilow = ap.getLong(0);
-            ihigh = ap.getLong(1);
-            istep = ap.getInt(2, 1);
-            if (istep == 0) {
-                throw Py.ValueError("range() arg 3 must not be zero");
+            try {
+                ilow = ap.getLong(0);
+                ihigh = ap.getLong(1);
+                istep = ap.getInt(2, 1);
+                if (istep == 0) {
+                    throw Py.ValueError("range() arg 3 must not be zero");
+                }
+            } catch (PyException e) {
+                if (e.match(Py.OverflowError)) {
+                    return new PyRange(subtype, ((PyLong) args[0]).getValue(), ((PyLong) args[1]).getValue(), ((PyLong) args[2]).getValue());
+                }
+                throw e;
             }
         }
         return new PyRange(ilow, ihigh, istep);
@@ -107,7 +137,7 @@ public class PyRange extends PySequence {
 
     @ExposedMethod(doc = BuiltinDocs.range___len___doc)
     final int range___len__() {
-        return (int)len;
+        return len.intValue();
     }
 
     @Override
@@ -139,21 +169,34 @@ public class PyRange extends PySequence {
         return range_reverse();
     }
 
-    private final PyXRangeIter range_iter() {
-        return new PyXRangeIter(0, (long)start, (long)step, (long)len);
+    private final PyIterator range_iter() {
+        if (extraLong) {
+            return new PyLongRangeIter(BigInteger.ZERO, start, step, len);
+        }
+        return new PyXRangeIter(0, start.longValue(), step.longValue(), len.longValue());
     }
 
-    private final PyXRangeIter range_reverse() {
+    private final PyIterator range_reverse() {
+        if (extraLong) {
+            return new PyLongRangeIter(BigInteger.ZERO,
+                    start.add(len.subtract(BigInteger.ONE)).multiply(step),   // start
+                    step.negate(),                                            // step (negative value)
+                    len);
+        }
+
+        long lstart = start.longValue();
+        long lstep = step.longValue();
+        long llen = len.longValue();
         return new PyXRangeIter(0,
-                (start + (len - 1) * step),   // start
-                (0 - step),                   // step (negative value)
-                len);
+                (lstart + (llen - 1) * lstep),   // start
+                (0 - lstep),                   // step (negative value)
+                llen);
     }
 
     @ExposedMethod
     public PyObject range___reduce__() {
         return new PyTuple(getType(),
-                new PyTuple(Py.newInteger(start), Py.newInteger(stop), Py.newInteger(step)));
+                new PyTuple(new PyLong(start), new PyLong(stop), new PyLong(step)));
     }
 
     @Override
@@ -163,7 +206,7 @@ public class PyRange extends PySequence {
 
     @Override
     protected PyObject pyget(int i) {
-        return Py.newInteger(start + (i % len) * step);
+        return new PyLong(start.add(step.multiply(BigInteger.valueOf(i))));
     }
 
     @Override
@@ -185,15 +228,9 @@ public class PyRange extends PySequence {
 
     @Override
     public String toString() {
-        long lstop = start + len * step;
-        if (lstop > PySystemState.maxint) { lstop = PySystemState.maxint; }
-        else if (lstop < PySystemState.minint) { lstop = PySystemState.minint; }
-        int stop = (int)lstop;
-        
-        // TODO: needs to support arbitrary length!
-        if (start == 0 && step == 1) {
+        if (start == BigInteger.ZERO && step == BigInteger.ONE) {
             return String.format("range(%d)", stop);
-        } else if (step == 1) {
+        } else if (step == BigInteger.ONE) {
             return String.format("range(%d, %d)", start, stop);
         } else {
             return String.format("range(%d, %d, %d)", start, stop, step);
