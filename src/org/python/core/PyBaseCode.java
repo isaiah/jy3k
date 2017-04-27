@@ -5,6 +5,9 @@
 package org.python.core;
 
 import com.google.common.base.Joiner;
+import org.python.core.generator.PyAsyncGenerator;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
 import org.python.modules._systemrestart;
 import com.google.common.base.CharMatcher;
 
@@ -117,6 +120,8 @@ public abstract class PyBaseCode extends PyCode {
         PyFrame frame = new PyFrame(this, globals);
         if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
@@ -134,6 +139,8 @@ public abstract class PyBaseCode extends PyCode {
         frame.f_fastlocals[0] = arg1;
         if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
@@ -154,6 +161,8 @@ public abstract class PyBaseCode extends PyCode {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         }
         return call(state, frame, closure);
     }
@@ -174,6 +183,8 @@ public abstract class PyBaseCode extends PyCode {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         }
         return call(state, frame, closure);
     }
@@ -194,6 +205,9 @@ public abstract class PyBaseCode extends PyCode {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         }
         return call(state, frame, closure);
     }
@@ -345,6 +359,8 @@ public abstract class PyBaseCode extends PyCode {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
         }
         return call(state, frame, closure);
     }

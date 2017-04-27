@@ -17,7 +17,6 @@ public class ScopeInfo extends Object implements ScopeConstants {
     public String scope_name;
     public int level;
     public int func_level;
-    public boolean async;
     public String qualname;
 
     public void dump() { // for debugging
@@ -62,6 +61,8 @@ public class ScopeInfo extends Object implements ScopeConstants {
     public boolean from_import_star;
     public boolean contains_ns_free_vars;
     public boolean generator;
+    public boolean async;
+    public boolean async_gen;
     public boolean comprehension;
     private boolean hasReturnWithValue;
     public int yield_count;

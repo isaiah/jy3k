@@ -6,20 +6,20 @@ import jline.console.UserInterruptException;
 import jnr.constants.Constant;
 import jnr.constants.platform.Errno;
 import jnr.posix.POSIX;
-import jnr.posix.POSIXFactory;
 import jnr.posix.util.Platform;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.python.antlr.base.mod;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
 import org.python.modules.sys.SysModule;
 import org.python.modules.posix.PosixModule;
 import org.python.util.Generic;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1239,8 +1239,7 @@ public final class Py {
 
     public static PyObject getAwaitableIter(PyObject obj) {
         if (obj instanceof PyCoroutine) return obj;
-        if (obj instanceof PyGenerator &&
-                ((PyBaseCode) ((PyGenerator) obj).gi_code).co_flags.isFlagSet(CodeFlag.CO_ITERABLE_COROUTINE)) {
+        if (obj instanceof PyGenerator && ((PyGenerator) obj).isFlagSet(CodeFlag.CO_ITERABLE_COROUTINE)) {
             return obj;
         } else {
             PyObject imp = obj.__findattr__("__await__");
@@ -1249,7 +1248,7 @@ public final class Py {
                 if (res != null) {
                     if (res instanceof PyCoroutine ||
                             (res instanceof PyGenerator &&
-                                    ((PyBaseCode) ((PyGenerator) res).gi_code).co_flags.isFlagSet(CodeFlag.CO_ITERABLE_COROUTINE))) {
+                                    ((PyGenerator) res).isFlagSet(CodeFlag.CO_ITERABLE_COROUTINE))) {
                         throw Py.TypeError("__await__() returned a coroutine");
                     } else {
                         PyObject nxt = res.__findattr__("__next__");

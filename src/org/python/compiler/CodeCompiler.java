@@ -81,14 +81,15 @@ import org.python.antlr.base.stmt;
 import org.python.core.AsyncContextGuard;
 import org.python.core.AsyncContextManager;
 import org.python.core.AsyncIterator;
+import org.python.core.CodeFlag;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
 import org.python.core.ContextGuard;
 import org.python.core.ContextManager;
 import org.python.core.Py;
-import org.python.core.PyBoolean;
 import org.python.core.PyCode;
-import org.python.core.PyCoroutine;
+import org.python.core.generator.PyAsyncGenWrappedValue;
+import org.python.core.generator.PyCoroutine;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
@@ -119,7 +120,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private static final Object NoExit = null;
     private Module module;
     private Code code;
+    // flags for the program
     private CompilerFlags cflags;
+
     private int temporary;
     private expr_contextType augmode;
     private int augtmp1;
@@ -759,7 +762,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         expr value = node.getInternalValue();
         if (value != null) {
-            visit(value);
+            if (my_scope.async_gen) {
+                code.new_(p(PyAsyncGenWrappedValue.class));
+                code.dup();
+                visit(value);
+                code.invokespecial(p(PyAsyncGenWrappedValue.class), "<init>", sig(Void.TYPE, PyObject.class));
+            } else {
+                visit(value);
+            }
         } else {
             getNone();
         }

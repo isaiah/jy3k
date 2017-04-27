@@ -45,6 +45,7 @@ public enum CodeFlag {
      */
     CO_COROUTINE(0x0080),
     CO_ITERABLE_COROUTINE(0x0100),
+    CO_ASYNC_GENERATOR(0x0200),
     /**
      * Denotes that generators are enabled in the code block.
      * No longer used.

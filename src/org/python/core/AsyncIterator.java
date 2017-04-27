@@ -1,5 +1,7 @@
 package org.python.core;
 
+import org.python.core.generator.PyCoroutine;
+
 /**
  * Created by isaiah on 6/26/16.
  */
