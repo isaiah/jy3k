@@ -80,12 +80,6 @@ import java.util.concurrent.TimeUnit;
 @ExposedModule(name = "posix", doc = BuiltinDocs.posix_doc)
 public class PosixModule {
 
-    /** Current OS information. */
-    private static final OS os = OS.getOS();
-
-    /** Platform specific POSIX services. */
-    private static final POSIX posix = POSIXFactory.getPOSIX(new PythonPOSIXHandler(), true);
-
     /** os.open flags. */
     @ExposedConst
     public static final int O_RDONLY = 0x0;
@@ -103,7 +97,6 @@ public class PosixModule {
     public static final int O_TRUNC = 0x400;
     @ExposedConst
     public static final int O_EXCL = 0x800;
-
     /** os.access constants. */
     @ExposedConst
     public static final int F_OK = 0;
@@ -113,7 +106,6 @@ public class PosixModule {
     public static final int W_OK = 1 << 1;
     @ExposedConst
     public static final int R_OK = 1 << 2;
-
     /** RTLD_* constants */
     @ExposedConst
     public static final int RTLD_LAZY = Library.LAZY;
@@ -123,14 +115,16 @@ public class PosixModule {
     public static final int RTLD_GLOBAL = Library.GLOBAL;
     @ExposedConst
     public static final int RTLD_LOCAL = Library.LOCAL;
-
     @ExposedConst
     public static final int WNOHANG = 0x00000001;
-
-    /** Lazily initialized singleton source for urandom. */
-    private static class UrandomSource {
-        static final SecureRandom INSTANCE = new SecureRandom();
-    }
+    /**
+     * Current OS information.
+     */
+    private static final OS os = OS.getOS();
+    /**
+     * Platform specific POSIX services.
+     */
+    private static final POSIX posix = POSIXFactory.getPOSIX(new PythonPOSIXHandler(), true);
 
     @ModuleInit
     public static void init(PyObject dict) {
@@ -185,60 +179,6 @@ public class PosixModule {
         dict.__setitem__("__all__", keys);
     }
 
-    // Combine Java FileDescriptor objects with Posix int file descriptors in one representation.
-    // Unfortunate ugliness!
-    public static class FDUnion {
-        volatile int intFD;
-        final FileDescriptor javaFD;
-
-        FDUnion(int fd) {
-            intFD = fd;
-            javaFD = null;
-        }
-
-        FDUnion(FileDescriptor fd) {
-            intFD = -1;
-            javaFD = fd;
-        }
-
-        boolean isIntFD() {
-            return intFD != -1;
-        }
-
-        public int getIntFD() {
-            return getIntFD(true);
-        }
-
-        int getIntFD(boolean checkFD) {
-            if (intFD == -1) {
-                if (!(javaFD instanceof FileDescriptor)) {
-                    throw Py.OSError(Errno.EBADF);
-                }
-                try {
-                    Field fdField = FieldAccess.getProtectedField(FileDescriptor.class, "fd");
-                    intFD = fdField.getInt(javaFD);
-                } catch (SecurityException e) {
-                } catch (IllegalArgumentException e) {
-                } catch (IllegalAccessException e) {
-                } catch (NullPointerException e) {}
-            }
-            if (checkFD) {
-                if (intFD == -1) {
-                    throw Py.OSError(Errno.EBADF);
-                } else {
-                    posix.fstat(intFD); // side effect of checking if this a good FD or not
-                }
-            }
-            return intFD;
-        }
-
-        @Override
-        public String toString() {
-            return "FDUnion(int=" + intFD  + ", java=" + javaFD + ")";
-        }
-
-    }
-
     public static FDUnion getFD(PyObject fdObj) {
         if (fdObj.isInteger()) {
             int intFd = fdObj.asInt();
@@ -270,7 +210,6 @@ public class PosixModule {
         }
         throw Py.TypeError("an integer or Java/Jython file descriptor is required");
     }
-
 
     @ExposedFunction(doc = BuiltinDocs.posix__exit_doc, defaults = {"0"})
     public static void _exit(int status) {
@@ -375,7 +314,29 @@ public class PosixModule {
         for (int i = fd_low; i < fd_high; i++) {
             try {
                 posix.close(i);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    @Hide(OS.NT)
+    @ExposedFunction(doc = BuiltinDocs.posix_fdatasync_doc)
+    public static void fdatasync(PyObject fd) {
+        Object javaobj = fd.__tojava__(RawIOBase.class);
+        if (javaobj != Py.NoConversion) {
+            fsync((RawIOBase) javaobj, false);
+        } else {
+            posix.fdatasync(getFD(fd).getIntFD());
+        }
+    }
+
+    @ExposedFunction(doc = BuiltinDocs.posix_fsync_doc)
+    public static void fsync(PyObject fd) {
+        Object javaobj = fd.__tojava__(RawIOBase.class);
+        if (javaobj != Py.NoConversion) {
+            fsync((RawIOBase) javaobj, true);
+        } else {
+            posix.fsync(getFD(fd).getIntFD());
         }
     }
 
@@ -425,27 +386,6 @@ public class PosixModule {
 //            throw Py.OSError(Errno.EINVAL);
 //        }
 //    }
-
-    @Hide(OS.NT)
-    @ExposedFunction(doc = BuiltinDocs.posix_fdatasync_doc)
-    public static void fdatasync(PyObject fd) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            fsync((RawIOBase)javaobj, false);
-        } else {
-            posix.fdatasync(getFD(fd).getIntFD());
-        }
-    }
-
-    @ExposedFunction(doc = BuiltinDocs.posix_fsync_doc)
-    public static void fsync(PyObject fd) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            fsync((RawIOBase)javaobj, true);
-        } else {
-            posix.fsync(getFD(fd).getIntFD());
-        }
-    }
 
     /**
      * Internal fsync implementation.
@@ -1183,6 +1123,18 @@ public class PosixModule {
         return new PyTuple(commandsTup);
     }
 
+    @ExposedFunction
+    public static PyObject fspath(PyObject path) {
+        if (path instanceof PyUnicode || path instanceof PyBytes) {
+            return path;
+        }
+        PyObject fspath = path.__findattr__("__fspath__");
+        if (fspath != null) {
+            return fspath.__call__();
+        }
+        throw Py.TypeError(String.format("expected str, bytes or os.PathLike object, not %s", path.getType().fastGetName()));
+    }
+
     /**
      * Initialize the environ dict from System.getenv. environ may be empty when the
      * security policy doesn't grant us access.
@@ -1286,6 +1238,68 @@ public class PosixModule {
         }
     }
 
+    /**
+     * Lazily initialized singleton source for urandom.
+     */
+    private static class UrandomSource {
+        static final SecureRandom INSTANCE = new SecureRandom();
+    }
+
+    // Combine Java FileDescriptor objects with Posix int file descriptors in one representation.
+    // Unfortunate ugliness!
+    public static class FDUnion {
+        final FileDescriptor javaFD;
+        volatile int intFD;
+
+        FDUnion(int fd) {
+            intFD = fd;
+            javaFD = null;
+        }
+
+        FDUnion(FileDescriptor fd) {
+            intFD = -1;
+            javaFD = fd;
+        }
+
+        boolean isIntFD() {
+            return intFD != -1;
+        }
+
+        public int getIntFD() {
+            return getIntFD(true);
+        }
+
+        int getIntFD(boolean checkFD) {
+            if (intFD == -1) {
+                if (!(javaFD instanceof FileDescriptor)) {
+                    throw Py.OSError(Errno.EBADF);
+                }
+                try {
+                    Field fdField = FieldAccess.getProtectedField(FileDescriptor.class, "fd");
+                    intFD = fdField.getInt(javaFD);
+                } catch (SecurityException e) {
+                } catch (IllegalArgumentException e) {
+                } catch (IllegalAccessException e) {
+                } catch (NullPointerException e) {
+                }
+            }
+            if (checkFD) {
+                if (intFD == -1) {
+                    throw Py.OSError(Errno.EBADF);
+                } else {
+                    posix.fstat(intFD); // side effect of checking if this a good FD or not
+                }
+            }
+            return intFD;
+        }
+
+        @Override
+        public String toString() {
+            return "FDUnion(int=" + intFD + ", java=" + javaFD + ")";
+        }
+
+    }
+
     @Untraversable
     static class LstatFunction extends PyBuiltinFunctionNarrow {
         LstatFunction() {
@@ -1364,6 +1378,8 @@ public class PosixModule {
     // Another advantage is setting the st_mode the same as CPython would return.
     @Untraversable
     static class WindowsStatFunction extends PyBuiltinFunctionNarrow {
+        private final static int _S_IFDIR = 0x4000;
+        private final static int _S_IFREG = 0x8000;
         WindowsStatFunction() {
             super("stat", 1, 1,
                     "stat(path) -> stat result\n\n" +
@@ -1371,9 +1387,6 @@ public class PosixModule {
                             "Note that some platforms may return only a small subset of the\n" +
                             "standard fields"); // like this one!
         }
-
-        private final static int _S_IFDIR = 0x4000;
-        private final static int _S_IFREG = 0x8000;
 
         static int attributes_to_mode(DosFileAttributes attr) {
             int m = 0;
