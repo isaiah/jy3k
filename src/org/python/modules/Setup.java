@@ -55,6 +55,7 @@ public class Setup {
 
     public static String[] newbuiltinModules = {
             "_ast:org.python.antlr.ast.AstModule",
+            "_blake2:org.python.modules._blake2._blake2module",
             "_bz2:org.python.modules.bz2.bz2",
             "_codecs",
             "_codecs_cn:org.python.modules.cjkcodecs._codecs_cn",
@@ -70,6 +71,7 @@ public class Setup {
             "_multibytecodec:org.python.modules.cjkcodecs._multibytecodec",
             "_multiprocessing:org.python.modules._multiprocessing._multiprocessing",
             "_posixsubprocess",
+            "_sha3:org.python.modules._sha3._sha3module",
             "_sre",
             "_sre_compile:org.python.modules.sre._sre_compile",
             "_string",
