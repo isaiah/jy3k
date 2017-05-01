@@ -5,6 +5,7 @@ import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.If;
 import org.python.antlr.ast.Interactive;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Return;
@@ -58,6 +59,13 @@ public class ClassClosureGenerator extends Visitor {
             }
         }
         return replacement == null ? stmts : replacement;
+    }
+
+    @Override
+    public Object visitIf(If node) throws Exception {
+        List<stmt> stmts = node.getInternalBody();
+        node.setInternalBody(filterClassDef(stmts));
+        return node;
     }
 
     @Override
