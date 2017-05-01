@@ -4,6 +4,7 @@ package org.python.core;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
+import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
 
 @ExposedType(name = "property", doc = BuiltinDocs.property_doc)
@@ -24,6 +25,7 @@ public class PyProperty extends PyObject implements Traverseproc {
     protected boolean docFromGetter;
 
     @ExposedGet(name = "__doc__")
+    @ExposedSet(name = "__doc__")
     protected PyObject doc;
 
     public PyProperty() {
