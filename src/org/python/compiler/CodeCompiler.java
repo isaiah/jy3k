@@ -787,13 +787,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         loadFrame();
         code.invokevirtual(p(PyFrame.class), "getGeneratorInput", sig(Object.class));
-        code.dup();
-        code.instanceof_(p(PyException.class));
-        Label done2 = new Label();
-        code.ifeq(done2);
-        code.checkcast(p(Throwable.class));
-        code.athrow();
-        code.label(done2);
         code.checkcast(p(PyObject.class));
 
         return null;
@@ -1494,6 +1487,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
             // do exception body
             suite(handler.getInternalBody());
+            popException();
             code.goto_(end_of_exceptions);
             code.label(end_of_self);
         }
