@@ -191,7 +191,7 @@ public class ClassFile
     }
 
     public void write(OutputStream stream) throws IOException {
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
+        cw.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
         // XXX: should imp.java really house this value or should imp.java point into
         // org.python.compiler?
