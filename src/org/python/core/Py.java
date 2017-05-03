@@ -1488,9 +1488,8 @@ public final class Py {
 
         maybeSystemExit(exc);
 
-        setException(exc, f);
-
         ThreadState ts = getThreadState();
+        setException(exc, f, ts);
 
 //        ts.systemState.last_value = exc.value;
 //        ts.systemState.last_type = exc.type;
@@ -1680,10 +1679,14 @@ public final class Py {
 
     /* Helpers to implement except clauses */
     public static PyException setException(Throwable t, PyFrame frame) {
+        return setException(t, frame, getThreadState());
+    }
+
+    public static PyException setException(Throwable t, PyFrame frame, ThreadState ts) {
         PyException pye = Py.JavaError(t);
         pye.normalize();
         pye.tracebackHere(frame);
-        getThreadState().exceptions.offerFirst(pye);
+        ts.exceptions.offerFirst(pye);
         return pye;
     }
 

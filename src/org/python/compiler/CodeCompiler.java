@@ -163,6 +163,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         exceptionHandlers = new Stack<ExceptionHandler>();
     }
 
+    public void setException() throws Exception {
+        loadThreadState();
+        loadFrame();
+        code.invokestatic(p(Py.class), "setException",
+                sig(PyException.class, Throwable.class, PyFrame.class, ThreadState.class));
+
+    }
+
     public void popException() throws Exception {
         loadThreadState();
         code.invokestatic(p(Py.class), "popException", sig(Void.TYPE, ThreadState.class));
@@ -1538,10 +1546,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.astore(excLocal);
 
         code.aload(excLocal);
-        loadFrame();
-
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
+        setException();
         code.pop();
 
         inlineFinally(inFinally);
@@ -1622,10 +1627,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         code.label(handler_start);
 
-        loadFrame();
-
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
+        setException();
 
         int exc = code.getFinallyLocal(p(Throwable.class));
         code.astore(exc);
@@ -3205,9 +3207,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // CATCH
         code.label(label_catch);
 
-        loadFrame();
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
+        setException();
         restoreLocals();
         code.aload(mgr_tmp);
         code.swap();
@@ -3347,9 +3347,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // CATCH
         code.label(label_catch);
 
-        loadFrame();
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
+
+        setException();
         code.aload(mgr_tmp);
         code.swap();
         loadThreadState();
