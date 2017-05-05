@@ -74,11 +74,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public AsyncWith(PyType subType) {
-        super(subType);
-    }
     public AsyncWith() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -100,80 +97,43 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
     }
 
     public AsyncWith(PyObject items, PyObject body) {
+        super(TYPE);
         setItems(items);
         setBody(body);
     }
 
+    // called from derived class
+    public AsyncWith(PyType subtype) {
+        super(subtype);
+    }
+
     public AsyncWith(Token token, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(token);
+        super(TYPE, token);
         this.items = items;
         if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
+            this.items = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public AsyncWith(Integer ttype, Token token, java.util.List<withitem> items,
-    java.util.List<stmt> body) {
-        super(ttype, token);
-        this.items = items;
-        if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public AsyncWith(TerminalNode node, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(node);
-        this.items = items;
-        if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
     public AsyncWith(PythonTree tree, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(tree);
+        super(TYPE, tree);
         this.items = items;
         if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
+            this.items = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
@@ -182,6 +142,7 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         return "AsyncWith";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("AsyncWith(");
         sb.append("items=");

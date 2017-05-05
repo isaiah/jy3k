@@ -275,7 +275,7 @@ class SymlinkLoopGlobTests(unittest.TestCase):
         with change_cwd(tempdir):
             os.makedirs('dir')
             create_empty_file(os.path.join('dir', 'file'))
-            os.symlink(os.curdir, os.path.join('dir', 'link'))
+            os.symlink('dir', os.path.join('dir', 'link'))
 
             results = glob.glob('**', recursive=True)
             self.assertEqual(len(results), len(set(results)))

@@ -41,9 +41,6 @@ public static final PyType TYPE = PyType.fromClass(Continue.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Continue(PyType subType) {
-        super(subType);
-    }
     @ExposedNew
     @ExposedMethod
     public void Continue___init__(PyObject[] args, String[] keywords) {
@@ -62,22 +59,20 @@ public static final PyType TYPE = PyType.fromClass(Continue.class);
     }
 
     public Continue() {
+        super(TYPE);
+    }
+
+    // called from derived class
+    public Continue(PyType subtype) {
+        super(subtype);
     }
 
     public Continue(Token token) {
-        super(token);
-    }
-
-    public Continue(Integer ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public Continue(TerminalNode node) {
-        super(node);
+        super(TYPE, token);
     }
 
     public Continue(PythonTree tree) {
-        super(tree);
+        super(TYPE, tree);
     }
 
     @ExposedGet(name = "repr")
@@ -85,6 +80,7 @@ public static final PyType TYPE = PyType.fromClass(Continue.class);
         return "Continue";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Continue(");
         sb.append(")");

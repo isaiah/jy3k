@@ -58,11 +58,8 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public JoinedStr(PyType subType) {
-        super(subType);
-    }
     public JoinedStr() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,50 +80,28 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
     }
 
     public JoinedStr(PyObject values) {
+        super(TYPE);
         setValues(values);
     }
 
+    // called from derived class
+    public JoinedStr(PyType subtype) {
+        super(subtype);
+    }
+
     public JoinedStr(Token token, java.util.List<expr> values) {
-        super(token);
+        super(TYPE, token);
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public JoinedStr(Integer ttype, Token token, java.util.List<expr> values) {
-        super(ttype, token);
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public JoinedStr(TerminalNode node, java.util.List<expr> values) {
-        super(node);
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
     public JoinedStr(PythonTree tree, java.util.List<expr> values) {
-        super(tree);
+        super(TYPE, tree);
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
@@ -135,6 +110,7 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         return "JoinedStr";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("JoinedStr(");
         sb.append("values=");

@@ -327,7 +327,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
         }
         if (ctx.AWAIT() != null) {
-            return new Await(ctx.AWAIT(), left);
+            return new Await(ctx.AWAIT().getSymbol(), left);
         }
         return left;
     }
@@ -564,24 +564,24 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitInteger(PythonParser.IntegerContext ctx) {
         if (ctx.DECIMAL_INTEGER() != null) {
-            return new Num(ctx.DECIMAL_INTEGER(), actions.makeDecimal(ctx.DECIMAL_INTEGER()));
+            return new Num(ctx.DECIMAL_INTEGER().getSymbol(), actions.makeDecimal(ctx.DECIMAL_INTEGER()));
         }
         if (ctx.HEX_INTEGER() != null) {
-            return new Num(ctx.HEX_INTEGER(), actions.makeInt(ctx.HEX_INTEGER(), 16));
+            return new Num(ctx.HEX_INTEGER().getSymbol(), actions.makeInt(ctx.HEX_INTEGER(), 16));
         }
         if (ctx.BIN_INTEGER() != null)
-            return new Num(ctx.BIN_INTEGER(), actions.makeInt(ctx.BIN_INTEGER(), 2));
+            return new Num(ctx.BIN_INTEGER().getSymbol(), actions.makeInt(ctx.BIN_INTEGER(), 2));
         if (ctx.OCT_INTEGER() != null)
-            return new Num(ctx.OCT_INTEGER(), actions.makeInt(ctx.OCT_INTEGER(), 8));
+            return new Num(ctx.OCT_INTEGER().getSymbol(), actions.makeInt(ctx.OCT_INTEGER(), 8));
         return super.visitInteger(ctx);
     }
 
     @Override
     public PythonTree visitNumber(PythonParser.NumberContext ctx) {
         if (ctx.FLOAT_NUMBER() != null) {
-            return new Num(ctx.FLOAT_NUMBER(), actions.makeFloat(ctx.FLOAT_NUMBER()));
+            return new Num(ctx.FLOAT_NUMBER().getSymbol(), actions.makeFloat(ctx.FLOAT_NUMBER()));
         } else if (ctx.IMAG_NUMBER() != null) {
-            return new Num(ctx.IMAG_NUMBER(), actions.makeComplex(ctx.IMAG_NUMBER()));
+            return new Num(ctx.IMAG_NUMBER().getSymbol(), actions.makeComplex(ctx.IMAG_NUMBER()));
         } else if (ctx.integer() != null) {
             return visit(ctx.integer());
         }
@@ -663,15 +663,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         } else if (ctx.yield_expr() != null) {
             return visit(ctx.yield_expr());
         } else if (ctx.NAME() != null) {
-            return new Name(ctx.NAME(), ctx.getText(), exprContextType);
+            return new Name(ctx.NAME().getSymbol(), ctx.getText(), exprContextType);
         } else if (ctx.ellipsis != null) {
             return new Ellipsis(ctx.ellipsis);
         } else if (ctx.TRUE() != null) {
-            return new NameConstant(ctx.TRUE(), ctx.getText());
+            return new NameConstant(ctx.TRUE().getSymbol(), ctx.getText());
         } else if (ctx.FALSE() != null) {
-            return new NameConstant(ctx.FALSE(), ctx.getText());
+            return new NameConstant(ctx.FALSE().getSymbol(), ctx.getText());
         } else if (ctx.NONE() != null) {
-            return new NameConstant(ctx.NONE(), ctx.getText());
+            return new NameConstant(ctx.NONE().getSymbol(), ctx.getText());
         } else if (ctx.str() != null) {
             return actions.parsestrplus(ctx.str());
         }
@@ -720,13 +720,13 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
      */
     @Override
     public PythonTree visitDotted_name(PythonParser.Dotted_nameContext ctx) {
-        expr current = new Name(ctx.NAME(0), ctx.NAME(0).getText(), exprContextType);
+        expr current = new Name(ctx.NAME(0).getSymbol(), ctx.NAME(0).getText(), exprContextType);
         if (ctx.DOT().isEmpty()) {
             return current;
         }
         for (int i = 1; i < ctx.NAME().size(); i++) {
             TerminalNode nameNode = ctx.NAME(i);
-            current = new Attribute(nameNode, current, nameNode.getText(), exprContextType);
+            current = new Attribute(nameNode.getSymbol(), current, nameNode.getText(), exprContextType);
         }
         return current;
     }

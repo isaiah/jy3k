@@ -206,6 +206,12 @@ public abstract class VisitorBase<R> implements VisitorIF<R> {
         return ret;
     }
 
+    public R visitBlock(Block node) throws Exception {
+        R ret = unhandled_node(node);
+        traverse(node);
+        return ret;
+    }
+
     public R visitBoolOp(BoolOp node) throws Exception {
         R ret = unhandled_node(node);
         traverse(node);

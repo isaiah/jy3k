@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Constant(PyType subType) {
-        super(subType);
-    }
     public Constant() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,26 +77,22 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
     }
 
     public Constant(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public Constant(PyType subtype) {
+        super(subtype);
+    }
+
     public Constant(Token token, String value) {
-        super(token);
-        this.value = value;
-    }
-
-    public Constant(Integer ttype, Token token, String value) {
-        super(ttype, token);
-        this.value = value;
-    }
-
-    public Constant(TerminalNode node, String value) {
-        super(node);
+        super(TYPE, token);
         this.value = value;
     }
 
     public Constant(PythonTree tree, String value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
     }
 
@@ -108,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
         return "Constant";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Constant(");
         sb.append("value=");

@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class NotEq extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(NotEq.class);
 
-public NotEq() {
-}
-
-public NotEq(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void NotEq___init__(PyObject[] args, String[] keywords) {}
+    public NotEq() {
+        super(TYPE);
+    }
+    public NotEq(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void NotEq___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void NotEq___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(2);
     }
 
+    @Override
+    public String toStringTree() {
+        return NotEq.class.toString();
+    }
 }

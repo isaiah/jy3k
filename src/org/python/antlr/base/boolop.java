@@ -22,22 +22,7 @@ public abstract class boolop extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyBytes[] get_attributes() { return attributes; }
 
-    public boolop() {
-    }
-
-    public boolop(PyType subType) {
-    }
-
-    public boolop(int ttype, Token token) {
-        super(ttype, token);
-    }
-
     public boolop(Token token) {
-        super(token);
+        super(TYPE, token);
     }
-
-    public boolop(PythonTree node) {
-        super(node);
-    }
-
 }

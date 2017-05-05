@@ -38,26 +38,16 @@ public abstract class expr extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public expr() {
+    public expr(PyType subtype) {
+        super(subtype);
     }
 
-    public expr(PyType subType) {
+    public expr(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public expr(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public expr(TerminalNode node) {
-        super(node);
-    }
-
-    public expr(Token token) {
-        super(token);
-    }
-
-    public expr(PythonTree node) {
-        super(node);
+    public expr(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

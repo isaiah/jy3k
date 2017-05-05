@@ -80,11 +80,8 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Slice(PyType subType) {
-        super(subType);
-    }
     public Slice() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -97,49 +94,29 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     }
 
     public Slice(PyObject lower, PyObject upper, PyObject step) {
+        super(TYPE);
         setLower(lower);
         setUpper(upper);
         setStep(step);
     }
 
+    // called from derived class
+    public Slice(PyType subtype) {
+        super(subtype);
+    }
+
     public Slice(Token token, expr lower, expr upper, expr step) {
-        super(token);
+        super(TYPE, token);
         this.lower = lower;
-        addChild(lower);
         this.upper = upper;
-        addChild(upper);
         this.step = step;
-        addChild(step);
-    }
-
-    public Slice(Integer ttype, Token token, expr lower, expr upper, expr step) {
-        super(ttype, token);
-        this.lower = lower;
-        addChild(lower);
-        this.upper = upper;
-        addChild(upper);
-        this.step = step;
-        addChild(step);
-    }
-
-    public Slice(TerminalNode node, expr lower, expr upper, expr step) {
-        super(node);
-        this.lower = lower;
-        addChild(lower);
-        this.upper = upper;
-        addChild(upper);
-        this.step = step;
-        addChild(step);
     }
 
     public Slice(PythonTree tree, expr lower, expr upper, expr step) {
-        super(tree);
+        super(TYPE, tree);
         this.lower = lower;
-        addChild(lower);
         this.upper = upper;
-        addChild(upper);
         this.step = step;
-        addChild(step);
     }
 
     @ExposedGet(name = "repr")
@@ -147,6 +124,7 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
         return "Slice";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Slice(");
         sb.append("lower=");

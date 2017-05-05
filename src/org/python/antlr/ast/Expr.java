@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Expr(PyType subType) {
-        super(subType);
-    }
     public Expr() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,31 +77,23 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
     }
 
     public Expr(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public Expr(PyType subtype) {
+        super(subtype);
+    }
+
     public Expr(Token token, expr value) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-    }
-
-    public Expr(Integer ttype, Token token, expr value) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-    }
-
-    public Expr(TerminalNode node, expr value) {
-        super(node);
-        this.value = value;
-        addChild(value);
     }
 
     public Expr(PythonTree tree, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -112,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
         return "Expr";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Expr(");
         sb.append("value=");

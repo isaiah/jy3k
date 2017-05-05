@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class FloorDiv extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(FloorDiv.class);
 
-public FloorDiv() {
-}
-
-public FloorDiv(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void FloorDiv___init__(PyObject[] args, String[] keywords) {}
+    public FloorDiv() {
+        super(TYPE);
+    }
+    public FloorDiv(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void FloorDiv___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void FloorDiv___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(13);
     }
 
+    @Override
+    public String toStringTree() {
+        return FloorDiv.class.toString();
+    }
 }

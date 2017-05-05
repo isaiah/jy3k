@@ -68,11 +68,8 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Lambda(PyType subType) {
-        super(subType);
-    }
     public Lambda() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -94,36 +91,26 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     }
 
     public Lambda(PyObject args, PyObject body) {
+        super(TYPE);
         setArgs(args);
         setBody(body);
     }
 
+    // called from derived class
+    public Lambda(PyType subtype) {
+        super(subtype);
+    }
+
     public Lambda(Token token, arguments args, expr body) {
-        super(token);
+        super(TYPE, token);
         this.args = args;
         this.body = body;
-        addChild(body);
-    }
-
-    public Lambda(Integer ttype, Token token, arguments args, expr body) {
-        super(ttype, token);
-        this.args = args;
-        this.body = body;
-        addChild(body);
-    }
-
-    public Lambda(TerminalNode node, arguments args, expr body) {
-        super(node);
-        this.args = args;
-        this.body = body;
-        addChild(body);
     }
 
     public Lambda(PythonTree tree, arguments args, expr body) {
-        super(tree);
+        super(TYPE, tree);
         this.args = args;
         this.body = body;
-        addChild(body);
     }
 
     @ExposedGet(name = "repr")
@@ -131,6 +118,7 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
         return "Lambda";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Lambda(");
         sb.append("args=");

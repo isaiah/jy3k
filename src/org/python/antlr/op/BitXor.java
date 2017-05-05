@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class BitXor extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(BitXor.class);
 
-public BitXor() {
-}
-
-public BitXor(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void BitXor___init__(PyObject[] args, String[] keywords) {}
+    public BitXor() {
+        super(TYPE);
+    }
+    public BitXor(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void BitXor___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void BitXor___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(11);
     }
 
+    @Override
+    public String toStringTree() {
+        return BitXor.class.toString();
+    }
 }

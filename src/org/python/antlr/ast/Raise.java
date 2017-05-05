@@ -68,11 +68,8 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Raise(PyType subType) {
-        super(subType);
-    }
     public Raise() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -94,40 +91,26 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     }
 
     public Raise(PyObject exc, PyObject cause) {
+        super(TYPE);
         setExc(exc);
         setCause(cause);
     }
 
+    // called from derived class
+    public Raise(PyType subtype) {
+        super(subtype);
+    }
+
     public Raise(Token token, expr exc, expr cause) {
-        super(token);
+        super(TYPE, token);
         this.exc = exc;
-        addChild(exc);
         this.cause = cause;
-        addChild(cause);
-    }
-
-    public Raise(Integer ttype, Token token, expr exc, expr cause) {
-        super(ttype, token);
-        this.exc = exc;
-        addChild(exc);
-        this.cause = cause;
-        addChild(cause);
-    }
-
-    public Raise(TerminalNode node, expr exc, expr cause) {
-        super(node);
-        this.exc = exc;
-        addChild(exc);
-        this.cause = cause;
-        addChild(cause);
     }
 
     public Raise(PythonTree tree, expr exc, expr cause) {
-        super(tree);
+        super(TYPE, tree);
         this.exc = exc;
-        addChild(exc);
         this.cause = cause;
-        addChild(cause);
     }
 
     @ExposedGet(name = "repr")
@@ -135,6 +118,7 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
         return "Raise";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Raise(");
         sb.append("exc=");

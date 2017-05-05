@@ -71,11 +71,8 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public BoolOp(PyType subType) {
-        super(subType);
-    }
     public BoolOp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -97,55 +94,31 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
     }
 
     public BoolOp(PyObject op, PyObject values) {
+        super(TYPE);
         setOp(op);
         setValues(values);
     }
 
+    // called from derived class
+    public BoolOp(PyType subtype) {
+        super(subtype);
+    }
+
     public BoolOp(Token token, boolopType op, java.util.List<expr> values) {
-        super(token);
+        super(TYPE, token);
         this.op = op;
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public BoolOp(Integer ttype, Token token, boolopType op, java.util.List<expr> values) {
-        super(ttype, token);
-        this.op = op;
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public BoolOp(TerminalNode node, boolopType op, java.util.List<expr> values) {
-        super(node);
-        this.op = op;
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
     public BoolOp(PythonTree tree, boolopType op, java.util.List<expr> values) {
-        super(tree);
+        super(TYPE, tree);
         this.op = op;
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
@@ -154,6 +127,7 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
         return "BoolOp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("BoolOp(");
         sb.append("op=");

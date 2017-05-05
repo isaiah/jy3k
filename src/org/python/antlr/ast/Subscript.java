@@ -81,11 +81,8 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Subscript(PyType subType) {
-        super(subType);
-    }
     public Subscript() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -108,39 +105,27 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     }
 
     public Subscript(PyObject value, PyObject slice, PyObject ctx) {
+        super(TYPE);
         setValue(value);
         setSlice(slice);
         setCtx(ctx);
     }
 
+    // called from derived class
+    public Subscript(PyType subtype) {
+        super(subtype);
+    }
+
     public Subscript(Token token, expr value, slice slice, expr_contextType ctx) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-        this.slice = slice;
-        this.ctx = ctx;
-    }
-
-    public Subscript(Integer ttype, Token token, expr value, slice slice, expr_contextType ctx) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-        this.slice = slice;
-        this.ctx = ctx;
-    }
-
-    public Subscript(TerminalNode node, expr value, slice slice, expr_contextType ctx) {
-        super(node);
-        this.value = value;
-        addChild(value);
         this.slice = slice;
         this.ctx = ctx;
     }
 
     public Subscript(PythonTree tree, expr value, slice slice, expr_contextType ctx) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
         this.slice = slice;
         this.ctx = ctx;
     }
@@ -150,6 +135,7 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
         return "Subscript";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Subscript(");
         sb.append("value=");

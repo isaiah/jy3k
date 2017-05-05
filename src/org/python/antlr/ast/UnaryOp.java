@@ -68,11 +68,8 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public UnaryOp(PyType subType) {
-        super(subType);
-    }
     public UnaryOp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -94,36 +91,26 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     }
 
     public UnaryOp(PyObject op, PyObject operand) {
+        super(TYPE);
         setOp(op);
         setOperand(operand);
     }
 
+    // called from derived class
+    public UnaryOp(PyType subtype) {
+        super(subtype);
+    }
+
     public UnaryOp(Token token, unaryopType op, expr operand) {
-        super(token);
+        super(TYPE, token);
         this.op = op;
         this.operand = operand;
-        addChild(operand);
-    }
-
-    public UnaryOp(Integer ttype, Token token, unaryopType op, expr operand) {
-        super(ttype, token);
-        this.op = op;
-        this.operand = operand;
-        addChild(operand);
-    }
-
-    public UnaryOp(TerminalNode node, unaryopType op, expr operand) {
-        super(node);
-        this.op = op;
-        this.operand = operand;
-        addChild(operand);
     }
 
     public UnaryOp(PythonTree tree, unaryopType op, expr operand) {
-        super(tree);
+        super(TYPE, tree);
         this.op = op;
         this.operand = operand;
-        addChild(operand);
     }
 
     @ExposedGet(name = "repr")
@@ -131,6 +118,7 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         return "UnaryOp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("UnaryOp(");
         sb.append("op=");

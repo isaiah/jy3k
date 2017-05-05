@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class LShift extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(LShift.class);
 
-public LShift() {
-}
-
-public LShift(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void LShift___init__(PyObject[] args, String[] keywords) {}
+    public LShift() {
+        super(TYPE);
+    }
+    public LShift(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void LShift___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void LShift___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(8);
     }
 
+    @Override
+    public String toStringTree() {
+        return LShift.class.toString();
+    }
 }

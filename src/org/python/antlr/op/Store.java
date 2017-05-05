@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Store extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Store.class);
 
-public Store() {
-}
-
-public Store(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Store___init__(PyObject[] args, String[] keywords) {}
+    public Store() {
+        super(TYPE);
+    }
+    public Store(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Store___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Store___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(2);
     }
 
+    @Override
+    public String toStringTree() {
+        return Store.class.toString();
+    }
 }

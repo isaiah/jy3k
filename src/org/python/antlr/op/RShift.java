@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class RShift extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(RShift.class);
 
-public RShift() {
-}
-
-public RShift(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void RShift___init__(PyObject[] args, String[] keywords) {}
+    public RShift() {
+        super(TYPE);
+    }
+    public RShift(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void RShift___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void RShift___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(9);
     }
 
+    @Override
+    public String toStringTree() {
+        return RShift.class.toString();
+    }
 }

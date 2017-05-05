@@ -356,21 +356,21 @@ public class jython {
                         file.close();
                     }
                 } catch (Throwable t) {
-                    if (t instanceof PyException
-                            && ((PyException)t).match(_systemrestart.SystemRestart)) {
-                        // Shutdown this instance...
-                        shouldRestart = true;
-                        shutdownInterpreter();
-                        interp.cleanup();
-                        // ..reset the state...
-                        Py.setSystemState(new PySystemState());
-                        // ...and start again
-                        return;
-                    } else {
+//                    if (t instanceof PyException
+//                            && ((PyException)t).match(_systemrestart.SystemRestart)) {
+//                        // Shutdown this instance...
+//                        shouldRestart = true;
+//                        shutdownInterpreter();
+//                        interp.cleanup();
+//                        // ..reset the state...
+//                        Py.setSystemState(new PySystemState());
+//                        // ...and start again
+//                        return;
+//                    } else {
                         Py.printException(t);
                         interp.cleanup();
                         System.exit(-1);
-                    }
+//                    }
                 }
             }
         } else {

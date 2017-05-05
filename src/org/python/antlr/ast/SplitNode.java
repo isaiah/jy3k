@@ -85,11 +85,8 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public SplitNode(PyType subType) {
-        super(subType);
-    }
     public SplitNode() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -112,60 +109,39 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     }
 
     public SplitNode(PyObject name, PyObject body, PyObject funcdef) {
+        super(TYPE);
         setName(name);
         setBody(body);
         setFuncdef(funcdef);
     }
 
+    // called from derived class
+    public SplitNode(PyType subtype) {
+        super(subtype);
+    }
+
     public SplitNode(Token token, String name, java.util.List<stmt> body, stmt funcdef) {
-        super(token);
+        super(TYPE, token);
         this.name = name;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.funcdef = funcdef;
-    }
-
-    public SplitNode(Integer ttype, Token token, String name, java.util.List<stmt> body, stmt
-    funcdef) {
-        super(ttype, token);
-        this.name = name;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.funcdef = funcdef;
-    }
-
-    public SplitNode(TerminalNode node, String name, java.util.List<stmt> body, stmt funcdef) {
-        super(node);
-        this.name = name;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.funcdef = funcdef;
     }
 
     public SplitNode(PythonTree tree, String name, java.util.List<stmt> body, stmt funcdef) {
-        super(tree);
+        super(TYPE, tree);
         this.name = name;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.funcdef = funcdef;
     }
@@ -175,6 +151,7 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
         return "SplitNode";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("SplitNode(");
         sb.append("name=");

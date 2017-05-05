@@ -74,11 +74,8 @@ public static final PyType TYPE = PyType.fromClass(With.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public With(PyType subType) {
-        super(subType);
-    }
     public With() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -100,80 +97,43 @@ public static final PyType TYPE = PyType.fromClass(With.class);
     }
 
     public With(PyObject items, PyObject body) {
+        super(TYPE);
         setItems(items);
         setBody(body);
     }
 
+    // called from derived class
+    public With(PyType subtype) {
+        super(subtype);
+    }
+
     public With(Token token, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(token);
+        super(TYPE, token);
         this.items = items;
         if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
+            this.items = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public With(Integer ttype, Token token, java.util.List<withitem> items, java.util.List<stmt>
-    body) {
-        super(ttype, token);
-        this.items = items;
-        if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public With(TerminalNode node, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(node);
-        this.items = items;
-        if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
     public With(PythonTree tree, java.util.List<withitem> items, java.util.List<stmt> body) {
-        super(tree);
+        super(TYPE, tree);
         this.items = items;
         if (items == null) {
-            this.items = new ArrayList<withitem>();
-        }
-        for(PythonTree t : this.items) {
-            addChild(t);
+            this.items = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
@@ -182,6 +142,7 @@ public static final PyType TYPE = PyType.fromClass(With.class);
         return "With";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("With(");
         sb.append("items=");

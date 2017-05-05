@@ -37,26 +37,16 @@ public abstract class slice extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public slice() {
+    public slice(PyType subtype) {
+        super(subtype);
     }
 
-    public slice(PyType subType) {
+    public slice(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public slice(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public slice(TerminalNode node) {
-        super(node);
-    }
-
-    public slice(Token token) {
-        super(token);
-    }
-
-    public slice(PythonTree node) {
-        super(node);
+    public slice(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

@@ -58,11 +58,8 @@ public static final PyType TYPE = PyType.fromClass(Global.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Global(PyType subType) {
-        super(subType);
-    }
     public Global() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,26 +80,22 @@ public static final PyType TYPE = PyType.fromClass(Global.class);
     }
 
     public Global(PyObject names) {
+        super(TYPE);
         setNames(names);
     }
 
+    // called from derived class
+    public Global(PyType subtype) {
+        super(subtype);
+    }
+
     public Global(Token token, java.util.List<String> names) {
-        super(token);
-        this.names = names;
-    }
-
-    public Global(Integer ttype, Token token, java.util.List<String> names) {
-        super(ttype, token);
-        this.names = names;
-    }
-
-    public Global(TerminalNode node, java.util.List<String> names) {
-        super(node);
+        super(TYPE, token);
         this.names = names;
     }
 
     public Global(PythonTree tree, java.util.List<String> names) {
-        super(tree);
+        super(TYPE, tree);
         this.names = names;
     }
 
@@ -111,6 +104,7 @@ public static final PyType TYPE = PyType.fromClass(Global.class);
         return "Global";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Global(");
         sb.append("names=");

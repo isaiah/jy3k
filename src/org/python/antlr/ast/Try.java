@@ -107,11 +107,8 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Try(PyType subType) {
-        super(subType);
-    }
     public Try() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -135,141 +132,75 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     }
 
     public Try(PyObject body, PyObject handlers, PyObject orelse, PyObject finalbody) {
+        super(TYPE);
         setBody(body);
         setHandlers(handlers);
         setOrelse(orelse);
         setFinalbody(finalbody);
     }
 
+    // called from derived class
+    public Try(PyType subtype) {
+        super(subtype);
+    }
+
     public Try(Token token, java.util.List<stmt> body, java.util.List<excepthandler> handlers,
     java.util.List<stmt> orelse, java.util.List<stmt> finalbody) {
-        super(token);
+        super(TYPE, token);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.handlers = handlers;
         if (handlers == null) {
-            this.handlers = new ArrayList<excepthandler>();
-        }
-        for(PythonTree t : this.handlers) {
-            addChild(t);
+            this.handlers = new ArrayList<>(0);
         }
         this.orelse = orelse;
         if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
+            this.orelse = new ArrayList<>(0);
         }
         for(PythonTree t : this.orelse) {
-            addChild(t);
+            addChild(t, this.orelse);
         }
         this.finalbody = finalbody;
         if (finalbody == null) {
-            this.finalbody = new ArrayList<stmt>();
+            this.finalbody = new ArrayList<>(0);
         }
         for(PythonTree t : this.finalbody) {
-            addChild(t);
-        }
-    }
-
-    public Try(Integer ttype, Token token, java.util.List<stmt> body, java.util.List<excepthandler>
-    handlers, java.util.List<stmt> orelse, java.util.List<stmt> finalbody) {
-        super(ttype, token);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.handlers = handlers;
-        if (handlers == null) {
-            this.handlers = new ArrayList<excepthandler>();
-        }
-        for(PythonTree t : this.handlers) {
-            addChild(t);
-        }
-        this.orelse = orelse;
-        if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.orelse) {
-            addChild(t);
-        }
-        this.finalbody = finalbody;
-        if (finalbody == null) {
-            this.finalbody = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.finalbody) {
-            addChild(t);
-        }
-    }
-
-    public Try(TerminalNode node, java.util.List<stmt> body, java.util.List<excepthandler>
-    handlers, java.util.List<stmt> orelse, java.util.List<stmt> finalbody) {
-        super(node);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.handlers = handlers;
-        if (handlers == null) {
-            this.handlers = new ArrayList<excepthandler>();
-        }
-        for(PythonTree t : this.handlers) {
-            addChild(t);
-        }
-        this.orelse = orelse;
-        if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.orelse) {
-            addChild(t);
-        }
-        this.finalbody = finalbody;
-        if (finalbody == null) {
-            this.finalbody = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.finalbody) {
-            addChild(t);
+            addChild(t, this.finalbody);
         }
     }
 
     public Try(PythonTree tree, java.util.List<stmt> body, java.util.List<excepthandler> handlers,
     java.util.List<stmt> orelse, java.util.List<stmt> finalbody) {
-        super(tree);
+        super(TYPE, tree);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.handlers = handlers;
         if (handlers == null) {
-            this.handlers = new ArrayList<excepthandler>();
-        }
-        for(PythonTree t : this.handlers) {
-            addChild(t);
+            this.handlers = new ArrayList<>(0);
         }
         this.orelse = orelse;
         if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
+            this.orelse = new ArrayList<>(0);
         }
         for(PythonTree t : this.orelse) {
-            addChild(t);
+            addChild(t, this.orelse);
         }
         this.finalbody = finalbody;
         if (finalbody == null) {
-            this.finalbody = new ArrayList<stmt>();
+            this.finalbody = new ArrayList<>(0);
         }
         for(PythonTree t : this.finalbody) {
-            addChild(t);
+            addChild(t, this.finalbody);
         }
     }
 
@@ -278,6 +209,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         return "Try";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Try(");
         sb.append("body=");

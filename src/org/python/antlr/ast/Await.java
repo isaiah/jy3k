@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(Await.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Await(PyType subType) {
-        super(subType);
-    }
     public Await() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,31 +77,23 @@ public static final PyType TYPE = PyType.fromClass(Await.class);
     }
 
     public Await(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public Await(PyType subtype) {
+        super(subtype);
+    }
+
     public Await(Token token, expr value) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-    }
-
-    public Await(Integer ttype, Token token, expr value) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-    }
-
-    public Await(TerminalNode node, expr value) {
-        super(node);
-        this.value = value;
-        addChild(value);
     }
 
     public Await(PythonTree tree, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -112,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(Await.class);
         return "Await";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Await(");
         sb.append("value=");

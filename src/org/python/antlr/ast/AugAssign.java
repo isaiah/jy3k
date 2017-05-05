@@ -81,11 +81,8 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public AugAssign(PyType subType) {
-        super(subType);
-    }
     public AugAssign() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -108,45 +105,29 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     }
 
     public AugAssign(PyObject target, PyObject op, PyObject value) {
+        super(TYPE);
         setTarget(target);
         setOp(op);
         setValue(value);
     }
 
+    // called from derived class
+    public AugAssign(PyType subtype) {
+        super(subtype);
+    }
+
     public AugAssign(Token token, expr target, operatorType op, expr value) {
-        super(token);
+        super(TYPE, token);
         this.target = target;
-        addChild(target);
         this.op = op;
         this.value = value;
-        addChild(value);
-    }
-
-    public AugAssign(Integer ttype, Token token, expr target, operatorType op, expr value) {
-        super(ttype, token);
-        this.target = target;
-        addChild(target);
-        this.op = op;
-        this.value = value;
-        addChild(value);
-    }
-
-    public AugAssign(TerminalNode node, expr target, operatorType op, expr value) {
-        super(node);
-        this.target = target;
-        addChild(target);
-        this.op = op;
-        this.value = value;
-        addChild(value);
     }
 
     public AugAssign(PythonTree tree, expr target, operatorType op, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.target = target;
-        addChild(target);
         this.op = op;
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -154,6 +135,7 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
         return "AugAssign";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("AugAssign(");
         sb.append("target=");

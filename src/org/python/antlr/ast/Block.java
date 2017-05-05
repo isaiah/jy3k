@@ -28,28 +28,28 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@ExposedType(name = "_ast.Import", base = stmt.class)
-public class Import extends stmt {
-public static final PyType TYPE = PyType.fromClass(Import.class);
-    private java.util.List<alias> names;
-    public java.util.List<alias> getInternalNames() {
-        return names;
+@ExposedType(name = "_ast.Block", base = stmt.class)
+public class Block extends stmt {
+public static final PyType TYPE = PyType.fromClass(Block.class);
+    private java.util.List<stmt> statements;
+    public java.util.List<stmt> getInternalStatements() {
+        return statements;
     }
-    public void setInternalNames(java.util.List<alias> names) {
-        this.names = names;
+    public void setInternalStatements(java.util.List<stmt> statements) {
+        this.statements = statements;
     }
-    @ExposedGet(name = "names")
-    public PyObject getNames() {
-        return new AstList(names, AstAdapters.aliasAdapter);
+    @ExposedGet(name = "statements")
+    public PyObject getStatements() {
+        return new AstList(statements, AstAdapters.stmtAdapter);
     }
-    @ExposedSet(name = "names")
-    public void setNames(PyObject names) {
-        this.names = AstAdapters.py2aliasList(names);
+    @ExposedSet(name = "statements")
+    public void setStatements(PyObject statements) {
+        this.statements = AstAdapters.py2stmtList(statements);
     }
 
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("names")};
+    new PyUnicode[] {new PyUnicode("statements")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -58,15 +58,15 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Import() {
+    public Block() {
         super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
-    public void Import___init__(PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("Import", args, keywords, new String[]
-            {"names", "lineno", "col_offset"}, 1, true);
-        setNames(ap.getPyObject(0, Py.None));
+    public void Block___init__(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("Block", args, keywords, new String[]
+            {"statements", "lineno", "col_offset"}, 1, true);
+        setStatements(ap.getPyObject(0, Py.None));
         int lin = ap.getInt(1, -1);
         if (lin != -1) {
             setLineno(lin);
@@ -79,54 +79,60 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
 
     }
 
-    public Import(PyObject names) {
+    public Block(PyObject statements) {
         super(TYPE);
-        setNames(names);
+        setStatements(statements);
     }
 
     // called from derived class
-    public Import(PyType subtype) {
+    public Block(PyType subtype) {
         super(subtype);
     }
 
-    public Import(Token token, java.util.List<alias> names) {
+    public Block(Token token, java.util.List<stmt> statements) {
         super(TYPE, token);
-        this.names = names;
-        if (names == null) {
-            this.names = new ArrayList<>(0);
+        this.statements = statements;
+        if (statements == null) {
+            this.statements = new ArrayList<>(0);
+        }
+        for(PythonTree t : this.statements) {
+            addChild(t, this.statements);
         }
     }
 
-    public Import(PythonTree tree, java.util.List<alias> names) {
+    public Block(PythonTree tree, java.util.List<stmt> statements) {
         super(TYPE, tree);
-        this.names = names;
-        if (names == null) {
-            this.names = new ArrayList<>(0);
+        this.statements = statements;
+        if (statements == null) {
+            this.statements = new ArrayList<>(0);
+        }
+        for(PythonTree t : this.statements) {
+            addChild(t, this.statements);
         }
     }
 
     @ExposedGet(name = "repr")
     public String toString() {
-        return "Import";
+        return "Block";
     }
 
     @Override
     public String toStringTree() {
-        StringBuffer sb = new StringBuffer("Import(");
-        sb.append("names=");
-        sb.append(dumpThis(names));
+        StringBuffer sb = new StringBuffer("Block(");
+        sb.append("statements=");
+        sb.append(dumpThis(statements));
         sb.append(",");
         sb.append(")");
         return sb.toString();
     }
 
     public <R> R accept(VisitorIF<R> visitor) throws Exception {
-        return visitor.visitImport(this);
+        return visitor.visitBlock(this);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
-        if (names != null) {
-            for (PythonTree t : names) {
+        if (statements != null) {
+            for (PythonTree t : statements) {
                 if (t != null)
                     t.accept(visitor);
             }

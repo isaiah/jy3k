@@ -85,11 +85,8 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public ImportFrom(PyType subType) {
-        super(subType);
-    }
     public ImportFrom() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -112,61 +109,33 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
     }
 
     public ImportFrom(PyObject module, PyObject names, PyObject level) {
+        super(TYPE);
         setModule(module);
         setNames(names);
         setLevel(level);
     }
 
+    // called from derived class
+    public ImportFrom(PyType subtype) {
+        super(subtype);
+    }
+
     public ImportFrom(Token token, String module, java.util.List<alias> names, Integer level) {
-        super(token);
+        super(TYPE, token);
         this.module = module;
         this.names = names;
         if (names == null) {
-            this.names = new ArrayList<alias>();
-        }
-        for(PythonTree t : this.names) {
-            addChild(t);
-        }
-        this.level = level;
-    }
-
-    public ImportFrom(Integer ttype, Token token, String module, java.util.List<alias> names,
-    Integer level) {
-        super(ttype, token);
-        this.module = module;
-        this.names = names;
-        if (names == null) {
-            this.names = new ArrayList<alias>();
-        }
-        for(PythonTree t : this.names) {
-            addChild(t);
-        }
-        this.level = level;
-    }
-
-    public ImportFrom(TerminalNode node, String module, java.util.List<alias> names, Integer level)
-    {
-        super(node);
-        this.module = module;
-        this.names = names;
-        if (names == null) {
-            this.names = new ArrayList<alias>();
-        }
-        for(PythonTree t : this.names) {
-            addChild(t);
+            this.names = new ArrayList<>(0);
         }
         this.level = level;
     }
 
     public ImportFrom(PythonTree tree, String module, java.util.List<alias> names, Integer level) {
-        super(tree);
+        super(TYPE, tree);
         this.module = module;
         this.names = names;
         if (names == null) {
-            this.names = new ArrayList<alias>();
-        }
-        for(PythonTree t : this.names) {
-            addChild(t);
+            this.names = new ArrayList<>(0);
         }
         this.level = level;
     }
@@ -176,6 +145,7 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         return "ImportFrom";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("ImportFrom(");
         sb.append("module=");

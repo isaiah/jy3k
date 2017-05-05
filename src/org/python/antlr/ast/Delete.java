@@ -58,11 +58,8 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Delete(PyType subType) {
-        super(subType);
-    }
     public Delete() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,50 +80,28 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
     }
 
     public Delete(PyObject targets) {
+        super(TYPE);
         setTargets(targets);
     }
 
+    // called from derived class
+    public Delete(PyType subtype) {
+        super(subtype);
+    }
+
     public Delete(Token token, java.util.List<expr> targets) {
-        super(token);
+        super(TYPE, token);
         this.targets = targets;
         if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
-        }
-    }
-
-    public Delete(Integer ttype, Token token, java.util.List<expr> targets) {
-        super(ttype, token);
-        this.targets = targets;
-        if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
-        }
-    }
-
-    public Delete(TerminalNode node, java.util.List<expr> targets) {
-        super(node);
-        this.targets = targets;
-        if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
+            this.targets = new ArrayList<>(0);
         }
     }
 
     public Delete(PythonTree tree, java.util.List<expr> targets) {
-        super(tree);
+        super(TYPE, tree);
         this.targets = targets;
         if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
+            this.targets = new ArrayList<>(0);
         }
     }
 
@@ -135,6 +110,7 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         return "Delete";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Delete(");
         sb.append("targets=");

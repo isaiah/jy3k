@@ -41,9 +41,6 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Ellipsis(PyType subType) {
-        super(subType);
-    }
     @ExposedNew
     @ExposedMethod
     public void Ellipsis___init__(PyObject[] args, String[] keywords) {
@@ -62,22 +59,20 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
     }
 
     public Ellipsis() {
+        super(TYPE);
+    }
+
+    // called from derived class
+    public Ellipsis(PyType subtype) {
+        super(subtype);
     }
 
     public Ellipsis(Token token) {
-        super(token);
-    }
-
-    public Ellipsis(Integer ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public Ellipsis(TerminalNode node) {
-        super(node);
+        super(TYPE, token);
     }
 
     public Ellipsis(PythonTree tree) {
-        super(tree);
+        super(TYPE, tree);
     }
 
     @ExposedGet(name = "repr")
@@ -85,6 +80,7 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
         return "Ellipsis";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Ellipsis(");
         sb.append(")");

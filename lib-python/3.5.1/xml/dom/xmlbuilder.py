@@ -353,14 +353,14 @@ class _AsyncDeprecatedProperty:
 class DocumentLS:
     """Mixin to create documents that conform to the load/save spec."""
 
-    async = _AsyncDeprecatedProperty()
+    _async = _AsyncDeprecatedProperty()
     async_ = False
 
     def _get_async(self):
         return False
 
-    def _set_async(self, async):
-        if async:
+    def _set_async(self, _async):
+        if _async:
             raise xml.dom.NotSupportedErr(
                 "asynchronous document loading is not supported")
 

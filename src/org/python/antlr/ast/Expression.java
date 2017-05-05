@@ -54,11 +54,8 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Expression(PyType subType) {
-        super(subType);
-    }
     public Expression() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -69,31 +66,23 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     }
 
     public Expression(PyObject body) {
+        super(TYPE);
         setBody(body);
     }
 
+    // called from derived class
+    public Expression(PyType subtype) {
+        super(subtype);
+    }
+
     public Expression(Token token, expr body) {
-        super(token);
+        super(TYPE, token);
         this.body = body;
-        addChild(body);
-    }
-
-    public Expression(Integer ttype, Token token, expr body) {
-        super(ttype, token);
-        this.body = body;
-        addChild(body);
-    }
-
-    public Expression(TerminalNode node, expr body) {
-        super(node);
-        this.body = body;
-        addChild(body);
     }
 
     public Expression(PythonTree tree, expr body) {
-        super(tree);
+        super(TYPE, tree);
         this.body = body;
-        addChild(body);
     }
 
     @ExposedGet(name = "repr")
@@ -101,6 +90,7 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
         return "Expression";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Expression(");
         sb.append("body=");

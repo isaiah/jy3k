@@ -101,11 +101,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public AsyncFor(PyType subType) {
-        super(subType);
-    }
     public AsyncFor() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -129,101 +126,57 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     }
 
     public AsyncFor(PyObject target, PyObject iter, PyObject body, PyObject orelse) {
+        super(TYPE);
         setTarget(target);
         setIter(iter);
         setBody(body);
         setOrelse(orelse);
     }
 
+    // called from derived class
+    public AsyncFor(PyType subtype) {
+        super(subtype);
+    }
+
     public AsyncFor(Token token, expr target, expr iter, java.util.List<stmt> body,
     java.util.List<stmt> orelse) {
-        super(token);
+        super(TYPE, token);
         this.target = target;
-        addChild(target);
         this.iter = iter;
-        addChild(iter);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.orelse = orelse;
         if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
+            this.orelse = new ArrayList<>(0);
         }
         for(PythonTree t : this.orelse) {
-            addChild(t);
-        }
-    }
-
-    public AsyncFor(Integer ttype, Token token, expr target, expr iter, java.util.List<stmt> body,
-    java.util.List<stmt> orelse) {
-        super(ttype, token);
-        this.target = target;
-        addChild(target);
-        this.iter = iter;
-        addChild(iter);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.orelse = orelse;
-        if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.orelse) {
-            addChild(t);
-        }
-    }
-
-    public AsyncFor(TerminalNode node, expr target, expr iter, java.util.List<stmt> body,
-    java.util.List<stmt> orelse) {
-        super(node);
-        this.target = target;
-        addChild(target);
-        this.iter = iter;
-        addChild(iter);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.orelse = orelse;
-        if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.orelse) {
-            addChild(t);
+            addChild(t, this.orelse);
         }
     }
 
     public AsyncFor(PythonTree tree, expr target, expr iter, java.util.List<stmt> body,
     java.util.List<stmt> orelse) {
-        super(tree);
+        super(TYPE, tree);
         this.target = target;
-        addChild(target);
         this.iter = iter;
-        addChild(iter);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.orelse = orelse;
         if (orelse == null) {
-            this.orelse = new ArrayList<stmt>();
+            this.orelse = new ArrayList<>(0);
         }
         for(PythonTree t : this.orelse) {
-            addChild(t);
+            addChild(t, this.orelse);
         }
     }
 
@@ -232,6 +185,7 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
         return "AsyncFor";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("AsyncFor(");
         sb.append("target=");

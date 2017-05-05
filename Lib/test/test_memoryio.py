@@ -166,6 +166,10 @@ class MemoryTestMixin:
         memio.seek(0)
         self.assertEqual(memio.read(None), buf)
         self.assertRaises(TypeError, memio.read, '')
+        memio.seek(len(buf) + 1)
+        self.assertEqual(memio.read(1), self.EOF)
+        memio.seek(len(buf) + 1)
+        self.assertEqual(memio.read(), self.EOF)
         memio.close()
         self.assertRaises(ValueError, memio.read)
 
@@ -185,6 +189,9 @@ class MemoryTestMixin:
         self.assertEqual(memio.readline(-1), buf)
         memio.seek(0)
         self.assertEqual(memio.readline(0), self.EOF)
+        # Issue #24989: Buffer overread
+        memio.seek(len(buf) * 2 + 1)
+        self.assertEqual(memio.readline(), self.EOF)
 
         buf = self.buftype("1234567890\n")
         memio = self.ioclass((buf * 3)[:-1])
@@ -217,6 +224,9 @@ class MemoryTestMixin:
         memio.seek(0)
         self.assertEqual(memio.readlines(None), [buf] * 10)
         self.assertRaises(TypeError, memio.readlines, '')
+        # Issue #24989: Buffer overread
+        memio.seek(len(buf) * 10 + 1)
+        self.assertEqual(memio.readlines(), [])
         memio.close()
         self.assertRaises(ValueError, memio.readlines)
 
@@ -238,6 +248,9 @@ class MemoryTestMixin:
             self.assertEqual(line, buf)
             i += 1
         self.assertEqual(i, 10)
+        # Issue #24989: Buffer overread
+        memio.seek(len(buf) * 10 + 1)
+        self.assertEqual(list(memio), [])
         memio = self.ioclass(buf * 2)
         memio.close()
         self.assertRaises(ValueError, memio.__next__)
@@ -418,13 +431,6 @@ class PyBytesIOTest(MemoryTestMixin, MemorySeekTestMixin,
                     BytesIOMixin, unittest.TestCase):
 
     UnsupportedOperation = pyio.UnsupportedOperation
-
-    # When Jython tries to use UnsupportedOperation as _pyio defines it, it runs
-    # into a problem with multiple inheritance and the slots array: issue 1996.
-    # Override the affected test version just so we can skip it visibly.
-    @unittest.skipIf(support.is_jython, "FIXME: Jython issue 1996")
-    def test_detach(self):
-        pass
 
     @staticmethod
     def buftype(s):
@@ -659,13 +665,6 @@ class TextIOTestMixin:
         for newline in (None, "", "\n", "\r", "\r\n"):
             self.ioclass(newline=newline)
 
-    # When Jython tries to use UnsupportedOperation as _pyio defines it, it runs
-    # into a problem with multiple inheritance and the slots array: issue 1996.
-    # Override the affected test version just so we can skip it visibly.
-    @unittest.skipIf(support.is_jython, "FIXME: Jython issue 1996")
-    def test_detach(self):
-        pass
-
 
 class PyStringIOTest(MemoryTestMixin, MemorySeekTestMixin,
                      TextIOTestMixin, unittest.TestCase):
@@ -676,16 +675,13 @@ class PyStringIOTest(MemoryTestMixin, MemorySeekTestMixin,
 
     def test_lone_surrogates(self):
         # Issue #20424
-        memio = self.ioclass('\\ud800')
-        self.assertEqual(memio.read(), '\\ud800')
+        memio = self.ioclass('\ud800')
+        self.assertEqual(memio.read(), '\ud800')
 
         memio = self.ioclass()
-        memio.write('\\ud800')
-        self.assertEqual(memio.getvalue(), '\\ud800')
+        memio.write('\ud800')
+        self.assertEqual(memio.getvalue(), '\ud800')
 
-    # Re-instate test_detach skipped by Jython in PyBytesIOTest
-    if support.is_jython: # FIXME: Jython issue 1996
-        test_detach = MemoryTestMixin.test_detach
 
 class PyStringIOPickleTest(TextIOTestMixin, unittest.TestCase):
     """Test if pickle restores properly the internal state of StringIO.
@@ -711,7 +707,8 @@ class CBytesIOTest(PyBytesIOTest):
         self.assertEqual(len(state), 3)
         bytearray(state[0]) # Check if state[0] supports the buffer interface.
         self.assertIsInstance(state[1], int)
-        self.assertTrue(isinstance(state[2], dict) or state[2] is None)
+        if state[2] is not None:
+            self.assertIsInstance(state[2], dict)
         memio.close()
         self.assertRaises(ValueError, memio.__getstate__)
 
@@ -792,17 +789,8 @@ class CStringIOTest(PyStringIOTest):
 
     # XXX: For the Python version of io.StringIO, this is highly
     # dependent on the encoding used for the underlying buffer.
-
-    # Re-instate test_detach skipped by Jython in PyBytesIOTest
-    if support.is_jython: # FIXME: Jython issue 1996
-        test_detach = MemoryTestMixin.test_detach
-
-    # This test checks that tell() results are consistent with the length of
-    # text written, but this is not documented in the API: only that seek()
-    # accept what tell() returns.
-    @unittest.skipIf(support.is_jython, "Exact value of tell() is CPython specific")
     def test_widechar(self):
-        buf = self.buftype("\\U0002030a\\U00020347")
+        buf = self.buftype("\U0002030a\U00020347")
         memio = self.ioclass(buf)
 
         self.assertEqual(memio.getvalue(), buf)
@@ -813,33 +801,6 @@ class CStringIOTest(PyStringIOTest):
         self.assertEqual(memio.tell(), len(buf) * 2)
         self.assertEqual(memio.getvalue(), buf + buf)
 
-    # This test checks that seek() accepts what tell() returns, without requiring
-    # that tell() return a particular absolute value. Conceived for Jython, but
-    # probably universal.
-    def test_widechar_seek(self):
-        buf = self.buftype("\\U0002030aX\\u00ca\\U00020347\\u05d1Y\\u0628Z")
-        memio = self.ioclass(buf)
-        self.assertEqual(memio.getvalue(), buf)
-
-        # For each character in buf, read it back from memio and its tell value
-        chars = list(buf)
-        tells = list()
-        for ch in chars :
-            tells.append(memio.tell())
-            self.assertEqual(memio.read(1), ch)
-
-        # For each character in buf, seek to it and check it's there
-        chpos = list(zip(chars, tells))
-        chpos.reverse()
-        for ch, pos in chpos:
-            memio.seek(pos)
-            self.assertEqual(memio.read(1), ch)
-
-        # Check write after seek to end
-        memio.seek(0, 2)
-        self.assertEqual(memio.write(buf), len(buf))
-        self.assertEqual(memio.getvalue(), buf + buf)
-
     def test_getstate(self):
         memio = self.ioclass()
         state = memio.__getstate__()
@@ -847,7 +808,8 @@ class CStringIOTest(PyStringIOTest):
         self.assertIsInstance(state[0], str)
         self.assertIsInstance(state[1], str)
         self.assertIsInstance(state[2], int)
-        self.assertTrue(isinstance(state[3], dict) or state[3] is None)
+        if state[3] is not None:
+            self.assertIsInstance(state[3], dict)
         memio.close()
         self.assertRaises(ValueError, memio.__getstate__)
 
@@ -879,10 +841,5 @@ class CStringIOPickleTest(PyStringIOPickleTest):
             pass
 
 
-def test_main():
-    tests = [PyBytesIOTest, PyStringIOTest, CBytesIOTest, CStringIOTest,
-             PyStringIOPickleTest, CStringIOPickleTest]
-    support.run_unittest(*tests)
-
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

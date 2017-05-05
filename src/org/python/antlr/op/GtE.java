@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class GtE extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(GtE.class);
 
-public GtE() {
-}
-
-public GtE(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void GtE___init__(PyObject[] args, String[] keywords) {}
+    public GtE() {
+        super(TYPE);
+    }
+    public GtE(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void GtE___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void GtE___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(6);
     }
 
+    @Override
+    public String toStringTree() {
+        return GtE.class.toString();
+    }
 }

@@ -57,11 +57,8 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Interactive(PyType subType) {
-        super(subType);
-    }
     public Interactive() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -72,50 +69,34 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
     }
 
     public Interactive(PyObject body) {
+        super(TYPE);
         setBody(body);
     }
 
+    // called from derived class
+    public Interactive(PyType subtype) {
+        super(subtype);
+    }
+
     public Interactive(Token token, java.util.List<stmt> body) {
-        super(token);
+        super(TYPE, token);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public Interactive(Integer ttype, Token token, java.util.List<stmt> body) {
-        super(ttype, token);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public Interactive(TerminalNode node, java.util.List<stmt> body) {
-        super(node);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
     public Interactive(PythonTree tree, java.util.List<stmt> body) {
-        super(tree);
+        super(TYPE, tree);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
@@ -124,6 +105,7 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
         return "Interactive";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Interactive(");
         sb.append("body=");

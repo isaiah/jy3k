@@ -68,11 +68,8 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Starred(PyType subType) {
-        super(subType);
-    }
     public Starred() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -94,35 +91,25 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     }
 
     public Starred(PyObject value, PyObject ctx) {
+        super(TYPE);
         setValue(value);
         setCtx(ctx);
     }
 
+    // called from derived class
+    public Starred(PyType subtype) {
+        super(subtype);
+    }
+
     public Starred(Token token, expr value, expr_contextType ctx) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-        this.ctx = ctx;
-    }
-
-    public Starred(Integer ttype, Token token, expr value, expr_contextType ctx) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-        this.ctx = ctx;
-    }
-
-    public Starred(TerminalNode node, expr value, expr_contextType ctx) {
-        super(node);
-        this.value = value;
-        addChild(value);
         this.ctx = ctx;
     }
 
     public Starred(PythonTree tree, expr value, expr_contextType ctx) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
         this.ctx = ctx;
     }
 
@@ -131,6 +118,7 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
         return "Starred";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Starred(");
         sb.append("value=");

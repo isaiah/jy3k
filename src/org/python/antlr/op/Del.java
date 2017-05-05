@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Del extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Del.class);
 
-public Del() {
-}
-
-public Del(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Del___init__(PyObject[] args, String[] keywords) {}
+    public Del() {
+        super(TYPE);
+    }
+    public Del(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Del___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Del___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(3);
     }
 
+    @Override
+    public String toStringTree() {
+        return Del.class.toString();
+    }
 }

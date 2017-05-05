@@ -121,11 +121,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public ClassDef(PyType subType) {
-        super(subType);
-    }
     public ClassDef() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -152,6 +149,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
 
     public ClassDef(PyObject name, PyObject bases, PyObject keywords, PyObject body, PyObject
     decorator_list) {
+        super(TYPE);
         setName(name);
         setBases(bases);
         setKeywords(keywords);
@@ -159,142 +157,59 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         setDecorator_list(decorator_list);
     }
 
+    // called from derived class
+    public ClassDef(PyType subtype) {
+        super(subtype);
+    }
+
     public ClassDef(Token token, String name, java.util.List<expr> bases, java.util.List<keyword>
     keywords, java.util.List<stmt> body, java.util.List<expr> decorator_list) {
-        super(token);
+        super(TYPE, token);
         this.name = name;
         this.bases = bases;
         if (bases == null) {
-            this.bases = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.bases) {
-            addChild(t);
+            this.bases = new ArrayList<>(0);
         }
         this.keywords = keywords;
         if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
+            this.keywords = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-    }
-
-    public ClassDef(Integer ttype, Token token, String name, java.util.List<expr> bases,
-    java.util.List<keyword> keywords, java.util.List<stmt> body, java.util.List<expr>
-    decorator_list) {
-        super(ttype, token);
-        this.name = name;
-        this.bases = bases;
-        if (bases == null) {
-            this.bases = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.bases) {
-            addChild(t);
-        }
-        this.keywords = keywords;
-        if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-    }
-
-    public ClassDef(TerminalNode node, String name, java.util.List<expr> bases,
-    java.util.List<keyword> keywords, java.util.List<stmt> body, java.util.List<expr>
-    decorator_list) {
-        super(node);
-        this.name = name;
-        this.bases = bases;
-        if (bases == null) {
-            this.bases = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.bases) {
-            addChild(t);
-        }
-        this.keywords = keywords;
-        if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
-        }
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
+            this.decorator_list = new ArrayList<>(0);
         }
     }
 
     public ClassDef(PythonTree tree, String name, java.util.List<expr> bases,
     java.util.List<keyword> keywords, java.util.List<stmt> body, java.util.List<expr>
     decorator_list) {
-        super(tree);
+        super(TYPE, tree);
         this.name = name;
         this.bases = bases;
         if (bases == null) {
-            this.bases = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.bases) {
-            addChild(t);
+            this.bases = new ArrayList<>(0);
         }
         this.keywords = keywords;
         if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
+            this.keywords = new ArrayList<>(0);
         }
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
+            this.decorator_list = new ArrayList<>(0);
         }
     }
 
@@ -303,6 +218,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         return "ClassDef";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("ClassDef(");
         sb.append("name=");

@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Not extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Not.class);
 
-public Not() {
-}
-
-public Not(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Not___init__(PyObject[] args, String[] keywords) {}
+    public Not() {
+        super(TYPE);
+    }
+    public Not(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Not___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Not___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(2);
     }
 
+    @Override
+    public String toStringTree() {
+        return Not.class.toString();
+    }
 }

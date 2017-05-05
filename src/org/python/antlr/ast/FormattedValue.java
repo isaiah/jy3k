@@ -82,11 +82,8 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public FormattedValue(PyType subType) {
-        super(subType);
-    }
     public FormattedValue() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -109,46 +106,29 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     }
 
     public FormattedValue(PyObject value, PyObject conversion, PyObject format_spec) {
+        super(TYPE);
         setValue(value);
         setConversion(conversion);
         setFormat_spec(format_spec);
     }
 
+    // called from derived class
+    public FormattedValue(PyType subtype) {
+        super(subtype);
+    }
+
     public FormattedValue(Token token, expr value, Integer conversion, expr format_spec) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
         this.conversion = conversion;
         this.format_spec = format_spec;
-        addChild(format_spec);
-    }
-
-    public FormattedValue(Integer ttype, Token token, expr value, Integer conversion, expr
-    format_spec) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-        this.conversion = conversion;
-        this.format_spec = format_spec;
-        addChild(format_spec);
-    }
-
-    public FormattedValue(TerminalNode node, expr value, Integer conversion, expr format_spec) {
-        super(node);
-        this.value = value;
-        addChild(value);
-        this.conversion = conversion;
-        this.format_spec = format_spec;
-        addChild(format_spec);
     }
 
     public FormattedValue(PythonTree tree, expr value, Integer conversion, expr format_spec) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
         this.conversion = conversion;
         this.format_spec = format_spec;
-        addChild(format_spec);
     }
 
     @ExposedGet(name = "repr")
@@ -156,6 +136,7 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
         return "FormattedValue";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("FormattedValue(");
         sb.append("value=");

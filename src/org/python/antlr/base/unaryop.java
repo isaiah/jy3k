@@ -22,22 +22,12 @@ public abstract class unaryop extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyBytes[] get_attributes() { return attributes; }
 
-    public unaryop() {
+    public unaryop(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public unaryop(PyType subType) {
-    }
-
-    public unaryop(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public unaryop(Token token) {
-        super(token);
-    }
-
-    public unaryop(PythonTree node) {
-        super(node);
+    public unaryop(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

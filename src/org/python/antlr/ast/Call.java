@@ -87,11 +87,8 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Call(PyType subType) {
-        super(subType);
-    }
     public Call() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -114,92 +111,42 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     }
 
     public Call(PyObject func, PyObject args, PyObject keywords) {
+        super(TYPE);
         setFunc(func);
         setArgs(args);
         setKeywords(keywords);
     }
 
+    // called from derived class
+    public Call(PyType subtype) {
+        super(subtype);
+    }
+
     public Call(Token token, expr func, java.util.List<expr> args, java.util.List<keyword>
     keywords) {
-        super(token);
+        super(TYPE, token);
         this.func = func;
-        addChild(func);
         this.args = args;
         if (args == null) {
-            this.args = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
+            this.args = new ArrayList<>(0);
         }
         this.keywords = keywords;
         if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
-        }
-    }
-
-    public Call(Integer ttype, Token token, expr func, java.util.List<expr> args,
-    java.util.List<keyword> keywords) {
-        super(ttype, token);
-        this.func = func;
-        addChild(func);
-        this.args = args;
-        if (args == null) {
-            this.args = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
-        }
-        this.keywords = keywords;
-        if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
-        }
-    }
-
-    public Call(TerminalNode node, expr func, java.util.List<expr> args, java.util.List<keyword>
-    keywords) {
-        super(node);
-        this.func = func;
-        addChild(func);
-        this.args = args;
-        if (args == null) {
-            this.args = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
-        }
-        this.keywords = keywords;
-        if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
+            this.keywords = new ArrayList<>(0);
         }
     }
 
     public Call(PythonTree tree, expr func, java.util.List<expr> args, java.util.List<keyword>
     keywords) {
-        super(tree);
+        super(TYPE, tree);
         this.func = func;
-        addChild(func);
         this.args = args;
         if (args == null) {
-            this.args = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
+            this.args = new ArrayList<>(0);
         }
         this.keywords = keywords;
         if (keywords == null) {
-            this.keywords = new ArrayList<keyword>();
-        }
-        for(PythonTree t : this.keywords) {
-            addChild(t);
+            this.keywords = new ArrayList<>(0);
         }
     }
 
@@ -208,6 +155,7 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         return "Call";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Call(");
         sb.append("func=");

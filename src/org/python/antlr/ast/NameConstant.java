@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(NameConstant.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public NameConstant(PyType subType) {
-        super(subType);
-    }
     public NameConstant() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,26 +77,22 @@ public static final PyType TYPE = PyType.fromClass(NameConstant.class);
     }
 
     public NameConstant(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public NameConstant(PyType subtype) {
+        super(subtype);
+    }
+
     public NameConstant(Token token, String value) {
-        super(token);
-        this.value = value;
-    }
-
-    public NameConstant(Integer ttype, Token token, String value) {
-        super(ttype, token);
-        this.value = value;
-    }
-
-    public NameConstant(TerminalNode node, String value) {
-        super(node);
+        super(TYPE, token);
         this.value = value;
     }
 
     public NameConstant(PythonTree tree, String value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
     }
 
@@ -108,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(NameConstant.class);
         return "NameConstant";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("NameConstant(");
         sb.append("value=");

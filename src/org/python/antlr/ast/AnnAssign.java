@@ -95,11 +95,8 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public AnnAssign(PyType subType) {
-        super(subType);
-    }
     public AnnAssign() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -123,54 +120,31 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     }
 
     public AnnAssign(PyObject target, PyObject annotation, PyObject value, PyObject simple) {
+        super(TYPE);
         setTarget(target);
         setAnnotation(annotation);
         setValue(value);
         setSimple(simple);
     }
 
+    // called from derived class
+    public AnnAssign(PyType subtype) {
+        super(subtype);
+    }
+
     public AnnAssign(Token token, expr target, expr annotation, expr value, Integer simple) {
-        super(token);
+        super(TYPE, token);
         this.target = target;
-        addChild(target);
         this.annotation = annotation;
-        addChild(annotation);
         this.value = value;
-        addChild(value);
-        this.simple = simple;
-    }
-
-    public AnnAssign(Integer ttype, Token token, expr target, expr annotation, expr value, Integer
-    simple) {
-        super(ttype, token);
-        this.target = target;
-        addChild(target);
-        this.annotation = annotation;
-        addChild(annotation);
-        this.value = value;
-        addChild(value);
-        this.simple = simple;
-    }
-
-    public AnnAssign(TerminalNode node, expr target, expr annotation, expr value, Integer simple) {
-        super(node);
-        this.target = target;
-        addChild(target);
-        this.annotation = annotation;
-        addChild(annotation);
-        this.value = value;
-        addChild(value);
         this.simple = simple;
     }
 
     public AnnAssign(PythonTree tree, expr target, expr annotation, expr value, Integer simple) {
-        super(tree);
+        super(TYPE, tree);
         this.target = target;
-        addChild(target);
         this.annotation = annotation;
-        addChild(annotation);
         this.value = value;
-        addChild(value);
         this.simple = simple;
     }
 
@@ -179,6 +153,7 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
         return "AnnAssign";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("AnnAssign(");
         sb.append("target=");

@@ -84,11 +84,8 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public DictComp(PyType subType) {
-        super(subType);
-    }
     public DictComp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -111,71 +108,35 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     }
 
     public DictComp(PyObject key, PyObject value, PyObject generators) {
+        super(TYPE);
         setKey(key);
         setValue(value);
         setGenerators(generators);
     }
 
+    // called from derived class
+    public DictComp(PyType subtype) {
+        super(subtype);
+    }
+
     public DictComp(Token token, expr key, expr value, java.util.List<comprehension> generators) {
-        super(token);
+        super(TYPE, token);
         this.key = key;
-        addChild(key);
         this.value = value;
-        addChild(value);
         this.generators = generators;
         if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
-        }
-    }
-
-    public DictComp(Integer ttype, Token token, expr key, expr value, java.util.List<comprehension>
-    generators) {
-        super(ttype, token);
-        this.key = key;
-        addChild(key);
-        this.value = value;
-        addChild(value);
-        this.generators = generators;
-        if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
-        }
-    }
-
-    public DictComp(TerminalNode node, expr key, expr value, java.util.List<comprehension>
-    generators) {
-        super(node);
-        this.key = key;
-        addChild(key);
-        this.value = value;
-        addChild(value);
-        this.generators = generators;
-        if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
+            this.generators = new ArrayList<>(0);
         }
     }
 
     public DictComp(PythonTree tree, expr key, expr value, java.util.List<comprehension>
     generators) {
-        super(tree);
+        super(TYPE, tree);
         this.key = key;
-        addChild(key);
         this.value = value;
-        addChild(value);
         this.generators = generators;
         if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
+            this.generators = new ArrayList<>(0);
         }
     }
 
@@ -184,6 +145,7 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
         return "DictComp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("DictComp(");
         sb.append("key=");

@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Div extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Div.class);
 
-public Div() {
-}
-
-public Div(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Div___init__(PyObject[] args, String[] keywords) {}
+    public Div() {
+        super(TYPE);
+    }
+    public Div(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Div___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Div___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(5);
     }
 
+    @Override
+    public String toStringTree() {
+        return Div.class.toString();
+    }
 }

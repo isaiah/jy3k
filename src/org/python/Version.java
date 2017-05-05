@@ -1,6 +1,8 @@
 /* Copyright (c) Jython Developers */
 package org.python;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -64,8 +66,14 @@ public class Version {
      */
     private static void loadProperties() {
         boolean loaded = false;
-        final String versionProperties = "/org/python/version.properties";
-        InputStream in = Version.class.getResourceAsStream(versionProperties);
+        final String versionProperties = "/home/isaiah/codes/jython3/build/classes/org/python/version.properties";
+        InputStream in = null;
+        try {
+            in = new FileInputStream(versionProperties);
+        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+        }
+        //= Version.class.getResourceAsStream(versionProperties);
         if (in != null) {
             try {
                 Properties properties = new Properties();

@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Mult extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Mult.class);
 
-public Mult() {
-}
-
-public Mult(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Mult___init__(PyObject[] args, String[] keywords) {}
+    public Mult() {
+        super(TYPE);
+    }
+    public Mult(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Mult___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Mult___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(3);
     }
 
+    @Override
+    public String toStringTree() {
+        return Mult.class.toString();
+    }
 }

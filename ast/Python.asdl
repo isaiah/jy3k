@@ -50,6 +50,10 @@ module Python
           | Nonlocal(identifier* names)
           | Expr(expr value)
           | Pass | Break | Continue
+          -- A synthetic AST node that represents a subset of function body
+          | SplitNode(identifier name, stmt* body, stmt funcdef)
+          -- A helper stmt that includes multiple stmts, it's useful when modify ast tree
+          | Block(stmt* statements)
 
           -- XXX Jython will be different
           -- col_offset is the byte offset in the utf8 string the parser uses

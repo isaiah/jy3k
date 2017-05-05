@@ -69,11 +69,8 @@ public class alias extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public alias(PyType subType) {
-        super(subType);
-    }
     public alias() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -85,30 +82,24 @@ public class alias extends PythonTree {
     }
 
     public alias(PyObject name, PyObject asname) {
+        super(TYPE);
         setName(name);
         setAsname(asname);
     }
 
+    // called from derived class
+    public alias(PyType subtype) {
+        super(subtype);
+    }
+
     public alias(Token token, String name, String asname) {
-        super(token);
-        this.name = name;
-        this.asname = asname;
-    }
-
-    public alias(Integer ttype, Token token, String name, String asname) {
-        super(ttype, token);
-        this.name = name;
-        this.asname = asname;
-    }
-
-    public alias(TerminalNode node, String name, String asname) {
-        super(node);
+        super(TYPE, token);
         this.name = name;
         this.asname = asname;
     }
 
     public alias(PythonTree tree, String name, String asname) {
-        super(tree);
+        super(TYPE, tree);
         this.name = name;
         this.asname = asname;
     }
@@ -118,6 +109,7 @@ public class alias extends PythonTree {
         return "alias";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("alias(");
         sb.append("name=");

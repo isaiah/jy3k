@@ -71,11 +71,8 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Assign(PyType subType) {
-        super(subType);
-    }
     public Assign() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -97,60 +94,32 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
     }
 
     public Assign(PyObject targets, PyObject value) {
+        super(TYPE);
         setTargets(targets);
         setValue(value);
     }
 
+    // called from derived class
+    public Assign(PyType subtype) {
+        super(subtype);
+    }
+
     public Assign(Token token, java.util.List<expr> targets, expr value) {
-        super(token);
+        super(TYPE, token);
         this.targets = targets;
         if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
+            this.targets = new ArrayList<>(0);
         }
         this.value = value;
-        addChild(value);
-    }
-
-    public Assign(Integer ttype, Token token, java.util.List<expr> targets, expr value) {
-        super(ttype, token);
-        this.targets = targets;
-        if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
-        }
-        this.value = value;
-        addChild(value);
-    }
-
-    public Assign(TerminalNode node, java.util.List<expr> targets, expr value) {
-        super(node);
-        this.targets = targets;
-        if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
-        }
-        this.value = value;
-        addChild(value);
     }
 
     public Assign(PythonTree tree, java.util.List<expr> targets, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.targets = targets;
         if (targets == null) {
-            this.targets = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.targets) {
-            addChild(t);
+            this.targets = new ArrayList<>(0);
         }
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -158,6 +127,7 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         return "Assign";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Assign(");
         sb.append("targets=");

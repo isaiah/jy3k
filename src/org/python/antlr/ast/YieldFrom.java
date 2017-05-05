@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(YieldFrom.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public YieldFrom(PyType subType) {
-        super(subType);
-    }
     public YieldFrom() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,31 +77,23 @@ public static final PyType TYPE = PyType.fromClass(YieldFrom.class);
     }
 
     public YieldFrom(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public YieldFrom(PyType subtype) {
+        super(subtype);
+    }
+
     public YieldFrom(Token token, expr value) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-    }
-
-    public YieldFrom(Integer ttype, Token token, expr value) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-    }
-
-    public YieldFrom(TerminalNode node, expr value) {
-        super(node);
-        this.value = value;
-        addChild(value);
     }
 
     public YieldFrom(PythonTree tree, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -112,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(YieldFrom.class);
         return "YieldFrom";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("YieldFrom(");
         sb.append("value=");

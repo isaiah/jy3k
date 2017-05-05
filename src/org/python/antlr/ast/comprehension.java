@@ -83,11 +83,8 @@ public class comprehension extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public comprehension(PyType subType) {
-        super(subType);
-    }
     public comprehension() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -100,69 +97,34 @@ public class comprehension extends PythonTree {
     }
 
     public comprehension(PyObject target, PyObject iter, PyObject ifs) {
+        super(TYPE);
         setTarget(target);
         setIter(iter);
         setIfs(ifs);
     }
 
+    // called from derived class
+    public comprehension(PyType subtype) {
+        super(subtype);
+    }
+
     public comprehension(Token token, expr target, expr iter, java.util.List<expr> ifs) {
-        super(token);
+        super(TYPE, token);
         this.target = target;
-        addChild(target);
         this.iter = iter;
-        addChild(iter);
         this.ifs = ifs;
         if (ifs == null) {
-            this.ifs = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.ifs) {
-            addChild(t);
-        }
-    }
-
-    public comprehension(Integer ttype, Token token, expr target, expr iter, java.util.List<expr>
-    ifs) {
-        super(ttype, token);
-        this.target = target;
-        addChild(target);
-        this.iter = iter;
-        addChild(iter);
-        this.ifs = ifs;
-        if (ifs == null) {
-            this.ifs = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.ifs) {
-            addChild(t);
-        }
-    }
-
-    public comprehension(TerminalNode node, expr target, expr iter, java.util.List<expr> ifs) {
-        super(node);
-        this.target = target;
-        addChild(target);
-        this.iter = iter;
-        addChild(iter);
-        this.ifs = ifs;
-        if (ifs == null) {
-            this.ifs = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.ifs) {
-            addChild(t);
+            this.ifs = new ArrayList<>(0);
         }
     }
 
     public comprehension(PythonTree tree, expr target, expr iter, java.util.List<expr> ifs) {
-        super(tree);
+        super(TYPE, tree);
         this.target = target;
-        addChild(target);
         this.iter = iter;
-        addChild(iter);
         this.ifs = ifs;
         if (ifs == null) {
-            this.ifs = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.ifs) {
-            addChild(t);
+            this.ifs = new ArrayList<>(0);
         }
     }
 
@@ -171,6 +133,7 @@ public class comprehension extends PythonTree {
         return "comprehension";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("comprehension(");
         sb.append("target=");

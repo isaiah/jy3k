@@ -74,11 +74,8 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Dict(PyType subType) {
-        super(subType);
-    }
     public Dict() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -100,80 +97,37 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
     }
 
     public Dict(PyObject keys, PyObject values) {
+        super(TYPE);
         setKeys(keys);
         setValues(values);
     }
 
+    // called from derived class
+    public Dict(PyType subtype) {
+        super(subtype);
+    }
+
     public Dict(Token token, java.util.List<expr> keys, java.util.List<expr> values) {
-        super(token);
+        super(TYPE, token);
         this.keys = keys;
         if (keys == null) {
-            this.keys = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.keys) {
-            addChild(t);
+            this.keys = new ArrayList<>(0);
         }
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public Dict(Integer ttype, Token token, java.util.List<expr> keys, java.util.List<expr> values)
-    {
-        super(ttype, token);
-        this.keys = keys;
-        if (keys == null) {
-            this.keys = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.keys) {
-            addChild(t);
-        }
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
-        }
-    }
-
-    public Dict(TerminalNode node, java.util.List<expr> keys, java.util.List<expr> values) {
-        super(node);
-        this.keys = keys;
-        if (keys == null) {
-            this.keys = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.keys) {
-            addChild(t);
-        }
-        this.values = values;
-        if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
     public Dict(PythonTree tree, java.util.List<expr> keys, java.util.List<expr> values) {
-        super(tree);
+        super(TYPE, tree);
         this.keys = keys;
         if (keys == null) {
-            this.keys = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.keys) {
-            addChild(t);
+            this.keys = new ArrayList<>(0);
         }
         this.values = values;
         if (values == null) {
-            this.values = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.values) {
-            addChild(t);
+            this.values = new ArrayList<>(0);
         }
     }
 
@@ -182,6 +136,7 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         return "Dict";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Dict(");
         sb.append("keys=");

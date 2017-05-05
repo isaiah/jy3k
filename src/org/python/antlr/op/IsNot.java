@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class IsNot extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(IsNot.class);
 
-public IsNot() {
-}
-
-public IsNot(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void IsNot___init__(PyObject[] args, String[] keywords) {}
+    public IsNot() {
+        super(TYPE);
+    }
+    public IsNot(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void IsNot___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void IsNot___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(8);
     }
 
+    @Override
+    public String toStringTree() {
+        return IsNot.class.toString();
+    }
 }

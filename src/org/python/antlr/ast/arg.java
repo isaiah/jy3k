@@ -68,11 +68,8 @@ public class arg extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public arg(PyType subType) {
-        super(subType);
-    }
     public arg() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -84,36 +81,26 @@ public class arg extends PythonTree {
     }
 
     public arg(PyObject arg, PyObject annotation) {
+        super(TYPE);
         setArg(arg);
         setAnnotation(annotation);
     }
 
+    // called from derived class
+    public arg(PyType subtype) {
+        super(subtype);
+    }
+
     public arg(Token token, String arg, expr annotation) {
-        super(token);
+        super(TYPE, token);
         this.arg = arg;
         this.annotation = annotation;
-        addChild(annotation);
-    }
-
-    public arg(Integer ttype, Token token, String arg, expr annotation) {
-        super(ttype, token);
-        this.arg = arg;
-        this.annotation = annotation;
-        addChild(annotation);
-    }
-
-    public arg(TerminalNode node, String arg, expr annotation) {
-        super(node);
-        this.arg = arg;
-        this.annotation = annotation;
-        addChild(annotation);
     }
 
     public arg(PythonTree tree, String arg, expr annotation) {
-        super(tree);
+        super(TYPE, tree);
         this.arg = arg;
         this.annotation = annotation;
-        addChild(annotation);
     }
 
     @ExposedGet(name = "repr")
@@ -121,6 +108,7 @@ public class arg extends PythonTree {
         return "arg";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("arg(");
         sb.append("arg=");

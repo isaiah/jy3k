@@ -68,11 +68,8 @@ public class keyword extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public keyword(PyType subType) {
-        super(subType);
-    }
     public keyword() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -84,36 +81,26 @@ public class keyword extends PythonTree {
     }
 
     public keyword(PyObject arg, PyObject value) {
+        super(TYPE);
         setArg(arg);
         setValue(value);
     }
 
+    // called from derived class
+    public keyword(PyType subtype) {
+        super(subtype);
+    }
+
     public keyword(Token token, String arg, expr value) {
-        super(token);
+        super(TYPE, token);
         this.arg = arg;
         this.value = value;
-        addChild(value);
-    }
-
-    public keyword(Integer ttype, Token token, String arg, expr value) {
-        super(ttype, token);
-        this.arg = arg;
-        this.value = value;
-        addChild(value);
-    }
-
-    public keyword(TerminalNode node, String arg, expr value) {
-        super(node);
-        this.arg = arg;
-        this.value = value;
-        addChild(value);
     }
 
     public keyword(PythonTree tree, String arg, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.arg = arg;
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -121,6 +108,7 @@ public class keyword extends PythonTree {
         return "keyword";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("keyword(");
         sb.append("arg=");

@@ -283,58 +283,6 @@ class AsyncBadSyntaxTest(unittest.TestCase):
             with self.subTest(code=code), self.assertRaises(SyntaxError):
                 compile(code, "<test>", "exec")
 
-    def test_goodsyntax_1(self):
-        # Tests for issue 24619
-
-        def foo(await):
-            async def foo(): pass
-            async def foo():
-                pass
-            return await + 1
-        self.assertEqual(foo(10), 11)
-
-        def foo(await):
-            async def foo(): pass
-            async def foo(): pass
-            return await + 2
-        self.assertEqual(foo(20), 22)
-
-        def foo(await):
-
-            async def foo(): pass
-
-            async def foo(): pass
-
-            return await + 2
-        self.assertEqual(foo(20), 22)
-
-        def foo(await):
-            """spam"""
-            async def foo(): \
-                pass
-            # 123
-            async def foo(): pass
-            # 456
-            return await + 2
-        self.assertEqual(foo(20), 22)
-
-        def foo(await):
-            def foo(): pass
-            def foo(): pass
-            async def bar(): return await_
-            await_ = await
-            try:
-                bar().send(None)
-            except StopIteration as ex:
-                return ex.args[0]
-        self.assertEqual(foo(42), 42)
-
-        async def f():
-            async def g(): pass
-            await z
-        await = 1
-        self.assertTrue(inspect.iscoroutinefunction(f))
-
 
 class TokenizerRegrTest(unittest.TestCase):
 

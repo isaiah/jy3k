@@ -41,9 +41,6 @@ public static final PyType TYPE = PyType.fromClass(Break.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Break(PyType subType) {
-        super(subType);
-    }
     @ExposedNew
     @ExposedMethod
     public void Break___init__(PyObject[] args, String[] keywords) {
@@ -62,22 +59,20 @@ public static final PyType TYPE = PyType.fromClass(Break.class);
     }
 
     public Break() {
+        super(TYPE);
+    }
+
+    // called from derived class
+    public Break(PyType subtype) {
+        super(subtype);
     }
 
     public Break(Token token) {
-        super(token);
-    }
-
-    public Break(Integer ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public Break(TerminalNode node) {
-        super(node);
+        super(TYPE, token);
     }
 
     public Break(PythonTree tree) {
-        super(tree);
+        super(TYPE, tree);
     }
 
     @ExposedGet(name = "repr")
@@ -85,6 +80,7 @@ public static final PyType TYPE = PyType.fromClass(Break.class);
         return "Break";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Break(");
         sb.append(")");

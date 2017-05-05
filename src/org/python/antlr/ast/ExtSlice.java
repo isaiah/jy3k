@@ -57,11 +57,8 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public ExtSlice(PyType subType) {
-        super(subType);
-    }
     public ExtSlice() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -72,50 +69,28 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
     }
 
     public ExtSlice(PyObject dims) {
+        super(TYPE);
         setDims(dims);
     }
 
+    // called from derived class
+    public ExtSlice(PyType subtype) {
+        super(subtype);
+    }
+
     public ExtSlice(Token token, java.util.List<slice> dims) {
-        super(token);
+        super(TYPE, token);
         this.dims = dims;
         if (dims == null) {
-            this.dims = new ArrayList<slice>();
-        }
-        for(PythonTree t : this.dims) {
-            addChild(t);
-        }
-    }
-
-    public ExtSlice(Integer ttype, Token token, java.util.List<slice> dims) {
-        super(ttype, token);
-        this.dims = dims;
-        if (dims == null) {
-            this.dims = new ArrayList<slice>();
-        }
-        for(PythonTree t : this.dims) {
-            addChild(t);
-        }
-    }
-
-    public ExtSlice(TerminalNode node, java.util.List<slice> dims) {
-        super(node);
-        this.dims = dims;
-        if (dims == null) {
-            this.dims = new ArrayList<slice>();
-        }
-        for(PythonTree t : this.dims) {
-            addChild(t);
+            this.dims = new ArrayList<>(0);
         }
     }
 
     public ExtSlice(PythonTree tree, java.util.List<slice> dims) {
-        super(tree);
+        super(TYPE, tree);
         this.dims = dims;
         if (dims == null) {
-            this.dims = new ArrayList<slice>();
-        }
-        for(PythonTree t : this.dims) {
-            addChild(t);
+            this.dims = new ArrayList<>(0);
         }
     }
 
@@ -124,6 +99,7 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         return "ExtSlice";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("ExtSlice(");
         sb.append("dims=");

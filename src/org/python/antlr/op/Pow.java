@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Pow extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Pow.class);
 
-public Pow() {
-}
-
-public Pow(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Pow___init__(PyObject[] args, String[] keywords) {}
+    public Pow() {
+        super(TYPE);
+    }
+    public Pow(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Pow___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Pow___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(7);
     }
 
+    @Override
+    public String toStringTree() {
+        return Pow.class.toString();
+    }
 }

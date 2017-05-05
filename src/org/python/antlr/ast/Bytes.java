@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Bytes(PyType subType) {
-        super(subType);
-    }
     public Bytes() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,26 +77,22 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
     }
 
     public Bytes(PyObject s) {
+        super(TYPE);
         setS(s);
     }
 
+    // called from derived class
+    public Bytes(PyType subtype) {
+        super(subtype);
+    }
+
     public Bytes(Token token, String s) {
-        super(token);
-        this.s = s;
-    }
-
-    public Bytes(Integer ttype, Token token, String s) {
-        super(ttype, token);
-        this.s = s;
-    }
-
-    public Bytes(TerminalNode node, String s) {
-        super(node);
+        super(TYPE, token);
         this.s = s;
     }
 
     public Bytes(PythonTree tree, String s) {
-        super(tree);
+        super(TYPE, tree);
         this.s = s;
     }
 
@@ -108,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
         return "Bytes";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Bytes(");
         sb.append("s=");

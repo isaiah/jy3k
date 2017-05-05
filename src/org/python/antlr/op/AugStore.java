@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class AugStore extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(AugStore.class);
 
-public AugStore() {
-}
-
-public AugStore(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void AugStore___init__(PyObject[] args, String[] keywords) {}
+    public AugStore() {
+        super(TYPE);
+    }
+    public AugStore(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void AugStore___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void AugStore___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(5);
     }
 
+    @Override
+    public String toStringTree() {
+        return AugStore.class.toString();
+    }
 }

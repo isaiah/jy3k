@@ -22,22 +22,12 @@ public abstract class operator extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyBytes[] get_attributes() { return attributes; }
 
-    public operator() {
+    public operator(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public operator(PyType subType) {
-    }
-
-    public operator(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public operator(Token token) {
-        super(token);
-    }
-
-    public operator(PythonTree node) {
-        super(node);
+    public operator(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

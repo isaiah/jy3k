@@ -133,11 +133,8 @@ public class arguments extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public arguments(PyType subType) {
-        super(subType);
-    }
     public arguments() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -154,6 +151,7 @@ public class arguments extends PythonTree {
 
     public arguments(PyObject args, PyObject vararg, PyObject kwonlyargs, PyObject kw_defaults,
     PyObject kwarg, PyObject defaults) {
+        super(TYPE);
         setArgs(args);
         setVararg(vararg);
         setKwonlyargs(kwonlyargs);
@@ -162,144 +160,54 @@ public class arguments extends PythonTree {
         setDefaults(defaults);
     }
 
+    // called from derived class
+    public arguments(PyType subtype) {
+        super(subtype);
+    }
+
     public arguments(Token token, java.util.List<arg> args, arg vararg, java.util.List<arg>
     kwonlyargs, java.util.List<expr> kw_defaults, arg kwarg, java.util.List<expr> defaults) {
-        super(token);
+        super(TYPE, token);
         this.args = args;
         if (args == null) {
-            this.args = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
+            this.args = new ArrayList<>(0);
         }
         this.vararg = vararg;
         this.kwonlyargs = kwonlyargs;
         if (kwonlyargs == null) {
-            this.kwonlyargs = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.kwonlyargs) {
-            addChild(t);
+            this.kwonlyargs = new ArrayList<>(0);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
-            this.kw_defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.kw_defaults) {
-            addChild(t);
+            this.kw_defaults = new ArrayList<>(0);
         }
         this.kwarg = kwarg;
         this.defaults = defaults;
         if (defaults == null) {
-            this.defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.defaults) {
-            addChild(t);
-        }
-    }
-
-    public arguments(Integer ttype, Token token, java.util.List<arg> args, arg vararg,
-    java.util.List<arg> kwonlyargs, java.util.List<expr> kw_defaults, arg kwarg,
-    java.util.List<expr> defaults) {
-        super(ttype, token);
-        this.args = args;
-        if (args == null) {
-            this.args = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
-        }
-        this.vararg = vararg;
-        this.kwonlyargs = kwonlyargs;
-        if (kwonlyargs == null) {
-            this.kwonlyargs = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.kwonlyargs) {
-            addChild(t);
-        }
-        this.kw_defaults = kw_defaults;
-        if (kw_defaults == null) {
-            this.kw_defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.kw_defaults) {
-            addChild(t);
-        }
-        this.kwarg = kwarg;
-        this.defaults = defaults;
-        if (defaults == null) {
-            this.defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.defaults) {
-            addChild(t);
-        }
-    }
-
-    public arguments(TerminalNode node, java.util.List<arg> args, arg vararg, java.util.List<arg>
-    kwonlyargs, java.util.List<expr> kw_defaults, arg kwarg, java.util.List<expr> defaults) {
-        super(node);
-        this.args = args;
-        if (args == null) {
-            this.args = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
-        }
-        this.vararg = vararg;
-        this.kwonlyargs = kwonlyargs;
-        if (kwonlyargs == null) {
-            this.kwonlyargs = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.kwonlyargs) {
-            addChild(t);
-        }
-        this.kw_defaults = kw_defaults;
-        if (kw_defaults == null) {
-            this.kw_defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.kw_defaults) {
-            addChild(t);
-        }
-        this.kwarg = kwarg;
-        this.defaults = defaults;
-        if (defaults == null) {
-            this.defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.defaults) {
-            addChild(t);
+            this.defaults = new ArrayList<>(0);
         }
     }
 
     public arguments(PythonTree tree, java.util.List<arg> args, arg vararg, java.util.List<arg>
     kwonlyargs, java.util.List<expr> kw_defaults, arg kwarg, java.util.List<expr> defaults) {
-        super(tree);
+        super(TYPE, tree);
         this.args = args;
         if (args == null) {
-            this.args = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.args) {
-            addChild(t);
+            this.args = new ArrayList<>(0);
         }
         this.vararg = vararg;
         this.kwonlyargs = kwonlyargs;
         if (kwonlyargs == null) {
-            this.kwonlyargs = new ArrayList<arg>();
-        }
-        for(PythonTree t : this.kwonlyargs) {
-            addChild(t);
+            this.kwonlyargs = new ArrayList<>(0);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
-            this.kw_defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.kw_defaults) {
-            addChild(t);
+            this.kw_defaults = new ArrayList<>(0);
         }
         this.kwarg = kwarg;
         this.defaults = defaults;
         if (defaults == null) {
-            this.defaults = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.defaults) {
-            addChild(t);
+            this.defaults = new ArrayList<>(0);
         }
     }
 
@@ -308,6 +216,7 @@ public class arguments extends PythonTree {
         return "arguments";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("arguments(");
         sb.append("args=");

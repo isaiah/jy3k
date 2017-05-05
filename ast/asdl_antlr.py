@@ -207,18 +207,19 @@ class JavaVisitor(EmitVisitor):
             self.emit('public static final PyType TYPE = PyType.fromClass(%s.class);' % type.name, depth + 1)
             self.emit('', 0)
 
-            self.emit("public %s() {" % (type.name), depth)
-            self.emit("}", depth)
-            self.emit('', 0)
+            self.emit("public %s() {" % type.name, depth + 1)
+            self.emit("super(TYPE);", depth + 2)
+            self.emit("}", depth + 1)
 
-            self.emit("public %s(PyType subType) {" % (type.name), depth)
-            self.emit("super(subType);", depth + 1)
-            self.emit("}", depth)
-            self.emit('', 0)
+            self.emit("public %s(PyType subType) {" % type.name, depth + 1)
+            self.emit("super(subType);", depth + 2)
+            self.emit("}", depth + 1)
 
-            self.emit("@ExposedNew", depth)
-            self.emit("@ExposedMethod", depth)
-            self.emit("public void %s___init__(PyObject[] args, String[] keywords) {}" % type.name, depth)
+
+
+            self.emit("@ExposedNew", depth + 1)
+            self.emit("@ExposedMethod", depth + 1)
+            self.emit("public void %s___init__(PyObject[] args, String[] keywords) {}" % type.name, depth + 1)
             self.emit('', 0)
 
             self.attributes(type, name, depth);
@@ -233,6 +234,12 @@ class JavaVisitor(EmitVisitor):
             self.emit('return Py.newInteger(%s);' % str(i + 1), depth + 2)
             self.emit("}", depth + 1)
             self.emit('', 0)
+
+            # The toStringTree() method
+            self.emit("@Override", depth+1)
+            self.emit("public String toStringTree() {", depth + 1)
+            self.emit("return %s.class.toString();" % type.name, depth + 2)
+            self.emit("}", depth + 1)
 
             self.emit("}", depth)
             self.close()
@@ -279,31 +286,18 @@ class JavaVisitor(EmitVisitor):
 
         self.attributes(sum, name, depth);
 
-        self.emit("public %(name)s() {" % locals(), depth+1)
+        self.emit("public %(name)s(PyType subtype) {" % locals(), depth+1)
+        self.emit("super(subtype);", depth+2)
         self.emit("}", depth+1)
         self.emit("", 0)
 
-        self.emit("public %(name)s(PyType subType) {" % locals(), depth+1)
+        self.emit("public %(name)s(PyType subtype, Token token) {" % locals(), depth+1)
+        self.emit("super(subtype, token);", depth+2)
         self.emit("}", depth+1)
         self.emit("", 0)
 
-        self.emit("public %(name)s(int ttype, Token token) {" % locals(), depth+1)
-        self.emit("super(ttype, token);", depth+2)
-        self.emit("}", depth+1)
-        self.emit("", 0)
-
-        self.emit("public %(name)s(TerminalNode node) {" % locals(), depth+1)
-        self.emit("super(node);", depth+2)
-        self.emit("}", depth+1)
-        self.emit("", 0)
-
-        self.emit("public %(name)s(Token token) {" % locals(), depth+1)
-        self.emit("super(token);", depth+2)
-        self.emit("}", depth+1)
-        self.emit("", 0)
-
-        self.emit("public %(name)s(PythonTree node) {" % locals(), depth+1)
-        self.emit("super(node);", depth+2)
+        self.emit("public %(name)s(PyType subtype, PythonTree node) {" % locals(), depth+1)
+        self.emit("super(subtype, node);", depth+2)
         self.emit("}", depth+1)
         self.emit("", 0)
 
@@ -414,13 +408,12 @@ class JavaVisitor(EmitVisitor):
             if not_simple and fparg.find("String") == -1:
                 if f.seq:
                     self.emit("if (%s == null) {" % f.name, depth+1);
-                    self.emit("this.%s = new ArrayList<%s>();" % (f.name, self.javaType(f, False)), depth+2)
+                    self.emit("this.%s = new ArrayList<>(0);" % f.name, depth+2)
                     self.emit("}", depth+1)
-                    self.emit("for(PythonTree t : this.%(name)s) {" % {"name":f.name}, depth+1)
-                    self.emit("addChild(t);", depth+2)
-                    self.emit("}", depth+1)
-                elif str(f.type) == "expr":
-                    self.emit("addChild(%s);" % (f.name), depth+1)
+                    if self.javaType(f, False) == 'stmt':
+                        self.emit("for(PythonTree t : this.%(name)s) {" % {"name":f.name}, depth+1)
+                        self.emit("addChild(t, this.%s);" % f.name, depth+2)
+                        self.emit("}", depth+1)
 
     #XXX: this method used to emit a pickle(DataOutputStream ostream) for cPickle support.
     #     If we want to re-add it, see Jython 2.2's pickle method in its ast nodes.
@@ -436,6 +429,7 @@ class JavaVisitor(EmitVisitor):
         self.emit("", 0)
 
         # The toStringTree() method
+        self.emit("@Override", depth)
         self.emit("public String toStringTree() {", depth)
         self.emit('StringBuffer sb = new StringBuffer("%s(");' % clsname,
                     depth+1)
@@ -503,14 +497,11 @@ class JavaVisitor(EmitVisitor):
 
 
     def javaConstructors(self, type, name, clsname, is_product, fields, depth):
-        self.emit("public %s(PyType subType) {" % (clsname), depth)
-        self.emit("super(subType);", depth + 1)
-        self.emit("}", depth)
-
         if len(fields) > 0:
             self.emit("public %s() {" % (clsname), depth)
-            self.emit("this(TYPE);", depth + 1)
+            self.emit("super(TYPE);", depth + 1)
             self.emit("}", depth)
+
             fnames = ['"%s"' % f.name for f in fields]
         else:
             fnames = []
@@ -546,8 +537,15 @@ class JavaVisitor(EmitVisitor):
 
         fpargs = ", ".join(["PyObject %s" % f.name for f in fields])
         self.emit("public %s(%s) {" % (clsname, fpargs), depth)
+        self.emit("super(TYPE);", depth + 1)
         for f in fields:
             self.emit("set%s(%s);" % (self.processFieldName(f.name), f.name), depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
+        self.emit("// called from derived class", depth)
+        self.emit("public %s(PyType subtype) {" % clsname, depth)
+        self.emit("super(subtype);", depth+1)
         self.emit("}", depth)
         self.emit("", 0)
 
@@ -555,36 +553,16 @@ class JavaVisitor(EmitVisitor):
         token.typedef = False
         fpargs = ", ".join([self.fieldDef(f) for f in [token] + fields])
         self.emit("public %s(%s) {" % (clsname, fpargs), depth)
-        self.emit("super(token);", depth+1)
+        self.emit("super(TYPE, token);", depth+1)
         self.javaConstructorHelper(fields, depth)
         self.emit("}", depth)
         self.emit("", 0)
-
-        ttype = asdl.Field('int', 'ttype')
-        ttype.typedef = False
-        fpargs = ", ".join([self.fieldDef(f) for f in [ttype, token] + fields])
-        self.emit("public %s(%s) {" % (clsname, fpargs), depth)
-        self.emit("super(ttype, token);", depth+1)
-        self.javaConstructorHelper(fields, depth)
-        self.emit("}", depth)
-        self.emit("", 0)
-
-        node = asdl.Field('TerminalNode', 'node')
-        node.typedef = False
-        fpargs = ", ".join([self.fieldDef(f) for f in [node] + fields])
-        self.emit("public %s(%s) {" % (clsname, fpargs), depth)
-        self.emit("super(node);", depth+1)
-        self.javaConstructorHelper(fields, depth)
-        self.emit("}", depth)
-        self.emit("", 0)
-
-
 
         tree = asdl.Field('PythonTree', 'tree')
         tree.typedef = False
         fpargs = ", ".join([self.fieldDef(f) for f in [tree] + fields])
         self.emit("public %s(%s) {" % (clsname, fpargs), depth)
-        self.emit("super(tree);", depth+1)
+        self.emit("super(TYPE, tree);", depth+1)
         self.javaConstructorHelper(fields, depth)
         self.emit("}", depth)
         self.emit("", 0)
@@ -753,7 +731,6 @@ def main(outdir, grammar="Python.asdl"):
 extra_fields = { "FunctionDef": ["split"], "Expr": ["print"] }
 
 if __name__ == "__main__":
-    import sys
     import getopt
 
     usage = "Usage: python %s [-o outdir] [grammar]" % sys.argv[0]

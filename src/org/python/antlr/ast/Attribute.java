@@ -82,11 +82,8 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Attribute(PyType subType) {
-        super(subType);
-    }
     public Attribute() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -109,39 +106,27 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     }
 
     public Attribute(PyObject value, PyObject attr, PyObject ctx) {
+        super(TYPE);
         setValue(value);
         setAttr(attr);
         setCtx(ctx);
     }
 
+    // called from derived class
+    public Attribute(PyType subtype) {
+        super(subtype);
+    }
+
     public Attribute(Token token, expr value, String attr, expr_contextType ctx) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-        this.attr = attr;
-        this.ctx = ctx;
-    }
-
-    public Attribute(Integer ttype, Token token, expr value, String attr, expr_contextType ctx) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-        this.attr = attr;
-        this.ctx = ctx;
-    }
-
-    public Attribute(TerminalNode node, expr value, String attr, expr_contextType ctx) {
-        super(node);
-        this.value = value;
-        addChild(value);
         this.attr = attr;
         this.ctx = ctx;
     }
 
     public Attribute(PythonTree tree, expr value, String attr, expr_contextType ctx) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
         this.attr = attr;
         this.ctx = ctx;
     }
@@ -151,6 +136,7 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
         return "Attribute";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Attribute(");
         sb.append("value=");

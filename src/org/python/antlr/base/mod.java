@@ -37,26 +37,16 @@ public abstract class mod extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public mod() {
+    public mod(PyType subtype) {
+        super(subtype);
     }
 
-    public mod(PyType subType) {
+    public mod(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public mod(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public mod(TerminalNode node) {
-        super(node);
-    }
-
-    public mod(Token token) {
-        super(token);
-    }
-
-    public mod(PythonTree node) {
-        super(node);
+    public mod(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

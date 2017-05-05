@@ -71,11 +71,8 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Tuple(PyType subType) {
-        super(subType);
-    }
     public Tuple() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -97,54 +94,30 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
     }
 
     public Tuple(PyObject elts, PyObject ctx) {
+        super(TYPE);
         setElts(elts);
         setCtx(ctx);
     }
 
+    // called from derived class
+    public Tuple(PyType subtype) {
+        super(subtype);
+    }
+
     public Tuple(Token token, java.util.List<expr> elts, expr_contextType ctx) {
-        super(token);
+        super(TYPE, token);
         this.elts = elts;
         if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
-        }
-        this.ctx = ctx;
-    }
-
-    public Tuple(Integer ttype, Token token, java.util.List<expr> elts, expr_contextType ctx) {
-        super(ttype, token);
-        this.elts = elts;
-        if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
-        }
-        this.ctx = ctx;
-    }
-
-    public Tuple(TerminalNode node, java.util.List<expr> elts, expr_contextType ctx) {
-        super(node);
-        this.elts = elts;
-        if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
+            this.elts = new ArrayList<>(0);
         }
         this.ctx = ctx;
     }
 
     public Tuple(PythonTree tree, java.util.List<expr> elts, expr_contextType ctx) {
-        super(tree);
+        super(TYPE, tree);
         this.elts = elts;
         if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
+            this.elts = new ArrayList<>(0);
         }
         this.ctx = ctx;
     }
@@ -154,6 +127,7 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         return "Tuple";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Tuple(");
         sb.append("elts=");

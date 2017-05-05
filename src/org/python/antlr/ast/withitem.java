@@ -67,11 +67,8 @@ public class withitem extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public withitem(PyType subType) {
-        super(subType);
-    }
     public withitem() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,40 +80,26 @@ public class withitem extends PythonTree {
     }
 
     public withitem(PyObject context_expr, PyObject optional_vars) {
+        super(TYPE);
         setContext_expr(context_expr);
         setOptional_vars(optional_vars);
     }
 
+    // called from derived class
+    public withitem(PyType subtype) {
+        super(subtype);
+    }
+
     public withitem(Token token, expr context_expr, expr optional_vars) {
-        super(token);
+        super(TYPE, token);
         this.context_expr = context_expr;
-        addChild(context_expr);
         this.optional_vars = optional_vars;
-        addChild(optional_vars);
-    }
-
-    public withitem(Integer ttype, Token token, expr context_expr, expr optional_vars) {
-        super(ttype, token);
-        this.context_expr = context_expr;
-        addChild(context_expr);
-        this.optional_vars = optional_vars;
-        addChild(optional_vars);
-    }
-
-    public withitem(TerminalNode node, expr context_expr, expr optional_vars) {
-        super(node);
-        this.context_expr = context_expr;
-        addChild(context_expr);
-        this.optional_vars = optional_vars;
-        addChild(optional_vars);
     }
 
     public withitem(PythonTree tree, expr context_expr, expr optional_vars) {
-        super(tree);
+        super(TYPE, tree);
         this.context_expr = context_expr;
-        addChild(context_expr);
         this.optional_vars = optional_vars;
-        addChild(optional_vars);
     }
 
     @ExposedGet(name = "repr")
@@ -124,6 +107,7 @@ public class withitem extends PythonTree {
         return "withitem";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("withitem(");
         sb.append("context_expr=");

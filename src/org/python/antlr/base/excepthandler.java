@@ -38,26 +38,16 @@ public abstract class excepthandler extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public excepthandler() {
+    public excepthandler(PyType subtype) {
+        super(subtype);
     }
 
-    public excepthandler(PyType subType) {
+    public excepthandler(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public excepthandler(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public excepthandler(TerminalNode node) {
-        super(node);
-    }
-
-    public excepthandler(Token token) {
-        super(token);
-    }
-
-    public excepthandler(PythonTree node) {
-        super(node);
+    public excepthandler(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

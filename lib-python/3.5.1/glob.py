@@ -127,8 +127,8 @@ def _rlistdir(dirname):
                 yield os.path.join(x, y)
 
 
-magic_check = re.compile('([*?[])')
-magic_check_bytes = re.compile(b'([*?[])')
+magic_check = re.compile('([*?\\[])')
+magic_check_bytes = re.compile(b'([*?\\[])')
 
 def has_magic(s):
     if isinstance(s, bytes):

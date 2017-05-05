@@ -71,11 +71,8 @@ public static final PyType TYPE = PyType.fromClass(ListComp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public ListComp(PyType subType) {
-        super(subType);
-    }
     public ListComp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -97,60 +94,31 @@ public static final PyType TYPE = PyType.fromClass(ListComp.class);
     }
 
     public ListComp(PyObject elt, PyObject generators) {
+        super(TYPE);
         setElt(elt);
         setGenerators(generators);
     }
 
+    // called from derived class
+    public ListComp(PyType subtype) {
+        super(subtype);
+    }
+
     public ListComp(Token token, expr elt, java.util.List<comprehension> generators) {
-        super(token);
+        super(TYPE, token);
         this.elt = elt;
-        addChild(elt);
         this.generators = generators;
         if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
-        }
-    }
-
-    public ListComp(Integer ttype, Token token, expr elt, java.util.List<comprehension> generators)
-    {
-        super(ttype, token);
-        this.elt = elt;
-        addChild(elt);
-        this.generators = generators;
-        if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
-        }
-    }
-
-    public ListComp(TerminalNode node, expr elt, java.util.List<comprehension> generators) {
-        super(node);
-        this.elt = elt;
-        addChild(elt);
-        this.generators = generators;
-        if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
+            this.generators = new ArrayList<>(0);
         }
     }
 
     public ListComp(PythonTree tree, expr elt, java.util.List<comprehension> generators) {
-        super(tree);
+        super(TYPE, tree);
         this.elt = elt;
-        addChild(elt);
         this.generators = generators;
         if (generators == null) {
-            this.generators = new ArrayList<comprehension>();
-        }
-        for(PythonTree t : this.generators) {
-            addChild(t);
+            this.generators = new ArrayList<>(0);
         }
     }
 
@@ -159,6 +127,7 @@ public static final PyType TYPE = PyType.fromClass(ListComp.class);
         return "ListComp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("ListComp(");
         sb.append("elt=");

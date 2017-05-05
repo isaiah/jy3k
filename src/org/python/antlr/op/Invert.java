@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Invert extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Invert.class);
 
-public Invert() {
-}
-
-public Invert(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Invert___init__(PyObject[] args, String[] keywords) {}
+    public Invert() {
+        super(TYPE);
+    }
+    public Invert(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Invert___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Invert___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(1);
     }
 
+    @Override
+    public String toStringTree() {
+        return Invert.class.toString();
+    }
 }

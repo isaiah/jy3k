@@ -216,4 +216,5 @@ class UserDictTest(mapping_tests.TestHashMappingProtocol):
 
 
 if __name__ == "__main__":
+    import unittest
     unittest.main()

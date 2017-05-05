@@ -58,11 +58,8 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Set(PyType subType) {
-        super(subType);
-    }
     public Set() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,50 +80,28 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
     }
 
     public Set(PyObject elts) {
+        super(TYPE);
         setElts(elts);
     }
 
+    // called from derived class
+    public Set(PyType subtype) {
+        super(subtype);
+    }
+
     public Set(Token token, java.util.List<expr> elts) {
-        super(token);
+        super(TYPE, token);
         this.elts = elts;
         if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
-        }
-    }
-
-    public Set(Integer ttype, Token token, java.util.List<expr> elts) {
-        super(ttype, token);
-        this.elts = elts;
-        if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
-        }
-    }
-
-    public Set(TerminalNode node, java.util.List<expr> elts) {
-        super(node);
-        this.elts = elts;
-        if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
+            this.elts = new ArrayList<>(0);
         }
     }
 
     public Set(PythonTree tree, java.util.List<expr> elts) {
-        super(tree);
+        super(TYPE, tree);
         this.elts = elts;
         if (elts == null) {
-            this.elts = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.elts) {
-            addChild(t);
+            this.elts = new ArrayList<>(0);
         }
     }
 
@@ -135,6 +110,7 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         return "Set";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Set(");
         sb.append("elts=");

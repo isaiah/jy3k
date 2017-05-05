@@ -18,16 +18,15 @@ import org.python.expose.ExposedType;
 public class Param extends PythonTree {
     public static final PyType TYPE = PyType.fromClass(Param.class);
 
-public Param() {
-}
-
-public Param(PyType subType) {
-    super(subType);
-}
-
-@ExposedNew
-@ExposedMethod
-public void Param___init__(PyObject[] args, String[] keywords) {}
+    public Param() {
+        super(TYPE);
+    }
+    public Param(PyType subType) {
+        super(subType);
+    }
+    @ExposedNew
+    @ExposedMethod
+    public void Param___init__(PyObject[] args, String[] keywords) {}
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
@@ -46,4 +45,8 @@ public void Param___init__(PyObject[] args, String[] keywords) {}
         return Py.newInteger(6);
     }
 
+    @Override
+    public String toStringTree() {
+        return Param.class.toString();
+    }
 }

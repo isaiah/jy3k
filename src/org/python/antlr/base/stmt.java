@@ -38,26 +38,16 @@ public abstract class stmt extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public stmt() {
+    public stmt(PyType subtype) {
+        super(subtype);
     }
 
-    public stmt(PyType subType) {
+    public stmt(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public stmt(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public stmt(TerminalNode node) {
-        super(node);
-    }
-
-    public stmt(Token token) {
-        super(token);
-    }
-
-    public stmt(PythonTree node) {
-        super(node);
+    public stmt(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

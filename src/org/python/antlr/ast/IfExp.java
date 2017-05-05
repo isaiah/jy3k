@@ -81,11 +81,8 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public IfExp(PyType subType) {
-        super(subType);
-    }
     public IfExp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -108,49 +105,29 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     }
 
     public IfExp(PyObject test, PyObject body, PyObject orelse) {
+        super(TYPE);
         setTest(test);
         setBody(body);
         setOrelse(orelse);
     }
 
+    // called from derived class
+    public IfExp(PyType subtype) {
+        super(subtype);
+    }
+
     public IfExp(Token token, expr test, expr body, expr orelse) {
-        super(token);
+        super(TYPE, token);
         this.test = test;
-        addChild(test);
         this.body = body;
-        addChild(body);
         this.orelse = orelse;
-        addChild(orelse);
-    }
-
-    public IfExp(Integer ttype, Token token, expr test, expr body, expr orelse) {
-        super(ttype, token);
-        this.test = test;
-        addChild(test);
-        this.body = body;
-        addChild(body);
-        this.orelse = orelse;
-        addChild(orelse);
-    }
-
-    public IfExp(TerminalNode node, expr test, expr body, expr orelse) {
-        super(node);
-        this.test = test;
-        addChild(test);
-        this.body = body;
-        addChild(body);
-        this.orelse = orelse;
-        addChild(orelse);
     }
 
     public IfExp(PythonTree tree, expr test, expr body, expr orelse) {
-        super(tree);
+        super(TYPE, tree);
         this.test = test;
-        addChild(test);
         this.body = body;
-        addChild(body);
         this.orelse = orelse;
-        addChild(orelse);
     }
 
     @ExposedGet(name = "repr")
@@ -158,6 +135,7 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
         return "IfExp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("IfExp(");
         sb.append("test=");

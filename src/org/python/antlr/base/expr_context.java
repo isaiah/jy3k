@@ -22,22 +22,12 @@ public abstract class expr_context extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyBytes[] get_attributes() { return attributes; }
 
-    public expr_context() {
+    public expr_context(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public expr_context(PyType subType) {
-    }
-
-    public expr_context(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public expr_context(Token token) {
-        super(token);
-    }
-
-    public expr_context(PythonTree node) {
-        super(node);
+    public expr_context(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

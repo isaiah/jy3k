@@ -55,11 +55,8 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Num(PyType subType) {
-        super(subType);
-    }
     public Num() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -80,26 +77,22 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     }
 
     public Num(PyObject n) {
+        super(TYPE);
         setN(n);
     }
 
+    // called from derived class
+    public Num(PyType subtype) {
+        super(subtype);
+    }
+
     public Num(Token token, Object n) {
-        super(token);
-        this.n = n;
-    }
-
-    public Num(Integer ttype, Token token, Object n) {
-        super(ttype, token);
-        this.n = n;
-    }
-
-    public Num(TerminalNode node, Object n) {
-        super(node);
+        super(TYPE, token);
         this.n = n;
     }
 
     public Num(PythonTree tree, Object n) {
-        super(tree);
+        super(TYPE, tree);
         this.n = n;
     }
 
@@ -108,6 +101,7 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
         return "Num";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Num(");
         sb.append("n=");

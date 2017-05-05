@@ -99,21 +99,6 @@ public class GrammarActions {
         return s;
     }
 
-    Name makeNameNode(TerminalNode t) {
-        if (t == null) {
-            return null;
-        }
-        return new Name(t, t.getText(), expr_contextType.Load);
-    }
-
-    List<Name> makeNameNodes(List<TerminalNode> names) {
-        List<Name> s = new ArrayList<Name>();
-        for (int i=0; i<names.size(); i++) {
-            s.add(makeNameNode(names.get(i)));
-        }
-        return s;
-    }
-
     void errorGenExpNotSoleArg(PythonTree t) {
         errorHandler.error("Generator expression must be parenthesized if not sole argument", t);
     }
@@ -227,24 +212,6 @@ public class GrammarActions {
         return new ArrayList<stmt>();
     }
 
-    expr makeDottedAttr(Token nameToken, List attrs) {
-        expr current = new Name(nameToken, nameToken.getText(), expr_contextType.Load);
-        for (Object o: attrs) {
-            Token t = (Token)o;
-            current = new Attribute(t, current, t.getText(), expr_contextType.Load);
-        }
-        return current;
-    }
-
-    stmt makeWhile(Token t, expr test, List body, List orelse) {
-        if (test == null) {
-            return errorHandler.errorStmt(new PythonTree(t));
-        }
-        List<stmt> o = castStmts(orelse);
-        List<stmt> b = castStmts(body);
-        return new While(t, test, b, o);
-    }
-
     stmt makeAsyncWith(Token t, List<withitem> items, List<stmt> body) {
         int last = items.size() - 1;
         AsyncWith result = null;
@@ -278,34 +245,10 @@ public class GrammarActions {
                 forStmt.getInternalBody(), forStmt.getInternalOrelse());
     }
 
-    stmt makeFor(Token t, expr target, expr iter, List body, List orelse) {
-        if (target == null || iter == null) {
-            return errorHandler.errorStmt(new PythonTree(t));
-        }
-        cantBeNone(target);
-
-        List<stmt> o = castStmts(orelse);
-        List<stmt> b = castStmts(body);
-        return new For(t, target, iter, b, o);
-    }
 
     stmt makeAsyncFuncdef(Token t, FunctionDef func, java.util.List<expr> decoratorList) {
         return new AsyncFunctionDef(t, func.getInternalName(), func.getInternalArgs(),
                 func.getInternalBody(), decoratorList, func.getInternalReturns());
-    }
-
-    stmt makeFuncdef(Token t, Token nameToken, arguments args, List funcStatements, expr returnNode) {
-        if (nameToken == null) {
-            return errorHandler.errorStmt(new PythonTree(t));
-        }
-        arguments a = args;
-        if (a == null) {
-            a = new arguments(t, new ArrayList<arg>(), (arg)null,
-                    // kwonlyargs, kw_defaults, kwarg, defaults
-                    new ArrayList<arg>(), new ArrayList<expr>(), (arg) null, new ArrayList<expr>());
-        }
-        List<stmt> s = castStmts(funcStatements);
-        return new FunctionDef(t, nameToken.getText(), a, s, null, returnNode);
     }
 
     List<expr> makeAssignTargets(expr lhs, List rhs) {
@@ -318,42 +261,6 @@ public class GrammarActions {
             e.add(r);
         }
         return e;
-    }
-
-    expr makeAssignValue(List rhs) {
-        expr value = castExpr(rhs.get(rhs.size() -1));
-        recurseSetContext(value, expr_contextType.Load);
-        return value;
-    }
-
-    void recurseSetContext(PythonTree tree, expr_contextType context) {
-        if (tree instanceof Context) {
-            ((Context)tree).setContext(context);
-        }
-        if (tree instanceof GeneratorExp) {
-            GeneratorExp g = (GeneratorExp)tree;
-            recurseSetContext(g.getInternalElt(), context);
-        } else if (tree instanceof ListComp) {
-            ListComp lc = (ListComp)tree;
-            recurseSetContext(lc.getInternalElt(), context);
-        } else if (tree instanceof SetComp) {
-            SetComp sc = (SetComp)tree;
-            recurseSetContext(sc.getInternalElt(), context);
-        } else if (tree instanceof DictComp) {
-            DictComp dc = (DictComp)tree;
-            recurseSetContext(dc.getInternalKey(), context);
-            recurseSetContext(dc.getInternalValue(), context);
-        } else if (!(tree instanceof ListComp) &&
-                  (!(tree instanceof DictComp)) &&
-                  (!(tree instanceof SetComp))) {
-            for (int i=0; i<tree.getChildCount(); i++) {
-                recurseSetContext(tree.getChild(i), context);
-            }
-        }
-    }
-
-    List<expr> extractArgs(List args) {
-        return castExprs(args);
     }
 
     List<keyword> makeKeywords(List args) {
@@ -523,75 +430,6 @@ public class GrammarActions {
         //return (Token)s.get(s.size() - 1);
     }
 
-    expr makeCall(Token t, expr func) {
-        return makeCall(t, func, null, null, null, null);
-    }
-
-    expr makeCall(Token t, expr func, List args, List keywords) {
-        if (func == null) {
-            return errorHandler.errorExpr(new PythonTree(t));
-        }
-        List<keyword> k = makeKeywords(keywords);
-        List<expr> a = castExprs(args);
-        return new Call(t, func, a, k);
-    }
-
-    expr makeCall(Token t, expr func, List args, List keywords, expr starargs, expr kwargs) {
-        return makeCall(t, func, args, keywords);
-    }
-
-    stmt makeClass(Token t, Token nameToken, List args, List ktypes, List stypes) {
-        String name = cantBeNone(nameToken);
-        List<expr> bases = castExprs(args);
-        List<stmt> statements = castStmts(stypes);
-        List<keyword> keywords = makeKeywords(ktypes);
-        return new ClassDef(t, name, bases, keywords, statements, new ArrayList<expr>());
-    }
-
-    expr negate(Token t, expr o) {
-        return negate(new PythonTree(t), o);
-    }
-
-    expr negate(PythonTree t, expr o) {
-        if (o instanceof Num) {
-            Num num = (Num)o;
-            if (num.getInternalN() instanceof PyLong) {
-                BigInteger v = ((PyLong)num.getInternalN()).getValue();
-                if (v.compareTo(BigInteger.ZERO) == 1) {
-                    num.setN(new PyLong(v.negate()));
-                    return num;
-                }
-            } else if (num.getInternalN() instanceof PyFloat) {
-                double v = ((PyFloat)num.getInternalN()).getValue();
-                if (v >= 0) {
-                    num.setN(new PyFloat(-v));
-                    return num;
-                }
-            } else if (num.getInternalN() instanceof PyComplex) {
-                double v = ((PyComplex)num.getInternalN()).imag;
-                if (v >= 0) {
-                    num.setN(new PyComplex(0,-v));
-                    return num;
-                }
-            }
-        }
-        return new UnaryOp(t, unaryopType.USub, o);
-    }
-
-    String cantBeNone(Token t) {
-        if (t == null || t.getText().equals("None")) {
-            errorHandler.error("can't be None", new PythonTree(t));
-        }
-        return t.getText();
-    }
-
-    Name cantBeNoneName(Token t) {
-        if (t == null || t.getText().equals("None")) {
-            errorHandler.error("can't be None", new PythonTree(t));
-        }
-        return new Name(t, t.getText(), expr_contextType.Load);
-    }
-
     void cantBeNone(PythonTree e) {
         if (e.getText().equals("None")) {
             errorHandler.error("can't be None", e);
@@ -687,41 +525,6 @@ public class GrammarActions {
             for (int i=0;i<elts.size();i++) {
                 checkDelete(elts.get(i));
             }
-        }
-    }
-
-    slice makeSubscript(PythonTree lower, Token colon, PythonTree upper, PythonTree sliceop) {
-            boolean isSlice = false;
-        expr s = null;
-        expr e = null;
-        expr o = null;
-        if (lower != null) {
-            s = castExpr(lower);
-        }
-        if (colon != null) {
-            isSlice = true;
-            if (upper != null) {
-                e = castExpr(upper);
-            }
-        }
-        if (sliceop != null) {
-            isSlice = true;
-            if (sliceop != null) {
-                o = castExpr(sliceop);
-            } else {
-                o = new Name(sliceop, "None", expr_contextType.Load);
-            }
-        }
-
-        PythonTree tok = lower;
-        if (lower == null) {
-            tok = new PythonTree(colon);
-        }
-        if (isSlice) {
-           return new Slice(tok, s, e, o);
-        }
-        else {
-           return new Index(tok, s);
         }
     }
 

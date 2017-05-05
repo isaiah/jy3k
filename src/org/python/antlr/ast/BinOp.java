@@ -81,11 +81,8 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public BinOp(PyType subType) {
-        super(subType);
-    }
     public BinOp() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -108,45 +105,29 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     }
 
     public BinOp(PyObject left, PyObject op, PyObject right) {
+        super(TYPE);
         setLeft(left);
         setOp(op);
         setRight(right);
     }
 
+    // called from derived class
+    public BinOp(PyType subtype) {
+        super(subtype);
+    }
+
     public BinOp(Token token, expr left, operatorType op, expr right) {
-        super(token);
+        super(TYPE, token);
         this.left = left;
-        addChild(left);
         this.op = op;
         this.right = right;
-        addChild(right);
-    }
-
-    public BinOp(Integer ttype, Token token, expr left, operatorType op, expr right) {
-        super(ttype, token);
-        this.left = left;
-        addChild(left);
-        this.op = op;
-        this.right = right;
-        addChild(right);
-    }
-
-    public BinOp(TerminalNode node, expr left, operatorType op, expr right) {
-        super(node);
-        this.left = left;
-        addChild(left);
-        this.op = op;
-        this.right = right;
-        addChild(right);
     }
 
     public BinOp(PythonTree tree, expr left, operatorType op, expr right) {
-        super(tree);
+        super(TYPE, tree);
         this.left = left;
-        addChild(left);
         this.op = op;
         this.right = right;
-        addChild(right);
     }
 
     @ExposedGet(name = "repr")
@@ -154,6 +135,7 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
         return "BinOp";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("BinOp(");
         sb.append("left=");

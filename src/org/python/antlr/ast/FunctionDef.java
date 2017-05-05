@@ -115,11 +115,8 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public FunctionDef(PyType subType) {
-        super(subType);
-    }
     public FunctionDef() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -145,6 +142,7 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
 
     public FunctionDef(PyObject name, PyObject args, PyObject body, PyObject decorator_list,
     PyObject returns) {
+        super(TYPE);
         setName(name);
         setArgs(args);
         setBody(body);
@@ -152,96 +150,47 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         setReturns(returns);
     }
 
+    // called from derived class
+    public FunctionDef(PyType subtype) {
+        super(subtype);
+    }
+
     public FunctionDef(Token token, String name, arguments args, java.util.List<stmt> body,
     java.util.List<expr> decorator_list, expr returns) {
-        super(token);
+        super(TYPE, token);
         this.name = name;
         this.args = args;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
+            this.decorator_list = new ArrayList<>(0);
         }
         this.returns = returns;
-        addChild(returns);
-    }
-
-    public FunctionDef(Integer ttype, Token token, String name, arguments args,
-    java.util.List<stmt> body, java.util.List<expr> decorator_list, expr returns) {
-        super(ttype, token);
-        this.name = name;
-        this.args = args;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
-    }
-
-    public FunctionDef(TerminalNode node, String name, arguments args, java.util.List<stmt> body,
-    java.util.List<expr> decorator_list, expr returns) {
-        super(node);
-        this.name = name;
-        this.args = args;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-        this.decorator_list = decorator_list;
-        if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
-        }
-        this.returns = returns;
-        addChild(returns);
     }
 
     public FunctionDef(PythonTree tree, String name, arguments args, java.util.List<stmt> body,
     java.util.List<expr> decorator_list, expr returns) {
-        super(tree);
+        super(TYPE, tree);
         this.name = name;
         this.args = args;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
-            this.decorator_list = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.decorator_list) {
-            addChild(t);
+            this.decorator_list = new ArrayList<>(0);
         }
         this.returns = returns;
-        addChild(returns);
     }
 
     @ExposedGet(name = "repr")
@@ -249,6 +198,7 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         return "FunctionDef";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("FunctionDef(");
         sb.append("name=");

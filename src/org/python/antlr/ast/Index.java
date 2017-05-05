@@ -54,11 +54,8 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Index(PyType subType) {
-        super(subType);
-    }
     public Index() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -69,31 +66,23 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
     }
 
     public Index(PyObject value) {
+        super(TYPE);
         setValue(value);
     }
 
+    // called from derived class
+    public Index(PyType subtype) {
+        super(subtype);
+    }
+
     public Index(Token token, expr value) {
-        super(token);
+        super(TYPE, token);
         this.value = value;
-        addChild(value);
-    }
-
-    public Index(Integer ttype, Token token, expr value) {
-        super(ttype, token);
-        this.value = value;
-        addChild(value);
-    }
-
-    public Index(TerminalNode node, expr value) {
-        super(node);
-        this.value = value;
-        addChild(value);
     }
 
     public Index(PythonTree tree, expr value) {
-        super(tree);
+        super(TYPE, tree);
         this.value = value;
-        addChild(value);
     }
 
     @ExposedGet(name = "repr")
@@ -101,6 +90,7 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
         return "Index";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Index(");
         sb.append("value=");

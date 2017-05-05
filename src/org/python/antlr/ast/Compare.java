@@ -87,11 +87,8 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Compare(PyType subType) {
-        super(subType);
-    }
     public Compare() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -114,68 +111,36 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     }
 
     public Compare(PyObject left, PyObject ops, PyObject comparators) {
+        super(TYPE);
         setLeft(left);
         setOps(ops);
         setComparators(comparators);
     }
 
+    // called from derived class
+    public Compare(PyType subtype) {
+        super(subtype);
+    }
+
     public Compare(Token token, expr left, java.util.List<cmpopType> ops, java.util.List<expr>
     comparators) {
-        super(token);
+        super(TYPE, token);
         this.left = left;
-        addChild(left);
         this.ops = ops;
         this.comparators = comparators;
         if (comparators == null) {
-            this.comparators = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.comparators) {
-            addChild(t);
-        }
-    }
-
-    public Compare(Integer ttype, Token token, expr left, java.util.List<cmpopType> ops,
-    java.util.List<expr> comparators) {
-        super(ttype, token);
-        this.left = left;
-        addChild(left);
-        this.ops = ops;
-        this.comparators = comparators;
-        if (comparators == null) {
-            this.comparators = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.comparators) {
-            addChild(t);
-        }
-    }
-
-    public Compare(TerminalNode node, expr left, java.util.List<cmpopType> ops,
-    java.util.List<expr> comparators) {
-        super(node);
-        this.left = left;
-        addChild(left);
-        this.ops = ops;
-        this.comparators = comparators;
-        if (comparators == null) {
-            this.comparators = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.comparators) {
-            addChild(t);
+            this.comparators = new ArrayList<>(0);
         }
     }
 
     public Compare(PythonTree tree, expr left, java.util.List<cmpopType> ops, java.util.List<expr>
     comparators) {
-        super(tree);
+        super(TYPE, tree);
         this.left = left;
-        addChild(left);
         this.ops = ops;
         this.comparators = comparators;
         if (comparators == null) {
-            this.comparators = new ArrayList<expr>();
-        }
-        for(PythonTree t : this.comparators) {
-            addChild(t);
+            this.comparators = new ArrayList<>(0);
         }
     }
 
@@ -184,6 +149,7 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
         return "Compare";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Compare(");
         sb.append("left=");

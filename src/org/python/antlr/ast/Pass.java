@@ -41,9 +41,6 @@ public static final PyType TYPE = PyType.fromClass(Pass.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Pass(PyType subType) {
-        super(subType);
-    }
     @ExposedNew
     @ExposedMethod
     public void Pass___init__(PyObject[] args, String[] keywords) {
@@ -62,22 +59,20 @@ public static final PyType TYPE = PyType.fromClass(Pass.class);
     }
 
     public Pass() {
+        super(TYPE);
+    }
+
+    // called from derived class
+    public Pass(PyType subtype) {
+        super(subtype);
     }
 
     public Pass(Token token) {
-        super(token);
-    }
-
-    public Pass(Integer ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public Pass(TerminalNode node) {
-        super(node);
+        super(TYPE, token);
     }
 
     public Pass(PythonTree tree) {
-        super(tree);
+        super(TYPE, tree);
     }
 
     @ExposedGet(name = "repr")
@@ -85,6 +80,7 @@ public static final PyType TYPE = PyType.fromClass(Pass.class);
         return "Pass";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Pass(");
         sb.append(")");

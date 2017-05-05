@@ -85,11 +85,8 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public ExceptHandler(PyType subType) {
-        super(subType);
-    }
     public ExceptHandler() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -112,65 +109,40 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     }
 
     public ExceptHandler(PyObject type, PyObject name, PyObject body) {
+        super(TYPE);
         setExceptType(type);
         setName(name);
         setBody(body);
     }
 
+    // called from derived class
+    public ExceptHandler(PyType subtype) {
+        super(subtype);
+    }
+
     public ExceptHandler(Token token, expr type, String name, java.util.List<stmt> body) {
-        super(token);
+        super(TYPE, token);
         this.type = type;
-        addChild(type);
         this.name = name;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public ExceptHandler(Integer ttype, Token token, expr type, String name, java.util.List<stmt>
-    body) {
-        super(ttype, token);
-        this.type = type;
-        addChild(type);
-        this.name = name;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public ExceptHandler(TerminalNode node, expr type, String name, java.util.List<stmt> body) {
-        super(node);
-        this.type = type;
-        addChild(type);
-        this.name = name;
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
     public ExceptHandler(PythonTree tree, expr type, String name, java.util.List<stmt> body) {
-        super(tree);
+        super(TYPE, tree);
         this.type = type;
-        addChild(type);
         this.name = name;
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
@@ -179,6 +151,7 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
         return "ExceptHandler";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("ExceptHandler(");
         sb.append("type=");

@@ -57,11 +57,8 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Module(PyType subType) {
-        super(subType);
-    }
     public Module() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -72,50 +69,34 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
     }
 
     public Module(PyObject body) {
+        super(TYPE);
         setBody(body);
     }
 
+    // called from derived class
+    public Module(PyType subtype) {
+        super(subtype);
+    }
+
     public Module(Token token, java.util.List<stmt> body) {
-        super(token);
+        super(TYPE, token);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public Module(Integer ttype, Token token, java.util.List<stmt> body) {
-        super(ttype, token);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
-        }
-    }
-
-    public Module(TerminalNode node, java.util.List<stmt> body) {
-        super(node);
-        this.body = body;
-        if (body == null) {
-            this.body = new ArrayList<stmt>();
-        }
-        for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
     public Module(PythonTree tree, java.util.List<stmt> body) {
-        super(tree);
+        super(TYPE, tree);
         this.body = body;
         if (body == null) {
-            this.body = new ArrayList<stmt>();
+            this.body = new ArrayList<>(0);
         }
         for(PythonTree t : this.body) {
-            addChild(t);
+            addChild(t, this.body);
         }
     }
 
@@ -124,6 +105,7 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         return "Module";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Module(");
         sb.append("body=");

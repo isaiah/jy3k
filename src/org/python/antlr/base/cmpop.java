@@ -22,22 +22,12 @@ public abstract class cmpop extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyBytes[] get_attributes() { return attributes; }
 
-    public cmpop() {
+    public cmpop(PyType subtype, Token token) {
+        super(subtype, token);
     }
 
-    public cmpop(PyType subType) {
-    }
-
-    public cmpop(int ttype, Token token) {
-        super(ttype, token);
-    }
-
-    public cmpop(Token token) {
-        super(token);
-    }
-
-    public cmpop(PythonTree node) {
-        super(node);
+    public cmpop(PyType subtype, PythonTree node) {
+        super(subtype, node);
     }
 
 }

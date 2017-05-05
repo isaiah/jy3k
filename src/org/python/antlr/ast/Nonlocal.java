@@ -58,11 +58,8 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Nonlocal(PyType subType) {
-        super(subType);
-    }
     public Nonlocal() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -83,26 +80,22 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
     }
 
     public Nonlocal(PyObject names) {
+        super(TYPE);
         setNames(names);
     }
 
+    // called from derived class
+    public Nonlocal(PyType subtype) {
+        super(subtype);
+    }
+
     public Nonlocal(Token token, java.util.List<String> names) {
-        super(token);
-        this.names = names;
-    }
-
-    public Nonlocal(Integer ttype, Token token, java.util.List<String> names) {
-        super(ttype, token);
-        this.names = names;
-    }
-
-    public Nonlocal(TerminalNode node, java.util.List<String> names) {
-        super(node);
+        super(TYPE, token);
         this.names = names;
     }
 
     public Nonlocal(PythonTree tree, java.util.List<String> names) {
-        super(tree);
+        super(TYPE, tree);
         this.names = names;
     }
 
@@ -111,6 +104,7 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
         return "Nonlocal";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Nonlocal(");
         sb.append("names=");

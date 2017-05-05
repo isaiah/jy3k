@@ -68,11 +68,8 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
-    public Assert(PyType subType) {
-        super(subType);
-    }
     public Assert() {
-        this(TYPE);
+        super(TYPE);
     }
     @ExposedNew
     @ExposedMethod
@@ -94,40 +91,26 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
     }
 
     public Assert(PyObject test, PyObject msg) {
+        super(TYPE);
         setTest(test);
         setMsg(msg);
     }
 
+    // called from derived class
+    public Assert(PyType subtype) {
+        super(subtype);
+    }
+
     public Assert(Token token, expr test, expr msg) {
-        super(token);
+        super(TYPE, token);
         this.test = test;
-        addChild(test);
         this.msg = msg;
-        addChild(msg);
-    }
-
-    public Assert(Integer ttype, Token token, expr test, expr msg) {
-        super(ttype, token);
-        this.test = test;
-        addChild(test);
-        this.msg = msg;
-        addChild(msg);
-    }
-
-    public Assert(TerminalNode node, expr test, expr msg) {
-        super(node);
-        this.test = test;
-        addChild(test);
-        this.msg = msg;
-        addChild(msg);
     }
 
     public Assert(PythonTree tree, expr test, expr msg) {
-        super(tree);
+        super(TYPE, tree);
         this.test = test;
-        addChild(test);
         this.msg = msg;
-        addChild(msg);
     }
 
     @ExposedGet(name = "repr")
@@ -135,6 +118,7 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
         return "Assert";
     }
 
+    @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Assert(");
         sb.append("test=");
