@@ -411,8 +411,9 @@ class JavaVisitor(EmitVisitor):
                     self.emit("this.%s = new ArrayList<>(0);" % f.name, depth+2)
                     self.emit("}", depth+1)
                     if self.javaType(f, False) == 'stmt':
-                        self.emit("for(PythonTree t : this.%(name)s) {" % {"name":f.name}, depth+1)
-                        self.emit("addChild(t, this.%s);" % f.name, depth+2)
+                        self.emit("for(int i = 0; i < this.%(name)s.size(); i++) {" % {"name":f.name}, depth+1)
+                        self.emit("PythonTree t = this.%s.get(i);" % f.name, depth+2)
+                        self.emit("addChild(t, i, this.%s);" % f.name, depth+2)
                         self.emit("}", depth+1)
 
     #XXX: this method used to emit a pickle(DataOutputStream ostream) for cPickle support.

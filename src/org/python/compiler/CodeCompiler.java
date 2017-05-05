@@ -18,6 +18,7 @@ import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
+import org.python.antlr.ast.Block;
 import org.python.antlr.ast.BoolOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Bytes;
@@ -115,7 +116,7 @@ import static org.python.util.CodegenUtils.*;
 
 public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
-    private static final Object Exit = new Integer(1);
+    private static final Object Exit = Integer.valueOf(1);
     private static final Object NoExit = null;
     private Module module;
     private Code code;
@@ -1650,6 +1651,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitSuite(Suite node) throws Exception {
         return suite(node.getInternalBody());
+    }
+
+    @Override
+    public Object visitBlock(Block node) throws Exception {
+        for (stmt s: node.getInternalBody()) {
+            visit(s);
+        }
+        return null;
     }
 
     public Object suite(java.util.List<stmt> stmts) throws Exception {

@@ -1,7 +1,9 @@
 package org.python.compiler;
 
+import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.FunctionDef;
@@ -36,63 +38,11 @@ public class ClassClosureGenerator extends Visitor {
     private Deque<Boolean> inClass = new LinkedList<>();
     private Deque<Boolean> needsClosure = new LinkedList<>();
 
-    private List<stmt> filterClassDef(List<stmt> stmts) throws Exception {
-        List<stmt> replacement = null;
-        for (int i = 0; i < stmts.size(); i++) {
-            stmt s = stmts.get(i);
-            Object o = visit(s);
-            if (s instanceof ClassDef) {
-                stmt[] ret = (stmt[]) o;
-                if (ret != null) {
-                    if (replacement == null) {
-                        replacement = new ArrayList<>(stmts.size() + 2);
-                        replacement.addAll(stmts.subList(0, i));
-                    }
-                    replacement.add(ret[0]);
-                    replacement.add(ret[1]);
-                } else if (replacement != null) {
-                    replacement.add(s);
-                }
-            } else if (replacement != null) {
-                replacement.add(s);
-            }
-        }
-        return replacement == null ? stmts : replacement;
-    }
-
-    @Override
-    public Object visitFunctionDef(FunctionDef node) throws Exception {
-        List<stmt> stmts = node.getInternalBody();
-        node.setInternalBody(filterClassDef(stmts));
-        return node;
-    }
-
-    @Override
-    public Object visitModule(org.python.antlr.ast.Module node) throws Exception {
-        List<stmt> stmts = node.getInternalBody();
-        node.setInternalBody(filterClassDef(stmts));
-        return node;
-    }
-
-    @Override
-    public Object visitSuite(Suite node) throws Exception {
-        List<stmt> stmts = node.getInternalBody();
-        node.setInternalBody(filterClassDef(stmts));
-        return node;
-    }
-
-    @Override
-    public Object visitInteractive(Interactive node) throws Exception {
-        List<stmt> stmts = node.getInternalBody();
-        node.setInternalBody(filterClassDef(stmts));
-        return node;
-    }
-
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
         inClass.push(true);
         needsClosure.push(false);
-        node.setInternalBody(filterClassDef(node.getInternalBody()));
+        traverse(node);
         inClass.pop();
         boolean thisNeedClosure = needsClosure.pop();
         if (thisNeedClosure) {
@@ -107,7 +57,8 @@ public class ClassClosureGenerator extends Visitor {
             node.setBases(new PyList(new PyObject[]{starred}));
             keyword kw = new keyword(node.getToken(), null, new Name(node.getToken(), kwarg, expr_contextType.Load));
             node.setKeywords(new PyList(new PyObject[]{kw}));
-            bod.add(node);
+            ClassDef copy = PythonTree.copy(node);
+            bod.add(copy);
 
             Name innerName = new Name(node, name, expr_contextType.Load);
             String funcName = "__$" + name;
@@ -123,7 +74,7 @@ public class ClassClosureGenerator extends Visitor {
             FunctionDef funcdef = new FunctionDef(node.getToken(), funcName, args, bod, new ArrayList<>(), null);
             assign = new Assign(node, Arrays.asList(new Name(node, name, expr_contextType.Store)),
                     new Call(node, outerName, bases, keywords));
-            return new stmt[] { funcdef, assign };
+            node.replaceSelf(new Block(node.getToken(), Arrays.asList(funcdef, assign)));
         }
         return null;
     }

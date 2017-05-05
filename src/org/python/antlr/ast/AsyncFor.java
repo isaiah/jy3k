@@ -147,15 +147,17 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
         this.orelse = orelse;
         if (orelse == null) {
             this.orelse = new ArrayList<>(0);
         }
-        for(PythonTree t : this.orelse) {
-            addChild(t, this.orelse);
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
         }
     }
 
@@ -168,15 +170,17 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
         this.orelse = orelse;
         if (orelse == null) {
             this.orelse = new ArrayList<>(0);
         }
-        for(PythonTree t : this.orelse) {
-            addChild(t, this.orelse);
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
         }
     }
 

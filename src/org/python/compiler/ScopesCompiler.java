@@ -207,6 +207,13 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         return null;
     }
 
+    public Object visitBlock(Block node) throws Exception {
+        for (stmt s: node.getInternalBody()) {
+            visit(s);
+        }
+        return null;
+    }
+
     public void suite(List<stmt> stmts) throws Exception {
         if (stmts == null) return;
         for (int i = 0; i < stmts.size(); i++) {

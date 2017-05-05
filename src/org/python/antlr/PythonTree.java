@@ -1,6 +1,7 @@
 package org.python.antlr;
 
 import org.antlr.v4.runtime.Token;
+import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.base.stmt;
@@ -17,7 +18,10 @@ public abstract class PythonTree extends AST implements Traverseproc {
 
     public boolean from_future_checked = false;
     private Token node;
+
     private List<stmt> block;
+
+    private int index;
 
     /** Who is the parent node of this node; if null, implies node is root */
     private PythonTree parent;
@@ -73,8 +77,17 @@ public abstract class PythonTree extends AST implements Traverseproc {
         this.parent = t;
     }
 
-    public void addChild(PythonTree t, List<stmt> body) {
-        t.block = body;
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public void setBlock(List<stmt> block) {
+        this.block = block;
+    }
+
+    public void addChild(PythonTree t, int index, List<stmt> body) {
+        t.setIndex(index);
+        t.setBlock(body);
     }
 
     /**
@@ -181,6 +194,14 @@ public abstract class PythonTree extends AST implements Traverseproc {
         return sb.toString();
     }
 
+    public PythonTree replaceSelf(stmt other) {
+        other.setIndex(this.index);
+        other.setParent(parent);
+        other.setBlock(block);
+        block.set(index, other);
+        return other;
+    }
+
     public <R> R accept(VisitorIF<R> visitor) throws Exception {
         throw new RuntimeException("Unexpected node: " + this);
     }
@@ -198,5 +219,11 @@ public abstract class PythonTree extends AST implements Traverseproc {
     @Override
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && ob == parent;
+    }
+
+    // Handle copying of node, so that the original index and parent is not lost in ast modification
+    public static ClassDef copy(ClassDef node) {
+        return new ClassDef(node.getToken(), node.getInternalName(), node.getInternalBases(),
+                node.getInternalKeywords(), node.getInternalBody(), node.getInternalDecorator_list());
     }
 }

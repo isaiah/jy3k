@@ -84,8 +84,9 @@ public static final PyType TYPE = PyType.fromClass(Suite.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
     }
 
@@ -95,8 +96,9 @@ public static final PyType TYPE = PyType.fromClass(Suite.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
     }
 

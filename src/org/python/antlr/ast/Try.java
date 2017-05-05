@@ -151,8 +151,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
         this.handlers = handlers;
         if (handlers == null) {
@@ -162,15 +163,17 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         if (orelse == null) {
             this.orelse = new ArrayList<>(0);
         }
-        for(PythonTree t : this.orelse) {
-            addChild(t, this.orelse);
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
         }
         this.finalbody = finalbody;
         if (finalbody == null) {
             this.finalbody = new ArrayList<>(0);
         }
-        for(PythonTree t : this.finalbody) {
-            addChild(t, this.finalbody);
+        for(int i = 0; i < this.finalbody.size(); i++) {
+            PythonTree t = this.finalbody.get(i);
+            addChild(t, i, this.finalbody);
         }
     }
 
@@ -181,8 +184,9 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         if (body == null) {
             this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.body) {
-            addChild(t, this.body);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
         this.handlers = handlers;
         if (handlers == null) {
@@ -192,15 +196,17 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         if (orelse == null) {
             this.orelse = new ArrayList<>(0);
         }
-        for(PythonTree t : this.orelse) {
-            addChild(t, this.orelse);
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
         }
         this.finalbody = finalbody;
         if (finalbody == null) {
             this.finalbody = new ArrayList<>(0);
         }
-        for(PythonTree t : this.finalbody) {
-            addChild(t, this.finalbody);
+        for(int i = 0; i < this.finalbody.size(); i++) {
+            PythonTree t = this.finalbody.get(i);
+            addChild(t, i, this.finalbody);
         }
     }
 

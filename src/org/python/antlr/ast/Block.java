@@ -31,25 +31,25 @@ import java.util.ArrayList;
 @ExposedType(name = "_ast.Block", base = stmt.class)
 public class Block extends stmt {
 public static final PyType TYPE = PyType.fromClass(Block.class);
-    private java.util.List<stmt> statements;
-    public java.util.List<stmt> getInternalStatements() {
-        return statements;
+    private java.util.List<stmt> body;
+    public java.util.List<stmt> getInternalBody() {
+        return body;
     }
-    public void setInternalStatements(java.util.List<stmt> statements) {
-        this.statements = statements;
+    public void setInternalBody(java.util.List<stmt> body) {
+        this.body = body;
     }
-    @ExposedGet(name = "statements")
-    public PyObject getStatements() {
-        return new AstList(statements, AstAdapters.stmtAdapter);
+    @ExposedGet(name = "body")
+    public PyObject getBody() {
+        return new AstList(body, AstAdapters.stmtAdapter);
     }
-    @ExposedSet(name = "statements")
-    public void setStatements(PyObject statements) {
-        this.statements = AstAdapters.py2stmtList(statements);
+    @ExposedSet(name = "body")
+    public void setBody(PyObject body) {
+        this.body = AstAdapters.py2stmtList(body);
     }
 
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("statements")};
+    new PyUnicode[] {new PyUnicode("body")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -65,8 +65,8 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
     @ExposedMethod
     public void Block___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("Block", args, keywords, new String[]
-            {"statements", "lineno", "col_offset"}, 1, true);
-        setStatements(ap.getPyObject(0, Py.None));
+            {"body", "lineno", "col_offset"}, 1, true);
+        setBody(ap.getPyObject(0, Py.None));
         int lin = ap.getInt(1, -1);
         if (lin != -1) {
             setLineno(lin);
@@ -79,9 +79,9 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
 
     }
 
-    public Block(PyObject statements) {
+    public Block(PyObject body) {
         super(TYPE);
-        setStatements(statements);
+        setBody(body);
     }
 
     // called from derived class
@@ -89,25 +89,27 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
         super(subtype);
     }
 
-    public Block(Token token, java.util.List<stmt> statements) {
+    public Block(Token token, java.util.List<stmt> body) {
         super(TYPE, token);
-        this.statements = statements;
-        if (statements == null) {
-            this.statements = new ArrayList<>(0);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.statements) {
-            addChild(t, this.statements);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
     }
 
-    public Block(PythonTree tree, java.util.List<stmt> statements) {
+    public Block(PythonTree tree, java.util.List<stmt> body) {
         super(TYPE, tree);
-        this.statements = statements;
-        if (statements == null) {
-            this.statements = new ArrayList<>(0);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
         }
-        for(PythonTree t : this.statements) {
-            addChild(t, this.statements);
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
         }
     }
 
@@ -119,8 +121,8 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
     @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("Block(");
-        sb.append("statements=");
-        sb.append(dumpThis(statements));
+        sb.append("body=");
+        sb.append(dumpThis(body));
         sb.append(",");
         sb.append(")");
         return sb.toString();
@@ -131,8 +133,8 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
-        if (statements != null) {
-            for (PythonTree t : statements) {
+        if (body != null) {
+            for (PythonTree t : body) {
                 if (t != null)
                     t.accept(visitor);
             }
