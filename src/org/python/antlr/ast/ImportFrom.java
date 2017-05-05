@@ -140,6 +140,10 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         this.level = level;
     }
 
+    public ImportFrom copy() {
+        return new ImportFrom(this.getToken(), this.module, this.names, this.level);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "ImportFrom";

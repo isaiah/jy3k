@@ -57,8 +57,7 @@ public class ClassClosureGenerator extends Visitor {
             node.setBases(new PyList(new PyObject[]{starred}));
             keyword kw = new keyword(node.getToken(), null, new Name(node.getToken(), kwarg, expr_contextType.Load));
             node.setKeywords(new PyList(new PyObject[]{kw}));
-            ClassDef copy = PythonTree.copy(node);
-            bod.add(copy);
+            bod.add(node.copy());
 
             Name innerName = new Name(node, name, expr_contextType.Load);
             String funcName = "__$" + name;

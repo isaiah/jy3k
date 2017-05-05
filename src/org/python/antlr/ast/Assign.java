@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         this.value = value;
     }
 
+    public Assign copy() {
+        return new Assign(this.getToken(), this.targets, this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Assign";

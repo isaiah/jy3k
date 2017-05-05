@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(GeneratorExp.class);
         }
     }
 
+    public GeneratorExp copy() {
+        return new GeneratorExp(this.getToken(), this.elt, this.generators);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "GeneratorExp";

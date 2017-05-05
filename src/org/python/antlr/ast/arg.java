@@ -103,6 +103,10 @@ public class arg extends PythonTree {
         this.annotation = annotation;
     }
 
+    public arg copy() {
+        return new arg(this.getToken(), this.arg, this.annotation);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "arg";

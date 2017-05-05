@@ -139,6 +139,10 @@ public static final PyType TYPE = PyType.fromClass(With.class);
         }
     }
 
+    public With copy() {
+        return new With(this.getToken(), this.items, this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "With";

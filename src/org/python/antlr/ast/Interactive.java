@@ -102,6 +102,10 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
         }
     }
 
+    public Interactive copy() {
+        return new Interactive(this.getToken(), this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Interactive";

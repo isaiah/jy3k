@@ -96,6 +96,10 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
         this.s = s;
     }
 
+    public Bytes copy() {
+        return new Bytes(this.getToken(), this.s);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Bytes";

@@ -164,6 +164,10 @@ public static final PyType TYPE = PyType.fromClass(If.class);
         }
     }
 
+    public If copy() {
+        return new If(this.getToken(), this.test, this.body, this.orelse);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "If";

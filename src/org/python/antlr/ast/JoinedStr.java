@@ -105,6 +105,10 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         }
     }
 
+    public JoinedStr copy() {
+        return new JoinedStr(this.getToken(), this.values);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "JoinedStr";

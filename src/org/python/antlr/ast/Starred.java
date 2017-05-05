@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
         this.ctx = ctx;
     }
 
+    public Starred copy() {
+        return new Starred(this.getToken(), this.value, this.ctx);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Starred";

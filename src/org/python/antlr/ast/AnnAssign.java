@@ -148,6 +148,11 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
         this.simple = simple;
     }
 
+    public AnnAssign copy() {
+        return new AnnAssign(this.getToken(), this.target, this.annotation, this.value,
+        this.simple);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "AnnAssign";

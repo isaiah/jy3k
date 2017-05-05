@@ -148,6 +148,10 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
         this.funcdef = funcdef;
     }
 
+    public SplitNode copy() {
+        return new SplitNode(this.getToken(), this.name, this.body, this.funcdef);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "SplitNode";

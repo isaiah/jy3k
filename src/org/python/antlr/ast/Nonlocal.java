@@ -99,6 +99,10 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
         this.names = names;
     }
 
+    public Nonlocal copy() {
+        return new Nonlocal(this.getToken(), this.names);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Nonlocal";

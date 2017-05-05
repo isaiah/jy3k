@@ -1492,10 +1492,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.athrow();
     }
 
-    @Override
-    public Object visitTry(Try node) throws Exception {
+    public Object visitTryFinally(Try node) throws Exception {
         if (node.getInternalFinalbody() == null) {
-            return visitTryExcept(node);
+            return visitTry(node);
         }
         Label start = new Label();
         Label end = new Label();
@@ -1516,7 +1515,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.label(start);
         inFinally.exceptionStarts.addElement(start);
 
-        visitTryExcept(node);
+        visitTry(node);
 //        ret = suite(node.getInternalBody());
 
         code.label(end);
@@ -1596,8 +1595,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    //    @Override
-    private Object visitTryExcept(Try node) throws Exception {
+    @Override
+    public Object visitTry(Try node) throws Exception {
         Label start = new Label();
         Label end = new Label();
         Label handler_start = new Label();
@@ -1630,11 +1629,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (node.getInternalOrelse() == null) {
             // No else clause to worry about
             exceptionTest(exc, handler_end, node, 1);
+            popException();
             code.label(handler_end);
         } else {
             // Have else clause
             Label else_end = new Label();
             exceptionTest(exc, else_end, node, 1);
+            popException();
             code.label(handler_end);
 
             // do else clause

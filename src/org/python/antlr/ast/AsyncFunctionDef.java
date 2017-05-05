@@ -195,6 +195,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         this.returns = returns;
     }
 
+    public AsyncFunctionDef copy() {
+        return new AsyncFunctionDef(this.getToken(), this.name, this.args, this.body,
+        this.decorator_list, this.returns);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "AsyncFunctionDef";

@@ -128,6 +128,10 @@ public class comprehension extends PythonTree {
         }
     }
 
+    public comprehension copy() {
+        return new comprehension(this.getToken(), this.target, this.iter, this.ifs);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "comprehension";

@@ -165,6 +165,10 @@ public static final PyType TYPE = PyType.fromClass(While.class);
         }
     }
 
+    public While copy() {
+        return new While(this.getToken(), this.test, this.body, this.orelse);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "While";

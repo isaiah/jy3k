@@ -1,5 +1,6 @@
 package org.python.compiler;
 
+import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Block;
@@ -42,38 +43,41 @@ public class Lower extends Visitor {
         }
         node.setInternalFinalbody(null);
 
-        excepthandler catchAll = catchAllBlock(node, finalBody);
+        excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBody);
         List<excepthandler> excepthandlers = node.getInternalHandlers();
         // when there is no except clause
-        if (excepthandlers == null || excepthandlers.isEmpty()) {
-            node.setInternalHandlers(asList(catchAll));
-            return null;
-        }
         node.accept(new Visitor() {
             // skip function definition
             @Override
             public Object visitFunctionDef(FunctionDef node) {
                 return node;
             }
+
             @Override
             public Object visitReturn(Return node) {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Name || value instanceof Num || value instanceof NameConstant) {
-                    node.replaceSelf(new Block(node.getToken(), prependFinalBody(finalBody, node)));
+                    node.replaceSelf(new Block(node.getToken(), prependFinalBody(finalBody, node.copy())));
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     List<stmt> newStmts = new ArrayList<>(finalBody.size() + 2);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);
                     newStmts.add(assign);
                     newStmts.addAll(finalBody);
+                    resultNode = resultNode.copy();
+                    resultNode.setContext(expr_contextType.Load);
                     newStmts.add(new Return(node.getToken(), resultNode));
                     node.replaceSelf(new Block(node.getToken(), newStmts));
                 }
                 return node;
             }
         });
-        Try newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, node), asList(catchAll), null, null);
+        if (excepthandlers == null || excepthandlers.isEmpty()) {
+            node.setInternalHandlers(asList(catchAll));
+            return null;
+        }
+        Try newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, node.copy()), asList(catchAll), null, null);
         node.replaceSelf(newTryNode);
         return null;
     }
@@ -92,7 +96,7 @@ public class Lower extends Visitor {
         return stmts;
     }
 
-    private excepthandler catchAllBlock(Try node, List<stmt> body) {
+    private excepthandler catchAllBlock(stmt node, List<stmt> body) {
         Raise raiseNode = new Raise(node.getToken(), null, null);
         return new ExceptHandler(node.getToken(), null, null, prependFinalBody(body, raiseNode));
     }

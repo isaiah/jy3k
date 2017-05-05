@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         this.ctx = ctx;
     }
 
+    public Tuple copy() {
+        return new Tuple(this.getToken(), this.elts, this.ctx);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Tuple";

@@ -96,6 +96,10 @@ public static final PyType TYPE = PyType.fromClass(Return.class);
         this.value = value;
     }
 
+    public Return copy() {
+        return new Return(this.getToken(), this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Return";

@@ -94,6 +94,10 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         }
     }
 
+    public ExtSlice copy() {
+        return new ExtSlice(this.getToken(), this.dims);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "ExtSlice";

@@ -148,6 +148,10 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
         }
     }
 
+    public ExceptHandler copy() {
+        return new ExceptHandler(this.getToken(), this.type, this.name, this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "ExceptHandler";

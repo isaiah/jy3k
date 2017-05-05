@@ -3,6 +3,8 @@ package org.python.antlr;
 import org.antlr.v4.runtime.Token;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Name;
+import org.python.antlr.ast.Return;
+import org.python.antlr.ast.Try;
 import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.base.stmt;
 import org.python.core.PyObject;
@@ -219,11 +221,5 @@ public abstract class PythonTree extends AST implements Traverseproc {
     @Override
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && ob == parent;
-    }
-
-    // Handle copying of node, so that the original index and parent is not lost in ast modification
-    public static ClassDef copy(ClassDef node) {
-        return new ClassDef(node.getToken(), node.getInternalName(), node.getInternalBases(),
-                node.getInternalKeywords(), node.getInternalBody(), node.getInternalDecorator_list());
     }
 }

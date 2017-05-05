@@ -85,6 +85,10 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
         this.value = value;
     }
 
+    public Index copy() {
+        return new Index(this.getToken(), this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Index";

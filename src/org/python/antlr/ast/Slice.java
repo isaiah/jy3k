@@ -119,6 +119,10 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
         this.step = step;
     }
 
+    public Slice copy() {
+        return new Slice(this.getToken(), this.lower, this.upper, this.step);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Slice";

@@ -96,6 +96,10 @@ public static final PyType TYPE = PyType.fromClass(Yield.class);
         this.value = value;
     }
 
+    public Yield copy() {
+        return new Yield(this.getToken(), this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Yield";

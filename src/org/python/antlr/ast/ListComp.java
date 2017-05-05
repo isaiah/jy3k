@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(ListComp.class);
         }
     }
 
+    public ListComp copy() {
+        return new ListComp(this.getToken(), this.elt, this.generators);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "ListComp";

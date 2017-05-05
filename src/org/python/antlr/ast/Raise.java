@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
         this.cause = cause;
     }
 
+    public Raise copy() {
+        return new Raise(this.getToken(), this.exc, this.cause);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Raise";

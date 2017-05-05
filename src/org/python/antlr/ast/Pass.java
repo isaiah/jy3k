@@ -75,6 +75,10 @@ public static final PyType TYPE = PyType.fromClass(Pass.class);
         super(TYPE, tree);
     }
 
+    public Pass copy() {
+        return new Pass(this.getToken());
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Pass";

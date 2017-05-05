@@ -103,6 +103,10 @@ public class keyword extends PythonTree {
         this.value = value;
     }
 
+    public keyword copy() {
+        return new keyword(this.getToken(), this.arg, this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "keyword";

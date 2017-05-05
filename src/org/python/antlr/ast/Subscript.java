@@ -130,6 +130,10 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
         this.ctx = ctx;
     }
 
+    public Subscript copy() {
+        return new Subscript(this.getToken(), this.value, this.slice, this.ctx);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Subscript";

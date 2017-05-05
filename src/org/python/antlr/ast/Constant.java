@@ -96,6 +96,10 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
         this.value = value;
     }
 
+    public Constant copy() {
+        return new Constant(this.getToken(), this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Constant";

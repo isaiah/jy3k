@@ -105,6 +105,10 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         }
     }
 
+    public Delete copy() {
+        return new Delete(this.getToken(), this.targets);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Delete";

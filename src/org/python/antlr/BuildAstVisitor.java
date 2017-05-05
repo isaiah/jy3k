@@ -76,6 +76,7 @@ import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.compiler.ClassClosureGenerator;
+import org.python.compiler.Lower;
 import org.python.core.Py;
 
 import java.io.File;
@@ -1228,6 +1229,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         ParseTree ctx = parser.file_input();
         PythonTree ast = v.visit(ctx);
         new ClassClosureGenerator().visit(ast);
+        new Lower().visit(ast);
         System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
         out.write(bytes);

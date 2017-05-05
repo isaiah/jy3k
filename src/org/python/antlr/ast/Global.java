@@ -99,6 +99,10 @@ public static final PyType TYPE = PyType.fromClass(Global.class);
         this.names = names;
     }
 
+    public Global copy() {
+        return new Global(this.getToken(), this.names);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Global";

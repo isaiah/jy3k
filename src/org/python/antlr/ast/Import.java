@@ -105,6 +105,10 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
         }
     }
 
+    public Import copy() {
+        return new Import(this.getToken(), this.names);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Import";

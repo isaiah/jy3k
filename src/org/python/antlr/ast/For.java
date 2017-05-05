@@ -184,6 +184,10 @@ public static final PyType TYPE = PyType.fromClass(For.class);
         }
     }
 
+    public For copy() {
+        return new For(this.getToken(), this.target, this.iter, this.body, this.orelse);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "For";

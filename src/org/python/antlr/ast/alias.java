@@ -104,6 +104,10 @@ public class alias extends PythonTree {
         this.asname = asname;
     }
 
+    public alias copy() {
+        return new alias(this.getToken(), this.name, this.asname);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "alias";

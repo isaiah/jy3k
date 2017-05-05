@@ -102,6 +102,10 @@ public class withitem extends PythonTree {
         this.optional_vars = optional_vars;
     }
 
+    public withitem copy() {
+        return new withitem(this.getToken(), this.context_expr, this.optional_vars);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "withitem";

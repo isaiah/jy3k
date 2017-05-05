@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         this.operand = operand;
     }
 
+    public UnaryOp copy() {
+        return new UnaryOp(this.getToken(), this.op, this.operand);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "UnaryOp";

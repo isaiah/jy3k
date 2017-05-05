@@ -96,6 +96,10 @@ public static final PyType TYPE = PyType.fromClass(Await.class);
         this.value = value;
     }
 
+    public Await copy() {
+        return new Await(this.getToken(), this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Await";

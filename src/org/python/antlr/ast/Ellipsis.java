@@ -75,6 +75,10 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
         super(TYPE, tree);
     }
 
+    public Ellipsis copy() {
+        return new Ellipsis(this.getToken());
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Ellipsis";

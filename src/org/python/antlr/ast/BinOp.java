@@ -130,6 +130,10 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
         this.right = right;
     }
 
+    public BinOp copy() {
+        return new BinOp(this.getToken(), this.left, this.op, this.right);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "BinOp";

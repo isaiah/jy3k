@@ -102,6 +102,10 @@ public static final PyType TYPE = PyType.fromClass(Suite.class);
         }
     }
 
+    public Suite copy() {
+        return new Suite(this.getToken(), this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Suite";

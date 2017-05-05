@@ -75,6 +75,10 @@ public static final PyType TYPE = PyType.fromClass(Break.class);
         super(TYPE, tree);
     }
 
+    public Break copy() {
+        return new Break(this.getToken());
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Break";

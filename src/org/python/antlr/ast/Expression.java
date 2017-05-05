@@ -85,6 +85,10 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
         this.body = body;
     }
 
+    public Expression copy() {
+        return new Expression(this.getToken(), this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Expression";

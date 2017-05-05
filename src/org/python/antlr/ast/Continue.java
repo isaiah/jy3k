@@ -75,6 +75,10 @@ public static final PyType TYPE = PyType.fromClass(Continue.class);
         super(TYPE, tree);
     }
 
+    public Continue copy() {
+        return new Continue(this.getToken());
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Continue";

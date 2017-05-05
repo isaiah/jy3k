@@ -131,6 +131,10 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         }
     }
 
+    public Dict copy() {
+        return new Dict(this.getToken(), this.keys, this.values);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Dict";

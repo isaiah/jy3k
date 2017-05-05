@@ -195,6 +195,11 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         this.returns = returns;
     }
 
+    public FunctionDef copy() {
+        return new FunctionDef(this.getToken(), this.name, this.args, this.body,
+        this.decorator_list, this.returns);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "FunctionDef";

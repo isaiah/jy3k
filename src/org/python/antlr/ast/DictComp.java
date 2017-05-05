@@ -140,6 +140,10 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
         }
     }
 
+    public DictComp copy() {
+        return new DictComp(this.getToken(), this.key, this.value, this.generators);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "DictComp";

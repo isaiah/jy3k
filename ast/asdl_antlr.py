@@ -568,6 +568,13 @@ class JavaVisitor(EmitVisitor):
         self.emit("}", depth)
         self.emit("", 0)
 
+        token = asdl.Field('Token', 'getToken()')
+        fpargs = ", ".join([f"this.{f.name}" for f in [token] + fields])
+        self.emit(f"public {clsname} copy() {{", depth)
+        self.emit(f"return new {clsname}({fpargs});", depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
 
     #This is mainly a kludge to turn get/setType -> get/setExceptType because
     #getType conflicts with a method on PyObject.

@@ -130,6 +130,10 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
         this.value = value;
     }
 
+    public AugAssign copy() {
+        return new AugAssign(this.getToken(), this.target, this.op, this.value);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "AugAssign";

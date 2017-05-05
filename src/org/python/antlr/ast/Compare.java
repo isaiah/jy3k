@@ -144,6 +144,10 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
         }
     }
 
+    public Compare copy() {
+        return new Compare(this.getToken(), this.left, this.ops, this.comparators);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Compare";

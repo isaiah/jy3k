@@ -102,6 +102,10 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         }
     }
 
+    public Module copy() {
+        return new Module(this.getToken(), this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Module";

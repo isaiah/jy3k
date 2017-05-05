@@ -130,6 +130,10 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
         this.orelse = orelse;
     }
 
+    public IfExp copy() {
+        return new IfExp(this.getToken(), this.test, this.body, this.orelse);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "IfExp";

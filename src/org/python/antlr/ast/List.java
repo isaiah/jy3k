@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(List.class);
         this.ctx = ctx;
     }
 
+    public List copy() {
+        return new List(this.getToken(), this.elts, this.ctx);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "List";

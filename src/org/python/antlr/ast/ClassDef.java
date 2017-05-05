@@ -215,6 +215,11 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
     }
 
+    public ClassDef copy() {
+        return new ClassDef(this.getToken(), this.name, this.bases, this.keywords, this.body,
+        this.decorator_list);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "ClassDef";

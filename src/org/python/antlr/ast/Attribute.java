@@ -131,6 +131,10 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
         this.ctx = ctx;
     }
 
+    public Attribute copy() {
+        return new Attribute(this.getToken(), this.value, this.attr, this.ctx);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Attribute";

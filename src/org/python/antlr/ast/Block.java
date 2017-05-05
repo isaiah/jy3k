@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
         }
     }
 
+    public Block copy() {
+        return new Block(this.getToken(), this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Block";

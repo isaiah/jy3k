@@ -70,7 +70,7 @@ class JavaProxyList {
             int n = PySequence.sliceLength(start, stop, step);
             List newList;
             try {
-                newList = list.getClass().newInstance();
+                newList = list.getClass().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw Py.JavaError(e);
             }

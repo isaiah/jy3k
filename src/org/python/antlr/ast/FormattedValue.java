@@ -131,6 +131,10 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
         this.format_spec = format_spec;
     }
 
+    public FormattedValue copy() {
+        return new FormattedValue(this.getToken(), this.value, this.conversion, this.format_spec);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "FormattedValue";

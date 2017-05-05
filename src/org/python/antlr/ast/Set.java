@@ -105,6 +105,10 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         }
     }
 
+    public Set copy() {
+        return new Set(this.getToken(), this.elts);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Set";

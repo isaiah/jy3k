@@ -184,6 +184,10 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
         }
     }
 
+    public AsyncFor copy() {
+        return new AsyncFor(this.getToken(), this.target, this.iter, this.body, this.orelse);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "AsyncFor";

@@ -139,6 +139,10 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         }
     }
 
+    public AsyncWith copy() {
+        return new AsyncWith(this.getToken(), this.items, this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "AsyncWith";

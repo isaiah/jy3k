@@ -210,6 +210,10 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         }
     }
 
+    public Try copy() {
+        return new Try(this.getToken(), this.body, this.handlers, this.orelse, this.finalbody);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Try";

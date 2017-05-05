@@ -122,6 +122,10 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
         }
     }
 
+    public BoolOp copy() {
+        return new BoolOp(this.getToken(), this.op, this.values);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "BoolOp";

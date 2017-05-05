@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
         this.body = body;
     }
 
+    public Lambda copy() {
+        return new Lambda(this.getToken(), this.args, this.body);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Lambda";

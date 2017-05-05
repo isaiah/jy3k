@@ -211,6 +211,11 @@ public class arguments extends PythonTree {
         }
     }
 
+    public arguments copy() {
+        return new arguments(this.getToken(), this.args, this.vararg, this.kwonlyargs,
+        this.kw_defaults, this.kwarg, this.defaults);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "arguments";

@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
         this.msg = msg;
     }
 
+    public Assert copy() {
+        return new Assert(this.getToken(), this.test, this.msg);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Assert";

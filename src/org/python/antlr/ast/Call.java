@@ -150,6 +150,10 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         }
     }
 
+    public Call copy() {
+        return new Call(this.getToken(), this.func, this.args, this.keywords);
+    }
+
     @ExposedGet(name = "repr")
     public String toString() {
         return "Call";
