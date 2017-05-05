@@ -4,6 +4,8 @@
 
 package org.python.util;
 
+import org.objectweb.asm.Type;
+
 import java.util.Arrays;
 
 public class CodegenUtils {
@@ -26,58 +28,59 @@ public class CodegenUtils {
      * Creates a class identifier of form Labc/abc;, from a Class.
      */
     public static String ci(Class n) {
-        if (n.isArray()) {
-            n = n.getComponentType();
-            if (n.isPrimitive()) {
-                if (n == Byte.TYPE) {
-                    return "[B";
-                } else if (n == Boolean.TYPE) {
-                    return "[Z";
-                } else if (n == Short.TYPE) {
-                    return "[S";
-                } else if (n == Character.TYPE) {
-                    return "[C";
-                } else if (n == Integer.TYPE) {
-                    return "[I";
-                } else if (n == Float.TYPE) {
-                    return "[F";
-                } else if (n == Double.TYPE) {
-                    return "[D";
-                } else if (n == Long.TYPE) {
-                    return "[J";
-                } else {
-                    throw new RuntimeException("Unrecognized type in compiler: " + n.getName());
-                }
-            } else {
-                return "[" + ci(n);
-            }
-        } else {
-            if (n.isPrimitive()) {
-                if (n == Byte.TYPE) {
-                    return "B";
-                } else if (n == Boolean.TYPE) {
-                    return "Z";
-                } else if (n == Short.TYPE) {
-                    return "S";
-                } else if (n == Character.TYPE) {
-                    return "C";
-                } else if (n == Integer.TYPE) {
-                    return "I";
-                } else if (n == Float.TYPE) {
-                    return "F";
-                } else if (n == Double.TYPE) {
-                    return "D";
-                } else if (n == Long.TYPE) {
-                    return "J";
-                } else if (n == Void.TYPE) {
-                    return "V";
-                } else {
-                    throw new RuntimeException("Unrecognized type in compiler: " + n.getName());
-                }
-            } else {
-                return "L" + p(n) + ";";
-            }
-        }
+        return Type.getDescriptor(n);
+//        if (n.isArray()) {
+//            n = n.getComponentType();
+//            if (n.isPrimitive()) {
+//                if (n == Byte.TYPE) {
+//                    return "[B";
+//                } else if (n == Boolean.TYPE) {
+//                    return "[Z";
+//                } else if (n == Short.TYPE) {
+//                    return "[S";
+//                } else if (n == Character.TYPE) {
+//                    return "[C";
+//                } else if (n == Integer.TYPE) {
+//                    return "[I";
+//                } else if (n == Float.TYPE) {
+//                    return "[F";
+//                } else if (n == Double.TYPE) {
+//                    return "[D";
+//                } else if (n == Long.TYPE) {
+//                    return "[J";
+//                } else {
+//                    throw new RuntimeException("Unrecognized type in compiler: " + n.getName());
+//                }
+//            } else {
+//                return "[" + ci(n);
+//            }
+//        } else {
+//            if (n.isPrimitive()) {
+//                if (n == Byte.TYPE) {
+//                    return "B";
+//                } else if (n == Boolean.TYPE) {
+//                    return "Z";
+//                } else if (n == Short.TYPE) {
+//                    return "S";
+//                } else if (n == Character.TYPE) {
+//                    return "C";
+//                } else if (n == Integer.TYPE) {
+//                    return "I";
+//                } else if (n == Float.TYPE) {
+//                    return "F";
+//                } else if (n == Double.TYPE) {
+//                    return "D";
+//                } else if (n == Long.TYPE) {
+//                    return "J";
+//                } else if (n == Void.TYPE) {
+//                    return "V";
+//                } else {
+//                    throw new RuntimeException("Unrecognized type in compiler: " + n.getName());
+//                }
+//            } else {
+//                return "L" + p(n) + ";";
+//            }
+//        }
     }
 
     /**
