@@ -4,6 +4,8 @@ package org.python.compiler;
  * Created by isaiah on 5/3/17.
  */
 public enum  CompilerConstants {
+    GEN("__gen"),
+    ITER("iter"),
     RETURN(":return");
 
 

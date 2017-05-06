@@ -13,6 +13,7 @@ import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -195,6 +196,10 @@ public abstract class PythonTree extends AST implements Traverseproc {
         }
         
         return sb.toString();
+    }
+
+    public PythonTree replaceSelf(stmt... others) {
+        return replaceSelf(Arrays.asList(others));
     }
 
     public PythonTree replaceSelf(List<stmt> others) {

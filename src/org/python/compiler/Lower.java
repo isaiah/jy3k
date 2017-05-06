@@ -3,14 +3,24 @@ package org.python.compiler;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Block;
+import org.python.antlr.ast.Call;
+import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.ExceptHandler;
+import org.python.antlr.ast.Expr;
+import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.GeneratorExp;
+import org.python.antlr.ast.If;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Try;
+import org.python.antlr.ast.Yield;
+import org.python.antlr.ast.arg;
+import org.python.antlr.ast.arguments;
+import org.python.antlr.ast.comprehension;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
@@ -20,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.python.compiler.CompilerConstants.GEN;
+import static org.python.compiler.CompilerConstants.ITER;
 import static org.python.compiler.CompilerConstants.RETURN;
 
 /**
@@ -31,8 +43,75 @@ import static org.python.compiler.CompilerConstants.RETURN;
  * lower for loop
  * lower comprehensions
  * lower generator expression
+ * lower with statement
  */
 public class Lower extends Visitor {
+
+    /**
+     * lower generator expression PEP-0289
+     * g = (x for x in range(10))
+     *
+     * becomes
+     *
+     * def __gen(exp):
+     *   for x in exp:
+     *   yield x**2
+     * g = __gen(iter(range(10)))
+     *
+     * @param node
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Object visitAssign(Assign node) throws Exception {
+        if (node.getInternalValue() instanceof GeneratorExp) {
+            lowerGeneratorExp(node);
+        } else {
+            super.visitAssign(node);
+        }
+        return node;
+    }
+
+    private void lowerGeneratorExp(Assign assignNode) {
+        GeneratorExp node = (GeneratorExp) assignNode.getInternalValue();
+        String bound_exp = "_(x)";
+        stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
+
+        expr iter = null;
+        for (int i = node.getInternalGenerators().size() - 1; i >= 0; i--) {
+            comprehension comp = node.getInternalGenerators().get(i);
+            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
+                java.util.List<stmt> bod = new ArrayList<>(1);
+                bod.add(n);
+                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod,
+                        new ArrayList<>());
+            }
+            List<stmt> bod = new ArrayList<>(1);
+            bod.add(n);
+            if (i == 0) {
+                n = new For(comp, comp.getInternalTarget(), new Name(node, bound_exp,
+                        expr_contextType.Load), bod, new ArrayList<>());
+                iter = comp.getInternalIter();
+                continue;
+            }
+            n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod,
+                    new ArrayList<>());
+        }
+
+        java.util.List<stmt> bod = new ArrayList<>(1);
+        bod.add(n);
+        arg arg = new arg(node.getToken(), bound_exp, null);
+        arguments args = new arguments(node.getToken(), asList(arg), null, null, null, null, null);
+        FunctionDef gen = new FunctionDef(node.getToken(), GEN.symbolName(), args, bod, null, null);
+        Name genfunc = new Name(node.getToken(), gen.getInternalName(), expr_contextType.Load);
+        Call iterCall = new Call(node.getToken(), new Name(node.getToken(), ITER.symbolName(), expr_contextType.Load), asList(iter), null);
+        Call genfuncCall = new Call(node.getToken(), genfunc, asList(iterCall), null);
+        assignNode.setInternalValue(genfuncCall);
+        genfunc = genfunc.copy();
+        genfunc.setContext(expr_contextType.Del);
+        Delete delGenfunc = new Delete(node.getToken(), asList(genfunc));
+        assignNode.replaceSelf(gen, assignNode.copy(), delGenfunc);
+    }
 
     @Override
     public Object visitTry(Try node) throws Exception {

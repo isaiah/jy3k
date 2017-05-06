@@ -51,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
