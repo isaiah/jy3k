@@ -1,6 +1,7 @@
 package org.python.antlr;
 
 import org.antlr.v4.runtime.Token;
+import org.python.antlr.ast.Block;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Return;
@@ -194,6 +195,10 @@ public abstract class PythonTree extends AST implements Traverseproc {
         }
         
         return sb.toString();
+    }
+
+    public PythonTree replaceSelf(List<stmt> others) {
+        return replaceSelf(new Block(getToken(), others));
     }
 
     public PythonTree replaceSelf(stmt other) {

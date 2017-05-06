@@ -1,6 +1,5 @@
 package org.python.compiler;
 
-import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Block;
@@ -20,8 +19,8 @@ import org.python.antlr.base.stmt;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.python.compiler.CompilerConstants.RETURN;
 import static java.util.Arrays.asList;
+import static org.python.compiler.CompilerConstants.RETURN;
 
 /**
  * Lower to more primitive operations. After lowering several nodes have been turned into more low level constructs
@@ -54,11 +53,16 @@ public class Lower extends Visitor {
             }
 
             @Override
+            public Object visitTry(Try node) throws Exception {
+                return Lower.this.visitTry(node);
+            }
+
+            @Override
             public Object visitReturn(Return node) {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Name || value instanceof Num || value instanceof NameConstant) {
-                    node.replaceSelf(new Block(node.getToken(), prependFinalBody(finalBody, node.copy())));
+                    node.replaceSelf(prependFinalBody(finalBody, node.copy()));
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     List<stmt> newStmts = new ArrayList<>(finalBody.size() + 2);
@@ -68,16 +72,18 @@ public class Lower extends Visitor {
                     resultNode = resultNode.copy();
                     resultNode.setContext(expr_contextType.Load);
                     newStmts.add(new Return(node.getToken(), resultNode));
-                    node.replaceSelf(new Block(node.getToken(), newStmts));
+                    node.replaceSelf(newStmts);
                 }
                 return node;
             }
         });
+        Try newTryNode;
         if (excepthandlers == null || excepthandlers.isEmpty()) {
-            node.setInternalHandlers(asList(catchAll));
-            return null;
+            Block newBody = new Block(node.getToken(), node.getInternalBody());
+            newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, newBody), asList(catchAll), null, null);
+        } else {
+            newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, node.copy()), asList(catchAll), null, null);
         }
-        Try newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, node.copy()), asList(catchAll), null, null);
         node.replaceSelf(newTryNode);
         return null;
     }
