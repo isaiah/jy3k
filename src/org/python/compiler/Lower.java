@@ -16,6 +16,7 @@ import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
+import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.arg;
@@ -124,7 +125,7 @@ public class Lower extends Visitor {
         excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBody);
         List<excepthandler> excepthandlers = node.getInternalHandlers();
         // when there is no except clause
-        node.accept(new Visitor() {
+        Visitor v = new Visitor() {
             // skip function definition
             @Override
             public Object visitFunctionDef(FunctionDef node) {
@@ -140,7 +141,7 @@ public class Lower extends Visitor {
             public Object visitReturn(Return node) {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
-                if (value == null || value instanceof Name || value instanceof Num || value instanceof NameConstant) {
+                if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
                     node.replaceSelf(prependFinalBody(finalBody, node.copy()));
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
@@ -155,7 +156,8 @@ public class Lower extends Visitor {
                 }
                 return node;
             }
-        });
+        };
+        v.traverse(node);
         Try newTryNode;
         if (excepthandlers == null || excepthandlers.isEmpty()) {
             Block newBody = new Block(node.getToken(), node.getInternalBody());
