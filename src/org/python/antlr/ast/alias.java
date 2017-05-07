@@ -35,6 +35,9 @@ public class alias extends PythonTree {
     public String getInternalName() {
         return name;
     }
+    public void setInternalName(String name) {
+        this.name = name;
+    }
     @ExposedGet(name = "name")
     public PyObject getName() {
         if (name == null) return Py.None;
@@ -48,6 +51,9 @@ public class alias extends PythonTree {
     private String asname;
     public String getInternalAsname() {
         return asname;
+    }
+    public void setInternalAsname(String asname) {
+        this.asname = asname;
     }
     @ExposedGet(name = "asname")
     public PyObject getAsname() {
@@ -132,6 +138,9 @@ public class alias extends PythonTree {
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

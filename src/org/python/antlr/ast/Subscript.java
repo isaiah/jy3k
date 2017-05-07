@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     public slice getInternalSlice() {
         return slice;
     }
+    public void setInternalSlice(slice slice) {
+        this.slice = slice;
+    }
     @ExposedGet(name = "slice")
     public PyObject getSlice() {
         return slice;
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     private expr_contextType ctx;
     public expr_contextType getInternalCtx() {
         return ctx;
+    }
+    public void setInternalCtx(expr_contextType ctx) {
+        this.ctx = ctx;
     }
     @ExposedGet(name = "ctx")
     public PyObject getCtx() {
@@ -119,14 +128,22 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
     public Subscript(Token token, expr value, slice slice, expr_contextType ctx) {
         super(TYPE, token);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.slice = slice;
+        if (this.slice != null)
+            this.slice.setParent(this);
         this.ctx = ctx;
     }
 
     public Subscript(PythonTree tree, expr value, slice slice, expr_contextType ctx) {
         super(TYPE, tree);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.slice = slice;
+        if (this.slice != null)
+            this.slice.setParent(this);
         this.ctx = ctx;
     }
 
@@ -164,6 +181,10 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
             value.accept(visitor);
         if (slice != null)
             slice.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

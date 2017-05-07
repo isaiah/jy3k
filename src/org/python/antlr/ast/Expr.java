@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -89,11 +92,15 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
     public Expr(Token token, expr value) {
         super(TYPE, token);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Expr(PythonTree tree, expr value) {
         super(TYPE, tree);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Expr copy() {
@@ -122,6 +129,10 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

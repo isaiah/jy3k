@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
     public String getInternalS() {
         return s;
     }
+    public void setInternalS(String s) {
+        this.s = s;
+    }
     @ExposedGet(name = "s")
     public PyObject getS() {
         return AstAdapters.bytes2py(s);
@@ -120,6 +123,9 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     public expr getInternalExc() {
         return exc;
     }
+    public void setInternalExc(expr exc) {
+        this.exc = exc;
+    }
     @ExposedGet(name = "exc")
     public PyObject getExc() {
         return exc;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     private expr cause;
     public expr getInternalCause() {
         return cause;
+    }
+    public void setInternalCause(expr cause) {
+        this.cause = cause;
     }
     @ExposedGet(name = "cause")
     public PyObject getCause() {
@@ -104,13 +110,21 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     public Raise(Token token, expr exc, expr cause) {
         super(TYPE, token);
         this.exc = exc;
+        if (this.exc != null)
+            this.exc.setParent(this);
         this.cause = cause;
+        if (this.cause != null)
+            this.cause.setParent(this);
     }
 
     public Raise(PythonTree tree, expr exc, expr cause) {
         super(TYPE, tree);
         this.exc = exc;
+        if (this.exc != null)
+            this.exc.setParent(this);
         this.cause = cause;
+        if (this.cause != null)
+            this.cause.setParent(this);
     }
 
     public Raise copy() {
@@ -144,6 +158,11 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
             exc.accept(visitor);
         if (cause != null)
             cause.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == exc) this.exc = newValue;
+        if (value == cause) this.cause = newValue;
     }
 
     public PyObject __dict__;

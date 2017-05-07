@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     public expr getInternalTarget() {
         return target;
     }
+    public void setInternalTarget(expr target) {
+        this.target = target;
+    }
     @ExposedGet(name = "target")
     public PyObject getTarget() {
         return target;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     private expr annotation;
     public expr getInternalAnnotation() {
         return annotation;
+    }
+    public void setInternalAnnotation(expr annotation) {
+        this.annotation = annotation;
     }
     @ExposedGet(name = "annotation")
     public PyObject getAnnotation() {
@@ -61,6 +67,9 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -73,6 +82,9 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     private Integer simple;
     public Integer getInternalSimple() {
         return simple;
+    }
+    public void setInternalSimple(Integer simple) {
+        this.simple = simple;
     }
     @ExposedGet(name = "simple")
     public PyObject getSimple() {
@@ -135,16 +147,28 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     public AnnAssign(Token token, expr target, expr annotation, expr value, Integer simple) {
         super(TYPE, token);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.simple = simple;
     }
 
     public AnnAssign(PythonTree tree, expr target, expr annotation, expr value, Integer simple) {
         super(TYPE, tree);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.simple = simple;
     }
 
@@ -188,6 +212,12 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
             annotation.accept(visitor);
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == target) this.target = newValue;
+        if (value == annotation) this.annotation = newValue;
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

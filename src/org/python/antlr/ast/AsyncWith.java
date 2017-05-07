@@ -113,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         if (items == null) {
             this.items = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.items.size(); i++) {
+            PythonTree t = this.items.get(i);
+            t.setParent(this);
+        }
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -128,6 +132,10 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         this.items = items;
         if (items == null) {
             this.items = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.items.size(); i++) {
+            PythonTree t = this.items.get(i);
+            t.setParent(this);
         }
         this.body = body;
         if (body == null) {
@@ -178,6 +186,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

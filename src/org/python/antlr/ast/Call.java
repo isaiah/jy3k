@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     public expr getInternalFunc() {
         return func;
     }
+    public void setInternalFunc(expr func) {
+        this.func = func;
+    }
     @ExposedGet(name = "func")
     public PyObject getFunc() {
         return func;
@@ -126,13 +129,23 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     keywords) {
         super(TYPE, token);
         this.func = func;
+        if (this.func != null)
+            this.func.setParent(this);
         this.args = args;
         if (args == null) {
             this.args = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            t.setParent(this);
+        }
         this.keywords = keywords;
         if (keywords == null) {
             this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            t.setParent(this);
         }
     }
 
@@ -140,13 +153,23 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     keywords) {
         super(TYPE, tree);
         this.func = func;
+        if (this.func != null)
+            this.func.setParent(this);
         this.args = args;
         if (args == null) {
             this.args = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            t.setParent(this);
+        }
         this.keywords = keywords;
         if (keywords == null) {
             this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            t.setParent(this);
         }
     }
 
@@ -193,6 +216,14 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == func) this.func = newValue;
+        for (int i=0;i<this.args.size();i++){
+            expr thisVal = this.args.get(i);
+            if (value == thisVal) this.args.set(i,newValue);
         }
     }
 

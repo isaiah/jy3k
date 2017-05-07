@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     public expr getInternalBody() {
         return body;
     }
+    public void setInternalBody(expr body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return body;
@@ -78,11 +81,15 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     public Expression(Token token, expr body) {
         super(TYPE, token);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Expression(PythonTree tree, expr body) {
         super(TYPE, tree);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Expression copy() {
@@ -111,6 +118,10 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (body != null)
             body.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == body) this.body = newValue;
     }
 
     public PyObject __dict__;

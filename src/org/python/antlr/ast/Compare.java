@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     public expr getInternalLeft() {
         return left;
     }
+    public void setInternalLeft(expr left) {
+        this.left = left;
+    }
     @ExposedGet(name = "left")
     public PyObject getLeft() {
         return left;
@@ -126,10 +129,16 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     comparators) {
         super(TYPE, token);
         this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
         this.ops = ops;
         this.comparators = comparators;
         if (comparators == null) {
             this.comparators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.comparators.size(); i++) {
+            PythonTree t = this.comparators.get(i);
+            t.setParent(this);
         }
     }
 
@@ -137,10 +146,16 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     comparators) {
         super(TYPE, tree);
         this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
         this.ops = ops;
         this.comparators = comparators;
         if (comparators == null) {
             this.comparators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.comparators.size(); i++) {
+            PythonTree t = this.comparators.get(i);
+            t.setParent(this);
         }
     }
 
@@ -181,6 +196,14 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == left) this.left = newValue;
+        for (int i=0;i<this.comparators.size();i++){
+            expr thisVal = this.comparators.get(i);
+            if (value == thisVal) this.comparators.set(i,newValue);
         }
     }
 

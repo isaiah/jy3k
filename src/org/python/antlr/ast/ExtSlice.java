@@ -84,6 +84,10 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         if (dims == null) {
             this.dims = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.dims.size(); i++) {
+            PythonTree t = this.dims.get(i);
+            t.setParent(this);
+        }
     }
 
     public ExtSlice(PythonTree tree, java.util.List<slice> dims) {
@@ -91,6 +95,10 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         this.dims = dims;
         if (dims == null) {
             this.dims = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.dims.size(); i++) {
+            PythonTree t = this.dims.get(i);
+            t.setParent(this);
         }
     }
 
@@ -124,6 +132,9 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

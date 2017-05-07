@@ -51,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(List.class);
     public expr_contextType getInternalCtx() {
         return ctx;
     }
+    public void setInternalCtx(expr_contextType ctx) {
+        this.ctx = ctx;
+    }
     @ExposedGet(name = "ctx")
     public PyObject getCtx() {
         return AstAdapters.expr_context2py(ctx);
@@ -110,6 +113,10 @@ public static final PyType TYPE = PyType.fromClass(List.class);
         if (elts == null) {
             this.elts = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.elts.size(); i++) {
+            PythonTree t = this.elts.get(i);
+            t.setParent(this);
+        }
         this.ctx = ctx;
     }
 
@@ -118,6 +125,10 @@ public static final PyType TYPE = PyType.fromClass(List.class);
         this.elts = elts;
         if (elts == null) {
             this.elts = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.elts.size(); i++) {
+            PythonTree t = this.elts.get(i);
+            t.setParent(this);
         }
         this.ctx = ctx;
     }
@@ -154,6 +165,13 @@ public static final PyType TYPE = PyType.fromClass(List.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.elts.size();i++){
+            expr thisVal = this.elts.get(i);
+            if (value == thisVal) this.elts.set(i,newValue);
         }
     }
 

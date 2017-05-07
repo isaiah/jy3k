@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     public Integer getInternalConversion() {
         return conversion;
     }
+    public void setInternalConversion(Integer conversion) {
+        this.conversion = conversion;
+    }
     @ExposedGet(name = "conversion")
     public PyObject getConversion() {
         return Py.newInteger(conversion);
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     private expr format_spec;
     public expr getInternalFormat_spec() {
         return format_spec;
+    }
+    public void setInternalFormat_spec(expr format_spec) {
+        this.format_spec = format_spec;
     }
     @ExposedGet(name = "format_spec")
     public PyObject getFormat_spec() {
@@ -120,15 +129,23 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     public FormattedValue(Token token, expr value, Integer conversion, expr format_spec) {
         super(TYPE, token);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.conversion = conversion;
         this.format_spec = format_spec;
+        if (this.format_spec != null)
+            this.format_spec.setParent(this);
     }
 
     public FormattedValue(PythonTree tree, expr value, Integer conversion, expr format_spec) {
         super(TYPE, tree);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.conversion = conversion;
         this.format_spec = format_spec;
+        if (this.format_spec != null)
+            this.format_spec.setParent(this);
     }
 
     public FormattedValue copy() {
@@ -165,6 +182,11 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
             value.accept(visitor);
         if (format_spec != null)
             format_spec.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
+        if (value == format_spec) this.format_spec = newValue;
     }
 
     public PyObject __dict__;

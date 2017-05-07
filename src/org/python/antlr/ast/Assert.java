@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
     public expr getInternalTest() {
         return test;
     }
+    public void setInternalTest(expr test) {
+        this.test = test;
+    }
     @ExposedGet(name = "test")
     public PyObject getTest() {
         return test;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
     private expr msg;
     public expr getInternalMsg() {
         return msg;
+    }
+    public void setInternalMsg(expr msg) {
+        this.msg = msg;
     }
     @ExposedGet(name = "msg")
     public PyObject getMsg() {
@@ -104,13 +110,21 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
     public Assert(Token token, expr test, expr msg) {
         super(TYPE, token);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.msg = msg;
+        if (this.msg != null)
+            this.msg.setParent(this);
     }
 
     public Assert(PythonTree tree, expr test, expr msg) {
         super(TYPE, tree);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.msg = msg;
+        if (this.msg != null)
+            this.msg.setParent(this);
     }
 
     public Assert copy() {
@@ -144,6 +158,11 @@ public static final PyType TYPE = PyType.fromClass(Assert.class);
             test.accept(visitor);
         if (msg != null)
             msg.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == test) this.test = newValue;
+        if (value == msg) this.msg = newValue;
     }
 
     public PyObject __dict__;

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Name.class);
     public String getInternalId() {
         return id;
     }
+    public void setInternalId(String id) {
+        this.id = id;
+    }
     @ExposedGet(name = "id")
     public PyObject getId() {
         if (id == null) return Py.None;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(Name.class);
     private expr_contextType ctx;
     public expr_contextType getInternalCtx() {
         return ctx;
+    }
+    public void setInternalCtx(expr_contextType ctx) {
+        this.ctx = ctx;
     }
     @ExposedGet(name = "ctx")
     public PyObject getCtx() {
@@ -141,6 +147,9 @@ public static final PyType TYPE = PyType.fromClass(Name.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

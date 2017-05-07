@@ -113,7 +113,13 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         if (targets == null) {
             this.targets = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.targets.size(); i++) {
+            PythonTree t = this.targets.get(i);
+            t.setParent(this);
+        }
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Assign(PythonTree tree, java.util.List<expr> targets, expr value) {
@@ -122,7 +128,13 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         if (targets == null) {
             this.targets = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.targets.size(); i++) {
+            PythonTree t = this.targets.get(i);
+            t.setParent(this);
+        }
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Assign copy() {
@@ -160,6 +172,14 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         }
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.targets.size();i++){
+            expr thisVal = this.targets.get(i);
+            if (value == thisVal) this.targets.set(i,newValue);
+        }
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

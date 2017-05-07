@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     private expr_contextType ctx;
     public expr_contextType getInternalCtx() {
         return ctx;
+    }
+    public void setInternalCtx(expr_contextType ctx) {
+        this.ctx = ctx;
     }
     @ExposedGet(name = "ctx")
     public PyObject getCtx() {
@@ -104,12 +110,16 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     public Starred(Token token, expr value, expr_contextType ctx) {
         super(TYPE, token);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.ctx = ctx;
     }
 
     public Starred(PythonTree tree, expr value, expr_contextType ctx) {
         super(TYPE, tree);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.ctx = ctx;
     }
 
@@ -142,6 +152,10 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

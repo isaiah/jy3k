@@ -7,6 +7,7 @@ import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.VisitorIF;
+import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 import org.python.core.PyObject;
 import org.python.core.PyType;
@@ -90,9 +91,16 @@ public abstract class PythonTree extends AST implements Traverseproc {
     }
 
     public void addChild(PythonTree t, int index, List<stmt> body) {
+        t.setParent(this);
         t.setIndex(index);
         t.setBlock(body);
     }
+
+//    public void addChild(expr t, int index, List<expr> body) {
+//        t.setParent(this);
+//        t.setIndex(index);
+//        t.setBlock(body);
+//    }
 
     /**
      * Converts a list of Name to a dotted-name string.
@@ -137,6 +145,8 @@ public abstract class PythonTree extends AST implements Traverseproc {
 
         return getToken().getText() + "(" + this.getLine() + "," + this.getCharPositionInLine() + ")";
     }
+
+    public void replaceField(expr value, expr newValue) {}
 
     public abstract String toStringTree();
 //    public String toStringTree() {
@@ -207,11 +217,14 @@ public abstract class PythonTree extends AST implements Traverseproc {
     }
 
     public PythonTree replaceSelf(stmt other) {
-        other.setIndex(this.index);
-        other.setParent(parent);
-        other.setBlock(block);
-        block.set(index, other);
-        return other;
+        if (this instanceof stmt) {
+            other.setIndex(this.index);
+            other.setParent(parent);
+            other.setBlock(block);
+            block.set(index, other);
+            return other;
+        }
+        throw new RuntimeException("Only support statement: " + this);
     }
 
     public <R> R accept(VisitorIF<R> visitor) throws Exception {
@@ -221,7 +234,7 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public void traverse(VisitorIF<?> visitor) throws Exception {
         throw new RuntimeException("Cannot traverse node: " + this);
     }
- 
+
     /* Traverseproc implementation */
     @Override
     public int traverse(Visitproc visit, Object arg) {

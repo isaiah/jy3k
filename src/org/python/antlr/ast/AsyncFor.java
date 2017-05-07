@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     public expr getInternalTarget() {
         return target;
     }
+    public void setInternalTarget(expr target) {
+        this.target = target;
+    }
     @ExposedGet(name = "target")
     public PyObject getTarget() {
         return target;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     private expr iter;
     public expr getInternalIter() {
         return iter;
+    }
+    public void setInternalIter(expr iter) {
+        this.iter = iter;
     }
     @ExposedGet(name = "iter")
     public PyObject getIter() {
@@ -142,7 +148,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     java.util.List<stmt> orelse) {
         super(TYPE, token);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -165,7 +175,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
     java.util.List<stmt> orelse) {
         super(TYPE, tree);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -233,6 +247,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFor.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == target) this.target = newValue;
+        if (value == iter) this.iter = newValue;
     }
 
     public PyObject __dict__;

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     public expr getInternalTest() {
         return test;
     }
+    public void setInternalTest(expr test) {
+        this.test = test;
+    }
     @ExposedGet(name = "test")
     public PyObject getTest() {
         return test;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     public expr getInternalBody() {
         return body;
     }
+    public void setInternalBody(expr body) {
+        this.body = body;
+    }
     @ExposedGet(name = "body")
     public PyObject getBody() {
         return body;
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     private expr orelse;
     public expr getInternalOrelse() {
         return orelse;
+    }
+    public void setInternalOrelse(expr orelse) {
+        this.orelse = orelse;
     }
     @ExposedGet(name = "orelse")
     public PyObject getOrelse() {
@@ -119,15 +128,27 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
     public IfExp(Token token, expr test, expr body, expr orelse) {
         super(TYPE, token);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
         this.orelse = orelse;
+        if (this.orelse != null)
+            this.orelse.setParent(this);
     }
 
     public IfExp(PythonTree tree, expr test, expr body, expr orelse) {
         super(TYPE, tree);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
         this.orelse = orelse;
+        if (this.orelse != null)
+            this.orelse.setParent(this);
     }
 
     public IfExp copy() {
@@ -166,6 +187,12 @@ public static final PyType TYPE = PyType.fromClass(IfExp.class);
             body.accept(visitor);
         if (orelse != null)
             orelse.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == test) this.test = newValue;
+        if (value == body) this.body = newValue;
+        if (value == orelse) this.orelse = newValue;
     }
 
     public PyObject __dict__;

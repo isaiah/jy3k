@@ -35,6 +35,9 @@ public class keyword extends PythonTree {
     public String getInternalArg() {
         return arg;
     }
+    public void setInternalArg(String arg) {
+        this.arg = arg;
+    }
     @ExposedGet(name = "arg")
     public PyObject getArg() {
         if (arg == null) return Py.None;
@@ -48,6 +51,9 @@ public class keyword extends PythonTree {
     private expr value;
     public expr getInternalValue() {
         return value;
+    }
+    public void setInternalValue(expr value) {
+        this.value = value;
     }
     @ExposedGet(name = "value")
     public PyObject getValue() {
@@ -95,12 +101,16 @@ public class keyword extends PythonTree {
         super(TYPE, token);
         this.arg = arg;
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public keyword(PythonTree tree, String arg, expr value) {
         super(TYPE, tree);
         this.arg = arg;
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public keyword copy() {
@@ -133,6 +143,10 @@ public class keyword extends PythonTree {
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

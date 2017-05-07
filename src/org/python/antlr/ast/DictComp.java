@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     public expr getInternalKey() {
         return key;
     }
+    public void setInternalKey(expr key) {
+        this.key = key;
+    }
     @ExposedGet(name = "key")
     public PyObject getKey() {
         return key;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     private expr value;
     public expr getInternalValue() {
         return value;
+    }
+    public void setInternalValue(expr value) {
+        this.value = value;
     }
     @ExposedGet(name = "value")
     public PyObject getValue() {
@@ -122,10 +128,18 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     public DictComp(Token token, expr key, expr value, java.util.List<comprehension> generators) {
         super(TYPE, token);
         this.key = key;
+        if (this.key != null)
+            this.key.setParent(this);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.generators = generators;
         if (generators == null) {
             this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            t.setParent(this);
         }
     }
 
@@ -133,10 +147,18 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     generators) {
         super(TYPE, tree);
         this.key = key;
+        if (this.key != null)
+            this.key.setParent(this);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.generators = generators;
         if (generators == null) {
             this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            t.setParent(this);
         }
     }
 
@@ -180,6 +202,11 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == key) this.key = newValue;
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

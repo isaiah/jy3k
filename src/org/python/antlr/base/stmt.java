@@ -38,6 +38,7 @@ public abstract class stmt extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
+    public abstract stmt copy();
     public stmt(PyType subtype) {
         super(subtype);
     }

@@ -95,6 +95,10 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
         if (names == null) {
             this.names = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.names.size(); i++) {
+            PythonTree t = this.names.get(i);
+            t.setParent(this);
+        }
     }
 
     public Import(PythonTree tree, java.util.List<alias> names) {
@@ -102,6 +106,10 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
         this.names = names;
         if (names == null) {
             this.names = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.names.size(); i++) {
+            PythonTree t = this.names.get(i);
+            t.setParent(this);
         }
     }
 
@@ -135,6 +143,9 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

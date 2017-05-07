@@ -134,6 +134,9 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         }
     }
 
+    public void replaceField(expr value, expr newValue) {
+    }
+
     public PyObject __dict__;
 
     @Override

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     public unaryopType getInternalOp() {
         return op;
     }
+    public void setInternalOp(unaryopType op) {
+        this.op = op;
+    }
     @ExposedGet(name = "op")
     public PyObject getOp() {
         return AstAdapters.unaryop2py(op);
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     private expr operand;
     public expr getInternalOperand() {
         return operand;
+    }
+    public void setInternalOperand(expr operand) {
+        this.operand = operand;
     }
     @ExposedGet(name = "operand")
     public PyObject getOperand() {
@@ -105,12 +111,16 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         super(TYPE, token);
         this.op = op;
         this.operand = operand;
+        if (this.operand != null)
+            this.operand.setParent(this);
     }
 
     public UnaryOp(PythonTree tree, unaryopType op, expr operand) {
         super(TYPE, tree);
         this.op = op;
         this.operand = operand;
+        if (this.operand != null)
+            this.operand.setParent(this);
     }
 
     public UnaryOp copy() {
@@ -142,6 +152,10 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (operand != null)
             operand.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == operand) this.operand = newValue;
     }
 
     public PyObject __dict__;

@@ -95,6 +95,10 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         if (values == null) {
             this.values = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.values.size(); i++) {
+            PythonTree t = this.values.get(i);
+            t.setParent(this);
+        }
     }
 
     public JoinedStr(PythonTree tree, java.util.List<expr> values) {
@@ -102,6 +106,10 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         this.values = values;
         if (values == null) {
             this.values = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.values.size(); i++) {
+            PythonTree t = this.values.get(i);
+            t.setParent(this);
         }
     }
 
@@ -134,6 +142,13 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.values.size();i++){
+            expr thisVal = this.values.get(i);
+            if (value == thisVal) this.values.set(i,newValue);
         }
     }
 

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
     public String getInternalModule() {
         return module;
     }
+    public void setInternalModule(String module) {
+        this.module = module;
+    }
     @ExposedGet(name = "module")
     public PyObject getModule() {
         if (module == null) return Py.None;
@@ -64,6 +67,9 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
     private Integer level;
     public Integer getInternalLevel() {
         return level;
+    }
+    public void setInternalLevel(Integer level) {
+        this.level = level;
     }
     @ExposedGet(name = "level")
     public PyObject getLevel() {
@@ -127,6 +133,10 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         if (names == null) {
             this.names = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.names.size(); i++) {
+            PythonTree t = this.names.get(i);
+            t.setParent(this);
+        }
         this.level = level;
     }
 
@@ -136,6 +146,10 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         this.names = names;
         if (names == null) {
             this.names = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.names.size(); i++) {
+            PythonTree t = this.names.get(i);
+            t.setParent(this);
         }
         this.level = level;
     }
@@ -176,6 +190,9 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     public expr getInternalValue() {
         return value;
     }
+    public void setInternalValue(expr value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return value;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     private String attr;
     public String getInternalAttr() {
         return attr;
+    }
+    public void setInternalAttr(String attr) {
+        this.attr = attr;
     }
     @ExposedGet(name = "attr")
     public PyObject getAttr() {
@@ -61,6 +67,9 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     private expr_contextType ctx;
     public expr_contextType getInternalCtx() {
         return ctx;
+    }
+    public void setInternalCtx(expr_contextType ctx) {
+        this.ctx = ctx;
     }
     @ExposedGet(name = "ctx")
     public PyObject getCtx() {
@@ -120,6 +129,8 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     public Attribute(Token token, expr value, String attr, expr_contextType ctx) {
         super(TYPE, token);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.attr = attr;
         this.ctx = ctx;
     }
@@ -127,6 +138,8 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     public Attribute(PythonTree tree, expr value, String attr, expr_contextType ctx) {
         super(TYPE, tree);
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
         this.attr = attr;
         this.ctx = ctx;
     }
@@ -163,6 +176,10 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

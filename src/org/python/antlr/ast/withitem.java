@@ -35,6 +35,9 @@ public class withitem extends PythonTree {
     public expr getInternalContext_expr() {
         return context_expr;
     }
+    public void setInternalContext_expr(expr context_expr) {
+        this.context_expr = context_expr;
+    }
     @ExposedGet(name = "context_expr")
     public PyObject getContext_expr() {
         return context_expr;
@@ -47,6 +50,9 @@ public class withitem extends PythonTree {
     private expr optional_vars;
     public expr getInternalOptional_vars() {
         return optional_vars;
+    }
+    public void setInternalOptional_vars(expr optional_vars) {
+        this.optional_vars = optional_vars;
     }
     @ExposedGet(name = "optional_vars")
     public PyObject getOptional_vars() {
@@ -93,13 +99,21 @@ public class withitem extends PythonTree {
     public withitem(Token token, expr context_expr, expr optional_vars) {
         super(TYPE, token);
         this.context_expr = context_expr;
+        if (this.context_expr != null)
+            this.context_expr.setParent(this);
         this.optional_vars = optional_vars;
+        if (this.optional_vars != null)
+            this.optional_vars.setParent(this);
     }
 
     public withitem(PythonTree tree, expr context_expr, expr optional_vars) {
         super(TYPE, tree);
         this.context_expr = context_expr;
+        if (this.context_expr != null)
+            this.context_expr.setParent(this);
         this.optional_vars = optional_vars;
+        if (this.optional_vars != null)
+            this.optional_vars.setParent(this);
     }
 
     public withitem copy() {
@@ -134,6 +148,11 @@ public class withitem extends PythonTree {
             context_expr.accept(visitor);
         if (optional_vars != null)
             optional_vars.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == context_expr) this.context_expr = newValue;
+        if (value == optional_vars) this.optional_vars = newValue;
     }
 
     public PyObject __dict__;

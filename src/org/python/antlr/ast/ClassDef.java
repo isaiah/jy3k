@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     public String getInternalName() {
         return name;
     }
+    public void setInternalName(String name) {
+        this.name = name;
+    }
     @ExposedGet(name = "name")
     public PyObject getName() {
         if (name == null) return Py.None;
@@ -170,9 +173,17 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         if (bases == null) {
             this.bases = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.bases.size(); i++) {
+            PythonTree t = this.bases.get(i);
+            t.setParent(this);
+        }
         this.keywords = keywords;
         if (keywords == null) {
             this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            t.setParent(this);
         }
         this.body = body;
         if (body == null) {
@@ -185,6 +196,10 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
             this.decorator_list = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            t.setParent(this);
         }
     }
 
@@ -197,9 +212,17 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         if (bases == null) {
             this.bases = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.bases.size(); i++) {
+            PythonTree t = this.bases.get(i);
+            t.setParent(this);
+        }
         this.keywords = keywords;
         if (keywords == null) {
             this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            t.setParent(this);
         }
         this.body = body;
         if (body == null) {
@@ -212,6 +235,10 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         this.decorator_list = decorator_list;
         if (decorator_list == null) {
             this.decorator_list = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            t.setParent(this);
         }
     }
 
@@ -275,6 +302,17 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.bases.size();i++){
+            expr thisVal = this.bases.get(i);
+            if (value == thisVal) this.bases.set(i,newValue);
+        }
+        for (int i=0;i<this.decorator_list.size();i++){
+            expr thisVal = this.decorator_list.get(i);
+            if (value == thisVal) this.decorator_list.set(i,newValue);
         }
     }
 

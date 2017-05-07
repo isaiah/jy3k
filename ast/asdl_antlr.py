@@ -286,6 +286,8 @@ class JavaVisitor(EmitVisitor):
 
         self.attributes(sum, name, depth);
 
+        if str(name) == 'stmt':
+            self.emit("public abstract stmt copy();", depth+1)
         self.emit("public %(name)s(PyType subtype) {" % locals(), depth+1)
         self.emit("super(subtype);", depth+2)
         self.emit("}", depth+1)
@@ -404,17 +406,23 @@ class JavaVisitor(EmitVisitor):
             not_simple = True
             if f.typedef is not None and is_simple(f.typedef):
                 not_simple = False
-            #For now ignoring String -- will want to revisit
-            if not_simple and fparg.find("String") == -1:
+            builtin_type = f.type in self.bltinnames
+            if not_simple:
                 if f.seq:
                     self.emit("if (%s == null) {" % f.name, depth+1);
                     self.emit("this.%s = new ArrayList<>(0);" % f.name, depth+2)
                     self.emit("}", depth+1)
-                    if self.javaType(f, False) == 'stmt':
+                    if not builtin_type:
                         self.emit("for(int i = 0; i < this.%(name)s.size(); i++) {" % {"name":f.name}, depth+1)
                         self.emit("PythonTree t = this.%s.get(i);" % f.name, depth+2)
-                        self.emit("addChild(t, i, this.%s);" % f.name, depth+2)
+                        if f.type == 'stmt':
+                            self.emit("addChild(t, i, this.%s);" % f.name, depth+2)
+                        else:
+                            self.emit("t.setParent(this);", depth+2)
                         self.emit("}", depth+1)
+                elif not builtin_type:
+                    self.emit(f"if (this.{f.name} != null)", depth+1)
+                    self.emit(f"this.{f.name}.setParent(this);", depth+2)
 
     #XXX: this method used to emit a pickle(DataOutputStream ostream) for cPickle support.
     #     If we want to re-add it, see Jython 2.2's pickle method in its ast nodes.
@@ -472,6 +480,20 @@ class JavaVisitor(EmitVisitor):
                 self.emit('if (%s != null)' % f.name, depth+1)
                 self.emit('%s.accept(visitor);' % f.name, depth+2)
         self.emit('}', depth)
+        self.emit("", 0)
+
+        # For ast modification
+        self.emit("public void replaceField(expr value, expr newValue) {", depth)
+        for f in fields:
+            if f.type == 'expr':
+                if f.seq:
+                    self.emit(f"for (int i=0;i<this.{f.name}.size();i++){{", depth+1)
+                    self.emit(f"expr thisVal = this.{f.name}.get(i);",depth+2)
+                    self.emit(f"if (value == thisVal) this.{f.name}.set(i,newValue);", depth+2)
+                    self.emit("}", depth+1)
+                else:
+                    self.emit(f"if (value == {f.name}) this.{f.name} = newValue;", depth+1)
+        self.emit("}", depth)
         self.emit("", 0)
 
         self.emit('public PyObject __dict__;', depth)
@@ -590,11 +612,10 @@ class JavaVisitor(EmitVisitor):
             str(field.name).capitalize()), depth)
         self.emit("return %s;" % field.name, depth+1)
         self.emit("}", depth)
-        if (field.seq):
-            self.emit("public void setInternal%s(%s %s) {" % (str(field.name).capitalize(),
-                self.javaType(field), field.name), depth)
-            self.emit("this.%s = %s;" % (field.name, field.name), depth+1)
-            self.emit("}", depth)
+        self.emit("public void setInternal%s(%s %s) {" % (str(field.name).capitalize(),
+            self.javaType(field), field.name), depth)
+        self.emit("this.%s = %s;" % (field.name, field.name), depth+1)
+        self.emit("}", depth)
 
         self.emit('@ExposedGet(name = "%s")' % field.name, depth)
         self.emit("public PyObject get%s() {" % self.processFieldName(field.name), depth)

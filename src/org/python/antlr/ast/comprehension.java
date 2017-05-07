@@ -35,6 +35,9 @@ public class comprehension extends PythonTree {
     public expr getInternalTarget() {
         return target;
     }
+    public void setInternalTarget(expr target) {
+        this.target = target;
+    }
     @ExposedGet(name = "target")
     public PyObject getTarget() {
         return target;
@@ -47,6 +50,9 @@ public class comprehension extends PythonTree {
     private expr iter;
     public expr getInternalIter() {
         return iter;
+    }
+    public void setInternalIter(expr iter) {
+        this.iter = iter;
     }
     @ExposedGet(name = "iter")
     public PyObject getIter() {
@@ -111,20 +117,36 @@ public class comprehension extends PythonTree {
     public comprehension(Token token, expr target, expr iter, java.util.List<expr> ifs) {
         super(TYPE, token);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
         this.ifs = ifs;
         if (ifs == null) {
             this.ifs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.ifs.size(); i++) {
+            PythonTree t = this.ifs.get(i);
+            t.setParent(this);
         }
     }
 
     public comprehension(PythonTree tree, expr target, expr iter, java.util.List<expr> ifs) {
         super(TYPE, tree);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
         this.ifs = ifs;
         if (ifs == null) {
             this.ifs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.ifs.size(); i++) {
+            PythonTree t = this.ifs.get(i);
+            t.setParent(this);
         }
     }
 
@@ -168,6 +190,15 @@ public class comprehension extends PythonTree {
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == target) this.target = newValue;
+        if (value == iter) this.iter = newValue;
+        for (int i=0;i<this.ifs.size();i++){
+            expr thisVal = this.ifs.get(i);
+            if (value == thisVal) this.ifs.set(i,newValue);
         }
     }
 

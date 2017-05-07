@@ -92,11 +92,17 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
     public Nonlocal(Token token, java.util.List<String> names) {
         super(TYPE, token);
         this.names = names;
+        if (names == null) {
+            this.names = new ArrayList<>(0);
+        }
     }
 
     public Nonlocal(PythonTree tree, java.util.List<String> names) {
         super(TYPE, tree);
         this.names = names;
+        if (names == null) {
+            this.names = new ArrayList<>(0);
+        }
     }
 
     public Nonlocal copy() {
@@ -123,6 +129,9 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     public arguments getInternalArgs() {
         return args;
     }
+    public void setInternalArgs(arguments args) {
+        this.args = args;
+    }
     @ExposedGet(name = "args")
     public PyObject getArgs() {
         return args;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     private expr body;
     public expr getInternalBody() {
         return body;
+    }
+    public void setInternalBody(expr body) {
+        this.body = body;
     }
     @ExposedGet(name = "body")
     public PyObject getBody() {
@@ -104,13 +110,21 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     public Lambda(Token token, arguments args, expr body) {
         super(TYPE, token);
         this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Lambda(PythonTree tree, arguments args, expr body) {
         super(TYPE, tree);
         this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
         this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Lambda copy() {
@@ -144,6 +158,10 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
             args.accept(visitor);
         if (body != null)
             body.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == body) this.body = newValue;
     }
 
     public PyObject __dict__;

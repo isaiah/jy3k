@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     public expr getInternalTarget() {
         return target;
     }
+    public void setInternalTarget(expr target) {
+        this.target = target;
+    }
     @ExposedGet(name = "target")
     public PyObject getTarget() {
         return target;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     public operatorType getInternalOp() {
         return op;
     }
+    public void setInternalOp(operatorType op) {
+        this.op = op;
+    }
     @ExposedGet(name = "op")
     public PyObject getOp() {
         return AstAdapters.operator2py(op);
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     private expr value;
     public expr getInternalValue() {
         return value;
+    }
+    public void setInternalValue(expr value) {
+        this.value = value;
     }
     @ExposedGet(name = "value")
     public PyObject getValue() {
@@ -119,15 +128,23 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     public AugAssign(Token token, expr target, operatorType op, expr value) {
         super(TYPE, token);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.op = op;
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public AugAssign(PythonTree tree, expr target, operatorType op, expr value) {
         super(TYPE, tree);
         this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
         this.op = op;
         this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public AugAssign copy() {
@@ -164,6 +181,11 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
             target.accept(visitor);
         if (value != null)
             value.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == target) this.target = newValue;
+        if (value == value) this.value = newValue;
     }
 
     public PyObject __dict__;

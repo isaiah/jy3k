@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     public expr getInternalType() {
         return type;
     }
+    public void setInternalType(expr type) {
+        this.type = type;
+    }
     @ExposedGet(name = "type")
     public PyObject getExceptType() {
         return type;
@@ -47,6 +50,9 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     private String name;
     public String getInternalName() {
         return name;
+    }
+    public void setInternalName(String name) {
+        this.name = name;
     }
     @ExposedGet(name = "name")
     public PyObject getName() {
@@ -123,6 +129,8 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     public ExceptHandler(Token token, expr type, String name, java.util.List<stmt> body) {
         super(TYPE, token);
         this.type = type;
+        if (this.type != null)
+            this.type.setParent(this);
         this.name = name;
         this.body = body;
         if (body == null) {
@@ -137,6 +145,8 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     public ExceptHandler(PythonTree tree, expr type, String name, java.util.List<stmt> body) {
         super(TYPE, tree);
         this.type = type;
+        if (this.type != null)
+            this.type.setParent(this);
         this.name = name;
         this.body = body;
         if (body == null) {
@@ -186,6 +196,10 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == type) this.type = newValue;
     }
 
     public PyObject __dict__;

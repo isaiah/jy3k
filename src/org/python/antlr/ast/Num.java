@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     public Object getInternalN() {
         return n;
     }
+    public void setInternalN(Object n) {
+        this.n = n;
+    }
     @ExposedGet(name = "n")
     public PyObject getN() {
         return (PyObject)n;
@@ -120,6 +123,9 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

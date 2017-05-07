@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
     public String getInternalValue() {
         return value;
     }
+    public void setInternalValue(String value) {
+        this.value = value;
+    }
     @ExposedGet(name = "value")
     public PyObject getValue() {
         return AstAdapters.constant2py(value);
@@ -120,6 +123,9 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
     }
 
     public void traverse(VisitorIF<?> visitor) throws Exception {
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

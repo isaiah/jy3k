@@ -95,6 +95,10 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         if (targets == null) {
             this.targets = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.targets.size(); i++) {
+            PythonTree t = this.targets.get(i);
+            t.setParent(this);
+        }
     }
 
     public Delete(PythonTree tree, java.util.List<expr> targets) {
@@ -102,6 +106,10 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         this.targets = targets;
         if (targets == null) {
             this.targets = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.targets.size(); i++) {
+            PythonTree t = this.targets.get(i);
+            t.setParent(this);
         }
     }
 
@@ -134,6 +142,13 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.targets.size();i++){
+            expr thisVal = this.targets.get(i);
+            if (value == thisVal) this.targets.set(i,newValue);
         }
     }
 

@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     public expr getInternalLower() {
         return lower;
     }
+    public void setInternalLower(expr lower) {
+        this.lower = lower;
+    }
     @ExposedGet(name = "lower")
     public PyObject getLower() {
         return lower;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     public expr getInternalUpper() {
         return upper;
     }
+    public void setInternalUpper(expr upper) {
+        this.upper = upper;
+    }
     @ExposedGet(name = "upper")
     public PyObject getUpper() {
         return upper;
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     private expr step;
     public expr getInternalStep() {
         return step;
+    }
+    public void setInternalStep(expr step) {
+        this.step = step;
     }
     @ExposedGet(name = "step")
     public PyObject getStep() {
@@ -108,15 +117,27 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     public Slice(Token token, expr lower, expr upper, expr step) {
         super(TYPE, token);
         this.lower = lower;
+        if (this.lower != null)
+            this.lower.setParent(this);
         this.upper = upper;
+        if (this.upper != null)
+            this.upper.setParent(this);
         this.step = step;
+        if (this.step != null)
+            this.step.setParent(this);
     }
 
     public Slice(PythonTree tree, expr lower, expr upper, expr step) {
         super(TYPE, tree);
         this.lower = lower;
+        if (this.lower != null)
+            this.lower.setParent(this);
         this.upper = upper;
+        if (this.upper != null)
+            this.upper.setParent(this);
         this.step = step;
+        if (this.step != null)
+            this.step.setParent(this);
     }
 
     public Slice copy() {
@@ -155,6 +176,12 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
             upper.accept(visitor);
         if (step != null)
             step.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == lower) this.lower = newValue;
+        if (value == upper) this.upper = newValue;
+        if (value == step) this.step = newValue;
     }
 
     public PyObject __dict__;

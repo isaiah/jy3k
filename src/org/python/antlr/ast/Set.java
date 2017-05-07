@@ -95,6 +95,10 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         if (elts == null) {
             this.elts = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.elts.size(); i++) {
+            PythonTree t = this.elts.get(i);
+            t.setParent(this);
+        }
     }
 
     public Set(PythonTree tree, java.util.List<expr> elts) {
@@ -102,6 +106,10 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         this.elts = elts;
         if (elts == null) {
             this.elts = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.elts.size(); i++) {
+            PythonTree t = this.elts.get(i);
+            t.setParent(this);
         }
     }
 
@@ -134,6 +142,13 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.elts.size();i++){
+            expr thisVal = this.elts.get(i);
+            if (value == thisVal) this.elts.set(i,newValue);
         }
     }
 

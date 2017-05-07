@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(SetComp.class);
     public expr getInternalElt() {
         return elt;
     }
+    public void setInternalElt(expr elt) {
+        this.elt = elt;
+    }
     @ExposedGet(name = "elt")
     public PyObject getElt() {
         return elt;
@@ -107,18 +110,30 @@ public static final PyType TYPE = PyType.fromClass(SetComp.class);
     public SetComp(Token token, expr elt, java.util.List<comprehension> generators) {
         super(TYPE, token);
         this.elt = elt;
+        if (this.elt != null)
+            this.elt.setParent(this);
         this.generators = generators;
         if (generators == null) {
             this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            t.setParent(this);
         }
     }
 
     public SetComp(PythonTree tree, expr elt, java.util.List<comprehension> generators) {
         super(TYPE, tree);
         this.elt = elt;
+        if (this.elt != null)
+            this.elt.setParent(this);
         this.generators = generators;
         if (generators == null) {
             this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            t.setParent(this);
         }
     }
 
@@ -157,6 +172,10 @@ public static final PyType TYPE = PyType.fromClass(SetComp.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == elt) this.elt = newValue;
     }
 
     public PyObject __dict__;

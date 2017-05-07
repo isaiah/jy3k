@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     public String getInternalName() {
         return name;
     }
+    public void setInternalName(String name) {
+        this.name = name;
+    }
     @ExposedGet(name = "name")
     public PyObject getName() {
         if (name == null) return Py.None;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     private arguments args;
     public arguments getInternalArgs() {
         return args;
+    }
+    public void setInternalArgs(arguments args) {
+        this.args = args;
     }
     @ExposedGet(name = "args")
     public PyObject getArgs() {
@@ -93,6 +99,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     private expr returns;
     public expr getInternalReturns() {
         return returns;
+    }
+    public void setInternalReturns(expr returns) {
+        this.returns = returns;
     }
     @ExposedGet(name = "returns")
     public PyObject getReturns() {
@@ -160,6 +169,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         super(TYPE, token);
         this.name = name;
         this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -172,7 +183,13 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         if (decorator_list == null) {
             this.decorator_list = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            t.setParent(this);
+        }
         this.returns = returns;
+        if (this.returns != null)
+            this.returns.setParent(this);
     }
 
     public AsyncFunctionDef(PythonTree tree, String name, arguments args, java.util.List<stmt>
@@ -180,6 +197,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         super(TYPE, tree);
         this.name = name;
         this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -192,7 +211,13 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         if (decorator_list == null) {
             this.decorator_list = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            t.setParent(this);
+        }
         this.returns = returns;
+        if (this.returns != null)
+            this.returns.setParent(this);
     }
 
     public AsyncFunctionDef copy() {
@@ -248,6 +273,14 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         }
         if (returns != null)
             returns.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.decorator_list.size();i++){
+            expr thisVal = this.decorator_list.get(i);
+            if (value == thisVal) this.decorator_list.set(i,newValue);
+        }
+        if (value == returns) this.returns = newValue;
     }
 
     public PyObject __dict__;

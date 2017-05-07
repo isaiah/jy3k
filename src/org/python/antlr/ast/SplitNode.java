@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     public String getInternalName() {
         return name;
     }
+    public void setInternalName(String name) {
+        this.name = name;
+    }
     @ExposedGet(name = "name")
     public PyObject getName() {
         if (name == null) return Py.None;
@@ -64,6 +67,9 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     private stmt funcdef;
     public stmt getInternalFuncdef() {
         return funcdef;
+    }
+    public void setInternalFuncdef(stmt funcdef) {
+        this.funcdef = funcdef;
     }
     @ExposedGet(name = "funcdef")
     public PyObject getFuncdef() {
@@ -132,6 +138,8 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
             addChild(t, i, this.body);
         }
         this.funcdef = funcdef;
+        if (this.funcdef != null)
+            this.funcdef.setParent(this);
     }
 
     public SplitNode(PythonTree tree, String name, java.util.List<stmt> body, stmt funcdef) {
@@ -146,6 +154,8 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
             addChild(t, i, this.body);
         }
         this.funcdef = funcdef;
+        if (this.funcdef != null)
+            this.funcdef.setParent(this);
     }
 
     public SplitNode copy() {
@@ -186,6 +196,9 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
         }
         if (funcdef != null)
             funcdef.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
     }
 
     public PyObject __dict__;

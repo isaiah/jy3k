@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(If.class);
     public expr getInternalTest() {
         return test;
     }
+    public void setInternalTest(expr test) {
+        this.test = test;
+    }
     @ExposedGet(name = "test")
     public PyObject getTest() {
         return test;
@@ -125,6 +128,8 @@ public static final PyType TYPE = PyType.fromClass(If.class);
     public If(Token token, expr test, java.util.List<stmt> body, java.util.List<stmt> orelse) {
         super(TYPE, token);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -146,6 +151,8 @@ public static final PyType TYPE = PyType.fromClass(If.class);
     public If(PythonTree tree, expr test, java.util.List<stmt> body, java.util.List<stmt> orelse) {
         super(TYPE, tree);
         this.test = test;
+        if (this.test != null)
+            this.test.setParent(this);
         this.body = body;
         if (body == null) {
             this.body = new ArrayList<>(0);
@@ -208,6 +215,10 @@ public static final PyType TYPE = PyType.fromClass(If.class);
                     t.accept(visitor);
             }
         }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == test) this.test = newValue;
     }
 
     public PyObject __dict__;

@@ -98,6 +98,9 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
     public void traverse(VisitorIF<?> visitor) throws Exception {
     }
 
+    public void replaceField(expr value, expr newValue) {
+    }
+
     public PyObject __dict__;
 
     @Override

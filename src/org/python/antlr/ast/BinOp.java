@@ -35,6 +35,9 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     public expr getInternalLeft() {
         return left;
     }
+    public void setInternalLeft(expr left) {
+        this.left = left;
+    }
     @ExposedGet(name = "left")
     public PyObject getLeft() {
         return left;
@@ -48,6 +51,9 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     public operatorType getInternalOp() {
         return op;
     }
+    public void setInternalOp(operatorType op) {
+        this.op = op;
+    }
     @ExposedGet(name = "op")
     public PyObject getOp() {
         return AstAdapters.operator2py(op);
@@ -60,6 +66,9 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     private expr right;
     public expr getInternalRight() {
         return right;
+    }
+    public void setInternalRight(expr right) {
+        this.right = right;
     }
     @ExposedGet(name = "right")
     public PyObject getRight() {
@@ -119,15 +128,23 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     public BinOp(Token token, expr left, operatorType op, expr right) {
         super(TYPE, token);
         this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
         this.op = op;
         this.right = right;
+        if (this.right != null)
+            this.right.setParent(this);
     }
 
     public BinOp(PythonTree tree, expr left, operatorType op, expr right) {
         super(TYPE, tree);
         this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
         this.op = op;
         this.right = right;
+        if (this.right != null)
+            this.right.setParent(this);
     }
 
     public BinOp copy() {
@@ -164,6 +181,11 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
             left.accept(visitor);
         if (right != null)
             right.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == left) this.left = newValue;
+        if (value == right) this.right = newValue;
     }
 
     public PyObject __dict__;

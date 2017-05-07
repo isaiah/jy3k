@@ -1,5 +1,6 @@
 package org.python.compiler;
 
+import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Block;
@@ -47,6 +48,7 @@ import static org.python.compiler.CompilerConstants.RETURN;
  * lower with statement
  */
 public class Lower extends Visitor {
+    private int count;
 
     /**
      * lower generator expression PEP-0289
@@ -63,23 +65,14 @@ public class Lower extends Visitor {
      * @return
      * @throws Exception
      */
-    @Override
-    public Object visitAssign(Assign node) throws Exception {
-        if (node.getInternalValue() instanceof GeneratorExp) {
-            lowerGeneratorExp(node);
-        } else {
-            super.visitAssign(node);
-        }
-        return node;
-    }
 
-    private void lowerGeneratorExp(Assign assignNode) {
-        GeneratorExp node = (GeneratorExp) assignNode.getInternalValue();
-        String bound_exp = "_(x)";
+    @Override
+    public Object visitGeneratorExp(GeneratorExp node) {
+        String bound_exp = "_(exp)";
         stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
 
         expr iter = null;
-        for (int i = node.getInternalGenerators().size() - 1; i >= 0; i--) {
+        for (int i = 0; i < node.getInternalGenerators().size(); i++) {
             comprehension comp = node.getInternalGenerators().get(i);
             for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
                 java.util.List<stmt> bod = new ArrayList<>(1);
@@ -89,7 +82,7 @@ public class Lower extends Visitor {
             }
             List<stmt> bod = new ArrayList<>(1);
             bod.add(n);
-            if (i == 0) {
+            if (i == node.getInternalGenerators().size() - 1) {
                 n = new For(comp, comp.getInternalTarget(), new Name(node, bound_exp,
                         expr_contextType.Load), bod, new ArrayList<>());
                 iter = comp.getInternalIter();
@@ -103,15 +96,24 @@ public class Lower extends Visitor {
         bod.add(n);
         arg arg = new arg(node.getToken(), bound_exp, null);
         arguments args = new arguments(node.getToken(), asList(arg), null, null, null, null, null);
-        FunctionDef gen = new FunctionDef(node.getToken(), GEN.symbolName(), args, bod, null, null);
+        FunctionDef gen = new FunctionDef(node.getToken(), GEN.symbolName() + count++, args, bod, null, null);
         Name genfunc = new Name(node.getToken(), gen.getInternalName(), expr_contextType.Load);
         Call iterCall = new Call(node.getToken(), new Name(node.getToken(), ITER.symbolName(), expr_contextType.Load), asList(iter), null);
         Call genfuncCall = new Call(node.getToken(), genfunc, asList(iterCall), null);
-        assignNode.setInternalValue(genfuncCall);
+        PythonTree parent = node.getParent();
+
         genfunc = genfunc.copy();
         genfunc.setContext(expr_contextType.Del);
         Delete delGenfunc = new Delete(node.getToken(), asList(genfunc));
-        assignNode.replaceSelf(gen, assignNode.copy(), delGenfunc);
+        // replace genexp with call
+        parent.replaceField(node, genfuncCall);
+        // Find the statement that hold the parent
+        while(!(parent instanceof stmt)) {
+            parent = parent.getParent();
+        }
+        // insert function definition and del
+        parent.replaceSelf(gen, ((stmt) parent).copy(), delGenfunc);
+        return node;
     }
 
     @Override
@@ -125,7 +127,7 @@ public class Lower extends Visitor {
         excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBody);
         List<excepthandler> excepthandlers = node.getInternalHandlers();
         // when there is no except clause
-        Visitor v = new Visitor() {
+        Visitor tryVisitor = new Visitor() {
             // skip function definition
             @Override
             public Object visitFunctionDef(FunctionDef node) {
@@ -157,7 +159,7 @@ public class Lower extends Visitor {
                 return node;
             }
         };
-        v.traverse(node);
+        tryVisitor.traverse(node);
         Try newTryNode;
         if (excepthandlers == null || excepthandlers.isEmpty()) {
             Block newBody = new Block(node.getToken(), node.getInternalBody());

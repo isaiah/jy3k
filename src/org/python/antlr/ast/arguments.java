@@ -51,6 +51,9 @@ public class arguments extends PythonTree {
     public arg getInternalVararg() {
         return vararg;
     }
+    public void setInternalVararg(arg vararg) {
+        this.vararg = vararg;
+    }
     @ExposedGet(name = "vararg")
     public PyObject getVararg() {
         return vararg;
@@ -95,6 +98,9 @@ public class arguments extends PythonTree {
     private arg kwarg;
     public arg getInternalKwarg() {
         return kwarg;
+    }
+    public void setInternalKwarg(arg kwarg) {
+        this.kwarg = kwarg;
     }
     @ExposedGet(name = "kwarg")
     public PyObject getKwarg() {
@@ -172,19 +178,39 @@ public class arguments extends PythonTree {
         if (args == null) {
             this.args = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            t.setParent(this);
+        }
         this.vararg = vararg;
+        if (this.vararg != null)
+            this.vararg.setParent(this);
         this.kwonlyargs = kwonlyargs;
         if (kwonlyargs == null) {
             this.kwonlyargs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.kwonlyargs.size(); i++) {
+            PythonTree t = this.kwonlyargs.get(i);
+            t.setParent(this);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
             this.kw_defaults = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.kw_defaults.size(); i++) {
+            PythonTree t = this.kw_defaults.get(i);
+            t.setParent(this);
+        }
         this.kwarg = kwarg;
+        if (this.kwarg != null)
+            this.kwarg.setParent(this);
         this.defaults = defaults;
         if (defaults == null) {
             this.defaults = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.defaults.size(); i++) {
+            PythonTree t = this.defaults.get(i);
+            t.setParent(this);
         }
     }
 
@@ -195,19 +221,39 @@ public class arguments extends PythonTree {
         if (args == null) {
             this.args = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            t.setParent(this);
+        }
         this.vararg = vararg;
+        if (this.vararg != null)
+            this.vararg.setParent(this);
         this.kwonlyargs = kwonlyargs;
         if (kwonlyargs == null) {
             this.kwonlyargs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.kwonlyargs.size(); i++) {
+            PythonTree t = this.kwonlyargs.get(i);
+            t.setParent(this);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
             this.kw_defaults = new ArrayList<>(0);
         }
+        for(int i = 0; i < this.kw_defaults.size(); i++) {
+            PythonTree t = this.kw_defaults.get(i);
+            t.setParent(this);
+        }
         this.kwarg = kwarg;
+        if (this.kwarg != null)
+            this.kwarg.setParent(this);
         this.defaults = defaults;
         if (defaults == null) {
             this.defaults = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.defaults.size(); i++) {
+            PythonTree t = this.defaults.get(i);
+            t.setParent(this);
         }
     }
 
@@ -279,6 +325,17 @@ public class arguments extends PythonTree {
                 if (t != null)
                     t.accept(visitor);
             }
+        }
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        for (int i=0;i<this.kw_defaults.size();i++){
+            expr thisVal = this.kw_defaults.get(i);
+            if (value == thisVal) this.kw_defaults.set(i,newValue);
+        }
+        for (int i=0;i<this.defaults.size();i++){
+            expr thisVal = this.defaults.get(i);
+            if (value == thisVal) this.defaults.set(i,newValue);
         }
     }
 

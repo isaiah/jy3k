@@ -35,6 +35,9 @@ public class arg extends PythonTree {
     public String getInternalArg() {
         return arg;
     }
+    public void setInternalArg(String arg) {
+        this.arg = arg;
+    }
     @ExposedGet(name = "arg")
     public PyObject getArg() {
         if (arg == null) return Py.None;
@@ -48,6 +51,9 @@ public class arg extends PythonTree {
     private expr annotation;
     public expr getInternalAnnotation() {
         return annotation;
+    }
+    public void setInternalAnnotation(expr annotation) {
+        this.annotation = annotation;
     }
     @ExposedGet(name = "annotation")
     public PyObject getAnnotation() {
@@ -95,12 +101,16 @@ public class arg extends PythonTree {
         super(TYPE, token);
         this.arg = arg;
         this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
     }
 
     public arg(PythonTree tree, String arg, expr annotation) {
         super(TYPE, tree);
         this.arg = arg;
         this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
     }
 
     public arg copy() {
@@ -133,6 +143,10 @@ public class arg extends PythonTree {
     public void traverse(VisitorIF<?> visitor) throws Exception {
         if (annotation != null)
             annotation.accept(visitor);
+    }
+
+    public void replaceField(expr value, expr newValue) {
+        if (value == annotation) this.annotation = newValue;
     }
 
     public PyObject __dict__;
