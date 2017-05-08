@@ -594,7 +594,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         java.util.List<comprehension> comps = null;
         if (ctx.comp_for() != null) {
             comps = visit_Comp_for(ctx.comp_for());
-            Collections.reverse(comps);
         }
 
         if (!ctx.COLON().isEmpty()) {
