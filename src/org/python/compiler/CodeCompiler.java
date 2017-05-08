@@ -2937,7 +2937,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         stmt n = new Expr(node, new Yield(node, elt));
 
         expr iter = null;
-        for (int i = generators.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < generators.size(); i++) {
             comprehension comp = generators.get(i);
             for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
                 java.util.List<stmt> bod = new ArrayList<stmt>();
@@ -2947,7 +2947,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
             java.util.List<stmt> bod = new ArrayList<stmt>();
             bod.add(n);
-            if (i != 0) {
+            if (i != generators.size() - 1) {
                 n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod, //
                         new ArrayList<stmt>());
             } else {
@@ -2991,80 +2991,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitGeneratorExp(GeneratorExp node) throws Exception {
-        String bound_exp = "_(x)";
-
-        setline(node);
-
-        code.new_(p(PyFunction.class));
-        code.dup();
-        loadFrame();
-        code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-
-        ScopeInfo scope = module.getScopeInfo(node);
-
-        int emptyArray = makeArray(new ArrayList<expr>());
-        code.aload(emptyArray);
-
-        code.new_(p(PyDictionary.class));
-        code.dup();
-        code.invokespecial(p(PyDictionary.class), "<init>",
-                sig(Void.TYPE));
-
-        scope.setup_closure();
-        scope.dump();
-
-        stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
-
-        expr iter = null;
-        for (int i = node.getInternalGenerators().size() - 1; i >= 0; i--) {
-            comprehension comp = node.getInternalGenerators().get(i);
-            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
-                java.util.List<stmt> bod = new ArrayList<stmt>();
-                bod.add(n);
-                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod, //
-                        new ArrayList<stmt>());
-            }
-            java.util.List<stmt> bod = new ArrayList<stmt>();
-            bod.add(n);
-            if (i != 0) {
-                n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod, //
-                        new ArrayList<stmt>());
-            } else {
-                n = new For(comp, comp.getInternalTarget(), new Name(node, bound_exp, //
-                        expr_contextType.Load), bod, new ArrayList<stmt>());
-                iter = comp.getInternalIter();
-            }
-        }
-
-        java.util.List<stmt> bod = new ArrayList<stmt>();
-        bod.add(n);
-        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className,
-                node.getLine(), scope, cflags).get(code);
-
-        code.aconst_null();
-        if (!makeClosure(scope)) {
-            code.invokespecial(p(PyFunction.class), "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class));
-        } else {
-            code.invokespecial(
-                    p(PyFunction.class),
-                    "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class,
-                            PyObject[].class));
-        }
-        int genExp = storeTop();
-
-        visit(iter);
-        code.aload(genExp);
-        code.freeLocal(genExp);
-        code.swap();
-        code.invokevirtual(p(PyObject.class), "__iter__", sig(PyObject.class));
-        loadThreadState();
-        code.swap();
-        code.invokevirtual(p(PyObject.class), "__call__",
-                sig(PyObject.class, ThreadState.class, PyObject.class));
-        freeArray(emptyArray);
-
+        visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
         return null;
     }
 
