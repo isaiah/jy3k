@@ -1,5 +1,6 @@
 package org.python.compiler;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Vector;
 
@@ -32,7 +33,6 @@ public class Code extends MethodVisitor implements Opcodes {
     }
     
     public int getLocal(String type) {
-        //Could optimize this to skip arguments?
         for(int l = argcount; l<nlocals; l++) {
             if (locals[l] == null) {
                 locals[l] = type;
@@ -44,8 +44,8 @@ public class Code extends MethodVisitor implements Opcodes {
             System.arraycopy(locals, 0, new_locals, 0, locals.length);
             locals = new_locals;
         }
-        locals[nlocals] = type;
-        nlocals += 1;
+        locals[nlocals++] = type;
+        int l = nlocals - 1;
         return nlocals-1;
     }
 
@@ -74,13 +74,13 @@ public class Code extends MethodVisitor implements Opcodes {
         return returnLocal;
     }
 
-    public Vector<String> getActiveLocals() {
-        Vector<String> ret = new Vector<String>();
-        ret.setSize(nlocals);
+    public String[] getActiveLocals() {
+        String[] ret = new String[nlocals];
+        Arrays.fill(ret, null);
         for (int l = argcount; l<nlocals; l++) {
             if (l == returnLocal || finallyLocals.get(l))
                 continue;
-            ret.setElementAt(locals[l], l);
+            ret[l] = locals[l];
         }
         return ret;
     }
