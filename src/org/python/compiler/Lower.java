@@ -16,6 +16,7 @@ import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.expr_contextType;
+import org.python.antlr.ast.operatorType;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
@@ -197,9 +198,11 @@ public class Lower extends Visitor {
 
     @Override
     public Object visitAugAssign(AugAssign node) {
-        expr right = node.getInternalTarget().copy();
-        ((Context) right).setContext(expr_contextType.Load);
-        BinOp binOp = new BinOp(node, node.getInternalValue(), node.getInternalOp(), right);
+        expr left = node.getInternalTarget().copy();
+        ((Context) left).setContext(expr_contextType.Load);
+        operatorType op = node.getInternalOp();
+        op.inplace = true;
+        BinOp binOp = new BinOp(node, left, node.getInternalOp(), node.getInternalValue());
         expr target = node.getInternalTarget().copy();
         ((Context) target).setContext(expr_contextType.Store);
         Assign ret = new Assign(node, asList(target), binOp);

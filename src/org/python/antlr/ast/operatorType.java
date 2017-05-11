@@ -18,4 +18,5 @@ public enum operatorType {
     BitXor,
     BitAnd,
     FloorDiv;
+    public boolean inplace = false;
 }

@@ -181,6 +181,9 @@ class JavaVisitor(EmitVisitor):
             self.emit("%s," % type.name, depth + 1)
         self.emit("%s;" % sum.types[len(sum.types) - 1].name, depth + 1)
 
+        if name == 'operator':
+            self.emit("public boolean inplace = false;", depth+1)
+
         self.emit("}", depth)
         self.close()
 
@@ -286,8 +289,8 @@ class JavaVisitor(EmitVisitor):
 
         self.attributes(sum, name, depth);
 
-        if str(name) == 'stmt' || str(name) == 'expr':
-            self.emit("public abstract stmt copy();", depth+1)
+        if str(name) == 'stmt' or str(name) == 'expr':
+            self.emit(f"public abstract {name} copy();", depth+1)
         self.emit("public %(name)s(PyType subtype) {" % locals(), depth+1)
         self.emit("super(subtype);", depth+2)
         self.emit("}", depth+1)
