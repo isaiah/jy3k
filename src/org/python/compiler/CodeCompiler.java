@@ -1269,9 +1269,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
 
             if (handler.getInternalName() != null) {
-                code.aload(exc);
                 code.getfield(p(PyException.class), "value", ci(PyObject.class));
-                set(new Name(handler, handler.getInternalName(), expr_contextType.Store));
+                set(new Name(handler, handler.getInternalName(), expr_contextType.Store), exc);
             }
 
             // do exception body
@@ -1283,69 +1282,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.athrow();
     }
 
-//    public Object visitTryFinally(Try node) throws Exception {
-//        if (node.getInternalFinalbody() == null) {
-//            return visitTry(node);
-//        }
-//        Label start = new Label();
-//        Label end = new Label();
-//        Label handlerStart = new Label();
-//        Label finallyEnd = new Label();
-//
-//        Object ret;
-//
-//        ExceptionHandler inFinally = new ExceptionHandler(node);
-//
-//        // Do protected suite
-//        exceptionHandlers.push(inFinally);
-//
-//        int excLocal = code.getLocal(p(Throwable.class));
-//        code.aconst_null();
-//        code.astore(excLocal);
-//
-//        code.label(start);
-//        inFinally.exceptionStarts.add(start);
-//
-//        visitTry(node);
-////        ret = suite(node.getInternalBody());
-//
-//        code.label(end);
-//        inFinally.exceptionEnds.add(end);
-//        inFinally.bodyDone = true;
-//
-//        exceptionHandlers.pop();
-//
-////        if (ret == NoExit) {
-//        inlineFinally(inFinally);
-//        code.goto_(finallyEnd);
-////        }
-//
-//        // Handle any Exceptions that get thrown in suite
-//        code.label(handlerStart);
-//        code.astore(excLocal);
-//
-//        code.aload(excLocal);
-//        loadFrame();
-//
-//        code.invokestatic(p(Py.class), "setException",
-//                sig(PyException.class, Throwable.class, PyFrame.class));
-//        code.pop();
-//
-//        inlineFinally(inFinally);
-////        popException();
-//        code.aload(excLocal);
-//        code.checkcast(p(Throwable.class));
-//        code.athrow();
-//
-//        code.label(finallyEnd);
-//
-//        code.freeLocal(excLocal);
-//
-//        inFinally.addExceptionHandlers(handlerStart);
-//        // According to any JVM verifiers, this code block might not return
-//        return null;
-//    }
-//
     private void inlineFinally(ExceptionHandler handler) throws Exception {
         if (!handler.bodyDone) {
             // end the previous exception block so inlined finally code doesn't
