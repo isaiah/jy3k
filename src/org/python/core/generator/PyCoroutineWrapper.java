@@ -1,5 +1,9 @@
-package org.python.core;
+package org.python.core.generator;
 
+import org.python.core.BuiltinDocs;
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyType;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedType;
 

@@ -1,6 +1,20 @@
 /* Copyright (c) Jython Developers */
-package org.python.core;
+package org.python.core.generator;
 
+import org.python.core.BuiltinDocs;
+import org.python.core.CodeFlag;
+import org.python.core.Py;
+import org.python.core.PyBaseCode;
+import org.python.core.PyCode;
+import org.python.core.PyException;
+import org.python.core.PyFrame;
+import org.python.core.PyIterator;
+import org.python.core.PyObject;
+import org.python.core.PyTraceback;
+import org.python.core.PyType;
+import org.python.core.PyUnicode;
+import org.python.core.ThreadState;
+import org.python.core.Visitproc;
 import org.python.core.finalization.FinalizableBuiltin;
 import org.python.core.finalization.FinalizeTrigger;
 import org.python.expose.ExposedGet;
@@ -21,7 +35,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     @ExposedGet
     protected boolean gi_running;
 
-    private PyObject closure;
+    protected PyObject closure;
 
     public PyGenerator(PyFrame frame, PyObject closure) {
         this(TYPE, frame, closure);
@@ -44,6 +58,9 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     @ExposedMethod(doc = BuiltinDocs.generator_send_doc)
     final PyObject generator_send(PyObject value) {
         if (gi_frame == null) {
+            if (this instanceof PyAsyncGenerator) {
+                throw Py.StopAsyncIteration();
+            }
             throw Py.StopIteration();
         }
 
@@ -217,7 +234,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             }
             String msg = String.format("Exception %s: %s in %s", className, pye.value.__repr__(),
                                        __repr__());
-            Py.stdout.println(new PyUnicode(msg));
+            Py.println(new PyUnicode(msg));
         } catch (Throwable t) {
             // but we currently ignore any Java exception completely. perhaps we
             // can also output something meaningful too?
@@ -348,5 +365,9 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
 
     private String tp() {
         return this instanceof PyCoroutine ? "coroutine" : "generator";
+    }
+
+    public boolean isFlagSet(CodeFlag flag) {
+        return ((PyBaseCode) gi_code).co_flags.isFlagSet(flag);
     }
 }

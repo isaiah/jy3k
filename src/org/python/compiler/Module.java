@@ -291,7 +291,9 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
             _moreflags |= CodeFlag.CO_NOFREE.flag;
         }
 
-        if (scope.async) {
+        if (scope.async_gen) {
+            _moreflags |= CodeFlag.CO_ASYNC_GENERATOR.flag;
+        } else if (scope.async) {
             _moreflags |= CodeFlag.CO_COROUTINE.flag;
         } else if (scope.generator) {
             _moreflags |= CodeFlag.CO_GENERATOR.flag;

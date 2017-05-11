@@ -407,7 +407,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     @Override
     public Object visitYield(Yield node) throws Exception {
         if (cur.async) {
-            throw new ParseException("'yield' inside async function", node);
+            cur.async_gen = true;
         }
         cur.defineAsGenerator();
         cur.yield_count++;

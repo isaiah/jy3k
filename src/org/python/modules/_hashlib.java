@@ -151,10 +151,6 @@ public class _hashlib implements ClassDictInit {
 
         private static final MessageDigest getDigest(String name) {
             try {
-                // since sha 224 is not present in java.security
-                if (name.equals("sha-224")) {
-                    return new SHA224Digest();
-                }
                 return MessageDigest.getInstance(name);
             } catch (NoSuchAlgorithmException nsae) {
                 throw Py.ValueError("unsupported hash type");
@@ -234,7 +230,7 @@ public class _hashlib implements ClassDictInit {
                 c = c > 9 ? c + 'a' - 10 : c + '0';
                 hexDigest[j++] = (char)c;
             }
-            return Py.newString(new String(hexDigest));
+            return new PyUnicode(new String(hexDigest));
         }
 
         public PyObject copy() {

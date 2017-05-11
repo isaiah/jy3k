@@ -1,5 +1,11 @@
-package org.python.core;
+package org.python.core.generator;
 
+import org.python.core.BuiltinDocs;
+import org.python.core.Py;
+import org.python.core.PyCode;
+import org.python.core.PyFrame;
+import org.python.core.PyObject;
+import org.python.core.PyType;
 import org.python.core.finalization.FinalizeTrigger;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;

@@ -463,6 +463,11 @@ public class PyList extends PySequenceList implements List {
         return buf.toString();
     }
 
+    @ExposedMethod(doc = BuiltinDocs.list_copy_doc)
+    final synchronized PyObject list_copy() {
+        return getslice(0, __len__());
+    }
+
     /**
      * Add a single element to the end of list.
      *

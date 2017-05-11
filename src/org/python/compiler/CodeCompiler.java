@@ -87,7 +87,7 @@ import org.python.core.ContextGuard;
 import org.python.core.ContextManager;
 import org.python.core.Py;
 import org.python.core.PyCode;
-import org.python.core.PyCoroutine;
+import org.python.core.generator.PyCoroutine;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
