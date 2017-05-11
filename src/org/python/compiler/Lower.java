@@ -261,9 +261,9 @@ public class Lower extends Visitor {
         // when there is no except clause
         if (excepthandlers == null || excepthandlers.isEmpty()) {
             Block newBody = new Block(node.getToken(), node.getInternalBody());
-            newTryNode = new Try(node.getToken(), asList(finalBlock, newBody), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), asList(newBody, finalBlock), asList(catchAll), null, null);
         } else {
-            newTryNode = new Try(node.getToken(), asList(finalBlock, node.copy()), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), asList(node.copy(), finalBlock), asList(catchAll), null, null);
         }
         node.replaceSelf(newTryNode);
         return null;
