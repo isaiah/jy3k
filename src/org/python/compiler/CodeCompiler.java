@@ -15,7 +15,6 @@ import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncFunctionDef;
 import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
-import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
@@ -110,7 +109,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
-import java.util.Vector;
 
 import static org.python.util.CodegenUtils.*;
 
@@ -130,7 +128,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private String className;
     private Deque<Label> continueLabels, breakLabels;
     private Deque<ExceptionHandler> exceptionHandlers;
-    private Vector<Label> yields = new Vector<Label>();
+    private java.util.List<Label> yields;
 
     final static Method contextGuard_getManager =
             Method.getMethod("org.python.core.ContextManager getManager (org.python.core.PyObject)");
@@ -154,6 +152,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         continueLabels = new LinkedList<>();
         breakLabels = new LinkedList<>();
         exceptionHandlers = new LinkedList<>();
+        yields = new ArrayList<>();
     }
 
     public void popException() throws Exception {
@@ -563,7 +562,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         saveLocals();
 
         Label restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
 
         loadFrame();
@@ -571,7 +570,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
+        yields.add(nonYieldSection);
         code.label(nonYieldSection);
         restoreLocals();
 
@@ -610,7 +609,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         saveLocals();
 
         Label restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
 
         loadFrame();
@@ -618,7 +617,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
+        yields.add(nonYieldSection);
         code.label(nonYieldSection);
         restoreLocals();
 
@@ -648,7 +647,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
 
         Label restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
         restoreLocals();
 
@@ -700,7 +699,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         Label end = new Label();
         code.label(end);
         for (ExceptionHandler handler:  exceptionHandlers) {
-            handler.exceptionEnds.addElement(end);
+            handler.exceptionEnds.add(end);
         }
     }
 
@@ -708,7 +707,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         Label start = new Label();
         code.label(start);
         for (ExceptionHandler handler:  exceptionHandlers) {
-            handler.exceptionStarts.addElement(start);
+            handler.exceptionStarts.add(start);
         }
     }
 
@@ -1074,7 +1073,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
 
         Label restartIter = new Label();
-        yields.addElement(restartIter);
+        yields.add(restartIter);
         code.label(restartIter);
 
         loadFrame();
@@ -1082,7 +1081,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         Label nonYieldSectionIter = new Label();
-        yields.addElement(nonYieldSectionIter);
+        yields.add(nonYieldSectionIter);
         code.label(nonYieldSectionIter);
         restoreLocals();
 
@@ -1121,7 +1120,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
 
         Label restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
 
         loadFrame();
@@ -1129,7 +1128,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
+        yields.add(nonYieldSection);
         code.label(nonYieldSection);
 //        restoreLocals();
 
@@ -1305,13 +1304,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //        code.astore(excLocal);
 //
 //        code.label(start);
-//        inFinally.exceptionStarts.addElement(start);
+//        inFinally.exceptionStarts.add(start);
 //
 //        visitTry(node);
 ////        ret = suite(node.getInternalBody());
 //
 //        code.label(end);
-//        inFinally.exceptionEnds.addElement(end);
+//        inFinally.exceptionEnds.add(end);
 //        inFinally.bodyDone = true;
 //
 //        exceptionHandlers.pop();
@@ -1353,7 +1352,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             // get covered by our exception handler.
             Label end = new Label();
             code.label(end);
-            handler.exceptionEnds.addElement(end);
+            handler.exceptionEnds.add(end);
             // also exiting the try: portion of this particular finally
         }
         if (handler.isFinallyHandler()) {
@@ -1365,7 +1364,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // restart exception coverage
         Label restart = new Label();
         code.label(restart);
-        handler.exceptionStarts.addElement(restart);
+        handler.exceptionStarts.add(restart);
     }
 
     /**
@@ -1396,13 +1395,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         ExceptionHandler handler = new ExceptionHandler();
 
         code.label(start);
-        handler.exceptionStarts.addElement(start);
+        handler.exceptionStarts.add(start);
         exceptionHandlers.push(handler);
         // Do suite
         Object exit = suite(node.getInternalBody());
         exceptionHandlers.pop();
         code.label(end);
-        handler.exceptionEnds.addElement(end);
+        handler.exceptionEnds.add(end);
 
         if (exit == null) {
             code.goto_(handler_end);
@@ -2610,7 +2609,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         saveLocals();
 
         Label restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
 
         loadFrame();
@@ -2618,7 +2617,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
+        yields.add(nonYieldSection);
         code.label(nonYieldSection);
         restoreLocals();
 
@@ -2660,7 +2659,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 compiler.saveLocals();
 
                 Label restart = new Label();
-                compiler.yields.addElement(restart);
+                compiler.yields.add(restart);
                 compiler.code.label(restart);
 
                 compiler.loadFrame();
@@ -2668,7 +2667,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 compiler.code.areturn();
                 compiler.yield_count++;
                 Label nonYieldSection = new Label();
-                compiler.yields.addElement(nonYieldSection);
+                compiler.yields.add(nonYieldSection);
                 compiler.code.label(nonYieldSection);
                 compiler.restoreLocals();
 
@@ -2683,7 +2682,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // try-catch block here
         ExceptionHandler handler = new ExceptionHandler();
         exceptionHandlers.push(handler);
-        handler.exceptionStarts.addElement(label_body_start);
+        handler.exceptionStarts.add(label_body_start);
 
         // VAR = value # Only if "as VAR" is present
         code.label(label_body_start);
@@ -2698,7 +2697,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         exceptionHandlers.pop();
         exceptionHandlers.pop();
         code.label(label_body_end);
-        handler.exceptionEnds.addElement(label_body_end);
+        handler.exceptionEnds.add(label_body_end);
 
         // FINALLY if *not* non-local-goto
         if (blockResult == NoExit) {
@@ -2714,7 +2713,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //        exceptionHandlers.pop();
 //        exceptionHandlers.pop();
 //        code.label(label_body_end);
-//        handler.exceptionEnds.addElement(label_body_end);
+//        handler.exceptionEnds.add(label_body_end);
 
         // CATCH
         code.label(label_catch);
@@ -2739,7 +2738,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         saveLocals();
 
         restart = new Label();
-        yields.addElement(restart);
+        yields.add(restart);
         code.label(restart);
 
         loadFrame();
@@ -2747,7 +2746,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         yield_count++;
         nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
+        yields.add(nonYieldSection);
         code.label(nonYieldSection);
         restoreLocals();
 
@@ -2833,7 +2832,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // try-catch block here
         ExceptionHandler handler = new ExceptionHandler();
         exceptionHandlers.push(handler);
-        handler.exceptionStarts.addElement(label_body_start);
+        handler.exceptionStarts.add(label_body_start);
 
         // VAR = value # Only if "as VAR" is present
         code.label(label_body_start);
@@ -2848,7 +2847,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         exceptionHandlers.pop();
         exceptionHandlers.pop();
         code.label(label_body_end);
-        handler.exceptionEnds.addElement(label_body_end);
+        handler.exceptionEnds.add(label_body_end);
 
         // FINALLY if *not* non-local-goto
         if (blockResult == NoExit) {
@@ -2915,8 +2914,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          * <p>
          * We also need to stop coverage for the recovery of the locals after a yield.
          */
-        public Vector<Label> exceptionStarts = new Vector<Label>();
-        public Vector<Label> exceptionEnds = new Vector<Label>();
+        public java.util.List<Label> exceptionStarts = new ArrayList<>();
+        public java.util.List<Label> exceptionEnds = new ArrayList<>();
         public boolean bodyDone = false;
         public PythonTree node = null;
 
@@ -2933,11 +2932,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         public void addExceptionHandlers(Label handlerStart) throws Exception {
             for (int i = 0; i < exceptionStarts.size(); ++i) {
-                Label start = exceptionStarts.elementAt(i);
-                Label end = exceptionEnds.elementAt(i);
+                Label start = exceptionStarts.get(i);
+                Label end = exceptionEnds.get(i);
                 // the start and end label has to match
                 if (start.getOffset() != end.getOffset()) {
-                    code.trycatch(exceptionStarts.elementAt(i), exceptionEnds.elementAt(i),
+                    code.trycatch(exceptionStarts.get(i), exceptionEnds.get(i),
                             handlerStart, p(Throwable.class));
                 }
             }
