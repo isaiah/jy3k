@@ -2193,7 +2193,7 @@ public final class Py {
     /**
      * concat an array of strings, used by byte compiler
      */
-    public static PyObject buildString(PyUnicode[] strs) {
+    public static PyObject buildString(PyObject[] strs) {
         return EmptyUnicode.join(new PyTuple(strs));
     }
 

@@ -1269,8 +1269,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
 
             if (handler.getInternalName() != null) {
+                code.aload(exc);
                 code.getfield(p(PyException.class), "value", ci(PyObject.class));
-                set(new Name(handler, handler.getInternalName(), expr_contextType.Store), exc);
+                set(new Name(handler, handler.getInternalName(), expr_contextType.Store));
             }
 
             // do exception body
@@ -2390,17 +2391,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<expr> values = node.getInternalValues();
         int n = values.size();
         code.iconst(n);
-        code.anewarray(p(PyUnicode.class));
+        code.anewarray(p(PyObject.class));
 
-        for (int i = 0; i < values.size(); i++) {
+        for (int i = 0; i < n; i++) {
             code.dup();
-            visit(values.get(i));
-            code.swap();
             code.iconst(i);
-            code.swap();
+            visit(values.get(i));
             code.aastore();
         }
-        code.invokestatic(p(Py.class), "buildString", sig(PyObject.class, PyUnicode[].class));
+        code.invokestatic(p(Py.class), "buildString", sig(PyObject.class, PyObject[].class));
         return null;
     }
 

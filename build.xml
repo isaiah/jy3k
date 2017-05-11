@@ -136,7 +136,7 @@
         <property name="test.source.dir" value="${jython.base.dir}/tests/java" />
         <property name="test.shell.dir" value="${jython.base.dir}/tests/shell" />
         <property name="templates.dir" value="${source.dir}/templates" />
-        <property name="python.lib" value="${jython.base.dir}/lib-python/3.5.1" />
+        <property name="python.lib" value="${jython.base.dir}/lib-python/3.6.0" />
         <property name="bugtests.dir" value="${jython.base.dir}/bugtests" />
         <property name="templates.lazy" value="true" />
         <property name="extlibs.dir" value="${jython.base.dir}/lib" />
