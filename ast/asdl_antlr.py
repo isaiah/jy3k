@@ -286,7 +286,7 @@ class JavaVisitor(EmitVisitor):
 
         self.attributes(sum, name, depth);
 
-        if str(name) == 'stmt':
+        if str(name) == 'stmt' || str(name) == 'expr':
             self.emit("public abstract stmt copy();", depth+1)
         self.emit("public %(name)s(PyType subtype) {" % locals(), depth+1)
         self.emit("super(subtype);", depth+2)

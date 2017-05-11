@@ -38,6 +38,7 @@ public abstract class expr extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyUnicode[] get_attributes() { return attributes; }
 
+    public abstract expr copy();
     public expr(PyType subtype) {
         super(subtype);
     }

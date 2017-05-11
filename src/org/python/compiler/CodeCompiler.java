@@ -87,7 +87,6 @@ import org.python.core.CompilerFlags;
 import org.python.core.ContextGuard;
 import org.python.core.ContextManager;
 import org.python.core.Py;
-import org.python.core.PyBoolean;
 import org.python.core.PyCode;
 import org.python.core.PyCoroutine;
 import org.python.core.PyDictionary;
@@ -110,7 +109,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
@@ -125,12 +123,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private Code code;
     private CompilerFlags cflags;
     private int temporary;
-    private expr_contextType augmode;
-    private int augtmp1;
-    private int augtmp2;
-    private int augtmp3;
-    private int augtmp4;
-    private boolean fast_locals, print_results;
+
+    private boolean fast_locals;
     private Map<String, SymInfo> tbl;
     private ScopeInfo my_scope;
     private boolean optimizeGlobals = true;
@@ -231,54 +225,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public void set(PythonTree node, int tmp) throws Exception {
         temporary = tmp;
         visit(node);
-    }
-
-    private void saveAugTmps(PythonTree node, int count) throws Exception {
-        if (count >= 4) {
-            augtmp4 = code.getLocal(ci(PyObject.class));
-            code.astore(augtmp4);
-        }
-        if (count >= 3) {
-            augtmp3 = code.getLocal(ci(PyObject.class));
-            code.astore(augtmp3);
-        }
-        if (count >= 2) {
-            augtmp2 = code.getLocal(ci(PyObject.class));
-            code.astore(augtmp2);
-        }
-        augtmp1 = code.getLocal(ci(PyObject.class));
-        code.astore(augtmp1);
-
-        code.aload(augtmp1);
-        if (count >= 2) {
-            code.aload(augtmp2);
-        }
-        if (count >= 3) {
-            code.aload(augtmp3);
-        }
-        if (count >= 4) {
-            code.aload(augtmp4);
-        }
-    }
-
-    private void restoreAugTmps(PythonTree node, int count) throws Exception {
-        code.aload(augtmp1);
-        code.freeLocal(augtmp1);
-        if (count == 1) {
-            return;
-        }
-        code.aload(augtmp2);
-        code.freeLocal(augtmp2);
-        if (count == 2) {
-            return;
-        }
-        code.aload(augtmp3);
-        code.freeLocal(augtmp3);
-        if (count == 3) {
-            return;
-        }
-        code.aload(augtmp4);
-        code.freeLocal(augtmp4);
     }
 
     static boolean checkOptimizeGlobals(boolean fast_locals, ScopeInfo scope) {
@@ -550,6 +496,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.pop();
         }
         return null;
+    }
+
+    @Override
+    public Object visitAugAssign(AugAssign node) {
+        System.out.println("foo");
+        return node;
     }
 
     @Override
@@ -1776,74 +1728,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    @Override
-    public Object visitAugAssign(AugAssign node) throws Exception {
-        setline(node);
-
-        augmode = expr_contextType.Load;
-        visit(node.getInternalTarget());
-        int target = storeTop();
-
-        visit(node.getInternalValue());
-
-        code.aload(target);
-        code.swap();
-        String name = null;
-        switch (node.getInternalOp()) {
-            case Add:
-                name = "_iadd";
-                break;
-            case Sub:
-                name = "_isub";
-                break;
-            case Mult:
-                name = "_imul";
-                break;
-            case MatMult:
-                name = "_imatmul";
-                break;
-            case Div:
-                name = "_idiv";
-                break;
-            case Mod:
-                name = "_imod";
-                break;
-            case Pow:
-                name = "_ipow";
-                break;
-            case LShift:
-                name = "_ilshift";
-                break;
-            case RShift:
-                name = "_irshift";
-                break;
-            case BitOr:
-                name = "_ior";
-                break;
-            case BitXor:
-                name = "_ixor";
-                break;
-            case BitAnd:
-                name = "_iand";
-                break;
-            case FloorDiv:
-                name = "_ifloordiv";
-                break;
-        }
-//        if (node.getInternalOp() == operatorType.Div && module.getFutures().areDivisionOn()) {
-//            name = "_itruediv";
-//        }
-        code.invokevirtual(p(PyObject.class), name, sig(PyObject.class, PyObject.class));
-        code.freeLocal(target);
-
-        temporary = storeTop();
-        augmode = expr_contextType.Store;
-        visit(node.getInternalTarget());
-        code.freeLocal(temporary);
-
-        return null;
-    }
-
     /**
      * Counterpart of makeStrings, instead of put the string array in local variable slot, leave it in stack
      * @param c
@@ -2055,38 +1939,27 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public Object Slice(Subscript node, Slice slice) throws Exception {
         expr_contextType ctx = node.getInternalCtx();
-        if (ctx == expr_contextType.AugStore && augmode == expr_contextType.Store) {
-            restoreAugTmps(node, 4);
-            ctx = expr_contextType.Store;
+        visit(node.getInternalValue());
+        stackProduce();
+        if (slice.getInternalLower() != null) {
+            visit(slice.getInternalLower());
         } else {
-            visit(node.getInternalValue());
-            stackProduce();
-            if (slice.getInternalLower() != null) {
-                visit(slice.getInternalLower());
-            } else {
-                code.aconst_null();
-            }
-            stackProduce();
-            if (slice.getInternalUpper() != null) {
-                visit(slice.getInternalUpper());
-            } else {
-                code.aconst_null();
-            }
-            stackProduce();
-            if (slice.getInternalStep() != null) {
-                visit(slice.getInternalStep());
-            } else {
-                code.aconst_null();
-            }
-            stackProduce();
-
-            if (node.getInternalCtx() == expr_contextType.AugStore
-                    && augmode == expr_contextType.Load) {
-                saveAugTmps(node, 4);
-                ctx = expr_contextType.Load;
-            }
-            stackConsume(4);
+            code.aconst_null();
         }
+        stackProduce();
+        if (slice.getInternalUpper() != null) {
+            visit(slice.getInternalUpper());
+        } else {
+            code.aconst_null();
+        }
+        stackProduce();
+        if (slice.getInternalStep() != null) {
+            visit(slice.getInternalStep());
+        } else {
+            code.aconst_null();
+        }
+        stackProduce();
+        stackConsume(4);
 
         switch (ctx) {
             case Del:
@@ -2115,21 +1988,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitSubscript(Subscript node) throws Exception {
         int value = temporary;
         expr_contextType ctx = node.getInternalCtx();
-        if (node.getInternalCtx() == expr_contextType.AugStore && augmode == expr_contextType.Store) {
-            restoreAugTmps(node, 2);
-            ctx = expr_contextType.Store;
-        } else {
-            visit(node.getInternalValue());
-            stackProduce();
-            visit(node.getInternalSlice());
-            stackConsume();
-
-            if (node.getInternalCtx() == expr_contextType.AugStore
-                    && augmode == expr_contextType.Load) {
-                saveAugTmps(node, 2);
-                ctx = expr_contextType.Load;
-            }
-        }
+        visit(node.getInternalValue());
+        stackProduce();
+        visit(node.getInternalSlice());
+        stackConsume();
 
         switch (ctx) {
             case Del:
@@ -2169,15 +2031,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         visit(node.getInternalValue());
         code.ldc(getName(node.getInternalAttr()));
         expr_contextType ctx = node.getInternalCtx();
-        if (node.getInternalCtx() == expr_contextType.AugStore && augmode == expr_contextType.Store) {
-            ctx = expr_contextType.Store;
-        } else {
-
-            if (node.getInternalCtx() == expr_contextType.AugStore
-                    && augmode == expr_contextType.Load) {
-                ctx = expr_contextType.Load;
-            }
-        }
 
         switch (ctx) {
             case Del:
@@ -2626,10 +2479,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         SymInfo syminf = tbl.get(name);
 
         expr_contextType ctx = node.getInternalCtx();
-        if (ctx == expr_contextType.AugStore) {
-            ctx = augmode;
-        }
-
         if (ctx == null) {
             System.out.println("oops");
         }

@@ -2,7 +2,10 @@ package org.python.compiler;
 
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
+import org.python.antlr.ast.Context;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Name;
@@ -29,13 +32,10 @@ import static org.python.compiler.CompilerConstants.RETURN;
  *
  * Such as:
  * code copying/inlining of finallies
+ * expand augassign to normal assign + binop
  * lower for loop
- * lower comprehensions
- * lower generator expression
- * lower with statement
  */
 public class Lower extends Visitor {
-    private int count;
      /**
       * lower list comprehension PEP-0289
       * [x for x in range(10)]
@@ -196,16 +196,26 @@ public class Lower extends Visitor {
 //    }
 
     @Override
+    public Object visitAugAssign(AugAssign node) {
+        expr right = node.getInternalTarget().copy();
+        ((Context) right).setContext(expr_contextType.Load);
+        BinOp binOp = new BinOp(node, node.getInternalValue(), node.getInternalOp(), right);
+        expr target = node.getInternalTarget().copy();
+        ((Context) target).setContext(expr_contextType.Store);
+        Assign ret = new Assign(node, asList(target), binOp);
+        node.replaceSelf(ret);
+        return node;
+    }
+
+    @Override
     public Object visitTry(Try node) throws Exception {
         final List<stmt> finalBody = node.getInternalFinalbody();
         if (finalBody == null || finalBody.isEmpty()) {
             return super.visitTry(node);
         }
+        final Block finalBlock = new Block(node.getToken(), finalBody);
         node.setInternalFinalbody(null);
 
-        excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBody);
-        List<excepthandler> excepthandlers = node.getInternalHandlers();
-        // when there is no except clause
         Visitor tryVisitor = new Visitor() {
             // skip function definition
             @Override
@@ -219,53 +229,45 @@ public class Lower extends Visitor {
             }
 
             @Override
+            public Object visitAugAssign(AugAssign node) {
+                return Lower.this.visitAugAssign(node);
+            }
+
+            @Override
             public Object visitReturn(Return node) {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
-                    node.replaceSelf(prependFinalBody(finalBody, node.copy()));
+                    node.replaceSelf(asList(finalBlock, node.copy()));
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
-                    List<stmt> newStmts = new ArrayList<>(finalBody.size() + 2);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);
-                    newStmts.add(assign);
-                    newStmts.addAll(finalBody);
                     resultNode = resultNode.copy();
                     resultNode.setContext(expr_contextType.Load);
-                    newStmts.add(new Return(node.getToken(), resultNode));
-                    node.replaceSelf(newStmts);
+                    node.replaceSelf(assign, finalBlock, new Return(node.getToken(), resultNode));
                 }
                 return node;
             }
         };
+        traverse(finalBlock);
         tryVisitor.traverse(node);
+
+        excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBlock);
+        List<excepthandler> excepthandlers = node.getInternalHandlers();
         Try newTryNode;
+        // when there is no except clause
         if (excepthandlers == null || excepthandlers.isEmpty()) {
             Block newBody = new Block(node.getToken(), node.getInternalBody());
-            newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, newBody), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), asList(finalBlock, newBody), asList(catchAll), null, null);
         } else {
-            newTryNode = new Try(node.getToken(), appendFinalBody(finalBody, node.copy()), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), asList(finalBlock, node.copy()), asList(catchAll), null, null);
         }
         node.replaceSelf(newTryNode);
         return null;
     }
 
-    private static List<stmt> appendFinalBody(List<stmt> finalBody, stmt statement) {
-        List<stmt> stmts = new ArrayList<>(finalBody.size() + 1);
-        stmts.add(statement);
-        stmts.addAll(finalBody);
-        return stmts;
-    }
-
-    private static List<stmt> prependFinalBody(List<stmt> finalBody, stmt statement) {
-        List<stmt> stmts = new ArrayList<>(finalBody.size() + 1);
-        stmts.addAll(finalBody);
-        stmts.add(statement);
-        return stmts;
-    }
-
-    private excepthandler catchAllBlock(stmt node, List<stmt> body) {
+    private excepthandler catchAllBlock(stmt node, Block body) {
         Raise raiseNode = new Raise(node.getToken(), null, null);
-        return new ExceptHandler(node.getToken(), null, null, prependFinalBody(body, raiseNode));
+        return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
     }
 }
