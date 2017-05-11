@@ -407,47 +407,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public int makeArray(java.util.List<? extends PythonTree> nodes) throws Exception {
-        final int n;
-
-        if (nodes == null) {
-            n = 0;
-        } else {
-            n = nodes.size();
-        }
-
-        int array = code.getLocal(ci(PyObject[].class));
-        if (n == 0) {
-            code.getstatic(p(Py.class), "EmptyObjects", ci(PyObject[].class));
-            code.astore(array);
-        } else {
-            code.iconst(n);
-            code.anewarray(p(PyObject.class));
-            code.astore(array);
-
-            for (int i = 0; i < n; i++) {
-                code.aload(array);
-                code.iconst(i);
-                visit(nodes.get(i));
-                code.aastore();
-            }
-        }
-        return array;
-    }
-
-    // nulls out an array of references
-    public void freeArray(int array) {
-        code.aload(array);
-        code.aconst_null();
-        code.invokestatic(p(Arrays.class), "fill", sig(Void.TYPE, Object[].class, Object.class));
-        code.freeLocal(array);
-    }
-
-    public void freeArrayRef(int array) {
-        code.aconst_null();
-        code.astore(array);
-        code.freeLocal(array);
-    }
 
     public Str getDocStr(java.util.List<stmt> suite) {
         if (suite.size() > 0) {
@@ -1911,28 +1870,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    static int makeStrings(Code c, Collection<String> names) throws IOException {
-        if (names != null) {
-            c.iconst(names.size());
-        } else {
-            c.iconst_0();
-        }
-        c.anewarray(p(String.class));
-        int strings = c.getLocal(ci(String[].class));
-        c.astore(strings);
-        if (names != null) {
-            int i = 0;
-            for (String name : names) {
-                c.aload(strings);
-                c.iconst(i);
-                c.ldc(name);
-                c.aastore();
-                i++;
-            }
-        }
-        return strings;
-    }
-
     public Object invokeNoKeywords(Attribute node, java.util.List<expr> values) throws Exception {
         String name = getName(node.getInternalAttr());
         visit(node.getInternalValue());
@@ -2492,20 +2429,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<stmt> bod = new ArrayList<stmt>();
         bod.add(new LambdaSyntheticReturn(node, node.getInternalBody()));
         mod retSuite = new Suite(node, bod);
-
         setline(node);
-
         ScopeInfo scope = module.getScopeInfo(node);
-
-        int defaultsArray = makeArray(scope.ac.getDefaults());
-        int kwDefaultKeys = makeStrings(code, scope.ac.kw_defaults.keySet());
-        int kwDefaultValues = makeArray(new ArrayList<>(scope.ac.kw_defaults.values()));
-
         code.new_(p(PyFunction.class));
 
         code.dup();
-        code.aload(defaultsArray);
-        code.freeLocal(defaultsArray);
+        loadArray(code, scope.ac.getDefaults());
 
         loadFrame();
         code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
@@ -2513,12 +2442,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         code.new_(p(PyDictionary.class));
         code.dup();
-        code.aload(kwDefaultKeys);
-        code.aload(kwDefaultValues);
+        loadStrings(code, scope.ac.kw_defaults.keySet());
+        loadArray(code, new ArrayList<>(scope.ac.kw_defaults.values()));
         code.invokespecial(p(PyDictionary.class), "<init>",
                 sig(Void.TYPE, String[].class, PyObject[].class));
-        code.freeLocal(kwDefaultKeys);
-        code.freeLocal(kwDefaultValues);
 
         scope.setup_closure();
         scope.dump();
@@ -2585,13 +2512,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         ScopeInfo scope = module.getScopeInfo(node);
         String name = getName(node.getInternalName());
         setline(node);
-
-        int baseArray = makeArray(node.getInternalBases());
-
         code.ldc(name);
         code.ldc(scope.qualname);
 
-        code.aload(baseArray);
+        loadArray(code, node.getInternalBases());
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = new ArrayList<>();
         java.util.List<keyword> keywords = node.getInternalKeywords();
@@ -2609,14 +2533,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 keys.add(kw.getInternalArg());
                 values.add(kw.getInternalValue());
             }
-            int argArray = makeArray(values);
-            int strArray = makeStrings(code, keys);
-            code.aload(strArray);
-            code.aload(argArray);
+            loadStrings(code, keys);
+            loadArray(code, values);
             code.invokestatic(p(PyDictionary.class), "fromKV",
                     sig(PyDictionary.class, String[].class, PyObject[].class));
 
-            code.freeLocal(strArray);
             if (kwarg != null) {
                 code.dup();
                 visit(kwarg);
@@ -2649,7 +2570,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         // Assign this new class to the given name
         set(new Name(node, node.getInternalName(), expr_contextType.Store));
-        freeArray(baseArray);
         return null;
     }
 

@@ -604,9 +604,7 @@ public class ProxyMaker extends ProxyCodeHelpers implements ClassConstants, Opco
         code.aload(0);
         code.ldc("__supernames__");
 
-        int strArray = CodeCompiler.makeStrings(code, supernames);
-        code.aload(strArray);
-        code.freeLocal(strArray);
+        CodeCompiler.loadStrings(code, supernames);
         code.invokestatic("org/python/core/Py", "java2py", makeSig($pyObj, $obj));
         code.invokevirtual("org/python/core/PyObject", "__setitem__", makeSig("V", $str, $pyObj));
         code.return_();
