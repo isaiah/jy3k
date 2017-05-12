@@ -642,7 +642,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         setLastI(++yield_count);
-
         saveLocals();
         code.areturn();
 
@@ -653,13 +652,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         loadFrame();
         code.invokevirtual(p(PyFrame.class), "getGeneratorInput", sig(Object.class));
-        code.dup();
-        code.instanceof_(p(PyException.class));
-        Label done2 = new Label();
-        code.ifeq(done2);
-        code.checkcast(p(Throwable.class));
-        code.athrow();
-        code.label(done2);
         code.checkcast(p(PyObject.class));
 
         return null;
@@ -1918,17 +1910,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             return seqDel(node.getInternalElts());
         }
 
-        if (my_scope.generator) {
-            code.new_(p(PyTuple.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyTuple.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        } else {
-            code.new_(p(PyTuple.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyTuple.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        }
+        code.new_(p(PyTuple.class));
+        code.dup();
+        loadArray(code, node.getInternalElts());
+        code.invokespecial(p(PyTuple.class), "<init>", sig(Void.TYPE, PyObject[].class));
         return null;
     }
 

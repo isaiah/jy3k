@@ -527,16 +527,16 @@ public class PyLong extends PyObject {
     public Object __tojava__(Class<?> c) {
         try {
             if (c == Byte.TYPE || c == Byte.class) {
-                return new Byte((byte)getLong(Byte.MIN_VALUE, 0xFF));
+                return Byte.valueOf((byte)getLong(Byte.MIN_VALUE, 0xFF));
             }
             if (c == Short.TYPE || c == Short.class) {
-                return new Short((short)getLong(Short.MIN_VALUE, Short.MAX_VALUE));
+                return Short.valueOf((short)getLong(Short.MIN_VALUE, Short.MAX_VALUE));
             }
             if (c == Integer.TYPE || c == Integer.class) {
-                return new Integer((int)getLong(Integer.MIN_VALUE, Integer.MAX_VALUE));
+                return Integer.valueOf((int)getLong(Integer.MIN_VALUE, Integer.MAX_VALUE));
             }
             if (c == Long.TYPE || c == Long.class) {
-                return new Long(getLong(Long.MIN_VALUE, Long.MAX_VALUE));
+                return Long.valueOf(getLong(Long.MIN_VALUE, Long.MAX_VALUE));
             }
             if (c == Float.TYPE || c == Double.TYPE || c == Float.class || c == Double.class) {
                 return __float__().__tojava__(c);
