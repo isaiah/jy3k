@@ -848,6 +848,13 @@ public final class Py {
         return new PyTuple(elements);
     }
 
+    public static PyList newList(PyObject[] elements) {
+        return new PyList(elements);
+    }
+
+    public static PySet newSet(PyObject[] elements) {
+        return new PySet(elements);
+    }
     public static PyBytes newStringUTF8(String s) {
         if (CharMatcher.ASCII.matchesAllOf(s)) {
             // ascii of course is a subset of UTF-8

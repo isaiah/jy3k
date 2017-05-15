@@ -345,11 +345,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         code.iconst(n);
         code.anewarray(p(PyObject.class));
+        stackProduce(p(PyObject[].class));
         for (int i = 0; i < n; i++) {
             code.dup();
+            stackProduce(p(PyObject[].class));
             code.iconst(i);
+            stackProduce(p(Integer.TYPE));
             visit(nodes.get(i));
+            stackProduce();
             code.aastore();
+            stackConsume(3);
         }
     }
 
@@ -672,13 +677,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         loadFrame();
         code.invokevirtual(p(PyFrame.class), "getGeneratorInput", sig(Object.class));
-        code.dup();
-        code.instanceof_(p(PyException.class));
-        Label done2 = new Label();
-        code.ifeq(done2);
-        code.checkcast(p(Throwable.class));
-        code.athrow();
-        code.label(done2);
         code.checkcast(p(PyObject.class));
 
         return null;
@@ -708,7 +706,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.iconst(stack.size());
             code.anewarray(p(Object.class));
             code.astore(array);
-            Iterator<String> content = stack.descendingIterator();
+            Iterator<String> content = stack.iterator();
             for (int i = 0; content.hasNext(); i++) {
                 String signature = content.next();
                 if (p(ThreadState.class).equals(signature)) {
@@ -719,9 +717,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     code.aload(array);
                     // Stack: |- ... value array
                     code.swap();
-                    code.iconst(i++);
+                    code.iconst(i);
                     code.swap();
                     // Stack: |- ... array index value
+                    if (signature.equals(p(Integer.TYPE))) {
+                        code.invokestatic(p(Integer.class), "valueOf", sig(Integer.class, Integer.TYPE));
+                    }
                     code.aastore();
                     // Stack: |- ...
                 }
@@ -735,7 +736,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private void restoreStack(int array) throws Exception {
         if (stack.size() > 0) {
             int i = stack.size() - 1;
-            for (String signature : stack) {
+            Iterator<String> content = stack.descendingIterator();
+            while (content.hasNext()) {
+                String signature = content.next();
                 if (p(ThreadState.class).equals(signature)) {
                     loadThreadState();
                 } else {
@@ -744,7 +747,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     code.iconst(i--);
                     code.aaload();
                     // Stack: |- ... value
-                    code.checkcast(signature);
+                    if (signature.equals(p(Integer.TYPE))) {
+                        code.checkcast(p(Integer.class));
+                        code.invokevirtual(p(Integer.class), "intValue", sig(Integer.TYPE));
+                    } else {
+                        code.checkcast(signature);
+                    }
                 }
             }
 //            code.freeLocal(array);
@@ -2110,17 +2118,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             return seqDel(node.getInternalElts());
         }
 
-        if (my_scope.generator) {
-            code.new_(p(PyTuple.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyTuple.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        } else {
-            code.new_(p(PyTuple.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyTuple.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        }
+        loadArray(code, node.getInternalElts());
+        code.invokestatic(p(Py.class), "newTuple", sig(PyTuple.class, PyObject[].class));
         return null;
     }
 
@@ -2133,17 +2132,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             return seqDel(node.getInternalElts());
         }
 
-        if (my_scope.generator) {
-            code.new_(p(PyList.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyList.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        } else {
-            code.new_(p(PyList.class));
-            code.dup();
-            loadArray(code, node.getInternalElts());
-            code.invokespecial(p(PyList.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        }
+        loadArray(code, node.getInternalElts());
+        code.invokestatic(p(Py.class), "newList", sig(PyList.class, PyObject[].class));
         return null;
     }
 
@@ -2247,17 +2237,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 scalars.add(e);
             }
         }
-        if (my_scope.generator) {
-            code.new_(p(PySet.class));
-            code.dup();
-            loadArray(code, scalars);
-            code.invokespecial(p(PySet.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        } else {
-            code.new_(p(PySet.class));
-            code.dup();
-            loadArray(code, scalars);
-            code.invokespecial(p(PySet.class), "<init>", sig(Void.TYPE, PyObject[].class));
-        }
+
+        loadArray(code, scalars);
+        code.invokestatic(p(Py.class), "newSet", sig(PySet.class, PyObject[].class));
         for (expr e : stars) {
             code.dup();
             visit(e);
