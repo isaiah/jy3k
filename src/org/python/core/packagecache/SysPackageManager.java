@@ -8,12 +8,9 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PySystemState;
 
-import java.lang.reflect.Layer;
-import java.lang.reflect.Module;
-import java.util.Arrays;
+import java.io.File;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.io.*;
 
 /**
  * System package manager. Used by org.python.core.PySystemState.
@@ -84,19 +81,19 @@ public class SysPackageManager extends PathPackageManager {
 
     private void findRuntimeModules() {
         Module module = SysPackageManager.class.getModule();
-        Layer layer = module.getLayer();
+        ModuleLayer layer = module.getLayer();
         if (layer == null) {
-            layer = Layer.boot();
+            layer = ModuleLayer.boot();
         }
 
         doLayer(layer);
     }
 
-    private void doLayer(Layer layer) {
+    private void doLayer(ModuleLayer layer) {
         if (layer != null) {
             for (Module m : layer.modules()) {
                 if (!m.isNamed()) continue;
-                addPackages(Arrays.asList(m.getPackages()), m.getName(), m.getClassLoader());
+                addPackages(m.getPackages(), m.getName(), m.getClassLoader());
             }
             layer.parents().stream().forEach(this::doLayer);
         }

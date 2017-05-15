@@ -844,6 +844,10 @@ public final class Py {
         return new PyBytes(s);
     }
 
+    public static PyTuple newTuple(PyObject[] elements) {
+        return new PyTuple(elements);
+    }
+
     public static PyBytes newStringUTF8(String s) {
         if (CharMatcher.ASCII.matchesAllOf(s)) {
             // ascii of course is a subset of UTF-8

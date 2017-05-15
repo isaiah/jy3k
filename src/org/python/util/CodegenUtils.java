@@ -21,7 +21,7 @@ public class CodegenUtils {
      * Creates a class path name, from a Class.
      */
     public static String p(Class n) {
-        return n.getName().replace('.','/');
+        return Type.getInternalName(n);
     }
 
     /**

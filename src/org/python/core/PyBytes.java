@@ -384,7 +384,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
         if (c == Character.TYPE || c == Character.class) {
             if (getString().length() == 1) {
-                return new Character(getString().charAt(0));
+                return Character.valueOf(getString().charAt(0));
             }
         }
 

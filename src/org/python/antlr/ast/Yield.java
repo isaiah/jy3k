@@ -182,4 +182,5 @@ public static final PyType TYPE = PyType.fromClass(Yield.class);
         col_offset = num;
     }
 
+    public String[] stack;
 }

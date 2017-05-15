@@ -7,8 +7,9 @@ import org.python.core.PyFrame;
  */
 public class Asmcheck {
     public static void main(String[] args) {
-        int a = 0;
-            a = 1;
+        Integer a = 0;
+        Object[] arr = new Object[3];
+        arr[a] = 2;
         System.out.println(a);
     }
 }

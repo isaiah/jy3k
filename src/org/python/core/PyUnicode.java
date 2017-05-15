@@ -2436,7 +2436,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
         if (c == Character.TYPE || c == Character.class) {
             if (getString().length() == 1) {
-                return new Character(getString().charAt(0));
+                return Character.valueOf(getString().charAt(0));
             }
         }
 
