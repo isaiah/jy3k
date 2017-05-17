@@ -6,6 +6,9 @@ package org.python.compiler;
 public enum  CompilerConstants {
     GEN("__gen"),
     ITER("iter"),
+    SAVE_OPRANDS("__save_operands__"),
+    RESTORE_OPRANDS("__restore_operands__"),
+    YIELD("__yield__"),
     RETURN(":return");
 
 

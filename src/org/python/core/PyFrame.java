@@ -72,6 +72,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     public int f_lasti;
 
     public Object[] f_savedlocals;
+    public Object[] f_savedStack;
 
     public Object generatorInput = Py.None;
 

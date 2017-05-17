@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -211,14 +212,8 @@ public class ClassFile
         endClassAnnotations();
         endFields();
         endMethods();
-
-        byte[] ba = cw.toByteArray();
-        //fos = io.FileOutputStream("%s.class" % self.name)
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(ba.length);
-        baos.write(ba, 0, ba.length);
-        baos.writeTo(stream);
-        //debug(baos);
-        baos.close();
+        final byte[] ba = CoroutineFixer.transform(cw.toByteArray());
+        stream.write(ba);
     }
 
 }

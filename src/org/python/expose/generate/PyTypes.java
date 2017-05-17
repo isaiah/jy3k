@@ -1,6 +1,7 @@
 package org.python.expose.generate;
 
 import org.objectweb.asm.Type;
+import org.python.compiler.ClassConstants;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
@@ -34,11 +35,9 @@ import org.python.expose.TypeBuilder;
 /**
  * Type objects used by exposed generation.
  */
-public interface PyTypes {
+public interface PyTypes extends ClassConstants {
 
     // Core Jython types
-    public static final Type PYOBJ = Type.getType(PyObject.class);
-
     public static final Type APYOBJ = Type.getType(PyObject[].class);
 
     public static final Type PYTYPE = Type.getType(PyType.class);
@@ -48,8 +47,6 @@ public interface PyTypes {
     public static final Type ASSUPER = Type.getType(ExposeAsSuperclass.class);
 
     public static final Type PYEXCEPTION = Type.getType(PyException.class);
-
-    public static final Type PY = Type.getType(Py.class);
 
     public static final Type PYBYTES = Type.getType(PyBytes.class);
 
