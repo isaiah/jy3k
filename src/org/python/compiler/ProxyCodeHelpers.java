@@ -176,19 +176,19 @@ public class ProxyCodeHelpers {
         case tByte:
         case tShort:
         case tInteger:
-            code.iconst_0();
+            code.iconst(0);
             code.ireturn();
             break;
         case tLong:
-            code.lconst_0();
+            code.lconst(0);
             code.lreturn();
             break;
         case tFloat:
-            code.fconst_0();
+            code.fconst(0);
             code.freturn();
             break;
         case tDouble:
-            code.dconst_0();
+            code.dconst(0);
             code.dreturn();
             break;
         case tVoid:

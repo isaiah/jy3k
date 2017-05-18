@@ -20,7 +20,7 @@ public class CoroutineFixer extends ClassVisitor {
 
     public static byte[] transform(byte[] b) {
         final ClassReader classReader = new ClassReader(b);
-        final ClassWriter cw = new ClassWriter(classReader, 0);
+        final ClassWriter cw = new ClassWriter(classReader, ClassWriter.COMPUTE_FRAMES);
         classReader.accept(new CoroutineFixer(cw), ClassReader.EXPAND_FRAMES);
         return cw.toByteArray();
     }

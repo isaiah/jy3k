@@ -1235,17 +1235,18 @@ public final class Py {
         return Class.forName(name, true, loader);
     }
 
-    public static PyObject getYieldFromIter(PyObject iter, PyFrame frame) {
+    public static void getYieldFromIter(PyObject iter, PyFrame frame) {
         if (iter instanceof PyCoroutine) {
             CompilerFlags flags = frame.f_code.co_flags;
             if (flags.isFlagSet(CodeFlag.CO_COROUTINE) || flags.isFlagSet(CodeFlag.CO_ITERABLE_COROUTINE)) {
-                return iter;
+                frame.f_yieldfrom = iter;
             }
             throw Py.TypeError("cannot 'yield from' a coroutine object in a non-coroutine generator");
         } else if (iter instanceof PyGenerator) {
-            return iter;
+            frame.f_yieldfrom = iter;
+        } else {
+            frame.f_yieldfrom = iter.__iter__();
         }
-        return iter.__iter__();
     }
 
     public static PyObject getAwaitableIter(PyObject obj) {

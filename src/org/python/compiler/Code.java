@@ -10,21 +10,22 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.commons.InstructionAdapter;
 
 public class Code extends MethodVisitor implements Opcodes {
-    MethodVisitor mv;
     String sig;
     String locals[];
     int nlocals;
     int argcount;
     int returnLocal;
     BitSet finallyLocals = new java.util.BitSet();
+    private InstructionAdapter inst;
     
     //XXX: I'd really like to get sig and access out of here since MethodVistitor
     //     should already have this information.
     public Code(MethodVisitor mv, String sig, int access) {
-        super(ASM5);
-        this.mv = mv;
+        super(ASM5, mv);
+        inst = new InstructionAdapter(mv);
         this.sig = sig;
         nlocals = -sigSize(sig, false);
         if ((access & ACC_STATIC) != ACC_STATIC) nlocals = nlocals+1;
@@ -91,74 +92,6 @@ public class Code extends MethodVisitor implements Opcodes {
 
     public AnnotationVisitor visitAnnotationDefault() {
         return mv.visitAnnotationDefault();
-    }
-
-    public void visitAttribute(Attribute arg0) {
-        mv.visitAttribute(arg0);
-    }
-
-    public void visitCode() {
-        mv.visitCode();
-    }
-
-    public void visitEnd() {
-        mv.visitEnd();
-    }
-
-    public void visitFieldInsn(int arg0, String arg1, String arg2, String arg3) {
-        mv.visitFieldInsn(arg0, arg1, arg2, arg3);
-    }
-
-    public void visitFrame(int arg0, int arg1, Object[] arg2, int arg3, Object[] arg4) {
-        mv.visitFrame(arg0, arg1, arg2, arg3, arg4);
-    }
-
-    public void visitIincInsn(int arg0, int arg1) {
-        mv.visitIincInsn(arg0, arg1);
-    }
-
-    public void visitInsn(int arg0) {
-        mv.visitInsn(arg0);
-    }
-
-    public void visitIntInsn(int arg0, int arg1) {
-        mv.visitIntInsn(arg0, arg1);
-    }
-
-    public void visitJumpInsn(int arg0, Label arg1) {
-        mv.visitJumpInsn(arg0, arg1);
-    }
-
-    public void visitLabel(Label arg0) {
-        mv.visitLabel(arg0);
-    }
-
-    public void visitLdcInsn(Object arg0) {
-        mv.visitLdcInsn(arg0);
-    }
-
-    public void visitLineNumber(int arg0, Label arg1) {
-        mv.visitLineNumber(arg0, arg1);
-    }
-
-    public void visitLocalVariable(String arg0, String arg1, String arg2, Label arg3, Label arg4, int arg5) {
-        mv.visitLocalVariable(arg0, arg1, arg2, arg3, arg4, arg5);
-    }
-
-    public void visitLookupSwitchInsn(Label arg0, int[] arg1, Label[] arg2) {
-        mv.visitLookupSwitchInsn(arg0, arg1, arg2);
-    }
-
-    public void visitMaxs(int arg0, int arg1) {
-        mv.visitMaxs(arg0, arg1);
-    }
-
-    public void visitMethodInsn(int arg0, String arg1, String arg2, String arg3, boolean itf) {
-        mv.visitMethodInsn(arg0, arg1, arg2, arg3, itf);
-    }
-
-    public void visitMultiANewArrayInsn(String arg0, int arg1) {
-        mv.visitMultiANewArrayInsn(arg0, arg1);
     }
 
     public AnnotationVisitor visitParameterAnnotation(int arg0, String arg1, boolean arg2) {
@@ -336,69 +269,6 @@ public class Code extends MethodVisitor implements Opcodes {
         mv.visitJumpInsn(GOTO, label);
     }
   
-    public void iconst(int value) {
-        if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
-            switch (value) {
-            case -1:
-                iconst_m1();
-                break;
-            case 0:
-                iconst_0();
-                break;
-            case 1:
-                iconst_1();
-                break;
-            case 2:
-                iconst_2();
-                break;
-            case 3:
-                iconst_3();
-                break;
-            case 4:
-                iconst_4();
-                break;
-            case 5:
-                iconst_5();
-                break;
-            default:
-                bipush(value);
-                break;
-            }
-        } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
-            sipush(value);
-        } else {
-            ldc(value);
-        }
-    }
-
-    public void iconst_m1() {
-        mv.visitInsn(ICONST_M1);
-    }
-    
-    public void iconst_0() {
-        mv.visitInsn(ICONST_0);
-    }
-    
-    public void iconst_1() {
-        mv.visitInsn(ICONST_1);
-    }
-    
-    public void iconst_2() {
-        mv.visitInsn(ICONST_2);
-    }
-    
-    public void iconst_3() {
-        mv.visitInsn(ICONST_3);
-    }
-    
-    public void iconst_4() {
-        mv.visitInsn(ICONST_4);
-    }
-    
-    public void iconst_5() {
-        mv.visitInsn(ICONST_5);
-    }
-    
     public void ifeq(Label label) {
         mv.visitJumpInsn(IFEQ, label);
     }
@@ -482,7 +352,11 @@ public class Code extends MethodVisitor implements Opcodes {
     public void invokestatic(String owner, String name, String type) {
         mv.visitMethodInsn(INVOKESTATIC, owner, name, type, false);
     }
-    
+
+    public void invokevirtual(String owner, String name, String type, boolean itf) {
+        mv.visitMethodInsn(INVOKEVIRTUAL, owner, name, type, itf);
+    }
+
     public void invokevirtual(String owner, String name, String type) {
         mv.visitMethodInsn(INVOKEVIRTUAL, owner, name, type, false);
     }
@@ -610,5 +484,23 @@ public class Code extends MethodVisitor implements Opcodes {
                                        Object... bmsArgs) {
         mv.visitInvokeDynamicInsn(name, descriptor, bsmHandle, bmsArgs);
     }
-    
+    public void iconst(int value) {
+        inst.iconst(value);
+    }
+
+    public void mark(Label l) {
+        inst.mark(l);
+    }
+
+    public void lconst(long l) {
+        inst.lconst(l);
+    }
+
+    public void fconst(float f) {
+        inst.fconst(f);
+    }
+
+    public void dconst(double d) {
+        inst.dconst(d);
+    }
 }

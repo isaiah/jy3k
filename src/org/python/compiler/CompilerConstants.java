@@ -8,7 +8,10 @@ public enum  CompilerConstants {
     ITER("iter"),
     SAVE_OPRANDS("__save_operands__"),
     RESTORE_OPRANDS("__restore_operands__"),
+    // mark a return op
     YIELD("__yield__"),
+    // mark a label location
+    MARK("__mark__"),
     RETURN(":return");
 
 
