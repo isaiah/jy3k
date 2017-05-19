@@ -277,6 +277,8 @@ public abstract class PyBaseCode extends PyCode {
                 PyObject value = args[i + argcount];
                 int j;
                 for (j = 0; j < paramCount; j++) {
+                    if (varargs && j == co_argcount) // skip the vararg parameter
+                        continue;
                     if (co_varnames[j].equals(keyword)) {
                         break;
                     }
