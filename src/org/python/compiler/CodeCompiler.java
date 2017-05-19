@@ -132,7 +132,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private String className;
     private Deque<Label> continueLabels, breakLabels;
     private Deque<ExceptionHandler> exceptionHandlers;
-    private Vector<Label> yields = new Vector<Label>();
 
     final static Method contextGuard_getManager =
             Method.getMethod("org.python.core.ContextManager getManager (org.python.core.PyObject)");
@@ -560,25 +559,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         visit(node.getInternalValue());
 
-        yield_count++;
-        setLastI(yield_count);
+        setLastI(++yield_count);
         code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
         loadFrame();
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
         saveLocals();
 
-        Label restart = new Label();
-        yields.addElement(restart);
-        code.mark(restart);
-
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.areturn();
+        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         yield_count++;
-        Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
-        code.mark(nonYieldSection);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
@@ -1068,18 +1061,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.aload(iter_tmp);
         code.checkcast(p(PyObject.class));
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-
-        Label restartIter = new Label();
-        yields.addElement(restartIter);
-        code.mark(restartIter);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.areturn();
         yield_count++;
-        Label nonYieldSectionIter = new Label();
-        yields.addElement(nonYieldSectionIter);
-        code.mark(nonYieldSectionIter);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
 
         // restore return value from subgenerator
@@ -1115,18 +1103,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadFrame();
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-
-        Label restart = new Label();
-        yields.addElement(restart);
-        code.mark(restart);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.areturn();
         yield_count++;
-        Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
-        code.mark(nonYieldSection);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 //        restoreLocals();
 
         // restore return value from subgenerator
@@ -2575,18 +2558,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
         saveLocals();
-
-        Label restart = new Label();
-        yields.addElement(restart);
-        code.mark(restart);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.areturn();
         yield_count++;
-        Label nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
-        code.mark(nonYieldSection);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
 
         // restore return value from subgenerator
@@ -2625,18 +2603,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 compiler.code.swap();
                 compiler.code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
                 compiler.saveLocals();
-
-                Label restart = new Label();
-                compiler.yields.addElement(restart);
-                compiler.code.mark(restart);
+                compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
                 compiler.loadFrame();
                 compiler.code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-                compiler.code.areturn();
+                compiler.code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
                 compiler.yield_count++;
-                Label nonYieldSection = new Label();
-                compiler.yields.addElement(nonYieldSection);
-                compiler.code.mark(nonYieldSection);
+                compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
                 compiler.restoreLocals();
 
                 // restore return value from subgenerator
@@ -2704,18 +2677,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
         saveLocals();
-
-        restart = new Label();
-        yields.addElement(restart);
-        code.mark(restart);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.areturn();
         yield_count++;
-        nonYieldSection = new Label();
-        yields.addElement(nonYieldSection);
-        code.mark(nonYieldSection);
+        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
 
         // restore return value from subgenerator
