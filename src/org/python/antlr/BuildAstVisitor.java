@@ -75,6 +75,7 @@ import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
+import org.python.compiler.AnnotationsCreator;
 import org.python.compiler.ClassClosureGenerator;
 import org.python.compiler.Lower;
 import org.python.core.Py;
@@ -1229,6 +1230,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         PythonTree ast = v.visit(ctx);
         new ClassClosureGenerator().visit(ast);
         new Lower().visit(ast);
+        new AnnotationsCreator().visit(ast);
         System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
         out.write(bytes);

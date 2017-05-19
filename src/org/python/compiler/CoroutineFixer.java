@@ -40,6 +40,5 @@ public class CoroutineFixer extends ClassVisitor {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
         AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(owner, access, name, desc, mv);
         return new OperandStackSaver(analyzerAdapter);
-//        return analyzerAdapter;
     }
 }
