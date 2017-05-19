@@ -1043,13 +1043,30 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
      * slot.
      */
     private static PyType solid_base(PyType type) {
-        do {
-            if (isSolidBase(type)) {
-                return type;
-            }
-            type = type.base;
-        } while (type != null);
-        return PyObject.TYPE;
+        PyType base;
+        if (type.base != null) {
+            base = solid_base(type.base);
+        } else {
+            base = PyObject.TYPE;
+        }
+        if (extraIvars(type, base)) {
+            return type;
+        }
+        return base;
+//        do {
+//            if (isSolidBase(type)) {
+//                return type;
+//            }
+//            type = type.base;
+//        } while (type != null);
+//        return PyObject.TYPE;
+    }
+
+    private static boolean extraIvars(PyType type, PyType base) {
+        if (type.underlying_class != null) {
+            return true;
+        }
+        return type.numSlots != base.numSlots;
     }
 
     private static boolean isSolidBase(PyType type) {
@@ -1075,7 +1092,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
                 winner = candidate;
                 best = (PyType)base;
             } else if (winner.isSubType(candidate)) {
-                ;
+                continue;
             } else if (candidate.isSubType(winner)) {
                 winner = candidate;
                 best = (PyType)base;
