@@ -43,7 +43,10 @@ public class OperandStackSaver extends InstructionAdapter {
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (opcode == INVOKESTATIC) {
-            if (name.equals(SAVE_OPRANDS.symbolName()) && analyzer.locals != null) {
+            if (name.equals(SAVE_OPRANDS.symbolName())) {
+                 if (analyzer.locals == null) {
+                     return;
+                 }
                 tmpIndex = analyzer.locals.size();
                 int stackSize = analyzer.stack.size();
                 stack = new ArrayList(analyzer.stack);
@@ -67,7 +70,10 @@ public class OperandStackSaver extends InstructionAdapter {
                 mv.visitVarInsn(ALOAD, tmpIndex);
                 mv.visitFieldInsn(PUTFIELD, PYFRAME.getInternalName(), "f_savedStack", OBJARR.getDescriptor());
                 return;
-            } else if (name.equals(RESTORE_OPRANDS.symbolName()) && stack != null) {
+            } else if (name.equals(RESTORE_OPRANDS.symbolName())) {
+                if (stack == null) {
+                    return;
+                }
                 mv.visitVarInsn(ALOAD, 1); // load frame
                 mv.visitFieldInsn(GETFIELD, PYFRAME.getInternalName(), "f_savedStack", OBJARR.getDescriptor());
                 mv.visitVarInsn(ASTORE, tmpIndex);
