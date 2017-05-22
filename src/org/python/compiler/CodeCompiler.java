@@ -902,12 +902,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         /* Visit the message part of the assertion, or pass Py.None */
         if (node.getInternalMsg() != null) {
             visit(node.getInternalMsg());
+            code.invokestatic(p(Py.class), "AssertionError",
+                    sig(PyException.class, PyObject.class));
         } else {
-            getNone();
+            code.invokestatic(p(Py.class), "AssertionError",
+                    sig(PyException.class));
         }
 
-        code.invokestatic(p(Py.class), "AssertionError",
-                sig(PyException.class, PyObject.class));
         /* Raise assertion error. Only executes this logic if assertion failed */
         code.athrow();
 
@@ -1254,6 +1255,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
             // do exception body
             suite(handler.getInternalBody());
+            popException();
             code.goto_(end_of_exceptions);
             code.mark(end_of_self);
         }
@@ -1398,13 +1400,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (node.getInternalOrelse() == null) {
             // No else clause to worry about
             exceptionTest(exc, handler_end, node, 1);
-            popException();
             code.mark(handler_end);
         } else {
             // Have else clause
             Label else_end = new Label();
             exceptionTest(exc, else_end, node, 1);
-            popException();
             code.mark(handler_end);
 
             // do else clause

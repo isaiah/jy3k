@@ -407,6 +407,10 @@ public final class Py {
 
     public static PyObject AssertionError;
 
+    public static PyException AssertionError() {
+        return new PyException(Py.AssertionError);
+    }
+
     public static PyException AssertionError(String message) {
         return new PyException(Py.AssertionError, message);
     }
