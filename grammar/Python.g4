@@ -930,25 +930,25 @@ BYTES_LITERAL
  | [rR]? [bB] ( SHORT_BYTES | LONG_BYTES )
  ;
 
-/// decimalinteger ::=  nonzerodigit digit* | "0"+
+/// decimalinteger ::=  nonzerodigit digit* | ("0" | "_")+
 DECIMAL_INTEGER
- : NON_ZERO_DIGIT DIGIT*
- | '0'+
+ : NON_ZERO_DIGIT ('_'? DIGIT)*
+ | '0' ('_'? '0')*
  ;
 
 /// octinteger     ::=  "0" ("o" | "O") octdigit+
 OCT_INTEGER
- : '0' [oO] OCT_DIGIT+
+ : '0' [oO] ('_'? OCT_DIGIT)+
  ;
 
 /// hexinteger     ::=  "0" ("x" | "X") hexdigit+
 HEX_INTEGER
- : '0' [xX] HEX_DIGIT+
+ : '0' [xX] ('_'? HEX_DIGIT)+
  ;
 
 /// bininteger     ::=  "0" ("b" | "B") bindigit+
 BIN_INTEGER
- : '0' [bB] BIN_DIGIT+
+ : '0' [bB] ('_'? BIN_DIGIT)+
  ;
 
 /// floatnumber   ::=  pointfloat | exponentfloat
@@ -1090,17 +1090,17 @@ fragment EXPONENT_FLOAT
 
 /// intpart       ::=  digit+
 fragment INT_PART
- : DIGIT+
+ : DIGIT ('_'? DIGIT)*
  ;
 
 /// fraction      ::=  "." digit+
 fragment FRACTION
- : '.' DIGIT+
+ : '.' INT_PART
  ;
 
 /// exponent      ::=  ("e" | "E") ["+" | "-"] digit+
 fragment EXPONENT
- : [eE] [+-]? DIGIT+
+ : [eE] [+-]? INT_PART+
  ;
 
 /// shortbytes     ::=  "'" shortbytesitem* "'" | '"' shortbytesitem* '"'

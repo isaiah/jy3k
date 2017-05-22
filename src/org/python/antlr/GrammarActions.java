@@ -285,21 +285,21 @@ public class GrammarActions {
     }
 
     Object makeFloat(TerminalNode t) {
-        return Py.newFloat(Double.valueOf(t.getText()));
+        return Py.newFloat(Double.valueOf(t.getText().replaceAll("_", "")));
     }
 
     Object makeComplex(TerminalNode t) {
-        String s = t.getText();
+        String s = t.getText().replaceAll("_", "");
         s = s.substring(0, s.length() - 1);
         return Py.newImaginary(Double.valueOf(s));
     }
 
     Object makeInt(TerminalNode t, int radix) {
-        return new PyLong(new BigInteger(t.getText().substring(2), radix));
+        return new PyLong(new BigInteger(t.getText().substring(2).replaceAll("_", ""), radix));
     }
 
     Object makeDecimal(TerminalNode t) {
-        return new PyLong(new BigInteger(t.getText(), 10));
+        return new PyLong(new BigInteger(t.getText().replaceAll("_", ""), 10));
     }
 
     expr parsestrplus(List<PythonParser.StrContext> s) {

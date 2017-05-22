@@ -141,6 +141,7 @@ public class PyObject implements Serializable {
      * finalizers.
      * </p>
      */
+    @SuppressWarnings("deprecation")
     protected final void finalize() throws Throwable {}
 
     @ExposedMethod(doc = BuiltinDocs.object___init___doc)
