@@ -5,7 +5,9 @@ import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
+import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Context;
+import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Name;
@@ -234,6 +236,18 @@ public class Lower extends Visitor {
             @Override
             public Object visitAugAssign(AugAssign node) {
                 return Lower.this.visitAugAssign(node);
+            }
+
+            @Override
+            public Object visitBreak(Break node) {
+                node.replaceSelf(asList(finalBlock, node.copy()));
+                return node;
+            }
+
+            @Override
+            public Object visitContinue(Continue node) {
+                node.replaceSelf(asList(finalBlock, node.copy()));
+                return node;
             }
 
             @Override
