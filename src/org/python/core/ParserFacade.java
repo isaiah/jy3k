@@ -44,16 +44,13 @@ public class ParserFacade {
         if (t instanceof PySyntaxError) {
             return (PySyntaxError) t;
         }
-        if (t instanceof ParseCancellationException) {
-            int line = 0, col = 0;
-            Throwable cause = t.getCause();
+        Throwable cause = t.getCause();
+        if (t instanceof ParseCancellationException && cause instanceof RecognitionException) {
             boolean indentationError = false;
             String msg = null;
             String text = "";
+            Token tok = ((RecognitionException) cause).getOffendingToken();
             if (cause instanceof InputMismatchException) {
-                Token tok = ((InputMismatchException) cause).getOffendingToken();
-                line = tok.getLine();
-                col = tok.getCharPositionInLine();
                 int tokType = tok.getType();
                 indentationError = tokType == PythonParser.INDENT || tokType == PythonParser.DEDENT;
                 text = tok.getText();
@@ -77,6 +74,9 @@ public class ParserFacade {
             if (msg == null) {
                 msg = "invalid syntax";
             }
+
+            int line = tok.getLine();
+            int col = tok.getCharPositionInLine();
             if (indentationError) {
                 return new PyIndentationError(msg, line, col, text, filename);
             }
