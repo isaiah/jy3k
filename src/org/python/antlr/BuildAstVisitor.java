@@ -185,6 +185,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         }
         if (ctx.annassign() != null) {
             expr target = (expr) visit(ctx.testlist_star_expr(0));
+            if (target instanceof List) {
+                throw Py.SyntaxError(target.getToken(), "only single target (not list) can be annotated", filename);
+            } else if (target instanceof Tuple) {
+                throw Py.SyntaxError(target.getToken(), "only single target (not tuple) can be annotated", filename);
+            }
             ((Context) target).setContext(expr_contextType.Store);
             AnnassignResult annassignResult = visit_Annassign(ctx.annassign());
             return new AnnAssign(ctx.getStart(), target, annassignResult.anno, annassignResult.value, 1);
