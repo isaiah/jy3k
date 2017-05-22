@@ -9,6 +9,7 @@ import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.For;
+import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Name;
@@ -30,13 +31,22 @@ import java.util.List;
  * Add __annotations__ initialization and modification based annotation or direct access
  */
 public class AnnotationsCreator extends Visitor {
+
+    @Override
+    public Object visitFunctionDef(FunctionDef node) {
+        // skip local variable
+        return node;
+    }
+
     @Override
     public Object visitAnnAssign(AnnAssign node) {
-        Name anno = new Name(node, "__annotations__", expr_contextType.Load);
-        slice val = new Index(node, new Str(node, node.getInternalTarget().getToken().getText()));
-        Subscript item = new Subscript(node, anno, val, expr_contextType.Store);
-        Assign updateAnno = new Assign(node, Arrays.asList(item), node.getInternalAnnotation());
-        node.replaceSelf(node.copy(), updateAnno);
+        if (node.getInternalTarget() instanceof Name) {
+            Name anno = new Name(node, "__annotations__", expr_contextType.Load);
+            slice val = new Index(node, new Str(node, node.getInternalTarget().getToken().getText()));
+            Subscript item = new Subscript(node, anno, val, expr_contextType.Store);
+            Assign updateAnno = new Assign(node, Arrays.asList(item), node.getInternalAnnotation());
+            node.replaceSelf(node.copy(), updateAnno);
+        }
         return node;
     }
 

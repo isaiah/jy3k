@@ -123,6 +123,18 @@ public class ScopeInfo extends Object implements ScopeConstants {
         }
     }
 
+    public int addAnnotated(String name) {
+        SymInfo info = tbl.get(name);
+        if (info == null) {
+            tbl.put(name, new SymInfo(DEF_ANNOT));
+            return 0;
+        }
+
+        int prev = info.flags;
+        info.flags |= DEF_ANNOT;
+        return prev;
+    }
+
     public void addUsed(String name) {
         if (tbl.get(name) == null) {
             tbl.put(name, new SymInfo(0));

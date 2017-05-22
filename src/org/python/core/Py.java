@@ -1702,6 +1702,11 @@ public final class Py {
         return pye;
     }
 
+    public static void popException(ThreadState state, PyFrame frame) {
+        frame.previousException = null;
+        state.exceptions.pollFirst();
+    }
+
     public static void popException(ThreadState state) {
         state.frame.previousException = null;
         state.exceptions.pollFirst();

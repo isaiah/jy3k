@@ -271,6 +271,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
                 if ((prev & GLOBAL) != 0) {
                     continue;
                 }
+                if ((prev & DEF_ANNOT) != 0) {
+                    code_compiler.error("annotated name '" + name
+                            + "' can't be global", true, node);
+                }
                 String what;
                 if ((prev & BOUND) != 0) {
                     what = "assignment";
@@ -278,7 +282,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
                     what = "use";
                 }
                 code_compiler.error("name '" + name
-                        + "' declared global after " + what, false, node);
+                        + "' declared global after " + what, true, node);
             }
         }
         return null;
@@ -324,6 +328,11 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         if (cur.isClassScope()) {
             // TODO collect the types here, and evaluate them in the class scope
             cur.addUsed("__annotations__");
+        }
+        String name = node.getInternalTarget().getText();
+        int prev = cur.addAnnotated(name);
+        if ((prev & GLOBAL) != 0) {
+            code_compiler.error("annotated name '" + name + "' can't be global", true, node);
         }
         return super.visitAnnAssign(node);
     }
