@@ -14,6 +14,7 @@ import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.BoolOp;
 import org.python.antlr.ast.Break;
+import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
@@ -28,6 +29,7 @@ import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.For;
+import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.Global;
@@ -37,6 +39,7 @@ import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Interactive;
+import org.python.antlr.ast.JoinedStr;
 import org.python.antlr.ast.Lambda;
 import org.python.antlr.ast.List;
 import org.python.antlr.ast.ListComp;
@@ -52,6 +55,7 @@ import org.python.antlr.ast.Set;
 import org.python.antlr.ast.SetComp;
 import org.python.antlr.ast.Slice;
 import org.python.antlr.ast.Starred;
+import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.Tuple;
@@ -1193,11 +1197,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     private void recursiveSetContextType(expr e, expr_contextType context) {
-         if (e instanceof NameConstant) {
-            throw Py.SyntaxError(e.getToken(), "can't assign to keyword", filename);
-        } else if (e instanceof Call) {
-            throw Py.SyntaxError(e.getToken(), "can't assign to function call", filename);
-        }
         if (e instanceof Context) {
             ((Context) e).setContext(context);
             if (e instanceof Tuple) {
@@ -1209,7 +1208,48 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             } else if (e instanceof List) {
                 ((List) e).getInternalElts().forEach(elt -> recursiveSetContextType(elt, context));
             }
+            return;
         }
+
+        String verb;
+        if (context == expr_contextType.Del) {
+            verb = "delete";
+        } else if (context == expr_contextType.Store) {
+            verb = "assign to";
+        } else {
+            return;
+        }
+        String exprName = "";
+        if (e instanceof NameConstant) {
+            exprName = "keyword";
+        } else if (e instanceof Call) {
+            exprName = "function call";
+        } else if (e instanceof Lambda) {
+            exprName = "lambda";
+        } else if (e instanceof BinOp || e instanceof BoolOp || e instanceof UnaryOp) {
+            exprName = "operator";
+        } else if (e instanceof GeneratorExp) {
+            exprName = "generator expression";
+        } else if (e instanceof Await) {
+            exprName = "await expression";
+        } else if (e instanceof ListComp) {
+            exprName = "list comprehension";
+        } else if (e instanceof SetComp) {
+            exprName = "set comprehension";
+        } else if (e instanceof DictComp) {
+            exprName = "dict comprehension";
+        } else if (e instanceof Dict || e instanceof Set || e instanceof Num || e instanceof Str ||
+                e instanceof Bytes || e instanceof JoinedStr || e instanceof FormattedValue) {
+            exprName = "literal";
+        } else if (e instanceof Ellipsis) {
+            exprName = "Ellipsis";
+        } else if (e instanceof Compare) {
+            exprName = "comparison";
+        } else if (e instanceof IfExp) {
+            exprName = "conditional expression";
+        }
+
+        throw Py.SyntaxError(e.getToken(), String.format("can't %s %s", verb, exprName), filename);
     }
 
     public static void main(String[] args) throws Exception {
