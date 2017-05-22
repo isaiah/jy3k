@@ -1,10 +1,14 @@
 package org.python.antlr;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.python.antlr.base.mod;
+
+import java.util.List;
 
 public class BaseParser {
 
@@ -27,64 +31,44 @@ public class BaseParser {
         this.partial = partial;
     }
 
-//    public void setAntlrErrorHandler(ErrorHandler eh) {
-//        this.errorHandler = eh;
-//    }
-
     protected PythonParser setupParser(boolean single) {
         PythonLexer lexer = new PythonLexer(charStream);
         lexer.single = single;
-//        lexer.setErrorHandler(errorHandler);
-//        lexer.single = single;
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-//        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename, single);
-//        tokens = new CommonTokenStream(tokens);
         PythonParser parser = new PythonParser(tokens);
+        parser.removeErrorListeners();
+//        parser.addErrorListener(new BaseErrorListener() {
+//            @Override
+//            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+//                List<String> stack = ((PythonParser) recognizer).getRuleInvocationStack();
+//                System.out.println(stack);
+//                System.out.println(e);
+//                super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+//            }
+//        });
         parser.setErrorHandler(new BailErrorStrategy());
-//        parser.setErrorHandler(errorHandler);
-//        parser.setTreeAdaptor(new PythonTreeAdaptor());
         return parser;
     }
 
     public mod parseExpression() {
-        mod tree = null;
         PythonParser parser = setupParser(false);
-        try {
-            PythonParser.Eval_inputContext r = parser.eval_input();
-            tree = (mod) new BuildAstVisitor(filename).visit(r);
-        } catch (RecognitionException e) {
-            //XXX: this can't happen.  Need to strip the throws from antlr
-            //     generated code.
-        }
+        PythonParser.Eval_inputContext r = parser.eval_input();
+        mod tree = (mod) new BuildAstVisitor(filename).visit(r);
         return tree;
     }
 
     public mod parseInteractive() {
-        mod tree = null;
         PythonParser parser = setupParser(true);
-        try {
-            parser.setErrorHandler(new BailErrorStrategy());
-            PythonParser.Single_inputContext r = parser.single_input();
-            tree = (mod) new BuildAstVisitor(filename).visit(r);
-        } catch (RecognitionException e) {
-            //I am only throwing ParseExceptions, but "throws RecognitionException" still gets
-            //into the generated code.
-            System.err.println("FIXME: pretty sure this can't happen -- but needs to be checked");
-        }
+        PythonParser.Single_inputContext r = parser.single_input();
+        mod tree = (mod) new BuildAstVisitor(filename).visit(r);
         return tree;
     }
 
     public mod parseModule() {
         mod tree = null;
         PythonParser parser = setupParser(false);
-        parser.setErrorHandler(new BailErrorStrategy());
-        try {
-            PythonParser.File_inputContext r = parser.file_input();
-            tree = (mod) new BuildAstVisitor(filename).visit(r);
-        } catch (RecognitionException e) {
-            //XXX: this can't happen.  Need to strip the throws from antlr
-            //     generated code.
-        }
+        PythonParser.File_inputContext r = parser.file_input();
+        tree = (mod) new BuildAstVisitor(filename).visit(r);
         return tree;
     }
 }
