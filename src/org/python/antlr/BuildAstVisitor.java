@@ -1,5 +1,6 @@
 package org.python.antlr;
 
+import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
@@ -185,6 +186,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         }
         if (ctx.annassign() != null) {
             expr target = (expr) visit(ctx.testlist_star_expr(0));
+            if (!(target instanceof Context)) {
+                throw Py.SyntaxError(ctx, "illegal target for annotation", filename);
+            }
             if (target instanceof List) {
                 throw Py.SyntaxError(target.getToken(), "only single target (not list) can be annotated", filename);
             } else if (target instanceof Tuple) {
@@ -904,9 +908,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
         java.util.List<expr> exprs = visit_Exprlist(ctx.exprlist());
         exprs.stream().forEach(expr -> {
-            if (expr instanceof Call) {
-                throw Py.SyntaxError(ctx, "can't delete function call", filename);
-            }
             ((Context) expr).setContext(expr_contextType.Del);
         });
         return new Delete(ctx.getStart(), exprs);
@@ -938,7 +939,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitExprlist(PythonParser.ExprlistContext ctx) {
         java.util.List<expr> elts = visit_Exprlist(ctx);
-        if (elts.size() == 1) {
+        if (ctx.COMMA().isEmpty()) {
             return elts.get(0);
         }
         return new Tuple(ctx.getStart(), elts, exprContextType);
