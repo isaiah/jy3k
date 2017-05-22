@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +57,9 @@ public class ParserFacade {
                 int tokType = tok.getType();
                 indentationError = tokType == PythonParser.INDENT || tokType == PythonParser.DEDENT;
                 text = tok.getText();
-                if (indentationError) {
+                if (tokType == PythonParser.EOF) {
+                    msg = "unexpected EOF while parsing";
+                } else if (indentationError) {
                     msg = "unexpected indent";
                 } else {
                     IntervalSet toks = ((InputMismatchException) cause).getExpectedTokens();
@@ -65,9 +68,14 @@ public class ParserFacade {
                         msg = "expected an indented block";
                     }
                 }
+            } else if (cause instanceof NoViableAltException) {
+                String cmd = ((NoViableAltException) cause).getCtx().getText();
+                if (cmd.equals("exec") || cmd.equals("print")) {
+                    msg = String.format("Missing parentheses in call to '%s'", cmd);
+                }
             }
             if (msg == null) {
-                msg = "invalid token";
+                msg = "invalid syntax";
             }
             if (indentationError) {
                 return new PyIndentationError(msg, line, col, text, filename);
@@ -125,13 +133,9 @@ public class ParserFacade {
         reader.mark(MARK_LIMIT); // We need the ability to move back on the
                                  // reader, for the benefit of fixParseError and
                                  // validPartialSentence
-        if (kind != null) {
-            CharStream cs = new ANTLRInputStream(reader);
-            BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
-            return kind.dispatch(parser);
-        } else {
-            throw Py.ValueError("parse kind must be eval, exec, or single");
-        }
+        CharStream cs = new ANTLRInputStream(reader);
+        BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
+        return kind.dispatch(parser);
     }
 
     public static mod parse(Reader reader,
