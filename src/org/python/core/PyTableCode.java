@@ -229,7 +229,7 @@ public class PyTableCode extends PyBaseCode
                 ts.exceptions.pop();
             }
 
-            ts.frame = ts.frame.f_back;
+            ts.frame = frame.f_back;
             throw pye;
         } finally {
             ThreadStateMapping.exitCall(ts);
