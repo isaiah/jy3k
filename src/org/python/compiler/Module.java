@@ -651,7 +651,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
                 }
             }
         }
-        throw new ParseException(msg, node);
+        throw Py.SyntaxError(node.getToken(), msg, sfilename);
     }
 
     public int makeConstArray(Code code, java.util.List<? extends PythonTree> nodes) throws IOException {

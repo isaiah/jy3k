@@ -5,7 +5,6 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Method;
-import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnnAssign;
@@ -107,7 +106,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
@@ -530,7 +528,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitBreak(Break node) throws Exception {
         // setline(node); Not needed here...
         if (breakLabels.isEmpty()) {
-            throw new ParseException("'break' outside loop", node);
+            throw Py.SyntaxError(node.getToken(), "'break' outside loop", module.getFilename());
         }
 
         doFinallysDownTo(bcfLevel);
@@ -543,7 +541,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitContinue(Continue node) throws Exception {
         // setline(node); Not needed here...
         if (continueLabels.isEmpty()) {
-            throw new ParseException("'continue' not properly in loop", node);
+            throw Py.SyntaxError(node.getToken(), "'continue' not properly in loop", module.getFilename());
         }
 
         doFinallysDownTo(bcfLevel);
@@ -596,7 +594,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitYieldFrom(YieldFrom node) throws Exception {
         if (!fast_locals) {
-            throw new ParseException("'yield from' outside function", node);
+            throw Py.SyntaxError(node.getToken(), "'yield from' outside function", module.getFilename());
         }
 
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
@@ -626,7 +624,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitYield(Yield node) throws Exception {
         setline(node);
         if (!fast_locals) {
-            throw new ParseException("'yield' outside function", node);
+            throw Py.SyntaxError(node.getToken(), "'yield' outside function", module.getFilename());
         }
 
         /**
@@ -734,7 +732,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitReturn(Return node, boolean inEval) throws Exception {
         setline(node);
         if (!inEval && !fast_locals) {
-            throw new ParseException("'return' outside function", node);
+            throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
         int tmp = 0;
         if (node.getInternalValue() != null) {
@@ -817,7 +815,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.ldc(node.getInternalModule());
         java.util.List<alias> aliases = node.getInternalNames();
         if (aliases == null || aliases.size() == 0) {
-            throw new ParseException("Internel parser error", node);
+            throw Py.SyntaxError(node.getToken(), "Internel parser error", module.getFilename());
         } else if (aliases.size() == 1 && aliases.get(0).getInternalName().equals("*")) {
             if (my_scope.func_level > 0) {
                 module.error("import * only allowed at module level", false, node);
@@ -1244,7 +1242,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.ifeq(end_of_self);
             } else {
                 if (i != node.getInternalHandlers().size() - 1) {
-                    throw new ParseException("default 'except:' must be last", handler);
+                    throw Py.SyntaxError(node.getToken(), "default 'except:' must be last", module.getFilename());
                 }
             }
 
@@ -1475,8 +1473,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (n > 1) {
             int result = code.getLocal(p(PyObject.class));
             for (int i = 0; i < n; i++) {
-                code.dup();
                 visit(node.getInternalComparators().get(i));
+                code.dup_x1();
                 visitCmpop(node.getInternalOps().get(i));
                 code.dup();
                 code.astore(result);
@@ -1937,13 +1935,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             if (elt instanceof Starred) {
                 if (!foundStarred) {
                     if (i >= 256) {
-                        throw new ParseException("too many expressions in star-unpacking assignment", node);
+                        throw Py.SyntaxError(node.getToken(), "too many expressions in star-unpacking assignment", module.getFilename());
                     }
                     count = i;
                     countAfter = elts.size() - i - 1;
                     foundStarred = true;
                 } else {
-                    throw new ParseException("two starred expressions in assignment", node);
+                    throw Py.SyntaxError(node.getToken(), "two starred expressions in assignment", module.getFilename());
                 }
             }
         }
@@ -2362,7 +2360,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                                 sig(Void.TYPE, String.class, PyObject.class));
                     } else {
                         if (syminf == null) {
-                            throw new ParseException("internal compiler error", node);
+                            throw Py.SyntaxError(node.getToken(), "internal compiler error", module.getFilename());
                         }
                         code.iconst(syminf.locals_index);
                         code.aload(temporary);
@@ -2383,7 +2381,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                                 sig(Void.TYPE, String.class));
                     } else {
                         if (syminf == null) {
-                            throw new ParseException("internal compiler error", node);
+                            throw Py.SyntaxError(node.getToken(), "internal compiler error", module.getFilename());
                         }
                         if ((syminf.flags & (ScopeInfo.FREE | ScopeInfo.CELL)) != 0) {
                             code.iconst(syminf.env_index);
