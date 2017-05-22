@@ -1159,14 +1159,14 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     private slice visit_Subscriptlist(PythonParser.SubscriptlistContext ctx) {
-        if (ctx.subscript().size() > 1) {
-            java.util.List<slice> dims = new ArrayList<>(ctx.subscript().size());
-            for (PythonParser.SubscriptContext subscriptContext : ctx.subscript()) {
-                dims.add((slice) visitSubscript(subscriptContext));
-            }
-            return new ExtSlice(ctx.getStart(), dims);
+        if (ctx.COMMA().isEmpty()) {
+            return (slice) visit(ctx.subscript(0));
         }
-        return (slice) visit(ctx.subscript(0));
+        java.util.List<slice> dims = new ArrayList<>(ctx.subscript().size());
+        for (PythonParser.SubscriptContext subscriptContext : ctx.subscript()) {
+            dims.add((slice) visitSubscript(subscriptContext));
+        }
+        return new ExtSlice(ctx.getStart(), dims);
     }
 
     private String visit_Dotted_name(PythonParser.Dotted_nameContext ctx) {
@@ -1259,8 +1259,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     public static void main(String[] args) throws Exception {
-//        TestRig rig = new TestRig(new String[]{"org.python.antlr.Python", "file_input", "/tmp/foo.py", "-tree"});
-//        rig.process();
+        TestRig rig = new TestRig(new String[]{"org.python.antlr.Python", "file_input", "/tmp/foo.py", "-tree"});
+        rig.process();
         String module = "encodings";
         File src = new File("/tmp/foo.py");
         byte[] bytes = org.python.core.imp.compileSource(module, src);
