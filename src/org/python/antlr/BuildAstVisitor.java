@@ -181,6 +181,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 value = (expr) visit(ctx.yield_expr(0));
             }
             expr target = (expr) visit(ctx.testlist_star_expr(0));
+            if (!(target instanceof Context)) {
+                throw Py.SyntaxError(ctx, "illegal target for annotation", filename);
+            }
             ((Context) target).setContext(expr_contextType.AugStore);
             return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
         }
