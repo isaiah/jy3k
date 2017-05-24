@@ -2467,12 +2467,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(Void.TYPE));
 
         scope.setup_closure();
-        scope.dump();
 
         stmt n = new Expr(node, new Yield(node, elt));
 
         expr iter = null;
-        for (int i = 0; i < generators.size(); i++) {
+        for (int i = generators.size() - 1; i >= 0; i--) {
             comprehension comp = generators.get(i);
             for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
                 java.util.List<stmt> bod = new ArrayList<>();
