@@ -199,7 +199,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
             ((Context) target).setContext(expr_contextType.Store);
             AnnassignResult annassignResult = visit_Annassign(ctx.annassign());
-            return new AnnAssign(ctx.getStart(), target, annassignResult.anno, annassignResult.value, 1);
+            int simple = target instanceof Name ? 1 : 0;
+            return new AnnAssign(ctx.getStart(), target, annassignResult.anno, annassignResult.value, simple);
         }
         /** Annotate assign */
         if (ctx.ASSIGN().isEmpty()) {
@@ -985,29 +986,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     /**
-     * Temporarily change exprContextType
-     */
-    private void withExprContextType(expr_contextType contextType, Runnable handle) {
-        expr_contextType oldContextType = exprContextType;
-        exprContextType = contextType;
-        try {
-            handle.run();
-        } finally {
-            exprContextType = oldContextType;
-        }
-    }
-
-    private PythonTree withExprContextType(expr_contextType contextType, Supplier<PythonTree> handle) {
-        expr_contextType oldContextType = exprContextType;
-        exprContextType = contextType;
-        try {
-            return handle.get();
-        } finally {
-            exprContextType = oldContextType;
-        }
-    }
-
-    /**
      * helper method
      */
     private java.util.List<expr> visit_Exprlist(PythonParser.ExprlistContext ctx) {
@@ -1108,7 +1086,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private java.util.List<comprehension> visit_Comp_for(PythonParser.Comp_forContext ctx) {
         java.util.List<comprehension> ret = new ArrayList<>();
-        expr target = (expr) withExprContextType(expr_contextType.Store, () -> visit(ctx.exprlist()));
+        expr target = (expr) visit(ctx.exprlist());
+        recursiveSetContextType(target, expr_contextType.Store);
         expr iter = (expr) visit(ctx.or_test());
         java.util.List<expr> ifs = new ArrayList<>();
         if (ctx.comp_iter() != null) {
