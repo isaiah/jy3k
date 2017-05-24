@@ -40,7 +40,7 @@ public class AnnotationsCreator extends Visitor {
 
     @Override
     public Object visitAnnAssign(AnnAssign node) {
-        if (node.getInternalTarget() instanceof Name) {
+        if (node.getInternalSimple() > 0) {
             Name anno = new Name(node, "__annotations__", expr_contextType.Load);
             slice val = new Index(node, new Str(node, node.getInternalTarget().getToken().getText()));
             Subscript item = new Subscript(node, anno, val, expr_contextType.Store);
