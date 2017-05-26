@@ -318,8 +318,21 @@ public class PySet extends BaseSet {
     	}
     }
 
-    @ExposedMethod(names = "__repr__", doc = BuiltinDocs.set___repr___doc)
-    final String set_toString() {
-        return baseset_toString();
+    @Override
+    public String toString() {
+        ThreadState ts = Py.getThreadState();
+        if (!ts.enterRepr(this)) {
+            return "{...}";
+        }
+        StringBuilder buf = new StringBuilder("{");
+        for (Iterator<PyObject> i = _set.iterator(); i.hasNext();) {
+            buf.append((i.next()).__repr__().toString());
+            if (i.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        buf.append("}");
+        ts.exitRepr(this);
+        return buf.toString();
     }
 }
