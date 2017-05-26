@@ -62,7 +62,6 @@ import org.python.antlr.ast.Try;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
-import org.python.antlr.ast.With;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.YieldFrom;
 import org.python.antlr.ast.alias;
@@ -92,7 +91,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -667,7 +665,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return testlistCompResult.exprs.get(0);
         } else if (ctx.OPEN_BRACK() != null) {
             if (testlistCompResult.comps != null) {
-                Collections.reverse(testlistCompResult.comps);
                 return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
             return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
@@ -1246,10 +1243,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         String module = "encodings";
         File src = new File("/tmp/foo.py");
         byte[] bytes = org.python.core.imp.compileSource(module, src);
-//        InputStream program = new FileInputStream("/tmp/foo.py");
-//        String program = "def foo(x):\n  return x + 1\n";
         BuildAstVisitor v = new BuildAstVisitor("<string>");
-//
+
         ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
         PythonLexer lexer = new PythonLexer(inputStream);
         TokenStream tokens = new CommonTokenStream(lexer);

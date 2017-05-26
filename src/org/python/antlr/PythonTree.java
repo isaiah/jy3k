@@ -208,6 +208,14 @@ public abstract class PythonTree extends AST implements Traverseproc {
         return sb.toString();
     }
 
+    public PythonTree replaceSelf(expr other) {
+        if (this instanceof expr) {
+            getParent().replaceField((expr) this, other);
+            return this;
+        }
+        throw new RuntimeException("only support expression");
+    }
+
     public PythonTree replaceSelf(stmt... others) {
         return replaceSelf(Arrays.asList(others));
     }

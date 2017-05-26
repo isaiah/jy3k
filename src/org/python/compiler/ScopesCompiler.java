@@ -183,7 +183,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitLambda(Lambda node) throws Exception {
+    public Object visitAnonymousFunction(AnonymousFunction node) throws Exception {
         ArgListCompiler ac = new ArgListCompiler();
         ac.visitArgs(node.getInternalArgs());
 
@@ -202,7 +202,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
             visit((stmt) o);
         }
         cur.markFromParam();
-        visit(node.getInternalBody());
+        suite(node.getInternalBody());
         endScope();
         return null;
     }
@@ -374,23 +374,6 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitListComp(ListComp node) throws Exception {
-        return visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
-    }
-
-    @Override
-    public Object visitDictComp(DictComp node) throws Exception {
-        java.util.List<expr> kv = Arrays.asList(node.getInternalKey(), node.getInternalValue());
-        return visitInternalGenerators(
-                node, new Tuple(node, kv, expr_contextType.UNDEFINED), node.getInternalGenerators());
-    }
-
-    @Override
-    public Object visitSetComp(SetComp node) throws Exception {
-        return visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
-    }
-
-    @Override
     public Object visitAwait(Await node) throws Exception {
         if (!cur.isFunction()) {
             throw new ParseException("'await' outside function", node);
@@ -431,64 +414,6 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         }
         traverse(node);
         return null;
-    }
-
-    private Object visitInternalGenerators(expr node, expr elt, java.util.List<comprehension> generators)
-            throws Exception {
-        // The first iterator is evaluated in the outer scope
-        if (generators != null && generators.size() > 0) {
-            visit(generators.get(0).getInternalIter());
-        }
-        String bound_exp = "_(x)";
-        String tmp = "_(" + node.getLine() + "_" + node.getCharPositionInLine()
-                + ")";
-        def(tmp);
-        ArgListCompiler ac = new ArgListCompiler();
-        List<arg> args = new ArrayList<>();
-        args.add(new arg(node.getToken(), bound_exp, null));
-        arg vararg = null;
-        List<arg> kwonlyargs = new ArrayList<>();
-        List<expr> kw_defaults = new ArrayList<>();
-        arg kwarg = null;
-        List<expr> defaults = new ArrayList<>();
-        ac.visitArgs(new arguments(node, args, vararg, kwonlyargs, kw_defaults, kwarg, defaults));
-        beginScope(tmp, FUNCSCOPE, node, ac);
-        cur.defineAsComprehension();
-        cur.addParam(bound_exp);
-        cur.markFromParam();
-
-        cur.defineAsGenerator();
-        cur.yield_count++;
-        // The reset of the iterators are evaluated in the inner scope
-        if (elt != null) {
-            visit(elt);
-        }
-        if (generators != null) {
-            for (int i = 0; i < generators.size(); i++) {
-                if (generators.get(i) != null) {
-                    if (i == 0) {
-                        visit(generators.get(i).getInternalTarget());
-                        if (generators.get(i).getInternalIfs() != null) {
-                            for (expr cond : generators.get(i).getInternalIfs()) {
-                                if (cond != null) {
-                                    visit(cond);
-                                }
-                            }
-                        }
-                    } else {
-                        visit(generators.get(i));
-                    }
-                }
-            }
-        }
-
-        endScope();
-        return null;
-    }
-
-    @Override
-    public Object visitGeneratorExp(GeneratorExp node) throws Exception {
-        return visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
     }
 
     @Override

@@ -1,29 +1,44 @@
 package org.python.compiler;
 
+import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
+import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Break;
+import org.python.antlr.ast.Call;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
+import org.python.antlr.ast.DictComp;
 import org.python.antlr.ast.ExceptHandler;
+import org.python.antlr.ast.Expr;
+import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.GeneratorExp;
+import org.python.antlr.ast.If;
+import org.python.antlr.ast.Lambda;
+import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
+import org.python.antlr.ast.SetComp;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Try;
+import org.python.antlr.ast.Yield;
+import org.python.antlr.ast.arg;
+import org.python.antlr.ast.arguments;
+import org.python.antlr.ast.comprehension;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -40,97 +55,91 @@ import static org.python.compiler.CompilerConstants.RETURN;
  */
 public class Lower extends Visitor {
      /**
-      * lower list comprehension PEP-0289
+      * convert list comprehension into an anonymous function call
       * [x for x in range(10)]
       *
-      * becomes
+      * becomes (pseudo code)
       *
-      * _tmp = []
-      * append = _tmp.append
-      * for x in range(10):
-      *   append(x)
-      * del append
-      * # do something with _tmp
-      * del _tmp
+      * lambda (elt):
+      *   _tmp = []
+      *   for x in elt:
+      *     _tmp.append(x)
+      *   return _tmp
+      * (iter(range(10)) // invoke lambda
       *
       * @param node
       * @return
       * @throws Exception
       */
-//    @Override
-//    public Object visitListComp(ListComp node) {
-//        Name tmp = new Name(node.getToken(), "__(tmp)" + count++, expr_contextType.Store);
-//        Assign initTmp = new Assign(node.getToken(), asList(tmp), new org.python.antlr.ast.List(node.getToken(), null, expr_contextType.Load));
-//        Name append = new Name(node.getToken(), "__append" + count++, expr_contextType.Store);
-//        tmp = tmp.copy();
-//        tmp.setContext(expr_contextType.Load);
-//        expr getAppend = new Attribute(node.getToken(), tmp, "append", expr_contextType.Load);
-//        Assign assignAppend = new Assign(node, asList(append), getAppend);
-//        append = append.copy();
-//        append.setContext(expr_contextType.Load);
-//        stmt n = new Expr(node, new Call(node, append, asList(node.getInternalElt()), null));
-//        for (int i = 0; i < node.getInternalGenerators().size(); i++) {
-//            comprehension comp = node.getInternalGenerators().get(i);
-//            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
-//                java.util.List<stmt> bod = new ArrayList<>(1);
-//                bod.add(n);
-//                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod,
-//                        new ArrayList<>());
-//            }
-//            List<stmt> bod = new ArrayList<>(1);
-//            bod.add(n);
-//            n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod,
-//                    new ArrayList<>());
-//        }
-//
-//        append = append.copy();
-//        append.setContext(expr_contextType.Del);
-//        Delete del = new Delete(node, asList(append));
-//        PythonTree parent = node.getParent();
-//        parent.replaceField(node, tmp);
-//        tmp = tmp.copy();
-//        tmp.setContext(expr_contextType.Del);
-//        Delete delTmp = new Delete(node, asList(tmp));
-//        while(!(parent instanceof stmt)) {
-//            parent = parent.getParent();
-//        }
-//        parent.replaceSelf(initTmp, assignAppend, n, del, delTmp);
-//        return node;
-//    }
-//
-//    @Override
-//    public Object visitDictComp(DictComp node) {
-//        Name tmp = new Name(node.getToken(), "__(tmp)" + count++, expr_contextType.Store);
-//        Assign initTmp = new Assign(node.getToken(), asList(tmp), new org.python.antlr.ast.Dict(node.getToken(), null, null));
-//        tmp = tmp.copy();
-//        tmp.setContext(expr_contextType.Load);
-//        Subscript sub = new Subscript(node, tmp, new Index(node, node.getInternalKey()), expr_contextType.Store);
-//        stmt n = new Assign(node, asList(sub), node.getInternalValue());
-//        for (int i = 0; i < node.getInternalGenerators().size(); i++) {
-//            comprehension comp = node.getInternalGenerators().get(i);
-//            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
-//                java.util.List<stmt> bod = new ArrayList<>(1);
-//                bod.add(n);
-//                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod,
-//                        new ArrayList<>());
-//            }
-//            List<stmt> bod = new ArrayList<>(1);
-//            bod.add(n);
-//            n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod,
-//                    new ArrayList<>());
-//        }
-//
-//        PythonTree parent = node.getParent();
-//        parent.replaceField(node, tmp);
-//        tmp = tmp.copy();
-//        tmp.setContext(expr_contextType.Del);
-//        Delete delTmp = new Delete(node, asList(tmp));
-//        while(!(parent instanceof stmt)) {
-//            parent = parent.getParent();
-//        }
-//        parent.replaceSelf(initTmp, n, delTmp);
-//        return node;
-//    }
+    @Override
+    public Object visitListComp(ListComp node) throws Exception {
+        traverse(node);
+        org.python.antlr.ast.List emptyList = new org.python.antlr.ast.List(node, null, expr_contextType.Load);
+        return visitComp(emptyList, "append", node, node.getInternalGenerators(), node.getInternalElt());
+    }
+
+    @Override
+    public Object visitSetComp(SetComp node) throws Exception {
+        traverse(node);
+        org.python.antlr.ast.Set emptySet = new org.python.antlr.ast.Set(node, null);
+        return visitComp(emptySet, "add", node, node.getInternalGenerators(), node.getInternalElt());
+    }
+
+    @Override
+    public Object visitDictComp(DictComp node) throws Exception {
+        traverse(node);
+        org.python.antlr.ast.Dict emptyDict = new org.python.antlr.ast.Dict(node, null, null);
+        return visitComp(emptyDict, "__setitem__", node, node.getInternalGenerators(), node.getInternalKey(), node.getInternalValue());
+    }
+
+    @Override
+    public Object visitGeneratorExp(GeneratorExp node) throws Exception {
+        traverse(node);
+        stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
+        expr iter = null;
+        List<comprehension> generators = node.getInternalGenerators();
+
+        String elt = "(elt)";
+        int last = generators.size() - 1;
+        for (int i = 0; i <= last; i++) {
+            comprehension comp = generators.get(i);
+
+            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
+                List<stmt> bod = asList(n);
+                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod, null);
+            }
+            List<stmt> bod = asList(n);
+            if (i == last) {
+                iter = comp.getInternalIter();
+                n = new For(comp, comp.getInternalTarget(), new Name(node, elt, expr_contextType.Load), bod, null);
+            } else {
+                n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod, null);
+            }
+        }
+
+        arg arg = new arg(node, elt, null);
+        arguments args = new arguments(node, asList(arg), null, null, null, null, null);
+        AnonymousFunction lambda = new AnonymousFunction(node, args, asList(n));
+        Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
+        expr result = new Call(node, lambda, asList(getIter), null);
+
+        node.replaceSelf(result);
+        return node;
+    }
+
+    /**
+     * Convert a lambda into an anonymous function
+     * @param node
+     * @return
+     */
+    @Override
+    public Object visitLambda(Lambda node) throws Exception {
+        traverse(node);
+        java.util.List<stmt> bod = asList(new Return(node, node.getInternalBody()));
+        expr anonymousFunction = new AnonymousFunction(node, node.getInternalArgs(), bod);
+        node.replaceSelf(anonymousFunction);
+        return node;
+    }
 
     /**
      * lower generator expression PEP-0289
@@ -138,68 +147,20 @@ public class Lower extends Visitor {
      *
      * becomes
      *
-     * def __gen(exp):
+     * g =
+     * lambda (exp):
      *   for x in exp:
      *   yield x**2
-     * g = __gen(iter(range(10)))
+     * (iter(range(10)))
      *
      * @param node
      * @return
      * @throws Exception
      */
 
-//    @Override
-//    public Object visitGeneratorExp(GeneratorExp node) {
-//        String bound_exp = "_(exp)";
-//        stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
-//
-//        expr iter = null;
-//        for (int i = 0; i < node.getInternalGenerators().size(); i++) {
-//            comprehension comp = node.getInternalGenerators().get(i);
-//            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
-//                java.util.List<stmt> bod = new ArrayList<>(1);
-//                bod.add(n);
-//                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod,
-//                        new ArrayList<>());
-//            }
-//            List<stmt> bod = new ArrayList<>(1);
-//            bod.add(n);
-//            if (i == node.getInternalGenerators().size() - 1) {
-//                n = new For(comp, comp.getInternalTarget(), new Name(node, bound_exp,
-//                        expr_contextType.Load), bod, new ArrayList<>());
-//                iter = comp.getInternalIter();
-//                continue;
-//            }
-//            n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod,
-//                    new ArrayList<>());
-//        }
-//
-//        java.util.List<stmt> bod = new ArrayList<>(1);
-//        bod.add(n);
-//        arg arg = new arg(node.getToken(), bound_exp, null);
-//        arguments args = new arguments(node.getToken(), asList(arg), null, null, null, null, null);
-//        FunctionDef gen = new FunctionDef(node.getToken(), GEN.symbolName() + count++, args, bod, null, null);
-//        Name genfunc = new Name(node.getToken(), gen.getInternalName(), expr_contextType.Load);
-//        Call iterCall = new Call(node.getToken(), new Name(node.getToken(), ITER.symbolName(), expr_contextType.Load), asList(iter), null);
-//        Call genfuncCall = new Call(node.getToken(), genfunc, asList(iterCall), null);
-//        PythonTree parent = node.getParent();
-//
-//        genfunc = genfunc.copy();
-//        genfunc.setContext(expr_contextType.Del);
-//        Delete delGenfunc = new Delete(node.getToken(), asList(genfunc));
-//        // replace genexp with call
-//        parent.replaceField(node, genfuncCall);
-//        // Find the statement that hold the parent
-//        while(!(parent instanceof stmt)) {
-//            parent = parent.getParent();
-//        }
-//        // insert function definition and del
-//        parent.replaceSelf(gen, ((stmt) parent).copy(), delGenfunc);
-//        return node;
-//    }
-
     @Override
-    public Object visitAugAssign(AugAssign node) {
+    public Object visitAugAssign(AugAssign node) throws Exception {
+        traverse(node);
         expr left = node.getInternalTarget().copy();
         ((Context) left).setContext(expr_contextType.Load);
         operatorType op = node.getInternalOp();
@@ -214,6 +175,8 @@ public class Lower extends Visitor {
 
     @Override
     public Object visitTry(Try node) throws Exception {
+        // apply other lowers in this visitor first
+        traverse(node);
         final List<stmt> finalBody = node.getInternalFinalbody();
         if (finalBody == null || finalBody.isEmpty()) {
             return super.visitTry(node);
@@ -231,11 +194,6 @@ public class Lower extends Visitor {
             @Override
             public Object visitTry(Try node) throws Exception {
                 return Lower.this.visitTry(node);
-            }
-
-            @Override
-            public Object visitAugAssign(AugAssign node) {
-                return Lower.this.visitAugAssign(node);
             }
 
             @Override
@@ -286,5 +244,41 @@ public class Lower extends Visitor {
     private excepthandler catchAllBlock(stmt node, Block body) {
         Raise raiseNode = new Raise(node.getToken(), null, null);
         return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
+    }
+
+    private Object visitComp(expr initVal, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) throws Exception {
+        String tmp = "(tmp)";
+        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
+        expr append = new Attribute(node, loadTmp, appendMeth, expr_contextType.Load);
+        stmt n = new Expr(node, new Call(node, append, asList(internalElt), null));
+        expr iter = null;
+        String elt = "(elt)";
+        int last = generators.size() - 1;
+        for (int i = 0; i <= last; i++) {
+            comprehension comp = generators.get(i);
+
+            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
+                List<stmt> bod = asList(n);
+                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod, null);
+            }
+            List<stmt> bod = asList(n);
+            if (i == last) {
+                iter = comp.getInternalIter();
+                n = new For(comp, comp.getInternalTarget(), new Name(node, elt, expr_contextType.Load), bod, null);
+            } else {
+                n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod, null);
+            }
+        }
+
+        arg arg = new arg(node, elt, null);
+        arguments args = new arguments(node, asList(arg), null, null, null, null, null);
+        stmt newList = new Assign(node, asList(new Name(node, tmp, expr_contextType.Store)), initVal);
+        AnonymousFunction lambda = new AnonymousFunction(node, args, asList(newList, n, new Return(node, loadTmp)));
+
+        Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
+        expr result = new Call(node, lambda, asList(getIter), null);
+
+        node.replaceSelf(result);
+        return node;
     }
 }

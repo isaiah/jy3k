@@ -8,6 +8,7 @@ import org.objectweb.asm.commons.Method;
 import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnnAssign;
+import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.AsyncFor;
@@ -1978,63 +1979,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitListComp(ListComp node) throws Exception {
-        code.new_(p(PyList.class));
-        code.dup();
-        visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
-        code.invokespecial(p(PyList.class), "<init>", sig(Void.TYPE, PyObject.class));
-        return null;
-    }
-
-    @Override
-    public Object visitSetComp(SetComp node) throws Exception {
-        code.new_(p(PySet.class));
-        code.dup();
-        visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
-        code.invokespecial(p(PySet.class), "<init>", sig(Void.TYPE, PyObject.class));
-        return null;
-    }
-
-    @Override
-    public Object visitDictComp(DictComp node) throws Exception {
-        code.new_(p(PyDictionary.class));
-        code.dup();
-        code.invokespecial(p(PyDictionary.class), "<init>", sig(Void.TYPE));
-        code.dup();
-        java.util.List<expr> kv = Arrays.asList(node.getInternalKey(), node.getInternalValue());
-        visitInternalGenerators(node, new Tuple(node, kv, expr_contextType.UNDEFINED),
-                node.getInternalGenerators());
-        code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
-        return null;
-    }
-
-    private void finishComp(expr node, java.util.List<expr> args,
-                            java.util.List<comprehension> generators, String tmp_append) throws Exception {
-        set(new Name(node, tmp_append, expr_contextType.Store));
-
-        stmt n = new Expr(node, new Call(node, new Name(node, tmp_append, expr_contextType.Load),
-                args, new ArrayList<keyword>()));
-
-        for (int i = generators.size() - 1; i >= 0; i--) {
-            comprehension lc = generators.get(i);
-            for (int j = lc.getInternalIfs().size() - 1; j >= 0; j--) {
-                java.util.List<stmt> body = new ArrayList<stmt>();
-                body.add(n);
-                n = new If(lc.getInternalIfs().get(j), lc.getInternalIfs().get(j), body, //
-                        new ArrayList<stmt>());
-            }
-            java.util.List<stmt> body = new ArrayList<stmt>();
-            body.add(n);
-            n = new For(lc, lc.getInternalTarget(), lc.getInternalIter(), body, //
-                    new ArrayList<stmt>());
-        }
-        visit(n);
-        java.util.List<expr> targets = new ArrayList<expr>();
-        targets.add(new Name(n, tmp_append, expr_contextType.Del));
-        visit(new Delete(n, targets));
-    }
-
-    @Override
     public Object visitDict(Dict node) throws Exception {
         java.util.List<PythonTree> elts = new ArrayList<PythonTree>();
         java.util.List<expr> keys = node.getInternalKeys();
@@ -2088,22 +2032,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    // a marker class to distinguish this usage; future generator rewriting may likely
-    // want to remove this support
-    private class LambdaSyntheticReturn extends Return {
-        private LambdaSyntheticReturn(PythonTree tree, expr value) {
-            super(tree, value);
-        }
-    }
-
     @Override
-    public Object visitLambda(Lambda node) throws Exception {
+    public Object visitAnonymousFunction(AnonymousFunction node) throws Exception {
         String name = "<lambda>";
 
-        // Add a synthetic return node onto the outside of suite;
-        java.util.List<stmt> bod = new ArrayList<stmt>();
-        bod.add(new LambdaSyntheticReturn(node, node.getInternalBody()));
-        mod retSuite = new Suite(node, bod);
+//        // Add a synthetic return node onto the outside of suite;
+//        java.util.List<stmt> bod = Arrays.asList(new LambdaSyntheticReturn(node, node.getInternalBody()));
+//        mod retSuite = new Suite(node, bod);
         setline(node);
         ScopeInfo scope = module.getScopeInfo(node);
         code.new_(p(PyFunction.class));
@@ -2124,7 +2059,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         scope.setup_closure();
         scope.dump();
-        module.codeConstant(retSuite, name, true, className, node.getLine(), scope, cflags).get(code);
+        module.codeConstant(new Suite(node, node.getInternalBody()), name, true, className, node.getLine(), scope, cflags).get(code);
 
         if (!makeClosure(scope)) {
             code.invokespecial(p(PyFunction.class), "<init>",
@@ -2444,82 +2379,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitStr(Str node) throws Exception {
         module.constant(node).get(code);
-        return null;
-    }
-
-    private Object visitInternalGenerators(expr node, expr elt,
-                                           java.util.List<comprehension> generators) throws Exception {
-        String bound_exp = "_(x)";
-
-        setline(node);
-
-        code.new_(p(PyFunction.class));
-        code.dup();
-        loadFrame();
-        code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-
-        ScopeInfo scope = module.getScopeInfo(node);
-
-        loadArray(code, new ArrayList<expr>(0));
-        code.new_(p(PyDictionary.class));
-        code.dup();
-        code.invokespecial(p(PyDictionary.class), "<init>",
-                sig(Void.TYPE));
-
-        scope.setup_closure();
-
-        stmt n = new Expr(node, new Yield(node, elt));
-
-        expr iter = null;
-        for (int i = generators.size() - 1; i >= 0; i--) {
-            comprehension comp = generators.get(i);
-            for (int j = comp.getInternalIfs().size() - 1; j >= 0; j--) {
-                java.util.List<stmt> bod = new ArrayList<>();
-                bod.add(n);
-                n = new If(comp.getInternalIfs().get(j), comp.getInternalIfs().get(j), bod, //
-                        new ArrayList<>());
-            }
-            java.util.List<stmt> bod = new ArrayList<>();
-            bod.add(n);
-            if (i != generators.size() - 1) {
-                n = new For(comp, comp.getInternalTarget(), comp.getInternalIter(), bod, //
-                        new ArrayList<>());
-            } else {
-                n = new For(comp, comp.getInternalTarget(), new Name(node, bound_exp, //
-                        expr_contextType.Load), bod, new ArrayList<>());
-                iter = comp.getInternalIter();
-            }
-        }
-
-        java.util.List<stmt> bod = new ArrayList<>();
-        bod.add(n);
-        module.codeConstant(new Suite(node, bod), "<genexpr>", true, className,
-                node.getLine(), scope, cflags).get(code);
-
-        code.aconst_null();
-        if (!makeClosure(scope)) {
-            code.invokespecial(p(PyFunction.class), "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class));
-        } else {
-            code.invokespecial(
-                    p(PyFunction.class),
-                    "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject.class,
-                            PyObject[].class));
-        }
-
-        visit(iter);
-        code.invokevirtual(p(PyObject.class), "__iter__", sig(PyObject.class));
-        loadThreadState();
-        code.swap();
-        code.invokevirtual(p(PyObject.class), "__call__",
-                sig(PyObject.class, ThreadState.class, PyObject.class));
-        return null;
-    }
-
-    @Override
-    public Object visitGeneratorExp(GeneratorExp node) throws Exception {
-        visitInternalGenerators(node, node.getInternalElt(), node.getInternalGenerators());
         return null;
     }
 

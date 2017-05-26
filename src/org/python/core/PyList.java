@@ -40,7 +40,7 @@ public class PyList extends PySequenceList implements List {
 
     public PyList(PyType type) {
         super(type);
-        list = Generic.list();
+        list = new ArrayList<>();
     }
 
     private PyList(List list, boolean convert) {
@@ -48,7 +48,7 @@ public class PyList extends PySequenceList implements List {
         if (!convert) {
             this.list = list;
         } else {
-            this.list = Generic.list();
+            this.list = new ArrayList<>();
             for (Object o : list) {
                 add(o);
             }
