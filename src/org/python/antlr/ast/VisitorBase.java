@@ -236,6 +236,12 @@ public abstract class VisitorBase<R> implements VisitorIF<R> {
         return ret;
     }
 
+    public R visitAnonymousFunction(AnonymousFunction node) throws Exception {
+        R ret = unhandled_node(node);
+        traverse(node);
+        return ret;
+    }
+
     public R visitIfExp(IfExp node) throws Exception {
         R ret = unhandled_node(node);
         traverse(node);

@@ -37,6 +37,7 @@ public interface VisitorIF<R> {
     public R visitBinOp(BinOp node) throws Exception;
     public R visitUnaryOp(UnaryOp node) throws Exception;
     public R visitLambda(Lambda node) throws Exception;
+    public R visitAnonymousFunction(AnonymousFunction node) throws Exception;
     public R visitIfExp(IfExp node) throws Exception;
     public R visitDict(Dict node) throws Exception;
     public R visitSet(Set node) throws Exception;
