@@ -2470,6 +2470,15 @@ public final class Py {
         return ret;
     }
 
+    /** helper method for code generator */
+    public static boolean addAll(List<PyObject> list, PyObject seq) {
+        PyObject iter = seq.__iter__();
+        for (PyObject cur; ((cur = iter.__next__()) != null); ) {
+            list.add(cur);
+        }
+        return true;
+    }
+
     public static PyObject iter(PyObject seq, String message) {
         try {
             return seq.__iter__();

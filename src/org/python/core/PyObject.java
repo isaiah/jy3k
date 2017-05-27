@@ -530,6 +530,14 @@ public class PyObject implements Serializable {
         return __call__(arg0, arg1, arg2, arg3);
     }
 
+    public PyObject _callextra(List<PyObject> arglist,
+                               String[] keywords,
+                               PyObject[] starargsArray,
+                               PyObject[] kwargsArray) {
+        PyObject[] args = arglist.toArray(new PyObject[0]);
+        return _callextra(args, keywords, starargsArray, kwargsArray);
+    }
+
     public PyObject _callextra(PyObject[] args,
                                String[] keywords,
                                PyObject[] starargsArray,
@@ -562,7 +570,7 @@ public class PyObject implements Serializable {
         }
         List<PyObject> starObjs = null;
         for (PyObject starargs : starargsArray) {
-            starObjs = new ArrayList<PyObject>();
+            starObjs = new ArrayList<>();
             PyObject iter = Py.iter(starargs, name + "argument after * must be a sequence");
             for (PyObject cur = null; ((cur = iter.__next__()) != null); ) {
                 starObjs.add(cur);

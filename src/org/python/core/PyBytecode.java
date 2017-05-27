@@ -1340,7 +1340,7 @@ public class PyBytecode extends PyBaseCode implements Traverseproc {
             args[na + j] = params[i + 1];
 
         }
-        stack.push(callable._callextra(args, keywords, starargs, kwargs));
+        stack.push(callable._callextra(Arrays.asList(args), keywords, starargs, kwargs));
     }
 
     private static void unpack_iterable(int oparg, PyStack stack) {

@@ -322,6 +322,28 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return visitReturn(new Return(node, node.getInternalBody()), true);
     }
 
+    public void loadList(Code code, java.util.List<? extends PythonTree> nodes) throws Exception {
+        final int n = nodes.size();
+        code.new_(p(ArrayList.class));
+        code.dup();
+        code.invokespecial(p(ArrayList.class), "<init>", sig(Void.TYPE));
+
+        if (n == 0) {
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            code.dup();
+            PythonTree node = nodes.get(i);
+            visit(node);
+            if (node instanceof Starred) {
+                code.invokestatic(p(Py.class), "addAll", sig(Boolean.TYPE, java.util.List.class, PyObject.class));
+            } else {
+                code.invokevirtual(p(ArrayList.class), "add", sig(Boolean.TYPE, Object.class));
+            }
+            code.pop();
+        }
+    }
+
     public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) throws Exception {
         final int n;
 
@@ -1699,15 +1721,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<expr> starargs = new ArrayList<>();
         java.util.List<expr> kwargs = new ArrayList<>();
         java.util.List<String> keys = new ArrayList<String>();
-        java.util.List<expr> values = new ArrayList<expr>();
-        for (int i = 0; i < node.getInternalArgs().size(); i++) {
-            expr arg = node.getInternalArgs().get(i);
-            if (arg instanceof Starred) {
-                starargs.add(arg);
-            } else {
-                values.add(arg);
-            }
-        }
+        java.util.List<expr> values = node.getInternalArgs();
+        boolean stararg = values.stream().anyMatch(val -> val instanceof Starred);
+//        for (int i = 0; i < node.getInternalArgs().size(); i++) {
+//            expr arg = node.getInternalArgs().get(i);
+//            if (arg instanceof Starred) {
+//                stararg = true;
+//                break;
+//        }
 
         java.util.List<keyword> keywords = node.getInternalKeywords();
         for (int i = 0; i < keywords.size(); i++) {
@@ -1716,27 +1737,30 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             if (key == null) {
                 kwargs.add(value);
             } else {
+                if (keys.contains(key)) {
+                    throw Py.SyntaxError("keyword argument repeated");
+                }
                 keys.add(key);
                 values.add(value);
             }
         }
 
         if (node.getInternalFunc() instanceof Attribute
-                && keys.isEmpty() && starargs.isEmpty() && kwargs.isEmpty()) {
+                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
             return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
         }
 
         visit(node.getInternalFunc());
 
-        if (!starargs.isEmpty() || !kwargs.isEmpty()) {
-            loadArray(code, values);
+        if (stararg || !kwargs.isEmpty()) {
+            loadList(code, values);
             loadStrings(code, keys);
             loadArray(code, starargs);
             loadArray(code, kwargs);
             code.invokevirtual(
                     p(PyObject.class),
                     "_callextra",
-                    sig(PyObject.class, PyObject[].class, String[].class, PyObject[].class,
+                    sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class,
                             PyObject[].class));
         } else if (keys.size() > 0) {
             loadThreadState();
