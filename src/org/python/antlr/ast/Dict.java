@@ -115,7 +115,8 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         }
         for(int i = 0; i < this.keys.size(); i++) {
             PythonTree t = this.keys.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.values = values;
         if (values == null) {
@@ -123,7 +124,8 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         }
         for(int i = 0; i < this.values.size(); i++) {
             PythonTree t = this.values.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -135,7 +137,8 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         }
         for(int i = 0; i < this.keys.size(); i++) {
             PythonTree t = this.keys.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.values = values;
         if (values == null) {
@@ -143,7 +146,8 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         }
         for(int i = 0; i < this.values.size(); i++) {
             PythonTree t = this.values.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

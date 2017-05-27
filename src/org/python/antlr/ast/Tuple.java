@@ -115,7 +115,8 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         }
         for(int i = 0; i < this.elts.size(); i++) {
             PythonTree t = this.elts.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.ctx = ctx;
     }
@@ -128,7 +129,8 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         }
         for(int i = 0; i < this.elts.size(); i++) {
             PythonTree t = this.elts.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.ctx = ctx;
     }

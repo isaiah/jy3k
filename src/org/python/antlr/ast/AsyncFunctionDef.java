@@ -185,7 +185,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         }
         for(int i = 0; i < this.decorator_list.size(); i++) {
             PythonTree t = this.decorator_list.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.returns = returns;
         if (this.returns != null)
@@ -213,7 +214,8 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         }
         for(int i = 0; i < this.decorator_list.size(); i++) {
             PythonTree t = this.decorator_list.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.returns = returns;
         if (this.returns != null)

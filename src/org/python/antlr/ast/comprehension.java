@@ -128,7 +128,8 @@ public class comprehension extends PythonTree {
         }
         for(int i = 0; i < this.ifs.size(); i++) {
             PythonTree t = this.ifs.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -146,7 +147,8 @@ public class comprehension extends PythonTree {
         }
         for(int i = 0; i < this.ifs.size(); i++) {
             PythonTree t = this.ifs.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

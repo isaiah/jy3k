@@ -421,7 +421,8 @@ class JavaVisitor(EmitVisitor):
                         if f.type == 'stmt':
                             self.emit("addChild(t, i, this.%s);" % f.name, depth+2)
                         else:
-                            self.emit("t.setParent(this);", depth+2)
+                            self.emit(f"if (t != null)", depth+2)
+                            self.emit("t.setParent(this);", depth+3)
                         self.emit("}", depth+1)
                 elif not builtin_type:
                     self.emit(f"if (this.{f.name} != null)", depth+1)

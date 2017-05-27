@@ -115,7 +115,8 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         }
         for(int i = 0; i < this.targets.size(); i++) {
             PythonTree t = this.targets.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.value = value;
         if (this.value != null)
@@ -130,7 +131,8 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         }
         for(int i = 0; i < this.targets.size(); i++) {
             PythonTree t = this.targets.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.value = value;
         if (this.value != null)

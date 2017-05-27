@@ -138,7 +138,8 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
         }
         for(int i = 0; i < this.comparators.size(); i++) {
             PythonTree t = this.comparators.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -155,7 +156,8 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
         }
         for(int i = 0; i < this.comparators.size(); i++) {
             PythonTree t = this.comparators.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

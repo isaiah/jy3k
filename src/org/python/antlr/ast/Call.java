@@ -137,7 +137,8 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         }
         for(int i = 0; i < this.args.size(); i++) {
             PythonTree t = this.args.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.keywords = keywords;
         if (keywords == null) {
@@ -145,7 +146,8 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         }
         for(int i = 0; i < this.keywords.size(); i++) {
             PythonTree t = this.keywords.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -161,7 +163,8 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         }
         for(int i = 0; i < this.args.size(); i++) {
             PythonTree t = this.args.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.keywords = keywords;
         if (keywords == null) {
@@ -169,7 +172,8 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         }
         for(int i = 0; i < this.keywords.size(); i++) {
             PythonTree t = this.keywords.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

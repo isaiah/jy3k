@@ -161,7 +161,8 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         }
         for(int i = 0; i < this.handlers.size(); i++) {
             PythonTree t = this.handlers.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.orelse = orelse;
         if (orelse == null) {
@@ -198,7 +199,8 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         }
         for(int i = 0; i < this.handlers.size(); i++) {
             PythonTree t = this.handlers.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.orelse = orelse;
         if (orelse == null) {

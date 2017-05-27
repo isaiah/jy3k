@@ -97,7 +97,8 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
         }
         for(int i = 0; i < this.names.size(); i++) {
             PythonTree t = this.names.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -109,7 +110,8 @@ public static final PyType TYPE = PyType.fromClass(Import.class);
         }
         for(int i = 0; i < this.names.size(); i++) {
             PythonTree t = this.names.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

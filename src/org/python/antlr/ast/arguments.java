@@ -180,7 +180,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.args.size(); i++) {
             PythonTree t = this.args.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.vararg = vararg;
         if (this.vararg != null)
@@ -191,7 +192,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.kwonlyargs.size(); i++) {
             PythonTree t = this.kwonlyargs.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
@@ -199,7 +201,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.kw_defaults.size(); i++) {
             PythonTree t = this.kw_defaults.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.kwarg = kwarg;
         if (this.kwarg != null)
@@ -210,7 +213,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.defaults.size(); i++) {
             PythonTree t = this.defaults.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -223,7 +227,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.args.size(); i++) {
             PythonTree t = this.args.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.vararg = vararg;
         if (this.vararg != null)
@@ -234,7 +239,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.kwonlyargs.size(); i++) {
             PythonTree t = this.kwonlyargs.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.kw_defaults = kw_defaults;
         if (kw_defaults == null) {
@@ -242,7 +248,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.kw_defaults.size(); i++) {
             PythonTree t = this.kw_defaults.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.kwarg = kwarg;
         if (this.kwarg != null)
@@ -253,7 +260,8 @@ public class arguments extends PythonTree {
         }
         for(int i = 0; i < this.defaults.size(); i++) {
             PythonTree t = this.defaults.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 

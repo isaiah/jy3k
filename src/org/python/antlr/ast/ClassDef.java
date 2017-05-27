@@ -175,7 +175,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.bases.size(); i++) {
             PythonTree t = this.bases.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.keywords = keywords;
         if (keywords == null) {
@@ -183,7 +184,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.keywords.size(); i++) {
             PythonTree t = this.keywords.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.body = body;
         if (body == null) {
@@ -199,7 +201,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.decorator_list.size(); i++) {
             PythonTree t = this.decorator_list.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
@@ -214,7 +217,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.bases.size(); i++) {
             PythonTree t = this.bases.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.keywords = keywords;
         if (keywords == null) {
@@ -222,7 +226,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.keywords.size(); i++) {
             PythonTree t = this.keywords.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
         this.body = body;
         if (body == null) {
@@ -238,7 +243,8 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         }
         for(int i = 0; i < this.decorator_list.size(); i++) {
             PythonTree t = this.decorator_list.get(i);
-            t.setParent(this);
+            if (t != null)
+                t.setParent(this);
         }
     }
 
