@@ -201,16 +201,21 @@ parameters
 ///   | '**' tfpdef [','])
 typedargslist
  : args+=tfpdef ( ASSIGN defaults+=test )? ( COMMA args+=tfpdef ( ASSIGN defaults+=test )? )*
-                  ( COMMA ( STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA (POWER kwarg=tfpdef COMMA? )? )?
+                  ( COMMA ( STAR vararg=tfpdef? ( COMMA tfpdkv )* ( COMMA (POWER kwarg=tfpdef COMMA? )? )?
                           | POWER kwarg=tfpdef COMMA? )?
                   )?
- | STAR vararg=tfpdef? ( COMMA kw+=tfpdef ( ASSIGN kwd+=test )? )* ( COMMA ( POWER kwarg=tfpdef COMMA? )? )?
+ | STAR vararg=tfpdef? ( COMMA tfpdkv )* ( COMMA ( POWER kwarg=tfpdef COMMA? )? )?
  | POWER kwarg=tfpdef COMMA?
  ;
 
 /// tfpdef: NAME [':' test]
 tfpdef
  : NAME ( COLON test )?
+ ;
+
+/// tfpdkv: tfpdef ('=' test)?
+tfpdkv
+ : tfpdef (ASSIGN test)?
  ;
 
 /// varargslist: (vfpdef ['=' test] (',' vfpdef ['=' test])* [',' [

@@ -792,18 +792,20 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitTypedargslist(PythonParser.TypedargslistContext ctx) {
         arg kwarg = null;
         arg vararg = null;
-        java.util.List<expr> kwdefaults = new ArrayList<>(ctx.kwd.size());
+        java.util.List<expr> kwdefaults = new ArrayList<>(ctx.tfpdkv().size());
         java.util.List<expr> defaults = new ArrayList<>();
         java.util.List<arg> args = new ArrayList<>();
-        java.util.List<arg> kwonlyargs = new ArrayList<>(ctx.kw.size());
+        java.util.List<arg> kwonlyargs = new ArrayList<>(ctx.tfpdkv().size());
         if (ctx.POWER() != null) {
             kwarg = (arg) visit(ctx.kwarg);
         }
-        for (PythonParser.TestContext testContext : ctx.kwd) {
-            kwdefaults.add((expr) visit(testContext));
-        }
-        for (PythonParser.TfpdefContext tfpdefContext : ctx.kw) {
-            kwonlyargs.add((arg) visit(tfpdefContext));
+        for (PythonParser.TfpdkvContext tfpdkvContext : ctx.tfpdkv()) {
+            kwonlyargs.add((arg) visit(tfpdkvContext.tfpdef()));
+            if (tfpdkvContext.ASSIGN() != null) {
+                kwdefaults.add((expr) visit(tfpdkvContext.test()));
+            } else {
+                kwdefaults.add(null);
+            }
         }
         if (ctx.vararg != null) {
             vararg = (arg) visit(ctx.vararg);
