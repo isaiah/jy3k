@@ -4,6 +4,7 @@ package org.python.compiler;
  * Created by isaiah on 5/3/17.
  */
 public enum  CompilerConstants {
+    ANNOT("__annotations__"),
     GEN("__gen"),
     ITER("iter"),
     SAVE_OPRANDS("__save_operands__"),

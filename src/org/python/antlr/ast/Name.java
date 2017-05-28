@@ -203,4 +203,14 @@ public static final PyType TYPE = PyType.fromClass(Name.class);
         col_offset = num;
     }
 
+
+    private boolean expr;
+
+    public boolean isExpr() {
+        return expr;
+    }
+
+    public void setExpr(boolean expr) {
+        this.expr = expr;
+    }
 }

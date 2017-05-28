@@ -197,7 +197,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
             ((Context) target).setContext(expr_contextType.Store);
             AnnassignResult annassignResult = visit_Annassign(ctx.annassign());
-            int simple = target instanceof Name ? 1 : 0;
+            int simple = target instanceof Name && !((Name) target).isExpr() ? 1 : 0;
             return new AnnAssign(ctx.getStart(), target, annassignResult.anno, annassignResult.value, simple);
         }
         /** Annotate assign */
@@ -658,11 +658,14 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             } else if (ctx.testlist_comp() == null || !ctx.testlist_comp().COMMA().isEmpty()) {
                 return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
             }
-            //else if (testlistCompResult.exprs.size() == 1) {
             if (testlistCompResult.comps != null) {
                 return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
-            return testlistCompResult.exprs.get(0);
+            expr e = testlistCompResult.exprs.get(0);
+            if (e instanceof Name) {
+                ((Name) e).setExpr(true);
+            }
+            return e;
         } else if (ctx.OPEN_BRACK() != null) {
             if (testlistCompResult.comps != null) {
                 return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
@@ -911,7 +914,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitDel_stmt(PythonParser.Del_stmtContext ctx) {
         java.util.List<expr> exprs = visit_Exprlist(ctx.exprlist());
         exprs.stream().forEach(expr -> {
-            ((Context) expr).setContext(expr_contextType.Del);
+            recursiveSetContextType(expr, expr_contextType.Del);
         });
         return new Delete(ctx.getStart(), exprs);
     }

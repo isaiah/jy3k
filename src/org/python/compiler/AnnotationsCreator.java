@@ -5,7 +5,11 @@ import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncWith;
+import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
+import org.python.antlr.ast.Call;
+import org.python.antlr.ast.ClassDef;
+import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.For;
@@ -19,13 +23,19 @@ import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.With;
+import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.base.excepthandler;
+import org.python.antlr.base.operator;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
+import org.python.antlr.op.In;
+import org.python.core.CompareOp;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.python.compiler.CompilerConstants.ANNOT;
 
 /**
  * Add __annotations__ initialization and modification based annotation or direct access
@@ -51,12 +61,31 @@ public class AnnotationsCreator extends Visitor {
     }
 
     @Override
+    public Object visitClassDef(ClassDef node) throws Exception {
+        Name anno = new Name(node, ANNOT.symbolName(), expr_contextType.Store);
+        Dict value = new Dict(anno, null, null);
+        Assign init = new Assign(node, Arrays.asList(anno), value);
+        node.setInternalBody(Arrays.asList(init, new Block(node, node.getInternalBody())));
+        return super.visitClassDef(node);
+    }
+
+    @Override
     public Object visitModule(org.python.antlr.ast.Module node) throws Exception {
+        /**
+         * if __annotations__ not in locals():
+         *   __annotations__ == {}
+         */
         if (findAnno(node.getInternalBody())) {
-            Name anno = new Name(node, "__annotations__", expr_contextType.Store);
+            Name anno = new Name(node, ANNOT.symbolName(), expr_contextType.Store);
             Dict value = new Dict(anno, null, null);
             Assign init = new Assign(node, Arrays.asList(anno), value);
-            node.setInternalBody(Arrays.asList(init, new Block(node, node.getInternalBody())));
+            Call locals = new Call(node, new Name(node, "locals", expr_contextType.Load), null, null);
+            If ifdef = new If(node,
+                    new Compare(node, new Str(node, ANNOT.symbolName()),
+                            Arrays.asList(cmpopType.NotIn), Arrays.asList(locals)),
+                    Arrays.asList(init),
+                    null);
+            node.setInternalBody(Arrays.asList(ifdef, new Block(node, node.getInternalBody())));
         }
         return super.visitModule(node);
     }

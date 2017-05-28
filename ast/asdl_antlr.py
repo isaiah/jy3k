@@ -761,7 +761,7 @@ def main(outdir, grammar="Python.asdl"):
     c.visit(mod)
 
 # Extra fields to add to the AST nodes
-extra_fields = { "FunctionDef": ["split"], "Expr": ["print"] }
+extra_fields = { "FunctionDef": ["split"], "Expr": ["print"], 'Name': ['expr'] }
 
 if __name__ == "__main__":
     import getopt
