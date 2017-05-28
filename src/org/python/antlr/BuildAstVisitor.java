@@ -290,7 +290,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitArgument(PythonParser.ArgumentContext ctx) {
         if (ctx.ASSIGN() != null) {
-            return new keyword(ctx.getStart(), ctx.key.getText(), (expr) visit(ctx.val));
+            PythonTree key = visit(ctx.key);
+            if (key instanceof Name) {
+                return new keyword(ctx.getStart(), ((Name) key).getInternalId(), (expr) visit(ctx.val));
+            }
+            throw Py.SyntaxError("keyword can't be an expression");
         } else if (ctx.POWER() != null) {
             return new keyword(ctx.getStart(), null, (expr) visit(ctx.test(0)));
         } else if (ctx.STAR() != null) {
