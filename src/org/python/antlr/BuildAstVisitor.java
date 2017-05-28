@@ -83,6 +83,7 @@ import org.python.compiler.AnnotationsCreator;
 import org.python.compiler.ClassClosureGenerator;
 import org.python.compiler.Lower;
 import org.python.core.Py;
+import org.python.core.PySyntaxError;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1110,10 +1111,13 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private ArglistResult visit_Arglist(PythonParser.ArglistContext ctx) {
         ArglistResult ret = new ArglistResult();
-        int ndoublestars = 0, nkeywords = 0, nargs = 0;
+        int ndoublestars = 0, nkeywords = 0, nargs = 0, ngens = 0;
 
         if (ctx == null) return ret;
         for (PythonParser.ArgumentContext argCtx : ctx.argument()) {
+            if (argCtx.comp_for() != null) {
+                ngens++;
+            }
             PythonTree arg = visit(argCtx);
             if (arg instanceof keyword) {
                 keyword kw = (keyword) arg;
@@ -1138,6 +1142,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                     }
                 }
             }
+        }
+        if (ngens > 1 || (ngens > 0 && (nkeywords > 0 || nargs > ngens))) {
+            throw Py.SyntaxError(ctx,"Generator expression must be parenthesized if not solo argument", filename);
         }
         return ret;
     }
