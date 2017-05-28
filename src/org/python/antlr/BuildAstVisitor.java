@@ -82,6 +82,7 @@ import org.python.antlr.base.stmt;
 import org.python.compiler.AnnotationsCreator;
 import org.python.compiler.ClassClosureGenerator;
 import org.python.compiler.Lower;
+import org.python.compiler.NameMangler;
 import org.python.core.Py;
 import org.python.core.PySyntaxError;
 
@@ -1263,6 +1264,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         PythonParser parser = new PythonParser(tokens);
         ParseTree ctx = parser.file_input();
         PythonTree ast = v.visit(ctx);
+        new NameMangler().visit(ast);
         new ClassClosureGenerator().visit(ast);
         new Lower().visit(ast);
         new AnnotationsCreator().visit(ast);

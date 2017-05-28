@@ -695,6 +695,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
             cflags = new CompilerFlags();
         }
 
+        new NameMangler().visit(node);
         /** create class closure if necessary */
         ClassClosureGenerator classClosure = new ClassClosureGenerator();
         classClosure.visit(node);

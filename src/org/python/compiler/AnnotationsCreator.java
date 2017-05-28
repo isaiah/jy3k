@@ -5,7 +5,6 @@ import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncWith;
-import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
@@ -17,7 +16,6 @@ import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Name;
-import org.python.antlr.ast.Slice;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.Try;
@@ -26,11 +24,8 @@ import org.python.antlr.ast.With;
 import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.base.excepthandler;
-import org.python.antlr.base.operator;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
-import org.python.antlr.op.In;
-import org.python.core.CompareOp;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,8 +38,12 @@ import static org.python.compiler.CompilerConstants.ANNOT;
 public class AnnotationsCreator extends Visitor {
 
     @Override
-    public Object visitFunctionDef(FunctionDef node) {
-        // skip local variable
+    public Object visitFunctionDef(FunctionDef node) throws Exception {
+        for (stmt s : node.getInternalBody()) {
+            if (s instanceof ClassDef) {
+                visitClassDef((ClassDef) s);
+            }
+        }
         return node;
     }
 
@@ -52,7 +51,7 @@ public class AnnotationsCreator extends Visitor {
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalSimple() > 0) {
             Name anno = new Name(node, "__annotations__", expr_contextType.Load);
-            slice val = new Index(node, new Str(node, node.getInternalTarget().getToken().getText()));
+            slice val = new Index(node, new Str(node, ((Name) node.getInternalTarget()).getInternalId()));
             Subscript item = new Subscript(node, anno, val, expr_contextType.Store);
             Assign updateAnno = new Assign(node, Arrays.asList(item), node.getInternalAnnotation());
             node.replaceSelf(node.copy(), updateAnno);
@@ -62,10 +61,12 @@ public class AnnotationsCreator extends Visitor {
 
     @Override
     public Object visitClassDef(ClassDef node) throws Exception {
-        Name anno = new Name(node, ANNOT.symbolName(), expr_contextType.Store);
-        Dict value = new Dict(anno, null, null);
-        Assign init = new Assign(node, Arrays.asList(anno), value);
-        node.setInternalBody(Arrays.asList(init, new Block(node, node.getInternalBody())));
+        if (findAnno(node.getInternalBody())) {
+            Name anno = new Name(node, ANNOT.symbolName(), expr_contextType.Store);
+            Dict value = new Dict(anno, null, null);
+            Assign init = new Assign(node, Arrays.asList(anno), value);
+            node.setInternalBody(Arrays.asList(init, new Block(node, node.getInternalBody())));
+        }
         return super.visitClassDef(node);
     }
 

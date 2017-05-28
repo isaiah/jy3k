@@ -1,6 +1,5 @@
 package org.python.compiler;
 
-import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assign;
