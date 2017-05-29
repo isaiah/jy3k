@@ -656,7 +656,7 @@ public class PyLong extends PyObject {
     private BigInteger divide(BigInteger x, BigInteger y) {
         BigInteger zero = BigInteger.valueOf(0);
         if (y.equals(zero)) {
-            throw Py.ZeroDivisionError("division by zero");
+            throw Py.ZeroDivisionError("integer division or modulo by zero");
         }
 
         if (y.compareTo(zero) < 0) {

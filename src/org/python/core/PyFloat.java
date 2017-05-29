@@ -527,7 +527,7 @@ public class PyFloat extends PyObject {
         }
         double rightv = coerce(right);
         if (rightv == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(Math.floor(getValue() / rightv));
     }
@@ -544,7 +544,7 @@ public class PyFloat extends PyObject {
         }
         double leftv = coerce(left);
         if (getValue() == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(Math.floor(leftv / getValue()));
     }
@@ -561,7 +561,7 @@ public class PyFloat extends PyObject {
         }
         double rightv = coerce(right);
         if (rightv == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(getValue() / rightv);
     }
@@ -578,7 +578,7 @@ public class PyFloat extends PyObject {
         }
         double leftv = coerce(left);
         if (getValue() == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(leftv / getValue());
     }
@@ -650,7 +650,7 @@ public class PyFloat extends PyObject {
         double rightv = coerce(right);
 
         if (rightv == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         double z = Math.floor(getValue() / rightv);
 
@@ -665,7 +665,7 @@ public class PyFloat extends PyObject {
         double leftv = coerce(left);
 
         if (getValue() == 0) {
-            throw Py.ZeroDivisionError("float division");
+            throw Py.ZeroDivisionError("float division by zero");
         }
         double z = Math.floor(leftv / getValue());
 
