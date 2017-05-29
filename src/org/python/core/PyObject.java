@@ -1263,7 +1263,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod(doc = BuiltinDocs.object___ne___doc)
     final PyObject object___ne__(PyObject other) {
-        return Py.NotImplemented;
+        return Py.False;
     }
 
     /**

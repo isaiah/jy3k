@@ -513,12 +513,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAugAssign(AugAssign node) {
-        System.out.println("foo");
-        return node;
-    }
-
-    @Override
     public Object visitAssign(Assign node) throws Exception {
         setline(node);
         visit(node.getInternalValue());
