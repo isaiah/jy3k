@@ -181,9 +181,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 value = (expr) visit(ctx.yield_expr(0));
             }
             expr target = (expr) visit(ctx.testlist_star_expr(0));
-            if (!(target instanceof Context)) {
-                throw Py.SyntaxError(ctx, "illegal target for annotation", filename);
-            }
+
+            recursiveSetContextType(target, expr_contextType.AugStore);
             ((Context) target).setContext(expr_contextType.AugStore);
             return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
         }
@@ -1216,7 +1215,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         String verb;
         if (context == expr_contextType.Del) {
             verb = "delete";
-        } else if (context == expr_contextType.Store) {
+        } else if (context == expr_contextType.Store || context == expr_contextType.AugStore) {
             verb = "assign to";
         } else {
             return;
