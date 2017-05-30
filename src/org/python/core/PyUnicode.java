@@ -776,7 +776,7 @@ public class PyUnicode extends PySequence implements Iterable {
             }
         }
         if (!(other instanceof PyUnicode)) {
-            throw Py.TypeError(String.format("%s not supported between instances of 'str' and '%s'",
+            throw Py.TypeError(String.format("'%s' not supported between instances of 'str' and '%s'",
                     op.toString(), other.getType().fastGetName()));
         }
         String s = ((PyUnicode) other).getString();

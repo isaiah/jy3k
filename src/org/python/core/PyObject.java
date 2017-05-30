@@ -1427,12 +1427,7 @@ public class PyObject implements Serializable {
             default:
                 res = Py.NotImplemented;
         }
-//        if (res != Py.NotImplemented) {
         return res;
-//        }
-//        PyType type = getType();
-//        PyObject meth = type.lookup(op.meth());
-//        return meth.__get__(this, type).__call__(other);
     }
 
     // Rich comparison entry for bytecode
@@ -1475,7 +1470,7 @@ public class PyObject implements Serializable {
                 case NE:
                     return Py.newBoolean(this != other);
                 default:
-                    throw Py.TypeError(String.format("'%s' not supported between instance of '%.100s' and '%.100s'", op, vt, wt));
+                    throw Py.TypeError(String.format("'%s' not supported between instance of '%.100s' and '%.100s'", op, vt.fastGetName(), wt.fastGetName()));
             }
         } finally {
             delete_token(ts, token);

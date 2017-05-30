@@ -173,11 +173,11 @@ public abstract class PySequence extends PyObject {
     @Override
     public PyObject richCompare(PyObject o, CompareOp op) {
         if (!isSubType(o)) {
-            if (op == EQ) {
-                return Py.False;
-            } else if (op == NE) {
-                return Py.True;
-            }
+//            if (op == EQ) {
+//                return Py.False;
+//            } else if (op == NE) {
+//                return Py.True;
+//            }
             return Py.NotImplemented;
         }
         int tl = __len__();
