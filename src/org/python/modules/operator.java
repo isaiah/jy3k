@@ -2,12 +2,10 @@
 package org.python.modules;
 
 import org.python.core.ArgParser;
-import org.python.core.ClassDictInit;
 import org.python.core.CompareOp;
 import org.python.core.Py;
 import org.python.core.PyBuiltinFunctionSet;
 import org.python.core.PyBytes;
-import org.python.core.PyIgnoreMethodTag;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PySlice;
@@ -15,12 +13,15 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Traverseproc;
-import org.python.core.Visitproc;
 import org.python.core.Untraversable;
+import org.python.core.Visitproc;
+import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedModule;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
+import org.python.expose.ModuleInit;
 
 @Untraversable
 class OperatorFunctions extends PyBuiltinFunctionSet
@@ -132,7 +133,8 @@ class OperatorFunctions extends PyBuiltinFunctionSet
 }
 
 @Untraversable
-public class operator extends PyObject implements ClassDictInit
+@ExposedModule(name = "_operator")
+public class operator
 {
     public static PyBytes __doc__ = new PyBytes(
         "Operator interface.\n"+
@@ -147,7 +149,8 @@ public class operator extends PyObject implements ClassDictInit
                 "and trailing\n"+
         "'__' are also provided for convenience.\n");
 
-    public static void classDictInit(PyObject dict) throws PyIgnoreMethodTag {
+    @ModuleInit
+    public static void init(PyObject dict) {
         dict.__setitem__("__add__", new OperatorFunctions("__add__", 0, 2));
         dict.__setitem__("add", new OperatorFunctions("add", 0, 2));
         dict.__setitem__("__concat__", new OperatorFunctions("__concat__", 0, 2));
@@ -264,6 +267,7 @@ public class operator extends PyObject implements ClassDictInit
         dict.__setitem__("methodcaller", PyMethodCaller.TYPE);
     }
 
+    @ExposedFunction
     public static int countOf(PyObject seq, PyObject item) {
         int count = 0;
 
@@ -275,6 +279,7 @@ public class operator extends PyObject implements ClassDictInit
         return count;
     }
 
+    @ExposedFunction
     public static int indexOf(PyObject seq, PyObject item) {
         int i = 0;
         PyObject iter = seq.__iter__();
