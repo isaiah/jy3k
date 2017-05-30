@@ -936,11 +936,7 @@ public class PyObjectDerived extends PyObject implements Slotted,FinalizablePyOb
     public PyObject richCompare(PyObject other,CompareOp op) {
         PyType type=getType();
         PyObject meth=type.lookup(op.meth());
-        PyObject res=meth.__get__(this,type).__call__(other);
-        if (res!=Py.NotImplemented) {
-            return res;
-        }
-        return super.richCompare(other,op);
+        return meth.__get__(this,type).__call__(other);
     }
 
     public PyObject __index__() {

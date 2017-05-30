@@ -224,30 +224,14 @@ public class PyComplex extends PyObject {
         return real != 0 || imag != 0;
     }
 
-    @Override
-    public PyObject __eq__(PyObject other) {
-        return complex___eq__(other);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___eq___doc)
-    final PyObject complex___eq__(PyObject other) {
-        switch (eq_helper(other)) {
-            case 0:
-                return Py.False;
-            case 1:
-                return Py.True;
-            default:
-                return null;
-        }
-    }
-
     /**
      * Helper for {@link #complex___eq__(PyObject)} and {@link #complex___ne__(PyObject)}.
      *
      * @param other to compare for equality with this
      * @return 0 = false, 1 = true, 2 = don't know (ask the <code>other</code> object)
      */
-    private int eq_helper(PyObject other) {
+    @Override
+    public PyObject richCompare(PyObject other, CompareOp op) {
         // We only deal with primitive types here. All others delegate upwards (return 2).
         boolean equal;
         if (other instanceof PyComplex) {
@@ -279,27 +263,10 @@ public class PyComplex extends PyObject {
             }
         } else {
             // other is not one of the types we know how to deal with.
-            return 2;
+            return Py.NotImplemented;
         }
         // Only "known" cases end here: translate to return code
-        return equal ? 1 : 0;
-    }
-
-    @Override
-    public PyObject __ne__(PyObject other) {
-        return complex___ne__(other);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___ne___doc)
-    final PyObject complex___ne__(PyObject other) {
-        switch (eq_helper(other)) {
-            case 0:
-                return Py.True;
-            case 1:
-                return Py.False;
-            default:
-                return null;
-        }
+        return equal ? Py.True : Py.False;
     }
 
     private PyObject unsupported_comparison(PyObject other) {

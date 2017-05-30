@@ -1248,7 +1248,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod(doc = BuiltinDocs.object___eq___doc)
     final PyObject object___eq__(PyObject other) {
-        return Py.NotImplemented;
+        return PyObject.richCompare(this, other, CompareOp.EQ);
     }
 
     /**
@@ -1263,7 +1263,8 @@ public class PyObject implements Serializable {
 
     @ExposedMethod(doc = BuiltinDocs.object___ne___doc)
     final PyObject object___ne__(PyObject other) {
-        return Py.False;
+        return PyObject.richCompare(this, other, CompareOp.NE);
+//        return Py.NotImplemented;
     }
 
     /**
@@ -1278,7 +1279,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod
     public PyObject object___le__(PyObject other) {
-        return Py.NotImplemented;
+        return PyObject.richCompare(this, other, CompareOp.LE);
     }
 
     /**
@@ -1293,7 +1294,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod
     public PyObject object___lt__(PyObject other) {
-        return Py.NotImplemented;
+        return PyObject.richCompare(this, other, CompareOp.LT);
     }
 
     /**
@@ -1308,7 +1309,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod
     public PyObject object___ge__(PyObject other) {
-        return Py.NotImplemented;
+        return PyObject.richCompare(this, other, CompareOp.GE);
     }
     /**
      * Equivalent to the standard Python __gt__ method.
@@ -1322,7 +1323,7 @@ public class PyObject implements Serializable {
 
     @ExposedMethod
     public PyObject object___gt__(PyObject other) {
-        return Py.NotImplemented;
+        return PyObject.richCompare(this, other, CompareOp.GT);
     }
 
     /**
@@ -1395,30 +1396,43 @@ public class PyObject implements Serializable {
             return new PyIdentityTuple(new PyObject[] { o, this });
     }
 
+    /**
+     * The break up into a static and an instance method is how it breaks up the recursive loop
+     * Because I didn't find out how not to call override version of richCompare in __ne__
+     * @param other
+     * @param op
+     * @return
+     */
+    // slot_tp_richcompare
     public PyObject richCompare(PyObject other, CompareOp op) {
+        return PyObject.richCompare(this, other, op);
+    }
+
+    // tp_richcompare
+    public static PyObject richCompare(PyObject obj, PyObject other, CompareOp op) {
         PyObject res;
         switch(op) {
             case EQ:
-                res = (this == other) ? Py.True : Py.NotImplemented;
+                res = (obj == other) ? Py.True : Py.NotImplemented;
                 break;
             case NE:
                 // by default, __ne__() delegates to __eq__() and inverts the result,
                 // unless the latter returns NotImplemented
                 // NOTE: this is recursive
-                res = richCompare(other, CompareOp.EQ);
+                res = obj.richCompare(other, CompareOp.EQ);
                 if (res != Py.NotImplemented) {
-                    res = Py.newBoolean(!res.__bool__());
+                    res = Py.newBoolean(res != Py.True);
                 }
                 break;
             default:
                 res = Py.NotImplemented;
         }
-        if (res != Py.NotImplemented) {
-            return res;
-        }
-        PyType type = getType();
-        PyObject meth = type.lookup(op.meth());
-        return meth.__get__(this, type).__call__(other);
+//        if (res != Py.NotImplemented) {
+        return res;
+//        }
+//        PyType type = getType();
+//        PyObject meth = type.lookup(op.meth());
+//        return meth.__get__(this, type).__call__(other);
     }
 
     // Rich comparison entry for bytecode
@@ -1447,7 +1461,7 @@ public class PyObject implements Serializable {
             if (res != Py.NotImplemented) {
                 return res;
             }
-            if (checkedReverseOp || op == CompareOp.EQ || op == CompareOp.NE) {
+            if (!checkedReverseOp) {
                 res = other.richCompare(this, op.reflectedOp());
                 if (res != Py.NotImplemented) {
                     return res;
