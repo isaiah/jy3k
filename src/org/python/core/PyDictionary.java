@@ -21,6 +21,8 @@ import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
 import org.python.util.Generic;
 
+import static org.python.core.CompareOp.EQ;
+
 
 /**
  * A builtin python dictionary.
@@ -262,23 +264,24 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @Override
-    public PyObject __eq__(PyObject otherObj) {
-        return dict___eq__(otherObj);
+    public PyObject richCompare(PyObject other, CompareOp op) {
+        PyObject res;
+        if (!(other instanceof PyDict)) {
+            res = Py.NotImplemented;
+        } else if (op == CompareOp.NE || op == CompareOp.EQ) {
+            res = op.bool(dict_equal(other));
+        } else {
+            res = Py.NotImplemented;
+        }
+        return res;
     }
 
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___eq___doc)
-    final PyObject dict___eq__(PyObject otherObj) {
-        PyType thisType = getType();
-        PyType otherType = otherObj.getType();
-        if (otherType != thisType && !thisType.isSubType(otherType)
-                && !otherType.isSubType(thisType) || otherType == PyObject.TYPE) {
-            return null;
-        }
+    final int dict_equal(PyObject otherObj) {
         PyDictionary other = (PyDictionary) otherObj;
         int an = getMap().size();
         int bn = other.getMap().size();
         if (an != bn) {
-            return Py.False;
+            return -1;
         }
 
         PyList akeys = keys_as_list();
@@ -286,48 +289,14 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             PyObject akey = akeys.pyget(i);
             PyObject bvalue = other.__finditem__(akey);
             if (bvalue == null) {
-                return Py.False;
+                return -1;
             }
             PyObject avalue = __finditem__(akey);
-            if (!avalue.richCompare(bvalue, CompareOp.EQ).__bool__()) {
-                return Py.False;
+            if (!avalue.richCompare(bvalue, EQ).__bool__()) {
+                return -1;
             }
         }
-        return Py.True;
-    }
-
-    @Override
-    public PyObject __ne__(PyObject otherObj) {
-        return dict___ne__(otherObj);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___ne___doc)
-    final PyObject dict___ne__(PyObject otherObj) {
-        PyObject eq_result = __eq__(otherObj);
-        if (eq_result == null) {
-            return null;
-        }
-        return eq_result.__not__();
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___lt___doc)
-    final PyObject dict___lt__(PyObject otherObj) {
-        return null;
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___gt___doc)
-    final PyObject dict___gt__(PyObject otherObj) {
-        return null;
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___le___doc)
-    final PyObject dict___le__(PyObject otherObj) {
-        return null;
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.dict___ge___doc)
-    final PyObject dict___ge__(PyObject otherObj) {
-        return null;
+        return 0;
     }
 
     @Override
