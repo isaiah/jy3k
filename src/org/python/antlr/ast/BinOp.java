@@ -235,4 +235,14 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
         col_offset = num;
     }
 
+
+    private boolean inplace;
+
+    public boolean isInplace() {
+        return inplace;
+    }
+
+    public void setInplace(boolean inplace) {
+        this.inplace = inplace;
+    }
 }

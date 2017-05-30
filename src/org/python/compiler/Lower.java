@@ -163,8 +163,8 @@ public class Lower extends Visitor {
         expr left = node.getInternalTarget().copy();
         ((Context) left).setContext(expr_contextType.Load);
         operatorType op = node.getInternalOp();
-        op.inplace = true;
         BinOp binOp = new BinOp(node, left, node.getInternalOp(), node.getInternalValue());
+        binOp.setInplace(true);
         expr target = node.getInternalTarget().copy();
         ((Context) target).setContext(expr_contextType.Store);
         Assign ret = new Assign(node, asList(target), binOp);

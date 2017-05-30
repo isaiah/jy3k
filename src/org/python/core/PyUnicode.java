@@ -170,9 +170,6 @@ public class PyUnicode extends PySequence implements Iterable {
         super(subtype);
         this.string = string;
         translator = isBasic ? BASIC : this.chooseIndexTranslator();
-        if (translator == null) {
-            System.out.println("weird");
-        }
     }
 
     public int[] toCodePoints() {
@@ -629,9 +626,6 @@ public class PyUnicode extends PySequence implements Iterable {
         }
 
         if (new_.for_type == subtype) {
-            if (S == null) {
-                return new PyUnicode("");
-            }
             if (encoding == null) {
                 return S.__str__();
             }

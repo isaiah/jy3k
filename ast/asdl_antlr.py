@@ -181,9 +181,6 @@ class JavaVisitor(EmitVisitor):
             self.emit("%s," % type.name, depth + 1)
         self.emit("%s;" % sum.types[len(sum.types) - 1].name, depth + 1)
 
-        if name == 'operator':
-            self.emit("public boolean inplace = false;", depth+1)
-
         self.emit("}", depth)
         self.close()
 
@@ -761,7 +758,7 @@ def main(outdir, grammar="Python.asdl"):
     c.visit(mod)
 
 # Extra fields to add to the AST nodes
-extra_fields = { "FunctionDef": ["split"], "Expr": ["print"], 'Name': ['expr'] }
+extra_fields = { "FunctionDef": ["split"], "Expr": ["print"], 'Name': ['expr'], 'BinOp': ['inplace'] }
 
 if __name__ == "__main__":
     import getopt
