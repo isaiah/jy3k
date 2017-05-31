@@ -759,7 +759,7 @@ public final class Py {
         } else if (t instanceof InvocationTargetException) {
             return JavaError(((InvocationTargetException) t).getTargetException());
         } else if (t instanceof StackOverflowError) {
-            t.printStackTrace();
+//            t.printStackTrace();
             return Py.RecursionError("maximum recursion depth exceeded (Java StackOverflowError)");
         } else if (t instanceof OutOfMemoryError) {
             memory_error((OutOfMemoryError) t);

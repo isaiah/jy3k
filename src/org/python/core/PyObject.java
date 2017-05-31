@@ -1436,8 +1436,7 @@ public class PyObject implements Serializable {
         ThreadState ts = Py.getThreadState();
         try {
             if (++ts.compareStateNesting > 500) {
-                if ((token = check_recursion(ts, this, other)) == null)
-                    return Py.True;
+                throw Py.RecursionError("maximum recursion depth exceeded");
             }
 
             boolean checkedReverseOp = false;
@@ -1473,7 +1472,6 @@ public class PyObject implements Serializable {
                     throw Py.TypeError(String.format("'%s' not supported between instance of '%.100s' and '%.100s'", op, vt.fastGetName(), wt.fastGetName()));
             }
         } finally {
-            delete_token(ts, token);
             ts.compareStateNesting--;
         }
     }
