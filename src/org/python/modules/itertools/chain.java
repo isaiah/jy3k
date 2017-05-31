@@ -59,8 +59,9 @@ public class chain extends PyIterator {
             PyObject currentIterator = superIterator.__next__().__iter__();
 
             public PyObject __next__() {
+                PyObject res;
                 try {
-                    return currentIterator.__next__();
+                    res = currentIterator.__next__();
                 } catch (PyException e) {
                     if (e.match(Py.StopIteration)) {
                         currentIterator = superIterator.__next__().__iter__();
@@ -68,8 +69,16 @@ public class chain extends PyIterator {
                     }
                     throw e;
                 }
+                if (res == null) {
+                    PyObject next = superIterator.__next__();
+                    if (next == null) {
+                        throw Py.StopIteration();
+                    }
+                    currentIterator = next.__iter__();
+                    return __next__();
+                }
+                return res;
             }
-
         };
     }
 
