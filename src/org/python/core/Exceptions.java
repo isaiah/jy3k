@@ -81,6 +81,8 @@ public class Exceptions {
 
         buildClass(dict, "ImportError", "StandardError", ImportError(),
                 "Import can't find module, or can't find name in module.");
+        buildClass(dict, "ModuleNotFoundError", "ImportError",
+                "Module not found.");
 
         buildClass(dict, "TypeError", "StandardError", "Inappropriate argument type.");
 
