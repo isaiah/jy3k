@@ -216,7 +216,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
         type.tp_flags = Py.TPFLAGS_HEAPTYPE | Py.TPFLAGS_BASETYPE;
         // Enable defining a custom __dict__ via a property, method, or other descriptor
-        boolean defines_dict = dict.__finditem__("__dict__") != null;
+        type.needs_userdict = dict.__finditem__("__dict__") != null;
 
         // immediately setup the javaProxy if applicable. may modify bases
         List<Class<?>> interfaces = new ArrayList<>();
@@ -229,7 +229,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
                                              base.name));
         }
 
-        type.createAllSlots(!(base.needs_userdict || defines_dict), !base.needs_weakref);
+        type.createAllSlots(!(base.needs_userdict || type.needs_userdict), !base.needs_weakref);
         type.ensureAttributes();
         type.invalidateMethodCache();
 

@@ -110,8 +110,8 @@ public class PyObject implements Serializable {
     static final PyObject object___new__(PyNewWrapper new_, boolean init, PyType subtype,
                                          PyObject[] args, String[] keywords) {
         // don't allow arguments if the default object.__init__() is about to be called
-        PyObject[] where = new PyObject[1];
-        subtype.lookup_where("__init__", where);
+//        PyObject[] where = new PyObject[1];
+//        subtype.lookup_where("__init__", where);
 //        if (where[0] == TYPE && args.length > 0) {
 //            throw Py.TypeError("object.__new__() takes no parameters");
 //        }
