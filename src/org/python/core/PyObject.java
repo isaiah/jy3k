@@ -9,11 +9,11 @@ import org.python.expose.ExposedNew;
 import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
 import org.python.modules.gc;
-import org.python.util.Generic;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class PyObject implements Serializable {
     protected Object attributes;
 
     /** Primitives classes their wrapper classes. */
-    private static final Map<Class<?>, Class<?>> primitiveMap = Generic.map();
+    private static final Map<Class<?>, Class<?>> primitiveMap = new HashMap<>();
 
     static {
         primitiveMap.put(Character.TYPE, Character.class);

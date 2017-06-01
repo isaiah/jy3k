@@ -1,17 +1,17 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.compiler;
 
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Set;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.util.Generic;
+
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.python.util.CodegenUtils.p;
 import static org.python.util.CodegenUtils.sig;
@@ -22,7 +22,7 @@ public class ProxyMaker extends ProxyCodeHelpers implements ClassConstants, Opco
     protected final Class<?> superclass;
     protected final Class<?>[] interfaces;
     Set<String> names;
-    Set<String> supernames = Generic.set();
+    Set<String> supernames = new HashSet<>();
     Set<String> namesAndSigs; // name+signature pairs
     public ClassFile classfile;
     /** The name of the class to build. */
@@ -619,8 +619,8 @@ public class ProxyMaker extends ProxyCodeHelpers implements ClassConstants, Opco
     }
 
     public void build() throws Exception {
-        names = Generic.set();
-        namesAndSigs = Generic.set();
+        names = new HashSet<>();
+        namesAndSigs = new HashSet<>();
         int access = superclass.getModifiers();
         if ((access & Modifier.FINAL) != 0) {
             throw new InstantiationException("can't subclass final class");

@@ -1,18 +1,18 @@
 package org.python.compiler;
 
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.objectweb.asm.Type;
 import org.python.core.Py;
 import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.PyProxy;
 import org.python.core.PyReflectedFunction;
-import org.python.util.Generic;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /*
  * Various constants and methods for generating Proxy code
@@ -33,7 +33,7 @@ public class ProxyCodeHelpers {
     public static Map<Class<?>, Integer> types = fillTypes();
 
     public static Map<Class<?>, Integer> fillTypes() {
-        Map<Class<?>, Integer> typeMap = Generic.map();
+        Map<Class<?>, Integer> typeMap = new HashMap<>();
         typeMap.put(Boolean.TYPE, tBoolean);
         typeMap.put(Byte.TYPE, tByte);
         typeMap.put(Short.TYPE, tShort);

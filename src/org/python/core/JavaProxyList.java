@@ -5,8 +5,6 @@ package org.python.core;
  * corresponding to the standard list type
  */
 
-import org.python.util.Generic;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -118,7 +116,7 @@ class JavaProxyList {
                 stop = start;
             }
             if (JyAttribute.getAttr(value, JyAttribute.JAVA_PROXY_ATTR) == this.list) {
-                List xs = Generic.list();
+                List xs = new ArrayList();
                 xs.addAll(this.list);
                 setsliceList(start, stop, step, xs);
             } else if (value instanceof PyList) {

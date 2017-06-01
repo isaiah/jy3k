@@ -521,7 +521,7 @@ class CommandLineOptions {
     public String[] argv;
     public Properties properties;
     public String command;
-    public List<String> warnoptions = Generic.list();
+    public List<String> warnoptions = new ArrayList<>();
     public String encoding;
     public String division;
     public String moduleName;

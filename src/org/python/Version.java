@@ -66,7 +66,7 @@ public class Version {
      */
     private static void loadProperties() {
         boolean loaded = false;
-        final String versionProperties = "/home/isaiah/codes/jython3/build/classes/org/python/version.properties";
+        final String versionProperties = "/home/isaiah/codes/jylang/build/classes/org/python/version.properties";
         InputStream in = null;
         try {
             in = new FileInputStream(versionProperties);

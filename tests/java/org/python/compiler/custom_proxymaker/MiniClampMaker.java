@@ -5,30 +5,32 @@ package org.python.compiler.custom_proxymaker;
  * implementation for the features that are provided by customizable ProxyMaker
  */
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import org.python.compiler.Code;
 import org.python.compiler.JavaMaker;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.__builtin__;
-import org.python.util.Generic;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class MiniClampMaker extends JavaMaker {
     
-    private final Map<String, PyObject> methodsToAdd = Generic.map();
-    private final Map<String, PyObject> constructorsToAdd = Generic.map();
+    private final Map<String, PyObject> methodsToAdd = new HashMap<>();
+    private final Map<String, PyObject> constructorsToAdd = new HashMap<>();
     private AnnotationDescr[] classAnnotations = new AnnotationDescr[]{};
     
     private static AnnotationDescr[] extractAnnotation(PyDictionary dict) {
-        List<AnnotationDescr> annotationDescrs = Generic.list();
+        List<AnnotationDescr> annotationDescrs = new ArrayList<>();
         for (PyObject annotationIter: dict.dict_iteritems().asIterable()) {
             PyObject annotationClass = annotationIter.__getitem__(0);
             PyObject annotationFields = annotationIter.__getitem__(1);
@@ -36,7 +38,7 @@ public class MiniClampMaker extends JavaMaker {
             if (annotationFields == Py.None) {
                 annotationDescr = new AnnotationDescr(Py.tojava(annotationClass, Class.class));
             } else {
-                Map<String, Object> fields = Generic.map();
+                Map<String, Object> fields = new HashMap<>();
                 for (PyObject item: ((PyDictionary)annotationFields).dict_iteritems().asIterable()) {
                     fields.put(Py.tojava(item.__getitem__(0), String.class), Py.tojava(item.__getitem__(1), Object.class));
                 }
@@ -97,7 +99,7 @@ public class MiniClampMaker extends JavaMaker {
     @Override
     protected void visitConstructors() throws Exception {
 
-        Set<Constructor<?>> superConstructors = Generic.set();
+        Set<Constructor<?>> superConstructors = new HashSet<>();
         for (Constructor<?> constructor: superclass.getDeclaredConstructors()) {
             superConstructors.add(constructor);
         }

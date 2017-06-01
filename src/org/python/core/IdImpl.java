@@ -2,9 +2,8 @@ package org.python.core;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.python.util.Generic;
 
 public class IdImpl {
 
@@ -12,7 +11,7 @@ public class IdImpl {
 
         private transient ReferenceQueue<Object> idKeys = new ReferenceQueue<Object>();
 
-        private Map<WeakIdKey, Object> objHashcodeToPyId = Generic.map();
+        private Map<WeakIdKey, Object> objHashcodeToPyId = new HashMap<>();
 
         @SuppressWarnings("element-type-mismatch")
         private void cleanup() {

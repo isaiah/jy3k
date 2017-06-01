@@ -2,14 +2,13 @@
 
 package javatests;
 
-import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
-import org.python.util.Generic;
 
 // The following tag interfaces duplicate the interface/abstract class supertypes of
 // Storm's IndifferentAccessMap, including Clojure types
@@ -27,7 +26,7 @@ public class DiamondIterableMapMRO extends AFn implements ILookup, IPersistentMa
     private final Map backing;
 
     public DiamondIterableMapMRO() {
-        backing = Generic.map();
+        backing = new HashMap<>();
     }
 
     public Object call() { return null; }

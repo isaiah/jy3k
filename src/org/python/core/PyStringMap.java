@@ -8,7 +8,6 @@ import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
-import org.python.util.Generic;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,13 +43,12 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
 
     public PyStringMap(int capacity) {
         super(getLazyType());
-        table = new ConcurrentHashMap<Object, PyObject>(capacity, Generic.CHM_LOAD_FACTOR,
-                                                        Generic.CHM_CONCURRENCY_LEVEL);
+        table = new ConcurrentHashMap<>(capacity);
     }
 
     public PyStringMap(Map<Object, PyObject> map) {
-        this(Math.max((int) (map.size() / Generic.CHM_LOAD_FACTOR) + 1,
-                      Generic.CHM_INITIAL_CAPACITY));
+        super(getLazyType());
+        table = new ConcurrentHashMap<>();
         table.putAll(map);
     }
 

@@ -1,13 +1,13 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.List;
-
 import org.objectweb.asm.ClassReader;
 import org.python.Version;
-import org.python.util.Generic;
+
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for loading compiled python modules and java classes defined in python modules.
@@ -78,7 +78,7 @@ public class BytecodeLoader {
 
     public static class Loader extends URLClassLoader {
 
-        private List<ClassLoader> parents = Generic.list();
+        private List<ClassLoader> parents = new ArrayList<>();
 
         public Loader() {
             super(new URL[0]);

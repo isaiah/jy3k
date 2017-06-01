@@ -1,8 +1,6 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._functools;
 
-import java.util.Map;
-
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyNewWrapper;
@@ -17,7 +15,9 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
-import org.python.util.Generic;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ExposedType(name = "_functools.partial")
 public class PyPartial extends PyObject implements Traverseproc {
@@ -94,7 +94,7 @@ public class PyPartial extends PyObject implements Traverseproc {
             kwAppl = this.keywords;
         } else {
             // first merge keywords to determine the keyword count
-            Map<String, PyObject> merged = Generic.map();
+            Map<String, PyObject> merged = new HashMap<>();
             int i;
             for (i = 0; i < this.keywords.length; i++) {
                 String keyword = this.keywords[i];

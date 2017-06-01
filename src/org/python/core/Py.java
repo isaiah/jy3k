@@ -14,9 +14,8 @@ import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
-import org.python.modules.sys.SysModule;
 import org.python.modules.posix.PosixModule;
-import org.python.util.Generic;
+import org.python.modules.sys.SysModule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,7 +33,12 @@ import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Builtin types that are used to setup PyObject.
  *
@@ -42,7 +46,7 @@ import java.util.*;
 class BootstrapTypesSingleton {
     private final Set<Class<?>> BOOTSTRAP_TYPES;
     private BootstrapTypesSingleton() {
-        BOOTSTRAP_TYPES = Generic.set();
+        BOOTSTRAP_TYPES = new HashSet<>();
         BOOTSTRAP_TYPES.add(PyObject.class);
         BOOTSTRAP_TYPES.add(PyType.class);
         BOOTSTRAP_TYPES.add(PyBuiltinCallable.class);

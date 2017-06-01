@@ -1,7 +1,5 @@
 package org.python.modules.itertools;
 
-import java.util.Map;
-
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyIterator;
@@ -12,7 +10,9 @@ import org.python.core.Visitproc;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
-import org.python.util.Generic;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ExposedType(name = "itertools.tee", base = PyObject.class,
     isBaseType = false, doc = PyTeeIterator.tee_doc)
@@ -29,7 +29,7 @@ public class PyTeeIterator extends PyIterator {
 
         public PyTeeData(PyObject iterator) {
             this.iterator = iterator;
-            buffer = Generic.concurrentMap();
+            buffer = new ConcurrentHashMap<>();
             total = 0;
             lock = new Object();
         }

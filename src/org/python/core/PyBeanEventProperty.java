@@ -4,15 +4,14 @@ package org.python.core;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import org.python.util.Generic;
 
 @Untraversable
 public class PyBeanEventProperty extends PyObject {
 
-    private static Map<String, Class<?>> adapterClasses = Generic.map();
+    private static Map<String, Class<?>> adapterClasses = new HashMap<>();
 
     private static Map<Object, Map<String, WeakReference<Object>>> adapters =
         new WeakHashMap<Object, Map<String, WeakReference<Object>>>();
@@ -101,10 +100,10 @@ public class PyBeanEventProperty extends PyObject {
     private void putAdapter(Object o, String evc, Object ad) {
         Map<String, WeakReference<Object>> ads = adapters.get(o);
         if (ads == null) {
-            ads = Generic.map();
+            ads = new HashMap<>();
             adapters.put(o, ads);
         }
-        ads.put(evc, new WeakReference<Object>(ad));
+        ads.put(evc, new WeakReference<>(ad));
     }
 
     private synchronized Object getAdapter(Object self) {

@@ -5,7 +5,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.ibm.icu.lang.UCharacter;
-import org.python.core.buffer.BaseBuffer;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FieldNameIterator;
 import org.python.core.stringlib.MarkupIterator;
@@ -15,14 +14,13 @@ import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
 import org.python.modules._codecs;
-import org.python.util.Generic;
 
 import java.io.Serializable;
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1070,7 +1068,7 @@ public class PyUnicode extends PySequence implements Iterable {
         public StripIterator(PyUnicode sep, Iterator<Integer> iter) {
             this.iter = iter;
             if (sep != null) {
-                Set<Integer> sepSet = Generic.set();
+                Set<Integer> sepSet = new HashSet<>();
                 for (Iterator<Integer> sepIter = sep.newSubsequenceIterator(); sepIter.hasNext();) {
                     sepSet.add(sepIter.next());
                 }
@@ -1340,7 +1338,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
     private static class ReversedIterator<T> implements Iterator {
 
-        private final List<T> reversed = Generic.list();
+        private final List<T> reversed = new ArrayList<>();
         private final Iterator<T> iter;
 
         ReversedIterator(Iterator<T> iter) {

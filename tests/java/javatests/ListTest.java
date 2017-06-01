@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.python.util.Generic;
-
 /**
  * @author updikca1
  */
@@ -22,7 +20,7 @@ public abstract class ListTest {
             public List<Object> newInstance(Collection<Object> c) {
                 List<Object> l = null;
                 if (c == null) {
-                    l = Generic.list();
+                    l = new ArrayList<>();
                 } else {
                     l = new ArrayList<Object>(c);
                 }
@@ -82,7 +80,7 @@ public abstract class ListTest {
     private final List<Object> nullList;
 
     protected List<Object> defaultList() {
-        List<Object> l = Generic.list();
+        List<Object> l = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             l.add(i);
         }
@@ -473,7 +471,7 @@ public abstract class ListTest {
         int prevIndex = li.previousIndex();
         TestSupport.assertThat(prevIndex == -1,
                                "ListIterator.previousIndex() on empty List did not return -1");
-        List<Object> l = Generic.list();
+        List<Object> l = new ArrayList<>();
         l.add(1);
         li = newInstance(l).listIterator();
         TestSupport.assertThat(!li.hasPrevious(),
@@ -495,7 +493,7 @@ public abstract class ListTest {
                 TestSupport.fail("expected IllegalStateException");
             } catch (IllegalStateException e) {}
         }
-        l = Generic.list(new Object[]{0, 1, 2});
+        l = Arrays.asList(0, 1, 2);
         li = newInstance(l).listIterator();
         for (int i = 0, n = l.size(); i < n; i++) {
             TestSupport.assertThat(li.next().equals(i),

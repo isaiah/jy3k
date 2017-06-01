@@ -7,15 +7,10 @@ import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.core.packagecache.PackageManager;
 import org.python.core.packagecache.SysPackageManager;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
 import org.python.modules.PyNamespace;
 import org.python.modules.Setup;
-import org.python.modules.sys.SysModule;
 import org.python.modules._imp;
-import org.python.modules.zipimport.PyZipImporter;
-import org.python.modules.zipimport.ZipImportModule;
-import org.python.util.Generic;
+import org.python.modules.sys.SysModule;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -46,6 +41,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarEntry;
@@ -192,7 +188,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     private static final ReferenceQueue<PySystemState> systemStateQueue =
             new ReferenceQueue<PySystemState>();
     private static final ConcurrentMap<WeakReference<PySystemState>, PySystemStateCloser> sysClosers =
-            Generic.concurrentMap();
+            new ConcurrentHashMap<>();
 
     public PySystemState() {
         initialize();
@@ -1343,7 +1339,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     }
 
     private static void initBuiltins(Properties props) {
-        builtinNames = Generic.map();
+        builtinNames = new HashMap<>();
 
         // add the oddball builtins that are specially handled
         builtinNames.put("__builtin__", "");

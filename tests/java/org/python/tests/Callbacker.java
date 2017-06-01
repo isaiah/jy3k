@@ -1,8 +1,7 @@
 package org.python.tests;
 
 import java.util.List;
-
-import org.python.util.Generic;
+import java.util.ArrayList;
 
 public class Callbacker {
 
@@ -15,7 +14,7 @@ public class Callbacker {
 
     public static class CollectingCallback implements Callback {
 
-        public List<String> calls = Generic.list();
+        public List<String> calls = new ArrayList<>();
 
         public void call() {
             calls.add("call()");

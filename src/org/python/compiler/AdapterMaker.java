@@ -1,12 +1,11 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.compiler;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
-import org.python.util.Generic;
+
+import java.lang.reflect.Method;
+import java.util.HashSet;
 
 public class AdapterMaker extends ProxyMaker {
 
@@ -16,7 +15,7 @@ public class AdapterMaker extends ProxyMaker {
 
     @Override
     public void build() throws Exception {
-        names = Generic.set();
+        names = new HashSet<>();
         int access = Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNCHRONIZED;
         classfile = new ClassFile(myClass, "java/lang/Object", access);
         classfile.addInterface(mapClass(interfaces[0]));

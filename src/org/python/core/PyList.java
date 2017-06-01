@@ -1,15 +1,14 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
-import org.python.util.Generic;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,8 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-
-import java.lang.reflect.Array;
 import java.util.Map;
 
 @ExposedType(name = "list", base = PyObject.class, doc = BuiltinDocs.list_doc)
@@ -92,7 +89,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     private static List<PyObject> listify(Iterator<PyObject> iter) {
-        List<PyObject> list = Generic.list();
+        List<PyObject> list = new ArrayList<>();
         while (iter.hasNext()) {
             list.add(iter.next());
         }

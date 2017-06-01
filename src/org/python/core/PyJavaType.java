@@ -1,5 +1,7 @@
 package org.python.core;
 
+import org.python.core.util.StringUtil;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,11 +17,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,29 +32,26 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.python.core.util.StringUtil;
-import org.python.util.Generic;
-
 
 public class PyJavaType extends PyType {
 
     private final static Class<?>[] OO = {PyObject.class, PyObject.class};
 
     /** Deprecated methods in java.awt.* that have bean property equivalents we prefer. */
-    private final static Set<String> BAD_AWT_METHODS = Generic.set("layout",
-                                                                   "insets",
-                                                                   "size",
-                                                                   "minimumSize",
-                                                                   "preferredSize",
-                                                                   "maximumSize",
-                                                                   "bounds",
-                                                                   "enable");
+    private final static Set<String> BAD_AWT_METHODS = new HashSet<>(Arrays.asList("layout",
+            "insets",
+            "size",
+            "minimumSize",
+            "preferredSize",
+            "maximumSize",
+            "bounds",
+            "enable"));
 
 
     // Add well-known immutable classes from standard packages of
     // java.lang, java.net, java.util that are not marked Cloneable.
     // This was found by hand, there are likely more!
-    private final static Set<Class<?>> immutableClasses = Generic.set(
+    private final static Set<Class<?>> immutableClasses = new HashSet<>(Arrays.asList(
             Boolean.class,
             Byte.class,
             Character.class,
@@ -66,7 +68,7 @@ public class PyJavaType extends PyType {
             java.net.InetSocketAddress.class,
             java.net.Proxy.class,
             java.net.URI.class,
-            java.util.concurrent.TimeUnit.class);
+            java.util.concurrent.TimeUnit.class));
 
 
     /**
@@ -114,7 +116,7 @@ public class PyJavaType extends PyType {
             }
         }
         if (modified == null) {
-            modified = Generic.set();
+            modified = new HashSet<>();
         }
         if (modified.add(name)) {
             if (conflicted != null) {
@@ -153,7 +155,7 @@ public class PyJavaType extends PyType {
             // If this descends from PyObject, don't do the Java mro cleanup
             super.handleMroError(toMerge, mro);
         }
-        Set<PyJavaType> inConflict = Generic.set();
+        Set<PyJavaType> inConflict = new HashSet<>();
         PyJavaType winner = null;
         for (MROMergeState mergee : toMerge) {
             for (int i = mergee.next; i < mergee.mro.length; i++) {
@@ -172,7 +174,7 @@ public class PyJavaType extends PyType {
             }
         }
 
-        Set<String> allModified = Generic.set();
+        Set<String> allModified = new HashSet<>();
         PyJavaType[] conflictedAttributes = inConflict.toArray(new PyJavaType[inConflict.size()]);
         for (PyJavaType type : conflictedAttributes) {
             if (type.modified == null) {
@@ -181,7 +183,7 @@ public class PyJavaType extends PyType {
             for (String method : type.modified) {
                 if (!allModified.add(method)) { // Another type in conflict has this method, possibly fail
                     PyList types = new PyList();
-                    Set<Class> proxySet = Generic.set();
+                    Set<Class> proxySet = new HashSet<>();
                     for (PyJavaType othertype : conflictedAttributes) {
                         if (othertype.modified != null && othertype.modified.contains(method)) {
                             types.add(othertype);
@@ -192,7 +194,7 @@ public class PyJavaType extends PyType {
                     // in having duplicate __iter__ added (see getCollectionProxies), while still allowing each
                     // path on the inheritance hierarchy to get an __iter__. Annoying but necessary logic.
                     // See http://bugs.jython.org/issue1878
-                    if (method.equals("__iter__") && proxySet.equals(Generic.set(Iterable.class, Map.class))) {
+                    if (method.equals("__iter__") && proxySet.equals(new HashSet(Arrays.asList(Iterable.class, Map.class)))) {
                         continue;
                     }
                     throw Py.TypeError(String.format("Supertypes that share a modified attribute "
@@ -208,7 +210,7 @@ public class PyJavaType extends PyType {
             for (PyJavaType otherType : inConflict) {
                 if (otherType != type) {
                     if (type.conflicted == null) {
-                        type.conflicted = Generic.set();
+                        type.conflicted = new HashSet<>();
                     }
                     type.conflicted.add(otherType);
                 }
@@ -243,7 +245,7 @@ public class PyJavaType extends PyType {
             objtype = PyType.fromClassSkippingInners(Class.class, needsInners);
             // Wrapped Java types fill in their mro first using all of their interfaces then their
             // super class.
-            List<PyObject> visibleBases = Generic.list();
+            List<PyObject> visibleBases = new ArrayList<>();
             for (Class<?> iface : forClass.getInterfaces()) {
                 if (iface == PyProxy.class || iface == ClassDictInit.class) {
                     // Don't show the interfaces added by proxy type construction; otherwise Python
@@ -282,15 +284,15 @@ public class PyJavaType extends PyType {
         }
 
         // Add methods and determine bean properties declared on this class
-        Map<String, PyBeanProperty> props = Generic.map();
-        Map<String, PyBeanEvent> events = Generic.map();
+        Map<String, PyBeanProperty> props = new HashMap<>();
+        Map<String, PyBeanEvent> events = new HashMap<>();
         Method[] methods;
         if (Options.respectJavaAccessibility) {
             // returns just the public methods
             methods = forClass.getMethods();
         } else {
             // Grab all methods on this class and all of its superclasses and make them accessible
-            List<Method> allMethods = Generic.list();
+            List<Method> allMethods = new ArrayList<>();
             for(Class<?> c = forClass; c != null; c = c.getSuperclass()) {
                 for (Method meth : c.getDeclaredMethods()) {
                     allMethods.add(meth);

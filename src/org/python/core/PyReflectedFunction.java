@@ -4,9 +4,8 @@ package org.python.core;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Set;
-
-import org.python.util.Generic;
 
 public class PyReflectedFunction extends PyObject implements Traverseproc {
 
@@ -291,7 +290,7 @@ public class PyReflectedFunction extends PyObject implements Traverseproc {
     }
 
     protected void throwBadArgError(int errArg, int nArgs, boolean self) {
-        Set<Class<?>> argTypes = Generic.set();
+        Set<Class<?>> argTypes = new HashSet<>();
         for (int i = 0; i < nargs; i++) {
             // This check works almost all the time.
             // I'm still a little worried about non-static methods called with an explicit self...

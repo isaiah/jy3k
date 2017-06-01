@@ -1,16 +1,7 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
-import java.io.Serializable;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
+import com.google.common.collect.MapMaker;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedDelete;
@@ -19,13 +10,21 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
-import org.python.expose.MethodType;
 import org.python.expose.TypeBuilder;
 import org.python.modules._weakref.WeakrefModule;
-import org.python.antlr.ast.cmpopType;
-import org.python.util.Generic;
 
-import com.google.common.collect.MapMaker;
+import java.io.Serializable;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * The Python Type object implementation.
@@ -97,7 +96,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     private int numSlots;
 
     private transient ReferenceQueue<PyType> subclasses_refq = new ReferenceQueue<PyType>();
-    private Set<WeakReference<PyType>> subclasses = Generic.set();
+    private Set<WeakReference<PyType>> subclasses = new HashSet<>();
 
     /** Global mro cache. */
     private static final MethodCache methodCache = new MethodCache();
@@ -220,7 +219,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         boolean defines_dict = dict.__finditem__("__dict__") != null;
 
         // immediately setup the javaProxy if applicable. may modify bases
-        List<Class<?>> interfaces = Generic.list();
+        List<Class<?>> interfaces = new ArrayList<>();
         Class<?> baseProxyClass = getJavaLayout(type.bases, interfaces);
         type.setupProxy(baseProxyClass, interfaces);
 
@@ -687,7 +686,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         JyAttribute.setAttr(this, JyAttribute.JAVA_PROXY_ATTR, proxyClass); 
 
         PyType proxyType = PyType.fromClass(proxyClass, false);
-        List<PyObject> cleanedBases = Generic.list();
+        List<PyObject> cleanedBases = new ArrayList<>();
         boolean addedProxyType = false;
         for (PyObject base : bases) {
             if (!(base instanceof PyType)) {
@@ -775,7 +774,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         PyObject[] savedBases = bases;
         PyType savedBase = base;
         PyObject[] savedMro = mro;
-        List<Object> savedSubMros = Generic.list();
+        List<Object> savedSubMros = new ArrayList<>();
         try {
             bases = newBases;
             base = newBase;
@@ -962,7 +961,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         toMerge[bases.length] = new MROMergeState();
         toMerge[bases.length].mro = bases;
 
-        List<PyObject> mro = Generic.list();
+        List<PyObject> mro = new ArrayList<>();
         mro.add(this);
         return computeMro(toMerge, mro);
     }
@@ -1019,7 +1018,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     void handleMroError(MROMergeState[] toMerge, List<PyObject> mro) {
         StringBuilder msg = new StringBuilder("Cannot create a consistent method resolution\n"
                 + "order (MRO) for bases ");
-        Set<PyObject> set = Generic.set();
+        Set<PyObject> set = new HashSet<>();
         for (MROMergeState mergee : toMerge) {
             if(!mergee.isMerged()) {
                 set.add(mergee.mro[0]);
@@ -1269,7 +1268,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
     public synchronized static void addBuilder(Class<?> forClass, TypeBuilder builder) {
         if (classToBuilder == null) {
-            classToBuilder = Generic.map();
+            classToBuilder = new HashMap<>();
         }
         classToBuilder.put(forClass, builder);
 
@@ -1380,7 +1379,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         // We haven't seen this class before, so its type needs to be created. If it's being
         // exposed as a Java class, defer processing its inner types until it's completely
         // created in case the inner class references a class that references this class.
-        Set<PyJavaType> needsInners = Generic.set();
+        Set<PyJavaType> needsInners = new HashSet<>();
         PyType result = addFromClass(c, needsInners);
         for (PyJavaType javaType : needsInners) {
             Class<?> forClass = javaType.getProxyType();
@@ -1405,7 +1404,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         }
         if (hardRef && result != null) {
             if (exposedTypes == null) {
-                exposedTypes = Generic.set();
+                exposedTypes = new HashSet<>();
             }
             exposedTypes.add(result) ;
         }
@@ -1990,7 +1989,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             if (isMerged()) {
                 return;
             }
-            List<PyObject> newMro = Generic.list();
+            List<PyObject> newMro = new ArrayList<>();
             for (PyObject mroEntry : mro) {
                 if (mroEntry != winner) {
                     newMro.add(mroEntry);

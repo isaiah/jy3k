@@ -1,14 +1,15 @@
 package org.python.core;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
-import org.python.util.Generic;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 @ExposedType(name = "set", base = PyObject.class, doc = BuiltinDocs.set_doc)
 public class PySet extends BaseSet {
@@ -24,15 +25,15 @@ public class PySet extends BaseSet {
     }
 
     public PySet(PyType type) {
-        super(type, Generic.<PyObject>concurrentSet());
+        super(type, Collections.synchronizedSet(new HashSet<>()));
     }
 
     public PySet(PyObject data) {
-        super(TYPE, _update(Generic.<PyObject>concurrentSet(), data));
+        super(TYPE, _update(Collections.synchronizedSet(new HashSet<>()), data));
     }
 
     public PySet(PyObject[] data) {
-        super(TYPE, _update(Generic.<PyObject>concurrentSet(), data));
+        super(TYPE, _update(Collections.synchronizedSet(new HashSet<>()), data));
     }
 
     public PySet(Set backing_set, PyObject data) {

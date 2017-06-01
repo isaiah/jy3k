@@ -1,12 +1,10 @@
 package org.python.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.python.core.Py;
+import org.python.core.PyException;
+import org.python.core.PyObject;
+import org.python.core.PySystemState;
+import org.python.core.PyUnicode;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -14,12 +12,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-
-import org.python.core.Py;
-import org.python.core.PyException;
-import org.python.core.PyObject;
-import org.python.core.PySystemState;
-import org.python.core.PyUnicode;
+import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This servlet is used to re-serve Jython servlets. It stores bytecode for Jython servlets and
@@ -244,5 +244,5 @@ public class PyServlet extends HttpServlet {
     private static final Pattern FIND_NAME = Pattern.compile("([^/]+)\\.py$");
 
     private PythonInterpreter interp;
-    private Map<String, CacheEntry> cache = Generic.map();
+    private Map<String, CacheEntry> cache = new HashMap<>();
 }

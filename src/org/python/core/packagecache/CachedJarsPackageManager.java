@@ -3,9 +3,6 @@
 
 package org.python.core.packagecache;
 
-import org.python.core.Options;
-import org.python.util.Generic;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -22,6 +19,7 @@ import java.net.URLConnection;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -157,12 +155,12 @@ public abstract class CachedJarsPackageManager extends PackageManager {
 
     @SuppressWarnings("unchecked")
     private List<String>[] createGenericStringListArray(){
-        return new List[] { Generic.list(), Generic.list() };
+        return new List[] { new ArrayList(), new ArrayList() };
     }
     
     // Extract all of the packages in a single jarfile
     private Collection<String> getZipPackages(InputStream jarin) throws IOException {
-        Map<String, List<String>[]> zipPackages = Generic.map();
+        Map<String, List<String>[]> zipPackages = new HashMap<>();
 
         ZipInputStream zip = new ZipInputStream(jarin);
 
@@ -459,7 +457,7 @@ public abstract class CachedJarsPackageManager extends PackageManager {
      */
     protected void initCache() {
         this.indexModified = false;
-        this.jarfiles = Generic.map();
+        this.jarfiles = new HashMap<>();
 
         DataInputStream istream = null;
         try {

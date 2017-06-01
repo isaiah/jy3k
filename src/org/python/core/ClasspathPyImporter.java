@@ -1,6 +1,13 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
+import org.python.core.util.FileUtil;
+import org.python.core.util.StringUtil;
+import org.python.core.util.importer;
+import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedNew;
+import org.python.expose.ExposedType;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,14 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.python.core.util.FileUtil;
-import org.python.core.util.StringUtil;
-import org.python.core.util.importer;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
-import org.python.util.Generic;
 
 // TODO: This could be replaced by the frozen module machinery, implement _imp.is_frozen / exec_frozen properly
 // NOTE: this class should be kept as a fallback to bootstrap the import machinery, before we find a way to freeze

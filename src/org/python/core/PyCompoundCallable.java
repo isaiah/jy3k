@@ -1,13 +1,12 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.python.util.Generic;
 
 public class PyCompoundCallable extends PyObject implements Traverseproc {
 
-    private List<PyObject> callables = Generic.list();
+    private List<PyObject> callables = new ArrayList<>();
 
     private PySystemState systemState = Py.getSystemState();
 

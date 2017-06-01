@@ -4,22 +4,20 @@
  */
 package org.python.core;
 
+import org.python.expose.ExposedClassMethod;
+import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedNew;
+import org.python.expose.ExposedType;
+import org.python.expose.MethodType;
+
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.ibm.icu.util.ValueIterator;
-import org.python.expose.ExposedClassMethod;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
-import org.python.expose.MethodType;
-import org.python.util.Generic;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.python.core.CompareOp.EQ;
 
@@ -55,8 +53,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
      */
     public PyDictionary(PyType type, int capacity) {
         super(type);
-        internalMap = new ConcurrentHashMap<PyObject, PyObject>(capacity, Generic.CHM_LOAD_FACTOR,
-                Generic.CHM_CONCURRENCY_LEVEL);
+        internalMap = new ConcurrentHashMap<>(capacity);
     }
 
     /**
@@ -64,7 +61,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
      */
     public PyDictionary(PyType type) {
         super(type);
-        internalMap = Generic.concurrentMap();
+        internalMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -99,8 +96,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
      * Create a new dictionary which is populated with entries the given map.
      */
     public PyDictionary(PyType type, Map<PyObject, PyObject> map) {
-        this(type, Math.max((int) (map.size() / Generic.CHM_LOAD_FACTOR) + 1,
-                Generic.CHM_INITIAL_CAPACITY));
+        this(type);
         getMap().putAll(map);
     }
 
@@ -112,7 +108,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     protected PyDictionary(PyType type, boolean initializeBacking) {
         super(type);
         if (initializeBacking) {
-            internalMap = Generic.concurrentMap();
+            internalMap = new ConcurrentHashMap<>();
         } else {
             internalMap = null; // for later initialization
         }

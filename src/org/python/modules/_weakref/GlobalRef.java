@@ -1,21 +1,21 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._weakref;
 
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.python.core.JyAttribute;
 import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
-import org.python.util.Generic;
 import org.python.modules.gc;
+
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class GlobalRef extends WeakReference<PyObject> {
 
@@ -54,7 +54,7 @@ public class GlobalRef extends WeakReference<PyObject> {
     private static Thread reaperThread;
     private static ReentrantReadWriteLock reaperLock = new ReentrantReadWriteLock();
 
-    private static ConcurrentMap<GlobalRef, GlobalRef> objects = Generic.concurrentMap();
+    private static ConcurrentMap<GlobalRef, GlobalRef> objects = new ConcurrentHashMap<>();
     private static List<GlobalRef> delayedCallbacks;
 
     public GlobalRef(PyObject object) {

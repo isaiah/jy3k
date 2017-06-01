@@ -1,20 +1,19 @@
 package org.python.tests;
 
-import java.util.Map;
-
 import org.python.core.Py;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyBuiltinMethodNarrow;
 import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.util.Generic;
+
+import java.util.Map;
+import java.util.HashMap;
 
 
 public class CustomizableMapHolder {
 
-    public Map<String, Integer> held = Generic.map();
-
+    public Map<String, Integer> held = new HashMap<>();
     {
         held.put("initial", 7);
     }

@@ -1,12 +1,13 @@
 package javatests;
 
+import org.python.core.PySet;
+import org.python.core.PyTuple;
+
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
-
-import org.python.core.PySet;
-import org.python.core.PyTuple;
-import org.python.util.Generic;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class PySetInJavaTest {
 
@@ -33,8 +34,8 @@ public class PySetInJavaTest {
         // Add a Random as it should be wrapped in a generic PyObject; go through addAll to give it
         // a little exercise
         Random rand = new Random();
-        check(s.addAll(Generic.list(rand)));
-        check(!s.addAll(Generic.list(rand, v)));
+        check(s.add(rand));
+        check(!s.addAll(Arrays.asList(rand, v)));
         naiveArray = s.toArray();
         check(naiveArray.length == 2);
         for (Object object : naiveArray) {
@@ -46,18 +47,18 @@ public class PySetInJavaTest {
         }
         check(!s.remove(new Random()), "The Random in the set shouldn't match a new Random");
         check(s.remove(rand));
-        check(s.removeAll(Generic.list(rand, v)),
+        check(s.removeAll(Arrays.asList(rand, v)),
               "The set should contain v and indicate it removed it");
         check(s.isEmpty());
-        check(s.addAll(Generic.list(rand, v)));
+        check(s.addAll(Arrays.asList(rand, v)));
         check(2 == s.size(), "There should be 2 items, not " + s.size());
-        check(s.containsAll(Generic.list(rand, v)));
-        check(!s.containsAll(Generic.list(rand, v, "other")));
-        check(s.retainAll(Generic.list(rand)));
-        check(!s.retainAll(Generic.list(rand)));
-        check(s.addAll(Generic.list(rand, v)));
+        check(s.containsAll(Arrays.asList(rand, v)));
+        check(!s.containsAll(Arrays.asList(rand, v, "other")));
+        check(s.retainAll(Arrays.asList(rand)));
+        check(!s.retainAll(Arrays.asList(rand)));
+        check(s.addAll(Arrays.asList(rand, v)));
         check(2 == s.size(), "There should be 2 items, not " + s.size());
-        check(!s.addAll(Generic.list(rand, v)));
+        check(!s.addAll(Arrays.asList(rand, v)));
         check(2 == s.size(), "There should be 2 items, not " + s.size());
     }
 
