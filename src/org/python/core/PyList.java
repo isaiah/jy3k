@@ -124,9 +124,9 @@ public class PyList extends PySequenceList implements List {
         if (seq == null) {
             return;
         }
-        if (seq instanceof PyList) {
+        if (PyList.checkExact(seq)) {
             list.addAll(((PyList) seq).list); // don't convert
-        } else if (seq instanceof PyTuple) {
+        } else if (PyTuple.checkExact(seq)) {
             list.addAll(((PyTuple) seq).getList());
         } else if (seq.getClass().isAssignableFrom(Collection.class)) {
             System.err.println("Adding from collection");
@@ -136,6 +136,10 @@ public class PyList extends PySequenceList implements List {
                 append(item);
             }
         }
+    }
+
+    final static boolean checkExact(PyObject obj) {
+        return obj.getType() == TYPE;
     }
 
     @Override
@@ -495,7 +499,7 @@ public class PyList extends PySequenceList implements List {
     final synchronized int list_count(PyObject o) {
         int count = 0;
         for (PyObject item : list) {
-            if (item.equals(o)) {
+            if (o.do_richCompareBool(item, CompareOp.EQ)) {
                 count++;
             }
         }
@@ -547,7 +551,7 @@ public class PyList extends PySequenceList implements List {
         if (validStart <= validStop) {
             try {
                 for (PyObject item : list.subList(validStart, validStop)) {
-                    if (item.equals(o)) {
+                    if (item.do_richCompareBool(o, CompareOp.EQ)) {
                         return i;
                     }
                     i++;
@@ -686,16 +690,7 @@ public class PyList extends PySequenceList implements List {
             return this;
         }
 
-        PyObject it;
-        try {
-            it = o.__iter__();
-        } catch (PyException pye) {
-            if (!pye.match(Py.TypeError)) {
-                throw pye;
-            }
-            return null;
-        }
-        extend(it);
+        extend(o.__iter__());
         return this;
     }
 

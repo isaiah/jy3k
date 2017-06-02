@@ -766,7 +766,8 @@ public final class Py {
 //            t.printStackTrace();
             return Py.RecursionError("maximum recursion depth exceeded (Java StackOverflowError)");
         } else if (t instanceof OutOfMemoryError) {
-            memory_error((OutOfMemoryError) t);
+          return Py.MemoryError("out of memory");
+            //memory_error((OutOfMemoryError) t);
         } else if (t instanceof UserInterruptException) {
             return Py.KeyboardInterrupt("");
         }

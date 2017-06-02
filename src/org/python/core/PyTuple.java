@@ -475,7 +475,7 @@ public class PyTuple extends PySequenceList implements List {
     final int tuple_count(PyObject value) {
         int count = 0;
         for (PyObject item : array) {
-            if (value.do_richCompareBool(item, CompareOp.EQ)) {
+            if (item.do_richCompareBool(value, CompareOp.EQ)) {
                 count++;
             }
         }
@@ -505,7 +505,7 @@ public class PyTuple extends PySequenceList implements List {
         int validStart = boundToSequence(start);
         int validStop = boundToSequence(stop);
         for (int i = validStart; i < validStop; i++) {
-            if (value.do_richCompareBool(array[i], CompareOp.EQ)) {
+            if (array[i].do_richCompareBool(value, CompareOp.EQ)) {
                 return i;
             }
         }
