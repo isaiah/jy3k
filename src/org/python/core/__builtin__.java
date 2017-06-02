@@ -4,20 +4,19 @@
  */
 package org.python.core;
 
+import org.python.antlr.base.mod;
+import org.python.core.stringlib.Encoding;
+import org.python.core.stringlib.IntegerFormatter;
+import org.python.core.util.ExtraMath;
+import org.python.core.util.RelativeFile;
+import org.python.modules._io._io;
+import org.python.modules.sys.SysModule;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.python.antlr.base.mod;
-import org.python.core.stringlib.Encoding;
-import org.python.core.stringlib.IntegerFormatter;
-import org.python.core.stringlib.InternalFormat;
-import org.python.core.util.ExtraMath;
-import org.python.core.util.RelativeFile;
-import org.python.modules._io._io;
-import org.python.modules.sys.SysModule;
 
 @Untraversable
 class BuiltinFunctions extends PyBuiltinFunctionSet {
@@ -1624,21 +1623,15 @@ class NextFunction extends PyBuiltinFunction {
         PyObject def = ap.getPyObject(1, null);
 
         PyObject next;
-        if ((next = it.__findattr__("next")) == null) {
-            if ((next = it.__findattr__("__next__")) == null) {
+        if ((next = it.__findattr__("__next__")) == null) {
+            System.out.println("doesn't have new __next__ attr: " + it);
+            if ((next = it.__findattr__("next")) == null) {
                 throw Py.TypeError(String.format("'%.200s' object is not an iterator",
-                        it.getType().fastGetName()));
+                    it.getType().fastGetName()));
             }
         }
 
-        try {
-            return next.__call__();
-        } catch (PyException pye) {
-            if (!pye.match(Py.StopIteration) || def == null) {
-                throw pye;
-            }
-        }
-        return def;
+        return next.__call__();
     }
 }
 

@@ -46,6 +46,7 @@ org/python/core/PyNone.class
 org/python/core/PyNotImplemented.class
 org/python/core/PyObject.class
 org/python/core/PyProperty.class
+org/python/core/PyReversedIterator.class
 org/python/core/PySequenceIter.class
 org/python/core/PySet.class
 org/python/core/PySlice.class

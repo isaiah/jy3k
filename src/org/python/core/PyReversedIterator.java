@@ -1,9 +1,13 @@
 package org.python.core;
 
+import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedType;
+
 /**
  * An iterator that yields the objects from a sequence-like object in reverse
  * order. 
  */
+@ExposedType(name = "reversed_iterator")
 public class PyReversedIterator extends PyIterator {
 
     /**
@@ -15,17 +19,19 @@ public class PyReversedIterator extends PyIterator {
      */
     public PyReversedIterator(PyObject seq) {
         this.seq = seq;
-        idx = seq.__len__();
-        if(idx > 0) {
-            idx = idx - 1;
-        }
+        idx = seq.__len__() - 1;
     }
 
-    public PyObject __next__() {
+    @ExposedMethod
+    public PyObject reversed_iterator___next__() {
         if(idx >= 0) {
             return seq.__finditem__(idx--);
         }
-        return null;
+        throw Py.StopIteration();
+    }
+
+    public PyObject __next__() {
+        return reversed_iterator___next__();
     }
 
     private PyObject seq;
