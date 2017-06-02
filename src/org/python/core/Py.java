@@ -2797,11 +2797,6 @@ public final class Py {
     }
 
     static PyObject[] make_array(PyObject iterable) {
-        // Special-case the common tuple and list cases, for efficiency
-        if (iterable instanceof PySequenceList) {
-            return ((PySequenceList) iterable).getArray();
-        }
-
         // Guess result size and allocate space. The typical make_array arg supports
         // __len__, with one exception being generators, so avoid the overhead of an
         // exception from __len__ in their case
@@ -2814,7 +2809,7 @@ public final class Py {
             }
         }
 
-        List<PyObject> objs = new ArrayList<PyObject>(n);
+        List<PyObject> objs = new ArrayList<>(n);
         for (PyObject item : iterable.asIterable()) {
             objs.add(item);
         }

@@ -878,13 +878,9 @@ public class PyObject implements Serializable {
      * the returned Iterable.
      */
     public Iterable<PyObject> asIterable() {
-        return new Iterable<PyObject>() {
-            public Iterator<PyObject> iterator() {
-                return new WrappedIterIterator<PyObject>(__iter__()) {
-                    public PyObject next() {
-                        return getNext();
-                    }
-                };
+        return () -> new WrappedIterIterator<PyObject>(__iter__()) {
+            public PyObject next() {
+                return getNext();
             }
         };
     }
@@ -1430,6 +1426,22 @@ public class PyObject implements Serializable {
         return res;
     }
 
+    public final boolean do_richCompareBool(PyObject other, CompareOp op) {
+        if (this == other) {
+            if (op == CompareOp.EQ) {
+                return true;
+            } else if (op == CompareOp.NE) {
+                return false;
+            }
+        }
+
+        PyObject res = do_richCompare(other, op);
+        if (res instanceof PyBoolean) {
+            return res == Py.True;
+        }
+        return res.__bool__();
+    }
+
     // Rich comparison entry for bytecode
     public final PyObject do_richCompare(PyObject other, CompareOp op) {
         PyObject token = null;
@@ -1602,7 +1614,7 @@ public class PyObject implements Serializable {
 
     final boolean object___contains__(PyObject o) {
         for (PyObject item : asIterable()) {
-            if (o.equals(item)) {
+            if (o.do_richCompareBool(item, CompareOp.EQ)) {
                 return true;
             }
         }

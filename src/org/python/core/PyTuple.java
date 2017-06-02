@@ -81,10 +81,7 @@ public class PyTuple extends PySequenceList implements List {
             if (S == null) {
                 return EMPTY_TUPLE;
             }
-            if (S instanceof PyTupleDerived) {
-                return new PyTuple(((PyTuple) S).getArray());
-            }
-            if (S instanceof PyTuple) {
+            if (PyTuple.checkExact(S)) {
                 return S;
             }
             return fromArrayNoCopy(Py.make_array(S));
@@ -94,6 +91,10 @@ public class PyTuple extends PySequenceList implements List {
             }
             return new PyTupleDerived(subtype, Py.make_array(S));
         }
+    }
+
+    final static boolean checkExact(PyObject pyobj) {
+        return pyobj.getType() == TYPE;
     }
 
     /**
@@ -474,7 +475,7 @@ public class PyTuple extends PySequenceList implements List {
     final int tuple_count(PyObject value) {
         int count = 0;
         for (PyObject item : array) {
-            if (item.equals(value)) {
+            if (value.do_richCompareBool(item, CompareOp.EQ)) {
                 count++;
             }
         }
@@ -504,7 +505,7 @@ public class PyTuple extends PySequenceList implements List {
         int validStart = boundToSequence(start);
         int validStop = boundToSequence(stop);
         for (int i = validStart; i < validStop; i++) {
-            if (array[i].equals(value)) {
+            if (value.do_richCompareBool(array[i], CompareOp.EQ)) {
                 return i;
             }
         }
@@ -518,10 +519,7 @@ public class PyTuple extends PySequenceList implements List {
         }
 
         if (other instanceof PyObject) {
-            PyObject res = richCompare((PyObject) other, CompareOp.EQ);
-            if (res != Py.NotImplemented) {
-                return res.__bool__();
-            }
+            return do_richCompareBool((PyObject) other, CompareOp.EQ);
         }
         if (other instanceof List) {
             return other.equals(this);
