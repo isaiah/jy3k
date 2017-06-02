@@ -443,9 +443,9 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         } else if (type == PyFrozenSet.TYPE) {
             so = new PyFrozenSet(iterable);
         } else if (Py.isSubClass(type, PySet.TYPE)) {
-            so = (BaseSet)(type.__call__(iterable == null ? Py.EmptyTuple : iterable));
+            so = new PySet(iterable);
         } else {
-            so = new PyFrozenSetDerived(type, iterable);
+            so = new PyFrozenSet(iterable);
         }
         return so;
     }

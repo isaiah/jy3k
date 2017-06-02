@@ -323,7 +323,7 @@ public class PySet extends BaseSet {
     public String toString() {
         ThreadState ts = Py.getThreadState();
         if (!ts.enterRepr(this)) {
-            return "{...}";
+            return "set(...)";
         }
         StringBuilder buf = new StringBuilder("{");
         for (Iterator<PyObject> i = _set.iterator(); i.hasNext();) {

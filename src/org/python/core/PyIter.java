@@ -22,6 +22,11 @@ public class PyIter extends PyObject {
     }
 
     @Override
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @Override
     public PyObject __next__() {
         try {
             return iterator___next__();
