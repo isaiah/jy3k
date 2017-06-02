@@ -33,6 +33,7 @@ org/python/core/PyFrozenSet.class
 org/python/core/PyFunction.class
 org/python/core/PyInstance.class
 org/python/core/PyInteger.class
+org/python/core/PyIter.class
 org/python/core/PyIterator.class
 org/python/core/PyList.class
 org/python/core/PyLong.class
