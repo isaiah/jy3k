@@ -256,16 +256,31 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             }
             return Py.NotImplemented;
         }
-        int ret;
         BaseSet o = asBaseSet(other);
-        if (_set.equals(o._set)) {
-            ret = 0;
-        } else if (baseset_issubset(o).__bool__()) {
-            ret = -1;
-        } else {
-            ret = 1;
+        switch(op) {
+            case EQ:
+                if (size() != o.size()) {
+                    return Py.False;
+                }
+                return baseset_issubset(other);
+            case NE:
+                return Py.newBoolean(richCompare(other, CompareOp.EQ) != Py.True);
+            case LE:
+                return baseset_issubset(other);
+            case GE:
+                return baseset_issuperset(other);
+            case LT:
+                if (size() >= o.size()) {
+                    return Py.False;
+                }
+                return baseset_issubset(other);
+            case GT:
+                if (size() <= o.size()) {
+                    return Py.False;
+                }
+                return baseset_issuperset(other);
         }
-        return op.bool(ret);
+        return Py.NotImplemented;
     }
 
     /**
