@@ -35,6 +35,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -763,8 +764,9 @@ public final class Py {
         } else if (t instanceof InvocationTargetException) {
             return JavaError(((InvocationTargetException) t).getTargetException());
         } else if (t instanceof StackOverflowError) {
-//            t.printStackTrace();
             return Py.RecursionError("maximum recursion depth exceeded (Java StackOverflowError)");
+        } else if (t instanceof ConcurrentModificationException) {
+            return Py.RuntimeError("changes while iterating");
         } else if (t instanceof OutOfMemoryError) {
           return Py.MemoryError("out of memory");
             //memory_error((OutOfMemoryError) t);

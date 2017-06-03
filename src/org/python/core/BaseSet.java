@@ -229,7 +229,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
     }
 
     final PyObject baseset___iter__() {
-        return new PyIter(_set.iterator());
+        return new PyIter(_set);
     }
 
     public boolean __contains__(PyObject other) {
