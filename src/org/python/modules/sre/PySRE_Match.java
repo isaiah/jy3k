@@ -60,10 +60,14 @@ public class PySRE_Match extends PyObject {
         if (index > matcher.groupCount()) {
             throw Py.IndexError("no such group");
         }
-        if (isByte) {
-            return new PyBytes(matcher.group(index));
+        String s = matcher.group(index);
+        if (s == null) {
+            return Py.None;
         }
-        return new PyUnicode(matcher.group(index));
+        if (isByte) {
+            return new PyBytes(s);
+        }
+        return new PyUnicode(s);
     }
 
     @ExposedMethod

@@ -2932,7 +2932,7 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         StringBuilder sb = new StringBuilder();
         sb.append(Character.toChars(ch));
         while (ASCII.isLower(ch=read()) || ASCII.isUpper(ch) ||
-               ASCII.isDigit(ch)) {
+               ASCII.isDigit(ch) || ch == '_') {
             sb.append(Character.toChars(ch));
         }
         if (sb.length() == 0)

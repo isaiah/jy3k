@@ -27,6 +27,7 @@ _compat_pickle.py
 _dummy_thread.py
 _LWPCookieJar.py
 _MozillaCookieJar.py
+_pydecimal.py
 _pyio.py
 _strptime.py
 _sitebuiltins.py
@@ -66,6 +67,7 @@ copy.py
 copyreg.py
 Cookie.py
 csv.py
+decimal.py
 difflib.py
 dircache.py
 dircmp.py
