@@ -4,20 +4,17 @@ package org.python.core;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.python.Version;
 import org.python.compiler.Module;
 import org.python.core.util.FileUtil;
 import org.python.core.util.PlatformUtil;
-import org.python.modules.Setup;
 
 /**
  * Utility functions for "import" support.
@@ -503,12 +500,12 @@ public class imp {
         return importer;
     }
 
-    // FIXME: This is deprecated, the use way is use the importlib machinery, which include a BuiltinImporter
+    // FIXME: This is deprecated, the new way is use the importlib machinery, which include a BuiltinImporter
     // Once all builtin modules are properly annotated and exposed, we can remove this
     public static PyObject loadBuiltin(String name) {
         if (name == "__builtin__" || name == "builtins") {
             Py.writeComment(IMPORT_LOG, "'" + name + "' as __builtin__ in builtin modules");
-            return new PyModule("__builtin__", Py.getSystemState().builtins);
+            return new PyModule("builtins", Py.getSystemState().builtins);
         }
         String mod = PySystemState.getBuiltin(name);
         if (mod != null) {
@@ -1090,7 +1087,7 @@ public class imp {
                         if (nameObj != null) {
                             String submodName = nameObj.__str__().toString() + '.' + sname;
                             value =
-                                    __builtin__
+                                    BuiltinModule
                                             .__import__(submodName, null, null, nonEmptyFromlist);
                         }
                     }

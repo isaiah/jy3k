@@ -1,18 +1,18 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.util;
 
+import org.python.core.BuiltinModule;
 import org.python.core.Py;
 import org.python.core.PyBuiltinFunctionSet;
 import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
 import org.python.core.PyUnicode;
-import org.python.core.__builtin__;
 
 /**
  * This class provides the read, execute, print loop needed by a Python console; it is not actually
  * a console itself. The primary capability is the {@link #interact()} method, which repeatedly
- * calls {@link #raw_input(PyObject)}, and hence {@link __builtin__#raw_input(PyObject)}, in order
+ * calls {@link #raw_input(PyObject)}, and hence {@link BuiltinModule#raw_input(PyObject)}, in order
  * to get lines, and {@link #push(String)} them into the interpreter. The built-in
  * <code>raw_input()</code> method prompts on <code>sys.stdout</code> and reads from
  * <code>sys.stdin</code>, the standard console. These may be redirected using
@@ -192,13 +192,13 @@ public class InteractiveConsole extends InteractiveInterpreter {
      * different implementation.
      */
     public String raw_input(PyObject prompt) {
-        return __builtin__.raw_input(prompt);
+        return BuiltinModule.raw_input(prompt);
     }
 
     /**
      * Write a prompt and read a line from a file.
      */
     public String raw_input(PyObject prompt, PyObject file) {
-        return __builtin__.raw_input(prompt, file);
+        return BuiltinModule.raw_input(prompt, file);
     }
 }

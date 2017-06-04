@@ -406,7 +406,7 @@ final class StringFormatter {
                     } else if (spec.type == 'r') {
                         argAsString = arg.__repr__();
                     } else {
-                        argAsString  = __builtin__.ascii(arg);
+                        argAsString  = BuiltinModule.ascii(arg);
                     }
                     // Format the str/unicode form of the argument using this Spec.
                     f = ft = new TextFormatter(buffer, spec);

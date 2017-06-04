@@ -322,7 +322,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             other = new PySet(other);
         }
 
-        if (size() <= __builtin__.len(other)) {
+        if (size() <= BuiltinModule.len(other)) {
             little = this;
             big = other;
         } else {
@@ -330,7 +330,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             big = this;
         }
 
-        PyObject common = __builtin__.filter(big.__getattr__("__contains__"), little);
+        PyObject common = BuiltinModule.filter(big.__getattr__("__contains__"), little);
         return BaseSet.makeNewSet(getType(), common);
     }
     

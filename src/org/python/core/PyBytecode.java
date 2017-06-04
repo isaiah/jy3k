@@ -14,7 +14,7 @@ public class PyBytecode extends PyBaseCode implements Traverseproc {
 
     private static synchronized PyObject get_dis() {
         if (dis == null) {
-            dis = __builtin__.__import__("dis");
+            dis = BuiltinModule.__import__("dis");
         }
         return dis;
     }

@@ -34,7 +34,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.core.__builtin__;
+import org.python.core.BuiltinModule;
 import org.python.core.codecs;
 import org.python.core.imp;
 import org.python.core.stringlib.Encoding;
@@ -2180,7 +2180,7 @@ public class _pickle implements ClassDictInit {
 
     private static PyObject importModule(String name) {
         PyObject fromlist = new PyTuple(Py.newString("__doc__"));
-        return __builtin__.__import__(name, Py.None, Py.None, fromlist);
+        return BuiltinModule.__import__(name, Py.None, Py.None, fromlist);
     }
 
     private static PyObject getJavaFunc(String name, String methodName) {

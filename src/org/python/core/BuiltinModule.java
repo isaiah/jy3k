@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Untraversable
 class BuiltinFunctions extends PyBuiltinFunctionSet {
-    public static final PyObject module = Py.newString("__builtin__");
+    public static final PyObject module = new PyUnicode("builtins");
 
     public BuiltinFunctions(String name, int index, int argcount) {
         this(name, index, argcount, argcount);
@@ -34,19 +34,19 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     public PyObject __call__() {
         switch (this.index) {
             case 4:
-                return __builtin__.globals();
+                return BuiltinModule.globals();
             case 16:
-                return __builtin__.dir();
+                return BuiltinModule.dir();
             case 24:
-                return __builtin__.input();
+                return BuiltinModule.input();
             case 28:
-                return __builtin__.locals();
+                return BuiltinModule.locals();
             case 34:
-                return Py.newUnicode(__builtin__.raw_input());
+                return Py.newUnicode(BuiltinModule.raw_input());
             case 41:
-                return __builtin__.vars();
+                return BuiltinModule.vars();
             case 43:
-                return __builtin__.zip();
+                return BuiltinModule.zip();
             default:
                 throw info.unexpectedCall(0, false);
         }
@@ -56,52 +56,52 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     public PyObject __call__(PyObject arg1) {
         switch (this.index) {
             case 0:
-                return Py.newUnicode(__builtin__.chr(Py.py2int(arg1,
+                return Py.newUnicode(BuiltinModule.chr(Py.py2int(arg1,
                                                               "chr(): 1st arg can't be coerced to "
                                                               + "int")));
             case 1:
-                return Py.newLong(__builtin__.len(arg1));
+                return Py.newLong(BuiltinModule.len(arg1));
             case 3:
-                return Py.newLong(__builtin__.ord(arg1));
+                return Py.newLong(BuiltinModule.ord(arg1));
             case 5:
-                return __builtin__.hash(arg1);
+                return BuiltinModule.hash(arg1);
 //            case 6:
 //                return Py.newUnicode(__builtin__.unichr(arg1));
             case 7:
-                return __builtin__.abs(arg1);
+                return BuiltinModule.abs(arg1);
             case 9:
-                return __builtin__.ascii(arg1);
+                return BuiltinModule.ascii(arg1);
             case 11:
-                return Py.newLong(__builtin__.id(arg1));
+                return Py.newLong(BuiltinModule.id(arg1));
             case 12:
-                return __builtin__.sum(arg1);
+                return BuiltinModule.sum(arg1);
             case 14:
-                return Py.newBoolean(__builtin__.callable(arg1));
+                return Py.newBoolean(BuiltinModule.callable(arg1));
             case 16:
-                return __builtin__.dir(arg1);
+                return BuiltinModule.dir(arg1);
             case 18:
-                return __builtin__.eval(arg1);
+                return BuiltinModule.eval(arg1);
             case 19:
-                __builtin__.execfile(arg1.asString());
+                BuiltinModule.execfile(arg1.asString());
                 return Py.None;
             case 23:
-                return __builtin__.hex(arg1);
+                return BuiltinModule.hex(arg1);
             case 24:
-                return __builtin__.input(arg1);
+                return BuiltinModule.input(arg1);
             case 25:
-                return __builtin__.intern(arg1);
+                return BuiltinModule.intern(arg1);
             case 27:
-                return __builtin__.iter(arg1);
+                return BuiltinModule.iter(arg1);
             case 32:
-                return __builtin__.oct(arg1);
+                return BuiltinModule.oct(arg1);
             case 34:
-                return Py.newUnicode(__builtin__.raw_input(arg1));
+                return Py.newUnicode(BuiltinModule.raw_input(arg1));
 //            case 36:
 //                return __builtin__.reload(arg1);
             case 37:
-                return __builtin__.repr(arg1);
+                return BuiltinModule.repr(arg1);
             case 41:
-                return __builtin__.vars(arg1);
+                return BuiltinModule.vars(arg1);
             case 30:
                 return fancyCall(new PyObject[] {arg1});
             case 31:
@@ -109,9 +109,9 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 43:
                 return fancyCall(new PyObject[] {arg1});
             case 45:
-                return __builtin__.reversed(arg1);
+                return BuiltinModule.reversed(arg1);
             case 46:
-                return __builtin__.exec(arg1);
+                return BuiltinModule.exec(arg1);
             default:
                 throw info.unexpectedCall(1, false);
         }
@@ -121,31 +121,31 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     public PyObject __call__(PyObject arg1, PyObject arg2) {
         switch (this.index) {
             case 10:
-                return Py.newBoolean(__builtin__.isinstance(arg1, arg2));
+                return Py.newBoolean(BuiltinModule.isinstance(arg1, arg2));
             case 12:
-                return __builtin__.sum(arg1, arg2);
+                return BuiltinModule.sum(arg1, arg2);
             case 15:
-                __builtin__.delattr(arg1, arg2);
+                BuiltinModule.delattr(arg1, arg2);
                 return Py.None;
             case 17:
-                return __builtin__.divmod(arg1, arg2);
+                return BuiltinModule.divmod(arg1, arg2);
             case 18:
-                return __builtin__.eval(arg1, arg2);
+                return BuiltinModule.eval(arg1, arg2);
             case 19:
-                __builtin__.execfile(arg1.asString(), arg2);
+                BuiltinModule.execfile(arg1.asString(), arg2);
                 return Py.None;
             case 20:
-                return __builtin__.filter(arg1, arg2);
+                return BuiltinModule.filter(arg1, arg2);
             case 21:
-                return __builtin__.getattr(arg1, arg2);
+                return BuiltinModule.getattr(arg1, arg2);
             case 22:
-                return Py.newBoolean(__builtin__.hasattr(arg1, arg2));
+                return Py.newBoolean(BuiltinModule.hasattr(arg1, arg2));
             case 26:
-                return Py.newBoolean(__builtin__.issubclass(arg1, arg2));
+                return Py.newBoolean(BuiltinModule.issubclass(arg1, arg2));
             case 27:
-                return __builtin__.iter(arg1, arg2);
+                return BuiltinModule.iter(arg1, arg2);
             case 33:
-                return __builtin__.pow(arg1, arg2);
+                return BuiltinModule.pow(arg1, arg2);
 //            case 35:
 //                return _functools.reduce(arg1, arg2);
             case 29:
@@ -157,7 +157,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 43:
                 return fancyCall(new PyObject[] {arg1, arg2});
             case 46:
-                return __builtin__.exec(arg1, arg2);
+                return BuiltinModule.exec(arg1, arg2);
             default:
                 throw info.unexpectedCall(2, false);
         }
@@ -174,24 +174,24 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                         arg3 = d;
                     }
                     PyDictionary d = (PyDictionary) arg3;
-                    return __builtin__.apply(arg1, arg2, d);
+                    return BuiltinModule.apply(arg1, arg2, d);
                 } catch (ClassCastException e) {
                     throw Py.TypeError("apply() 3rd argument must be a "
                                        + "dictionary with string keys");
                 }
             case 18:
-                return __builtin__.eval(arg1, arg2, arg3);
+                return BuiltinModule.eval(arg1, arg2, arg3);
             case 19:
-                __builtin__.execfile(arg1.asString(), arg2, arg3);
+                BuiltinModule.execfile(arg1.asString(), arg2, arg3);
                 return Py.None;
             case 21:
-                return __builtin__.getattr(arg1, arg2, arg3);
+                return BuiltinModule.getattr(arg1, arg2, arg3);
             case 33:
-                return __builtin__.pow(arg1, arg2, arg3);
+                return BuiltinModule.pow(arg1, arg2, arg3);
 //            case 35:
 //                return _functools.reduce(arg1, arg2, arg3);
             case 39:
-                __builtin__.setattr(arg1, arg2, arg3);
+                BuiltinModule.setattr(arg1, arg2, arg3);
                 return Py.None;
             case 44:
                 return fancyCall(new PyObject[] {arg1, arg2, arg3});
@@ -204,7 +204,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 43:
                 return fancyCall(new PyObject[] {arg1, arg2, arg3});
             case 46:
-                return __builtin__.exec(arg1, arg2, arg3);
+                return BuiltinModule.exec(arg1, arg2, arg3);
             default:
                 throw info.unexpectedCall(3, false);
         }
@@ -232,9 +232,9 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     public PyObject fancyCall(PyObject[] args) {
         switch (this.index) {
             case 29:
-                return __builtin__.map(args);
+                return BuiltinModule.map(args);
             case 43:
-                return __builtin__.zip(args);
+                return BuiltinModule.zip(args);
             default:
                 throw info.unexpectedCall(args.length, false);
         }
@@ -249,7 +249,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
 /**
  * The builtin module. All builtin functions are defined here
  */
-public class __builtin__ {
+public class BuiltinModule {
 
     private static final PyStringMap internedStrings = new PyStringMap();
 

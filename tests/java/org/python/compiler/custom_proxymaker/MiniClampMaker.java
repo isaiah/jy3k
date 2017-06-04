@@ -10,7 +10,7 @@ import org.python.compiler.JavaMaker;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
-import org.python.core.__builtin__;
+import org.python.core.BuiltinModule;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -71,7 +71,7 @@ public class MiniClampMaker extends JavaMaker {
         for (PyObject pykey : methods.asIterable()) {
             String key = Py.tojava(pykey, String.class);
             PyObject value = methods.__finditem__(key);
-            PyObject clampObj = __builtin__.getattr(value, clampAttr, Py.None);
+            PyObject clampObj = BuiltinModule.getattr(value, clampAttr, Py.None);
             if (clampObj == Py.None) {
                 continue;
             }

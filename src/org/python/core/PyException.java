@@ -293,13 +293,13 @@ public class PyException extends RuntimeException implements Traverseproc
         // java.io.IOExceptions.  This is a hack for 1.0.x until I can do
         // it right in 1.1
         if (exc == Py.IOError) {
-            if (__builtin__.isinstance(value, PyType.fromClass(IOException.class))) {
+            if (BuiltinModule.isinstance(value, PyType.fromClass(IOException.class))) {
                 return true;
             }
         }
         // FIXME too, same approach for OutOfMemoryError
         if (exc == Py.MemoryError) {
-            if (__builtin__.isinstance(value,
+            if (BuiltinModule.isinstance(value,
                                        PyType.fromClass(OutOfMemoryError.class))) {
                 return true;
             }

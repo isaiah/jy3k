@@ -10,7 +10,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.__builtin__;
+import org.python.core.BuiltinModule;
 
 public class PythonObjectInputStream extends ObjectInputStream {
 
@@ -48,6 +48,6 @@ public class PythonObjectInputStream extends ObjectInputStream {
 
     private static PyObject importModule(String name) {
         PyObject fromlist = new PyTuple(Py.newString("__doc__"));
-        return __builtin__.__import__(name, null, null, fromlist);
+        return BuiltinModule.__import__(name, null, null, fromlist);
     }
 }

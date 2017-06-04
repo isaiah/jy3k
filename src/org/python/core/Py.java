@@ -697,7 +697,7 @@ public final class Py {
         }
         PyObject mod;
         try {
-            mod = __builtin__.__import__("warnings");
+            mod = BuiltinModule.__import__("warnings");
         } catch (PyException e) {
             if (e.match(ImportError)) {
                 return null;
@@ -907,7 +907,7 @@ public final class Py {
         if (date == null) {
             return Py.None;
         }
-        PyObject datetimeModule = __builtin__.__import__("datetime");
+        PyObject datetimeModule = BuiltinModule.__import__("datetime");
         PyObject dateClass = datetimeModule.__getattr__("date");
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -922,7 +922,7 @@ public final class Py {
         if (time == null) {
             return Py.None;
         }
-        PyObject datetimeModule = __builtin__.__import__("datetime");
+        PyObject datetimeModule = BuiltinModule.__import__("datetime");
         PyObject timeClass = datetimeModule.__getattr__("time");
         Calendar cal = Calendar.getInstance();
         cal.setTime(time);
@@ -937,7 +937,7 @@ public final class Py {
         if (timestamp == null) {
             return Py.None;
         }
-        PyObject datetimeModule = __builtin__.__import__("datetime");
+        PyObject datetimeModule = BuiltinModule.__import__("datetime");
         PyObject datetimeClass = datetimeModule.__getattr__("datetime");
         Calendar cal = Calendar.getInstance();
         cal.setTime(timestamp);
@@ -955,7 +955,7 @@ public final class Py {
         if (decimal == null) {
             return Py.None;
         }
-        PyObject decimalModule = __builtin__.__import__("decimal");
+        PyObject decimalModule = BuiltinModule.__import__("decimal");
         PyObject decimalClass = decimalModule.__getattr__("Decimal");
         return decimalClass.__call__(newUnicode(decimal));
     }
@@ -1560,7 +1560,7 @@ public final class Py {
         if (tb instanceof PyTraceback) {
             stderr.print(((PyTraceback) tb).dumpStack());
         }
-        if (Py.SyntaxError != null && __builtin__.isinstance(value, Py.SyntaxError)) {
+        if (Py.SyntaxError != null && BuiltinModule.isinstance(value, Py.SyntaxError)) {
             PyObject filename = value.__findattr__("filename");
             PyObject text = value.__findattr__("text");
             PyObject lineno = value.__findattr__("lineno");

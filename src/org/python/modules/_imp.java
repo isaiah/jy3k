@@ -2,19 +2,11 @@
 package org.python.modules;
 
 import org.python.Version;
-import org.python.core.BufferProtocol;
 import org.python.core.BytecodeLoader;
-import org.python.core.ClassDictInit;
-import org.python.core.PyBUF;
-import org.python.core.PyBuffer;
-import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
-import org.python.core.PyCode;
 import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
-import org.python.core.__builtin__;
 import org.python.core.Py;
-import org.python.core.PyFile;
 import org.python.core.PyList;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
@@ -26,14 +18,7 @@ import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.locks.ReentrantLock;
 
 @ExposedModule

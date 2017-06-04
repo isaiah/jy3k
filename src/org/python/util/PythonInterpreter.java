@@ -1,6 +1,7 @@
 package org.python.util;
 
 import org.python.antlr.base.mod;
+import org.python.core.BuiltinModule;
 import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
@@ -14,7 +15,6 @@ import org.python.core.PyFileWriter;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
-import org.python.core.__builtin__;
 import org.python.modules.sys.SysModule;
 
 import java.io.Closeable;
@@ -246,7 +246,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      */
     public PyObject eval(String s) {
         setSystemState();
-        return __builtin__.eval(new PyBytes(s), getLocals());
+        return BuiltinModule.eval(new PyBytes(s), getLocals());
     }
 
     /**
@@ -254,7 +254,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      */
     public PyObject eval(PyObject code) {
         setSystemState();
-        return __builtin__.eval(code, getLocals());
+        return BuiltinModule.eval(code, getLocals());
     }
 
     /**
@@ -281,7 +281,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     public void execfile(String filename) {
         PyObject locals = getLocals();
         setSystemState();
-        __builtin__.execfile_flags(filename, locals, locals, cflags);
+        BuiltinModule.execfile_flags(filename, locals, locals, cflags);
         Py.flushLine();
     }
 

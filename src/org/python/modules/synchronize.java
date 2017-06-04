@@ -4,7 +4,7 @@
  */
 package org.python.modules;
 
-import org.python.core.__builtin__;
+import org.python.core.BuiltinModule;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.PyMethod;
@@ -23,13 +23,13 @@ public class synchronize {
                                               PyObject args) {
         synchronized (_getSync(syncObject)) {
 
-            return __builtin__.apply(callable, args);
+            return BuiltinModule.apply(callable, args);
         }
     }
     public static PyObject apply_synchronized(PyObject syncObject, PyObject callable,
                                               PyObject args, PyDictionary kws) {
         synchronized (_getSync(syncObject)) {
-            return __builtin__.apply(callable, args, kws);
+            return BuiltinModule.apply(callable, args, kws);
         }
     }
 

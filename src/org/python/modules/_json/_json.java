@@ -2,6 +2,7 @@
 package org.python.modules._json;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinModule;
 import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyBuiltinFunctionNarrow;
@@ -48,7 +49,7 @@ public class _json implements ClassDictInit {
 
     private static synchronized PyObject get_errmsg_fn() {
         if (errmsg_fn == null) {
-            PyObject json = org.python.core.__builtin__.__import__("json");
+            PyObject json = BuiltinModule.__import__("json");
             if (json != null) {
                 PyObject decoder = json.__findattr__("decoder");
                 if (decoder != null) {

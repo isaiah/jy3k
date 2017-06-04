@@ -181,7 +181,7 @@ public class PyScriptEngine extends AbstractScriptEngine implements Compilable, 
             PyObject value = pye.value;
             PyTraceback tb = pye.traceback;
 
-            if (__builtin__.isinstance(value, Py.SyntaxError)) {
+            if (BuiltinModule.isinstance(value, Py.SyntaxError)) {
                 PyObject filename = value.__findattr__("filename");
                 PyObject lineno = value.__findattr__("lineno");
                 PyObject offset = value.__findattr__("offset");

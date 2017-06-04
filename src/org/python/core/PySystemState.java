@@ -226,7 +226,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         if (builtins == null) {
             builtins = getDefaultBuiltins();
         }
-        modules.__setitem__("__builtin__", new PyModule("__builtin__", getDefaultBuiltins()));
+        modules.__setitem__("__builtin__", new PyModule("builtins", builtins));
         __dict__ = new PyStringMap();
         __dict__.invoke("update", getType().fastGetDict());
         __dict__.__setitem__("displayhook", __displayhook__);
@@ -296,8 +296,8 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
         static PyObject fillin() {
             PyObject temp = new PyStringMap();
-            __builtin__.fillWithBuiltins(temp);
-            __builtin__.fillWithBuiltinExceptions(temp);
+            BuiltinModule.fillWithBuiltins(temp);
+            BuiltinModule.fillWithBuiltinExceptions(temp);
             return temp;
         }
     }
@@ -332,7 +332,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public void setBuiltins(PyObject value) {
         builtins = value;
-        modules.__setitem__("__builtin__", new PyModule("__builtin__", value));
+        modules.__setitem__("__builtin__", new PyModule("builtins", value));
     }
 
     public PyObject getWarnoptions() {

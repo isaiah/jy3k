@@ -3,17 +3,15 @@ package org.python.modules;
 
 import java.math.BigInteger;
 
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
-import org.python.core.__builtin__;
+import org.python.core.BuiltinModule;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedModule;
 
 @ExposedModule(name = "math")
@@ -503,7 +501,7 @@ public class math {
 
     @ExposedFunction
     public static double fsum(final PyObject iterable) {
-        PyFloat result = (PyFloat)__builtin__.__import__("_fsum").invoke("fsum", iterable);
+        PyFloat result = (PyFloat) BuiltinModule.__import__("_fsum").invoke("fsum", iterable);
         return result.asDouble();
     }
 
