@@ -13,6 +13,7 @@ import org.python.core.PyTuple;
 import org.python.core.__builtin__;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedModule;
 
 @ExposedModule(name = "math")
@@ -39,6 +40,10 @@ public class math {
     private static final BigInteger MIN_LONG_BIGINTEGER = new BigInteger(
             String.valueOf(Long.MIN_VALUE));
 
+    @ExposedFunction
+    public static PyObject gcd(PyObject self, PyObject other) {
+        return ((PyLong) self.__index__()).gcd(other);
+    }
     @ExposedFunction
     public static double gamma(double v) {
         return math_gamma.gamma(v);

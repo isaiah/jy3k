@@ -1186,4 +1186,8 @@ public class PyLong extends PyObject {
     public boolean isSequenceType() {
         return false;
     }
+
+    public PyLong gcd(PyObject other) {
+        return new PyLong(getValue().gcd(((PyLong) other.__index__()).getValue()));
+    }
 }
