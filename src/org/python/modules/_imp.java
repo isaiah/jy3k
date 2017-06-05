@@ -224,6 +224,10 @@ public class _imp {
     public static final PyObject _compile_bytecode(PyObject name, PyObject data, PyObject filename) {
         if (data instanceof PyBytes) {
             byte[] bytes = ((PyBytes) data).toBytes();
+            /**
+             * The class name don't have to be the same as the file name, such as __init__.jython_36, appending the
+             * cache tag here is just to easier identify the file on debug
+             */
             return BytecodeLoader.makeCode(name.toString() + Version.PY_CACHE_TAG, bytes, filename.toString());
         }
         throw Py.TypeError(String.format("bytes expected, found %s", data.getType().getName()));

@@ -1132,6 +1132,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         // Cause sys to export the console handler that was installed
         SysModule.setObject("_jy_console", Py.java2py(Py.getConsole()));
 
+        Py.defaultSystemState.initstdio();
         try {
             InputStream _frozen_importlib_input =  new FileInputStream(new File("src/resources/frozen_importlib/_frozen_importlib.class"));
             InputStream _frozen_importlib_external_input =  new FileInputStream(new File("src/resources/frozen_importlib/_frozen_importlib_external.class"));
@@ -1143,7 +1144,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             e.printStackTrace();
         }
 
-        Py.defaultSystemState.initstdio();
         Py.defaultSystemState.initEncoding();
         return Py.defaultSystemState;
     }

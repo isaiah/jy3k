@@ -46,7 +46,7 @@ public class JycompileAntTask extends GlobMatchingTask {
                 continue;
             }
             Path classPath = src.toPath().resolveSibling(
-                    Paths.get(imp.CACHEDIR, src.getName().substring(0, src.getName().length() - 3) + Version.PY_CACHE_TAG + ".class"));
+                    Paths.get(imp.CACHEDIR, src.getName().substring(0, src.getName().length() - 3) + "." + Version.PY_CACHE_TAG + ".class"));
             File classFile = classPath.toFile();
             if (classFile.exists() && classFile.lastModified() > src.lastModified())
                 continue;
@@ -82,7 +82,7 @@ public class JycompileAntTask extends GlobMatchingTask {
                 }
                 File compiled = Paths.get(destDir.toString(),
                         classPath.getParent().toString(),
-                        classPath.getFileName().toString() + Version.PY_CACHE_TAG + ".class").toFile();
+                        classPath.getFileName().toString() + "."  + Version.PY_CACHE_TAG + ".class").toFile();
                 compile(src, compiled, name);
             } catch (RuntimeException e) {
                 log("Could not compile " + src);

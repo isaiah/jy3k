@@ -21,15 +21,22 @@ work. One should use importlib as the public-facing version of this module.
 # anything specified at the class level.
 
 # Bootstrap-related code ######################################################
-
-_CASE_INSENSITIVE_PLATFORMS = 'win', 'cygwin', 'darwin'
+_CASE_INSENSITIVE_PLATFORMS_STR_KEY = 'win',
+_CASE_INSENSITIVE_PLATFORMS_BYTES_KEY = 'cygwin', 'darwin'
+_CASE_INSENSITIVE_PLATFORMS =  (_CASE_INSENSITIVE_PLATFORMS_BYTES_KEY
+                                + _CASE_INSENSITIVE_PLATFORMS_STR_KEY)
 
 
 def _make_relax_case():
     if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
+        if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS_STR_KEY):
+            key = 'PYTHONCASEOK'
+        else:
+            key = b'PYTHONCASEOK'
+
         def _relax_case():
             """True if filenames must be checked case-insensitively."""
-            return b'PYTHONCASEOK' in _os.environ
+            return key in _os.environ
     else:
         def _relax_case():
             """True if filenames must be checked case-insensitively."""
@@ -130,10 +137,6 @@ _code_type = type(_write_atomic.__code__)
 # a .pyc file in text mode the magic number will be wrong; also, the
 # Apple MPW compiler swaps their values, botching string constants.
 #
-# The magic numbers must be spaced apart at least 2 values, as the
-# -U interpeter flag will cause MAGIC+1 being used. They have been
-# odd numbers for some time now.
-#
 # There were a variety of old schemes for setting the magic number.
 # The current working scheme is to increment the previous value by
 # 10.
@@ -223,12 +226,29 @@ _code_type = type(_write_atomic.__code__)
 #     Python 3.5b1  3330 (PEP 448: Additional Unpacking Generalizations)
 #     Python 3.5b2  3340 (fix dictionary display evaluation order #11205)
 #     Python 3.5b2  3350 (add GET_YIELD_FROM_ITER opcode #24400)
+#     Python 3.5.2  3351 (fix BUILD_MAP_UNPACK_WITH_CALL opcode #27286)
+#     Python 3.6a0  3360 (add FORMAT_VALUE opcode #25483
+#     Python 3.6a0  3361 (lineno delta of code.co_lnotab becomes signed)
+#     Python 3.6a1  3370 (16 bit wordcode)
+#     Python 3.6a1  3371 (add BUILD_CONST_KEY_MAP opcode #27140)
+#     Python 3.6a1  3372 (MAKE_FUNCTION simplification, remove MAKE_CLOSURE
+#                         #27095)
+#     Python 3.6b1  3373 (add BUILD_STRING opcode #27078)
+#     Python 3.6b1  3375 (add SETUP_ANNOTATIONS and STORE_ANNOTATION opcodes
+#                         #27985)
+#     Python 3.6b1  3376 (simplify CALL_FUNCTIONs & BUILD_MAP_UNPACK_WITH_CALL)
+#     Python 3.6b1  3377 (set __class__ cell from type.__new__ #23722)
+#     Python 3.6b2  3378 (add BUILD_TUPLE_UNPACK_WITH_CALL #28257)
+#     Python 3.6rc1 3379 (more thorough __class__ validation #23722)
 #
 # MAGIC must change whenever the bytecode emitted by the compiler may no
 # longer be understood by older implementations of the eval loop (usually
 # due to the addition of new opcodes).
+#
+# Whenever MAGIC_NUMBER is changed, the ranges in the magic_values array
+# in PC/launcher.c must also be updated.
 
-MAGIC_NUMBER = (3350).to_bytes(2, 'little') + b'\r\n'
+MAGIC_NUMBER = (3379).to_bytes(2, 'little') + b'\r\n'
 _RAW_MAGIC_NUMBER = int.from_bytes(MAGIC_NUMBER, 'little')  # For import.c
 
 _PYCACHE = '__pycache__'
@@ -265,12 +285,13 @@ def cache_from_source(path, debug_override=None, *, optimization=None):
             message = 'debug_override or optimization must be set to None'
             raise TypeError(message)
         optimization = '' if debug_override else 1
+    path = _os.fspath(path)
     head, tail = _path_split(path)
     base, sep, rest = tail.rpartition('.')
     tag = sys.implementation.cache_tag
     if tag is None:
         raise NotImplementedError('sys.implementation.cache_tag is None')
-    almost_filename = ''.join([(base if base else rest), tag])
+    almost_filename = ''.join([(base if base else rest), sep, tag])
     if optimization is None:
         if sys.flags.optimize == 0:
             optimization = ''
@@ -295,16 +316,17 @@ def source_from_cache(path):
     """
     if sys.implementation.cache_tag is None:
         raise NotImplementedError('sys.implementation.cache_tag is None')
+    path = _os.fspath(path)
     head, pycache_filename = _path_split(path)
     head, pycache = _path_split(head)
     if pycache != _PYCACHE:
         raise ValueError('{} not bottom-level directory in '
                          '{!r}'.format(_PYCACHE, path))
     dot_count = pycache_filename.count('.')
-    if dot_count not in {1, 2}:
-        raise ValueError('expected only 1 or 2 dots in '
+    if dot_count not in {2, 3}:
+        raise ValueError('expected only 2 or 3 dots in '
                          '{!r}'.format(pycache_filename))
-    elif dot_count == 2:
+    elif dot_count == 3:
         optimization = pycache_filename.rsplit('.', 2)[-2]
         if not optimization.startswith(_OPT):
             raise ValueError("optimization portion of filename does not start "
@@ -313,7 +335,7 @@ def source_from_cache(path):
         if not opt_level.isalnum():
             raise ValueError("optimization level {!r} is not an alphanumeric "
                              "value".format(optimization))
-    base_filename = pycache_filename.partition('$')[0]
+    base_filename = pycache_filename.partition('.')[0]
     return _path_join(head, base_filename + SOURCE_SUFFIXES[0])
 
 
@@ -326,7 +348,7 @@ def _get_sourcefile(bytecode_path):
     """
     if len(bytecode_path) == 0:
         return None
-    rest, _, extension = bytecode_path.rpartition('$')
+    rest, _, extension = bytecode_path.rpartition('.')
     if not rest or extension.lower()[-3:-1] != 'py':
         return bytecode_path
     try:
@@ -358,14 +380,6 @@ def _calc_mode(path):
     # later even when the source files are read-only on Windows (#6074)
     mode |= 0o200
     return mode
-
-
-def _verbose_message(message, *args, verbosity=1):
-    """Print the message to stderr if -v/PYTHONVERBOSE is turned on."""
-    if sys.flags.verbose >= verbosity:
-        if not message.startswith(('#', 'import ')):
-            message = '# ' + message
-        print(message.format(*args), file=sys.stderr)
 
 
 def _check_name(method):
@@ -413,7 +427,7 @@ def _find_module_shim(self, fullname):
     return loader
 
 
-def _validate_bytecode_header(data, source_stats=None, name=None, path=None, bytecode_stats=None):
+def _validate_bytecode_header(data, source_stats=None, bytecode_stats=None, name=None, path=None):
     """Validate the header of the passed-in bytecode against source_stats (if
     given) and returning the bytecode that can be compiled by compile().
 
@@ -424,7 +438,6 @@ def _validate_bytecode_header(data, source_stats=None, name=None, path=None, byt
     truncated.
 
     """
-    # maybe we can pack the java classfile with the .pyc headers, but not for now
     exc_details = {}
     if name is not None:
         exc_details['name'] = name
@@ -433,7 +446,21 @@ def _validate_bytecode_header(data, source_stats=None, name=None, path=None, byt
         name = '<bytecode>'
     if path is not None:
         exc_details['path'] = path
-
+    #magic = data[:4]
+    #raw_timestamp = data[4:8]
+    #raw_size = data[8:12]
+    #if magic != MAGIC_NUMBER:
+    #    message = 'bad magic number in {!r}: {!r}'.format(name, magic)
+    #    _bootstrap._verbose_message('{}', message)
+    #    raise ImportError(message, **exc_details)
+    #elif len(raw_timestamp) != 4:
+    #    message = 'reached EOF while reading timestamp in {!r}'.format(name)
+    #    _bootstrap._verbose_message('{}', message)
+    #    raise EOFError(message)
+    #elif len(raw_size) != 4:
+    #    message = 'reached EOF while reading size of source in {!r}'.format(name)
+    #    _bootstrap._verbose_message('{}', message)
+    #    raise EOFError(message)
     if source_stats is not None and bytecode_stats is not None:
         try:
             source_mtime = int(source_stats['mtime'])
@@ -443,44 +470,18 @@ def _validate_bytecode_header(data, source_stats=None, name=None, path=None, byt
         else:
             if bytecode_mtime < source_mtime:
                 message = 'bytecode is stale for {!r}'.format(name)
-                _verbose_message('{}', message)
+                _bootstrap._verbose_message('{}', message)
                 raise ImportError(message, **exc_details)
-
-    return data
-    #magic = data[:4]
-    #raw_timestamp = data[4:8]
-    #raw_size = data[8:12]
-    #if magic != MAGIC_NUMBER:
-    #    message = 'bad magic number in {!r}: {!r}'.format(name, magic)
-    #    _verbose_message('{}', message)
-    #    raise ImportError(message, **exc_details)
-    #elif len(raw_timestamp) != 4:
-    #    message = 'reached EOF while reading timestamp in {!r}'.format(name)
-    #    _verbose_message('{}', message)
-    #    raise EOFError(message)
-    #elif len(raw_size) != 4:
-    #    message = 'reached EOF while reading size of source in {!r}'.format(name)
-    #    _verbose_message('{}', message)
-    #    raise EOFError(message)
-    #if source_stats is not None:
-    #    try:
-    #        source_mtime = int(source_stats['mtime'])
-    #    except KeyError:
-    #        pass
-    #    else:
-    #        if _r_long(raw_timestamp) != source_mtime:
-    #            message = 'bytecode is stale for {!r}'.format(name)
-    #            _verbose_message('{}', message)
-    #            raise ImportError(message, **exc_details)
-    #    try:
-    #        source_size = source_stats['size'] & 0xFFFFFFFF
-    #    except KeyError:
-    #        pass
-    #    else:
-    #        if _r_long(raw_size) != source_size:
-    #            raise ImportError('bytecode is stale for {!r}'.format(name),
-    #                              **exc_details)
+        #try:
+        #    source_size = source_stats['size'] & 0xFFFFFFFF
+        #except KeyError:
+        #    pass
+        #else:
+        #    if _r_long(raw_size) != source_size:
+        #        raise ImportError('bytecode is stale for {!r}'.format(name),
+        #                          **exc_details)
     #return data[12:]
+    return data
 
 
 def _compile_bytecode(data, name=None, bytecode_path=None, source_path=None):
@@ -488,7 +489,7 @@ def _compile_bytecode(data, name=None, bytecode_path=None, source_path=None):
     code = _imp._compile_bytecode(name, data, source_path)
     #code = marshal.loads(data)
     if isinstance(code, _code_type):
-        _verbose_message('code object from {!r}', bytecode_path)
+        _bootstrap._verbose_message('code object from {!r}', bytecode_path)
         if source_path is not None:
             _imp._fix_co_filename(code, source_path)
         return code
@@ -546,6 +547,8 @@ def spec_from_file_location(name, location=None, *, loader=None,
                 location = loader.get_filename(name)
             except ImportError:
                 pass
+    else:
+        location = _os.fspath(location)
 
     # If the location is on the filesystem, but doesn't actually exist,
     # we could return None here, indicating that the location is not
@@ -615,7 +618,7 @@ class WindowsRegistryFinder:
         else:
             registry_key = cls.REGISTRY_KEY
         key = registry_key.format(fullname=fullname,
-                                  sys_version=sys.version[:3])
+                                  sys_version='%d.%d' % sys.version_info[:2])
         try:
             with cls._open_registry(key) as hkey:
                 filepath = _winreg.QueryValue(hkey, '')
@@ -678,6 +681,7 @@ class _LoaderBasics:
         _bootstrap._call_with_frames_removed(exec, code, module.__dict__)
 
     def load_module(self, fullname):
+        """This module is deprecated."""
         return _bootstrap._load_module_shim(self, fullname)
 
 
@@ -758,42 +762,43 @@ class SourceLoader(_LoaderBasics):
         else:
             try:
                 st = self.path_stats(source_path)
+                byte_st = self.path_stats(bytecode_path)
             except IOError:
                 pass
             else:
                 source_mtime = int(st['mtime'])
                 try:
                     data = self.get_data(bytecode_path)
-                    bytecode_st = self.path_stats(bytecode_path)
                 except OSError:
                     pass
                 else:
                     try:
                         bytes_data = _validate_bytecode_header(data,
                                 source_stats=st, name=fullname,
-                                path=bytecode_path, bytecode_stats=bytecode_st)
+                                path=bytecode_path, bytecode_stats=byte_st)
                     except (ImportError, EOFError):
                         pass
                     else:
-                        _verbose_message('{} matches {}', bytecode_path,
-                                        source_path)
+                        _bootstrap._verbose_message('{} matches {}', bytecode_path,
+                                                    source_path)
                         return _compile_bytecode(bytes_data, name=fullname,
                                                  bytecode_path=bytecode_path,
                                                  source_path=source_path)
         source_bytes = self.get_data(source_path)
         data = self.source_to_bytecode(fullname, source_bytes, source_path)
+        #code_object = self.source_to_code(source_bytes, source_path)
         code_object = _compile_bytecode(data, name=fullname,
                                         bytecode_path=bytecode_path,
                                         source_path=source_path)
-        #code_object = self.source_to_code(source_bytes, source_path)
-        _verbose_message('code object from {}', source_path)
+
+        _bootstrap._verbose_message('code object from {}', source_path)
         if (not sys.dont_write_bytecode and bytecode_path is not None and
                 source_mtime is not None):
             #data = _code_to_bytecode(code_object, source_mtime,
             #        len(source_bytes))
             try:
                 self._cache_bytecode(source_path, bytecode_path, data)
-                _verbose_message('wrote {!r}', bytecode_path)
+                _bootstrap._verbose_message('wrote {!r}', bytecode_path)
             except NotImplementedError:
                 pass
         return code_object
@@ -873,14 +878,16 @@ class SourceFileLoader(FileLoader, SourceLoader):
             except OSError as exc:
                 # Could be a permission error, read-only filesystem: just forget
                 # about writing the data.
-                _verbose_message('could not create {!r}: {!r}', parent, exc)
+                _bootstrap._verbose_message('could not create {!r}: {!r}',
+                                            parent, exc)
                 return
         try:
             _write_atomic(path, data, _mode)
-            _verbose_message('created {!r}', path)
+            _bootstrap._verbose_message('created {!r}', path)
         except OSError as exc:
             # Same as above: just don't write the bytecode.
-            _verbose_message('could not create {!r}: {!r}', path, exc)
+            _bootstrap._verbose_message('could not create {!r}: {!r}', path,
+                                        exc)
 
 
 class SourcelessFileLoader(FileLoader, _LoaderBasics):
@@ -925,14 +932,14 @@ class ExtensionFileLoader(FileLoader, _LoaderBasics):
         """Create an unitialized extension module"""
         module = _bootstrap._call_with_frames_removed(
             _imp.create_dynamic, spec)
-        _verbose_message('extension module {!r} loaded from {!r}',
+        _bootstrap._verbose_message('extension module {!r} loaded from {!r}',
                          spec.name, self.path)
         return module
 
     def exec_module(self, module):
         """Initialize an extension module"""
         _bootstrap._call_with_frames_removed(_imp.exec_dynamic, module)
-        _verbose_message('extension module {!r} executed from {!r}',
+        _bootstrap._verbose_message('extension module {!r} executed from {!r}',
                          self.name, self.path)
 
     def is_package(self, fullname):
@@ -998,6 +1005,9 @@ class _NamespacePath:
     def __iter__(self):
         return iter(self._recalculate())
 
+    def __setitem__(self, index, path):
+        self._path[index] = path
+
     def __len__(self):
         return len(self._recalculate())
 
@@ -1047,7 +1057,8 @@ class _NamespaceLoader:
 
         """
         # The import system never calls this method.
-        _verbose_message('namespace module loaded with path {!r}', self._path)
+        _bootstrap._verbose_message('namespace module loaded with path {!r}',
+                                    self._path)
         return _bootstrap._load_module_shim(self, fullname)
 
 
@@ -1067,11 +1078,7 @@ class PathFinder:
 
     @classmethod
     def _path_hooks(cls, path):
-        """Search sequence of hooks for a finder for 'path'.
-
-        If 'hooks' is false then use sys.path_hooks.
-
-        """
+        """Search sys.path_hooks for a finder for 'path'."""
         if sys.path_hooks is not None and not sys.path_hooks:
             _warnings.warn('sys.path_hooks is empty', ImportWarning)
         for hook in sys.path_hooks:
@@ -1153,8 +1160,10 @@ class PathFinder:
 
     @classmethod
     def find_spec(cls, fullname, path=None, target=None):
-        """find the module on sys.path or 'path' based on sys.path_hooks and
-        sys.path_importer_cache."""
+        """Try to find a spec for 'fullname' on sys.path or 'path'.
+
+        The search is based on sys.path_hooks and sys.path_importer_cache.
+        """
         if path is None:
             path = sys.path
         spec = cls._get_spec(fullname, path, target)
@@ -1234,8 +1243,10 @@ class FileFinder:
                                        submodule_search_locations=smsl)
 
     def find_spec(self, fullname, target=None):
-        """Try to find a loader for the specified module, or the namespace
-        package portions. Returns (loader, list-of-portions)."""
+        """Try to find a spec for the specified module.
+
+        Returns the matching spec, or None if not found.
+        """
         is_namespace = False
         tail_module = fullname.rpartition('.')[2]
         try:
@@ -1267,12 +1278,13 @@ class FileFinder:
         # Check for a file w/ a proper suffix exists.
         for suffix, loader_class in self._loaders:
             full_path = _path_join(self.path, tail_module + suffix)
-            _verbose_message('trying {}'.format(full_path), verbosity=2)
+            _bootstrap._verbose_message('trying {}', full_path, verbosity=2)
             if cache_module + suffix in cache:
                 if _path_isfile(full_path):
-                    return self._get_spec(loader_class, fullname, full_path, None, target)
+                    return self._get_spec(loader_class, fullname, full_path,
+                                          None, target)
         if is_namespace:
-            _verbose_message('possible namespace for {}'.format(base_path))
+            _bootstrap._verbose_message('possible namespace for {}', base_path)
             spec = _bootstrap.ModuleSpec(fullname, None)
             spec.submodule_search_locations = [base_path]
             return spec
@@ -1443,8 +1455,3 @@ def _install(_bootstrap_module):
     if _os.__name__ == 'nt':
         sys.meta_path.append(WindowsRegistryFinder)
     sys.meta_path.append(PathFinder)
-
-    # XXX We expose a couple of classes in _bootstrap for the sake of
-    # a setuptools bug (https://bitbucket.org/pypa/setuptools/issue/378).
-    _bootstrap_module.FileFinder = FileFinder
-    _bootstrap_module.SourceFileLoader = SourceFileLoader
