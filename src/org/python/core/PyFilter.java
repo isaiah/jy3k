@@ -21,7 +21,7 @@ public class PyFilter extends PyObject {
     }
 
     @ExposedNew
-    public PyObject filter___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    public static PyObject filter___new__(PyNewWrapper new_, boolean init, PyType subtype,
                                                 PyObject[] args, String[] keywords) {
         PyFilter filter = new PyFilter();
         filter.func = args[0];

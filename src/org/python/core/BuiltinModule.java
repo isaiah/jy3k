@@ -43,8 +43,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return Py.newUnicode(BuiltinModule.raw_input());
             case 41:
                 return BuiltinModule.vars();
-            case 43:
-                return BuiltinModule.zip();
             default:
                 throw info.unexpectedCall(0, false);
         }
@@ -98,8 +96,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return fancyCall(new PyObject[] {arg1});
             case 31:
                 return fancyCall(new PyObject[] {arg1});
-            case 43:
-                return fancyCall(new PyObject[] {arg1});
             case 45:
                 return BuiltinModule.reversed(arg1);
             case 46:
@@ -141,8 +137,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 30:
                 return fancyCall(new PyObject[] {arg1, arg2});
             case 31:
-                return fancyCall(new PyObject[] {arg1, arg2});
-            case 43:
                 return fancyCall(new PyObject[] {arg1, arg2});
             case 46:
                 return BuiltinModule.exec(arg1, arg2);
@@ -187,8 +181,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return fancyCall(new PyObject[] {arg1, arg2, arg3});
             case 31:
                 return fancyCall(new PyObject[] {arg1, arg2, arg3});
-            case 43:
-                return fancyCall(new PyObject[] {arg1, arg2, arg3});
             case 46:
                 return BuiltinModule.exec(arg1, arg2, arg3);
             default:
@@ -207,8 +199,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return fancyCall(new PyObject[] {arg1, arg2, arg3, arg4});
             case 31:
                 return fancyCall(new PyObject[] {arg1, arg2, arg3, arg4});
-            case 43:
-                return fancyCall(new PyObject[] {arg1, arg2, arg3, arg4});
             default:
                 throw info.unexpectedCall(4, false);
         }
@@ -216,12 +206,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
 
     @Override
     public PyObject fancyCall(PyObject[] args) {
-        switch (this.index) {
-            case 43:
-                return BuiltinModule.zip(args);
-            default:
-                throw info.unexpectedCall(args.length, false);
-        }
+        throw info.unexpectedCall(args.length, false);
     }
 
     @Override
@@ -250,6 +235,7 @@ public class BuiltinModule {
         dict.__setitem__("list", PyList.TYPE);
         dict.__setitem__("map", PyMap.TYPE);
         dict.__setitem__("filter", PyFilter.TYPE);
+        dict.__setitem__("zip", PyZip.TYPE);
         dict.__setitem__("tuple", PyTuple.TYPE);
         dict.__setitem__("set", PySet.TYPE);
         dict.__setitem__("frozenset", PyFrozenSet.TYPE);
@@ -304,9 +290,9 @@ public class BuiltinModule {
         dict.__setitem__("pow", new BuiltinFunctions("pow", 33, 2, 3));
         dict.__setitem__("input", new BuiltinFunctions("input", 34, 0, 1));
         dict.__setitem__("round", new RoundFunction());
+        dict.__setitem__("repr", new BuiltinFunctions("repr", 37, 1));
         dict.__setitem__("setattr", new BuiltinFunctions("setattr", 39, 3));
         dict.__setitem__("vars", new BuiltinFunctions("vars", 41, 0, 1));
-        dict.__setitem__("zip", new BuiltinFunctions("zip", 43, 0, -1));
         dict.__setitem__("compile", new CompileFunction());
         dict.__setitem__("open", new OpenFunction());
         dict.__setitem__("reversed", new BuiltinFunctions("reversed", 45, 1));
@@ -915,55 +901,6 @@ public class BuiltinModule {
                 throw Py.TypeError("vars() argument must have __dict__ attribute");
             }
             throw e;
-        }
-    }
-
-    public static PyUnicode __doc__zip = new PyUnicode(
-        "zip(seq1 [, seq2 [...]]) -> [(seq1[0], seq2[0] ...), (...)]\n\n" +
-        "Return a list of tuples, where each tuple contains the i-th element\n" +
-        "from each of the argument sequences.  The returned list is\n" +
-        "truncated in length to the length of the shortest argument sequence.");
-
-    public static PyObject zip() {
-        return new PyList();
-    }
-
-    public static PyObject zip(PyObject[] argstar) {
-        int itemsize = argstar.length;
-
-        // Type check the arguments; they must be sequences. Might as well
-        // cache the __iter__() methods.
-        PyObject[] iters = new PyObject[itemsize];
-
-        for (int j = 0; j < itemsize; j++) {
-            PyObject iter = argstar[j].__iter__();
-            if (iter == null) {
-                throw Py.TypeError("zip argument #" + (j + 1) + " must support iteration");
-            }
-            iters[j] = iter;
-        }
-
-        PyList ret = new PyList();
-
-        for (int i = 0;; i++) {
-            PyObject[] next = new PyObject[itemsize];
-            PyObject item;
-
-            for (int j = 0; j < itemsize; j++) {
-                try {
-                    item = iters[j].__next__();
-                } catch (PyException e) {
-                    if (e.match(Py.StopIteration)) {
-                        return ret;
-                    }
-                    throw e;
-                }
-                if (item == null) {
-                    return ret;
-                }
-                next[j] = item;
-            }
-            ret.append(new PyTuple(next));
         }
     }
 
