@@ -2431,17 +2431,35 @@ public final class Py {
         return Py.compile_flags(node, Py.getName(), filename, true, true, cflags);
     }
 
+    /**
+     * Return next item.
+     * If an error occurs, return null.
+     * @return
+     */
+    public static PyObject PyIter_Next(PyObject iter) {
+        try {
+            return iter.__next__();
+        } catch (PyException e) {
+            if (e.match(Py.StopIteration)) {
+                return null;
+            }
+            throw e;
+        }
+    }
+
     public static PyObject[] unpackIterator(PyObject obj, int argcount, int argcountAfter) {
+        // optimization
         if (obj instanceof PyTuple && obj.__len__() == argcount && argcountAfter == -1) {
-            // optimization
             return ((PyTuple) obj).getArray();
+        } else if (obj instanceof PyList && obj.__len__() == argcount && argcountAfter == -1) {
+            return ((PyList) obj).getArray();
         }
 
         PyObject[] ret = new PyObject[argcount + argcountAfter + 1];
         PyObject iter = obj.__iter__();
         int i = 0;
         for (; i < argcount; i++) {
-            PyObject tmp = iter.__next__();
+            PyObject tmp = PyIter_Next(iter);
             if (tmp == null) {
                 if (argcountAfter == -1) {
                     throw Py.ValueError(String.format("not enough values to unpack (expected %d, got %d)",
@@ -2456,12 +2474,13 @@ public final class Py {
 
         if (argcountAfter == -1) {
             // We better have exhausted the iterator now.
-            if (iter.__next__() != null) {
+            if (PyIter_Next(iter) != null) {
                 throw Py.ValueError(String.format("too many values to unpack (expected %d)", argcount));
             }
         } else {
             PyList after = new PyList();
-            for (PyObject o = null; (o = iter.__next__()) != null; ) {
+            PyObject o;
+            while ((o = PyIter_Next(iter)) != null) {
                 after.append(o);
             }
             if (after.size() < argcountAfter) {
