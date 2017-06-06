@@ -211,7 +211,7 @@ public class PyFloat extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.float_hex_doc)
     public PyObject float_hex() {
-        return new PyBytes(pyHexString(getValue()));
+        return new PyUnicode(pyHexString(getValue()));
     }
 
     /**
