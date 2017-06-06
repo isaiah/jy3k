@@ -231,8 +231,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     @Override
     public PyObject fancyCall(PyObject[] args) {
         switch (this.index) {
-            case 29:
-                return BuiltinModule.map(args);
             case 43:
                 return BuiltinModule.zip(args);
             default:
@@ -265,6 +263,7 @@ public class BuiltinModule {
         dict.__setitem__("complex", PyComplex.TYPE);
         dict.__setitem__("dict", PyDictionary.TYPE);
         dict.__setitem__("list", PyList.TYPE);
+        dict.__setitem__("map", PyMap.TYPE);
         dict.__setitem__("tuple", PyTuple.TYPE);
         dict.__setitem__("set", PySet.TYPE);
         dict.__setitem__("frozenset", PyFrozenSet.TYPE);
@@ -319,7 +318,6 @@ public class BuiltinModule {
         dict.__setitem__("issubclass", new BuiltinFunctions("issubclass", 26, 2));
         dict.__setitem__("iter", new BuiltinFunctions("iter", 27, 1, 2));
         dict.__setitem__("locals", new BuiltinFunctions("locals", 28, 0));
-        dict.__setitem__("map", new BuiltinFunctions("map", 29, 2, -1));
         dict.__setitem__("max", new MaxFunction());
         dict.__setitem__("min", new MinFunction());
         dict.__setitem__("oct", new BuiltinFunctions("oct", 32, 1));
@@ -713,47 +711,6 @@ public class BuiltinModule {
 
     public static PyObject locals() {
         return Py.getFrame().getLocals();
-    }
-
-    public static PyObject map(PyObject[] argstar) {
-        int n = argstar.length - 1;
-        if (n < 1) {
-            throw Py.TypeError("map requires at least two arguments");
-        }
-        PyObject element;
-        PyObject f = argstar[0];
-        PyList list = new PyList();
-        PyObject[] args = new PyObject[n];
-        PyObject[] iters = new PyObject[n];
-
-        for (int j = 0; j < n; j++) {
-            iters[j] = Py.iter(argstar[j + 1], "argument " + (j + 1)
-                               + " to map() must support iteration");
-        }
-
-        while (true) {
-            boolean all_items = true;
-            for (int j = 0; j < n; j++) {
-                if ((element = iters[j].__next__()) != null) {
-                    args[j] = element;
-                } else {
-                    all_items = false;
-                }
-            }
-            if (!all_items) {
-                break;
-            }
-            if (f == Py.None) {
-                if (n == 1) {
-                    list.append(args[0]);
-                } else {
-                    list.append(new PyTuple(args.clone()));
-                }
-            } else {
-                list.append(f.__call__(args));
-            }
-        }
-        return list;
     }
 
     /**
