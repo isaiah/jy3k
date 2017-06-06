@@ -197,11 +197,7 @@ public class PySRE_Pattern extends PyObject {
                 sb.append(s.substring(pos));
                 break;
             }
-            if (matcher.start() != pos) {
-                sb.append(s.substring(pos, matcher.start()));
-                pos = matcher.end();
-            }
-
+            pos = matcher.end();
             if (replCallable) {
                 PyObject match = new PySRE_Match(matcher, args[1], this);
                 replacement = ((PyUnicode) filter.__call__(match)).getString();

@@ -12,6 +12,9 @@ import static org.objectweb.asm.Opcodes.*;
 import static org.python.compiler.ClassConstants.*;
 import static org.python.compiler.CompilerConstants.*;
 
+/**
+ * It tracks the stack and replace placeholder with real instructions
+ */
 public class OperandStackSaver extends InstructionAdapter {
     private AnalyzerAdapter analyzer;
     private List stack;
