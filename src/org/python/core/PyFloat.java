@@ -4,11 +4,13 @@ package org.python.core;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.python.core.stringlib.FloatFormatter;
 import org.python.core.stringlib.InternalFormat;
 import org.python.core.stringlib.InternalFormat.Formatter;
 import org.python.core.stringlib.InternalFormat.Spec;
+import org.python.core.util.ExtraMath;
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
@@ -797,6 +799,21 @@ public class PyFloat extends PyObject {
         return new PyFloat(Math.abs(getValue()));
     }
 
+    @ExposedMethod(doc = BuiltinDocs.float___round___doc)
+    final PyObject float___round__(PyObject[] args, String[] kwds) {
+        int ndigits = args.length > 0 ? args[0].asIndex() : 0;
+        double x = asDouble();
+        double r = ExtraMath.round(x, ndigits);
+        if (Double.isInfinite(r) && !Double.isInfinite(x)) {
+            // Rounding caused magnitude to increase beyond representable range
+            throw Py.OverflowError("rounded value too large to represent");
+        } else {
+            if (!Double.isInfinite(r) && args.length > 0)
+                return new PyFloat(r);
+            return new PyLong(r);
+        }
+    }
+
     @Override
     public PyObject __int__() {
         return float___int__();
@@ -954,7 +971,7 @@ public class PyFloat extends PyObject {
         }
         PyTuple frexp = math.frexp(value);
         double float_part = ((Double)frexp.get(0)).doubleValue();
-        int exponent = ((Integer)frexp.get(1)).intValue();
+        int exponent = ((BigInteger)frexp.get(1)).intValue();
         for (int i = 0; i < 300 && float_part != Math.floor(float_part); i++) {
             float_part *= 2.0;
             exponent--;

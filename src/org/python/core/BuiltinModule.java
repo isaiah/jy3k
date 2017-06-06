@@ -1489,17 +1489,15 @@ class RoundFunction extends PyBuiltinFunction {
     public PyObject __call__(PyObject args[], String kwds[]) {
         ArgParser ap = new ArgParser("round", args, kwds, new String[] {"number", "ndigits"}, 0);
         PyObject number = ap.getPyObject(0);
-        int ndigits = ap.getIndex(1, 0);
-        double x = number.asDouble();
-        double r = ExtraMath.round(x, ndigits);
-        if (Double.isInfinite(r) && !Double.isInfinite(x)) {
-            // Rounding caused magnitude to increase beyond representable range
-            throw Py.OverflowError("rounded value too large to represent");
-        } else {
-            if (!(number instanceof PyLong) && !Double.isInfinite(r) && args.length > 1)
-                return new PyFloat(r);
-            return new PyLong(r);
+        PyObject ndigits = ap.getPyObject(1, null);
+        PyObject round = number.getType().__findattr__("__round__");
+        if (round == null) {
+            throw Py.TypeError(String.format("type %s doesn't define __round__ method", getType()));
         }
+        if (ndigits == null) {
+            return round.__get__(number, number.getType()).__call__();
+        }
+        return round.__get__(number, number.getType()).__call__(ndigits);
     }
 }
 
@@ -1631,7 +1629,14 @@ class NextFunction extends PyBuiltinFunction {
             }
         }
 
-        return next.__call__();
+        try {
+            return next.__call__();
+        } catch (PyException e) {
+            if (def != null && e.match(Py.StopIteration)) {
+                return def;
+            }
+            throw e;
+        }
     }
 }
 
