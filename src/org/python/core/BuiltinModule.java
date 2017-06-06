@@ -37,8 +37,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return BuiltinModule.globals();
             case 16:
                 return BuiltinModule.dir();
-            case 24:
-                return BuiltinModule.input();
             case 28:
                 return BuiltinModule.locals();
             case 34:
@@ -65,8 +63,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return Py.newLong(BuiltinModule.ord(arg1));
             case 5:
                 return BuiltinModule.hash(arg1);
-//            case 6:
-//                return Py.newUnicode(__builtin__.unichr(arg1));
             case 7:
                 return BuiltinModule.abs(arg1);
             case 9:
@@ -86,8 +82,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return Py.None;
             case 23:
                 return BuiltinModule.hex(arg1);
-            case 24:
-                return BuiltinModule.input(arg1);
             case 25:
                 return BuiltinModule.intern(arg1);
             case 27:
@@ -96,8 +90,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return BuiltinModule.oct(arg1);
             case 34:
                 return Py.newUnicode(BuiltinModule.raw_input(arg1));
-//            case 36:
-//                return __builtin__.reload(arg1);
             case 37:
                 return BuiltinModule.repr(arg1);
             case 41:
@@ -134,8 +126,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 19:
                 BuiltinModule.execfile(arg1.asString(), arg2);
                 return Py.None;
-            case 20:
-                return BuiltinModule.filter(arg1, arg2);
             case 21:
                 return BuiltinModule.getattr(arg1, arg2);
             case 22:
@@ -146,8 +136,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return BuiltinModule.iter(arg1, arg2);
             case 33:
                 return BuiltinModule.pow(arg1, arg2);
-//            case 35:
-//                return _functools.reduce(arg1, arg2);
             case 29:
                 return fancyCall(new PyObject[] {arg1, arg2});
             case 30:
@@ -188,8 +176,6 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
                 return BuiltinModule.getattr(arg1, arg2, arg3);
             case 33:
                 return BuiltinModule.pow(arg1, arg2, arg3);
-//            case 35:
-//                return _functools.reduce(arg1, arg2, arg3);
             case 39:
                 BuiltinModule.setattr(arg1, arg2, arg3);
                 return Py.None;
@@ -259,11 +245,11 @@ public class BuiltinModule {
         dict.__setitem__("int", PyLong.TYPE);
         dict.__setitem__("enumerate", PyEnumerate.TYPE);
         dict.__setitem__("float", PyFloat.TYPE);
-//        dict.__setitem__("long", PyLong.TYPE);
         dict.__setitem__("complex", PyComplex.TYPE);
         dict.__setitem__("dict", PyDictionary.TYPE);
         dict.__setitem__("list", PyList.TYPE);
         dict.__setitem__("map", PyMap.TYPE);
+        dict.__setitem__("filter", PyFilter.TYPE);
         dict.__setitem__("tuple", PyTuple.TYPE);
         dict.__setitem__("set", PySet.TYPE);
         dict.__setitem__("frozenset", PyFrozenSet.TYPE);
@@ -272,7 +258,6 @@ public class BuiltinModule {
         dict.__setitem__("classmethod", PyClassMethod.TYPE);
         dict.__setitem__("super", PySuper.TYPE);
         dict.__setitem__("str", PyUnicode.TYPE);
-//        dict.__setitem__("file", PyFile.TYPE);
         dict.__setitem__("slice", PySlice.TYPE);
         dict.__setitem__("range", PyRange.TYPE);
 
@@ -291,10 +276,8 @@ public class BuiltinModule {
 
 // TODO: redo the builtin function stuff to possibly use enum
         dict.__setitem__("abs", new BuiltinFunctions("abs", 7, 1));
-//        dict.__setitem__("apply", new BuiltinFunctions("apply", 9, 1, 3));
         dict.__setitem__("ascii", new BuiltinFunctions("ascii", 9, 1));
         dict.__setitem__("callable", new BuiltinFunctions("callable", 14, 1));
-//        dict.__setitem__("coerce", new BuiltinFunctions("coerce", 13, 2));
         dict.__setitem__("chr", new BuiltinFunctions("chr", 0, 1));
         dict.__setitem__("globals", new BuiltinFunctions("globals", 4, 0));
         dict.__setitem__("hash", new BuiltinFunctions("hash", 5, 1));
@@ -303,17 +286,14 @@ public class BuiltinModule {
         dict.__setitem__("len", new BuiltinFunctions("len", 1, 1));
         dict.__setitem__("ord", new BuiltinFunctions("ord", 3, 1));
         dict.__setitem__("sum", new BuiltinFunctions("sum", 12, 1, 2));
-//        dict.__setitem__("unichr", new BuiltinFunctions("unichr", 6, 1));
         dict.__setitem__("delattr", new BuiltinFunctions("delattr", 15, 2));
         dict.__setitem__("dir", new BuiltinFunctions("dir", 16, 0, 1));
         dict.__setitem__("divmod", new BuiltinFunctions("divmod", 17, 2));
         dict.__setitem__("eval", new BuiltinFunctions("eval", 18, 1, 3));
         dict.__setitem__("execfile", new BuiltinFunctions("execfile", 19, 1, 3));
-        dict.__setitem__("filter", new BuiltinFunctions("filter", 20, 2));
         dict.__setitem__("getattr", new BuiltinFunctions("getattr", 21, 2, 3));
         dict.__setitem__("hasattr", new BuiltinFunctions("hasattr", 22, 2));
         dict.__setitem__("hex", new BuiltinFunctions("hex", 23, 1));
-//        dict.__setitem__("input", new BuiltinFunctions("input", 24, 0, 1));
         dict.__setitem__("intern", new BuiltinFunctions("intern", 25, 1));
         dict.__setitem__("issubclass", new BuiltinFunctions("issubclass", 26, 2));
         dict.__setitem__("iter", new BuiltinFunctions("iter", 27, 1, 2));
@@ -323,9 +303,6 @@ public class BuiltinModule {
         dict.__setitem__("oct", new BuiltinFunctions("oct", 32, 1));
         dict.__setitem__("pow", new BuiltinFunctions("pow", 33, 2, 3));
         dict.__setitem__("input", new BuiltinFunctions("input", 34, 0, 1));
-//        dict.__setitem__("reduce", new BuiltinFunctions("reduce", 35, 2, 3));
-//        dict.__setitem__("reload", new BuiltinFunctions("reload", 36, 1));
-        dict.__setitem__("repr", new BuiltinFunctions("repr", 37, 1));
         dict.__setitem__("round", new RoundFunction());
         dict.__setitem__("setattr", new BuiltinFunctions("setattr", 39, 3));
         dict.__setitem__("vars", new BuiltinFunctions("vars", 41, 0, 1));
@@ -660,15 +637,6 @@ public class BuiltinModule {
         return Py.id(o);
     }
 
-    public static PyObject input(PyObject prompt) {
-        String line = raw_input(prompt);
-        return eval(new PyBytes(line));
-    }
-
-    public static PyObject input() {
-        return input(new PyBytes(""));
-    }
-
     public static PyUnicode intern(PyObject obj) {
         if (!(obj instanceof PyBytes) || obj instanceof PyUnicode) {
             throw Py.TypeError("intern() argument 1 must be string, not "
@@ -889,51 +857,6 @@ public class BuiltinModule {
     public static String raw_input() {
         return raw_input(Py.EmptyByte);
     }
-
-//    public static PyObject reduce(PyObject f, PyObject l, PyObject z) {
-//        PyObject result = z;
-//        PyObject iter = Py.iter(l, "reduce() arg 2 must support iteration");
-//
-//        for (PyObject item; (item = iter.__next__()) != null;) {
-//            if (result == null) {
-//                result = item;
-//            } else {
-//                result = f.__call__(result, item);
-//            }
-//        }
-//        if (result == null) {
-//            throw Py.TypeError("reduce of empty sequence with no initial value");
-//        }
-//        return result;
-//    }
-//
-//    public static PyObject reduce(PyObject f, PyObject l) {
-//        return reduce(f, l, null);
-//    }
-
-//    public static PyObject reload(PyObject o) {
-//        Object module = o.__tojava__(PyModule.class);
-//        if (module == Py.NoConversion) {
-//            if (o instanceof PySystemState) {
-//                return __builtin__.reload((PySystemState)o);
-//            } else if(o instanceof PyJavaType) {
-//                // This has always been a no-op.  Should be disabled in py3k.
-//                return o;
-//            }
-//            throw Py.TypeError("reload() argument must be a module");
-//        }
-//        return __builtin__.reload((PyModule) module);
-//    }
-//
-//    public static PyObject reload(PyModule o) {
-//        return imp.reload(o);
-//    }
-//
-//    public static PyObject reload(PySystemState o) {
-//        // reinitialize methods
-//        o.reload();
-//        return o;
-//    }
 
     public static PyUnicode repr(PyObject o) {
         return o.__repr__();
