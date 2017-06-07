@@ -7,7 +7,6 @@ package org.python.core;
 import org.python.antlr.base.mod;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.IntegerFormatter;
-import org.python.core.util.ExtraMath;
 import org.python.core.util.RelativeFile;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
@@ -958,6 +957,30 @@ public class BuiltinModule {
         }
         throw Py.TypeError(function + "(): attribute name must be string");
     }
+
+        static PyObject max_min(PyObject o, PyObject key, PyObject defaultVal, CompareOp op) {
+        PyObject max = null;
+        PyObject maxKey = null;
+        for (PyObject item : o.asIterable()) {
+            PyObject itemKey;
+            if (key == null) {
+                itemKey = item;
+            } else {
+                itemKey = key.__call__(item);
+            }
+            if (maxKey == null || itemKey.richCompare(maxKey, op).__bool__()) {
+                maxKey = itemKey;
+                max = item;
+            }
+        }
+        if (max == null) {
+            if (defaultVal != null) {
+                return defaultVal;
+            }
+            throw Py.ValueError("max_min of empty sequence");
+        }
+        return max;
+    }
 }
 
 @Untraversable
@@ -1170,9 +1193,9 @@ class PrintFunction extends PyBuiltinFunction {
 @Untraversable
 class MaxFunction extends PyBuiltinFunction {
     MaxFunction() {
-        super("max",
-              "max(iterable, *[, default=obj, key=func]) -> value\n" +
-              "max(a, b, c, ...[, key=func]) -> value\n\n" +
+        super("max_min",
+              "max_min(iterable, *[, default=obj, key=func]) -> value\n" +
+              "max_min(a, b, c, ...[, key=func]) -> value\n\n" +
               "With a single iterable argument, return its largest item.\n" +
               "With two or more arguments, return the largest argument.");
     }
@@ -1180,51 +1203,22 @@ class MaxFunction extends PyBuiltinFunction {
     @Override
     public PyObject __call__(PyObject args[], String kwds[]) {
         ArgParser ap = new ArgParser("max", args, kwds, 1, "iterable", "*", "default", "key");
-        int argslen = args.length;
-        PyObject key = ap.getPyObject(3, null);
-        PyObject defaultValue = ap.getPyObject(2, null);
+        int argslen = args.length - kwds.length;
+        PyObject key = ap.getPyObject("key", null);
+        PyObject defaultValue = ap.getPyObject("default", null);
 
-        if (args.length - kwds.length == 0) {
-            throw Py.TypeError("max() expected 1 arguments, got 0");
-        }
-        if (kwds.length > 0) {
-            if (kwds[0].equals("key")) {
-                key = args[argslen - 1];
-                PyObject newargs[] = new PyObject[argslen - 1];
-                System.arraycopy(args, 0, newargs, 0, argslen - 1);
-                args = newargs;
-            } else {
-                throw Py.TypeError("max() got an unexpected keyword argument");
+        if (argslen == 0) {
+            throw Py.TypeError("max() expected at least 1 argument, got 0");
+        } else if (argslen > 1) {
+            if (defaultValue != null) {
+                throw Py.TypeError("Cannot specify a default for max() with multiple positional arguments");
             }
-        }
-
-        if (args.length > 1) {
-            return max(new PyTuple(args), key);
+            return BuiltinModule.max_min(new PyTuple(PyTuple.TYPE, args, argslen), key, defaultValue, CompareOp.GT);
         } else {
-            return max(args[0], key);
+            return BuiltinModule.max_min(args[0], key, defaultValue, CompareOp.GT);
         }
     }
 
-    private static PyObject max(PyObject o, PyObject key) {
-        PyObject max = null;
-        PyObject maxKey = null;
-        for (PyObject item : o.asIterable()) {
-            PyObject itemKey;
-            if (key == null) {
-                itemKey = item;
-            } else {
-                itemKey = key.__call__(item);
-            }
-            if (maxKey == null || itemKey.richCompare(maxKey, CompareOp.GT).__bool__()) {
-                maxKey = itemKey;
-                max = item;
-            }
-        }
-        if (max == null) {
-            throw Py.ValueError("max of empty sequence");
-        }
-        return max;
-    }
 
 }
 
@@ -1240,49 +1234,21 @@ class MinFunction extends PyBuiltinFunction {
 
     @Override
     public PyObject __call__(PyObject args[], String kwds[]) {
-        int argslen = args.length;
-        PyObject key = null;
+        ArgParser ap = new ArgParser("min", args, kwds, 1, "iterable", "*", "default", "key");
+        int argslen = args.length - kwds.length;
+        PyObject key = ap.getPyObject("key", null);
+        PyObject defaultValue = ap.getPyObject("default", null);
 
-        if (args.length - kwds.length == 0) {
-            throw Py.TypeError("min() expected 1 arguments, got 0");
-        }
-        if (kwds.length > 0) {
-            if (kwds[0].equals("key")) {
-                key = args[argslen - 1];
-                PyObject newargs[] = new PyObject[argslen - 1];
-                System.arraycopy(args, 0, newargs, 0, argslen - 1);
-                args = newargs;
-            } else {
-                throw Py.TypeError("min() got an unexpected keyword argument");
+        if (argslen == 0) {
+            throw Py.TypeError("min() expected at least 1 argument, got 0");
+        } else if (argslen > 1) {
+            if (defaultValue != null) {
+                throw Py.TypeError("Cannot specify a default for min() with multiple positional arguments");
             }
-        }
-
-        if (args.length > 1) {
-            return min(new PyTuple(args), key);
+            return BuiltinModule.max_min(new PyTuple(PyTuple.TYPE, args, argslen), key, defaultValue, CompareOp.LT);
         } else {
-            return min(args[0], key);
+            return BuiltinModule.max_min(args[0], key, defaultValue, CompareOp.LT);
         }
-    }
-
-    private static PyObject min(PyObject o, PyObject key) {
-        PyObject min = null;
-        PyObject minKey = null;
-        for (PyObject item : o.asIterable()) {
-            PyObject itemKey;
-            if (key == null) {
-                itemKey = item;
-            } else {
-                itemKey = key.__call__(item);
-            }
-            if (minKey == null || itemKey.richCompare(minKey, CompareOp.LT).__bool__()) {
-                minKey = itemKey;
-                min = item;
-            }
-        }
-        if (min == null) {
-            throw Py.ValueError("min of empty sequence");
-        }
-        return min;
     }
 }
 

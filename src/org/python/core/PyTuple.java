@@ -37,12 +37,18 @@ public class PyTuple extends PySequenceList implements List {
     }
 
     public PyTuple(PyType subtype, PyObject[] elements) {
+        this(subtype, elements, -1);
+    }
+    public PyTuple(PyType subtype, PyObject[] elements, int length) {
         super(subtype);
         if (elements == null) {
             array = new PyObject[0];
         } else {
-            array = new PyObject[elements.length];
-            System.arraycopy(elements, 0, array, 0, elements.length);
+            if (length < 0) {
+                length = elements.length;
+            }
+            array = new PyObject[length];
+            System.arraycopy(elements, 0, array, 0, length);
         }
     }
 

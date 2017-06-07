@@ -332,7 +332,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public void setBuiltins(PyObject value) {
         builtins = value;
-        modules.__setitem__("__builtin__", new PyModule("builtins", value));
+        modules.__setitem__("builtins", new PyModule("builtins", value));
     }
 
     public PyObject getWarnoptions() {

@@ -222,6 +222,19 @@ public class ArgParser {
         return value;
     }
 
+    public PyObject getPyObject(String keyword, PyObject def) {
+        for (int i = 0; i < kws.length; i++) {
+            if (keyword.equals(kws[i])) {
+                int idx = args.length - kws.length + i;
+                if (idx < 0) {
+                    return def;
+                }
+                return args[idx];
+            }
+        }
+        return def;
+    }
+
     /**
      * Return a required argument as a PyObject, ensuring the object is of the specified type.
      * 
@@ -285,7 +298,7 @@ public class ArgParser {
     private void splitParams(String[] paramnames) {
         int starargIndex = -1;
         for (int i = 0; i < paramnames.length; i++) {
-            if (paramnames[i].equals("*")) {
+            if (paramnames[i].startsWith("*")) {
                 starargIndex = i;
                 break;
             }
