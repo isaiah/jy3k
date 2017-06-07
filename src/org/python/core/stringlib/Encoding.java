@@ -100,8 +100,20 @@ public class Encoding {
                 v.append('x');
                 v.append(hexdigit[(ch >> 4) & 0xf]);
                 v.append(hexdigit[ch & 0xf]);
-            } else {/* Copy everything else as-is */
+            /* Copy ASCII characters as it is */
+            } else if (ch < 0x7f) {/* Copy everything else as-is */
                 v.append(ch);
+            } else {
+                if (UCharacter.isPrintable(ch)) {
+                    v.append(ch);
+                } else {
+                    if (ch < 0xff) {
+                        v.append('\\');
+                        v.append('x');
+                        v.append(hexdigit[(ch >> 4) & 0xf]);
+                        v.append(hexdigit[ch & 0xf]);
+                    }
+                }
             }
         }
         if (use_quotes) {
