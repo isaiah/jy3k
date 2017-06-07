@@ -227,6 +227,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             builtins = getDefaultBuiltins();
         }
         modules.__setitem__("__builtin__", new PyModule("builtins", builtins));
+        modules.__setitem__("builtins", new PyModule("builtins", builtins));
         __dict__ = new PyStringMap();
         __dict__.invoke("update", getType().fastGetDict());
         __dict__.__setitem__("displayhook", __displayhook__);

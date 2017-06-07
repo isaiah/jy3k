@@ -1747,16 +1747,7 @@ public final class Py {
         } else if (globals.__finditem__("__builtins__") == null) {
             // Apply side effect of copying into globals,
             // per documentation of eval and observed behavior of exec
-            try {
-                globals.__setitem__("__builtins__", Py.getSystemState().modules.__finditem__("__builtin__").__getattr__("__dict__"));
-            } catch (PyException e) {
-                // Quietly ignore if cannot set __builtins__ - Jython previously allowed a much wider range of
-                // mappable objects for the globals mapping than CPython, do not want to break existing code
-                // as we try to get better CPython compliance
-                if (!e.match(AttributeError)) {
-                    throw e;
-                }
-            }
+            globals.__setitem__("__builtins__", ts.systemState.builtins);
         }
 
         PyBaseCode baseCode = null;
@@ -1764,7 +1755,7 @@ public final class Py {
             baseCode = (PyBaseCode) code;
         }
 
-        f = new PyFrame(baseCode, locals, globals, Py.getSystemState().getBuiltins());
+        f = new PyFrame(baseCode, locals, globals);
         return code.call(ts, f);
     }
 
@@ -2281,7 +2272,7 @@ public final class Py {
             dict.__setitem__("__doc__", classDoc);
         }
 
-        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals, Py.getSystemState().getBuiltins());
+        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals);
         code.call(state, f, new PyTuple(closure_cells));
 
         try {

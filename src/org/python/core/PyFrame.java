@@ -90,11 +90,22 @@ public class PyFrame extends PyObject implements Traverseproc {
     private static final String FREEVAR_ERROR_MSG =
             "free variable '%.200s' referenced before assignment";
 
-    public PyFrame(PyBaseCode code, PyObject locals, PyObject globals, PyObject builtins) {
+    public PyFrame(PyBaseCode code, PyObject locals, PyObject globals) {
         super(TYPE);
         f_code = code;
         f_locals = locals;
         f_globals = globals;
+        PyObject builtins = f_globals.__finditem__("__builtins__");
+        if (builtins != null) {
+            if (builtins instanceof PyModule) {
+                builtins = builtins.getDict();
+            }
+        } else {
+            /** No builtins! Make up a minimal one
+             *  Give them 'None', at least */
+            builtins = new PyStringMap();
+            builtins.__setitem__("None", Py.None);
+        }
         f_builtins = builtins;
         // This needs work to be efficient with multiple interpreter states
         if (locals == null && code != null) {
@@ -123,7 +134,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public PyFrame(PyBaseCode code, PyObject globals) {
-        this(code, null, globals, null);
+        this(code, null, globals);
     }
 
     /**
@@ -295,10 +306,6 @@ public class PyFrame extends PyObject implements Traverseproc {
             return ret;
         }
 
-        // Set up f_builtins if not already set
-        if (f_builtins == null) {
-            f_builtins = Py.getThreadState().systemState.builtins;
-        }
         return f_builtins.__finditem__(index);
     }
 

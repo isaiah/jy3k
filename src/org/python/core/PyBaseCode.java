@@ -43,13 +43,13 @@ public abstract class PyBaseCode extends PyCode {
 
         // Push frame
         frame.f_back = ts.frame;
-        if (frame.f_builtins == null) {
-            if (frame.f_back != null) {
-                frame.f_builtins = frame.f_back.f_builtins;
-            } else {
-                frame.f_builtins = ts.systemState.builtins;
-            }
-        }
+//        if (frame.f_builtins == null) {
+//            if (frame.f_back != null) {
+//                frame.f_builtins = frame.f_back.f_builtins;
+//            } else {
+//                frame.f_builtins = ts.systemState.builtins;
+//            }
+//        }
         // nested scopes: setup env with closure
         // this should only be done once, so let the frame take care of it
         frame.setupEnv((PyTuple) closure);

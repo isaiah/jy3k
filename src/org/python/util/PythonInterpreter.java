@@ -332,11 +332,11 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         }
     }
 
-    public void setLocals(PyObject d) {
+    public void setLocals(PyObject dict) {
         if (!useThreadLocalState) {
-            globals = d;
+            globals = dict;
         } else {
-            threadLocals.get()[0] = d;
+            threadLocals.get()[0] = dict;
         }
     }
 
