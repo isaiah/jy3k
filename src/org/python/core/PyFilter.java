@@ -23,6 +23,9 @@ public class PyFilter extends PyObject {
     @ExposedNew
     public static PyObject filter___new__(PyNewWrapper new_, boolean init, PyType subtype,
                                                 PyObject[] args, String[] keywords) {
+        if (args.length != 2) {
+            throw Py.TypeError(String.format("filter expected 2 arguments, got %d", args.length));
+        }
         PyFilter filter = new PyFilter();
         filter.func = args[0];
         filter.seq = args[1].asIterable().iterator();

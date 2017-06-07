@@ -311,15 +311,15 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     }
 
     public PyObject getStdout() {
-        return sysdict.__getitem__("stdout");
+        return sysdict.__finditem__("stdout");
     }
 
     public PyObject getStderr() {
-        return sysdict.__getitem__("stderr");
+        return sysdict.__finditem__("stderr");
     }
 
     public PyObject getStdin() {
-        return sysdict.__getitem__("stdin");
+        return sysdict.__finditem__("stdin");
     }
 
     public void setStdout(PyObject stdout) {

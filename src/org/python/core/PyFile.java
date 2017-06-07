@@ -4,10 +4,6 @@
  */
 package org.python.core;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.Callable;
-
 import org.python.core.finalization.FinalizableBuiltin;
 import org.python.core.finalization.FinalizeTrigger;
 import org.python.core.io.BinaryIOWrapper;
@@ -29,6 +25,10 @@ import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.Callable;
 
 /**
  * The Python file type. Wraps an {@link TextIOBase} object.
@@ -336,30 +336,30 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
         return fileioMode.toString();
     }
 
-    public PyBytes read1() {
+    public PyUnicode read1() {
         return file_read(-1);
     }
 
-    public PyBytes read1(int size) {
+    public PyUnicode read1(int size) {
         return file_read1(size);
     }
 
     @ExposedMethod
-    final synchronized PyBytes file_read1(int size) {
+    final synchronized PyUnicode file_read1(int size) {
         return file_read(size);
     }
 
     @ExposedMethod(defaults = {"-1"}, doc = BuiltinDocs.TextIOBase_read_doc)
-    final synchronized PyBytes file_read(int size) {
+    final synchronized PyUnicode file_read(int size) {
         checkClosed();
-        return new PyBytes(file.read(size));
+        return new PyUnicode(file.read(size));
     }
 
-    public PyBytes read(int size) {
+    public PyUnicode read(int size) {
         return file_read(size);
     }
 
-    public PyBytes read() {
+    public PyUnicode read() {
         return file_read(-1);
     }
 
@@ -376,16 +376,16 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
 //    }
 
     @ExposedMethod(defaults = {"-1"}, doc = BuiltinDocs.TextIOBase_readline_doc)
-    final synchronized PyBytes file_readline(int max) {
+    final synchronized PyUnicode file_readline(int max) {
         checkClosed();
-        return new PyBytes(file.readline(max));
+        return new PyUnicode(file.readline(max));
     }
 
-    public PyBytes readline(int max) {
+    public PyUnicode readline(int max) {
         return file_readline(max);
     }
 
-    public PyBytes readline() {
+    public PyUnicode readline() {
         return file_readline(-1);
     }
 
@@ -402,7 +402,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
                 break;
             }
             count += len;
-            list.append(new PyBytes(line));
+            list.append(new PyUnicode(line));
         } while (sizehint <= 0 || count < sizehint);
         return list;
     }
@@ -427,7 +427,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
         if (next.length() == 0) {
             throw Py.StopIteration();
         }
-        return new PyBytes(next);
+        return new PyUnicode(next);
     }
 
     @ExposedMethod(names = {"__enter__", "__iter__", "xreadlines"},

@@ -40,7 +40,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 28:
                 return BuiltinModule.locals();
             case 34:
-                return Py.newUnicode(BuiltinModule.raw_input());
+                return BuiltinModule.raw_input();
             case 41:
                 return BuiltinModule.vars();
             default:
@@ -87,7 +87,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
             case 32:
                 return BuiltinModule.oct(arg1);
             case 34:
-                return Py.newUnicode(BuiltinModule.raw_input(arg1));
+                return BuiltinModule.raw_input(arg1);
             case 37:
                 return BuiltinModule.repr(arg1);
             case 41:
@@ -352,7 +352,8 @@ public class BuiltinModule {
     }
 
     public static PyObject ascii(PyObject obj) {
-        return new PyUnicode(Encoding.encode_UnicodeEscapeAsASCII(obj.toString(), false));
+        boolean quoted = obj instanceof PyUnicode || obj instanceof PyBytes;
+        return new PyUnicode(Encoding.encode_UnicodeEscapeAsASCII(obj.toString(), quoted));
     }
 
     public static boolean callable(PyObject obj) {
@@ -783,16 +784,15 @@ public class BuiltinModule {
                                          y.getType().fastGetName(), z.getType().fastGetName()));
     }
 
-    private static PyBytes readline(PyObject file) {
-        if (file instanceof PyFile) {
-            return ((PyFile) file).readline();
-        } else {
-            PyObject ret = file.invoke("readline");
-            if (!(ret instanceof PyBytes)) {
-                throw Py.TypeError("object.readline() returned non-string");
-            }
-            return (PyBytes) ret;
-        }
+    private static PyUnicode readline(PyObject file) {
+      PyObject ret = file.invoke("readline");
+      if (!(ret instanceof PyUnicode)) {
+        throw Py.TypeError("object.readline() returned non-string");
+      }
+      if (ret.equals(Py.EmptyUnicode)) {
+          throw Py.EOFError("EOF when reading a line");
+      }
+      return (PyUnicode) ret;
     }
 
     /**
@@ -803,21 +803,17 @@ public class BuiltinModule {
      * @param file a file-like object to read from
      * @return line of text from the file (encoded as bytes values compatible with PyBytes)
      */
-    public static String raw_input(PyObject prompt, PyObject file) {
-        PyObject stdout = Py.getSystemState().getStdout();
-        if (stdout instanceof PyAttributeDeleted) {
-            throw Py.RuntimeError("[raw_]input: lost sys.stdout");
-        }
-        Py.print(stdout, prompt);
-        String data = readline(file).toString();
-        if (data.endsWith("\n")) {
-            return data.substring(0, data.length() - 1);
-        } else {
-            if (data.length() == 0) {
-                throw Py.EOFError("raw_input()");
+    public static PyObject raw_input(PyObject prompt, PyObject file) {
+        if (prompt != null && prompt != Py.None) {
+            PyObject stdout = Py.getSystemState().getStdout();
+            if (stdout == null) {
+                throw Py.RuntimeError("input(): lost sys.stdout");
+            } else {
+                Py.print(stdout, prompt);
             }
         }
-        return data;
+        PyUnicode data = readline(file);
+        return data.str_rstrip(null);
     }
 
     /**
@@ -827,10 +823,10 @@ public class BuiltinModule {
      * @param prompt to issue at console before read
      * @return line of text from console (encoded as bytes values compatible with PyBytes)
      */
-    public static String raw_input(PyObject prompt) {
+    public static PyObject raw_input(PyObject prompt) {
         PyObject stdin = Py.getSystemState().getStdin();
-        if (stdin instanceof PyAttributeDeleted) {
-            throw Py.RuntimeError("[raw_]input: lost sys.stdin");
+        if (stdin == null) {
+            throw Py.RuntimeError("input: lost sys.stdin");
         }
         return raw_input(prompt, stdin);
     }
@@ -840,8 +836,8 @@ public class BuiltinModule {
      *
      * @return line of text from console (encoded as bytes values compatible with PyBytes)
      */
-    public static String raw_input() {
-        return raw_input(Py.EmptyByte);
+    public static PyObject raw_input() {
+        return raw_input(null);
     }
 
     public static PyUnicode repr(PyObject o) {
@@ -1183,17 +1179,13 @@ class MaxFunction extends PyBuiltinFunction {
 
     @Override
     public PyObject __call__(PyObject args[], String kwds[]) {
+        ArgParser ap = new ArgParser("max", args, kwds, 1, "iterable", "*", "default", "key");
         int argslen = args.length;
-        PyObject key = null;
-        PyObject defaultValue = null;
+        PyObject key = ap.getPyObject(3, null);
+        PyObject defaultValue = ap.getPyObject(2, null);
 
         if (args.length - kwds.length == 0) {
             throw Py.TypeError("max() expected 1 arguments, got 0");
-        }
-        for (int i = 0; i < kwds.length; i++) {
-            if (kwds[i].equals("key")) {
-
-            }
         }
         if (kwds.length > 0) {
             if (kwds[0].equals("key")) {
