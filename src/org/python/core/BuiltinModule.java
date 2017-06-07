@@ -51,9 +51,7 @@ class BuiltinFunctions extends PyBuiltinFunctionSet {
     public PyObject __call__(PyObject arg1) {
         switch (this.index) {
             case 0:
-                return Py.newUnicode(BuiltinModule.chr(Py.py2int(arg1,
-                                                              "chr(): 1st arg can't be coerced to "
-                                                              + "int")));
+                return Py.newUnicode(BuiltinModule.chr(Py.py2long(arg1)));
             case 1:
                 return Py.newLong(BuiltinModule.len(arg1));
             case 3:
@@ -359,11 +357,11 @@ public class BuiltinModule {
         return obj.isCallable();
     }
 
-    public static String chr(int i) {
+    public static String chr(long i) {
         if (i < 0 || i > SysModule.MAXUNICODE) {
             throw Py.ValueError("chr() arg not in range(0x110000)");
         }
-        return String.valueOf(Character.toChars(i));
+        return String.valueOf(Character.toChars((int) i));
     }
 
     public static void delattr(PyObject obj, PyObject name) {
@@ -934,10 +932,10 @@ public class BuiltinModule {
         PyObject[] args;
         if (level < 0) {
         	// for backward compatibility provide only 4 arguments
-        	args = new PyObject[] {Py.newString(name), globals, locals,
+        	args = new PyObject[] {new PyUnicode(name), globals, locals,
         			fromlist};
         } else {
-        	args = new PyObject[] {Py.newString(name), globals, locals,
+        	args = new PyObject[] {new PyUnicode(name), globals, locals,
         			fromlist, Py.newInteger(level)};
         }
         PyObject module = __import__.__call__(args);
