@@ -4,23 +4,19 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.expose.ExposedGet;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
-
 
 @ExposedType(name = "_json.Scanner", base = PyObject.class)
 public class Scanner extends PyObject implements Traverseproc {
-
     public static final PyType TYPE = PyType.fromClass(Scanner.class);
-
-    @ExposedGet
-    public final String __module__ = "_json";
-
     final String encoding;
     final boolean strict;
     final PyObject object_hook;
@@ -30,7 +26,7 @@ public class Scanner extends PyObject implements Traverseproc {
     final PyObject parse_constant;
 
     public Scanner(PyObject context) {
-        super();
+        super(TYPE);
         encoding = "utf-8";
         strict = context.__getattr__("strict").__bool__();
         object_hook = context.__getattr__("object_hook");
@@ -38,6 +34,12 @@ public class Scanner extends PyObject implements Traverseproc {
         parse_float = context.__getattr__("parse_float");
         parse_int = context.__getattr__("parse_int");
         parse_constant = context.__getattr__("parse_constant");
+    }
+
+    @ExposedNew
+    static final PyObject Scanner___new__(PyNewWrapper new_, boolean init, PyType subtype,
+                                          PyObject[] args, String[] keywords) {
+        return new Scanner(args[0]);
     }
 
     public PyObject __call__(PyObject string, PyObject idx) {

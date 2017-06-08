@@ -6,9 +6,13 @@ import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyUnicode;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
-
-public class jffi implements ClassDictInit  {
+@ExposedModule
+public class jffi {
     public static final int FUNCFLAG_STDCALL = 0x0;
     public static final int FUNCFLAG_CDECL = 0x1;
     public static final int FUNCFLAG_HRESULT = 0x2;
@@ -16,8 +20,8 @@ public class jffi implements ClassDictInit  {
     public static final int FUNCFLAG_USE_ERRNO = 0x8;
     public static final int FUNCFLAG_USE_LASTERROR = 0x10;
 
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("__name__", Py.newString("jffi"));
+    @ModuleInit
+    public static void init(PyObject dict) {
         dict.__setitem__("DynamicLibrary", DynamicLibrary.TYPE);
         dict.__setitem__("Type", CType.TYPE);
         dict.__setitem__("Function", Function.TYPE);
@@ -36,23 +40,28 @@ public class jffi implements ClassDictInit  {
         dict.__setitem__("RTLD_LAZY", Py.newInteger(Library.LAZY));
         dict.__setitem__("RTLD_NOW", Py.newInteger(Library.NOW));
 
-        dict.__setitem__("__version__", Py.newString("0.0.1"));
+        dict.__setitem__("__version__", new PyUnicode("0.0.1"));
     }
 
+    @ExposedFunction
     public static PyObject dlopen(PyObject name, PyObject mode) {
         return new DynamicLibrary(name != Py.None ? name.asString() : null, mode.asInt());
     }
 
+    @ExposedFunction
     public static PyObject get_errno() {
         return Py.newInteger(0);
     }
 
+    @ExposedFunction
     public static PyObject set_errno(PyObject type) {
         return Py.newInteger(0);
     }
+    @ExposedFunction
     public static PyObject pointer(PyObject type) {
         return Py.newInteger(0);
     }
+    @ExposedFunction
     public static PyObject POINTER(PyObject type) {
         return type;
     }
@@ -69,6 +78,7 @@ public class jffi implements ClassDictInit  {
         }
     }
 
+    @ExposedFunction
     public static PyObject memmove(PyObject dst, PyObject src, PyObject length) {
         com.kenai.jffi.MemoryIO.getInstance().copyMemory(getMemoryAddress(src),
                 getMemoryAddress(dst), length.asInt());
@@ -76,6 +86,7 @@ public class jffi implements ClassDictInit  {
         return Py.None;
     }
 
+    @ExposedFunction
     public static PyObject memset(PyObject dst, PyObject value, PyObject length) {
         com.kenai.jffi.MemoryIO.getInstance().setMemory(getMemoryAddress(dst), length.asInt(), (byte) value.asInt());
         return Py.None;

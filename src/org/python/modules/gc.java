@@ -2,7 +2,6 @@ package org.python.modules;
 
 import org.python.core.JyAttribute;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.Traverseproc;
@@ -10,6 +9,10 @@ import org.python.core.TraverseprocDerived;
 import org.python.core.Untraversable;
 import org.python.core.Visitproc;
 import org.python.core.finalization.FinalizeTrigger;
+import org.python.expose.ExposedConst;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 import org.python.modules._weakref.GlobalRef;
 
 import java.lang.ref.Reference;
@@ -168,6 +171,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * performance or so.
  * </p>
  */
+@ExposedModule
 public class gc {
     /**
      * A constant that can occur as result of {@link #collect()} and
@@ -403,6 +407,7 @@ public class gc {
      * @see #set_debug(int)
      * @see #get_debug()
      */
+    @ExposedConst
     public static final int DEBUG_STATS         = (1<<0);
 
     /**
@@ -412,6 +417,7 @@ public class gc {
      * @see #set_debug(int)
      * @see #get_debug()
      */
+    @ExposedConst
     public static final int DEBUG_COLLECTABLE   = (1<<1);
 
     /**
@@ -421,6 +427,7 @@ public class gc {
      * @see #set_debug(int)
      * @see #get_debug()
      */
+    @ExposedConst
     public static final int DEBUG_UNCOLLECTABLE = (1<<2);
 
     /**
@@ -448,6 +455,7 @@ public class gc {
      * @see #set_debug(int)
      * @see #get_debug()
      */
+    @ExposedConst
     public static final int DEBUG_SAVEALL       = (1<<5);
 
     /**
@@ -458,6 +466,7 @@ public class gc {
      * @see #set_debug(int)
      * @see #get_debug()
      */
+    @ExposedConst
     public static final int DEBUG_LEAK = DEBUG_COLLECTABLE |
                                          DEBUG_UNCOLLECTABLE |
                                          DEBUG_INSTANCES |
@@ -478,11 +487,6 @@ public class gc {
     private static int gcMonitoredRunCount = 0;
     public static long gcRecallTime = 4000;
 
-    /**
-     * list of uncollectable objects
-     */
-    public static PyList garbage = new PyList();
-
     //Finalization preprocess/postprocess-related declarations:
     private static List<Runnable> preFinalizationProcess, postFinalizationProcess;
     private static List<Runnable> preFinalizationProcessRemove, postFinalizationProcessRemove;
@@ -502,115 +506,12 @@ public class gc {
     private static final byte NOTIFY_FOR_RERUN = 2;
     private static byte delayedFinalizationMode = DO_NOTHING_SPECIAL;
     private static boolean notifyRerun = false;
+    public static PyList garbage = new PyList();
 
-    public static final String __doc__ =
-            "This module provides access to the garbage collector for reference cycles.\n" +
-            "\n" +
-            "enable() -- Enable automatic garbage collection (does nothing in Jython).\n" +
-            "disable() -- Disable automatic garbage collection (raises NotImplementedError in Jython).\n" +
-            "isenabled() -- Returns True because Java garbage collection cannot be disabled.\n" +
-            "collect() -- Do a full collection right now (potentially expensive).\n" +
-            "get_count() -- Return the current collection counts (raises NotImplementedError in Jython).\n" +
-            "set_debug() -- Set debugging flags.\n" +
-            "get_debug() -- Get debugging flags.\n" +
-            "set_threshold() -- Set the collection thresholds (raise NotImplementedError in Jython).\n" +
-            "get_threshold() -- Return the current the collection thresholds (raise NotImplementedError in Jython).\n" +
-            "get_objects() -- Return a list of all objects tracked by the collector (raises NotImplementedError in Jython).\n" +
-            "is_tracked() -- Returns true if a given object is tracked (i.e. monitored in Jython).\n" +
-            "get_referrers() -- Return the list of objects that refer to an object (only finds monitored referrers in Jython).\n" +
-            "get_referents() -- Return the list of objects that an object refers to.\n";
-
-    public static final String __name__ = "gc";
-
-    public static final PyBytes __doc__enable = new PyBytes(
-            "enable() -> None\n" +
-            "\n" +
-            "Enable automatic garbage collection.\n" +
-            "(does nothing in Jython)\n");
-
-    public static final PyBytes __doc__disable = new PyBytes(
-            "disable() -> None\n" +
-            "\n" +
-            "Disable automatic garbage collection.\n" +
-            "(raises NotImplementedError in Jython)\n");
-
-    public static final PyBytes __doc__isenabled = new PyBytes(
-            "isenabled() -> status\n" +
-            "\n" +
-            "Returns true if automatic garbage collection is enabled.\n");
-
-    public static final PyBytes __doc__collect = new PyBytes(
-            "collect([generation]) -> n\n" +
-            "\n" +
-            "With no arguments, run a full collection.  The optional argument\n" +
-            "may be an integer specifying which generation to collect.  A ValueError\n" +
-            "is raised if the generation number is invalid.\n\n" +
-            "The number of unreachable objects is returned.\n" +
-            "(Jython emulates CPython cyclic trash counting if objects are monitored.\n" +
-            "If no objects are monitored, returns -2\n");
-
-    public static final PyBytes __doc__get_count = new PyBytes(
-            "get_count() -> (count0, count1, count2)\n" +
-            "\n" +
-            "Return the current collection counts\n" +
-            "(raises NotImplementedError in Jython)\n");
-
-    public static final PyBytes __doc__set_debug = new PyBytes(
-            "set_debug(flags) -> None\n" +
-            "\n" +
-            "Set the garbage collection debugging flags. Debugging information is\n" +
-            "written to sys.stderr.\n" +
-            "\n" +
-            "flags is an integer and can have the following bits turned on:\n" +
-            "\n" +
-            "  DEBUG_STATS - Print statistics during collection.\n" +
-            "  DEBUG_COLLECTABLE - Print collectable objects found.\n" +
-            "  DEBUG_UNCOLLECTABLE - Print unreachable but uncollectable objects found.\n" +
-            "  DEBUG_INSTANCES - Print instance objects.\n" +
-            "  DEBUG_OBJECTS - Print objects other than instances.\n" +
-            "  DEBUG_SAVEALL - Save objects to gc.garbage rather than freeing them.\n" +
-            "  DEBUG_LEAK - Debug leaking programs (everything but STATS).\n");
-
-    public static final PyBytes __doc__get_debug = new PyBytes(
-            "get_debug() -> flags\n" +
-            "\n" +
-            "Get the garbage collection debugging flags.\n");
-
-    public static final PyBytes __doc__set_thresh = new PyBytes(
-            "set_threshold(threshold0, [threshold1, threshold2]) -> None\n" +
-            "\n" +
-            "Sets the collection thresholds.  Setting threshold0 to zero disables\n" +
-            "collection.\n" +
-            "(raises NotImplementedError in Jython)\n");
-
-    public static final PyBytes __doc__get_thresh = new PyBytes(
-            "get_threshold() -> (threshold0, threshold1, threshold2)\n" +
-            "\n" +
-            "Return the current collection thresholds\n" +
-            "(raises NotImplementedError in Jython)\n");
-
-    public static final PyBytes __doc__get_objects = new PyBytes(
-            "get_objects() -> [...]\n" +
-            "\n" +
-            "Return a list of objects tracked by the collector (excluding the list\n" +
-            "returned).\n" +
-            "(raises NotImplementedError in Jython)\n");
-
-    public static final PyBytes __doc__is_tracked = new PyBytes(
-            "is_tracked(obj) -> bool\n" +
-            "\n" +
-            "Returns true if the object is tracked by the garbage collector.\n" +
-            "(i.e. monitored in Jython)\n");
-
-    public static final PyBytes __doc__get_referrers = new PyBytes(
-            "get_referrers(*objs) -> list\n" +
-            "Return the list of objects that directly refer to any of objs.\n" +
-            "(only finds monitored referrers in Jython)");
-
-    public static final PyBytes __doc__get_referents = new PyBytes(
-            "get_referents(*objs) -> list\n" +
-            "Return the list of objects that are directly referred to by objs.");
-
+    @ModuleInit
+    public static void init(PyObject dict) {
+        dict.__setitem__("garbage", garbage);
+    }
 
     public static class CycleMarkAttr {
         private boolean cyclic = false;
@@ -1370,7 +1271,7 @@ public class gc {
     public static void monitorObject(PyObject ob, boolean initString) {
         //Already collected garbage should not be monitored,
         //thus also not the garbage list:
-        if (ob == null || ob == garbage) {
+        if (ob == null || ob.__len__() == 0) {
             return;
         }
 
@@ -1674,6 +1575,7 @@ public class gc {
     /**
      * Does nothing in Jython as Java-gc is always enabled.
      */
+    @ExposedFunction
     public static void enable() {}
 
     /**
@@ -1682,6 +1584,7 @@ public class gc {
      *
      * @throws org.python.core.Py.NotImplementedError
      */
+    @ExposedFunction
     public static void disable() {
         throw Py.NotImplementedError("can't disable Java GC");
     }
@@ -1689,6 +1592,7 @@ public class gc {
     /**
      * Always returns {@code true} in Jython.
      */
+    @ExposedFunction
     public static boolean isenabled() { return true; }
 
     /**
@@ -1700,7 +1604,8 @@ public class gc {
      * an error occurred and collection did not complete.
      * @see #collect()
      */
-    public static int collect(int generation) {
+    @ExposedFunction(defaults = {"null"})
+    public static int collect(PyObject o) {
         return collect();
     }
  
@@ -2330,6 +2235,7 @@ public class gc {
      *
      * @throws org.python.core.Py.NotImplementedError
      */
+    @ExposedFunction
     public static PyObject get_count() {
         throw Py.NotImplementedError("not applicable to Java GC");
     }
@@ -2358,6 +2264,7 @@ public class gc {
      * @see #DEBUG_SAVEALL
      * @see #DEBUG_LEAK
      */
+    @ExposedFunction
     public static void set_debug(int flags) {
         debugFlags = flags;
     }
@@ -2367,6 +2274,7 @@ public class gc {
      * <br>
      * Get the garbage collection debugging flags.
      */
+    @ExposedFunction
     public static int get_debug() {
         return debugFlags;
     }
@@ -2377,6 +2285,7 @@ public class gc {
      *
      * @throws org.python.core.Py.NotImplementedError
      */
+    @ExposedFunction
     public static void set_threshold(PyObject[] args, String[] kwargs) {
         throw Py.NotImplementedError("not applicable to Java GC");
     }
@@ -2387,6 +2296,7 @@ public class gc {
      *
      * @throws org.python.core.Py.NotImplementedError
      */
+    @ExposedFunction
     public static PyObject get_threshold() {
         throw Py.NotImplementedError("not applicable to Java GC");
     }
@@ -2397,6 +2307,7 @@ public class gc {
      *
      * @throws org.python.core.Py.NotImplementedError
      */
+    @ExposedFunction
     public static PyObject get_objects() {
         throw Py.NotImplementedError("not applicable to Java GC");
     }
@@ -2409,6 +2320,7 @@ public class gc {
      * Further note that the resulting list will contain referrers in no specific
      * order and may even include duplicates.
      */
+    @ExposedFunction
     public static PyObject get_referrers(PyObject[] args, String[] kwargs) {
         if (!isMonitoring()) {
             throw Py.NotImplementedError(
@@ -2450,6 +2362,7 @@ public class gc {
      * Further note that the resulting list will contain referents in no
      * specific order and may even include duplicates.
      */
+    @ExposedFunction
     public static PyObject get_referents(PyObject[] args, String[] kwargs) {
         if (args == null) {
             return Py.None;
@@ -2467,6 +2380,7 @@ public class gc {
      * participates in a cycle. This mimics CPython behavior and passes
      * the corresponding unit test in {@code test_gc.py}.
      */
+    @ExposedFunction
     public static PyObject is_tracked(PyObject[] args, String[] kwargs) {
         if (isTraversable(args[0]) &&
             (monitoredObjects == null || isMonitored(args[0]))) {

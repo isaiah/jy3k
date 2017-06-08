@@ -11,28 +11,26 @@ import org.python.core.PyMethod;
 import org.python.core.Py;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
 
 
+@ExposedModule
 public class synchronize {
 
     public static Object _getSync(PyObject obj) {
         return Py.tojava(obj, Object.class);
     }
 
+    @ExposedFunction
     public static PyObject apply_synchronized(PyObject syncObject, PyObject callable,
-                                              PyObject args) {
+                                              PyObject args, String[] kws) {
         synchronized (_getSync(syncObject)) {
-
             return BuiltinModule.apply(callable, args);
         }
     }
-    public static PyObject apply_synchronized(PyObject syncObject, PyObject callable,
-                                              PyObject args, PyDictionary kws) {
-        synchronized (_getSync(syncObject)) {
-            return BuiltinModule.apply(callable, args, kws);
-        }
-    }
 
+    @ExposedFunction
     public static PyObject make_synchronized(PyObject callable) {
         return new SynchronizedCallable(callable);
     }

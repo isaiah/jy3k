@@ -3582,7 +3582,7 @@ public class PyObject implements Serializable {
         return f.__call__(args, keywords);
     }
 
-    public PyObject invoke(String name, PyObject[] args) {
+    public PyObject invoke(String name, PyObject... args) {
         PyObject f = __getattr__(name);
         return f.__call__(args);
     }

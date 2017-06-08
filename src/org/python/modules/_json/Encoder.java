@@ -7,6 +7,7 @@ import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyLong;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -14,16 +15,12 @@ import org.python.core.PyUnicode;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.expose.ExposedGet;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "_json.encoder", base = PyObject.class)
+@ExposedType(name = "_json.Encoder", base = PyObject.class)
 public class Encoder extends PyObject implements Traverseproc {
-
     public static final PyType TYPE = PyType.fromClass(Encoder.class);
-
-    @ExposedGet
-    public final String __module__ = "_json";
-
     final PyDictionary markers;
     final PyObject defaultfn;
     final PyObject encoder;
@@ -35,7 +32,7 @@ public class Encoder extends PyObject implements Traverseproc {
     final boolean allow_nan;
 
     public Encoder(PyObject[] args, String[] kwds) {
-        super();
+        super(TYPE);
         ArgParser ap = new ArgParser("encoder", args, kwds,
                 new String[]{"markers", "default", "encoder", "indent",
                         "key_separator", "item_separator", "sort_keys", "skipkeys", "allow_nan"});
@@ -50,6 +47,12 @@ public class Encoder extends PyObject implements Traverseproc {
         sort_keys = ap.getPyObject(6);
         skipkeys = ap.getPyObject(7).__bool__();
         allow_nan = ap.getPyObject(8).__bool__();
+    }
+
+    @ExposedNew
+    static final PyObject Encoder___new__(PyNewWrapper new_, boolean init, PyType subtype,
+                                    PyObject[] args, String[] keywords) {
+        return new Encoder(args, keywords);
     }
 
     public PyObject __call__(PyObject obj) {

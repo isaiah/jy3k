@@ -26,6 +26,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyModule;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
@@ -38,6 +39,11 @@ import org.python.core.BuiltinModule;
 import org.python.core.codecs;
 import org.python.core.imp;
 import org.python.core.stringlib.Encoding;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ExposedNew;
+import org.python.expose.ExposedType;
+import org.python.expose.ModuleInit;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -343,13 +349,8 @@ import java.util.Map;
  * @author Finn Bock, bckfnn@pipmail.dknet.dk
  * @version _pickle.java,v 1.30 1999/05/15 17:40:12 fb Exp
  */
-public class _pickle implements ClassDictInit {
-    /**
-     * The doc string
-     */
-    public static String __doc__ =
-       "Java implementation and optimization of the Python pickle module\n";
-
+@ExposedModule
+public class _pickle {
     /**
      * The program version.
      */
@@ -481,12 +482,9 @@ public class _pickle implements ClassDictInit {
     /**
      * Initialization when module is imported.
      */
-    public static void classDictInit(PyObject dict) {
+    @ModuleInit
+    public static void init(PyObject dict) {
         _pickle.dict = dict;
-
-        // XXX: Hack for JPython 1.0.1. By default __builtin__ is not in
-        // sys.modules.
-        imp.importName("__builtin__", true);
 
         PyModule copyreg = (PyModule)importModule("copyreg");
 
@@ -499,6 +497,11 @@ public class _pickle implements ClassDictInit {
         UnpickleableError = Py.makeClass("UnpickleableError", _UnpickleableError(), PickleError);
         UnpicklingError = Py.makeClass("UnpicklingError", exceptionNamespace(), PickleError);
         BadPickleGet = Py.makeClass("BadPickleGet", exceptionNamespace(), UnpicklingError);
+        dict.__setitem__("PickleError", PickleError);
+        dict.__setitem__("PicklingError", PicklingError);
+        dict.__setitem__("UnpicklingError", UnpicklingError);
+        dict.__setitem__("Pickler", Pickler.TYPE);
+        dict.__setitem__("Unpickler", Unpickler.TYPE);
     }
 
     public static PyObject exceptionNamespace() {
@@ -536,53 +539,6 @@ public class _pickle implements ClassDictInit {
     }
 
     /**
-     * @param file      a file-like object, can be a cStringIO.StringIO,
-     *                  a PyFile or any python object which implements a
-     *                  <i>write</i> method. The data will be written as text.
-     * @return a new Pickler instance.
-     */
-    public static Pickler Pickler(PyObject file) {
-        return new Pickler(file, 0);
-    }
-
-
-    /**
-     * @param file      a file-like object, can be a cStringIO.StringIO,
-     *                  a PyFile or any python object which implements a
-     *                  <i>write</i> method.
-     * @param protocol  pickle protocol version (0 - text, 1 - pre-2.3 binary, 2 - 2.3)
-     * @return         a new Pickler instance.
-     */
-    public static Pickler Pickler(PyObject file, int protocol) {
-        return new Pickler(file, protocol);
-    }
-
-
-    /**
-     * Returns a unpickler instance.
-     * @param file      a file-like object, can be a cStringIO.StringIO,
-     *                  a PyFile or any python object which implements a
-     *                  <i>read</i> and <i>readline</i> method.
-     * @return         a new Unpickler instance.
-     */
-    public static Unpickler Unpickler(PyObject file) {
-        return new Unpickler(file);
-    }
-
-
-    /**
-     * Shorthand function which pickles the object on the file.
-     * @param object    a data object which should be pickled.
-     * @param file      a file-like object, can be a cStringIO.StringIO,
-     *                  a PyFile or any python object which implements a
-     *                  <i>write</i>  method. The data will be written as
-     *                  text.
-     */
-    public static void dump(PyObject object, PyObject file) {
-        dump(object, file, 0);
-    }
-
-    /**
      * Shorthand function which pickles the object on the file.
      * @param object    a data object which should be pickled.
      * @param file      a file-like object, can be a cStringIO.StringIO,
@@ -590,26 +546,18 @@ public class _pickle implements ClassDictInit {
      *                  <i>write</i> method.
      * @param protocol  pickle protocol version (0 - text, 1 - pre-2.3 binary, 2 - 2.3)
      */
+    @ExposedFunction(defaults = {"0"})
     public static void dump(PyObject object, PyObject file, int protocol) {
         new Pickler(file, protocol).dump(object);
     }
 
-
-    /**
-     * Shorthand function which pickles and returns the string representation.
-     * @param object    a data object which should be pickled.
-     * @return         a string representing the pickled object.
-     */
-    public static PyBytes dumps(PyObject object) {
-        return dumps(object, 0);
-    }
-
     /**
      * Shorthand function which pickles and returns the string representation.
      * @param object    a data object which should be pickled.
      * @param protocol  pickle protocol version (0 - text, 1 - pre-2.3 binary, 2 - 2.3)
      * @return         a string representing the pickled object.
      */
+    @ExposedFunction(defaults = {"0"})
     public static PyBytes dumps(PyObject object, int protocol) {
         cStringIO.StringIO file = cStringIO.StringIO();
         dump(object, file, protocol);
@@ -624,7 +572,8 @@ public class _pickle implements ClassDictInit {
      *                  <i>read</i> and <i>readline</i> method.
      * @return         a new object.
      */
-    public static Object load(PyObject file) {
+    @ExposedFunction
+    public static PyObject load(PyObject file) {
         try {
             return new Unpickler(file).load();
         }
@@ -645,7 +594,8 @@ public class _pickle implements ClassDictInit {
      *                  representation.
      * @return         a new object.
      */
-    public static Object loads(PyObject str) {
+    @ExposedFunction
+    public static PyObject loads(PyObject str) {
         cStringIO.StringIO file = cStringIO.StringIO(str.toString());
         return load(file);
     }
@@ -659,7 +609,10 @@ public class _pickle implements ClassDictInit {
      * @see _pickle#Pickler(PyObject)
      * @see _pickle#Pickler(PyObject,int)
      */
-    static public class Pickler {
+    @ExposedType(name = "_pickler.Pickler")
+    static public class Pickler extends PyObject {
+        public static final PyType TYPE = PyType.fromClass(Pickler.class);
+
         private PyIOFile file;
         private int protocol;
 
@@ -697,6 +650,16 @@ public class _pickle implements ClassDictInit {
             this.protocol = protocol;
         }
 
+        @ExposedNew
+        public static PyObject Pickler_new(PyNewWrapper new_, boolean init, PyType subtype,
+                                        PyObject[] args, String[] keywords) {
+
+            int protocol = 0;
+            if (args.length > 1) {
+                protocol = args[1].asInt();
+            }
+            return new Pickler(args[0], protocol);
+        }
 
         /**
          * Write a pickled representation of the object.
@@ -1502,7 +1465,9 @@ public class _pickle implements ClassDictInit {
      * methods Unpickler.
      * @see _pickle#Unpickler(PyObject)
      */
-    static public class Unpickler {
+    @ExposedType(name = "_pickler.Unpickler")
+    static public class Unpickler extends PyObject {
+        public static final PyType TYPE = PyType.fromClass(Unpickler.class);
 
         private PyIOFile file;
 
@@ -1529,6 +1494,12 @@ public class _pickle implements ClassDictInit {
 
         Unpickler(PyObject file) {
             this.file = PyIOFileFactory.createIOFile(file);
+        }
+
+        @ExposedNew
+        public static PyObject Unpickler_new(PyNewWrapper new_, boolean init, PyType subtype,
+                                        PyObject[] args, String[] keywords) {
+            return new Unpickler(args[0]);
         }
 
 
@@ -2179,7 +2150,7 @@ public class _pickle implements ClassDictInit {
 
 
     private static PyObject importModule(String name) {
-        PyObject fromlist = new PyTuple(Py.newString("__doc__"));
+        PyObject fromlist = new PyTuple(new PyUnicode("__doc__"));
         return BuiltinModule.__import__(name, Py.None, Py.None, fromlist);
     }
 

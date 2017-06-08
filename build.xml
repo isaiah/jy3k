@@ -451,6 +451,7 @@
         source="${jdk.source.version}"
         debug="${debug}"
         deprecation="${deprecation}"
+        includeantruntime="true"
         nowarn="${nowarn}">
         <compilerarg line="${javac.Xlint}"/>
       </javac>
@@ -463,6 +464,7 @@
         debug="${debug}"
         deprecation="${deprecation}"
         nowarn="${nowarn}"
+        includeantruntime="true"
         encoding="UTF-8">
         <compilerarg line="${javac.Xlint}"/>
         <classpath refid="test.classpath" />
@@ -473,6 +475,7 @@
         source="${jdk.source.version}"
         debug="${debug}"
         deprecation="${deprecation}"
+        includeantruntime="true"
         nowarn="${nowarn}"> 
         <compilerarg line="${javac.Xlint}"/>
         <classpath refid="test.classpath" />

@@ -1,31 +1,32 @@
 package org.python.modules;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
 import org.python.core.BaseSet;
-import org.python.core.ClassDictInit;
-import org.python.core.PyFile;
-import org.python.core.PyObject;
-import org.python.core.PyBytes;
 import org.python.core.Py;
 import org.python.core.PyBytecode;
+import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyDictionary;
+import org.python.core.PyFile;
 import org.python.core.PyFloat;
 import org.python.core.PyFrozenSet;
 import org.python.core.PyList;
 import org.python.core.PyLong;
+import org.python.core.PyObject;
 import org.python.core.PySet;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
+import org.python.expose.ExposedConst;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
-public class marshal implements ClassDictInit {
+import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("__name__", Py.newString("marshal"));
-    }
+@ExposedModule
+public class marshal {
     private final static char TYPE_NULL = '0';
     private final static char TYPE_NONE = 'N';
     private final static char TYPE_FALSE = 'F';
@@ -51,7 +52,12 @@ public class marshal implements ClassDictInit {
     private final static char TYPE_SET = '<';
     private final static char TYPE_FROZENSET = '>';
     private final static int MAX_MARSHAL_STACK_DEPTH = 2000;
-    private final static int CURRENT_VERSION = 2;
+
+    @ExposedConst(name = "version")
+    public final static int CURRENT_VERSION = 2;
+
+    @ModuleInit
+    public static void init(PyObject dict) {}
 
     public static class Marshaller extends PyObject implements Traverseproc {
 
@@ -561,10 +567,12 @@ public class marshal implements ClassDictInit {
         dump(value, file, 2);
     }
 
+    @ExposedFunction
     public static void dump(PyObject value, PyObject file, int version) {
         new Marshaller(file).dump(value);
     }
 
+    @ExposedFunction
     public static PyObject dumps(PyObject value, int version) {
         cStringIO.StringIO f = cStringIO.StringIO();
         dump(value, f, version);
@@ -575,10 +583,12 @@ public class marshal implements ClassDictInit {
         return dumps(value, 2);
     }
 
+    @ExposedFunction
     public static PyObject load(PyObject f) {
         return new Unmarshaller(f).load();
     }
 
+    @ExposedFunction
     public static PyObject loads(PyObject bytes) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(((PyBytes) bytes).getString().getBytes());
         PyObject f = new PyFile(inputStream);

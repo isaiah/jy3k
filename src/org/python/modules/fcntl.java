@@ -7,24 +7,23 @@ import org.python.core.ClassDictInit;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 import org.python.modules.posix.PosixModule;
 
-/**
- * Created by isaiah on 6/17/16.
- */
-public class fcntl implements ClassDictInit {
+@ExposedModule
+public class fcntl {
     private static POSIX posix = PosixModule.getPOSIX();
 
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("__name__", new PyUnicode("fcntl"));
+    @ModuleInit
+    public static void init(PyObject dict) {
         for (Fcntl val : Fcntl.values()) {
             dict.__setitem__(val.name(), new PyLong(val.longValue()));
         }
-
-        // hide from Python
-        dict.__setitem__("classDictInit", null);
     }
 
+    @ExposedFunction
     public static int fcntl(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("fcntl", args, keywords, "fd", "cmd", "arg");
         PyObject fileDescriptor = ap.getPyObject(0);

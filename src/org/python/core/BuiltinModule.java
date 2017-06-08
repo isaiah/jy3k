@@ -5,6 +5,7 @@
 package org.python.core;
 
 import org.python.antlr.base.mod;
+import org.python.bootstrap.Import;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.IntegerFormatter;
 import org.python.core.util.RelativeFile;
@@ -310,10 +311,6 @@ public class BuiltinModule {
 
     public static PyObject abs(PyObject o) {
         return o.__abs__();
-    }
-
-    public static PyObject apply(PyObject o) {
-    return o.__call__();
     }
 
     public static PyObject apply(PyObject o, PyObject args) {
@@ -984,17 +981,7 @@ public class BuiltinModule {
 @Untraversable
 class ImportFunction extends PyBuiltinFunction {
     ImportFunction() {
-        super("__import__",
-              "__import__(name, globals={}, locals={}, fromlist=[], level=0) -> module\n\n" +
-              "Import a module.  The globals are only used to determine the context;\n" +
-              "they are not modified.  The locals are currently unused.  The fromlist\n" +
-              "should be a list of names to emulate ``from name import ...'', or an\n" +
-              "empty list to emulate ``import name''.\n" +
-              "When importing a module from a package, note that __import__('A.B', ...)\n" +
-              "returns package A when fromlist is empty, but its submodule B when\n" +
-              "fromlist is not empty.  Level is used to determine whether to perform \n" +
-              "absolute or relative imports.  0 is absolute, a positive number\n" +
-              "is the number of parent directories to search relative to the current module.");
+        super("__import__", BuiltinDocs.builtins___import___doc);
     }
 
     @Override
@@ -1003,19 +990,20 @@ class ImportFunction extends PyBuiltinFunction {
                                      new String[] {"name", "globals", "locals", "fromlist",
                                                    "level"},
                                      1);
-        String module = ap.getString(0);
+        PyObject name = ap.getPyObject(0);
         PyObject globals = ap.getPyObject(1, null);
         PyObject fromlist = ap.getPyObject(3, Py.EmptyTuple);
         int level = ap.getInt(4, imp.DEFAULT_LEVEL);
-        return imp.importName(module.intern(), fromlist == Py.None || fromlist.__len__() == 0,
-                              globals, fromlist, level);
+        return Import.importModuleLevelObject(name, globals, fromlist, level);
+//        return imp.importName(module.intern(), fromlist == Py.None || fromlist.__len__() == 0,
+//                              globals, fromlist, level);
     }
 }
 
 @Untraversable
 class SortedFunction extends PyBuiltinFunction {
     SortedFunction() {
-        super("sorted", "sorted(iterable, cmp=None, key=None, reverse=False) --> new sorted list");
+        super("sorted", BuiltinDocs.builtins_sorted_doc);
     }
 
     @Override
@@ -1046,9 +1034,7 @@ class SortedFunction extends PyBuiltinFunction {
 @Untraversable
 class AllFunction extends PyBuiltinFunctionNarrow {
     AllFunction() {
-        super("all", 1, 1,
-              "all(iterable) -> bool\n\n" +
-              "Return True if bool(x) is True for all values x in the iterable.");
+        super("all", 1, 1, BuiltinDocs.builtins_all_doc);
     }
 
     @Override
@@ -1069,9 +1055,7 @@ class AllFunction extends PyBuiltinFunctionNarrow {
 @Untraversable
 class AnyFunction extends PyBuiltinFunctionNarrow {
     AnyFunction() {
-        super("any", 1, 1,
-              "any(iterable) -> bool\n\n" +
-              "Return True if bool(x) is True for any x in the iterable.");
+        super("any", 1, 1, BuiltinDocs.builtins_any_doc);
     }
 
     @Override
@@ -1092,10 +1076,7 @@ class AnyFunction extends PyBuiltinFunctionNarrow {
 @Untraversable
 class FormatFunction extends PyBuiltinFunctionNarrow {
     FormatFunction() {
-        super("format", 1, 2,
-              "format(value[, format_spec]) -> string\n\n" +
-              "Returns value.__format__(format_spec)\n" +
-               "format_spec defaults to \"\"");
+        super("format", 1, 2, BuiltinDocs.builtins_format_doc);
     }
 
     @Override
@@ -1116,14 +1097,7 @@ class FormatFunction extends PyBuiltinFunctionNarrow {
 @Untraversable
 class PrintFunction extends PyBuiltinFunction {
     PrintFunction() {
-
-        super("print",
-              "print(value, ..., sep=' ', end='\\n', file=sys.stdout)\n\n" +
-              "Prints the values to a stream, or to sys.stdout by default.\n" +
-              "Optional keyword arguments:\n" +
-              "file: a file-like object (stream); defaults to the current sys.stdout.\n" +
-              "sep:  string inserted between values, default a space.\n" +
-              "end:  string appended after the last value, default a newline.\n");
+        super("print", BuiltinDocs.builtins_print_doc);
     }
 
     @Override
@@ -1191,11 +1165,7 @@ class PrintFunction extends PyBuiltinFunction {
 @Untraversable
 class MaxFunction extends PyBuiltinFunction {
     MaxFunction() {
-        super("max_min",
-              "max_min(iterable, *[, default=obj, key=func]) -> value\n" +
-              "max_min(a, b, c, ...[, key=func]) -> value\n\n" +
-              "With a single iterable argument, return its largest item.\n" +
-              "With two or more arguments, return the largest argument.");
+        super("max", BuiltinDocs.builtins_map_doc);
     }
 
     @Override
@@ -1223,11 +1193,7 @@ class MaxFunction extends PyBuiltinFunction {
 @Untraversable
 class MinFunction extends PyBuiltinFunction {
     MinFunction() {
-        super("min",
-              "min(iterable[, key=func]) -> value\n" +
-              "min(a, b, c, ...[, key=func]) -> value\n\n" +
-              "With a single iterable argument, return its smallest item.\n" +
-              "With two or more arguments, return the smallest argument.'");
+        super("min", BuiltinDocs.builtins_min_doc);
     }
 
     @Override
@@ -1253,9 +1219,7 @@ class MinFunction extends PyBuiltinFunction {
 @Untraversable
 class RoundFunction extends PyBuiltinFunction {
     RoundFunction() {
-        super("round", "round(number[, ndigits]) -> floating point number\n\n" +
-              "Round a number to a given precision in decimal digits (default 0 digits).\n" +
-              "This always returns a floating point number.  Precision may be negative.");
+        super("round", BuiltinDocs.builtins_round_doc);
     }
 
     @Override
@@ -1277,19 +1241,7 @@ class RoundFunction extends PyBuiltinFunction {
 @Untraversable
 class CompileFunction extends PyBuiltinFunction {
     CompileFunction() {
-        super("compile",
-              "compile(source, filename, mode[, flags[, dont_inherit]]) -> code object\n\n"
-              + "Compile the source string (a Python module, statement or expression)\n"
-              + "into a code object that can be executed by the exec statement or eval().\n"
-              + "The filename will be used for run-time error messages.\n"
-              + "The mode must be 'exec' to compile a module, 'single' to compile a\n"
-              + "single (interactive) statement, or 'eval' to compile an expression.\n"
-              + "The flags argument, if present, controls which future statements influence\n"
-              + "the compilation of the code.\n"
-              + "The dont_inherit argument, if non-zero, stops the compilation inheriting\n"
-              + "the effects of any future statements in effect in the code calling\n"
-              + "compile; if absent or zero these statements do influence the compilation,\n"
-              + "in addition to any features explicitly specified.");
+        super("compile", BuiltinDocs.builtins_compile_doc);
     }
 
     @Override
@@ -1381,9 +1333,7 @@ class OpenFunction extends PyBuiltinFunction {
 @Untraversable
 class NextFunction extends PyBuiltinFunction {
     NextFunction() {
-        super("next", "next(iterator[, default])\n\n"
-              + "Return the next item from the iterator. If default is given and the iterator\n"
-              + "is exhausted, it is returned instead of raising StopIteration.");
+        super("next", BuiltinDocs.builtins_next_doc);
     }
 
     @Override
@@ -1416,8 +1366,7 @@ class NextFunction extends PyBuiltinFunction {
 @Untraversable
 class BinFunction extends PyBuiltinFunction {
     BinFunction() {
-        super("bin", "bin(number)\n\n"
-              + "Return the binary representation of an integer or long integer.");
+        super("bin", BuiltinDocs.builtins_bin_doc);
     }
 
     @Override

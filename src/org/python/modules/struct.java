@@ -21,6 +21,9 @@ import org.python.core.PyTuple;
 import java.math.BigInteger;
 import org.python.core.ClassDictInit;
 import org.python.core.PyArray;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
 /**
  * This module performs conversions between Python values and C
@@ -253,39 +256,14 @@ import org.python.core.PyArray;
  * @author Finn Bock, bckfnn@pipmail.dknet.dk
  * @version struct.java,v 1.6 1999/04/17 12:04:34 fb Exp
  */
-public class struct implements ClassDictInit {
+@ExposedModule
+public class struct {
 
     /**
      * Exception raised on various occasions; argument is a
      * string describing what is wrong.
      */
     public static final PyObject error = Py.makeClass("error", exceptionNamespace(), Py.Exception);
-
-    public static String __doc__ =
-        "Functions to convert between Python values and C structs.\n" +
-        "Python strings are used to hold the data representing the C\n" +
-        "struct and also as format strings to describe the layout of\n" +
-        "data in the C struct.\n" +
-        "\n" +
-        "The optional first format char indicates byte ordering and\n" +
-        "alignment:\n" +
-        " @: native w/native alignment(default)\n" +
-        " =: native w/standard alignment\n" +
-        " <: little-endian, std. alignment\n" +
-        " >: big-endian, std. alignment\n" +
-        " !: network, std (same as >)\n" +
-        "\n" +
-        "The remaining chars indicate types of args and must match\n" +
-        "exactly; these can be preceded by a decimal repeat count:\n" +
-        " x: pad byte (no data); c:char; b:signed byte; B:unsigned byte;\n" +
-        " h:short; H:unsigned short; i:int; I:unsigned int;\n" +
-        " l:long; L:unsigned long; f:float; d:double.\n" +
-        "Special cases (preceding decimal count indicates length):\n" +
-        " s:string (array of char); p: pascal string (w. count byte).\n" +
-        "Whitespace between formats is ignored.\n" +
-        "\n" +
-        "The variable struct.error is an exception raised on errors.";
-
 
     static class FormatDef {
         char name;
@@ -984,6 +962,7 @@ public class struct implements ClassDictInit {
      * Return the size of the struct (and hence of the string)
      * corresponding to the given format.
      */
+    @ExposedFunction
     static public int calcsize(String format) {
         FormatDef[] f = whichtable(format);
         return calcsize(format, f);
@@ -995,7 +974,8 @@ public class struct implements ClassDictInit {
      * to the given format. The arguments must match the
      * values required by the format exactly.
      */
-    static public PyBytes pack(PyObject[] args) {
+    @ExposedFunction
+    static public PyBytes pack(PyObject[] args, String[] kws) {
         if (args.length < 1)
             Py.TypeError("illegal argument type for built-in operation");
 
@@ -1008,7 +988,8 @@ public class struct implements ClassDictInit {
     }
     
     // xxx - may need to consider doing a generic arg parser here
-    static public void pack_into(PyObject[] args) {
+    @ExposedFunction
+    static public void pack_into(PyObject[] args, String[] kws) {
         if (args.length < 3)
             Py.TypeError("illegal argument type for built-in operation");
         String format = args[0].toString();
@@ -1080,7 +1061,7 @@ public class struct implements ClassDictInit {
      * The string must contain exactly the amount of data required by
      * the format (i.e. len(string) must equal calcsize(fmt)).
      */
-   
+
     public static PyTuple unpack(String format, String string) {
         FormatDef[] f = whichtable(format);
         int size = calcsize(format, f);
@@ -1089,9 +1070,10 @@ public class struct implements ClassDictInit {
             throw StructError("unpack str size does not match format");
          return unpack(f, size, format, new ByteStream(string));
     }
-    
-    public static PyTuple unpack(String format, PyArray buffer) {
-        String string = buffer.tostring();
+
+    @ExposedFunction
+    public static PyTuple unpack(String format, PyObject buffer) {
+        String string = ((PyArray) buffer).tostring();
         FormatDef[] f = whichtable(format);
         int size = calcsize(format, f);
         int len = string.length();
@@ -1100,10 +1082,7 @@ public class struct implements ClassDictInit {
          return unpack(f, size, format, new ByteStream(string));
     }
     
-    public static PyTuple unpack_from(String format, String string) {
-        return unpack_from(format, string, 0);   
-    }
-        
+    @ExposedFunction(defaults = {"0"})
     public static PyTuple unpack_from(String format, String string, int offset) {
         FormatDef[] f = whichtable(format);
         int size = calcsize(format, f);
@@ -1151,7 +1130,8 @@ public class struct implements ClassDictInit {
         dict.__setitem__("__module__", new PyBytes("struct"));
         return dict;
     }
-    
+
+    @ModuleInit
     public static void classDictInit(PyObject dict) {
         dict.__setitem__("Struct", PyStruct.TYPE);
     }

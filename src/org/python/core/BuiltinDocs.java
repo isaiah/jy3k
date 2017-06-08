@@ -4,671 +4,6 @@ package org.python.core;
 
 public class BuiltinDocs {
 
-    // Docs for <module 'array' from '/usr/lib/python3.5/lib-dynload/array.cpython-35m-x86_64-linux-gnu.so'>
-    public final static String array_ArrayType_doc = 
-        "array(typecode [, initializer]) -> array\n" + 
-        "\n" + 
-        "Return a new array whose items are restricted by typecode, and\n" + 
-        "initialized from the optional initializer value, which must be a list,\n" + 
-        "string or iterable over elements of the appropriate type.\n" + 
-        "\n" + 
-        "Arrays represent basic values and behave very much like lists, except\n" + 
-        "the type of objects stored in them is constrained. The type is specified\n" + 
-        "at object creation time by using a type code, which is a single character.\n" + 
-        "The following type codes are defined:\n" + 
-        "\n" + 
-        "    Type code   C Type             Minimum size in bytes \n" + 
-        "    'b'         signed integer     1 \n" + 
-        "    'B'         unsigned integer   1 \n" + 
-        "    'u'         Unicode character  2 (see note) \n" + 
-        "    'h'         signed integer     2 \n" + 
-        "    'H'         unsigned integer   2 \n" + 
-        "    'i'         signed integer     2 \n" + 
-        "    'I'         unsigned integer   2 \n" + 
-        "    'l'         signed integer     4 \n" + 
-        "    'L'         unsigned integer   4 \n" + 
-        "    'q'         signed integer     8 (see note) \n" + 
-        "    'Q'         unsigned integer   8 (see note) \n" + 
-        "    'f'         floating point     4 \n" + 
-        "    'd'         floating point     8 \n" + 
-        "\n" + 
-        "NOTE: The 'u' typecode corresponds to Python's unicode character. On \n" + 
-        "narrow builds this is 2-bytes on wide builds this is 4-bytes.\n" + 
-        "\n" + 
-        "NOTE: The 'q' and 'Q' type codes are only available if the platform \n" + 
-        "C compiler used to build Python supports 'long long', or, on Windows, \n" + 
-        "'__int64'.\n" + 
-        "\n" + 
-        "Methods:\n" + 
-        "\n" + 
-        "append() -- append a new item to the end of the array\n" + 
-        "buffer_info() -- return information giving the current memory info\n" + 
-        "byteswap() -- byteswap all the items of the array\n" + 
-        "count() -- return number of occurrences of an object\n" + 
-        "extend() -- extend array by appending multiple elements from an iterable\n" + 
-        "fromfile() -- read items from a file object\n" + 
-        "fromlist() -- append items from the list\n" + 
-        "frombytes() -- append items from the string\n" + 
-        "index() -- return index of first occurrence of an object\n" + 
-        "insert() -- insert a new item into the array at a provided position\n" + 
-        "pop() -- remove and return item (default last)\n" + 
-        "remove() -- remove first occurrence of an object\n" + 
-        "reverse() -- reverse the order of the items in the array\n" + 
-        "tofile() -- write all items to a file object\n" + 
-        "tolist() -- return the array converted to an ordinary list\n" + 
-        "tobytes() -- return the array converted to a string\n" + 
-        "\n" + 
-        "Attributes:\n" + 
-        "\n" + 
-        "typecode -- the typecode character used to create the array\n" + 
-        "itemsize -- the length in bytes of one array item\n" + 
-        "";
-
-    public final static String array_doc = 
-        "This module defines an object type which can efficiently represent\n" + 
-        "an array of basic values: characters, integers, floating point\n" + 
-        "numbers.  Arrays are sequence types and behave very much like lists,\n" + 
-        "except that the type of objects stored in them is constrained.\n" + 
-        "";
-
-    public final static String array___file___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String array___loader___doc = 
-        "Loader for extension modules.\n" + 
-        "\n" + 
-        "    The constructor is designed to work with FileFinder.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String array___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String array___package___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String array___spec___doc = 
-        "The specification for a module, used for loading.\n" + 
-        "\n" + 
-        "    A module's spec is the source for information about the module.  For\n" + 
-        "    data associated with the module, including source, use the spec's\n" + 
-        "    loader.\n" + 
-        "\n" + 
-        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
-        "    to use when loading the module.  `parent` is the name of the\n" + 
-        "    package the module is in.  The parent is derived from the name.\n" + 
-        "\n" + 
-        "    `is_package` determines if the module is considered a package or\n" + 
-        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
-        "\n" + 
-        "    `origin` is the specific location used by the loader from which to\n" + 
-        "    load the module, if that information is available.  When filename is\n" + 
-        "    set, origin will match.\n" + 
-        "\n" + 
-        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
-        "    When this is True, `__file__` attribute of the module is set.\n" + 
-        "\n" + 
-        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
-        "    corresponds to the `__cached__` attribute.\n" + 
-        "\n" + 
-        "    `submodule_search_locations` is the sequence of path entries to\n" + 
-        "    search when importing submodules.  If set, is_package should be\n" + 
-        "    True--and False otherwise.\n" + 
-        "\n" + 
-        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
-        "    has a non-None value in `submodule_search_locations`, the import\n" + 
-        "    system will consider modules loaded from the spec as packages.\n" + 
-        "\n" + 
-        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
-        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String array__array_reconstructor_doc = 
-        "Internal. Used for pickling support.";
-
-    public final static String array_array_doc = 
-        "array(typecode [, initializer]) -> array\n" + 
-        "\n" + 
-        "Return a new array whose items are restricted by typecode, and\n" + 
-        "initialized from the optional initializer value, which must be a list,\n" + 
-        "string or iterable over elements of the appropriate type.\n" + 
-        "\n" + 
-        "Arrays represent basic values and behave very much like lists, except\n" + 
-        "the type of objects stored in them is constrained. The type is specified\n" + 
-        "at object creation time by using a type code, which is a single character.\n" + 
-        "The following type codes are defined:\n" + 
-        "\n" + 
-        "    Type code   C Type             Minimum size in bytes \n" + 
-        "    'b'         signed integer     1 \n" + 
-        "    'B'         unsigned integer   1 \n" + 
-        "    'u'         Unicode character  2 (see note) \n" + 
-        "    'h'         signed integer     2 \n" + 
-        "    'H'         unsigned integer   2 \n" + 
-        "    'i'         signed integer     2 \n" + 
-        "    'I'         unsigned integer   2 \n" + 
-        "    'l'         signed integer     4 \n" + 
-        "    'L'         unsigned integer   4 \n" + 
-        "    'q'         signed integer     8 (see note) \n" + 
-        "    'Q'         unsigned integer   8 (see note) \n" + 
-        "    'f'         floating point     4 \n" + 
-        "    'd'         floating point     8 \n" + 
-        "\n" + 
-        "NOTE: The 'u' typecode corresponds to Python's unicode character. On \n" + 
-        "narrow builds this is 2-bytes on wide builds this is 4-bytes.\n" + 
-        "\n" + 
-        "NOTE: The 'q' and 'Q' type codes are only available if the platform \n" + 
-        "C compiler used to build Python supports 'long long', or, on Windows, \n" + 
-        "'__int64'.\n" + 
-        "\n" + 
-        "Methods:\n" + 
-        "\n" + 
-        "append() -- append a new item to the end of the array\n" + 
-        "buffer_info() -- return information giving the current memory info\n" + 
-        "byteswap() -- byteswap all the items of the array\n" + 
-        "count() -- return number of occurrences of an object\n" + 
-        "extend() -- extend array by appending multiple elements from an iterable\n" + 
-        "fromfile() -- read items from a file object\n" + 
-        "fromlist() -- append items from the list\n" + 
-        "frombytes() -- append items from the string\n" + 
-        "index() -- return index of first occurrence of an object\n" + 
-        "insert() -- insert a new item into the array at a provided position\n" + 
-        "pop() -- remove and return item (default last)\n" + 
-        "remove() -- remove first occurrence of an object\n" + 
-        "reverse() -- reverse the order of the items in the array\n" + 
-        "tofile() -- write all items to a file object\n" + 
-        "tolist() -- return the array converted to an ordinary list\n" + 
-        "tobytes() -- return the array converted to a string\n" + 
-        "\n" + 
-        "Attributes:\n" + 
-        "\n" + 
-        "typecode -- the typecode character used to create the array\n" + 
-        "itemsize -- the length in bytes of one array item\n" + 
-        "";
-
-    public final static String array_typecodes_doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    // Docs for <module 'csv' from '/usr/lib/python3.5/csv.py'>
-    public final static String csv_Dialect_doc = 
-        "Describe a CSV dialect.\n" + 
-        "\n" + 
-        "    This must be subclassed (see csv.excel).  Valid attributes are:\n" + 
-        "    delimiter, quotechar, escapechar, doublequote, skipinitialspace,\n" + 
-        "    lineterminator, quoting.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String csv_DictReader_doc = 
-        "";
-
-    public final static String csv_DictWriter_doc = 
-        "";
-
-    public final static String csv_Error_doc = 
-        "";
-
-    public final static String csv_QUOTE_ALL_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String csv_QUOTE_MINIMAL_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String csv_QUOTE_NONE_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String csv_QUOTE_NONNUMERIC_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String csv_Sniffer_doc = 
-        "\n" + 
-        "    \"Sniffs\" the format of a CSV file (i.e. delimiter, quotechar)\n" + 
-        "    Returns a Dialect object.\n" + 
-        "    ";
-
-    public final static String csv_StringIO_doc = 
-        "Text I/O implementation using an in-memory buffer.\n" + 
-        "\n" + 
-        "The initial_value argument sets the value of object.  The newline\n" + 
-        "argument is like the one of TextIOWrapper's constructor.";
-
-    public final static String csv__Dialect_doc = 
-        "CSV dialect\n" + 
-        "\n" + 
-        "The Dialect type records CSV parsing and generation options.\n" + 
-        "";
-
-    public final static String csv___all___doc = 
-        "list() -> new empty list\n" + 
-        "list(iterable) -> new list initialized from iterable's items";
-
-    public final static String csv___builtins___doc = 
-        "dict() -> new empty dictionary\n" + 
-        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
-        "    (key, value) pairs\n" + 
-        "dict(iterable) -> new dictionary initialized as if via:\n" + 
-        "    d = {}\n" + 
-        "    for k, v in iterable:\n" + 
-        "        d[k] = v\n" + 
-        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
-        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
-
-    public final static String csv___cached___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String csv_doc = 
-        "CSV parsing and writing.\n" + 
-        "\n" + 
-        "This module provides classes that assist in the reading and writing\n" + 
-        "of Comma Separated Value (CSV) files, and implements the interface\n" + 
-        "described by PEP 305.  Although many CSV files are simple to parse,\n" + 
-        "the format is not formally defined by a stable specification and\n" + 
-        "is subtle enough that parsing lines of a CSV file with something\n" + 
-        "like line.split(\",\") is bound to fail.  The module supports three\n" + 
-        "basic APIs: reading, writing, and registration of dialects.\n" + 
-        "\n" + 
-        "\n" + 
-        "DIALECT REGISTRATION:\n" + 
-        "\n" + 
-        "Readers and writers support a dialect argument, which is a convenient\n" + 
-        "handle on a group of settings.  When the dialect argument is a string,\n" + 
-        "it identifies one of the dialects previously registered with the module.\n" + 
-        "If it is a class or instance, the attributes of the argument are used as\n" + 
-        "the settings for the reader or writer:\n" + 
-        "\n" + 
-        "    class excel:\n" + 
-        "        delimiter = ','\n" + 
-        "        quotechar = '\"'\n" + 
-        "        escapechar = None\n" + 
-        "        doublequote = True\n" + 
-        "        skipinitialspace = False\n" + 
-        "        lineterminator = '\\r\\n'\n" + 
-        "        quoting = QUOTE_MINIMAL\n" + 
-        "\n" + 
-        "SETTINGS:\n" + 
-        "\n" + 
-        "    * quotechar - specifies a one-character string to use as the \n" + 
-        "        quoting character.  It defaults to '\"'.\n" + 
-        "    * delimiter - specifies a one-character string to use as the \n" + 
-        "        field separator.  It defaults to ','.\n" + 
-        "    * skipinitialspace - specifies how to interpret whitespace which\n" + 
-        "        immediately follows a delimiter.  It defaults to False, which\n" + 
-        "        means that whitespace immediately following a delimiter is part\n" + 
-        "        of the following field.\n" + 
-        "    * lineterminator -  specifies the character sequence which should \n" + 
-        "        terminate rows.\n" + 
-        "    * quoting - controls when quotes should be generated by the writer.\n" + 
-        "        It can take on any of the following module constants:\n" + 
-        "\n" + 
-        "        csv.QUOTE_MINIMAL means only when required, for example, when a\n" + 
-        "            field contains either the quotechar or the delimiter\n" + 
-        "        csv.QUOTE_ALL means that quotes are always placed around fields.\n" + 
-        "        csv.QUOTE_NONNUMERIC means that quotes are always placed around\n" + 
-        "            fields which do not parse as integers or floating point\n" + 
-        "            numbers.\n" + 
-        "        csv.QUOTE_NONE means that quotes are never placed around fields.\n" + 
-        "    * escapechar - specifies a one-character string used to escape \n" + 
-        "        the delimiter when quoting is set to QUOTE_NONE.\n" + 
-        "    * doublequote - controls the handling of quotes inside fields.  When\n" + 
-        "        True, two consecutive quotes are interpreted as one during read,\n" + 
-        "        and when writing, each quote character embedded in the data is\n" + 
-        "        written as two quotes\n" + 
-        "";
-
-    public final static String csv___file___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String csv___loader___doc = 
-        "Concrete implementation of SourceLoader using the file system.";
-
-    public final static String csv___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String csv___package___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String csv___spec___doc = 
-        "The specification for a module, used for loading.\n" + 
-        "\n" + 
-        "    A module's spec is the source for information about the module.  For\n" + 
-        "    data associated with the module, including source, use the spec's\n" + 
-        "    loader.\n" + 
-        "\n" + 
-        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
-        "    to use when loading the module.  `parent` is the name of the\n" + 
-        "    package the module is in.  The parent is derived from the name.\n" + 
-        "\n" + 
-        "    `is_package` determines if the module is considered a package or\n" + 
-        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
-        "\n" + 
-        "    `origin` is the specific location used by the loader from which to\n" + 
-        "    load the module, if that information is available.  When filename is\n" + 
-        "    set, origin will match.\n" + 
-        "\n" + 
-        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
-        "    When this is True, `__file__` attribute of the module is set.\n" + 
-        "\n" + 
-        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
-        "    corresponds to the `__cached__` attribute.\n" + 
-        "\n" + 
-        "    `submodule_search_locations` is the sequence of path entries to\n" + 
-        "    search when importing submodules.  If set, is_package should be\n" + 
-        "    True--and False otherwise.\n" + 
-        "\n" + 
-        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
-        "    has a non-None value in `submodule_search_locations`, the import\n" + 
-        "    system will consider modules loaded from the spec as packages.\n" + 
-        "\n" + 
-        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
-        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String csv___version___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String csv_excel_doc = 
-        "Describe the usual properties of Excel-generated CSV files.";
-
-    public final static String csv_excel_tab_doc = 
-        "Describe the usual properties of Excel-generated TAB-delimited files.";
-
-    public final static String csv_field_size_limit_doc = 
-        "Sets an upper limit on parsed fields.\n" + 
-        "    csv.field_size_limit([limit])\n" + 
-        "\n" + 
-        "Returns old limit. If limit is not given, no new limit is set and\n" + 
-        "the old limit is returned";
-
-    public final static String csv_get_dialect_doc = 
-        "Return the dialect instance associated with name.\n" + 
-        "    dialect = csv.get_dialect(name)";
-
-    public final static String csv_list_dialects_doc = 
-        "Return a list of all know dialect names.\n" + 
-        "    names = csv.list_dialects()";
-
-    public final static String csv_re_doc = 
-        "Support for regular expressions (RE).\n" + 
-        "\n" + 
-        "This module provides regular expression matching operations similar to\n" + 
-        "those found in Perl.  It supports both 8-bit and Unicode strings; both\n" + 
-        "the pattern and the strings being processed can contain null bytes and\n" + 
-        "characters outside the US ASCII range.\n" + 
-        "\n" + 
-        "Regular expressions can contain both special and ordinary characters.\n" + 
-        "Most ordinary characters, like \"A\", \"a\", or \"0\", are the simplest\n" + 
-        "regular expressions; they simply match themselves.  You can\n" + 
-        "concatenate ordinary characters, so last matches the string 'last'.\n" + 
-        "\n" + 
-        "The special characters are:\n" + 
-        "    \".\"      Matches any character except a newline.\n" + 
-        "    \"^\"      Matches the start of the string.\n" + 
-        "    \"$\"      Matches the end of the string or just before the newline at\n" + 
-        "             the end of the string.\n" + 
-        "    \"*\"      Matches 0 or more (greedy) repetitions of the preceding RE.\n" + 
-        "             Greedy means that it will match as many repetitions as possible.\n" + 
-        "    \"+\"      Matches 1 or more (greedy) repetitions of the preceding RE.\n" + 
-        "    \"?\"      Matches 0 or 1 (greedy) of the preceding RE.\n" + 
-        "    *?,+?,?? Non-greedy versions of the previous three special characters.\n" + 
-        "    {m,n}    Matches from m to n repetitions of the preceding RE.\n" + 
-        "    {m,n}?   Non-greedy version of the above.\n" + 
-        "    \"\\\\\"     Either escapes special characters or signals a special sequence.\n" + 
-        "    []       Indicates a set of characters.\n" + 
-        "             A \"^\" as the first character indicates a complementing set.\n" + 
-        "    \"|\"      A|B, creates an RE that will match either A or B.\n" + 
-        "    (...)    Matches the RE inside the parentheses.\n" + 
-        "             The contents can be retrieved or matched later in the string.\n" + 
-        "    (?aiLmsux) Set the A, I, L, M, S, U, or X flag for the RE (see below).\n" + 
-        "    (?:...)  Non-grouping version of regular parentheses.\n" + 
-        "    (?P<name>...) The substring matched by the group is accessible by name.\n" + 
-        "    (?P=name)     Matches the text matched earlier by the group named name.\n" + 
-        "    (?#...)  A comment; ignored.\n" + 
-        "    (?=...)  Matches if ... matches next, but doesn't consume the string.\n" + 
-        "    (?!...)  Matches if ... doesn't match next.\n" + 
-        "    (?<=...) Matches if preceded by ... (must be fixed length).\n" + 
-        "    (?<!...) Matches if not preceded by ... (must be fixed length).\n" + 
-        "    (?(id/name)yes|no) Matches yes pattern if the group with id/name matched,\n" + 
-        "                       the (optional) no pattern otherwise.\n" + 
-        "\n" + 
-        "The special sequences consist of \"\\\\\" and a character from the list\n" + 
-        "below.  If the ordinary character is not on the list, then the\n" + 
-        "resulting RE will match the second character.\n" + 
-        "    \\number  Matches the contents of the group of the same number.\n" + 
-        "    \\A       Matches only at the start of the string.\n" + 
-        "    \\Z       Matches only at the end of the string.\n" + 
-        "    \\b       Matches the empty string, but only at the start or end of a word.\n" + 
-        "    \\B       Matches the empty string, but not at the start or end of a word.\n" + 
-        "    \\d       Matches any decimal digit; equivalent to the set [0-9] in\n" + 
-        "             bytes patterns or string patterns with the ASCII flag.\n" + 
-        "             In string patterns without the ASCII flag, it will match the whole\n" + 
-        "             range of Unicode digits.\n" + 
-        "    \\D       Matches any non-digit character; equivalent to [^\\d].\n" + 
-        "    \\s       Matches any whitespace character; equivalent to [ \\t\\n\\r\\f\\v] in\n" + 
-        "             bytes patterns or string patterns with the ASCII flag.\n" + 
-        "             In string patterns without the ASCII flag, it will match the whole\n" + 
-        "             range of Unicode whitespace characters.\n" + 
-        "    \\S       Matches any non-whitespace character; equivalent to [^\\s].\n" + 
-        "    \\w       Matches any alphanumeric character; equivalent to [a-zA-Z0-9_]\n" + 
-        "             in bytes patterns or string patterns with the ASCII flag.\n" + 
-        "             In string patterns without the ASCII flag, it will match the\n" + 
-        "             range of Unicode alphanumeric characters (letters plus digits\n" + 
-        "             plus underscore).\n" + 
-        "             With LOCALE, it will match the set [0-9_] plus characters defined\n" + 
-        "             as letters for the current locale.\n" + 
-        "    \\W       Matches the complement of \\w.\n" + 
-        "    \\\\       Matches a literal backslash.\n" + 
-        "\n" + 
-        "This module exports the following functions:\n" + 
-        "    match     Match a regular expression pattern to the beginning of a string.\n" + 
-        "    fullmatch Match a regular expression pattern to all of a string.\n" + 
-        "    search    Search a string for the presence of a pattern.\n" + 
-        "    sub       Substitute occurrences of a pattern found in a string.\n" + 
-        "    subn      Same as sub, but also return the number of substitutions made.\n" + 
-        "    split     Split a string by the occurrences of a pattern.\n" + 
-        "    findall   Find all occurrences of a pattern in a string.\n" + 
-        "    finditer  Return an iterator yielding a match object for each match.\n" + 
-        "    compile   Compile a pattern into a RegexObject.\n" + 
-        "    purge     Clear the regular expression cache.\n" + 
-        "    escape    Backslash all non-alphanumerics in a string.\n" + 
-        "\n" + 
-        "Some of the functions in this module takes flags as optional parameters:\n" + 
-        "    A  ASCII       For string patterns, make \\w, \\W, \\b, \\B, \\d, \\D\n" + 
-        "                   match the corresponding ASCII character categories\n" + 
-        "                   (rather than the whole Unicode categories, which is the\n" + 
-        "                   default).\n" + 
-        "                   For bytes patterns, this flag is the only available\n" + 
-        "                   behaviour and needn't be specified.\n" + 
-        "    I  IGNORECASE  Perform case-insensitive matching.\n" + 
-        "    L  LOCALE      Make \\w, \\W, \\b, \\B, dependent on the current locale.\n" + 
-        "    M  MULTILINE   \"^\" matches the beginning of lines (after a newline)\n" + 
-        "                   as well as the string.\n" + 
-        "                   \"$\" matches the end of lines (before a newline) as well\n" + 
-        "                   as the end of the string.\n" + 
-        "    S  DOTALL      \".\" matches any character at all, including the newline.\n" + 
-        "    X  VERBOSE     Ignore whitespace and comments for nicer looking RE's.\n" + 
-        "    U  UNICODE     For compatibility only. Ignored for string patterns (it\n" + 
-        "                   is the default), and forbidden for bytes patterns.\n" + 
-        "\n" + 
-        "This module also defines an exception 'error'.\n" + 
-        "\n" + 
-        "";
-
-    public final static String csv_reader_doc = 
-        "    csv_reader = reader(iterable [, dialect='excel']\n" + 
-        "                        [optional keyword args])\n" + 
-        "    for row in csv_reader:\n" + 
-        "        process(row)\n" + 
-        "\n" + 
-        "The \"iterable\" argument can be any object that returns a line\n" + 
-        "of input for each iteration, such as a file object or a list.  The\n" + 
-        "optional \"dialect\" parameter is discussed below.  The function\n" + 
-        "also accepts optional keyword arguments which override settings\n" + 
-        "provided by the dialect.\n" + 
-        "\n" + 
-        "The returned object is an iterator.  Each iteration returns a row\n" + 
-        "of the CSV file (which can span multiple input lines).\n" + 
-        "";
-
-    public final static String csv_register_dialect_doc = 
-        "Create a mapping from a string name to a dialect class.\n" + 
-        "    dialect = csv.register_dialect(name[, dialect[, **fmtparams]])";
-
-    public final static String csv_unix_dialect_doc = 
-        "Describe the usual properties of Unix-generated CSV files.";
-
-    public final static String csv_unregister_dialect_doc = 
-        "Delete the name/dialect mapping associated with a string name.\n" + 
-        "    csv.unregister_dialect(name)";
-
-    public final static String csv_writer_doc = 
-        "    csv_writer = csv.writer(fileobj [, dialect='excel']\n" + 
-        "                            [optional keyword args])\n" + 
-        "    for row in sequence:\n" + 
-        "        csv_writer.writerow(row)\n" + 
-        "\n" + 
-        "    [or]\n" + 
-        "\n" + 
-        "    csv_writer = csv.writer(fileobj [, dialect='excel']\n" + 
-        "                            [optional keyword args])\n" + 
-        "    csv_writer.writerows(rows)\n" + 
-        "\n" + 
-        "The \"fileobj\" argument can be any object that supports the file API.\n" + 
-        "";
-
     // Docs for <module 'builtins' (built-in)>
     public final static String builtins_ArithmeticError_doc = 
         "Base class for arithmetic errors.";
@@ -780,6 +115,9 @@ public class BuiltinDocs {
 
     public final static String builtins_MemoryError_doc = 
         "Out of memory.";
+
+    public final static String builtins_ModuleNotFoundError_doc = 
+        "Module not found.";
 
     public final static String builtins_NameError_doc = 
         "Name not found globally.";
@@ -1078,8 +416,9 @@ public class BuiltinDocs {
         "To declare a class method, use this idiom:\n" + 
         "\n" + 
         "  class C:\n" + 
-        "      def f(cls, arg1, arg2, ...): ...\n" + 
-        "      f = classmethod(f)\n" + 
+        "      @classmethod\n" + 
+        "      def f(cls, arg1, arg2, ...):\n" + 
+        "          ...\n" + 
         "\n" + 
         "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
         "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
@@ -1572,7 +911,7 @@ public class BuiltinDocs {
     public final static String builtins_sorted_doc = 
         "Return a new list containing all items from the iterable in ascending order.\n" + 
         "\n" + 
-        "A custom key function can be supplied to customise the sort order, and the\n" + 
+        "A custom key function can be supplied to customize the sort order, and the\n" + 
         "reverse flag can be set to request the result in descending order.";
 
     public final static String builtins_staticmethod_doc = 
@@ -1584,8 +923,9 @@ public class BuiltinDocs {
         "To declare a static method, use this idiom:\n" + 
         "\n" + 
         "     class C:\n" + 
-        "     def f(arg1, arg2, ...): ...\n" + 
-        "     f = staticmethod(f)\n" + 
+        "         @staticmethod\n" + 
+        "         def f(arg1, arg2, ...):\n" + 
+        "             ...\n" + 
         "\n" + 
         "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
         "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
@@ -1690,6 +1030,13 @@ public class BuiltinDocs {
     public final static String object___init___doc = 
         "Initialize self.  See help(type(self)) for accurate signature.";
 
+    public final static String object___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
     public final static String object___le___doc = 
         "Return self<=value.";
 
@@ -1730,445 +1077,20 @@ public class BuiltinDocs {
         "overrides the normal algorithm (and the outcome is cached).\n" + 
         "";
 
-    // Docs for <module 'time' (built-in)>
-    public final static String time_CLOCK_MONOTONIC_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_CLOCK_MONOTONIC_RAW_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_CLOCK_PROCESS_CPUTIME_ID_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_CLOCK_REALTIME_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_CLOCK_THREAD_CPUTIME_ID_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time__STRUCT_TM_ITEMS_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_doc = 
-        "This module provides various functions to manipulate time values.\n" + 
-        "\n" + 
-        "There are two standard representations of time.  One is the number\n" + 
-        "of seconds since the Epoch, in UTC (a.k.a. GMT).  It may be an integer\n" + 
-        "or a floating point number (to represent fractions of seconds).\n" + 
-        "The Epoch is system-defined; on Unix, it is generally January 1st, 1970.\n" + 
-        "The actual value can be retrieved by calling gmtime(0).\n" + 
-        "\n" + 
-        "The other representation is a tuple of 9 integers giving local time.\n" + 
-        "The tuple items are:\n" + 
-        "  year (including century, e.g. 1998)\n" + 
-        "  month (1-12)\n" + 
-        "  day (1-31)\n" + 
-        "  hours (0-23)\n" + 
-        "  minutes (0-59)\n" + 
-        "  seconds (0-59)\n" + 
-        "  weekday (0-6, Monday is 0)\n" + 
-        "  Julian day (day in the year, 1-366)\n" + 
-        "  DST (Daylight Savings Time) flag (-1, 0 or 1)\n" + 
-        "If the DST flag is 0, the time is given in the regular time zone;\n" + 
-        "if it is 1, the time is given in the DST time zone;\n" + 
-        "if it is -1, mktime() should guess based on the date and time.\n" + 
-        "\n" + 
-        "Variables:\n" + 
-        "\n" + 
-        "timezone -- difference in seconds between UTC and local standard time\n" + 
-        "altzone -- difference in  seconds between UTC and local DST time\n" + 
-        "daylight -- whether local time should reflect DST\n" + 
-        "tzname -- tuple of (standard time zone name, DST time zone name)\n" + 
-        "\n" + 
-        "Functions:\n" + 
-        "\n" + 
-        "time() -- return current time in seconds since the Epoch as a float\n" + 
-        "clock() -- return CPU time since process start as a float\n" + 
-        "sleep() -- delay for a number of seconds given as a float\n" + 
-        "gmtime() -- convert seconds since Epoch to UTC tuple\n" + 
-        "localtime() -- convert seconds since Epoch to local time tuple\n" + 
-        "asctime() -- convert time tuple to string\n" + 
-        "ctime() -- convert time in seconds to string\n" + 
-        "mktime() -- convert local time tuple to seconds since Epoch\n" + 
-        "strftime() -- convert time tuple to string according to format specification\n" + 
-        "strptime() -- parse string to time tuple according to format specification\n" + 
-        "tzset() -- change the local timezone";
-
-    public final static String time___loader___doc = 
-        "Meta path import for built-in modules.\n" + 
-        "\n" + 
-        "    All methods are either class or static methods to avoid the need to\n" + 
-        "    instantiate the class.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String time___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String time___package___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String time___spec___doc = 
-        "The specification for a module, used for loading.\n" + 
-        "\n" + 
-        "    A module's spec is the source for information about the module.  For\n" + 
-        "    data associated with the module, including source, use the spec's\n" + 
-        "    loader.\n" + 
-        "\n" + 
-        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
-        "    to use when loading the module.  `parent` is the name of the\n" + 
-        "    package the module is in.  The parent is derived from the name.\n" + 
-        "\n" + 
-        "    `is_package` determines if the module is considered a package or\n" + 
-        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
-        "\n" + 
-        "    `origin` is the specific location used by the loader from which to\n" + 
-        "    load the module, if that information is available.  When filename is\n" + 
-        "    set, origin will match.\n" + 
-        "\n" + 
-        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
-        "    When this is True, `__file__` attribute of the module is set.\n" + 
-        "\n" + 
-        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
-        "    corresponds to the `__cached__` attribute.\n" + 
-        "\n" + 
-        "    `submodule_search_locations` is the sequence of path entries to\n" + 
-        "    search when importing submodules.  If set, is_package should be\n" + 
-        "    True--and False otherwise.\n" + 
-        "\n" + 
-        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
-        "    has a non-None value in `submodule_search_locations`, the import\n" + 
-        "    system will consider modules loaded from the spec as packages.\n" + 
-        "\n" + 
-        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
-        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String time_altzone_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_asctime_doc = 
-        "asctime([tuple]) -> string\n" + 
-        "\n" + 
-        "Convert a time tuple to a string, e.g. 'Sat Jun 06 16:26:11 1998'.\n" + 
-        "When the time tuple is not present, current time as returned by localtime()\n" + 
-        "is used.";
-
-    public final static String time_clock_doc = 
-        "clock() -> floating point number\n" + 
-        "\n" + 
-        "Return the CPU time or real time since the start of the process or since\n" + 
-        "the first call to clock().  This has as much precision as the system\n" + 
-        "records.";
-
-    public final static String time_clock_getres_doc = 
-        "clock_getres(clk_id) -> floating point number\n" + 
-        "\n" + 
-        "Return the resolution (precision) of the specified clock clk_id.";
-
-    public final static String time_clock_gettime_doc = 
-        "clock_gettime(clk_id) -> floating point number\n" + 
-        "\n" + 
-        "Return the time of the specified clock clk_id.";
-
-    public final static String time_clock_settime_doc = 
-        "clock_settime(clk_id, time)\n" + 
-        "\n" + 
-        "Set the time of the specified clock clk_id.";
-
-    public final static String time_ctime_doc = 
-        "ctime(seconds) -> string\n" + 
-        "\n" + 
-        "Convert a time in seconds since the Epoch to a string in local time.\n" + 
-        "This is equivalent to asctime(localtime(seconds)). When the time tuple is\n" + 
-        "not present, current time as returned by localtime() is used.";
-
-    public final static String time_daylight_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_get_clock_info_doc = 
-        "get_clock_info(name: str) -> dict\n" + 
-        "\n" + 
-        "Get information of the specified clock.";
-
-    public final static String time_gmtime_doc = 
-        "gmtime([seconds]) -> (tm_year, tm_mon, tm_mday, tm_hour, tm_min,\n" + 
-        "                       tm_sec, tm_wday, tm_yday, tm_isdst)\n" + 
-        "\n" + 
-        "Convert seconds since the Epoch to a time tuple expressing UTC (a.k.a.\n" + 
-        "GMT).  When 'seconds' is not passed in, convert the current time instead.\n" + 
-        "\n" + 
-        "If the platform supports the tm_gmtoff and tm_zone, they are available as\n" + 
-        "attributes only.";
-
-    public final static String time_localtime_doc = 
-        "localtime([seconds]) -> (tm_year,tm_mon,tm_mday,tm_hour,tm_min,\n" + 
-        "                          tm_sec,tm_wday,tm_yday,tm_isdst)\n" + 
-        "\n" + 
-        "Convert seconds since the Epoch to a time tuple expressing local time.\n" + 
-        "When 'seconds' is not passed in, convert the current time instead.";
-
-    public final static String time_mktime_doc = 
-        "mktime(tuple) -> floating point number\n" + 
-        "\n" + 
-        "Convert a time tuple in local time to seconds since the Epoch.\n" + 
-        "Note that mktime(gmtime(0)) will not generally return zero for most\n" + 
-        "time zones; instead the returned value will either be equal to that\n" + 
-        "of the timezone or altzone attributes on the time module.";
-
-    public final static String time_monotonic_doc = 
-        "monotonic() -> float\n" + 
-        "\n" + 
-        "Monotonic clock, cannot go backward.";
-
-    public final static String time_perf_counter_doc = 
-        "perf_counter() -> float\n" + 
-        "\n" + 
-        "Performance counter for benchmarking.";
-
-    public final static String time_process_time_doc = 
-        "process_time() -> float\n" + 
-        "\n" + 
-        "Process time for profiling: sum of the kernel and user-space CPU time.";
-
-    public final static String time_sleep_doc = 
-        "sleep(seconds)\n" + 
-        "\n" + 
-        "Delay execution for a given number of seconds.  The argument may be\n" + 
-        "a floating point number for subsecond precision.";
-
-    public final static String time_strftime_doc = 
-        "strftime(format[, tuple]) -> string\n" + 
-        "\n" + 
-        "Convert a time tuple to a string according to a format specification.\n" + 
-        "See the library reference manual for formatting codes. When the time tuple\n" + 
-        "is not present, current time as returned by localtime() is used.\n" + 
-        "\n" + 
-        "Commonly used format codes:\n" + 
-        "\n" + 
-        "%Y  Year with century as a decimal number.\n" + 
-        "%m  Month as a decimal number [01,12].\n" + 
-        "%d  Day of the month as a decimal number [01,31].\n" + 
-        "%H  Hour (24-hour clock) as a decimal number [00,23].\n" + 
-        "%M  Minute as a decimal number [00,59].\n" + 
-        "%S  Second as a decimal number [00,61].\n" + 
-        "%z  Time zone offset from UTC.\n" + 
-        "%a  Locale's abbreviated weekday name.\n" + 
-        "%A  Locale's full weekday name.\n" + 
-        "%b  Locale's abbreviated month name.\n" + 
-        "%B  Locale's full month name.\n" + 
-        "%c  Locale's appropriate date and time representation.\n" + 
-        "%I  Hour (12-hour clock) as a decimal number [01,12].\n" + 
-        "%p  Locale's equivalent of either AM or PM.\n" + 
-        "\n" + 
-        "Other codes may be available on your platform.  See documentation for\n" + 
-        "the C library strftime function.\n" + 
+    // Docs for <class 'type'>
+    public final static String type___abstractmethods___doc = 
         "";
 
-    public final static String time_strptime_doc = 
-        "strptime(string, format) -> struct_time\n" + 
-        "\n" + 
-        "Parse a string to a time tuple according to a format specification.\n" + 
-        "See the library reference manual for formatting codes (same as\n" + 
-        "strftime()).\n" + 
-        "\n" + 
-        "Commonly used format codes:\n" + 
-        "\n" + 
-        "%Y  Year with century as a decimal number.\n" + 
-        "%m  Month as a decimal number [01,12].\n" + 
-        "%d  Day of the month as a decimal number [01,31].\n" + 
-        "%H  Hour (24-hour clock) as a decimal number [00,23].\n" + 
-        "%M  Minute as a decimal number [00,59].\n" + 
-        "%S  Second as a decimal number [00,61].\n" + 
-        "%z  Time zone offset from UTC.\n" + 
-        "%a  Locale's abbreviated weekday name.\n" + 
-        "%A  Locale's full weekday name.\n" + 
-        "%b  Locale's abbreviated month name.\n" + 
-        "%B  Locale's full month name.\n" + 
-        "%c  Locale's appropriate date and time representation.\n" + 
-        "%I  Hour (12-hour clock) as a decimal number [01,12].\n" + 
-        "%p  Locale's equivalent of either AM or PM.\n" + 
-        "\n" + 
-        "Other codes may be available on your platform.  See documentation for\n" + 
-        "the C library strftime function.\n" + 
-        "";
+    public final static String type___base___doc = 
+        "The most base type";
 
-    public final static String time_struct_time_doc = 
-        "The time value as returned by gmtime(), localtime(), and strptime(), and\n" + 
-        " accepted by asctime(), mktime() and strftime().  May be considered as a\n" + 
-        " sequence of 9 integers.\n" + 
-        "\n" + 
-        " Note that several fields' values are not the same as those defined by\n" + 
-        " the C language standard for struct tm.  For example, the value of the\n" + 
-        " field tm_year is the actual year, not year - 1900.  See individual\n" + 
-        " fields' descriptions for details.";
-
-    public final static String time_time_doc = 
-        "time() -> floating point number\n" + 
-        "\n" + 
-        "Return the current time in seconds since the Epoch.\n" + 
-        "Fractions of a second may be present if the system clock provides them.";
-
-    public final static String time_timezone_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String time_tzname_doc = 
+    public final static String type___bases___doc = 
         "tuple() -> empty tuple\n" + 
         "tuple(iterable) -> tuple initialized from iterable's items\n" + 
         "\n" + 
         "If the argument is a tuple, the return value is the same object.";
 
-    public final static String time_tzset_doc = 
-        "tzset()\n" + 
-        "\n" + 
-        "Initialize, or reinitialize, the local timezone to the value stored in\n" + 
-        "os.environ['TZ']. The TZ environment variable should be specified in\n" + 
-        "standard Unix timezone format as documented in the tzset man page\n" + 
-        "(eg. 'US/Eastern', 'Europe/Amsterdam'). Unknown timezones will silently\n" + 
-        "fall back to UTC. If the TZ environment variable is not set, the local\n" + 
-        "timezone is set to the systems best guess of wallclock time.\n" + 
-        "Changing the TZ environment variable without calling tzset *may* change\n" + 
-        "the local timezone used by methods such as localtime, but this behaviour\n" + 
-        "should not be relied on.";
-
-    // Docs for <module 'datetime' from '/usr/lib/python3.5/datetime.py'>
-    public final static String datetime_MAXYEAR_doc = 
+    public final static String type___basicsize___doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -2184,7 +1106,21 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String datetime_MINYEAR_doc = 
+    public final static String type___call___doc = 
+        "Call self as a function.";
+
+    public final static String type___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String type___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String type___dict___doc = 
+        "";
+
+    public final static String type___dictoffset___doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -2200,7 +1136,617 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String datetime___builtins___doc = 
+    public final static String type___dir___doc = 
+        "__dir__() -> list\n" + 
+        "specialized __dir__ implementation for types";
+
+    public final static String type_doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String type___eq___doc = 
+        "Return self==value.";
+
+    public final static String type___flags___doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String type___format___doc = 
+        "default object formatter";
+
+    public final static String type___ge___doc = 
+        "Return self>=value.";
+
+    public final static String type___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String type___gt___doc = 
+        "Return self>value.";
+
+    public final static String type___hash___doc = 
+        "Return hash(self).";
+
+    public final static String type___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String type___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String type___instancecheck___doc = 
+        "__instancecheck__() -> bool\n" + 
+        "check if an object is an instance";
+
+    public final static String type___itemsize___doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String type___le___doc = 
+        "Return self<=value.";
+
+    public final static String type___lt___doc = 
+        "Return self<value.";
+
+    public final static String type___module___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String type___mro___doc = 
+        "tuple() -> empty tuple\n" + 
+        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
+        "\n" + 
+        "If the argument is a tuple, the return value is the same object.";
+
+    public final static String type___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String type___ne___doc = 
+        "Return self!=value.";
+
+    public final static String type___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String type___prepare___doc = 
+        "__prepare__() -> dict\n" + 
+        "used to create the namespace for the class statement";
+
+    public final static String type___qualname___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String type___reduce___doc = 
+        "helper for pickle";
+
+    public final static String type___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String type___repr___doc = 
+        "Return repr(self).";
+
+    public final static String type___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String type___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "return memory consumption of the type object";
+
+    public final static String type___str___doc = 
+        "Return str(self).";
+
+    public final static String type___subclasscheck___doc = 
+        "__subclasscheck__() -> bool\n" + 
+        "check if a class is a subclass";
+
+    public final static String type___subclasses___doc = 
+        "__subclasses__() -> list of immediate subclasses";
+
+    public final static String type___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String type___text_signature___doc = 
+        "";
+
+    public final static String type___weakrefoffset___doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String type_mro_doc = 
+        "mro() -> list\n" + 
+        "return a type's method resolution order";
+
+    // Docs for <class 'bytes'>
+    public final static String bytes___add___doc = 
+        "Return self+value.";
+
+    public final static String bytes___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String bytes___contains___doc = 
+        "Return key in self.";
+
+    public final static String bytes___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String bytes___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String bytes_doc = 
+        "bytes(iterable_of_ints) -> bytes\n" + 
+        "bytes(string, encoding[, errors]) -> bytes\n" + 
+        "bytes(bytes_or_buffer) -> immutable copy of bytes_or_buffer\n" + 
+        "bytes(int) -> bytes object of size given by the parameter initialized with null bytes\n" + 
+        "bytes() -> empty bytes object\n" + 
+        "\n" + 
+        "Construct an immutable array of bytes from:\n" + 
+        "  - an iterable yielding integers in range(256)\n" + 
+        "  - a text string encoded using the specified encoding\n" + 
+        "  - any object implementing the buffer API.\n" + 
+        "  - an integer";
+
+    public final static String bytes___eq___doc = 
+        "Return self==value.";
+
+    public final static String bytes___format___doc = 
+        "default object formatter";
+
+    public final static String bytes___ge___doc = 
+        "Return self>=value.";
+
+    public final static String bytes___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String bytes___getitem___doc = 
+        "Return self[key].";
+
+    public final static String bytes___getnewargs___doc = 
+        "";
+
+    public final static String bytes___gt___doc = 
+        "Return self>value.";
+
+    public final static String bytes___hash___doc = 
+        "Return hash(self).";
+
+    public final static String bytes___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String bytes___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String bytes___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String bytes___le___doc = 
+        "Return self<=value.";
+
+    public final static String bytes___len___doc = 
+        "Return len(self).";
+
+    public final static String bytes___lt___doc = 
+        "Return self<value.";
+
+    public final static String bytes___mod___doc = 
+        "Return self%value.";
+
+    public final static String bytes___mul___doc = 
+        "Return self*value.n";
+
+    public final static String bytes___ne___doc = 
+        "Return self!=value.";
+
+    public final static String bytes___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String bytes___reduce___doc = 
+        "helper for pickle";
+
+    public final static String bytes___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String bytes___repr___doc = 
+        "Return repr(self).";
+
+    public final static String bytes___rmod___doc = 
+        "Return value%self.";
+
+    public final static String bytes___rmul___doc = 
+        "Return self*value.";
+
+    public final static String bytes___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String bytes___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String bytes___str___doc = 
+        "Return str(self).";
+
+    public final static String bytes___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String bytes_capitalize_doc = 
+        "B.capitalize() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with only its first character capitalized (ASCII)\n" + 
+        "and the rest lower-cased.";
+
+    public final static String bytes_center_doc = 
+        "B.center(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B centered in a string of length width.  Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String bytes_count_doc = 
+        "B.count(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the number of non-overlapping occurrences of subsection sub in\n" + 
+        "bytes B[start:end].  Optional arguments start and end are interpreted\n" + 
+        "as in slice notation.";
+
+    public final static String bytes_decode_doc = 
+        "Decode the bytes using the codec registered for encoding.\n" + 
+        "\n" + 
+        "  encoding\n" + 
+        "    The encoding with which to decode the bytes.\n" + 
+        "  errors\n" + 
+        "    The error handling scheme to use for the handling of decoding errors.\n" + 
+        "    The default is 'strict' meaning that decoding errors raise a\n" + 
+        "    UnicodeDecodeError. Other possible values are 'ignore' and 'replace'\n" + 
+        "    as well as any other name registered with codecs.register_error that\n" + 
+        "    can handle UnicodeDecodeErrors.";
+
+    public final static String bytes_endswith_doc = 
+        "B.endswith(suffix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if B ends with the specified suffix, False otherwise.\n" + 
+        "With optional start, test B beginning at that position.\n" + 
+        "With optional end, stop comparing B at that position.\n" + 
+        "suffix can also be a tuple of bytes to try.";
+
+    public final static String bytes_expandtabs_doc = 
+        "B.expandtabs(tabsize=8) -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B where all tab characters are expanded using spaces.\n" + 
+        "If tabsize is not given, a tab size of 8 characters is assumed.";
+
+    public final static String bytes_find_doc = 
+        "B.find(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the lowest index in B where subsection sub is found,\n" + 
+        "such that sub is contained within B[start,end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String bytes_fromhex_doc = 
+        "Create a bytes object from a string of hexadecimal numbers.\n" + 
+        "\n" + 
+        "Spaces between two numbers are accepted.\n" + 
+        "Example: bytes.fromhex('B9 01EF') -> b'\\\\xb9\\\\x01\\\\xef'.";
+
+    public final static String bytes_hex_doc = 
+        "B.hex() -> string\n" + 
+        "\n" + 
+        "Create a string of hexadecimal numbers from a bytes object.\n" + 
+        "Example: b'\\xb9\\x01\\xef'.hex() -> 'b901ef'.";
+
+    public final static String bytes_index_doc = 
+        "B.index(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like B.find() but raise ValueError when the subsection is not found.";
+
+    public final static String bytes_isalnum_doc = 
+        "B.isalnum() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are alphanumeric\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytes_isalpha_doc = 
+        "B.isalpha() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are alphabetic\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytes_isdigit_doc = 
+        "B.isdigit() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are digits\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytes_islower_doc = 
+        "B.islower() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in B are lowercase and there is\n" + 
+        "at least one cased character in B, False otherwise.";
+
+    public final static String bytes_isspace_doc = 
+        "B.isspace() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are whitespace\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytes_istitle_doc = 
+        "B.istitle() -> bool\n" + 
+        "\n" + 
+        "Return True if B is a titlecased string and there is at least one\n" + 
+        "character in B, i.e. uppercase characters may only follow uncased\n" + 
+        "characters and lowercase characters only cased ones. Return False\n" + 
+        "otherwise.";
+
+    public final static String bytes_isupper_doc = 
+        "B.isupper() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in B are uppercase and there is\n" + 
+        "at least one cased character in B, False otherwise.";
+
+    public final static String bytes_join_doc = 
+        "Concatenate any number of bytes objects.\n" + 
+        "\n" + 
+        "The bytes whose method is called is inserted in between each pair.\n" + 
+        "\n" + 
+        "The result is returned as a new bytes object.\n" + 
+        "\n" + 
+        "Example: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'.";
+
+    public final static String bytes_ljust_doc = 
+        "B.ljust(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B left justified in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String bytes_lower_doc = 
+        "B.lower() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with all ASCII characters converted to lowercase.";
+
+    public final static String bytes_lstrip_doc = 
+        "Strip leading bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip leading  ASCII whitespace.";
+
+    public final static String bytes_maketrans_doc = 
+        "Return a translation table useable for the bytes or bytearray translate method.\n" + 
+        "\n" + 
+        "The returned table will be one where each byte in frm is mapped to the byte at\n" + 
+        "the same position in to.\n" + 
+        "\n" + 
+        "The bytes objects frm and to must be of the same length.";
+
+    public final static String bytes_partition_doc = 
+        "Partition the bytes into three parts using the given separator.\n" + 
+        "\n" + 
+        "This will search for the separator sep in the bytes. If the separator is found,\n" + 
+        "returns a 3-tuple containing the part before the separator, the separator\n" + 
+        "itself, and the part after it.\n" + 
+        "\n" + 
+        "If the separator is not found, returns a 3-tuple containing the original bytes\n" + 
+        "object and two empty bytes objects.";
+
+    public final static String bytes_replace_doc = 
+        "Return a copy with all occurrences of substring old replaced by new.\n" + 
+        "\n" + 
+        "  count\n" + 
+        "    Maximum number of occurrences to replace.\n" + 
+        "    -1 (the default value) means replace all occurrences.\n" + 
+        "\n" + 
+        "If the optional argument count is given, only the first count occurrences are\n" + 
+        "replaced.";
+
+    public final static String bytes_rfind_doc = 
+        "B.rfind(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the highest index in B where subsection sub is found,\n" + 
+        "such that sub is contained within B[start,end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String bytes_rindex_doc = 
+        "B.rindex(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like B.rfind() but raise ValueError when the subsection is not found.";
+
+    public final static String bytes_rjust_doc = 
+        "B.rjust(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B right justified in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space)";
+
+    public final static String bytes_rpartition_doc = 
+        "Partition the bytes into three parts using the given separator.\n" + 
+        "\n" + 
+        "This will search for the separator sep in the bytes, starting and the end. If\n" + 
+        "the separator is found, returns a 3-tuple containing the part before the\n" + 
+        "separator, the separator itself, and the part after it.\n" + 
+        "\n" + 
+        "If the separator is not found, returns a 3-tuple containing two empty bytes\n" + 
+        "objects and the original bytes object.";
+
+    public final static String bytes_rsplit_doc = 
+        "Return a list of the sections in the bytes, using sep as the delimiter.\n" + 
+        "\n" + 
+        "  sep\n" + 
+        "    The delimiter according which to split the bytes.\n" + 
+        "    None (the default value) means split on ASCII whitespace characters\n" + 
+        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
+        "  maxsplit\n" + 
+        "    Maximum number of splits to do.\n" + 
+        "    -1 (the default value) means no limit.\n" + 
+        "\n" + 
+        "Splitting is done starting at the end of the bytes and working to the front.";
+
+    public final static String bytes_rstrip_doc = 
+        "Strip trailing bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip trailing ASCII whitespace.";
+
+    public final static String bytes_split_doc = 
+        "Return a list of the sections in the bytes, using sep as the delimiter.\n" + 
+        "\n" + 
+        "  sep\n" + 
+        "    The delimiter according which to split the bytes.\n" + 
+        "    None (the default value) means split on ASCII whitespace characters\n" + 
+        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
+        "  maxsplit\n" + 
+        "    Maximum number of splits to do.\n" + 
+        "    -1 (the default value) means no limit.";
+
+    public final static String bytes_splitlines_doc = 
+        "Return a list of the lines in the bytes, breaking at line boundaries.\n" + 
+        "\n" + 
+        "Line breaks are not included in the resulting list unless keepends is given and\n" + 
+        "true.";
+
+    public final static String bytes_startswith_doc = 
+        "B.startswith(prefix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if B starts with the specified prefix, False otherwise.\n" + 
+        "With optional start, test B beginning at that position.\n" + 
+        "With optional end, stop comparing B at that position.\n" + 
+        "prefix can also be a tuple of bytes to try.";
+
+    public final static String bytes_strip_doc = 
+        "Strip leading and trailing bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip leading and trailing ASCII whitespace.";
+
+    public final static String bytes_swapcase_doc = 
+        "B.swapcase() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with uppercase ASCII characters converted\n" + 
+        "to lowercase ASCII and vice versa.";
+
+    public final static String bytes_title_doc = 
+        "B.title() -> copy of B\n" + 
+        "\n" + 
+        "Return a titlecased version of B, i.e. ASCII words start with uppercase\n" + 
+        "characters, all remaining cased characters have lowercase.";
+
+    public final static String bytes_translate_doc = 
+        "Return a copy with each character mapped by the given translation table.\n" + 
+        "\n" + 
+        "  table\n" + 
+        "    Translation table, which must be a bytes object of length 256.\n" + 
+        "\n" + 
+        "All characters occurring in the optional argument delete are removed.\n" + 
+        "The remaining characters are mapped through the given translation table.";
+
+    public final static String bytes_upper_doc = 
+        "B.upper() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with all ASCII characters converted to uppercase.";
+
+    public final static String bytes_zfill_doc = 
+        "B.zfill(width) -> copy of B\n" + 
+        "\n" + 
+        "Pad a numeric string B with zeros on the left, to fill a field\n" + 
+        "of the specified width.  B is never truncated.";
+
+    // Docs for <class 'dict'>
+    public final static String dict___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String dict___contains___doc = 
+        "True if D has a key k, else False.";
+
+    public final static String dict___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String dict___delitem___doc = 
+        "Delete self[key].";
+
+    public final static String dict___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String dict_doc = 
         "dict() -> new empty dictionary\n" + 
         "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
         "    (key, value) pairs\n" + 
@@ -2211,7 +1757,1342 @@ public class BuiltinDocs {
         "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
         "    in the keyword argument list.  For example:  dict(one=1, two=2)";
 
-    public final static String datetime___cached___doc = 
+    public final static String dict___eq___doc = 
+        "Return self==value.";
+
+    public final static String dict___format___doc = 
+        "default object formatter";
+
+    public final static String dict___ge___doc = 
+        "Return self>=value.";
+
+    public final static String dict___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String dict___getitem___doc = 
+        "x.__getitem__(y) <==> x[y]";
+
+    public final static String dict___gt___doc = 
+        "Return self>value.";
+
+    public final static String dict___hash___doc = 
+        "";
+
+    public final static String dict___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String dict___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String dict___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String dict___le___doc = 
+        "Return self<=value.";
+
+    public final static String dict___len___doc = 
+        "Return len(self).";
+
+    public final static String dict___lt___doc = 
+        "Return self<value.";
+
+    public final static String dict___ne___doc = 
+        "Return self!=value.";
+
+    public final static String dict___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String dict___reduce___doc = 
+        "helper for pickle";
+
+    public final static String dict___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String dict___repr___doc = 
+        "Return repr(self).";
+
+    public final static String dict___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String dict___setitem___doc = 
+        "Set self[key] to value.";
+
+    public final static String dict___sizeof___doc = 
+        "D.__sizeof__() -> size of D in memory, in bytes";
+
+    public final static String dict___str___doc = 
+        "Return str(self).";
+
+    public final static String dict___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String dict_clear_doc = 
+        "D.clear() -> None.  Remove all items from D.";
+
+    public final static String dict_copy_doc = 
+        "D.copy() -> a shallow copy of D";
+
+    public final static String dict_fromkeys_doc = 
+        "Returns a new dict with keys from iterable and values equal to value.";
+
+    public final static String dict_get_doc = 
+        "D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.";
+
+    public final static String dict_items_doc = 
+        "D.items() -> a set-like object providing a view on D's items";
+
+    public final static String dict_keys_doc = 
+        "D.keys() -> a set-like object providing a view on D's keys";
+
+    public final static String dict_pop_doc = 
+        "D.pop(k[,d]) -> v, remove specified key and return the corresponding value.\n" + 
+        "If key is not found, d is returned if given, otherwise KeyError is raised";
+
+    public final static String dict_popitem_doc = 
+        "D.popitem() -> (k, v), remove and return some (key, value) pair as a\n" + 
+        "2-tuple; but raise KeyError if D is empty.";
+
+    public final static String dict_setdefault_doc = 
+        "D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D";
+
+    public final static String dict_update_doc = 
+        "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\n" + 
+        "If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\n" + 
+        "If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\n" + 
+        "In either case, this is followed by: for k in F:  D[k] = F[k]";
+
+    public final static String dict_values_doc = 
+        "D.values() -> an object providing a view on D's values";
+
+    // Docs for <class 'list'>
+    public final static String list___add___doc = 
+        "Return self+value.";
+
+    public final static String list___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String list___contains___doc = 
+        "Return key in self.";
+
+    public final static String list___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String list___delitem___doc = 
+        "Delete self[key].";
+
+    public final static String list___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String list_doc = 
+        "list() -> new empty list\n" + 
+        "list(iterable) -> new list initialized from iterable's items";
+
+    public final static String list___eq___doc = 
+        "Return self==value.";
+
+    public final static String list___format___doc = 
+        "default object formatter";
+
+    public final static String list___ge___doc = 
+        "Return self>=value.";
+
+    public final static String list___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String list___getitem___doc = 
+        "x.__getitem__(y) <==> x[y]";
+
+    public final static String list___gt___doc = 
+        "Return self>value.";
+
+    public final static String list___hash___doc = 
+        "";
+
+    public final static String list___iadd___doc = 
+        "Implement self+=value.";
+
+    public final static String list___imul___doc = 
+        "Implement self*=value.";
+
+    public final static String list___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String list___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String list___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String list___le___doc = 
+        "Return self<=value.";
+
+    public final static String list___len___doc = 
+        "Return len(self).";
+
+    public final static String list___lt___doc = 
+        "Return self<value.";
+
+    public final static String list___mul___doc = 
+        "Return self*value.n";
+
+    public final static String list___ne___doc = 
+        "Return self!=value.";
+
+    public final static String list___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String list___reduce___doc = 
+        "helper for pickle";
+
+    public final static String list___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String list___repr___doc = 
+        "Return repr(self).";
+
+    public final static String list___reversed___doc = 
+        "L.__reversed__() -- return a reverse iterator over the list";
+
+    public final static String list___rmul___doc = 
+        "Return self*value.";
+
+    public final static String list___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String list___setitem___doc = 
+        "Set self[key] to value.";
+
+    public final static String list___sizeof___doc = 
+        "L.__sizeof__() -- size of L in memory, in bytes";
+
+    public final static String list___str___doc = 
+        "Return str(self).";
+
+    public final static String list___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String list_append_doc = 
+        "L.append(object) -> None -- append object to end";
+
+    public final static String list_clear_doc = 
+        "L.clear() -> None -- remove all items from L";
+
+    public final static String list_copy_doc = 
+        "L.copy() -> list -- a shallow copy of L";
+
+    public final static String list_count_doc = 
+        "L.count(value) -> integer -- return number of occurrences of value";
+
+    public final static String list_extend_doc = 
+        "L.extend(iterable) -> None -- extend list by appending elements from the iterable";
+
+    public final static String list_index_doc = 
+        "L.index(value, [start, [stop]]) -> integer -- return first index of value.\n" + 
+        "Raises ValueError if the value is not present.";
+
+    public final static String list_insert_doc = 
+        "L.insert(index, object) -- insert object before index";
+
+    public final static String list_pop_doc = 
+        "L.pop([index]) -> item -- remove and return item at index (default last).\n" + 
+        "Raises IndexError if list is empty or index is out of range.";
+
+    public final static String list_remove_doc = 
+        "L.remove(value) -> None -- remove first occurrence of value.\n" + 
+        "Raises ValueError if the value is not present.";
+
+    public final static String list_reverse_doc = 
+        "L.reverse() -- reverse *IN PLACE*";
+
+    public final static String list_sort_doc = 
+        "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*";
+
+    // Docs for <class 'slice'>
+    public final static String slice___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String slice___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String slice___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String slice_doc = 
+        "slice(stop)\n" + 
+        "slice(start, stop[, step])\n" + 
+        "\n" + 
+        "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).";
+
+    public final static String slice___eq___doc = 
+        "Return self==value.";
+
+    public final static String slice___format___doc = 
+        "default object formatter";
+
+    public final static String slice___ge___doc = 
+        "Return self>=value.";
+
+    public final static String slice___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String slice___gt___doc = 
+        "Return self>value.";
+
+    public final static String slice___hash___doc = 
+        "";
+
+    public final static String slice___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String slice___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String slice___le___doc = 
+        "Return self<=value.";
+
+    public final static String slice___lt___doc = 
+        "Return self<value.";
+
+    public final static String slice___ne___doc = 
+        "Return self!=value.";
+
+    public final static String slice___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String slice___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String slice___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String slice___repr___doc = 
+        "Return repr(self).";
+
+    public final static String slice___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String slice___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String slice___str___doc = 
+        "Return str(self).";
+
+    public final static String slice___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String slice_indices_doc = 
+        "S.indices(len) -> (start, stop, stride)\n" + 
+        "\n" + 
+        "Assuming a sequence of length len, calculate the start and stop\n" + 
+        "indices, and the stride length of the extended slice described by\n" + 
+        "S. Out of bounds indices are clipped in a manner consistent with the\n" + 
+        "handling of normal slices.";
+
+    public final static String slice_start_doc = 
+        "";
+
+    public final static String slice_step_doc = 
+        "";
+
+    public final static String slice_stop_doc = 
+        "";
+
+    // Docs for <class 'super'>
+    public final static String super___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String super___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String super___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String super_doc = 
+        "super() -> same as super(__class__, <first argument>)\n" + 
+        "super(type) -> unbound super object\n" + 
+        "super(type, obj) -> bound super object; requires isinstance(obj, type)\n" + 
+        "super(type, type2) -> bound super object; requires issubclass(type2, type)\n" + 
+        "Typical use to call a cooperative superclass method:\n" + 
+        "class C(B):\n" + 
+        "    def meth(self, arg):\n" + 
+        "        super().meth(arg)\n" + 
+        "This works for class methods too:\n" + 
+        "class C(B):\n" + 
+        "    @classmethod\n" + 
+        "    def cmeth(cls, arg):\n" + 
+        "        super().cmeth(arg)\n" + 
+        "";
+
+    public final static String super___eq___doc = 
+        "Return self==value.";
+
+    public final static String super___format___doc = 
+        "default object formatter";
+
+    public final static String super___ge___doc = 
+        "Return self>=value.";
+
+    public final static String super___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String super___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String super___gt___doc = 
+        "Return self>value.";
+
+    public final static String super___hash___doc = 
+        "Return hash(self).";
+
+    public final static String super___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String super___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String super___le___doc = 
+        "Return self<=value.";
+
+    public final static String super___lt___doc = 
+        "Return self<value.";
+
+    public final static String super___ne___doc = 
+        "Return self!=value.";
+
+    public final static String super___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String super___reduce___doc = 
+        "helper for pickle";
+
+    public final static String super___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String super___repr___doc = 
+        "Return repr(self).";
+
+    public final static String super___self___doc = 
+        "the instance invoking super(); may be None";
+
+    public final static String super___self_class___doc = 
+        "the type of the instance invoking super(); may be None";
+
+    public final static String super___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String super___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String super___str___doc = 
+        "Return str(self).";
+
+    public final static String super___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String super___thisclass___doc = 
+        "the class invoking super()";
+
+    // Docs for <class 'staticmethod'>
+    public final static String staticmethod___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String staticmethod___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String staticmethod___dict___doc = 
+        "";
+
+    public final static String staticmethod___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String staticmethod_doc = 
+        "staticmethod(function) -> method\n" + 
+        "\n" + 
+        "Convert a function to be a static method.\n" + 
+        "\n" + 
+        "A static method does not receive an implicit first argument.\n" + 
+        "To declare a static method, use this idiom:\n" + 
+        "\n" + 
+        "     class C:\n" + 
+        "         @staticmethod\n" + 
+        "         def f(arg1, arg2, ...):\n" + 
+        "             ...\n" + 
+        "\n" + 
+        "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
+        "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
+        "\n" + 
+        "Static methods in Python are similar to those found in Java or C++.\n" + 
+        "For a more advanced concept, see the classmethod builtin.";
+
+    public final static String staticmethod___eq___doc = 
+        "Return self==value.";
+
+    public final static String staticmethod___format___doc = 
+        "default object formatter";
+
+    public final static String staticmethod___func___doc = 
+        "";
+
+    public final static String staticmethod___ge___doc = 
+        "Return self>=value.";
+
+    public final static String staticmethod___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String staticmethod___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String staticmethod___gt___doc = 
+        "Return self>value.";
+
+    public final static String staticmethod___hash___doc = 
+        "Return hash(self).";
+
+    public final static String staticmethod___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String staticmethod___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String staticmethod___isabstractmethod___doc = 
+        "";
+
+    public final static String staticmethod___le___doc = 
+        "Return self<=value.";
+
+    public final static String staticmethod___lt___doc = 
+        "Return self<value.";
+
+    public final static String staticmethod___ne___doc = 
+        "Return self!=value.";
+
+    public final static String staticmethod___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String staticmethod___reduce___doc = 
+        "helper for pickle";
+
+    public final static String staticmethod___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String staticmethod___repr___doc = 
+        "Return repr(self).";
+
+    public final static String staticmethod___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String staticmethod___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String staticmethod___str___doc = 
+        "Return str(self).";
+
+    public final static String staticmethod___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'float'>
+    public final static String float___abs___doc = 
+        "abs(self)";
+
+    public final static String float___add___doc = 
+        "Return self+value.";
+
+    public final static String float___bool___doc = 
+        "self != 0";
+
+    public final static String float___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String float___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String float___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String float___divmod___doc = 
+        "Return divmod(self, value).";
+
+    public final static String float_doc = 
+        "float(x) -> floating point number\n" + 
+        "\n" + 
+        "Convert a string or number to a floating point number, if possible.";
+
+    public final static String float___eq___doc = 
+        "Return self==value.";
+
+    public final static String float___float___doc = 
+        "float(self)";
+
+    public final static String float___floordiv___doc = 
+        "Return self//value.";
+
+    public final static String float___format___doc = 
+        "float.__format__(format_spec) -> string\n" + 
+        "\n" + 
+        "Formats the float according to format_spec.";
+
+    public final static String float___ge___doc = 
+        "Return self>=value.";
+
+    public final static String float___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String float___getformat___doc = 
+        "float.__getformat__(typestr) -> string\n" + 
+        "\n" + 
+        "You probably don't want to use this function.  It exists mainly to be\n" + 
+        "used in Python's test suite.\n" + 
+        "\n" + 
+        "typestr must be 'double' or 'float'.  This function returns whichever of\n" + 
+        "'unknown', 'IEEE, big-endian' or 'IEEE, little-endian' best describes the\n" + 
+        "format of floating point numbers used by the C type named by typestr.";
+
+    public final static String float___getnewargs___doc = 
+        "";
+
+    public final static String float___gt___doc = 
+        "Return self>value.";
+
+    public final static String float___hash___doc = 
+        "Return hash(self).";
+
+    public final static String float___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String float___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String float___int___doc = 
+        "int(self)";
+
+    public final static String float___le___doc = 
+        "Return self<=value.";
+
+    public final static String float___lt___doc = 
+        "Return self<value.";
+
+    public final static String float___mod___doc = 
+        "Return self%value.";
+
+    public final static String float___mul___doc = 
+        "Return self*value.";
+
+    public final static String float___ne___doc = 
+        "Return self!=value.";
+
+    public final static String float___neg___doc = 
+        "-self";
+
+    public final static String float___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String float___pos___doc = 
+        "+self";
+
+    public final static String float___pow___doc = 
+        "Return pow(self, value, mod).";
+
+    public final static String float___radd___doc = 
+        "Return value+self.";
+
+    public final static String float___rdivmod___doc = 
+        "Return divmod(value, self).";
+
+    public final static String float___reduce___doc = 
+        "helper for pickle";
+
+    public final static String float___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String float___repr___doc = 
+        "Return repr(self).";
+
+    public final static String float___rfloordiv___doc = 
+        "Return value//self.";
+
+    public final static String float___rmod___doc = 
+        "Return value%self.";
+
+    public final static String float___rmul___doc = 
+        "Return value*self.";
+
+    public final static String float___round___doc = 
+        "Return the Integral closest to x, rounding half toward even.\n" + 
+        "When an argument is passed, work like built-in round(x, ndigits).";
+
+    public final static String float___rpow___doc = 
+        "Return pow(value, self, mod).";
+
+    public final static String float___rsub___doc = 
+        "Return value-self.";
+
+    public final static String float___rtruediv___doc = 
+        "Return value/self.";
+
+    public final static String float___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String float___setformat___doc = 
+        "float.__setformat__(typestr, fmt) -> None\n" + 
+        "\n" + 
+        "You probably don't want to use this function.  It exists mainly to be\n" + 
+        "used in Python's test suite.\n" + 
+        "\n" + 
+        "typestr must be 'double' or 'float'.  fmt must be one of 'unknown',\n" + 
+        "'IEEE, big-endian' or 'IEEE, little-endian', and in addition can only be\n" + 
+        "one of the latter two if it appears to match the underlying C reality.\n" + 
+        "\n" + 
+        "Override the automatic determination of C-level floating point type.\n" + 
+        "This affects how floats are converted to and from binary strings.";
+
+    public final static String float___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String float___str___doc = 
+        "Return str(self).";
+
+    public final static String float___sub___doc = 
+        "Return self-value.";
+
+    public final static String float___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String float___truediv___doc = 
+        "Return self/value.";
+
+    public final static String float___trunc___doc = 
+        "Return the Integral closest to x between 0 and x.";
+
+    public final static String float_as_integer_ratio_doc = 
+        "float.as_integer_ratio() -> (int, int)\n" + 
+        "\n" + 
+        "Return a pair of integers, whose ratio is exactly equal to the original\n" + 
+        "float and with a positive denominator.\n" + 
+        "Raise OverflowError on infinities and a ValueError on NaNs.\n" + 
+        "\n" + 
+        ">>> (10.0).as_integer_ratio()\n" + 
+        "(10, 1)\n" + 
+        ">>> (0.0).as_integer_ratio()\n" + 
+        "(0, 1)\n" + 
+        ">>> (-.25).as_integer_ratio()\n" + 
+        "(-1, 4)";
+
+    public final static String float_conjugate_doc = 
+        "Return self, the complex conjugate of any float.";
+
+    public final static String float_fromhex_doc = 
+        "float.fromhex(string) -> float\n" + 
+        "\n" + 
+        "Create a floating-point number from a hexadecimal string.\n" + 
+        ">>> float.fromhex('0x1.ffffp10')\n" + 
+        "2047.984375\n" + 
+        ">>> float.fromhex('-0x1p-1074')\n" + 
+        "-5e-324";
+
+    public final static String float_hex_doc = 
+        "float.hex() -> string\n" + 
+        "\n" + 
+        "Return a hexadecimal representation of a floating-point number.\n" + 
+        ">>> (-0.1).hex()\n" + 
+        "'-0x1.999999999999ap-4'\n" + 
+        ">>> 3.14159.hex()\n" + 
+        "'0x1.921f9f01b866ep+1'";
+
+    public final static String float_imag_doc = 
+        "the imaginary part of a complex number";
+
+    public final static String float_is_integer_doc = 
+        "Return True if the float is an integer.";
+
+    public final static String float_real_doc = 
+        "the real part of a complex number";
+
+    // Docs for <class 'enumerate'>
+    public final static String enumerate___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String enumerate___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String enumerate___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String enumerate_doc = 
+        "enumerate(iterable[, start]) -> iterator for index, value of iterable\n" + 
+        "\n" + 
+        "Return an enumerate object.  iterable must be another object that supports\n" + 
+        "iteration.  The enumerate object yields pairs containing a count (from\n" + 
+        "start, which defaults to zero) and a value yielded by the iterable argument.\n" + 
+        "enumerate is useful for obtaining an indexed list:\n" + 
+        "    (0, seq[0]), (1, seq[1]), (2, seq[2]), ...";
+
+    public final static String enumerate___eq___doc = 
+        "Return self==value.";
+
+    public final static String enumerate___format___doc = 
+        "default object formatter";
+
+    public final static String enumerate___ge___doc = 
+        "Return self>=value.";
+
+    public final static String enumerate___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String enumerate___gt___doc = 
+        "Return self>value.";
+
+    public final static String enumerate___hash___doc = 
+        "Return hash(self).";
+
+    public final static String enumerate___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String enumerate___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String enumerate___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String enumerate___le___doc = 
+        "Return self<=value.";
+
+    public final static String enumerate___lt___doc = 
+        "Return self<value.";
+
+    public final static String enumerate___ne___doc = 
+        "Return self!=value.";
+
+    public final static String enumerate___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String enumerate___next___doc = 
+        "Implement next(self).";
+
+    public final static String enumerate___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String enumerate___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String enumerate___repr___doc = 
+        "Return repr(self).";
+
+    public final static String enumerate___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String enumerate___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String enumerate___str___doc = 
+        "Return str(self).";
+
+    public final static String enumerate___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'int'>
+    public final static String int___abs___doc = 
+        "abs(self)";
+
+    public final static String int___add___doc = 
+        "Return self+value.";
+
+    public final static String int___and___doc = 
+        "Return self&value.";
+
+    public final static String int___bool___doc = 
+        "self != 0";
+
+    public final static String int___ceil___doc = 
+        "Ceiling of an Integral returns itself.";
+
+    public final static String int___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String int___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String int___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String int___divmod___doc = 
+        "Return divmod(self, value).";
+
+    public final static String int_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String int___eq___doc = 
+        "Return self==value.";
+
+    public final static String int___float___doc = 
+        "float(self)";
+
+    public final static String int___floor___doc = 
+        "Flooring an Integral returns itself.";
+
+    public final static String int___floordiv___doc = 
+        "Return self//value.";
+
+    public final static String int___format___doc = 
+        "";
+
+    public final static String int___ge___doc = 
+        "Return self>=value.";
+
+    public final static String int___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String int___getnewargs___doc = 
+        "";
+
+    public final static String int___gt___doc = 
+        "Return self>value.";
+
+    public final static String int___hash___doc = 
+        "Return hash(self).";
+
+    public final static String int___index___doc = 
+        "Return self converted to an integer, if self is suitable for use as an index into a list.";
+
+    public final static String int___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String int___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String int___int___doc = 
+        "int(self)";
+
+    public final static String int___invert___doc = 
+        "~self";
+
+    public final static String int___le___doc = 
+        "Return self<=value.";
+
+    public final static String int___lshift___doc = 
+        "Return self<<value.";
+
+    public final static String int___lt___doc = 
+        "Return self<value.";
+
+    public final static String int___mod___doc = 
+        "Return self%value.";
+
+    public final static String int___mul___doc = 
+        "Return self*value.";
+
+    public final static String int___ne___doc = 
+        "Return self!=value.";
+
+    public final static String int___neg___doc = 
+        "-self";
+
+    public final static String int___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String int___or___doc = 
+        "Return self|value.";
+
+    public final static String int___pos___doc = 
+        "+self";
+
+    public final static String int___pow___doc = 
+        "Return pow(self, value, mod).";
+
+    public final static String int___radd___doc = 
+        "Return value+self.";
+
+    public final static String int___rand___doc = 
+        "Return value&self.";
+
+    public final static String int___rdivmod___doc = 
+        "Return divmod(value, self).";
+
+    public final static String int___reduce___doc = 
+        "helper for pickle";
+
+    public final static String int___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String int___repr___doc = 
+        "Return repr(self).";
+
+    public final static String int___rfloordiv___doc = 
+        "Return value//self.";
+
+    public final static String int___rlshift___doc = 
+        "Return value<<self.";
+
+    public final static String int___rmod___doc = 
+        "Return value%self.";
+
+    public final static String int___rmul___doc = 
+        "Return value*self.";
+
+    public final static String int___ror___doc = 
+        "Return value|self.";
+
+    public final static String int___round___doc = 
+        "Rounding an Integral returns itself.\n" + 
+        "Rounding with an ndigits argument also returns an integer.";
+
+    public final static String int___rpow___doc = 
+        "Return pow(value, self, mod).";
+
+    public final static String int___rrshift___doc = 
+        "Return value>>self.";
+
+    public final static String int___rshift___doc = 
+        "Return self>>value.";
+
+    public final static String int___rsub___doc = 
+        "Return value-self.";
+
+    public final static String int___rtruediv___doc = 
+        "Return value/self.";
+
+    public final static String int___rxor___doc = 
+        "Return value^self.";
+
+    public final static String int___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String int___sizeof___doc = 
+        "Returns size in memory, in bytes";
+
+    public final static String int___str___doc = 
+        "Return str(self).";
+
+    public final static String int___sub___doc = 
+        "Return self-value.";
+
+    public final static String int___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String int___truediv___doc = 
+        "Return self/value.";
+
+    public final static String int___trunc___doc = 
+        "Truncating an Integral returns itself.";
+
+    public final static String int___xor___doc = 
+        "Return self^value.";
+
+    public final static String int_bit_length_doc = 
+        "int.bit_length() -> int\n" + 
+        "\n" + 
+        "Number of bits necessary to represent self in binary.\n" + 
+        ">>> bin(37)\n" + 
+        "'0b100101'\n" + 
+        ">>> (37).bit_length()\n" + 
+        "6";
+
+    public final static String int_conjugate_doc = 
+        "Returns self, the complex conjugate of any int.";
+
+    public final static String int_denominator_doc = 
+        "the denominator of a rational number in lowest terms";
+
+    public final static String int_from_bytes_doc = 
+        "int.from_bytes(bytes, byteorder, *, signed=False) -> int\n" + 
+        "\n" + 
+        "Return the integer represented by the given array of bytes.\n" + 
+        "\n" + 
+        "The bytes argument must be a bytes-like object (e.g. bytes or bytearray).\n" + 
+        "\n" + 
+        "The byteorder argument determines the byte order used to represent the\n" + 
+        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
+        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
+        "significant byte is at the end of the byte array.  To request the native\n" + 
+        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
+        "\n" + 
+        "The signed keyword-only argument indicates whether two's complement is\n" + 
+        "used to represent the integer.";
+
+    public final static String int_imag_doc = 
+        "the imaginary part of a complex number";
+
+    public final static String int_numerator_doc = 
+        "the numerator of a rational number in lowest terms";
+
+    public final static String int_real_doc = 
+        "the real part of a complex number";
+
+    public final static String int_to_bytes_doc = 
+        "int.to_bytes(length, byteorder, *, signed=False) -> bytes\n" + 
+        "\n" + 
+        "Return an array of bytes representing an integer.\n" + 
+        "\n" + 
+        "The integer is represented using length bytes.  An OverflowError is\n" + 
+        "raised if the integer is not representable with the given number of\n" + 
+        "bytes.\n" + 
+        "\n" + 
+        "The byteorder argument determines the byte order used to represent the\n" + 
+        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
+        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
+        "significant byte is at the end of the byte array.  To request the native\n" + 
+        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
+        "\n" + 
+        "The signed keyword-only argument determines whether two's complement is\n" + 
+        "used to represent the integer.  If signed is False and a negative integer\n" + 
+        "is given, an OverflowError is raised.";
+
+    // Docs for <class 'tuple'>
+    public final static String tuple___add___doc = 
+        "Return self+value.";
+
+    public final static String tuple___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String tuple___contains___doc = 
+        "Return key in self.";
+
+    public final static String tuple___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String tuple___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String tuple_doc = 
+        "tuple() -> empty tuple\n" + 
+        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
+        "\n" + 
+        "If the argument is a tuple, the return value is the same object.";
+
+    public final static String tuple___eq___doc = 
+        "Return self==value.";
+
+    public final static String tuple___format___doc = 
+        "default object formatter";
+
+    public final static String tuple___ge___doc = 
+        "Return self>=value.";
+
+    public final static String tuple___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String tuple___getitem___doc = 
+        "Return self[key].";
+
+    public final static String tuple___getnewargs___doc = 
+        "";
+
+    public final static String tuple___gt___doc = 
+        "Return self>value.";
+
+    public final static String tuple___hash___doc = 
+        "Return hash(self).";
+
+    public final static String tuple___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String tuple___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String tuple___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String tuple___le___doc = 
+        "Return self<=value.";
+
+    public final static String tuple___len___doc = 
+        "Return len(self).";
+
+    public final static String tuple___lt___doc = 
+        "Return self<value.";
+
+    public final static String tuple___mul___doc = 
+        "Return self*value.n";
+
+    public final static String tuple___ne___doc = 
+        "Return self!=value.";
+
+    public final static String tuple___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String tuple___reduce___doc = 
+        "helper for pickle";
+
+    public final static String tuple___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String tuple___repr___doc = 
+        "Return repr(self).";
+
+    public final static String tuple___rmul___doc = 
+        "Return self*value.";
+
+    public final static String tuple___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String tuple___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String tuple___str___doc = 
+        "Return str(self).";
+
+    public final static String tuple___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String tuple_count_doc = 
+        "T.count(value) -> integer -- return number of occurrences of value";
+
+    public final static String tuple_index_doc = 
+        "T.index(value, [start, [stop]]) -> integer -- return first index of value.\n" + 
+        "Raises ValueError if the value is not present.";
+
+    // Docs for <class 'str'>
+    public final static String str___add___doc = 
+        "Return self+value.";
+
+    public final static String str___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String str___contains___doc = 
+        "Return key in self.";
+
+    public final static String str___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String str___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String str_doc = 
         "str(object='') -> str\n" + 
         "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
         "\n" + 
@@ -2223,10 +3104,2338 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
-    public final static String datetime_doc = 
-        "Fast implementation of the datetime type.";
+    public final static String str___eq___doc = 
+        "Return self==value.";
 
-    public final static String datetime___file___doc = 
+    public final static String str___format___doc = 
+        "S.__format__(format_spec) -> str\n" + 
+        "\n" + 
+        "Return a formatted version of S as described by format_spec.";
+
+    public final static String str___ge___doc = 
+        "Return self>=value.";
+
+    public final static String str___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String str___getitem___doc = 
+        "Return self[key].";
+
+    public final static String str___getnewargs___doc = 
+        "";
+
+    public final static String str___gt___doc = 
+        "Return self>value.";
+
+    public final static String str___hash___doc = 
+        "Return hash(self).";
+
+    public final static String str___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String str___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String str___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String str___le___doc = 
+        "Return self<=value.";
+
+    public final static String str___len___doc = 
+        "Return len(self).";
+
+    public final static String str___lt___doc = 
+        "Return self<value.";
+
+    public final static String str___mod___doc = 
+        "Return self%value.";
+
+    public final static String str___mul___doc = 
+        "Return self*value.n";
+
+    public final static String str___ne___doc = 
+        "Return self!=value.";
+
+    public final static String str___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String str___reduce___doc = 
+        "helper for pickle";
+
+    public final static String str___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String str___repr___doc = 
+        "Return repr(self).";
+
+    public final static String str___rmod___doc = 
+        "Return value%self.";
+
+    public final static String str___rmul___doc = 
+        "Return self*value.";
+
+    public final static String str___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String str___sizeof___doc = 
+        "S.__sizeof__() -> size of S in memory, in bytes";
+
+    public final static String str___str___doc = 
+        "Return str(self).";
+
+    public final static String str___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String str_capitalize_doc = 
+        "S.capitalize() -> str\n" + 
+        "\n" + 
+        "Return a capitalized version of S, i.e. make the first character\n" + 
+        "have upper case and the rest lower case.";
+
+    public final static String str_casefold_doc = 
+        "S.casefold() -> str\n" + 
+        "\n" + 
+        "Return a version of S suitable for caseless comparisons.";
+
+    public final static String str_center_doc = 
+        "S.center(width[, fillchar]) -> str\n" + 
+        "\n" + 
+        "Return S centered in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space)";
+
+    public final static String str_count_doc = 
+        "S.count(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the number of non-overlapping occurrences of substring sub in\n" + 
+        "string S[start:end].  Optional arguments start and end are\n" + 
+        "interpreted as in slice notation.";
+
+    public final static String str_encode_doc = 
+        "S.encode(encoding='utf-8', errors='strict') -> bytes\n" + 
+        "\n" + 
+        "Encode S using the codec registered for encoding. Default encoding\n" + 
+        "is 'utf-8'. errors may be given to set a different error\n" + 
+        "handling scheme. Default is 'strict' meaning that encoding errors raise\n" + 
+        "a UnicodeEncodeError. Other possible values are 'ignore', 'replace' and\n" + 
+        "'xmlcharrefreplace' as well as any other name registered with\n" + 
+        "codecs.register_error that can handle UnicodeEncodeErrors.";
+
+    public final static String str_endswith_doc = 
+        "S.endswith(suffix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if S ends with the specified suffix, False otherwise.\n" + 
+        "With optional start, test S beginning at that position.\n" + 
+        "With optional end, stop comparing S at that position.\n" + 
+        "suffix can also be a tuple of strings to try.";
+
+    public final static String str_expandtabs_doc = 
+        "S.expandtabs(tabsize=8) -> str\n" + 
+        "\n" + 
+        "Return a copy of S where all tab characters are expanded using spaces.\n" + 
+        "If tabsize is not given, a tab size of 8 characters is assumed.";
+
+    public final static String str_find_doc = 
+        "S.find(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the lowest index in S where substring sub is found,\n" + 
+        "such that sub is contained within S[start:end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String str_format_doc = 
+        "S.format(*args, **kwargs) -> str\n" + 
+        "\n" + 
+        "Return a formatted version of S, using substitutions from args and kwargs.\n" + 
+        "The substitutions are identified by braces ('{' and '}').";
+
+    public final static String str_format_map_doc = 
+        "S.format_map(mapping) -> str\n" + 
+        "\n" + 
+        "Return a formatted version of S, using substitutions from mapping.\n" + 
+        "The substitutions are identified by braces ('{' and '}').";
+
+    public final static String str_index_doc = 
+        "S.index(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like S.find() but raise ValueError when the substring is not found.";
+
+    public final static String str_isalnum_doc = 
+        "S.isalnum() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in S are alphanumeric\n" + 
+        "and there is at least one character in S, False otherwise.";
+
+    public final static String str_isalpha_doc = 
+        "S.isalpha() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in S are alphabetic\n" + 
+        "and there is at least one character in S, False otherwise.";
+
+    public final static String str_isdecimal_doc = 
+        "S.isdecimal() -> bool\n" + 
+        "\n" + 
+        "Return True if there are only decimal characters in S,\n" + 
+        "False otherwise.";
+
+    public final static String str_isdigit_doc = 
+        "S.isdigit() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in S are digits\n" + 
+        "and there is at least one character in S, False otherwise.";
+
+    public final static String str_isidentifier_doc = 
+        "S.isidentifier() -> bool\n" + 
+        "\n" + 
+        "Return True if S is a valid identifier according\n" + 
+        "to the language definition.\n" + 
+        "\n" + 
+        "Use keyword.iskeyword() to test for reserved identifiers\n" + 
+        "such as \"def\" and \"class\".\n" + 
+        "";
+
+    public final static String str_islower_doc = 
+        "S.islower() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in S are lowercase and there is\n" + 
+        "at least one cased character in S, False otherwise.";
+
+    public final static String str_isnumeric_doc = 
+        "S.isnumeric() -> bool\n" + 
+        "\n" + 
+        "Return True if there are only numeric characters in S,\n" + 
+        "False otherwise.";
+
+    public final static String str_isprintable_doc = 
+        "S.isprintable() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in S are considered\n" + 
+        "printable in repr() or S is empty, False otherwise.";
+
+    public final static String str_isspace_doc = 
+        "S.isspace() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in S are whitespace\n" + 
+        "and there is at least one character in S, False otherwise.";
+
+    public final static String str_istitle_doc = 
+        "S.istitle() -> bool\n" + 
+        "\n" + 
+        "Return True if S is a titlecased string and there is at least one\n" + 
+        "character in S, i.e. upper- and titlecase characters may only\n" + 
+        "follow uncased characters and lowercase characters only cased ones.\n" + 
+        "Return False otherwise.";
+
+    public final static String str_isupper_doc = 
+        "S.isupper() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in S are uppercase and there is\n" + 
+        "at least one cased character in S, False otherwise.";
+
+    public final static String str_join_doc = 
+        "S.join(iterable) -> str\n" + 
+        "\n" + 
+        "Return a string which is the concatenation of the strings in the\n" + 
+        "iterable.  The separator between elements is S.";
+
+    public final static String str_ljust_doc = 
+        "S.ljust(width[, fillchar]) -> str\n" + 
+        "\n" + 
+        "Return S left-justified in a Unicode string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String str_lower_doc = 
+        "S.lower() -> str\n" + 
+        "\n" + 
+        "Return a copy of the string S converted to lowercase.";
+
+    public final static String str_lstrip_doc = 
+        "S.lstrip([chars]) -> str\n" + 
+        "\n" + 
+        "Return a copy of the string S with leading whitespace removed.\n" + 
+        "If chars is given and not None, remove characters in chars instead.";
+
+    public final static String str_maketrans_doc = 
+        "Return a translation table usable for str.translate().\n" + 
+        "\n" + 
+        "If there is only one argument, it must be a dictionary mapping Unicode\n" + 
+        "ordinals (integers) or characters to Unicode ordinals, strings or None.\n" + 
+        "Character keys will be then converted to ordinals.\n" + 
+        "If there are two arguments, they must be strings of equal length, and\n" + 
+        "in the resulting dictionary, each character in x will be mapped to the\n" + 
+        "character at the same position in y. If there is a third argument, it\n" + 
+        "must be a string, whose characters will be mapped to None in the result.";
+
+    public final static String str_partition_doc = 
+        "S.partition(sep) -> (head, sep, tail)\n" + 
+        "\n" + 
+        "Search for the separator sep in S, and return the part before it,\n" + 
+        "the separator itself, and the part after it.  If the separator is not\n" + 
+        "found, return S and two empty strings.";
+
+    public final static String str_replace_doc = 
+        "S.replace(old, new[, count]) -> str\n" + 
+        "\n" + 
+        "Return a copy of S with all occurrences of substring\n" + 
+        "old replaced by new.  If the optional argument count is\n" + 
+        "given, only the first count occurrences are replaced.";
+
+    public final static String str_rfind_doc = 
+        "S.rfind(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the highest index in S where substring sub is found,\n" + 
+        "such that sub is contained within S[start:end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String str_rindex_doc = 
+        "S.rindex(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like S.rfind() but raise ValueError when the substring is not found.";
+
+    public final static String str_rjust_doc = 
+        "S.rjust(width[, fillchar]) -> str\n" + 
+        "\n" + 
+        "Return S right-justified in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String str_rpartition_doc = 
+        "S.rpartition(sep) -> (head, sep, tail)\n" + 
+        "\n" + 
+        "Search for the separator sep in S, starting at the end of S, and return\n" + 
+        "the part before it, the separator itself, and the part after it.  If the\n" + 
+        "separator is not found, return two empty strings and S.";
+
+    public final static String str_rsplit_doc = 
+        "S.rsplit(sep=None, maxsplit=-1) -> list of strings\n" + 
+        "\n" + 
+        "Return a list of the words in S, using sep as the\n" + 
+        "delimiter string, starting at the end of the string and\n" + 
+        "working to the front.  If maxsplit is given, at most maxsplit\n" + 
+        "splits are done. If sep is not specified, any whitespace string\n" + 
+        "is a separator.";
+
+    public final static String str_rstrip_doc = 
+        "S.rstrip([chars]) -> str\n" + 
+        "\n" + 
+        "Return a copy of the string S with trailing whitespace removed.\n" + 
+        "If chars is given and not None, remove characters in chars instead.";
+
+    public final static String str_split_doc = 
+        "S.split(sep=None, maxsplit=-1) -> list of strings\n" + 
+        "\n" + 
+        "Return a list of the words in S, using sep as the\n" + 
+        "delimiter string.  If maxsplit is given, at most maxsplit\n" + 
+        "splits are done. If sep is not specified or is None, any\n" + 
+        "whitespace string is a separator and empty strings are\n" + 
+        "removed from the result.";
+
+    public final static String str_splitlines_doc = 
+        "S.splitlines([keepends]) -> list of strings\n" + 
+        "\n" + 
+        "Return a list of the lines in S, breaking at line boundaries.\n" + 
+        "Line breaks are not included in the resulting list unless keepends\n" + 
+        "is given and true.";
+
+    public final static String str_startswith_doc = 
+        "S.startswith(prefix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if S starts with the specified prefix, False otherwise.\n" + 
+        "With optional start, test S beginning at that position.\n" + 
+        "With optional end, stop comparing S at that position.\n" + 
+        "prefix can also be a tuple of strings to try.";
+
+    public final static String str_strip_doc = 
+        "S.strip([chars]) -> str\n" + 
+        "\n" + 
+        "Return a copy of the string S with leading and trailing\n" + 
+        "whitespace removed.\n" + 
+        "If chars is given and not None, remove characters in chars instead.";
+
+    public final static String str_swapcase_doc = 
+        "S.swapcase() -> str\n" + 
+        "\n" + 
+        "Return a copy of S with uppercase characters converted to lowercase\n" + 
+        "and vice versa.";
+
+    public final static String str_title_doc = 
+        "S.title() -> str\n" + 
+        "\n" + 
+        "Return a titlecased version of S, i.e. words start with title case\n" + 
+        "characters, all remaining cased characters have lower case.";
+
+    public final static String str_translate_doc = 
+        "S.translate(table) -> str\n" + 
+        "\n" + 
+        "Return a copy of the string S in which each character has been mapped\n" + 
+        "through the given translation table. The table must implement\n" + 
+        "lookup/indexing via __getitem__, for instance a dictionary or list,\n" + 
+        "mapping Unicode ordinals to Unicode ordinals, strings, or None. If\n" + 
+        "this operation raises LookupError, the character is left untouched.\n" + 
+        "Characters mapped to None are deleted.";
+
+    public final static String str_upper_doc = 
+        "S.upper() -> str\n" + 
+        "\n" + 
+        "Return a copy of S converted to uppercase.";
+
+    public final static String str_zfill_doc = 
+        "S.zfill(width) -> str\n" + 
+        "\n" + 
+        "Pad a numeric string S with zeros on the left, to fill a field\n" + 
+        "of the specified width. The string S is never truncated.";
+
+    // Docs for <class 'property'>
+    public final static String property___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String property___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String property___delete___doc = 
+        "Delete an attribute of instance.";
+
+    public final static String property___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String property_doc = 
+        "property(fget=None, fset=None, fdel=None, doc=None) -> property attribute\n" + 
+        "\n" + 
+        "fget is a function to be used for getting an attribute value, and likewise\n" + 
+        "fset is a function for setting, and fdel a function for del'ing, an\n" + 
+        "attribute.  Typical use is to define a managed attribute x:\n" + 
+        "\n" + 
+        "class C(object):\n" + 
+        "    def getx(self): return self._x\n" + 
+        "    def setx(self, value): self._x = value\n" + 
+        "    def delx(self): del self._x\n" + 
+        "    x = property(getx, setx, delx, \"I'm the 'x' property.\")\n" + 
+        "\n" + 
+        "Decorators make defining new properties or modifying existing ones easy:\n" + 
+        "\n" + 
+        "class C(object):\n" + 
+        "    @property\n" + 
+        "    def x(self):\n" + 
+        "        \"I am the 'x' property.\"\n" + 
+        "        return self._x\n" + 
+        "    @x.setter\n" + 
+        "    def x(self, value):\n" + 
+        "        self._x = value\n" + 
+        "    @x.deleter\n" + 
+        "    def x(self):\n" + 
+        "        del self._x\n" + 
+        "";
+
+    public final static String property___eq___doc = 
+        "Return self==value.";
+
+    public final static String property___format___doc = 
+        "default object formatter";
+
+    public final static String property___ge___doc = 
+        "Return self>=value.";
+
+    public final static String property___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String property___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String property___gt___doc = 
+        "Return self>value.";
+
+    public final static String property___hash___doc = 
+        "Return hash(self).";
+
+    public final static String property___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String property___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String property___isabstractmethod___doc = 
+        "";
+
+    public final static String property___le___doc = 
+        "Return self<=value.";
+
+    public final static String property___lt___doc = 
+        "Return self<value.";
+
+    public final static String property___ne___doc = 
+        "Return self!=value.";
+
+    public final static String property___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String property___reduce___doc = 
+        "helper for pickle";
+
+    public final static String property___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String property___repr___doc = 
+        "Return repr(self).";
+
+    public final static String property___set___doc = 
+        "Set an attribute of instance to value.";
+
+    public final static String property___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String property___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String property___str___doc = 
+        "Return str(self).";
+
+    public final static String property___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String property_deleter_doc = 
+        "Descriptor to change the deleter on a property.";
+
+    public final static String property_fdel_doc = 
+        "";
+
+    public final static String property_fget_doc = 
+        "";
+
+    public final static String property_fset_doc = 
+        "";
+
+    public final static String property_getter_doc = 
+        "Descriptor to change the getter on a property.";
+
+    public final static String property_setter_doc = 
+        "Descriptor to change the setter on a property.";
+
+    // Docs for <class 'range'>
+    public final static String range___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String range___contains___doc = 
+        "Return key in self.";
+
+    public final static String range___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String range___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String range_doc = 
+        "range(stop) -> range object\n" + 
+        "range(start, stop[, step]) -> range object\n" + 
+        "\n" + 
+        "Return an object that produces a sequence of integers from start (inclusive)\n" + 
+        "to stop (exclusive) by step.  range(i, j) produces i, i+1, i+2, ..., j-1.\n" + 
+        "start defaults to 0, and stop is omitted!  range(4) produces 0, 1, 2, 3.\n" + 
+        "These are exactly the valid indices for a list of 4 elements.\n" + 
+        "When step is given, it specifies the increment (or decrement).";
+
+    public final static String range___eq___doc = 
+        "Return self==value.";
+
+    public final static String range___format___doc = 
+        "default object formatter";
+
+    public final static String range___ge___doc = 
+        "Return self>=value.";
+
+    public final static String range___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String range___getitem___doc = 
+        "Return self[key].";
+
+    public final static String range___gt___doc = 
+        "Return self>value.";
+
+    public final static String range___hash___doc = 
+        "Return hash(self).";
+
+    public final static String range___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String range___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String range___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String range___le___doc = 
+        "Return self<=value.";
+
+    public final static String range___len___doc = 
+        "Return len(self).";
+
+    public final static String range___lt___doc = 
+        "Return self<value.";
+
+    public final static String range___ne___doc = 
+        "Return self!=value.";
+
+    public final static String range___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String range___reduce___doc = 
+        "";
+
+    public final static String range___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String range___repr___doc = 
+        "Return repr(self).";
+
+    public final static String range___reversed___doc = 
+        "Return a reverse iterator.";
+
+    public final static String range___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String range___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String range___str___doc = 
+        "Return str(self).";
+
+    public final static String range___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String range_count_doc = 
+        "rangeobject.count(value) -> integer -- return number of occurrences of value";
+
+    public final static String range_index_doc = 
+        "rangeobject.index(value, [start, [stop]]) -> integer -- return index of value.\n" + 
+        "Raise ValueError if the value is not present.";
+
+    public final static String range_start_doc = 
+        "";
+
+    public final static String range_step_doc = 
+        "";
+
+    public final static String range_stop_doc = 
+        "";
+
+    // Docs for <class 'complex'>
+    public final static String complex___abs___doc = 
+        "abs(self)";
+
+    public final static String complex___add___doc = 
+        "Return self+value.";
+
+    public final static String complex___bool___doc = 
+        "self != 0";
+
+    public final static String complex___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String complex___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String complex___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String complex___divmod___doc = 
+        "Return divmod(self, value).";
+
+    public final static String complex_doc = 
+        "complex(real[, imag]) -> complex number\n" + 
+        "\n" + 
+        "Create a complex number from a real part and an optional imaginary part.\n" + 
+        "This is equivalent to (real + imag*1j) where imag defaults to 0.";
+
+    public final static String complex___eq___doc = 
+        "Return self==value.";
+
+    public final static String complex___float___doc = 
+        "float(self)";
+
+    public final static String complex___floordiv___doc = 
+        "Return self//value.";
+
+    public final static String complex___format___doc = 
+        "complex.__format__() -> str\n" + 
+        "\n" + 
+        "Convert to a string according to format_spec.";
+
+    public final static String complex___ge___doc = 
+        "Return self>=value.";
+
+    public final static String complex___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String complex___getnewargs___doc = 
+        "";
+
+    public final static String complex___gt___doc = 
+        "Return self>value.";
+
+    public final static String complex___hash___doc = 
+        "Return hash(self).";
+
+    public final static String complex___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String complex___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String complex___int___doc = 
+        "int(self)";
+
+    public final static String complex___le___doc = 
+        "Return self<=value.";
+
+    public final static String complex___lt___doc = 
+        "Return self<value.";
+
+    public final static String complex___mod___doc = 
+        "Return self%value.";
+
+    public final static String complex___mul___doc = 
+        "Return self*value.";
+
+    public final static String complex___ne___doc = 
+        "Return self!=value.";
+
+    public final static String complex___neg___doc = 
+        "-self";
+
+    public final static String complex___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String complex___pos___doc = 
+        "+self";
+
+    public final static String complex___pow___doc = 
+        "Return pow(self, value, mod).";
+
+    public final static String complex___radd___doc = 
+        "Return value+self.";
+
+    public final static String complex___rdivmod___doc = 
+        "Return divmod(value, self).";
+
+    public final static String complex___reduce___doc = 
+        "helper for pickle";
+
+    public final static String complex___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String complex___repr___doc = 
+        "Return repr(self).";
+
+    public final static String complex___rfloordiv___doc = 
+        "Return value//self.";
+
+    public final static String complex___rmod___doc = 
+        "Return value%self.";
+
+    public final static String complex___rmul___doc = 
+        "Return value*self.";
+
+    public final static String complex___rpow___doc = 
+        "Return pow(value, self, mod).";
+
+    public final static String complex___rsub___doc = 
+        "Return value-self.";
+
+    public final static String complex___rtruediv___doc = 
+        "Return value/self.";
+
+    public final static String complex___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String complex___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String complex___str___doc = 
+        "Return str(self).";
+
+    public final static String complex___sub___doc = 
+        "Return self-value.";
+
+    public final static String complex___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String complex___truediv___doc = 
+        "Return self/value.";
+
+    public final static String complex_conjugate_doc = 
+        "complex.conjugate() -> complex\n" + 
+        "\n" + 
+        "Return the complex conjugate of its argument. (3-4j).conjugate() == 3+4j.";
+
+    public final static String complex_imag_doc = 
+        "the imaginary part of a complex number";
+
+    public final static String complex_real_doc = 
+        "the real part of a complex number";
+
+    // Docs for <class 'bool'>
+    public final static String bool___abs___doc = 
+        "abs(self)";
+
+    public final static String bool___add___doc = 
+        "Return self+value.";
+
+    public final static String bool___and___doc = 
+        "Return self&value.";
+
+    public final static String bool___bool___doc = 
+        "self != 0";
+
+    public final static String bool___ceil___doc = 
+        "Ceiling of an Integral returns itself.";
+
+    public final static String bool___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String bool___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String bool___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String bool___divmod___doc = 
+        "Return divmod(self, value).";
+
+    public final static String bool_doc = 
+        "bool(x) -> bool\n" + 
+        "\n" + 
+        "Returns True when the argument x is true, False otherwise.\n" + 
+        "The builtins True and False are the only two instances of the class bool.\n" + 
+        "The class bool is a subclass of the class int, and cannot be subclassed.";
+
+    public final static String bool___eq___doc = 
+        "Return self==value.";
+
+    public final static String bool___float___doc = 
+        "float(self)";
+
+    public final static String bool___floor___doc = 
+        "Flooring an Integral returns itself.";
+
+    public final static String bool___floordiv___doc = 
+        "Return self//value.";
+
+    public final static String bool___format___doc = 
+        "";
+
+    public final static String bool___ge___doc = 
+        "Return self>=value.";
+
+    public final static String bool___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String bool___getnewargs___doc = 
+        "";
+
+    public final static String bool___gt___doc = 
+        "Return self>value.";
+
+    public final static String bool___hash___doc = 
+        "Return hash(self).";
+
+    public final static String bool___index___doc = 
+        "Return self converted to an integer, if self is suitable for use as an index into a list.";
+
+    public final static String bool___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String bool___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String bool___int___doc = 
+        "int(self)";
+
+    public final static String bool___invert___doc = 
+        "~self";
+
+    public final static String bool___le___doc = 
+        "Return self<=value.";
+
+    public final static String bool___lshift___doc = 
+        "Return self<<value.";
+
+    public final static String bool___lt___doc = 
+        "Return self<value.";
+
+    public final static String bool___mod___doc = 
+        "Return self%value.";
+
+    public final static String bool___mul___doc = 
+        "Return self*value.";
+
+    public final static String bool___ne___doc = 
+        "Return self!=value.";
+
+    public final static String bool___neg___doc = 
+        "-self";
+
+    public final static String bool___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String bool___or___doc = 
+        "Return self|value.";
+
+    public final static String bool___pos___doc = 
+        "+self";
+
+    public final static String bool___pow___doc = 
+        "Return pow(self, value, mod).";
+
+    public final static String bool___radd___doc = 
+        "Return value+self.";
+
+    public final static String bool___rand___doc = 
+        "Return value&self.";
+
+    public final static String bool___rdivmod___doc = 
+        "Return divmod(value, self).";
+
+    public final static String bool___reduce___doc = 
+        "helper for pickle";
+
+    public final static String bool___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String bool___repr___doc = 
+        "Return repr(self).";
+
+    public final static String bool___rfloordiv___doc = 
+        "Return value//self.";
+
+    public final static String bool___rlshift___doc = 
+        "Return value<<self.";
+
+    public final static String bool___rmod___doc = 
+        "Return value%self.";
+
+    public final static String bool___rmul___doc = 
+        "Return value*self.";
+
+    public final static String bool___ror___doc = 
+        "Return value|self.";
+
+    public final static String bool___round___doc = 
+        "Rounding an Integral returns itself.\n" + 
+        "Rounding with an ndigits argument also returns an integer.";
+
+    public final static String bool___rpow___doc = 
+        "Return pow(value, self, mod).";
+
+    public final static String bool___rrshift___doc = 
+        "Return value>>self.";
+
+    public final static String bool___rshift___doc = 
+        "Return self>>value.";
+
+    public final static String bool___rsub___doc = 
+        "Return value-self.";
+
+    public final static String bool___rtruediv___doc = 
+        "Return value/self.";
+
+    public final static String bool___rxor___doc = 
+        "Return value^self.";
+
+    public final static String bool___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String bool___sizeof___doc = 
+        "Returns size in memory, in bytes";
+
+    public final static String bool___str___doc = 
+        "Return str(self).";
+
+    public final static String bool___sub___doc = 
+        "Return self-value.";
+
+    public final static String bool___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String bool___truediv___doc = 
+        "Return self/value.";
+
+    public final static String bool___trunc___doc = 
+        "Truncating an Integral returns itself.";
+
+    public final static String bool___xor___doc = 
+        "Return self^value.";
+
+    public final static String bool_bit_length_doc = 
+        "int.bit_length() -> int\n" + 
+        "\n" + 
+        "Number of bits necessary to represent self in binary.\n" + 
+        ">>> bin(37)\n" + 
+        "'0b100101'\n" + 
+        ">>> (37).bit_length()\n" + 
+        "6";
+
+    public final static String bool_conjugate_doc = 
+        "Returns self, the complex conjugate of any int.";
+
+    public final static String bool_denominator_doc = 
+        "the denominator of a rational number in lowest terms";
+
+    public final static String bool_from_bytes_doc = 
+        "int.from_bytes(bytes, byteorder, *, signed=False) -> int\n" + 
+        "\n" + 
+        "Return the integer represented by the given array of bytes.\n" + 
+        "\n" + 
+        "The bytes argument must be a bytes-like object (e.g. bytes or bytearray).\n" + 
+        "\n" + 
+        "The byteorder argument determines the byte order used to represent the\n" + 
+        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
+        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
+        "significant byte is at the end of the byte array.  To request the native\n" + 
+        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
+        "\n" + 
+        "The signed keyword-only argument indicates whether two's complement is\n" + 
+        "used to represent the integer.";
+
+    public final static String bool_imag_doc = 
+        "the imaginary part of a complex number";
+
+    public final static String bool_numerator_doc = 
+        "the numerator of a rational number in lowest terms";
+
+    public final static String bool_real_doc = 
+        "the real part of a complex number";
+
+    public final static String bool_to_bytes_doc = 
+        "int.to_bytes(length, byteorder, *, signed=False) -> bytes\n" + 
+        "\n" + 
+        "Return an array of bytes representing an integer.\n" + 
+        "\n" + 
+        "The integer is represented using length bytes.  An OverflowError is\n" + 
+        "raised if the integer is not representable with the given number of\n" + 
+        "bytes.\n" + 
+        "\n" + 
+        "The byteorder argument determines the byte order used to represent the\n" + 
+        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
+        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
+        "significant byte is at the end of the byte array.  To request the native\n" + 
+        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
+        "\n" + 
+        "The signed keyword-only argument determines whether two's complement is\n" + 
+        "used to represent the integer.  If signed is False and a negative integer\n" + 
+        "is given, an OverflowError is raised.";
+
+    // Docs for <class 'classmethod'>
+    public final static String classmethod___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String classmethod___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String classmethod___dict___doc = 
+        "";
+
+    public final static String classmethod___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String classmethod_doc = 
+        "classmethod(function) -> method\n" + 
+        "\n" + 
+        "Convert a function to be a class method.\n" + 
+        "\n" + 
+        "A class method receives the class as implicit first argument,\n" + 
+        "just like an instance method receives the instance.\n" + 
+        "To declare a class method, use this idiom:\n" + 
+        "\n" + 
+        "  class C:\n" + 
+        "      @classmethod\n" + 
+        "      def f(cls, arg1, arg2, ...):\n" + 
+        "          ...\n" + 
+        "\n" + 
+        "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
+        "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
+        "If a class method is called for a derived class, the derived class\n" + 
+        "object is passed as the implied first argument.\n" + 
+        "\n" + 
+        "Class methods are different than C++ or Java static methods.\n" + 
+        "If you want those, see the staticmethod builtin.";
+
+    public final static String classmethod___eq___doc = 
+        "Return self==value.";
+
+    public final static String classmethod___format___doc = 
+        "default object formatter";
+
+    public final static String classmethod___func___doc = 
+        "";
+
+    public final static String classmethod___ge___doc = 
+        "Return self>=value.";
+
+    public final static String classmethod___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String classmethod___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String classmethod___gt___doc = 
+        "Return self>value.";
+
+    public final static String classmethod___hash___doc = 
+        "Return hash(self).";
+
+    public final static String classmethod___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String classmethod___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String classmethod___isabstractmethod___doc = 
+        "";
+
+    public final static String classmethod___le___doc = 
+        "Return self<=value.";
+
+    public final static String classmethod___lt___doc = 
+        "Return self<value.";
+
+    public final static String classmethod___ne___doc = 
+        "Return self!=value.";
+
+    public final static String classmethod___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String classmethod___reduce___doc = 
+        "helper for pickle";
+
+    public final static String classmethod___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String classmethod___repr___doc = 
+        "Return repr(self).";
+
+    public final static String classmethod___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String classmethod___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String classmethod___str___doc = 
+        "Return str(self).";
+
+    public final static String classmethod___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'set'>
+    public final static String set___and___doc = 
+        "Return self&value.";
+
+    public final static String set___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String set___contains___doc = 
+        "x.__contains__(y) <==> y in x.";
+
+    public final static String set___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String set___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String set_doc = 
+        "set() -> new empty set object\n" + 
+        "set(iterable) -> new set object\n" + 
+        "\n" + 
+        "Build an unordered collection of unique elements.";
+
+    public final static String set___eq___doc = 
+        "Return self==value.";
+
+    public final static String set___format___doc = 
+        "default object formatter";
+
+    public final static String set___ge___doc = 
+        "Return self>=value.";
+
+    public final static String set___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String set___gt___doc = 
+        "Return self>value.";
+
+    public final static String set___hash___doc = 
+        "";
+
+    public final static String set___iand___doc = 
+        "Return self&=value.";
+
+    public final static String set___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String set___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String set___ior___doc = 
+        "Return self|=value.";
+
+    public final static String set___isub___doc = 
+        "Return self-=value.";
+
+    public final static String set___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String set___ixor___doc = 
+        "Return self^=value.";
+
+    public final static String set___le___doc = 
+        "Return self<=value.";
+
+    public final static String set___len___doc = 
+        "Return len(self).";
+
+    public final static String set___lt___doc = 
+        "Return self<value.";
+
+    public final static String set___ne___doc = 
+        "Return self!=value.";
+
+    public final static String set___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String set___or___doc = 
+        "Return self|value.";
+
+    public final static String set___rand___doc = 
+        "Return value&self.";
+
+    public final static String set___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String set___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String set___repr___doc = 
+        "Return repr(self).";
+
+    public final static String set___ror___doc = 
+        "Return value|self.";
+
+    public final static String set___rsub___doc = 
+        "Return value-self.";
+
+    public final static String set___rxor___doc = 
+        "Return value^self.";
+
+    public final static String set___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String set___sizeof___doc = 
+        "S.__sizeof__() -> size of S in memory, in bytes";
+
+    public final static String set___str___doc = 
+        "Return str(self).";
+
+    public final static String set___sub___doc = 
+        "Return self-value.";
+
+    public final static String set___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String set___xor___doc = 
+        "Return self^value.";
+
+    public final static String set_add_doc = 
+        "Add an element to a set.\n" + 
+        "\n" + 
+        "This has no effect if the element is already present.";
+
+    public final static String set_clear_doc = 
+        "Remove all elements from this set.";
+
+    public final static String set_copy_doc = 
+        "Return a shallow copy of a set.";
+
+    public final static String set_difference_doc = 
+        "Return the difference of two or more sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in this set but not the others.)";
+
+    public final static String set_difference_update_doc = 
+        "Remove all elements of another set from this set.";
+
+    public final static String set_discard_doc = 
+        "Remove an element from a set if it is a member.\n" + 
+        "\n" + 
+        "If the element is not a member, do nothing.";
+
+    public final static String set_intersection_doc = 
+        "Return the intersection of two sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in both sets.)";
+
+    public final static String set_intersection_update_doc = 
+        "Update a set with the intersection of itself and another.";
+
+    public final static String set_isdisjoint_doc = 
+        "Return True if two sets have a null intersection.";
+
+    public final static String set_issubset_doc = 
+        "Report whether another set contains this set.";
+
+    public final static String set_issuperset_doc = 
+        "Report whether this set contains another set.";
+
+    public final static String set_pop_doc = 
+        "Remove and return an arbitrary set element.\n" + 
+        "Raises KeyError if the set is empty.";
+
+    public final static String set_remove_doc = 
+        "Remove an element from a set; it must be a member.\n" + 
+        "\n" + 
+        "If the element is not a member, raise a KeyError.";
+
+    public final static String set_symmetric_difference_doc = 
+        "Return the symmetric difference of two sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in exactly one of the sets.)";
+
+    public final static String set_symmetric_difference_update_doc = 
+        "Update a set with the symmetric difference of itself and another.";
+
+    public final static String set_union_doc = 
+        "Return the union of sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in either set.)";
+
+    public final static String set_update_doc = 
+        "Update a set with the union of itself and others.";
+
+    // Docs for <class 'frozenset'>
+    public final static String frozenset___and___doc = 
+        "Return self&value.";
+
+    public final static String frozenset___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String frozenset___contains___doc = 
+        "x.__contains__(y) <==> y in x.";
+
+    public final static String frozenset___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String frozenset___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String frozenset_doc = 
+        "frozenset() -> empty frozenset object\n" + 
+        "frozenset(iterable) -> frozenset object\n" + 
+        "\n" + 
+        "Build an immutable unordered collection of unique elements.";
+
+    public final static String frozenset___eq___doc = 
+        "Return self==value.";
+
+    public final static String frozenset___format___doc = 
+        "default object formatter";
+
+    public final static String frozenset___ge___doc = 
+        "Return self>=value.";
+
+    public final static String frozenset___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String frozenset___gt___doc = 
+        "Return self>value.";
+
+    public final static String frozenset___hash___doc = 
+        "Return hash(self).";
+
+    public final static String frozenset___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String frozenset___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String frozenset___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String frozenset___le___doc = 
+        "Return self<=value.";
+
+    public final static String frozenset___len___doc = 
+        "Return len(self).";
+
+    public final static String frozenset___lt___doc = 
+        "Return self<value.";
+
+    public final static String frozenset___ne___doc = 
+        "Return self!=value.";
+
+    public final static String frozenset___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String frozenset___or___doc = 
+        "Return self|value.";
+
+    public final static String frozenset___rand___doc = 
+        "Return value&self.";
+
+    public final static String frozenset___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String frozenset___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String frozenset___repr___doc = 
+        "Return repr(self).";
+
+    public final static String frozenset___ror___doc = 
+        "Return value|self.";
+
+    public final static String frozenset___rsub___doc = 
+        "Return value-self.";
+
+    public final static String frozenset___rxor___doc = 
+        "Return value^self.";
+
+    public final static String frozenset___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String frozenset___sizeof___doc = 
+        "S.__sizeof__() -> size of S in memory, in bytes";
+
+    public final static String frozenset___str___doc = 
+        "Return str(self).";
+
+    public final static String frozenset___sub___doc = 
+        "Return self-value.";
+
+    public final static String frozenset___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String frozenset___xor___doc = 
+        "Return self^value.";
+
+    public final static String frozenset_copy_doc = 
+        "Return a shallow copy of a set.";
+
+    public final static String frozenset_difference_doc = 
+        "Return the difference of two or more sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in this set but not the others.)";
+
+    public final static String frozenset_intersection_doc = 
+        "Return the intersection of two sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in both sets.)";
+
+    public final static String frozenset_isdisjoint_doc = 
+        "Return True if two sets have a null intersection.";
+
+    public final static String frozenset_issubset_doc = 
+        "Report whether another set contains this set.";
+
+    public final static String frozenset_issuperset_doc = 
+        "Report whether this set contains another set.";
+
+    public final static String frozenset_symmetric_difference_doc = 
+        "Return the symmetric difference of two sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in exactly one of the sets.)";
+
+    public final static String frozenset_union_doc = 
+        "Return the union of sets as a new set.\n" + 
+        "\n" + 
+        "(i.e. all elements that are in either set.)";
+
+    // Docs for <class 'BaseException'>
+    public final static String BaseException___cause___doc = 
+        "exception cause";
+
+    public final static String BaseException___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String BaseException___context___doc = 
+        "exception context";
+
+    public final static String BaseException___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String BaseException___dict___doc = 
+        "";
+
+    public final static String BaseException___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String BaseException_doc = 
+        "Common base class for all exceptions";
+
+    public final static String BaseException___eq___doc = 
+        "Return self==value.";
+
+    public final static String BaseException___format___doc = 
+        "default object formatter";
+
+    public final static String BaseException___ge___doc = 
+        "Return self>=value.";
+
+    public final static String BaseException___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String BaseException___gt___doc = 
+        "Return self>value.";
+
+    public final static String BaseException___hash___doc = 
+        "Return hash(self).";
+
+    public final static String BaseException___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String BaseException___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String BaseException___le___doc = 
+        "Return self<=value.";
+
+    public final static String BaseException___lt___doc = 
+        "Return self<value.";
+
+    public final static String BaseException___ne___doc = 
+        "Return self!=value.";
+
+    public final static String BaseException___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String BaseException___reduce___doc = 
+        "";
+
+    public final static String BaseException___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String BaseException___repr___doc = 
+        "Return repr(self).";
+
+    public final static String BaseException___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String BaseException___setstate___doc = 
+        "";
+
+    public final static String BaseException___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String BaseException___str___doc = 
+        "Return str(self).";
+
+    public final static String BaseException___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String BaseException___suppress_context___doc = 
+        "";
+
+    public final static String BaseException___traceback___doc = 
+        "";
+
+    public final static String BaseException_args_doc = 
+        "";
+
+    public final static String BaseException_with_traceback_doc = 
+        "Exception.with_traceback(tb) --\n" + 
+        "    set self.__traceback__ to tb and return self.";
+
+    // Docs for <class 'bytearray'>
+    public final static String bytearray___add___doc = 
+        "Return self+value.";
+
+    public final static String bytearray___alloc___doc = 
+        "B.__alloc__() -> int\n" + 
+        "\n" + 
+        "Return the number of bytes actually allocated.";
+
+    public final static String bytearray___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String bytearray___contains___doc = 
+        "Return key in self.";
+
+    public final static String bytearray___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String bytearray___delitem___doc = 
+        "Delete self[key].";
+
+    public final static String bytearray___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String bytearray_doc = 
+        "bytearray(iterable_of_ints) -> bytearray\n" + 
+        "bytearray(string, encoding[, errors]) -> bytearray\n" + 
+        "bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer\n" + 
+        "bytearray(int) -> bytes array of size given by the parameter initialized with null bytes\n" + 
+        "bytearray() -> empty bytes array\n" + 
+        "\n" + 
+        "Construct a mutable bytearray object from:\n" + 
+        "  - an iterable yielding integers in range(256)\n" + 
+        "  - a text string encoded using the specified encoding\n" + 
+        "  - a bytes or a buffer object\n" + 
+        "  - any object implementing the buffer API.\n" + 
+        "  - an integer";
+
+    public final static String bytearray___eq___doc = 
+        "Return self==value.";
+
+    public final static String bytearray___format___doc = 
+        "default object formatter";
+
+    public final static String bytearray___ge___doc = 
+        "Return self>=value.";
+
+    public final static String bytearray___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String bytearray___getitem___doc = 
+        "Return self[key].";
+
+    public final static String bytearray___gt___doc = 
+        "Return self>value.";
+
+    public final static String bytearray___hash___doc = 
+        "";
+
+    public final static String bytearray___iadd___doc = 
+        "Implement self+=value.";
+
+    public final static String bytearray___imul___doc = 
+        "Implement self*=value.";
+
+    public final static String bytearray___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String bytearray___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String bytearray___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String bytearray___le___doc = 
+        "Return self<=value.";
+
+    public final static String bytearray___len___doc = 
+        "Return len(self).";
+
+    public final static String bytearray___lt___doc = 
+        "Return self<value.";
+
+    public final static String bytearray___mod___doc = 
+        "Return self%value.";
+
+    public final static String bytearray___mul___doc = 
+        "Return self*value.n";
+
+    public final static String bytearray___ne___doc = 
+        "Return self!=value.";
+
+    public final static String bytearray___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String bytearray___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String bytearray___reduce_ex___doc = 
+        "Return state information for pickling.";
+
+    public final static String bytearray___repr___doc = 
+        "Return repr(self).";
+
+    public final static String bytearray___rmod___doc = 
+        "Return value%self.";
+
+    public final static String bytearray___rmul___doc = 
+        "Return self*value.";
+
+    public final static String bytearray___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String bytearray___setitem___doc = 
+        "Set self[key] to value.";
+
+    public final static String bytearray___sizeof___doc = 
+        "Returns the size of the bytearray object in memory, in bytes.";
+
+    public final static String bytearray___str___doc = 
+        "Return str(self).";
+
+    public final static String bytearray___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String bytearray_append_doc = 
+        "Append a single item to the end of the bytearray.\n" + 
+        "\n" + 
+        "  item\n" + 
+        "    The item to be appended.";
+
+    public final static String bytearray_capitalize_doc = 
+        "B.capitalize() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with only its first character capitalized (ASCII)\n" + 
+        "and the rest lower-cased.";
+
+    public final static String bytearray_center_doc = 
+        "B.center(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B centered in a string of length width.  Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String bytearray_clear_doc = 
+        "Remove all items from the bytearray.";
+
+    public final static String bytearray_copy_doc = 
+        "Return a copy of B.";
+
+    public final static String bytearray_count_doc = 
+        "B.count(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the number of non-overlapping occurrences of subsection sub in\n" + 
+        "bytes B[start:end].  Optional arguments start and end are interpreted\n" + 
+        "as in slice notation.";
+
+    public final static String bytearray_decode_doc = 
+        "Decode the bytearray using the codec registered for encoding.\n" + 
+        "\n" + 
+        "  encoding\n" + 
+        "    The encoding with which to decode the bytearray.\n" + 
+        "  errors\n" + 
+        "    The error handling scheme to use for the handling of decoding errors.\n" + 
+        "    The default is 'strict' meaning that decoding errors raise a\n" + 
+        "    UnicodeDecodeError. Other possible values are 'ignore' and 'replace'\n" + 
+        "    as well as any other name registered with codecs.register_error that\n" + 
+        "    can handle UnicodeDecodeErrors.";
+
+    public final static String bytearray_endswith_doc = 
+        "B.endswith(suffix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if B ends with the specified suffix, False otherwise.\n" + 
+        "With optional start, test B beginning at that position.\n" + 
+        "With optional end, stop comparing B at that position.\n" + 
+        "suffix can also be a tuple of bytes to try.";
+
+    public final static String bytearray_expandtabs_doc = 
+        "B.expandtabs(tabsize=8) -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B where all tab characters are expanded using spaces.\n" + 
+        "If tabsize is not given, a tab size of 8 characters is assumed.";
+
+    public final static String bytearray_extend_doc = 
+        "Append all the items from the iterator or sequence to the end of the bytearray.\n" + 
+        "\n" + 
+        "  iterable_of_ints\n" + 
+        "    The iterable of items to append.";
+
+    public final static String bytearray_find_doc = 
+        "B.find(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the lowest index in B where subsection sub is found,\n" + 
+        "such that sub is contained within B[start,end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String bytearray_fromhex_doc = 
+        "Create a bytearray object from a string of hexadecimal numbers.\n" + 
+        "\n" + 
+        "Spaces between two numbers are accepted.\n" + 
+        "Example: bytearray.fromhex('B9 01EF') -> bytearray(b'\\\\xb9\\\\x01\\\\xef')";
+
+    public final static String bytearray_hex_doc = 
+        "B.hex() -> string\n" + 
+        "\n" + 
+        "Create a string of hexadecimal numbers from a bytearray object.\n" + 
+        "Example: bytearray([0xb9, 0x01, 0xef]).hex() -> 'b901ef'.";
+
+    public final static String bytearray_index_doc = 
+        "B.index(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like B.find() but raise ValueError when the subsection is not found.";
+
+    public final static String bytearray_insert_doc = 
+        "Insert a single item into the bytearray before the given index.\n" + 
+        "\n" + 
+        "  index\n" + 
+        "    The index where the value is to be inserted.\n" + 
+        "  item\n" + 
+        "    The item to be inserted.";
+
+    public final static String bytearray_isalnum_doc = 
+        "B.isalnum() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are alphanumeric\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytearray_isalpha_doc = 
+        "B.isalpha() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are alphabetic\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytearray_isdigit_doc = 
+        "B.isdigit() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are digits\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytearray_islower_doc = 
+        "B.islower() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in B are lowercase and there is\n" + 
+        "at least one cased character in B, False otherwise.";
+
+    public final static String bytearray_isspace_doc = 
+        "B.isspace() -> bool\n" + 
+        "\n" + 
+        "Return True if all characters in B are whitespace\n" + 
+        "and there is at least one character in B, False otherwise.";
+
+    public final static String bytearray_istitle_doc = 
+        "B.istitle() -> bool\n" + 
+        "\n" + 
+        "Return True if B is a titlecased string and there is at least one\n" + 
+        "character in B, i.e. uppercase characters may only follow uncased\n" + 
+        "characters and lowercase characters only cased ones. Return False\n" + 
+        "otherwise.";
+
+    public final static String bytearray_isupper_doc = 
+        "B.isupper() -> bool\n" + 
+        "\n" + 
+        "Return True if all cased characters in B are uppercase and there is\n" + 
+        "at least one cased character in B, False otherwise.";
+
+    public final static String bytearray_join_doc = 
+        "Concatenate any number of bytes/bytearray objects.\n" + 
+        "\n" + 
+        "The bytearray whose method is called is inserted in between each pair.\n" + 
+        "\n" + 
+        "The result is returned as a new bytearray object.";
+
+    public final static String bytearray_ljust_doc = 
+        "B.ljust(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B left justified in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space).";
+
+    public final static String bytearray_lower_doc = 
+        "B.lower() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with all ASCII characters converted to lowercase.";
+
+    public final static String bytearray_lstrip_doc = 
+        "Strip leading bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip leading ASCII whitespace.";
+
+    public final static String bytearray_maketrans_doc = 
+        "Return a translation table useable for the bytes or bytearray translate method.\n" + 
+        "\n" + 
+        "The returned table will be one where each byte in frm is mapped to the byte at\n" + 
+        "the same position in to.\n" + 
+        "\n" + 
+        "The bytes objects frm and to must be of the same length.";
+
+    public final static String bytearray_partition_doc = 
+        "Partition the bytearray into three parts using the given separator.\n" + 
+        "\n" + 
+        "This will search for the separator sep in the bytearray. If the separator is\n" + 
+        "found, returns a 3-tuple containing the part before the separator, the\n" + 
+        "separator itself, and the part after it.\n" + 
+        "\n" + 
+        "If the separator is not found, returns a 3-tuple containing the original\n" + 
+        "bytearray object and two empty bytearray objects.";
+
+    public final static String bytearray_pop_doc = 
+        "Remove and return a single item from B.\n" + 
+        "\n" + 
+        "  index\n" + 
+        "    The index from where to remove the item.\n" + 
+        "    -1 (the default value) means remove the last item.\n" + 
+        "\n" + 
+        "If no index argument is given, will pop the last item.";
+
+    public final static String bytearray_remove_doc = 
+        "Remove the first occurrence of a value in the bytearray.\n" + 
+        "\n" + 
+        "  value\n" + 
+        "    The value to remove.";
+
+    public final static String bytearray_replace_doc = 
+        "Return a copy with all occurrences of substring old replaced by new.\n" + 
+        "\n" + 
+        "  count\n" + 
+        "    Maximum number of occurrences to replace.\n" + 
+        "    -1 (the default value) means replace all occurrences.\n" + 
+        "\n" + 
+        "If the optional argument count is given, only the first count occurrences are\n" + 
+        "replaced.";
+
+    public final static String bytearray_reverse_doc = 
+        "Reverse the order of the values in B in place.";
+
+    public final static String bytearray_rfind_doc = 
+        "B.rfind(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Return the highest index in B where subsection sub is found,\n" + 
+        "such that sub is contained within B[start,end].  Optional\n" + 
+        "arguments start and end are interpreted as in slice notation.\n" + 
+        "\n" + 
+        "Return -1 on failure.";
+
+    public final static String bytearray_rindex_doc = 
+        "B.rindex(sub[, start[, end]]) -> int\n" + 
+        "\n" + 
+        "Like B.rfind() but raise ValueError when the subsection is not found.";
+
+    public final static String bytearray_rjust_doc = 
+        "B.rjust(width[, fillchar]) -> copy of B\n" + 
+        "\n" + 
+        "Return B right justified in a string of length width. Padding is\n" + 
+        "done using the specified fill character (default is a space)";
+
+    public final static String bytearray_rpartition_doc = 
+        "Partition the bytes into three parts using the given separator.\n" + 
+        "\n" + 
+        "This will search for the separator sep in the bytearray, starting and the end.\n" + 
+        "If the separator is found, returns a 3-tuple containing the part before the\n" + 
+        "separator, the separator itself, and the part after it.\n" + 
+        "\n" + 
+        "If the separator is not found, returns a 3-tuple containing two empty bytearray\n" + 
+        "objects and the original bytearray object.";
+
+    public final static String bytearray_rsplit_doc = 
+        "Return a list of the sections in the bytearray, using sep as the delimiter.\n" + 
+        "\n" + 
+        "  sep\n" + 
+        "    The delimiter according which to split the bytearray.\n" + 
+        "    None (the default value) means split on ASCII whitespace characters\n" + 
+        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
+        "  maxsplit\n" + 
+        "    Maximum number of splits to do.\n" + 
+        "    -1 (the default value) means no limit.\n" + 
+        "\n" + 
+        "Splitting is done starting at the end of the bytearray and working to the front.";
+
+    public final static String bytearray_rstrip_doc = 
+        "Strip trailing bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip trailing ASCII whitespace.";
+
+    public final static String bytearray_split_doc = 
+        "Return a list of the sections in the bytearray, using sep as the delimiter.\n" + 
+        "\n" + 
+        "  sep\n" + 
+        "    The delimiter according which to split the bytearray.\n" + 
+        "    None (the default value) means split on ASCII whitespace characters\n" + 
+        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
+        "  maxsplit\n" + 
+        "    Maximum number of splits to do.\n" + 
+        "    -1 (the default value) means no limit.";
+
+    public final static String bytearray_splitlines_doc = 
+        "Return a list of the lines in the bytearray, breaking at line boundaries.\n" + 
+        "\n" + 
+        "Line breaks are not included in the resulting list unless keepends is given and\n" + 
+        "true.";
+
+    public final static String bytearray_startswith_doc = 
+        "B.startswith(prefix[, start[, end]]) -> bool\n" + 
+        "\n" + 
+        "Return True if B starts with the specified prefix, False otherwise.\n" + 
+        "With optional start, test B beginning at that position.\n" + 
+        "With optional end, stop comparing B at that position.\n" + 
+        "prefix can also be a tuple of bytes to try.";
+
+    public final static String bytearray_strip_doc = 
+        "Strip leading and trailing bytes contained in the argument.\n" + 
+        "\n" + 
+        "If the argument is omitted or None, strip leading and trailing ASCII whitespace.";
+
+    public final static String bytearray_swapcase_doc = 
+        "B.swapcase() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with uppercase ASCII characters converted\n" + 
+        "to lowercase ASCII and vice versa.";
+
+    public final static String bytearray_title_doc = 
+        "B.title() -> copy of B\n" + 
+        "\n" + 
+        "Return a titlecased version of B, i.e. ASCII words start with uppercase\n" + 
+        "characters, all remaining cased characters have lowercase.";
+
+    public final static String bytearray_translate_doc = 
+        "Return a copy with each character mapped by the given translation table.\n" + 
+        "\n" + 
+        "  table\n" + 
+        "    Translation table, which must be a bytes object of length 256.\n" + 
+        "\n" + 
+        "All characters occurring in the optional argument delete are removed.\n" + 
+        "The remaining characters are mapped through the given translation table.";
+
+    public final static String bytearray_upper_doc = 
+        "B.upper() -> copy of B\n" + 
+        "\n" + 
+        "Return a copy of B with all ASCII characters converted to uppercase.";
+
+    public final static String bytearray_zfill_doc = 
+        "B.zfill(width) -> copy of B\n" + 
+        "\n" + 
+        "Pad a numeric string B with zeros on the left, to fill a field\n" + 
+        "of the specified width.  B is never truncated.";
+
+    // Docs for <class 'memoryview'>
+    public final static String memoryview___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String memoryview___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String memoryview___delitem___doc = 
+        "Delete self[key].";
+
+    public final static String memoryview___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String memoryview_doc = 
+        "Create a new memoryview object which references the given object.";
+
+    public final static String memoryview___enter___doc = 
+        "";
+
+    public final static String memoryview___eq___doc = 
+        "Return self==value.";
+
+    public final static String memoryview___exit___doc = 
+        "";
+
+    public final static String memoryview___format___doc = 
+        "default object formatter";
+
+    public final static String memoryview___ge___doc = 
+        "Return self>=value.";
+
+    public final static String memoryview___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String memoryview___getitem___doc = 
+        "Return self[key].";
+
+    public final static String memoryview___gt___doc = 
+        "Return self>value.";
+
+    public final static String memoryview___hash___doc = 
+        "Return hash(self).";
+
+    public final static String memoryview___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String memoryview___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String memoryview___le___doc = 
+        "Return self<=value.";
+
+    public final static String memoryview___len___doc = 
+        "Return len(self).";
+
+    public final static String memoryview___lt___doc = 
+        "Return self<value.";
+
+    public final static String memoryview___ne___doc = 
+        "Return self!=value.";
+
+    public final static String memoryview___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String memoryview___reduce___doc = 
+        "helper for pickle";
+
+    public final static String memoryview___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String memoryview___repr___doc = 
+        "Return repr(self).";
+
+    public final static String memoryview___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String memoryview___setitem___doc = 
+        "Set self[key] to value.";
+
+    public final static String memoryview___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String memoryview___str___doc = 
+        "Return str(self).";
+
+    public final static String memoryview___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String memoryview_c_contiguous_doc = 
+        "A bool indicating whether the memory is C contiguous.";
+
+    public final static String memoryview_cast_doc = 
+        "Cast a memoryview to a new format or shape.";
+
+    public final static String memoryview_contiguous_doc = 
+        "A bool indicating whether the memory is contiguous.";
+
+    public final static String memoryview_f_contiguous_doc = 
+        "A bool indicating whether the memory is Fortran contiguous.";
+
+    public final static String memoryview_format_doc = 
+        "A string containing the format (in struct module style)\n" + 
+        " for each element in the view.";
+
+    public final static String memoryview_hex_doc = 
+        "Return the data in the buffer as a string of hexadecimal numbers.";
+
+    public final static String memoryview_itemsize_doc = 
+        "The size in bytes of each element of the memoryview.";
+
+    public final static String memoryview_nbytes_doc = 
+        "The amount of space in bytes that the array would use in\n" + 
+        " a contiguous representation.";
+
+    public final static String memoryview_ndim_doc = 
+        "An integer indicating how many dimensions of a multi-dimensional\n" + 
+        " array the memory represents.";
+
+    public final static String memoryview_obj_doc = 
+        "The underlying object of the memoryview.";
+
+    public final static String memoryview_readonly_doc = 
+        "A bool indicating whether the memory is read only.";
+
+    public final static String memoryview_release_doc = 
+        "Release the underlying buffer exposed by the memoryview object.";
+
+    public final static String memoryview_shape_doc = 
+        "A tuple of ndim integers giving the shape of the memory\n" + 
+        " as an N-dimensional array.";
+
+    public final static String memoryview_strides_doc = 
+        "A tuple of ndim integers giving the size in bytes to access\n" + 
+        " each element for each dimension of the array.";
+
+    public final static String memoryview_suboffsets_doc = 
+        "A tuple of integers used internally for PIL-style arrays.";
+
+    public final static String memoryview_tobytes_doc = 
+        "Return the data in the buffer as a byte string.";
+
+    public final static String memoryview_tolist_doc = 
+        "Return the data in the buffer as a list of elements.";
+
+    // Docs for <class 'generator'>
+    public final static String generator___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String generator___del___doc = 
+        "";
+
+    public final static String generator___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String generator___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String generator_doc = 
+        "";
+
+    public final static String generator___eq___doc = 
+        "Return self==value.";
+
+    public final static String generator___format___doc = 
+        "default object formatter";
+
+    public final static String generator___ge___doc = 
+        "Return self>=value.";
+
+    public final static String generator___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String generator___gt___doc = 
+        "Return self>value.";
+
+    public final static String generator___hash___doc = 
+        "Return hash(self).";
+
+    public final static String generator___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String generator___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String generator___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String generator___le___doc = 
+        "Return self<=value.";
+
+    public final static String generator___lt___doc = 
+        "Return self<value.";
+
+    public final static String generator___name___doc = 
         "str(object='') -> str\n" + 
         "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
         "\n" + 
@@ -2238,10 +5447,16 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
-    public final static String datetime___loader___doc = 
-        "Concrete implementation of SourceLoader using the file system.";
+    public final static String generator___ne___doc = 
+        "Return self!=value.";
 
-    public final static String datetime___name___doc = 
+    public final static String generator___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String generator___next___doc = 
+        "Implement next(self).";
+
+    public final static String generator___qualname___doc = 
         "str(object='') -> str\n" + 
         "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
         "\n" + 
@@ -2253,7 +5468,114 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
-    public final static String datetime___package___doc = 
+    public final static String generator___reduce___doc = 
+        "helper for pickle";
+
+    public final static String generator___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String generator___repr___doc = 
+        "Return repr(self).";
+
+    public final static String generator___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String generator___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String generator___str___doc = 
+        "Return str(self).";
+
+    public final static String generator___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String generator_close_doc = 
+        "close() -> raise GeneratorExit inside generator.";
+
+    public final static String generator_gi_code_doc = 
+        "";
+
+    public final static String generator_gi_frame_doc = 
+        "";
+
+    public final static String generator_gi_running_doc = 
+        "";
+
+    public final static String generator_gi_yieldfrom_doc = 
+        "object being iterated by yield from, or None";
+
+    public final static String generator_send_doc = 
+        "send(arg) -> send 'arg' into generator,\n" + 
+        "return next yielded value or raise StopIteration.";
+
+    public final static String generator_throw_doc = 
+        "throw(typ[,val[,tb]]) -> raise exception in generator,\n" + 
+        "return next yielded value or raise StopIteration.";
+
+    // Docs for <class 'coroutine'>
+    public final static String coroutine___await___doc = 
+        "Return an iterator to be used in await expression.";
+
+    public final static String coroutine___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String coroutine___del___doc = 
+        "";
+
+    public final static String coroutine___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String coroutine___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String coroutine_doc = 
+        "";
+
+    public final static String coroutine___eq___doc = 
+        "Return self==value.";
+
+    public final static String coroutine___format___doc = 
+        "default object formatter";
+
+    public final static String coroutine___ge___doc = 
+        "Return self>=value.";
+
+    public final static String coroutine___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String coroutine___gt___doc = 
+        "Return self>value.";
+
+    public final static String coroutine___hash___doc = 
+        "Return hash(self).";
+
+    public final static String coroutine___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String coroutine___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String coroutine___le___doc = 
+        "Return self<=value.";
+
+    public final static String coroutine___lt___doc = 
+        "Return self<value.";
+
+    public final static String coroutine___name___doc = 
         "str(object='') -> str\n" + 
         "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
         "\n" + 
@@ -2265,7 +5587,2648 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
-    public final static String datetime___spec___doc = 
+    public final static String coroutine___ne___doc = 
+        "Return self!=value.";
+
+    public final static String coroutine___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String coroutine___qualname___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String coroutine___reduce___doc = 
+        "helper for pickle";
+
+    public final static String coroutine___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String coroutine___repr___doc = 
+        "Return repr(self).";
+
+    public final static String coroutine___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String coroutine___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String coroutine___str___doc = 
+        "Return str(self).";
+
+    public final static String coroutine___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String coroutine_close_doc = 
+        "close() -> raise GeneratorExit inside coroutine.";
+
+    public final static String coroutine_cr_await_doc = 
+        "object being awaited on, or None";
+
+    public final static String coroutine_cr_code_doc = 
+        "";
+
+    public final static String coroutine_cr_frame_doc = 
+        "";
+
+    public final static String coroutine_cr_running_doc = 
+        "";
+
+    public final static String coroutine_send_doc = 
+        "send(arg) -> send 'arg' into coroutine,\n" + 
+        "return next iterated value or raise StopIteration.";
+
+    public final static String coroutine_throw_doc = 
+        "throw(typ[,val[,tb]]) -> raise exception in coroutine,\n" + 
+        "return next iterated value or raise StopIteration.";
+
+    // Docs for <class 'coroutine_wrapper'>
+    public final static String coroutine_wrapper___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String coroutine_wrapper___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String coroutine_wrapper___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String coroutine_wrapper_doc = 
+        "A wrapper object implementing __await__ for coroutines.";
+
+    public final static String coroutine_wrapper___eq___doc = 
+        "Return self==value.";
+
+    public final static String coroutine_wrapper___format___doc = 
+        "default object formatter";
+
+    public final static String coroutine_wrapper___ge___doc = 
+        "Return self>=value.";
+
+    public final static String coroutine_wrapper___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String coroutine_wrapper___gt___doc = 
+        "Return self>value.";
+
+    public final static String coroutine_wrapper___hash___doc = 
+        "Return hash(self).";
+
+    public final static String coroutine_wrapper___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String coroutine_wrapper___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String coroutine_wrapper___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String coroutine_wrapper___le___doc = 
+        "Return self<=value.";
+
+    public final static String coroutine_wrapper___lt___doc = 
+        "Return self<value.";
+
+    public final static String coroutine_wrapper___ne___doc = 
+        "Return self!=value.";
+
+    public final static String coroutine_wrapper___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String coroutine_wrapper___next___doc = 
+        "Implement next(self).";
+
+    public final static String coroutine_wrapper___reduce___doc = 
+        "helper for pickle";
+
+    public final static String coroutine_wrapper___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String coroutine_wrapper___repr___doc = 
+        "Return repr(self).";
+
+    public final static String coroutine_wrapper___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String coroutine_wrapper___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String coroutine_wrapper___str___doc = 
+        "Return str(self).";
+
+    public final static String coroutine_wrapper___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String coroutine_wrapper_close_doc = 
+        "close() -> raise GeneratorExit inside coroutine.";
+
+    public final static String coroutine_wrapper_send_doc = 
+        "send(arg) -> send 'arg' into coroutine,\n" + 
+        "return next iterated value or raise StopIteration.";
+
+    public final static String coroutine_wrapper_throw_doc = 
+        "throw(typ[,val[,tb]]) -> raise exception in coroutine,\n" + 
+        "return next iterated value or raise StopIteration.";
+
+    // Docs for <class 'function'>
+    public final static String function___annotations___doc = 
+        "";
+
+    public final static String function___call___doc = 
+        "Call self as a function.";
+
+    public final static String function___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String function___closure___doc = 
+        "";
+
+    public final static String function___code___doc = 
+        "";
+
+    public final static String function___defaults___doc = 
+        "";
+
+    public final static String function___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String function___dict___doc = 
+        "";
+
+    public final static String function___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String function_doc = 
+        "function(code, globals[, name[, argdefs[, closure]]])\n" + 
+        "\n" + 
+        "Create a function object from a code object and a dictionary.\n" + 
+        "The optional name string overrides the name from the code object.\n" + 
+        "The optional argdefs tuple specifies the default argument values.\n" + 
+        "The optional closure tuple supplies the bindings for free variables.";
+
+    public final static String function___eq___doc = 
+        "Return self==value.";
+
+    public final static String function___format___doc = 
+        "default object formatter";
+
+    public final static String function___ge___doc = 
+        "Return self>=value.";
+
+    public final static String function___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String function___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String function___globals___doc = 
+        "";
+
+    public final static String function___gt___doc = 
+        "Return self>value.";
+
+    public final static String function___hash___doc = 
+        "Return hash(self).";
+
+    public final static String function___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String function___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String function___kwdefaults___doc = 
+        "";
+
+    public final static String function___le___doc = 
+        "Return self<=value.";
+
+    public final static String function___lt___doc = 
+        "Return self<value.";
+
+    public final static String function___module___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String function___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String function___ne___doc = 
+        "Return self!=value.";
+
+    public final static String function___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String function___qualname___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String function___reduce___doc = 
+        "helper for pickle";
+
+    public final static String function___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String function___repr___doc = 
+        "Return repr(self).";
+
+    public final static String function___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String function___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String function___str___doc = 
+        "Return str(self).";
+
+    public final static String function___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'code'>
+    public final static String code___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String code___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String code___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String code_doc = 
+        "code(argcount, kwonlyargcount, nlocals, stacksize, flags, codestring,\n" + 
+        "      constants, names, varnames, filename, name, firstlineno,\n" + 
+        "      lnotab[, freevars[, cellvars]])\n" + 
+        "\n" + 
+        "Create a code object.  Not for the faint of heart.";
+
+    public final static String code___eq___doc = 
+        "Return self==value.";
+
+    public final static String code___format___doc = 
+        "default object formatter";
+
+    public final static String code___ge___doc = 
+        "Return self>=value.";
+
+    public final static String code___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String code___gt___doc = 
+        "Return self>value.";
+
+    public final static String code___hash___doc = 
+        "Return hash(self).";
+
+    public final static String code___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String code___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String code___le___doc = 
+        "Return self<=value.";
+
+    public final static String code___lt___doc = 
+        "Return self<value.";
+
+    public final static String code___ne___doc = 
+        "Return self!=value.";
+
+    public final static String code___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String code___reduce___doc = 
+        "helper for pickle";
+
+    public final static String code___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String code___repr___doc = 
+        "Return repr(self).";
+
+    public final static String code___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String code___sizeof___doc = 
+        "";
+
+    public final static String code___str___doc = 
+        "Return str(self).";
+
+    public final static String code___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String code_co_argcount_doc = 
+        "";
+
+    public final static String code_co_cellvars_doc = 
+        "";
+
+    public final static String code_co_code_doc = 
+        "";
+
+    public final static String code_co_consts_doc = 
+        "";
+
+    public final static String code_co_filename_doc = 
+        "";
+
+    public final static String code_co_firstlineno_doc = 
+        "";
+
+    public final static String code_co_flags_doc = 
+        "";
+
+    public final static String code_co_freevars_doc = 
+        "";
+
+    public final static String code_co_kwonlyargcount_doc = 
+        "";
+
+    public final static String code_co_lnotab_doc = 
+        "";
+
+    public final static String code_co_name_doc = 
+        "";
+
+    public final static String code_co_names_doc = 
+        "";
+
+    public final static String code_co_nlocals_doc = 
+        "";
+
+    public final static String code_co_stacksize_doc = 
+        "";
+
+    public final static String code_co_varnames_doc = 
+        "";
+
+    // Docs for <class 'types.SimpleNamespace'>
+    public final static String SimpleNamespace___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String SimpleNamespace___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String SimpleNamespace___dict___doc = 
+        "";
+
+    public final static String SimpleNamespace___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String SimpleNamespace_doc = 
+        "A simple attribute-based namespace.\n" + 
+        "\n" + 
+        "SimpleNamespace(**kwargs)";
+
+    public final static String SimpleNamespace___eq___doc = 
+        "Return self==value.";
+
+    public final static String SimpleNamespace___format___doc = 
+        "default object formatter";
+
+    public final static String SimpleNamespace___ge___doc = 
+        "Return self>=value.";
+
+    public final static String SimpleNamespace___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String SimpleNamespace___gt___doc = 
+        "Return self>value.";
+
+    public final static String SimpleNamespace___hash___doc = 
+        "";
+
+    public final static String SimpleNamespace___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String SimpleNamespace___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String SimpleNamespace___le___doc = 
+        "Return self<=value.";
+
+    public final static String SimpleNamespace___lt___doc = 
+        "Return self<value.";
+
+    public final static String SimpleNamespace___ne___doc = 
+        "Return self!=value.";
+
+    public final static String SimpleNamespace___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String SimpleNamespace___reduce___doc = 
+        "Return state information for pickling";
+
+    public final static String SimpleNamespace___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String SimpleNamespace___repr___doc = 
+        "Return repr(self).";
+
+    public final static String SimpleNamespace___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String SimpleNamespace___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String SimpleNamespace___str___doc = 
+        "Return str(self).";
+
+    public final static String SimpleNamespace___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'frame'>
+    public final static String frame___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String frame___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String frame___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String frame_doc = 
+        "";
+
+    public final static String frame___eq___doc = 
+        "Return self==value.";
+
+    public final static String frame___format___doc = 
+        "default object formatter";
+
+    public final static String frame___ge___doc = 
+        "Return self>=value.";
+
+    public final static String frame___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String frame___gt___doc = 
+        "Return self>value.";
+
+    public final static String frame___hash___doc = 
+        "Return hash(self).";
+
+    public final static String frame___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String frame___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String frame___le___doc = 
+        "Return self<=value.";
+
+    public final static String frame___lt___doc = 
+        "Return self<value.";
+
+    public final static String frame___ne___doc = 
+        "Return self!=value.";
+
+    public final static String frame___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String frame___reduce___doc = 
+        "helper for pickle";
+
+    public final static String frame___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String frame___repr___doc = 
+        "Return repr(self).";
+
+    public final static String frame___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String frame___sizeof___doc = 
+        "F.__sizeof__() -> size of F in memory, in bytes";
+
+    public final static String frame___str___doc = 
+        "Return str(self).";
+
+    public final static String frame___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String frame_clear_doc = 
+        "F.clear(): clear most references held by the frame";
+
+    public final static String frame_f_back_doc = 
+        "";
+
+    public final static String frame_f_builtins_doc = 
+        "";
+
+    public final static String frame_f_code_doc = 
+        "";
+
+    public final static String frame_f_globals_doc = 
+        "";
+
+    public final static String frame_f_lasti_doc = 
+        "";
+
+    public final static String frame_f_lineno_doc = 
+        "";
+
+    public final static String frame_f_locals_doc = 
+        "";
+
+    public final static String frame_f_trace_doc = 
+        "";
+
+    // Docs for <class 'traceback'>
+    public final static String traceback___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String traceback___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String traceback___dir___doc = 
+        "";
+
+    public final static String traceback_doc = 
+        "";
+
+    public final static String traceback___eq___doc = 
+        "Return self==value.";
+
+    public final static String traceback___format___doc = 
+        "default object formatter";
+
+    public final static String traceback___ge___doc = 
+        "Return self>=value.";
+
+    public final static String traceback___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String traceback___gt___doc = 
+        "Return self>value.";
+
+    public final static String traceback___hash___doc = 
+        "Return hash(self).";
+
+    public final static String traceback___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String traceback___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String traceback___le___doc = 
+        "Return self<=value.";
+
+    public final static String traceback___lt___doc = 
+        "Return self<value.";
+
+    public final static String traceback___ne___doc = 
+        "Return self!=value.";
+
+    public final static String traceback___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String traceback___reduce___doc = 
+        "helper for pickle";
+
+    public final static String traceback___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String traceback___repr___doc = 
+        "Return repr(self).";
+
+    public final static String traceback___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String traceback___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String traceback___str___doc = 
+        "Return str(self).";
+
+    public final static String traceback___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String traceback_tb_frame_doc = 
+        "";
+
+    public final static String traceback_tb_lasti_doc = 
+        "";
+
+    public final static String traceback_tb_lineno_doc = 
+        "";
+
+    public final static String traceback_tb_next_doc = 
+        "";
+
+    // Docs for <class '_sre.SRE_Pattern'>
+    public final static String SRE_Pattern___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String SRE_Pattern___copy___doc = 
+        "";
+
+    public final static String SRE_Pattern___deepcopy___doc = 
+        "";
+
+    public final static String SRE_Pattern___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String SRE_Pattern___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String SRE_Pattern_doc = 
+        "Compiled regular expression objects";
+
+    public final static String SRE_Pattern___eq___doc = 
+        "Return self==value.";
+
+    public final static String SRE_Pattern___format___doc = 
+        "default object formatter";
+
+    public final static String SRE_Pattern___ge___doc = 
+        "Return self>=value.";
+
+    public final static String SRE_Pattern___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String SRE_Pattern___gt___doc = 
+        "Return self>value.";
+
+    public final static String SRE_Pattern___hash___doc = 
+        "Return hash(self).";
+
+    public final static String SRE_Pattern___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String SRE_Pattern___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String SRE_Pattern___le___doc = 
+        "Return self<=value.";
+
+    public final static String SRE_Pattern___lt___doc = 
+        "Return self<value.";
+
+    public final static String SRE_Pattern___ne___doc = 
+        "Return self!=value.";
+
+    public final static String SRE_Pattern___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String SRE_Pattern___reduce___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Pattern___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Pattern___repr___doc = 
+        "Return repr(self).";
+
+    public final static String SRE_Pattern___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String SRE_Pattern___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String SRE_Pattern___str___doc = 
+        "Return str(self).";
+
+    public final static String SRE_Pattern___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String SRE_Pattern_findall_doc = 
+        "Return a list of all non-overlapping matches of pattern in string.";
+
+    public final static String SRE_Pattern_finditer_doc = 
+        "Return an iterator over all non-overlapping matches for the RE pattern in string.\n" + 
+        "\n" + 
+        "For each match, the iterator returns a match object.";
+
+    public final static String SRE_Pattern_flags_doc = 
+        "";
+
+    public final static String SRE_Pattern_fullmatch_doc = 
+        "Matches against all of the string";
+
+    public final static String SRE_Pattern_groupindex_doc = 
+        "A dictionary mapping group names to group numbers.";
+
+    public final static String SRE_Pattern_groups_doc = 
+        "";
+
+    public final static String SRE_Pattern_match_doc = 
+        "Matches zero or more characters at the beginning of the string.";
+
+    public final static String SRE_Pattern_pattern_doc = 
+        "";
+
+    public final static String SRE_Pattern_scanner_doc = 
+        "";
+
+    public final static String SRE_Pattern_search_doc = 
+        "Scan through string looking for a match, and return a corresponding match object instance.\n" + 
+        "\n" + 
+        "Return None if no position in the string matches.";
+
+    public final static String SRE_Pattern_split_doc = 
+        "Split string by the occurrences of pattern.";
+
+    public final static String SRE_Pattern_sub_doc = 
+        "Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.";
+
+    public final static String SRE_Pattern_subn_doc = 
+        "Return the tuple (new_string, number_of_subs_made) found by replacing the leftmost non-overlapping occurrences of pattern with the replacement repl.";
+
+    // Docs for <class '_sre.SRE_Match'>
+    public final static String SRE_Match___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String SRE_Match___copy___doc = 
+        "";
+
+    public final static String SRE_Match___deepcopy___doc = 
+        "";
+
+    public final static String SRE_Match___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String SRE_Match___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String SRE_Match_doc = 
+        "The result of re.match() and re.search().\n" + 
+        "Match objects always have a boolean value of True.";
+
+    public final static String SRE_Match___eq___doc = 
+        "Return self==value.";
+
+    public final static String SRE_Match___format___doc = 
+        "default object formatter";
+
+    public final static String SRE_Match___ge___doc = 
+        "Return self>=value.";
+
+    public final static String SRE_Match___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String SRE_Match___getitem___doc = 
+        "Return self[key].";
+
+    public final static String SRE_Match___gt___doc = 
+        "Return self>value.";
+
+    public final static String SRE_Match___hash___doc = 
+        "Return hash(self).";
+
+    public final static String SRE_Match___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String SRE_Match___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String SRE_Match___le___doc = 
+        "Return self<=value.";
+
+    public final static String SRE_Match___lt___doc = 
+        "Return self<value.";
+
+    public final static String SRE_Match___ne___doc = 
+        "Return self!=value.";
+
+    public final static String SRE_Match___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String SRE_Match___reduce___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Match___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Match___repr___doc = 
+        "Return repr(self).";
+
+    public final static String SRE_Match___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String SRE_Match___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String SRE_Match___str___doc = 
+        "Return str(self).";
+
+    public final static String SRE_Match___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String SRE_Match_end_doc = 
+        "Return index of the end of the substring matched by group.";
+
+    public final static String SRE_Match_endpos_doc = 
+        "";
+
+    public final static String SRE_Match_expand_doc = 
+        "Return the string obtained by doing backslash substitution on the string template, as done by the sub() method.";
+
+    public final static String SRE_Match_group_doc = 
+        "group([group1, ...]) -> str or tuple.\n" + 
+        "    Return subgroup(s) of the match by indices or names.\n" + 
+        "    For 0 returns the entire match.";
+
+    public final static String SRE_Match_groupdict_doc = 
+        "Return a dictionary containing all the named subgroups of the match, keyed by the subgroup name.\n" + 
+        "\n" + 
+        "  default\n" + 
+        "    Is used for groups that did not participate in the match.";
+
+    public final static String SRE_Match_groups_doc = 
+        "Return a tuple containing all the subgroups of the match, from 1.\n" + 
+        "\n" + 
+        "  default\n" + 
+        "    Is used for groups that did not participate in the match.";
+
+    public final static String SRE_Match_lastgroup_doc = 
+        "";
+
+    public final static String SRE_Match_lastindex_doc = 
+        "";
+
+    public final static String SRE_Match_pos_doc = 
+        "";
+
+    public final static String SRE_Match_re_doc = 
+        "";
+
+    public final static String SRE_Match_regs_doc = 
+        "";
+
+    public final static String SRE_Match_span_doc = 
+        "For MatchObject m, return the 2-tuple (m.start(group), m.end(group)).";
+
+    public final static String SRE_Match_start_doc = 
+        "Return index of the start of the substring matched by group.";
+
+    public final static String SRE_Match_string_doc = 
+        "";
+
+    // Docs for <class '_sre.SRE_Scanner'>
+    public final static String SRE_Scanner___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String SRE_Scanner___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String SRE_Scanner___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String SRE_Scanner_doc = 
+        "";
+
+    public final static String SRE_Scanner___eq___doc = 
+        "Return self==value.";
+
+    public final static String SRE_Scanner___format___doc = 
+        "default object formatter";
+
+    public final static String SRE_Scanner___ge___doc = 
+        "Return self>=value.";
+
+    public final static String SRE_Scanner___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String SRE_Scanner___gt___doc = 
+        "Return self>value.";
+
+    public final static String SRE_Scanner___hash___doc = 
+        "Return hash(self).";
+
+    public final static String SRE_Scanner___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String SRE_Scanner___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String SRE_Scanner___le___doc = 
+        "Return self<=value.";
+
+    public final static String SRE_Scanner___lt___doc = 
+        "Return self<value.";
+
+    public final static String SRE_Scanner___ne___doc = 
+        "Return self!=value.";
+
+    public final static String SRE_Scanner___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String SRE_Scanner___reduce___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Scanner___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String SRE_Scanner___repr___doc = 
+        "Return repr(self).";
+
+    public final static String SRE_Scanner___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String SRE_Scanner___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String SRE_Scanner___str___doc = 
+        "Return str(self).";
+
+    public final static String SRE_Scanner___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String SRE_Scanner_match_doc = 
+        "";
+
+    public final static String SRE_Scanner_pattern_doc = 
+        "";
+
+    public final static String SRE_Scanner_search_doc = 
+        "";
+
+    // Docs for <class 'range_iterator'>
+    public final static String range_iterator___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String range_iterator___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String range_iterator___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String range_iterator_doc = 
+        "";
+
+    public final static String range_iterator___eq___doc = 
+        "Return self==value.";
+
+    public final static String range_iterator___format___doc = 
+        "default object formatter";
+
+    public final static String range_iterator___ge___doc = 
+        "Return self>=value.";
+
+    public final static String range_iterator___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String range_iterator___gt___doc = 
+        "Return self>value.";
+
+    public final static String range_iterator___hash___doc = 
+        "Return hash(self).";
+
+    public final static String range_iterator___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String range_iterator___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String range_iterator___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String range_iterator___le___doc = 
+        "Return self<=value.";
+
+    public final static String range_iterator___length_hint___doc = 
+        "Private method returning an estimate of len(list(it)).";
+
+    public final static String range_iterator___lt___doc = 
+        "Return self<value.";
+
+    public final static String range_iterator___ne___doc = 
+        "Return self!=value.";
+
+    public final static String range_iterator___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String range_iterator___next___doc = 
+        "Implement next(self).";
+
+    public final static String range_iterator___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String range_iterator___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String range_iterator___repr___doc = 
+        "Return repr(self).";
+
+    public final static String range_iterator___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String range_iterator___setstate___doc = 
+        "Set state information for unpickling.";
+
+    public final static String range_iterator___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String range_iterator___str___doc = 
+        "Return str(self).";
+
+    public final static String range_iterator___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'list_iterator'>
+    public final static String list_iterator___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String list_iterator___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String list_iterator___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String list_iterator_doc = 
+        "";
+
+    public final static String list_iterator___eq___doc = 
+        "Return self==value.";
+
+    public final static String list_iterator___format___doc = 
+        "default object formatter";
+
+    public final static String list_iterator___ge___doc = 
+        "Return self>=value.";
+
+    public final static String list_iterator___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String list_iterator___gt___doc = 
+        "Return self>value.";
+
+    public final static String list_iterator___hash___doc = 
+        "Return hash(self).";
+
+    public final static String list_iterator___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String list_iterator___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String list_iterator___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String list_iterator___le___doc = 
+        "Return self<=value.";
+
+    public final static String list_iterator___length_hint___doc = 
+        "Private method returning an estimate of len(list(it)).";
+
+    public final static String list_iterator___lt___doc = 
+        "Return self<value.";
+
+    public final static String list_iterator___ne___doc = 
+        "Return self!=value.";
+
+    public final static String list_iterator___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String list_iterator___next___doc = 
+        "Implement next(self).";
+
+    public final static String list_iterator___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String list_iterator___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String list_iterator___repr___doc = 
+        "Return repr(self).";
+
+    public final static String list_iterator___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String list_iterator___setstate___doc = 
+        "Set state information for unpickling.";
+
+    public final static String list_iterator___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String list_iterator___str___doc = 
+        "Return str(self).";
+
+    public final static String list_iterator___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'itertools.chain'>
+    public final static String chain___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String chain___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String chain___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String chain_doc = 
+        "chain(*iterables) --> chain object\n" + 
+        "\n" + 
+        "Return a chain object whose .__next__() method returns elements from the\n" + 
+        "first iterable until it is exhausted, then elements from the next\n" + 
+        "iterable, until all of the iterables are exhausted.";
+
+    public final static String chain___eq___doc = 
+        "Return self==value.";
+
+    public final static String chain___format___doc = 
+        "default object formatter";
+
+    public final static String chain___ge___doc = 
+        "Return self>=value.";
+
+    public final static String chain___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String chain___gt___doc = 
+        "Return self>value.";
+
+    public final static String chain___hash___doc = 
+        "Return hash(self).";
+
+    public final static String chain___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String chain___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String chain___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String chain___le___doc = 
+        "Return self<=value.";
+
+    public final static String chain___lt___doc = 
+        "Return self<value.";
+
+    public final static String chain___ne___doc = 
+        "Return self!=value.";
+
+    public final static String chain___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String chain___next___doc = 
+        "Implement next(self).";
+
+    public final static String chain___reduce___doc = 
+        "Return state information for pickling.";
+
+    public final static String chain___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String chain___repr___doc = 
+        "Return repr(self).";
+
+    public final static String chain___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String chain___setstate___doc = 
+        "Set state information for unpickling.";
+
+    public final static String chain___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String chain___str___doc = 
+        "Return str(self).";
+
+    public final static String chain___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String chain_from_iterable_doc = 
+        "chain.from_iterable(iterable) --> chain object\n" + 
+        "\n" + 
+        "Alternate chain() constructor taking a single iterable argument\n" + 
+        "that evaluates lazily.";
+
+    // Docs for <class 'NoneType'>
+    public final static String NoneType___bool___doc = 
+        "self != 0";
+
+    public final static String NoneType___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String NoneType___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String NoneType___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String NoneType_doc = 
+        "";
+
+    public final static String NoneType___eq___doc = 
+        "Return self==value.";
+
+    public final static String NoneType___format___doc = 
+        "default object formatter";
+
+    public final static String NoneType___ge___doc = 
+        "Return self>=value.";
+
+    public final static String NoneType___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String NoneType___gt___doc = 
+        "Return self>value.";
+
+    public final static String NoneType___hash___doc = 
+        "Return hash(self).";
+
+    public final static String NoneType___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String NoneType___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String NoneType___le___doc = 
+        "Return self<=value.";
+
+    public final static String NoneType___lt___doc = 
+        "Return self<value.";
+
+    public final static String NoneType___ne___doc = 
+        "Return self!=value.";
+
+    public final static String NoneType___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String NoneType___reduce___doc = 
+        "helper for pickle";
+
+    public final static String NoneType___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String NoneType___repr___doc = 
+        "Return repr(self).";
+
+    public final static String NoneType___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String NoneType___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String NoneType___str___doc = 
+        "Return str(self).";
+
+    public final static String NoneType___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'NotImplementedType'>
+    public final static String NotImplementedType___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String NotImplementedType___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String NotImplementedType___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String NotImplementedType_doc = 
+        "";
+
+    public final static String NotImplementedType___eq___doc = 
+        "Return self==value.";
+
+    public final static String NotImplementedType___format___doc = 
+        "default object formatter";
+
+    public final static String NotImplementedType___ge___doc = 
+        "Return self>=value.";
+
+    public final static String NotImplementedType___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String NotImplementedType___gt___doc = 
+        "Return self>value.";
+
+    public final static String NotImplementedType___hash___doc = 
+        "Return hash(self).";
+
+    public final static String NotImplementedType___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String NotImplementedType___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String NotImplementedType___le___doc = 
+        "Return self<=value.";
+
+    public final static String NotImplementedType___lt___doc = 
+        "Return self<value.";
+
+    public final static String NotImplementedType___ne___doc = 
+        "Return self!=value.";
+
+    public final static String NotImplementedType___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String NotImplementedType___reduce___doc = 
+        "";
+
+    public final static String NotImplementedType___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String NotImplementedType___repr___doc = 
+        "Return repr(self).";
+
+    public final static String NotImplementedType___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String NotImplementedType___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String NotImplementedType___str___doc = 
+        "Return str(self).";
+
+    public final static String NotImplementedType___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class 'ellipsis'>
+    public final static String ellipsis___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String ellipsis___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String ellipsis___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String ellipsis_doc = 
+        "";
+
+    public final static String ellipsis___eq___doc = 
+        "Return self==value.";
+
+    public final static String ellipsis___format___doc = 
+        "default object formatter";
+
+    public final static String ellipsis___ge___doc = 
+        "Return self>=value.";
+
+    public final static String ellipsis___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String ellipsis___gt___doc = 
+        "Return self>value.";
+
+    public final static String ellipsis___hash___doc = 
+        "Return hash(self).";
+
+    public final static String ellipsis___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String ellipsis___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String ellipsis___le___doc = 
+        "Return self<=value.";
+
+    public final static String ellipsis___lt___doc = 
+        "Return self<value.";
+
+    public final static String ellipsis___ne___doc = 
+        "Return self!=value.";
+
+    public final static String ellipsis___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String ellipsis___reduce___doc = 
+        "";
+
+    public final static String ellipsis___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String ellipsis___repr___doc = 
+        "Return repr(self).";
+
+    public final static String ellipsis___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String ellipsis___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String ellipsis___str___doc = 
+        "Return str(self).";
+
+    public final static String ellipsis___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    // Docs for <class '_multiprocessing.SemLock'>
+    public final static String SemLock_SEM_VALUE_MAX_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String SemLock___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String SemLock___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String SemLock___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String SemLock_doc = 
+        "Semaphore/Mutex type";
+
+    public final static String SemLock___enter___doc = 
+        "enter the semaphore/lock";
+
+    public final static String SemLock___eq___doc = 
+        "Return self==value.";
+
+    public final static String SemLock___exit___doc = 
+        "exit the semaphore/lock";
+
+    public final static String SemLock___format___doc = 
+        "default object formatter";
+
+    public final static String SemLock___ge___doc = 
+        "Return self>=value.";
+
+    public final static String SemLock___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String SemLock___gt___doc = 
+        "Return self>value.";
+
+    public final static String SemLock___hash___doc = 
+        "Return hash(self).";
+
+    public final static String SemLock___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String SemLock___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String SemLock___le___doc = 
+        "Return self<=value.";
+
+    public final static String SemLock___lt___doc = 
+        "Return self<value.";
+
+    public final static String SemLock___ne___doc = 
+        "Return self!=value.";
+
+    public final static String SemLock___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String SemLock___reduce___doc = 
+        "helper for pickle";
+
+    public final static String SemLock___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String SemLock___repr___doc = 
+        "Return repr(self).";
+
+    public final static String SemLock___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String SemLock___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String SemLock___str___doc = 
+        "Return str(self).";
+
+    public final static String SemLock___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String SemLock__after_fork_doc = 
+        "rezero the net acquisition count after fork()";
+
+    public final static String SemLock__count_doc = 
+        "num of `acquire()`s minus num of `release()`s for this process";
+
+    public final static String SemLock__get_value_doc = 
+        "get the value of the semaphore";
+
+    public final static String SemLock__is_mine_doc = 
+        "whether the lock is owned by this thread";
+
+    public final static String SemLock__is_zero_doc = 
+        "returns whether semaphore has value zero";
+
+    public final static String SemLock__rebuild_doc = 
+        "";
+
+    public final static String SemLock_acquire_doc = 
+        "acquire the semaphore/lock";
+
+    public final static String SemLock_handle_doc = 
+        "";
+
+    public final static String SemLock_kind_doc = 
+        "";
+
+    public final static String SemLock_maxvalue_doc = 
+        "";
+
+    public final static String SemLock_name_doc = 
+        "";
+
+    public final static String SemLock_release_doc = 
+        "release the semaphore/lock";
+
+    // Docs for <class 'io.TextIOBase'>
+    public final static String TextIOBase___abstractmethods___doc = 
+        "";
+
+    public final static String TextIOBase___class___doc = 
+        "Metaclass for defining Abstract Base Classes (ABCs).\n" + 
+        "\n" + 
+        "    Use this metaclass to create an ABC.  An ABC can be subclassed\n" + 
+        "    directly, and then acts as a mix-in class.  You can also register\n" + 
+        "    unrelated concrete classes (even built-in classes) and unrelated\n" + 
+        "    ABCs as 'virtual subclasses' -- these and their descendants will\n" + 
+        "    be considered subclasses of the registering ABC by the built-in\n" + 
+        "    issubclass() function, but the registering ABC won't show up in\n" + 
+        "    their MRO (Method Resolution Order) nor will method\n" + 
+        "    implementations defined by the registering ABC be callable (not\n" + 
+        "    even via super()).\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String TextIOBase___del___doc = 
+        "";
+
+    public final static String TextIOBase___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String TextIOBase___dict___doc = 
+        "";
+
+    public final static String TextIOBase___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String TextIOBase_doc = 
+        "Base class for text I/O.\n" + 
+        "\n" + 
+        "This class provides a character and line based interface to stream\n" + 
+        "I/O. There is no readinto method because Python's character strings\n" + 
+        "are immutable. There is no public constructor.\n" + 
+        "";
+
+    public final static String TextIOBase___enter___doc = 
+        "";
+
+    public final static String TextIOBase___eq___doc = 
+        "Return self==value.";
+
+    public final static String TextIOBase___exit___doc = 
+        "";
+
+    public final static String TextIOBase___format___doc = 
+        "default object formatter";
+
+    public final static String TextIOBase___ge___doc = 
+        "Return self>=value.";
+
+    public final static String TextIOBase___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String TextIOBase___gt___doc = 
+        "Return self>value.";
+
+    public final static String TextIOBase___hash___doc = 
+        "Return hash(self).";
+
+    public final static String TextIOBase___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String TextIOBase___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String TextIOBase___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String TextIOBase___le___doc = 
+        "Return self<=value.";
+
+    public final static String TextIOBase___lt___doc = 
+        "Return self<value.";
+
+    public final static String TextIOBase___module___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String TextIOBase___ne___doc = 
+        "Return self!=value.";
+
+    public final static String TextIOBase___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String TextIOBase___next___doc = 
+        "Implement next(self).";
+
+    public final static String TextIOBase___reduce___doc = 
+        "helper for pickle";
+
+    public final static String TextIOBase___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String TextIOBase___repr___doc = 
+        "Return repr(self).";
+
+    public final static String TextIOBase___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String TextIOBase___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String TextIOBase___str___doc = 
+        "Return str(self).";
+
+    public final static String TextIOBase___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String TextIOBase__abc_cache_doc = 
+        "";
+
+    public final static String TextIOBase__abc_negative_cache_doc = 
+        "";
+
+    public final static String TextIOBase__abc_negative_cache_version_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String TextIOBase__abc_registry_doc = 
+        "";
+
+    public final static String TextIOBase__checkClosed_doc = 
+        "";
+
+    public final static String TextIOBase__checkReadable_doc = 
+        "";
+
+    public final static String TextIOBase__checkSeekable_doc = 
+        "";
+
+    public final static String TextIOBase__checkWritable_doc = 
+        "";
+
+    public final static String TextIOBase_close_doc = 
+        "Flush and close the IO object.\n" + 
+        "\n" + 
+        "This method has no effect if the file is already closed.";
+
+    public final static String TextIOBase_closed_doc = 
+        "";
+
+    public final static String TextIOBase_detach_doc = 
+        "Separate the underlying buffer from the TextIOBase and return it.\n" + 
+        "\n" + 
+        "After the underlying buffer has been detached, the TextIO is in an\n" + 
+        "unusable state.\n" + 
+        "";
+
+    public final static String TextIOBase_encoding_doc = 
+        "Encoding of the text stream.\n" + 
+        "\n" + 
+        "Subclasses should override.\n" + 
+        "";
+
+    public final static String TextIOBase_errors_doc = 
+        "The error setting of the decoder or encoder.\n" + 
+        "\n" + 
+        "Subclasses should override.\n" + 
+        "";
+
+    public final static String TextIOBase_fileno_doc = 
+        "Returns underlying file descriptor if one exists.\n" + 
+        "\n" + 
+        "OSError is raised if the IO object does not use a file descriptor.";
+
+    public final static String TextIOBase_flush_doc = 
+        "Flush write buffers, if applicable.\n" + 
+        "\n" + 
+        "This is not implemented for read-only and non-blocking streams.";
+
+    public final static String TextIOBase_isatty_doc = 
+        "Return whether this is an 'interactive' stream.\n" + 
+        "\n" + 
+        "Return False if it can't be determined.";
+
+    public final static String TextIOBase_newlines_doc = 
+        "Line endings translated so far.\n" + 
+        "\n" + 
+        "Only line endings translated during reading are considered.\n" + 
+        "\n" + 
+        "Subclasses should override.\n" + 
+        "";
+
+    public final static String TextIOBase_read_doc = 
+        "Read at most n characters from stream.\n" + 
+        "\n" + 
+        "Read from underlying buffer until we have n characters or we hit EOF.\n" + 
+        "If n is negative or omitted, read until EOF.\n" + 
+        "";
+
+    public final static String TextIOBase_readable_doc = 
+        "Return whether object was opened for reading.\n" + 
+        "\n" + 
+        "If False, read() will raise OSError.";
+
+    public final static String TextIOBase_readline_doc = 
+        "Read until newline or EOF.\n" + 
+        "\n" + 
+        "Returns an empty string if EOF is hit immediately.\n" + 
+        "";
+
+    public final static String TextIOBase_readlines_doc = 
+        "Return a list of lines from the stream.\n" + 
+        "\n" + 
+        "hint can be specified to control the number of lines read: no more\n" + 
+        "lines will be read if the total size (in bytes/characters) of all\n" + 
+        "lines so far exceeds hint.";
+
+    public final static String TextIOBase_seek_doc = 
+        "Change stream position.\n" + 
+        "\n" + 
+        "Change the stream position to the given byte offset. The offset is\n" + 
+        "interpreted relative to the position indicated by whence.  Values\n" + 
+        "for whence are:\n" + 
+        "\n" + 
+        "* 0 -- start of stream (the default); offset should be zero or positive\n" + 
+        "* 1 -- current stream position; offset may be negative\n" + 
+        "* 2 -- end of stream; offset is usually negative\n" + 
+        "\n" + 
+        "Return the new absolute position.";
+
+    public final static String TextIOBase_seekable_doc = 
+        "Return whether object supports random access.\n" + 
+        "\n" + 
+        "If False, seek(), tell() and truncate() will raise OSError.\n" + 
+        "This method may need to do a test seek().";
+
+    public final static String TextIOBase_tell_doc = 
+        "Return current stream position.";
+
+    public final static String TextIOBase_truncate_doc = 
+        "Truncate file to size bytes.\n" + 
+        "\n" + 
+        "File pointer is left unchanged.  Size defaults to the current IO\n" + 
+        "position as reported by tell().  Returns the new size.";
+
+    public final static String TextIOBase_writable_doc = 
+        "Return whether object was opened for writing.\n" + 
+        "\n" + 
+        "If False, write() will raise OSError.";
+
+    public final static String TextIOBase_write_doc = 
+        "Write string to stream.\n" + 
+        "Returns the number of characters written (which is always equal to\n" + 
+        "the length of the string).\n" + 
+        "";
+
+    public final static String TextIOBase_writelines_doc = 
+        "";
+
+    // Docs for <class '_io.BufferedReader'>
+    public final static String BufferedReader___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String BufferedReader___del___doc = 
+        "";
+
+    public final static String BufferedReader___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String BufferedReader___dict___doc = 
+        "";
+
+    public final static String BufferedReader___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String BufferedReader_doc = 
+        "Create a new buffered reader using the given readable raw IO object.";
+
+    public final static String BufferedReader___enter___doc = 
+        "";
+
+    public final static String BufferedReader___eq___doc = 
+        "Return self==value.";
+
+    public final static String BufferedReader___exit___doc = 
+        "";
+
+    public final static String BufferedReader___format___doc = 
+        "default object formatter";
+
+    public final static String BufferedReader___ge___doc = 
+        "Return self>=value.";
+
+    public final static String BufferedReader___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String BufferedReader___getstate___doc = 
+        "";
+
+    public final static String BufferedReader___gt___doc = 
+        "Return self>value.";
+
+    public final static String BufferedReader___hash___doc = 
+        "Return hash(self).";
+
+    public final static String BufferedReader___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String BufferedReader___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String BufferedReader___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String BufferedReader___le___doc = 
+        "Return self<=value.";
+
+    public final static String BufferedReader___lt___doc = 
+        "Return self<value.";
+
+    public final static String BufferedReader___ne___doc = 
+        "Return self!=value.";
+
+    public final static String BufferedReader___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String BufferedReader___next___doc = 
+        "Implement next(self).";
+
+    public final static String BufferedReader___reduce___doc = 
+        "helper for pickle";
+
+    public final static String BufferedReader___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String BufferedReader___repr___doc = 
+        "Return repr(self).";
+
+    public final static String BufferedReader___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String BufferedReader___sizeof___doc = 
+        "";
+
+    public final static String BufferedReader___str___doc = 
+        "Return str(self).";
+
+    public final static String BufferedReader___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String BufferedReader__checkClosed_doc = 
+        "";
+
+    public final static String BufferedReader__checkReadable_doc = 
+        "";
+
+    public final static String BufferedReader__checkSeekable_doc = 
+        "";
+
+    public final static String BufferedReader__checkWritable_doc = 
+        "";
+
+    public final static String BufferedReader__dealloc_warn_doc = 
+        "";
+
+    public final static String BufferedReader__finalizing_doc = 
+        "";
+
+    public final static String BufferedReader_close_doc = 
+        "";
+
+    public final static String BufferedReader_closed_doc = 
+        "";
+
+    public final static String BufferedReader_detach_doc = 
+        "";
+
+    public final static String BufferedReader_fileno_doc = 
+        "";
+
+    public final static String BufferedReader_flush_doc = 
+        "";
+
+    public final static String BufferedReader_isatty_doc = 
+        "";
+
+    public final static String BufferedReader_mode_doc = 
+        "";
+
+    public final static String BufferedReader_name_doc = 
+        "";
+
+    public final static String BufferedReader_peek_doc = 
+        "";
+
+    public final static String BufferedReader_raw_doc = 
+        "";
+
+    public final static String BufferedReader_read_doc = 
+        "";
+
+    public final static String BufferedReader_read1_doc = 
+        "";
+
+    public final static String BufferedReader_readable_doc = 
+        "";
+
+    public final static String BufferedReader_readinto_doc = 
+        "";
+
+    public final static String BufferedReader_readinto1_doc = 
+        "";
+
+    public final static String BufferedReader_readline_doc = 
+        "";
+
+    public final static String BufferedReader_readlines_doc = 
+        "Return a list of lines from the stream.\n" + 
+        "\n" + 
+        "hint can be specified to control the number of lines read: no more\n" + 
+        "lines will be read if the total size (in bytes/characters) of all\n" + 
+        "lines so far exceeds hint.";
+
+    public final static String BufferedReader_seek_doc = 
+        "";
+
+    public final static String BufferedReader_seekable_doc = 
+        "";
+
+    public final static String BufferedReader_tell_doc = 
+        "";
+
+    public final static String BufferedReader_truncate_doc = 
+        "";
+
+    public final static String BufferedReader_writable_doc = 
+        "Return whether object was opened for writing.\n" + 
+        "\n" + 
+        "If False, write() will raise OSError.";
+
+    public final static String BufferedReader_write_doc = 
+        "Write the given buffer to the IO stream.\n" + 
+        "\n" + 
+        "Returns the number of bytes written, which is always the length of b\n" + 
+        "in bytes.\n" + 
+        "\n" + 
+        "Raises BlockingIOError if the buffer is full and the\n" + 
+        "underlying raw stream cannot accept more data at the moment.\n" + 
+        "";
+
+    public final static String BufferedReader_writelines_doc = 
+        "";
+
+    // Docs for <class '_io.BufferedWriter'>
+    public final static String BufferedWriter___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String BufferedWriter___del___doc = 
+        "";
+
+    public final static String BufferedWriter___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String BufferedWriter___dict___doc = 
+        "";
+
+    public final static String BufferedWriter___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String BufferedWriter_doc = 
+        "A buffer for a writeable sequential RawIO object.\n" + 
+        "\n" + 
+        "The constructor creates a BufferedWriter for the given writeable raw\n" + 
+        "stream. If the buffer_size is not given, it defaults to\n" + 
+        "DEFAULT_BUFFER_SIZE.";
+
+    public final static String BufferedWriter___enter___doc = 
+        "";
+
+    public final static String BufferedWriter___eq___doc = 
+        "Return self==value.";
+
+    public final static String BufferedWriter___exit___doc = 
+        "";
+
+    public final static String BufferedWriter___format___doc = 
+        "default object formatter";
+
+    public final static String BufferedWriter___ge___doc = 
+        "Return self>=value.";
+
+    public final static String BufferedWriter___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String BufferedWriter___getstate___doc = 
+        "";
+
+    public final static String BufferedWriter___gt___doc = 
+        "Return self>value.";
+
+    public final static String BufferedWriter___hash___doc = 
+        "Return hash(self).";
+
+    public final static String BufferedWriter___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String BufferedWriter___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String BufferedWriter___iter___doc = 
+        "Implement iter(self).";
+
+    public final static String BufferedWriter___le___doc = 
+        "Return self<=value.";
+
+    public final static String BufferedWriter___lt___doc = 
+        "Return self<value.";
+
+    public final static String BufferedWriter___ne___doc = 
+        "Return self!=value.";
+
+    public final static String BufferedWriter___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String BufferedWriter___next___doc = 
+        "Implement next(self).";
+
+    public final static String BufferedWriter___reduce___doc = 
+        "helper for pickle";
+
+    public final static String BufferedWriter___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String BufferedWriter___repr___doc = 
+        "Return repr(self).";
+
+    public final static String BufferedWriter___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String BufferedWriter___sizeof___doc = 
+        "";
+
+    public final static String BufferedWriter___str___doc = 
+        "Return str(self).";
+
+    public final static String BufferedWriter___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
+    public final static String BufferedWriter__checkClosed_doc = 
+        "";
+
+    public final static String BufferedWriter__checkReadable_doc = 
+        "";
+
+    public final static String BufferedWriter__checkSeekable_doc = 
+        "";
+
+    public final static String BufferedWriter__checkWritable_doc = 
+        "";
+
+    public final static String BufferedWriter__dealloc_warn_doc = 
+        "";
+
+    public final static String BufferedWriter__finalizing_doc = 
+        "";
+
+    public final static String BufferedWriter_close_doc = 
+        "";
+
+    public final static String BufferedWriter_closed_doc = 
+        "";
+
+    public final static String BufferedWriter_detach_doc = 
+        "";
+
+    public final static String BufferedWriter_fileno_doc = 
+        "";
+
+    public final static String BufferedWriter_flush_doc = 
+        "";
+
+    public final static String BufferedWriter_isatty_doc = 
+        "";
+
+    public final static String BufferedWriter_mode_doc = 
+        "";
+
+    public final static String BufferedWriter_name_doc = 
+        "";
+
+    public final static String BufferedWriter_raw_doc = 
+        "";
+
+    public final static String BufferedWriter_read_doc = 
+        "Read and return up to n bytes.\n" + 
+        "\n" + 
+        "If the argument is omitted, None, or negative, reads and\n" + 
+        "returns all data until EOF.\n" + 
+        "\n" + 
+        "If the argument is positive, and the underlying raw stream is\n" + 
+        "not 'interactive', multiple raw reads may be issued to satisfy\n" + 
+        "the byte count (unless EOF is reached first).  But for\n" + 
+        "interactive raw streams (as well as sockets and pipes), at most\n" + 
+        "one raw read will be issued, and a short result does not imply\n" + 
+        "that EOF is imminent.\n" + 
+        "\n" + 
+        "Returns an empty bytes object on EOF.\n" + 
+        "\n" + 
+        "Returns None if the underlying raw stream was open in non-blocking\n" + 
+        "mode and no data is available at the moment.\n" + 
+        "";
+
+    public final static String BufferedWriter_read1_doc = 
+        "Read and return up to n bytes, with at most one read() call\n" + 
+        "to the underlying raw stream. A short result does not imply\n" + 
+        "that EOF is imminent.\n" + 
+        "\n" + 
+        "Returns an empty bytes object on EOF.\n" + 
+        "";
+
+    public final static String BufferedWriter_readable_doc = 
+        "Return whether object was opened for reading.\n" + 
+        "\n" + 
+        "If False, read() will raise OSError.";
+
+    public final static String BufferedWriter_readinto_doc = 
+        "";
+
+    public final static String BufferedWriter_readinto1_doc = 
+        "";
+
+    public final static String BufferedWriter_readline_doc = 
+        "Read and return a line from the stream.\n" + 
+        "\n" + 
+        "If size is specified, at most size bytes will be read.\n" + 
+        "\n" + 
+        "The line terminator is always b'\\n' for binary files; for text\n" + 
+        "files, the newlines argument to open can be used to select the line\n" + 
+        "terminator(s) recognized.";
+
+    public final static String BufferedWriter_readlines_doc = 
+        "Return a list of lines from the stream.\n" + 
+        "\n" + 
+        "hint can be specified to control the number of lines read: no more\n" + 
+        "lines will be read if the total size (in bytes/characters) of all\n" + 
+        "lines so far exceeds hint.";
+
+    public final static String BufferedWriter_seek_doc = 
+        "";
+
+    public final static String BufferedWriter_seekable_doc = 
+        "";
+
+    public final static String BufferedWriter_tell_doc = 
+        "";
+
+    public final static String BufferedWriter_truncate_doc = 
+        "";
+
+    public final static String BufferedWriter_writable_doc = 
+        "";
+
+    public final static String BufferedWriter_write_doc = 
+        "";
+
+    public final static String BufferedWriter_writelines_doc = 
+        "";
+
+    // Docs for <module 'array' from '/usr/lib/python3.6/lib-dynload/array.cpython-36m-x86_64-linux-gnu.so'>
+    public final static String array_ArrayType_doc = 
+        "array(typecode [, initializer]) -> array\n" + 
+        "\n" + 
+        "Return a new array whose items are restricted by typecode, and\n" + 
+        "initialized from the optional initializer value, which must be a list,\n" + 
+        "string or iterable over elements of the appropriate type.\n" + 
+        "\n" + 
+        "Arrays represent basic values and behave very much like lists, except\n" + 
+        "the type of objects stored in them is constrained. The type is specified\n" + 
+        "at object creation time by using a type code, which is a single character.\n" + 
+        "The following type codes are defined:\n" + 
+        "\n" + 
+        "    Type code   C Type             Minimum size in bytes \n" + 
+        "    'b'         signed integer     1 \n" + 
+        "    'B'         unsigned integer   1 \n" + 
+        "    'u'         Unicode character  2 (see note) \n" + 
+        "    'h'         signed integer     2 \n" + 
+        "    'H'         unsigned integer   2 \n" + 
+        "    'i'         signed integer     2 \n" + 
+        "    'I'         unsigned integer   2 \n" + 
+        "    'l'         signed integer     4 \n" + 
+        "    'L'         unsigned integer   4 \n" + 
+        "    'q'         signed integer     8 (see note) \n" + 
+        "    'Q'         unsigned integer   8 (see note) \n" + 
+        "    'f'         floating point     4 \n" + 
+        "    'd'         floating point     8 \n" + 
+        "\n" + 
+        "NOTE: The 'u' typecode corresponds to Python's unicode character. On \n" + 
+        "narrow builds this is 2-bytes on wide builds this is 4-bytes.\n" + 
+        "\n" + 
+        "NOTE: The 'q' and 'Q' type codes are only available if the platform \n" + 
+        "C compiler used to build Python supports 'long long', or, on Windows, \n" + 
+        "'__int64'.\n" + 
+        "\n" + 
+        "Methods:\n" + 
+        "\n" + 
+        "append() -- append a new item to the end of the array\n" + 
+        "buffer_info() -- return information giving the current memory info\n" + 
+        "byteswap() -- byteswap all the items of the array\n" + 
+        "count() -- return number of occurrences of an object\n" + 
+        "extend() -- extend array by appending multiple elements from an iterable\n" + 
+        "fromfile() -- read items from a file object\n" + 
+        "fromlist() -- append items from the list\n" + 
+        "frombytes() -- append items from the string\n" + 
+        "index() -- return index of first occurrence of an object\n" + 
+        "insert() -- insert a new item into the array at a provided position\n" + 
+        "pop() -- remove and return item (default last)\n" + 
+        "remove() -- remove first occurrence of an object\n" + 
+        "reverse() -- reverse the order of the items in the array\n" + 
+        "tofile() -- write all items to a file object\n" + 
+        "tolist() -- return the array converted to an ordinary list\n" + 
+        "tobytes() -- return the array converted to a string\n" + 
+        "\n" + 
+        "Attributes:\n" + 
+        "\n" + 
+        "typecode -- the typecode character used to create the array\n" + 
+        "itemsize -- the length in bytes of one array item\n" + 
+        "";
+
+    public final static String array_doc = 
+        "This module defines an object type which can efficiently represent\n" + 
+        "an array of basic values: characters, integers, floating point\n" + 
+        "numbers.  Arrays are sequence types and behave very much like lists,\n" + 
+        "except that the type of objects stored in them is constrained.\n" + 
+        "";
+
+    public final static String array___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String array___loader___doc = 
+        "Loader for extension modules.\n" + 
+        "\n" + 
+        "    The constructor is designed to work with FileFinder.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String array___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String array___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String array___spec___doc = 
         "The specification for a module, used for loading.\n" + 
         "\n" + 
         "    A module's spec is the source for information about the module.  For\n" + 
@@ -2302,49 +8265,2749 @@ public class BuiltinDocs {
         "\n" + 
         "    ";
 
-    public final static String datetime__divide_and_round_doc = 
-        "divide a by b and round result to the nearest integer\n" + 
+    public final static String array__array_reconstructor_doc = 
+        "Internal. Used for pickling support.";
+
+    public final static String array_array_doc = 
+        "array(typecode [, initializer]) -> array\n" + 
         "\n" + 
-        "    When the ratio is exactly half-way between two integers,\n" + 
-        "    the even integer is returned.\n" + 
+        "Return a new array whose items are restricted by typecode, and\n" + 
+        "initialized from the optional initializer value, which must be a list,\n" + 
+        "string or iterable over elements of the appropriate type.\n" + 
+        "\n" + 
+        "Arrays represent basic values and behave very much like lists, except\n" + 
+        "the type of objects stored in them is constrained. The type is specified\n" + 
+        "at object creation time by using a type code, which is a single character.\n" + 
+        "The following type codes are defined:\n" + 
+        "\n" + 
+        "    Type code   C Type             Minimum size in bytes \n" + 
+        "    'b'         signed integer     1 \n" + 
+        "    'B'         unsigned integer   1 \n" + 
+        "    'u'         Unicode character  2 (see note) \n" + 
+        "    'h'         signed integer     2 \n" + 
+        "    'H'         unsigned integer   2 \n" + 
+        "    'i'         signed integer     2 \n" + 
+        "    'I'         unsigned integer   2 \n" + 
+        "    'l'         signed integer     4 \n" + 
+        "    'L'         unsigned integer   4 \n" + 
+        "    'q'         signed integer     8 (see note) \n" + 
+        "    'Q'         unsigned integer   8 (see note) \n" + 
+        "    'f'         floating point     4 \n" + 
+        "    'd'         floating point     8 \n" + 
+        "\n" + 
+        "NOTE: The 'u' typecode corresponds to Python's unicode character. On \n" + 
+        "narrow builds this is 2-bytes on wide builds this is 4-bytes.\n" + 
+        "\n" + 
+        "NOTE: The 'q' and 'Q' type codes are only available if the platform \n" + 
+        "C compiler used to build Python supports 'long long', or, on Windows, \n" + 
+        "'__int64'.\n" + 
+        "\n" + 
+        "Methods:\n" + 
+        "\n" + 
+        "append() -- append a new item to the end of the array\n" + 
+        "buffer_info() -- return information giving the current memory info\n" + 
+        "byteswap() -- byteswap all the items of the array\n" + 
+        "count() -- return number of occurrences of an object\n" + 
+        "extend() -- extend array by appending multiple elements from an iterable\n" + 
+        "fromfile() -- read items from a file object\n" + 
+        "fromlist() -- append items from the list\n" + 
+        "frombytes() -- append items from the string\n" + 
+        "index() -- return index of first occurrence of an object\n" + 
+        "insert() -- insert a new item into the array at a provided position\n" + 
+        "pop() -- remove and return item (default last)\n" + 
+        "remove() -- remove first occurrence of an object\n" + 
+        "reverse() -- reverse the order of the items in the array\n" + 
+        "tofile() -- write all items to a file object\n" + 
+        "tolist() -- return the array converted to an ordinary list\n" + 
+        "tobytes() -- return the array converted to a string\n" + 
+        "\n" + 
+        "Attributes:\n" + 
+        "\n" + 
+        "typecode -- the typecode character used to create the array\n" + 
+        "itemsize -- the length in bytes of one array item\n" + 
+        "";
+
+    public final static String array_typecodes_doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    // Docs for <module 'csv' from '/usr/lib/python3.6/csv.py'>
+    public final static String csv_Dialect_doc = 
+        "Describe a CSV dialect.\n" + 
+        "\n" + 
+        "    This must be subclassed (see csv.excel).  Valid attributes are:\n" + 
+        "    delimiter, quotechar, escapechar, doublequote, skipinitialspace,\n" + 
+        "    lineterminator, quoting.\n" + 
+        "\n" + 
         "    ";
 
-    public final static String datetime_date_doc = 
-        "date(year, month, day) --> date object";
-
-    public final static String datetime_datetime_doc = 
-        "datetime(year, month, day[, hour[, minute[, second[, microsecond[,tzinfo]]]]])\n" + 
-        "\n" + 
-        "The year, month and day arguments are required. tzinfo may be None, or an\n" + 
-        "instance of a tzinfo subclass. The remaining arguments may be ints.\n" + 
+    public final static String csv_DictReader_doc = 
         "";
 
-    public final static String datetime_datetime_CAPI_doc = 
-        "Capsule objects let you wrap a C \"void *\" pointer in a Python\n" + 
-        "object.  They're a way of passing data through the Python interpreter\n" + 
-        "without creating your own custom type.\n" + 
-        "\n" + 
-        "Capsules are used for communication between extension modules.\n" + 
-        "They provide a way for an extension module to export a C interface\n" + 
-        "to other extension modules, so that extension modules can use the\n" + 
-        "Python import mechanism to link to one another.\n" + 
+    public final static String csv_DictWriter_doc = 
         "";
 
-    public final static String datetime_time_doc = 
-        "time([hour[, minute[, second[, microsecond[, tzinfo]]]]]) --> a time object\n" + 
-        "\n" + 
-        "All arguments are optional. tzinfo may be None, or an instance of\n" + 
-        "a tzinfo subclass. The remaining arguments may be ints.\n" + 
+    public final static String csv_Error_doc = 
         "";
 
-    public final static String datetime_timedelta_doc = 
-        "Difference between two datetime values.";
+    public final static String csv_OrderedDict_doc = 
+        "Dictionary that remembers insertion order";
 
-    public final static String datetime_timezone_doc = 
-        "Fixed offset from UTC implementation of tzinfo.";
+    public final static String csv_QUOTE_ALL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
 
-    public final static String datetime_tzinfo_doc = 
-        "Abstract base class for time zone info objects.";
+    public final static String csv_QUOTE_MINIMAL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String csv_QUOTE_NONE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String csv_QUOTE_NONNUMERIC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String csv_Sniffer_doc = 
+        "\n" + 
+        "    \"Sniffs\" the format of a CSV file (i.e. delimiter, quotechar)\n" + 
+        "    Returns a Dialect object.\n" + 
+        "    ";
+
+    public final static String csv_StringIO_doc = 
+        "Text I/O implementation using an in-memory buffer.\n" + 
+        "\n" + 
+        "The initial_value argument sets the value of object.  The newline\n" + 
+        "argument is like the one of TextIOWrapper's constructor.";
+
+    public final static String csv__Dialect_doc = 
+        "CSV dialect\n" + 
+        "\n" + 
+        "The Dialect type records CSV parsing and generation options.\n" + 
+        "";
+
+    public final static String csv___all___doc = 
+        "list() -> new empty list\n" + 
+        "list(iterable) -> new list initialized from iterable's items";
+
+    public final static String csv___builtins___doc = 
+        "dict() -> new empty dictionary\n" + 
+        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
+        "    (key, value) pairs\n" + 
+        "dict(iterable) -> new dictionary initialized as if via:\n" + 
+        "    d = {}\n" + 
+        "    for k, v in iterable:\n" + 
+        "        d[k] = v\n" + 
+        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
+        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
+
+    public final static String csv___cached___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String csv_doc = 
+        "CSV parsing and writing.\n" + 
+        "\n" + 
+        "This module provides classes that assist in the reading and writing\n" + 
+        "of Comma Separated Value (CSV) files, and implements the interface\n" + 
+        "described by PEP 305.  Although many CSV files are simple to parse,\n" + 
+        "the format is not formally defined by a stable specification and\n" + 
+        "is subtle enough that parsing lines of a CSV file with something\n" + 
+        "like line.split(\",\") is bound to fail.  The module supports three\n" + 
+        "basic APIs: reading, writing, and registration of dialects.\n" + 
+        "\n" + 
+        "\n" + 
+        "DIALECT REGISTRATION:\n" + 
+        "\n" + 
+        "Readers and writers support a dialect argument, which is a convenient\n" + 
+        "handle on a group of settings.  When the dialect argument is a string,\n" + 
+        "it identifies one of the dialects previously registered with the module.\n" + 
+        "If it is a class or instance, the attributes of the argument are used as\n" + 
+        "the settings for the reader or writer:\n" + 
+        "\n" + 
+        "    class excel:\n" + 
+        "        delimiter = ','\n" + 
+        "        quotechar = '\"'\n" + 
+        "        escapechar = None\n" + 
+        "        doublequote = True\n" + 
+        "        skipinitialspace = False\n" + 
+        "        lineterminator = '\\r\\n'\n" + 
+        "        quoting = QUOTE_MINIMAL\n" + 
+        "\n" + 
+        "SETTINGS:\n" + 
+        "\n" + 
+        "    * quotechar - specifies a one-character string to use as the \n" + 
+        "        quoting character.  It defaults to '\"'.\n" + 
+        "    * delimiter - specifies a one-character string to use as the \n" + 
+        "        field separator.  It defaults to ','.\n" + 
+        "    * skipinitialspace - specifies how to interpret whitespace which\n" + 
+        "        immediately follows a delimiter.  It defaults to False, which\n" + 
+        "        means that whitespace immediately following a delimiter is part\n" + 
+        "        of the following field.\n" + 
+        "    * lineterminator -  specifies the character sequence which should \n" + 
+        "        terminate rows.\n" + 
+        "    * quoting - controls when quotes should be generated by the writer.\n" + 
+        "        It can take on any of the following module constants:\n" + 
+        "\n" + 
+        "        csv.QUOTE_MINIMAL means only when required, for example, when a\n" + 
+        "            field contains either the quotechar or the delimiter\n" + 
+        "        csv.QUOTE_ALL means that quotes are always placed around fields.\n" + 
+        "        csv.QUOTE_NONNUMERIC means that quotes are always placed around\n" + 
+        "            fields which do not parse as integers or floating point\n" + 
+        "            numbers.\n" + 
+        "        csv.QUOTE_NONE means that quotes are never placed around fields.\n" + 
+        "    * escapechar - specifies a one-character string used to escape \n" + 
+        "        the delimiter when quoting is set to QUOTE_NONE.\n" + 
+        "    * doublequote - controls the handling of quotes inside fields.  When\n" + 
+        "        True, two consecutive quotes are interpreted as one during read,\n" + 
+        "        and when writing, each quote character embedded in the data is\n" + 
+        "        written as two quotes\n" + 
+        "";
+
+    public final static String csv___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String csv___loader___doc = 
+        "Concrete implementation of SourceLoader using the file system.";
+
+    public final static String csv___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String csv___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String csv___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String csv___version___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String csv_excel_doc = 
+        "Describe the usual properties of Excel-generated CSV files.";
+
+    public final static String csv_excel_tab_doc = 
+        "Describe the usual properties of Excel-generated TAB-delimited files.";
+
+    public final static String csv_field_size_limit_doc = 
+        "Sets an upper limit on parsed fields.\n" + 
+        "    csv.field_size_limit([limit])\n" + 
+        "\n" + 
+        "Returns old limit. If limit is not given, no new limit is set and\n" + 
+        "the old limit is returned";
+
+    public final static String csv_get_dialect_doc = 
+        "Return the dialect instance associated with name.\n" + 
+        "    dialect = csv.get_dialect(name)";
+
+    public final static String csv_list_dialects_doc = 
+        "Return a list of all know dialect names.\n" + 
+        "    names = csv.list_dialects()";
+
+    public final static String csv_re_doc = 
+        "Support for regular expressions (RE).\n" + 
+        "\n" + 
+        "This module provides regular expression matching operations similar to\n" + 
+        "those found in Perl.  It supports both 8-bit and Unicode strings; both\n" + 
+        "the pattern and the strings being processed can contain null bytes and\n" + 
+        "characters outside the US ASCII range.\n" + 
+        "\n" + 
+        "Regular expressions can contain both special and ordinary characters.\n" + 
+        "Most ordinary characters, like \"A\", \"a\", or \"0\", are the simplest\n" + 
+        "regular expressions; they simply match themselves.  You can\n" + 
+        "concatenate ordinary characters, so last matches the string 'last'.\n" + 
+        "\n" + 
+        "The special characters are:\n" + 
+        "    \".\"      Matches any character except a newline.\n" + 
+        "    \"^\"      Matches the start of the string.\n" + 
+        "    \"$\"      Matches the end of the string or just before the newline at\n" + 
+        "             the end of the string.\n" + 
+        "    \"*\"      Matches 0 or more (greedy) repetitions of the preceding RE.\n" + 
+        "             Greedy means that it will match as many repetitions as possible.\n" + 
+        "    \"+\"      Matches 1 or more (greedy) repetitions of the preceding RE.\n" + 
+        "    \"?\"      Matches 0 or 1 (greedy) of the preceding RE.\n" + 
+        "    *?,+?,?? Non-greedy versions of the previous three special characters.\n" + 
+        "    {m,n}    Matches from m to n repetitions of the preceding RE.\n" + 
+        "    {m,n}?   Non-greedy version of the above.\n" + 
+        "    \"\\\\\"     Either escapes special characters or signals a special sequence.\n" + 
+        "    []       Indicates a set of characters.\n" + 
+        "             A \"^\" as the first character indicates a complementing set.\n" + 
+        "    \"|\"      A|B, creates an RE that will match either A or B.\n" + 
+        "    (...)    Matches the RE inside the parentheses.\n" + 
+        "             The contents can be retrieved or matched later in the string.\n" + 
+        "    (?aiLmsux) Set the A, I, L, M, S, U, or X flag for the RE (see below).\n" + 
+        "    (?:...)  Non-grouping version of regular parentheses.\n" + 
+        "    (?P<name>...) The substring matched by the group is accessible by name.\n" + 
+        "    (?P=name)     Matches the text matched earlier by the group named name.\n" + 
+        "    (?#...)  A comment; ignored.\n" + 
+        "    (?=...)  Matches if ... matches next, but doesn't consume the string.\n" + 
+        "    (?!...)  Matches if ... doesn't match next.\n" + 
+        "    (?<=...) Matches if preceded by ... (must be fixed length).\n" + 
+        "    (?<!...) Matches if not preceded by ... (must be fixed length).\n" + 
+        "    (?(id/name)yes|no) Matches yes pattern if the group with id/name matched,\n" + 
+        "                       the (optional) no pattern otherwise.\n" + 
+        "\n" + 
+        "The special sequences consist of \"\\\\\" and a character from the list\n" + 
+        "below.  If the ordinary character is not on the list, then the\n" + 
+        "resulting RE will match the second character.\n" + 
+        "    \\number  Matches the contents of the group of the same number.\n" + 
+        "    \\A       Matches only at the start of the string.\n" + 
+        "    \\Z       Matches only at the end of the string.\n" + 
+        "    \\b       Matches the empty string, but only at the start or end of a word.\n" + 
+        "    \\B       Matches the empty string, but not at the start or end of a word.\n" + 
+        "    \\d       Matches any decimal digit; equivalent to the set [0-9] in\n" + 
+        "             bytes patterns or string patterns with the ASCII flag.\n" + 
+        "             In string patterns without the ASCII flag, it will match the whole\n" + 
+        "             range of Unicode digits.\n" + 
+        "    \\D       Matches any non-digit character; equivalent to [^\\d].\n" + 
+        "    \\s       Matches any whitespace character; equivalent to [ \\t\\n\\r\\f\\v] in\n" + 
+        "             bytes patterns or string patterns with the ASCII flag.\n" + 
+        "             In string patterns without the ASCII flag, it will match the whole\n" + 
+        "             range of Unicode whitespace characters.\n" + 
+        "    \\S       Matches any non-whitespace character; equivalent to [^\\s].\n" + 
+        "    \\w       Matches any alphanumeric character; equivalent to [a-zA-Z0-9_]\n" + 
+        "             in bytes patterns or string patterns with the ASCII flag.\n" + 
+        "             In string patterns without the ASCII flag, it will match the\n" + 
+        "             range of Unicode alphanumeric characters (letters plus digits\n" + 
+        "             plus underscore).\n" + 
+        "             With LOCALE, it will match the set [0-9_] plus characters defined\n" + 
+        "             as letters for the current locale.\n" + 
+        "    \\W       Matches the complement of \\w.\n" + 
+        "    \\\\       Matches a literal backslash.\n" + 
+        "\n" + 
+        "This module exports the following functions:\n" + 
+        "    match     Match a regular expression pattern to the beginning of a string.\n" + 
+        "    fullmatch Match a regular expression pattern to all of a string.\n" + 
+        "    search    Search a string for the presence of a pattern.\n" + 
+        "    sub       Substitute occurrences of a pattern found in a string.\n" + 
+        "    subn      Same as sub, but also return the number of substitutions made.\n" + 
+        "    split     Split a string by the occurrences of a pattern.\n" + 
+        "    findall   Find all occurrences of a pattern in a string.\n" + 
+        "    finditer  Return an iterator yielding a match object for each match.\n" + 
+        "    compile   Compile a pattern into a RegexObject.\n" + 
+        "    purge     Clear the regular expression cache.\n" + 
+        "    escape    Backslash all non-alphanumerics in a string.\n" + 
+        "\n" + 
+        "Some of the functions in this module takes flags as optional parameters:\n" + 
+        "    A  ASCII       For string patterns, make \\w, \\W, \\b, \\B, \\d, \\D\n" + 
+        "                   match the corresponding ASCII character categories\n" + 
+        "                   (rather than the whole Unicode categories, which is the\n" + 
+        "                   default).\n" + 
+        "                   For bytes patterns, this flag is the only available\n" + 
+        "                   behaviour and needn't be specified.\n" + 
+        "    I  IGNORECASE  Perform case-insensitive matching.\n" + 
+        "    L  LOCALE      Make \\w, \\W, \\b, \\B, dependent on the current locale.\n" + 
+        "    M  MULTILINE   \"^\" matches the beginning of lines (after a newline)\n" + 
+        "                   as well as the string.\n" + 
+        "                   \"$\" matches the end of lines (before a newline) as well\n" + 
+        "                   as the end of the string.\n" + 
+        "    S  DOTALL      \".\" matches any character at all, including the newline.\n" + 
+        "    X  VERBOSE     Ignore whitespace and comments for nicer looking RE's.\n" + 
+        "    U  UNICODE     For compatibility only. Ignored for string patterns (it\n" + 
+        "                   is the default), and forbidden for bytes patterns.\n" + 
+        "\n" + 
+        "This module also defines an exception 'error'.\n" + 
+        "\n" + 
+        "";
+
+    public final static String csv_reader_doc = 
+        "    csv_reader = reader(iterable [, dialect='excel']\n" + 
+        "                        [optional keyword args])\n" + 
+        "    for row in csv_reader:\n" + 
+        "        process(row)\n" + 
+        "\n" + 
+        "The \"iterable\" argument can be any object that returns a line\n" + 
+        "of input for each iteration, such as a file object or a list.  The\n" + 
+        "optional \"dialect\" parameter is discussed below.  The function\n" + 
+        "also accepts optional keyword arguments which override settings\n" + 
+        "provided by the dialect.\n" + 
+        "\n" + 
+        "The returned object is an iterator.  Each iteration returns a row\n" + 
+        "of the CSV file (which can span multiple input lines).\n" + 
+        "";
+
+    public final static String csv_register_dialect_doc = 
+        "Create a mapping from a string name to a dialect class.\n" + 
+        "    dialect = csv.register_dialect(name[, dialect[, **fmtparams]])";
+
+    public final static String csv_unix_dialect_doc = 
+        "Describe the usual properties of Unix-generated CSV files.";
+
+    public final static String csv_unregister_dialect_doc = 
+        "Delete the name/dialect mapping associated with a string name.\n" + 
+        "    csv.unregister_dialect(name)";
+
+    public final static String csv_writer_doc = 
+        "    csv_writer = csv.writer(fileobj [, dialect='excel']\n" + 
+        "                            [optional keyword args])\n" + 
+        "    for row in sequence:\n" + 
+        "        csv_writer.writerow(row)\n" + 
+        "\n" + 
+        "    [or]\n" + 
+        "\n" + 
+        "    csv_writer = csv.writer(fileobj [, dialect='excel']\n" + 
+        "                            [optional keyword args])\n" + 
+        "    csv_writer.writerows(rows)\n" + 
+        "\n" + 
+        "The \"fileobj\" argument can be any object that supports the file API.\n" + 
+        "";
+
+    // Docs for <module 'errno' (built-in)>
+    public final static String errno_E2BIG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EACCES_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EADDRINUSE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EADDRNOTAVAIL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EADV_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EAFNOSUPPORT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EAGAIN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EALREADY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADF_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADFD_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADMSG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADRQC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBADSLT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBFONT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EBUSY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECANCELED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECHILD_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECHRNG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECOMM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECONNABORTED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECONNREFUSED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ECONNRESET_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDEADLK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDEADLOCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDESTADDRREQ_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDOM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDOTDOT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EDQUOT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EEXIST_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EFAULT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EFBIG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EHOSTDOWN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EHOSTUNREACH_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EIDRM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EILSEQ_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EINPROGRESS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EINTR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EINVAL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EIO_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EISCONN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EISDIR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EISNAM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EKEYEXPIRED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EKEYREJECTED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EKEYREVOKED_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EL2HLT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EL2NSYNC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EL3HLT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EL3RST_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELIBACC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELIBBAD_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELIBEXEC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELIBMAX_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELIBSCN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELNRNG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ELOOP_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EMEDIUMTYPE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EMFILE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EMLINK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EMSGSIZE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EMULTIHOP_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENAMETOOLONG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENAVAIL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENETDOWN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENETRESET_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENETUNREACH_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENFILE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOANO_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOBUFS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOCSI_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENODATA_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENODEV_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOENT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOEXEC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOKEY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOLCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOLINK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOMEDIUM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOMEM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOMSG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENONET_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOPKG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOPROTOOPT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOSPC_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOSR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOSTR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOSYS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTBLK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTCONN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTDIR_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTEMPTY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTNAM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTRECOVERABLE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTSOCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTSUP_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTTY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENOTUNIQ_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ENXIO_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EOPNOTSUPP_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EOVERFLOW_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EOWNERDEAD_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPERM_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPFNOSUPPORT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPIPE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPROTO_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPROTONOSUPPORT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EPROTOTYPE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ERANGE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EREMCHG_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EREMOTE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EREMOTEIO_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ERESTART_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ERFKILL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EROFS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESHUTDOWN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESOCKTNOSUPPORT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESPIPE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESRCH_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESRMNT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESTALE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ESTRPIPE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ETIME_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ETIMEDOUT_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ETOOMANYREFS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_ETXTBSY_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EUCLEAN_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EUNATCH_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EUSERS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EWOULDBLOCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EXDEV_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_EXFULL_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String errno_doc = 
+        "This module makes available standard errno system symbols.\n" + 
+        "\n" + 
+        "The value of each symbol is the corresponding integer value,\n" + 
+        "e.g., on most systems, errno.ENOENT equals the integer 2.\n" + 
+        "\n" + 
+        "The dictionary errno.errorcode maps numeric codes to symbol names,\n" + 
+        "e.g., errno.errorcode[2] could be the string 'ENOENT'.\n" + 
+        "\n" + 
+        "Symbols that are not relevant to the underlying system are not defined.\n" + 
+        "\n" + 
+        "To map error codes to error messages, use the function os.strerror(),\n" + 
+        "e.g. os.strerror(2) could return 'No such file or directory'.";
+
+    public final static String errno___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String errno___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String errno___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String errno___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String errno_errorcode_doc = 
+        "dict() -> new empty dictionary\n" + 
+        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
+        "    (key, value) pairs\n" + 
+        "dict(iterable) -> new dictionary initialized as if via:\n" + 
+        "    d = {}\n" + 
+        "    for k, v in iterable:\n" + 
+        "        d[k] = v\n" + 
+        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
+        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
 
     // Docs for <module 'posix' (built-in)>
     public final static String posix_CLD_CONTINUED_doc = 
@@ -2410,6 +11073,9 @@ public class BuiltinDocs {
         "Base 0 means to interpret the base from the string as an integer literal.\n" + 
         ">>> int('0b100', base=0)\n" + 
         "4";
+
+    public final static String posix_DirEntry_doc = 
+        "";
 
     public final static String posix_EX_CANTCREAT_doc = 
         "int(x=0) -> integer\n" + 
@@ -2732,6 +11398,38 @@ public class BuiltinDocs {
         "4";
 
     public final static String posix_F_ULOCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String posix_GRND_NONBLOCK_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String posix_GRND_RANDOM_doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -4066,7 +12764,7 @@ public class BuiltinDocs {
         "Use the real uid/gid to test for access to a path.\n" + 
         "\n" + 
         "  path\n" + 
-        "    Path to be tested; can be string, bytes, or open-file-descriptor int.\n" + 
+        "    Path to be tested; can be string or bytes\n" + 
         "  mode\n" + 
         "    Operating-system mode bitfield.  Can be F_OK to test existence,\n" + 
         "    or the inclusive-OR of R_OK, W_OK, and X_OK.\n" + 
@@ -4171,7 +12869,11 @@ public class BuiltinDocs {
         "    in the keyword argument list.  For example:  dict(one=1, two=2)";
 
     public final static String posix_cpu_count_doc = 
-        "Return the number of CPUs in the system; return None if indeterminable.";
+        "Return the number of CPUs in the system; return None if indeterminable.\n" + 
+        "\n" + 
+        "This number is not equivalent to the number of CPUs the current process can\n" + 
+        "use.  The number of usable CPUs can be obtained with\n" + 
+        "``len(os.sched_getaffinity(0))``";
 
     public final static String posix_ctermid_doc = 
         "Return the name of the controlling terminal for this process.";
@@ -4256,6 +12958,13 @@ public class BuiltinDocs {
         "Return the configuration limit name for the file descriptor fd.\n" + 
         "\n" + 
         "If there is no limit, return -1.";
+
+    public final static String posix_fspath_doc = 
+        "Return the file system path representation of the object.\n" + 
+        "\n" + 
+        "If the object is str or bytes, then allow it to pass through as-is. If the\n" + 
+        "object defines __fspath__(), then return the result of that method. All other\n" + 
+        "types raise a TypeError.";
 
     public final static String posix_fstat_doc = 
         "Perform a stat system call on the given file descriptor.\n" + 
@@ -4351,6 +13060,9 @@ public class BuiltinDocs {
 
     public final static String posix_getpriority_doc = 
         "Return program scheduling priority.";
+
+    public final static String posix_getrandom_doc = 
+        "Obtain a series of random bytes.";
 
     public final static String posix_getresgid_doc = 
         "Return a tuple of the current process's real, effective, and saved group ids.";
@@ -4656,7 +13368,7 @@ public class BuiltinDocs {
         "Get the minimum scheduling priority for policy.";
 
     public final static String posix_sched_getaffinity_doc = 
-        "Return the affinity of the process identified by pid.\n" + 
+        "Return the affinity of the process identified by pid (or the current process if zero).\n" + 
         "\n" + 
         "The affinity is returned as a set of CPU identifiers.";
 
@@ -4769,7 +13481,8 @@ public class BuiltinDocs {
         "Perform a stat system call on the given path.\n" + 
         "\n" + 
         "  path\n" + 
-        "    Path to be examined; can be string, bytes, or open-file-descriptor int.\n" + 
+        "    Path to be examined; can be string, bytes, path-like object or\n" + 
+        "    open-file-descriptor int.\n" + 
         "  dir_fd\n" + 
         "    If not None, it should be a file descriptor open to a directory,\n" + 
         "    and path should be a relative string; path will then be relative to\n" + 
@@ -5012,8819 +13725,6 @@ public class BuiltinDocs {
         "\n" + 
         "Returns the total number of bytes written.\n" + 
         "buffers must be a sequence of bytes-like objects.";
-
-    // Docs for <class 'type'>
-    public final static String type___abstractmethods___doc = 
-        "";
-
-    public final static String type___base___doc = 
-        "The most base type";
-
-    public final static String type___bases___doc = 
-        "tuple() -> empty tuple\n" + 
-        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
-        "\n" + 
-        "If the argument is a tuple, the return value is the same object.";
-
-    public final static String type___basicsize___doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String type___call___doc = 
-        "Call self as a function.";
-
-    public final static String type___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String type___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String type___dict___doc = 
-        "";
-
-    public final static String type___dictoffset___doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String type___dir___doc = 
-        "__dir__() -> list\n" + 
-        "specialized __dir__ implementation for types";
-
-    public final static String type_doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String type___eq___doc = 
-        "Return self==value.";
-
-    public final static String type___flags___doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String type___format___doc = 
-        "default object formatter";
-
-    public final static String type___ge___doc = 
-        "Return self>=value.";
-
-    public final static String type___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String type___gt___doc = 
-        "Return self>value.";
-
-    public final static String type___hash___doc = 
-        "Return hash(self).";
-
-    public final static String type___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String type___instancecheck___doc = 
-        "__instancecheck__() -> bool\n" + 
-        "check if an object is an instance";
-
-    public final static String type___itemsize___doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String type___le___doc = 
-        "Return self<=value.";
-
-    public final static String type___lt___doc = 
-        "Return self<value.";
-
-    public final static String type___module___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String type___mro___doc = 
-        "tuple() -> empty tuple\n" + 
-        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
-        "\n" + 
-        "If the argument is a tuple, the return value is the same object.";
-
-    public final static String type___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String type___ne___doc = 
-        "Return self!=value.";
-
-    public final static String type___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String type___prepare___doc = 
-        "__prepare__() -> dict\n" + 
-        "used to create the namespace for the class statement";
-
-    public final static String type___qualname___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String type___reduce___doc = 
-        "helper for pickle";
-
-    public final static String type___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String type___repr___doc = 
-        "Return repr(self).";
-
-    public final static String type___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String type___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "return memory consumption of the type object";
-
-    public final static String type___str___doc = 
-        "Return str(self).";
-
-    public final static String type___subclasscheck___doc = 
-        "__subclasscheck__() -> bool\n" + 
-        "check if a class is a subclass";
-
-    public final static String type___subclasses___doc = 
-        "__subclasses__() -> list of immediate subclasses";
-
-    public final static String type___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String type___text_signature___doc = 
-        "";
-
-    public final static String type___weakrefoffset___doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String type_mro_doc = 
-        "mro() -> list\n" + 
-        "return a type's method resolution order";
-
-    // Docs for <class 'bytes'>
-    public final static String bytes___add___doc = 
-        "Return self+value.";
-
-    public final static String bytes___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String bytes___contains___doc = 
-        "Return key in self.";
-
-    public final static String bytes___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String bytes___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String bytes_doc = 
-        "bytes(iterable_of_ints) -> bytes\n" + 
-        "bytes(string, encoding[, errors]) -> bytes\n" + 
-        "bytes(bytes_or_buffer) -> immutable copy of bytes_or_buffer\n" + 
-        "bytes(int) -> bytes object of size given by the parameter initialized with null bytes\n" + 
-        "bytes() -> empty bytes object\n" + 
-        "\n" + 
-        "Construct an immutable array of bytes from:\n" + 
-        "  - an iterable yielding integers in range(256)\n" + 
-        "  - a text string encoded using the specified encoding\n" + 
-        "  - any object implementing the buffer API.\n" + 
-        "  - an integer";
-
-    public final static String bytes___eq___doc = 
-        "Return self==value.";
-
-    public final static String bytes___format___doc = 
-        "default object formatter";
-
-    public final static String bytes___ge___doc = 
-        "Return self>=value.";
-
-    public final static String bytes___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String bytes___getitem___doc = 
-        "Return self[key].";
-
-    public final static String bytes___getnewargs___doc = 
-        "";
-
-    public final static String bytes___gt___doc = 
-        "Return self>value.";
-
-    public final static String bytes___hash___doc = 
-        "Return hash(self).";
-
-    public final static String bytes___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String bytes___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String bytes___le___doc = 
-        "Return self<=value.";
-
-    public final static String bytes___len___doc = 
-        "Return len(self).";
-
-    public final static String bytes___lt___doc = 
-        "Return self<value.";
-
-    public final static String bytes___mod___doc = 
-        "Return self%value.";
-
-    public final static String bytes___mul___doc = 
-        "Return self*value.n";
-
-    public final static String bytes___ne___doc = 
-        "Return self!=value.";
-
-    public final static String bytes___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String bytes___reduce___doc = 
-        "helper for pickle";
-
-    public final static String bytes___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String bytes___repr___doc = 
-        "Return repr(self).";
-
-    public final static String bytes___rmod___doc = 
-        "Return value%self.";
-
-    public final static String bytes___rmul___doc = 
-        "Return self*value.";
-
-    public final static String bytes___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String bytes___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String bytes___str___doc = 
-        "Return str(self).";
-
-    public final static String bytes___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String bytes_capitalize_doc = 
-        "B.capitalize() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with only its first character capitalized (ASCII)\n" + 
-        "and the rest lower-cased.";
-
-    public final static String bytes_center_doc = 
-        "B.center(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B centered in a string of length width.  Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String bytes_count_doc = 
-        "B.count(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the number of non-overlapping occurrences of substring sub in\n" + 
-        "string B[start:end].  Optional arguments start and end are interpreted\n" + 
-        "as in slice notation.";
-
-    public final static String bytes_decode_doc = 
-        "Decode the bytes using the codec registered for encoding.\n" + 
-        "\n" + 
-        "  encoding\n" + 
-        "    The encoding with which to decode the bytes.\n" + 
-        "  errors\n" + 
-        "    The error handling scheme to use for the handling of decoding errors.\n" + 
-        "    The default is 'strict' meaning that decoding errors raise a\n" + 
-        "    UnicodeDecodeError. Other possible values are 'ignore' and 'replace'\n" + 
-        "    as well as any other name registered with codecs.register_error that\n" + 
-        "    can handle UnicodeDecodeErrors.";
-
-    public final static String bytes_endswith_doc = 
-        "B.endswith(suffix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if B ends with the specified suffix, False otherwise.\n" + 
-        "With optional start, test B beginning at that position.\n" + 
-        "With optional end, stop comparing B at that position.\n" + 
-        "suffix can also be a tuple of bytes to try.";
-
-    public final static String bytes_expandtabs_doc = 
-        "B.expandtabs(tabsize=8) -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B where all tab characters are expanded using spaces.\n" + 
-        "If tabsize is not given, a tab size of 8 characters is assumed.";
-
-    public final static String bytes_find_doc = 
-        "B.find(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the lowest index in B where substring sub is found,\n" + 
-        "such that sub is contained within B[start:end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String bytes_fromhex_doc = 
-        "Create a bytes object from a string of hexadecimal numbers.\n" + 
-        "\n" + 
-        "Spaces between two numbers are accepted.\n" + 
-        "Example: bytes.fromhex('B9 01EF') -> b'\\\\xb9\\\\x01\\\\xef'.";
-
-    public final static String bytes_hex_doc = 
-        "B.hex() -> string\n" + 
-        "\n" + 
-        "Create a string of hexadecimal numbers from a bytes object.\n" + 
-        "Example: b'\\xb9\\x01\\xef'.hex() -> 'b901ef'.";
-
-    public final static String bytes_index_doc = 
-        "B.index(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like B.find() but raise ValueError when the substring is not found.";
-
-    public final static String bytes_isalnum_doc = 
-        "B.isalnum() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are alphanumeric\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytes_isalpha_doc = 
-        "B.isalpha() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are alphabetic\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytes_isdigit_doc = 
-        "B.isdigit() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are digits\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytes_islower_doc = 
-        "B.islower() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in B are lowercase and there is\n" + 
-        "at least one cased character in B, False otherwise.";
-
-    public final static String bytes_isspace_doc = 
-        "B.isspace() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are whitespace\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytes_istitle_doc = 
-        "B.istitle() -> bool\n" + 
-        "\n" + 
-        "Return True if B is a titlecased string and there is at least one\n" + 
-        "character in B, i.e. uppercase characters may only follow uncased\n" + 
-        "characters and lowercase characters only cased ones. Return False\n" + 
-        "otherwise.";
-
-    public final static String bytes_isupper_doc = 
-        "B.isupper() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in B are uppercase and there is\n" + 
-        "at least one cased character in B, False otherwise.";
-
-    public final static String bytes_join_doc = 
-        "Concatenate any number of bytes objects.\n" + 
-        "\n" + 
-        "The bytes whose method is called is inserted in between each pair.\n" + 
-        "\n" + 
-        "The result is returned as a new bytes object.\n" + 
-        "\n" + 
-        "Example: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'.";
-
-    public final static String bytes_ljust_doc = 
-        "B.ljust(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B left justified in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String bytes_lower_doc = 
-        "B.lower() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with all ASCII characters converted to lowercase.";
-
-    public final static String bytes_lstrip_doc = 
-        "Strip leading bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip leading  ASCII whitespace.";
-
-    public final static String bytes_maketrans_doc = 
-        "Return a translation table useable for the bytes or bytearray translate method.\n" + 
-        "\n" + 
-        "The returned table will be one where each byte in frm is mapped to the byte at\n" + 
-        "the same position in to.\n" + 
-        "\n" + 
-        "The bytes objects frm and to must be of the same length.";
-
-    public final static String bytes_partition_doc = 
-        "Partition the bytes into three parts using the given separator.\n" + 
-        "\n" + 
-        "This will search for the separator sep in the bytes. If the separator is found,\n" + 
-        "returns a 3-tuple containing the part before the separator, the separator\n" + 
-        "itself, and the part after it.\n" + 
-        "\n" + 
-        "If the separator is not found, returns a 3-tuple containing the original bytes\n" + 
-        "object and two empty bytes objects.";
-
-    public final static String bytes_replace_doc = 
-        "Return a copy with all occurrences of substring old replaced by new.\n" + 
-        "\n" + 
-        "  count\n" + 
-        "    Maximum number of occurrences to replace.\n" + 
-        "    -1 (the default value) means replace all occurrences.\n" + 
-        "\n" + 
-        "If the optional argument count is given, only the first count occurrences are\n" + 
-        "replaced.";
-
-    public final static String bytes_rfind_doc = 
-        "B.rfind(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the highest index in B where substring sub is found,\n" + 
-        "such that sub is contained within B[start:end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String bytes_rindex_doc = 
-        "B.rindex(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like B.rfind() but raise ValueError when the substring is not found.";
-
-    public final static String bytes_rjust_doc = 
-        "B.rjust(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B right justified in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space)";
-
-    public final static String bytes_rpartition_doc = 
-        "Partition the bytes into three parts using the given separator.\n" + 
-        "\n" + 
-        "This will search for the separator sep in the bytes, starting and the end. If\n" + 
-        "the separator is found, returns a 3-tuple containing the part before the\n" + 
-        "separator, the separator itself, and the part after it.\n" + 
-        "\n" + 
-        "If the separator is not found, returns a 3-tuple containing two empty bytes\n" + 
-        "objects and the original bytes object.";
-
-    public final static String bytes_rsplit_doc = 
-        "Return a list of the sections in the bytes, using sep as the delimiter.\n" + 
-        "\n" + 
-        "  sep\n" + 
-        "    The delimiter according which to split the bytes.\n" + 
-        "    None (the default value) means split on ASCII whitespace characters\n" + 
-        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
-        "  maxsplit\n" + 
-        "    Maximum number of splits to do.\n" + 
-        "    -1 (the default value) means no limit.\n" + 
-        "\n" + 
-        "Splitting is done starting at the end of the bytes and working to the front.";
-
-    public final static String bytes_rstrip_doc = 
-        "Strip trailing bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip trailing ASCII whitespace.";
-
-    public final static String bytes_split_doc = 
-        "Return a list of the sections in the bytes, using sep as the delimiter.\n" + 
-        "\n" + 
-        "  sep\n" + 
-        "    The delimiter according which to split the bytes.\n" + 
-        "    None (the default value) means split on ASCII whitespace characters\n" + 
-        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
-        "  maxsplit\n" + 
-        "    Maximum number of splits to do.\n" + 
-        "    -1 (the default value) means no limit.";
-
-    public final static String bytes_splitlines_doc = 
-        "Return a list of the lines in the bytes, breaking at line boundaries.\n" + 
-        "\n" + 
-        "Line breaks are not included in the resulting list unless keepends is given and\n" + 
-        "true.";
-
-    public final static String bytes_startswith_doc = 
-        "B.startswith(prefix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if B starts with the specified prefix, False otherwise.\n" + 
-        "With optional start, test B beginning at that position.\n" + 
-        "With optional end, stop comparing B at that position.\n" + 
-        "prefix can also be a tuple of bytes to try.";
-
-    public final static String bytes_strip_doc = 
-        "Strip leading and trailing bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip leading and trailing ASCII whitespace.";
-
-    public final static String bytes_swapcase_doc = 
-        "B.swapcase() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with uppercase ASCII characters converted\n" + 
-        "to lowercase ASCII and vice versa.";
-
-    public final static String bytes_title_doc = 
-        "B.title() -> copy of B\n" + 
-        "\n" + 
-        "Return a titlecased version of B, i.e. ASCII words start with uppercase\n" + 
-        "characters, all remaining cased characters have lowercase.";
-
-    public final static String bytes_translate_doc = 
-        "translate(table, [deletechars])\n" + 
-        "Return a copy with each character mapped by the given translation table.\n" + 
-        "\n" + 
-        "  table\n" + 
-        "    Translation table, which must be a bytes object of length 256.\n" + 
-        "\n" + 
-        "All characters occurring in the optional argument deletechars are removed.\n" + 
-        "The remaining characters are mapped through the given translation table.";
-
-    public final static String bytes_upper_doc = 
-        "B.upper() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with all ASCII characters converted to uppercase.";
-
-    public final static String bytes_zfill_doc = 
-        "B.zfill(width) -> copy of B\n" + 
-        "\n" + 
-        "Pad a numeric string B with zeros on the left, to fill a field\n" + 
-        "of the specified width.  B is never truncated.";
-
-    // Docs for <class 'dict'>
-    public final static String dict___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String dict___contains___doc = 
-        "True if D has a key k, else False.";
-
-    public final static String dict___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String dict___delitem___doc = 
-        "Delete self[key].";
-
-    public final static String dict___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String dict_doc = 
-        "dict() -> new empty dictionary\n" + 
-        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
-        "    (key, value) pairs\n" + 
-        "dict(iterable) -> new dictionary initialized as if via:\n" + 
-        "    d = {}\n" + 
-        "    for k, v in iterable:\n" + 
-        "        d[k] = v\n" + 
-        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
-        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
-
-    public final static String dict___eq___doc = 
-        "Return self==value.";
-
-    public final static String dict___format___doc = 
-        "default object formatter";
-
-    public final static String dict___ge___doc = 
-        "Return self>=value.";
-
-    public final static String dict___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String dict___getitem___doc = 
-        "x.__getitem__(y) <==> x[y]";
-
-    public final static String dict___gt___doc = 
-        "Return self>value.";
-
-    public final static String dict___hash___doc = 
-        "";
-
-    public final static String dict___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String dict___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String dict___le___doc = 
-        "Return self<=value.";
-
-    public final static String dict___len___doc = 
-        "Return len(self).";
-
-    public final static String dict___lt___doc = 
-        "Return self<value.";
-
-    public final static String dict___ne___doc = 
-        "Return self!=value.";
-
-    public final static String dict___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String dict___reduce___doc = 
-        "helper for pickle";
-
-    public final static String dict___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String dict___repr___doc = 
-        "Return repr(self).";
-
-    public final static String dict___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String dict___setitem___doc = 
-        "Set self[key] to value.";
-
-    public final static String dict___sizeof___doc = 
-        "D.__sizeof__() -> size of D in memory, in bytes";
-
-    public final static String dict___str___doc = 
-        "Return str(self).";
-
-    public final static String dict___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String dict_clear_doc = 
-        "D.clear() -> None.  Remove all items from D.";
-
-    public final static String dict_copy_doc = 
-        "D.copy() -> a shallow copy of D";
-
-    public final static String dict_fromkeys_doc = 
-        "Returns a new dict with keys from iterable and values equal to value.";
-
-    public final static String dict_get_doc = 
-        "D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.";
-
-    public final static String dict_items_doc = 
-        "D.items() -> a set-like object providing a view on D's items";
-
-    public final static String dict_keys_doc = 
-        "D.keys() -> a set-like object providing a view on D's keys";
-
-    public final static String dict_pop_doc = 
-        "D.pop(k[,d]) -> v, remove specified key and return the corresponding value.\n" + 
-        "If key is not found, d is returned if given, otherwise KeyError is raised";
-
-    public final static String dict_popitem_doc = 
-        "D.popitem() -> (k, v), remove and return some (key, value) pair as a\n" + 
-        "2-tuple; but raise KeyError if D is empty.";
-
-    public final static String dict_setdefault_doc = 
-        "D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D";
-
-    public final static String dict_update_doc = 
-        "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\n" + 
-        "If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\n" + 
-        "If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\n" + 
-        "In either case, this is followed by: for k in F:  D[k] = F[k]";
-
-    public final static String dict_values_doc = 
-        "D.values() -> an object providing a view on D's values";
-
-    // Docs for <class 'list'>
-    public final static String list___add___doc = 
-        "Return self+value.";
-
-    public final static String list___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String list___contains___doc = 
-        "Return key in self.";
-
-    public final static String list___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String list___delitem___doc = 
-        "Delete self[key].";
-
-    public final static String list___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String list_doc = 
-        "list() -> new empty list\n" + 
-        "list(iterable) -> new list initialized from iterable's items";
-
-    public final static String list___eq___doc = 
-        "Return self==value.";
-
-    public final static String list___format___doc = 
-        "default object formatter";
-
-    public final static String list___ge___doc = 
-        "Return self>=value.";
-
-    public final static String list___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String list___getitem___doc = 
-        "x.__getitem__(y) <==> x[y]";
-
-    public final static String list___gt___doc = 
-        "Return self>value.";
-
-    public final static String list___hash___doc = 
-        "";
-
-    public final static String list___iadd___doc = 
-        "Implement self+=value.";
-
-    public final static String list___imul___doc = 
-        "Implement self*=value.";
-
-    public final static String list___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String list___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String list___le___doc = 
-        "Return self<=value.";
-
-    public final static String list___len___doc = 
-        "Return len(self).";
-
-    public final static String list___lt___doc = 
-        "Return self<value.";
-
-    public final static String list___mul___doc = 
-        "Return self*value.n";
-
-    public final static String list___ne___doc = 
-        "Return self!=value.";
-
-    public final static String list___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String list___reduce___doc = 
-        "helper for pickle";
-
-    public final static String list___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String list___repr___doc = 
-        "Return repr(self).";
-
-    public final static String list___reversed___doc = 
-        "L.__reversed__() -- return a reverse iterator over the list";
-
-    public final static String list___rmul___doc = 
-        "Return self*value.";
-
-    public final static String list___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String list___setitem___doc = 
-        "Set self[key] to value.";
-
-    public final static String list___sizeof___doc = 
-        "L.__sizeof__() -- size of L in memory, in bytes";
-
-    public final static String list___str___doc = 
-        "Return str(self).";
-
-    public final static String list___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String list_append_doc = 
-        "L.append(object) -> None -- append object to end";
-
-    public final static String list_clear_doc = 
-        "L.clear() -> None -- remove all items from L";
-
-    public final static String list_copy_doc = 
-        "L.copy() -> list -- a shallow copy of L";
-
-    public final static String list_count_doc = 
-        "L.count(value) -> integer -- return number of occurrences of value";
-
-    public final static String list_extend_doc = 
-        "L.extend(iterable) -> None -- extend list by appending elements from the iterable";
-
-    public final static String list_index_doc = 
-        "L.index(value, [start, [stop]]) -> integer -- return first index of value.\n" + 
-        "Raises ValueError if the value is not present.";
-
-    public final static String list_insert_doc = 
-        "L.insert(index, object) -- insert object before index";
-
-    public final static String list_pop_doc = 
-        "L.pop([index]) -> item -- remove and return item at index (default last).\n" + 
-        "Raises IndexError if list is empty or index is out of range.";
-
-    public final static String list_remove_doc = 
-        "L.remove(value) -> None -- remove first occurrence of value.\n" + 
-        "Raises ValueError if the value is not present.";
-
-    public final static String list_reverse_doc = 
-        "L.reverse() -- reverse *IN PLACE*";
-
-    public final static String list_sort_doc = 
-        "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*";
-
-    // Docs for <class 'slice'>
-    public final static String slice___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String slice___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String slice___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String slice_doc = 
-        "slice(stop)\n" + 
-        "slice(start, stop[, step])\n" + 
-        "\n" + 
-        "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).";
-
-    public final static String slice___eq___doc = 
-        "Return self==value.";
-
-    public final static String slice___format___doc = 
-        "default object formatter";
-
-    public final static String slice___ge___doc = 
-        "Return self>=value.";
-
-    public final static String slice___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String slice___gt___doc = 
-        "Return self>value.";
-
-    public final static String slice___hash___doc = 
-        "";
-
-    public final static String slice___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String slice___le___doc = 
-        "Return self<=value.";
-
-    public final static String slice___lt___doc = 
-        "Return self<value.";
-
-    public final static String slice___ne___doc = 
-        "Return self!=value.";
-
-    public final static String slice___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String slice___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String slice___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String slice___repr___doc = 
-        "Return repr(self).";
-
-    public final static String slice___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String slice___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String slice___str___doc = 
-        "Return str(self).";
-
-    public final static String slice___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String slice_indices_doc = 
-        "S.indices(len) -> (start, stop, stride)\n" + 
-        "\n" + 
-        "Assuming a sequence of length len, calculate the start and stop\n" + 
-        "indices, and the stride length of the extended slice described by\n" + 
-        "S. Out of bounds indices are clipped in a manner consistent with the\n" + 
-        "handling of normal slices.";
-
-    public final static String slice_start_doc = 
-        "";
-
-    public final static String slice_step_doc = 
-        "";
-
-    public final static String slice_stop_doc = 
-        "";
-
-    // Docs for <class 'super'>
-    public final static String super___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String super___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String super___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String super_doc = 
-        "super() -> same as super(__class__, <first argument>)\n" + 
-        "super(type) -> unbound super object\n" + 
-        "super(type, obj) -> bound super object; requires isinstance(obj, type)\n" + 
-        "super(type, type2) -> bound super object; requires issubclass(type2, type)\n" + 
-        "Typical use to call a cooperative superclass method:\n" + 
-        "class C(B):\n" + 
-        "    def meth(self, arg):\n" + 
-        "        super().meth(arg)\n" + 
-        "This works for class methods too:\n" + 
-        "class C(B):\n" + 
-        "    @classmethod\n" + 
-        "    def cmeth(cls, arg):\n" + 
-        "        super().cmeth(arg)\n" + 
-        "";
-
-    public final static String super___eq___doc = 
-        "Return self==value.";
-
-    public final static String super___format___doc = 
-        "default object formatter";
-
-    public final static String super___ge___doc = 
-        "Return self>=value.";
-
-    public final static String super___get___doc = 
-        "Return an attribute of instance, which is of type owner.";
-
-    public final static String super___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String super___gt___doc = 
-        "Return self>value.";
-
-    public final static String super___hash___doc = 
-        "Return hash(self).";
-
-    public final static String super___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String super___le___doc = 
-        "Return self<=value.";
-
-    public final static String super___lt___doc = 
-        "Return self<value.";
-
-    public final static String super___ne___doc = 
-        "Return self!=value.";
-
-    public final static String super___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String super___reduce___doc = 
-        "helper for pickle";
-
-    public final static String super___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String super___repr___doc = 
-        "Return repr(self).";
-
-    public final static String super___self___doc = 
-        "the instance invoking super(); may be None";
-
-    public final static String super___self_class___doc = 
-        "the type of the instance invoking super(); may be None";
-
-    public final static String super___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String super___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String super___str___doc = 
-        "Return str(self).";
-
-    public final static String super___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String super___thisclass___doc = 
-        "the class invoking super()";
-
-    // Docs for <class 'staticmethod'>
-    public final static String staticmethod___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String staticmethod___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String staticmethod___dict___doc = 
-        "";
-
-    public final static String staticmethod___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String staticmethod_doc = 
-        "staticmethod(function) -> method\n" + 
-        "\n" + 
-        "Convert a function to be a static method.\n" + 
-        "\n" + 
-        "A static method does not receive an implicit first argument.\n" + 
-        "To declare a static method, use this idiom:\n" + 
-        "\n" + 
-        "     class C:\n" + 
-        "     def f(arg1, arg2, ...): ...\n" + 
-        "     f = staticmethod(f)\n" + 
-        "\n" + 
-        "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
-        "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
-        "\n" + 
-        "Static methods in Python are similar to those found in Java or C++.\n" + 
-        "For a more advanced concept, see the classmethod builtin.";
-
-    public final static String staticmethod___eq___doc = 
-        "Return self==value.";
-
-    public final static String staticmethod___format___doc = 
-        "default object formatter";
-
-    public final static String staticmethod___func___doc = 
-        "";
-
-    public final static String staticmethod___ge___doc = 
-        "Return self>=value.";
-
-    public final static String staticmethod___get___doc = 
-        "Return an attribute of instance, which is of type owner.";
-
-    public final static String staticmethod___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String staticmethod___gt___doc = 
-        "Return self>value.";
-
-    public final static String staticmethod___hash___doc = 
-        "Return hash(self).";
-
-    public final static String staticmethod___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String staticmethod___isabstractmethod___doc = 
-        "";
-
-    public final static String staticmethod___le___doc = 
-        "Return self<=value.";
-
-    public final static String staticmethod___lt___doc = 
-        "Return self<value.";
-
-    public final static String staticmethod___ne___doc = 
-        "Return self!=value.";
-
-    public final static String staticmethod___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String staticmethod___reduce___doc = 
-        "helper for pickle";
-
-    public final static String staticmethod___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String staticmethod___repr___doc = 
-        "Return repr(self).";
-
-    public final static String staticmethod___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String staticmethod___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String staticmethod___str___doc = 
-        "Return str(self).";
-
-    public final static String staticmethod___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'float'>
-    public final static String float___abs___doc = 
-        "abs(self)";
-
-    public final static String float___add___doc = 
-        "Return self+value.";
-
-    public final static String float___bool___doc = 
-        "self != 0";
-
-    public final static String float___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String float___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String float___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String float___divmod___doc = 
-        "Return divmod(self, value).";
-
-    public final static String float_doc = 
-        "float(x) -> floating point number\n" + 
-        "\n" + 
-        "Convert a string or number to a floating point number, if possible.";
-
-    public final static String float___eq___doc = 
-        "Return self==value.";
-
-    public final static String float___float___doc = 
-        "float(self)";
-
-    public final static String float___floordiv___doc = 
-        "Return self//value.";
-
-    public final static String float___format___doc = 
-        "float.__format__(format_spec) -> string\n" + 
-        "\n" + 
-        "Formats the float according to format_spec.";
-
-    public final static String float___ge___doc = 
-        "Return self>=value.";
-
-    public final static String float___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String float___getformat___doc = 
-        "float.__getformat__(typestr) -> string\n" + 
-        "\n" + 
-        "You probably don't want to use this function.  It exists mainly to be\n" + 
-        "used in Python's test suite.\n" + 
-        "\n" + 
-        "typestr must be 'double' or 'float'.  This function returns whichever of\n" + 
-        "'unknown', 'IEEE, big-endian' or 'IEEE, little-endian' best describes the\n" + 
-        "format of floating point numbers used by the C type named by typestr.";
-
-    public final static String float___getnewargs___doc = 
-        "";
-
-    public final static String float___gt___doc = 
-        "Return self>value.";
-
-    public final static String float___hash___doc = 
-        "Return hash(self).";
-
-    public final static String float___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String float___int___doc = 
-        "int(self)";
-
-    public final static String float___le___doc = 
-        "Return self<=value.";
-
-    public final static String float___lt___doc = 
-        "Return self<value.";
-
-    public final static String float___mod___doc = 
-        "Return self%value.";
-
-    public final static String float___mul___doc = 
-        "Return self*value.";
-
-    public final static String float___ne___doc = 
-        "Return self!=value.";
-
-    public final static String float___neg___doc = 
-        "-self";
-
-    public final static String float___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String float___pos___doc = 
-        "+self";
-
-    public final static String float___pow___doc = 
-        "Return pow(self, value, mod).";
-
-    public final static String float___radd___doc = 
-        "Return value+self.";
-
-    public final static String float___rdivmod___doc = 
-        "Return divmod(value, self).";
-
-    public final static String float___reduce___doc = 
-        "helper for pickle";
-
-    public final static String float___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String float___repr___doc = 
-        "Return repr(self).";
-
-    public final static String float___rfloordiv___doc = 
-        "Return value//self.";
-
-    public final static String float___rmod___doc = 
-        "Return value%self.";
-
-    public final static String float___rmul___doc = 
-        "Return value*self.";
-
-    public final static String float___round___doc = 
-        "Return the Integral closest to x, rounding half toward even.\n" + 
-        "When an argument is passed, work like built-in round(x, ndigits).";
-
-    public final static String float___rpow___doc = 
-        "Return pow(value, self, mod).";
-
-    public final static String float___rsub___doc = 
-        "Return value-self.";
-
-    public final static String float___rtruediv___doc = 
-        "Return value/self.";
-
-    public final static String float___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String float___setformat___doc = 
-        "float.__setformat__(typestr, fmt) -> None\n" + 
-        "\n" + 
-        "You probably don't want to use this function.  It exists mainly to be\n" + 
-        "used in Python's test suite.\n" + 
-        "\n" + 
-        "typestr must be 'double' or 'float'.  fmt must be one of 'unknown',\n" + 
-        "'IEEE, big-endian' or 'IEEE, little-endian', and in addition can only be\n" + 
-        "one of the latter two if it appears to match the underlying C reality.\n" + 
-        "\n" + 
-        "Override the automatic determination of C-level floating point type.\n" + 
-        "This affects how floats are converted to and from binary strings.";
-
-    public final static String float___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String float___str___doc = 
-        "Return str(self).";
-
-    public final static String float___sub___doc = 
-        "Return self-value.";
-
-    public final static String float___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String float___truediv___doc = 
-        "Return self/value.";
-
-    public final static String float___trunc___doc = 
-        "Return the Integral closest to x between 0 and x.";
-
-    public final static String float_as_integer_ratio_doc = 
-        "float.as_integer_ratio() -> (int, int)\n" + 
-        "\n" + 
-        "Return a pair of integers, whose ratio is exactly equal to the original\n" + 
-        "float and with a positive denominator.\n" + 
-        "Raise OverflowError on infinities and a ValueError on NaNs.\n" + 
-        "\n" + 
-        ">>> (10.0).as_integer_ratio()\n" + 
-        "(10, 1)\n" + 
-        ">>> (0.0).as_integer_ratio()\n" + 
-        "(0, 1)\n" + 
-        ">>> (-.25).as_integer_ratio()\n" + 
-        "(-1, 4)";
-
-    public final static String float_conjugate_doc = 
-        "Return self, the complex conjugate of any float.";
-
-    public final static String float_fromhex_doc = 
-        "float.fromhex(string) -> float\n" + 
-        "\n" + 
-        "Create a floating-point number from a hexadecimal string.\n" + 
-        ">>> float.fromhex('0x1.ffffp10')\n" + 
-        "2047.984375\n" + 
-        ">>> float.fromhex('-0x1p-1074')\n" + 
-        "-5e-324";
-
-    public final static String float_hex_doc = 
-        "float.hex() -> string\n" + 
-        "\n" + 
-        "Return a hexadecimal representation of a floating-point number.\n" + 
-        ">>> (-0.1).hex()\n" + 
-        "'-0x1.999999999999ap-4'\n" + 
-        ">>> 3.14159.hex()\n" + 
-        "'0x1.921f9f01b866ep+1'";
-
-    public final static String float_imag_doc = 
-        "the imaginary part of a complex number";
-
-    public final static String float_is_integer_doc = 
-        "Return True if the float is an integer.";
-
-    public final static String float_real_doc = 
-        "the real part of a complex number";
-
-    // Docs for <class 'enumerate'>
-    public final static String enumerate___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String enumerate___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String enumerate___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String enumerate_doc = 
-        "enumerate(iterable[, start]) -> iterator for index, value of iterable\n" + 
-        "\n" + 
-        "Return an enumerate object.  iterable must be another object that supports\n" + 
-        "iteration.  The enumerate object yields pairs containing a count (from\n" + 
-        "start, which defaults to zero) and a value yielded by the iterable argument.\n" + 
-        "enumerate is useful for obtaining an indexed list:\n" + 
-        "    (0, seq[0]), (1, seq[1]), (2, seq[2]), ...";
-
-    public final static String enumerate___eq___doc = 
-        "Return self==value.";
-
-    public final static String enumerate___format___doc = 
-        "default object formatter";
-
-    public final static String enumerate___ge___doc = 
-        "Return self>=value.";
-
-    public final static String enumerate___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String enumerate___gt___doc = 
-        "Return self>value.";
-
-    public final static String enumerate___hash___doc = 
-        "Return hash(self).";
-
-    public final static String enumerate___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String enumerate___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String enumerate___le___doc = 
-        "Return self<=value.";
-
-    public final static String enumerate___lt___doc = 
-        "Return self<value.";
-
-    public final static String enumerate___ne___doc = 
-        "Return self!=value.";
-
-    public final static String enumerate___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String enumerate___next___doc = 
-        "Implement next(self).";
-
-    public final static String enumerate___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String enumerate___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String enumerate___repr___doc = 
-        "Return repr(self).";
-
-    public final static String enumerate___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String enumerate___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String enumerate___str___doc = 
-        "Return str(self).";
-
-    public final static String enumerate___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'int'>
-    public final static String int___abs___doc = 
-        "abs(self)";
-
-    public final static String int___add___doc = 
-        "Return self+value.";
-
-    public final static String int___and___doc = 
-        "Return self&value.";
-
-    public final static String int___bool___doc = 
-        "self != 0";
-
-    public final static String int___ceil___doc = 
-        "Ceiling of an Integral returns itself.";
-
-    public final static String int___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String int___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String int___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String int___divmod___doc = 
-        "Return divmod(self, value).";
-
-    public final static String int_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String int___eq___doc = 
-        "Return self==value.";
-
-    public final static String int___float___doc = 
-        "float(self)";
-
-    public final static String int___floor___doc = 
-        "Flooring an Integral returns itself.";
-
-    public final static String int___floordiv___doc = 
-        "Return self//value.";
-
-    public final static String int___format___doc = 
-        "";
-
-    public final static String int___ge___doc = 
-        "Return self>=value.";
-
-    public final static String int___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String int___getnewargs___doc = 
-        "";
-
-    public final static String int___gt___doc = 
-        "Return self>value.";
-
-    public final static String int___hash___doc = 
-        "Return hash(self).";
-
-    public final static String int___index___doc = 
-        "Return self converted to an integer, if self is suitable for use as an index into a list.";
-
-    public final static String int___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String int___int___doc = 
-        "int(self)";
-
-    public final static String int___invert___doc = 
-        "~self";
-
-    public final static String int___le___doc = 
-        "Return self<=value.";
-
-    public final static String int___lshift___doc = 
-        "Return self<<value.";
-
-    public final static String int___lt___doc = 
-        "Return self<value.";
-
-    public final static String int___mod___doc = 
-        "Return self%value.";
-
-    public final static String int___mul___doc = 
-        "Return self*value.";
-
-    public final static String int___ne___doc = 
-        "Return self!=value.";
-
-    public final static String int___neg___doc = 
-        "-self";
-
-    public final static String int___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String int___or___doc = 
-        "Return self|value.";
-
-    public final static String int___pos___doc = 
-        "+self";
-
-    public final static String int___pow___doc = 
-        "Return pow(self, value, mod).";
-
-    public final static String int___radd___doc = 
-        "Return value+self.";
-
-    public final static String int___rand___doc = 
-        "Return value&self.";
-
-    public final static String int___rdivmod___doc = 
-        "Return divmod(value, self).";
-
-    public final static String int___reduce___doc = 
-        "helper for pickle";
-
-    public final static String int___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String int___repr___doc = 
-        "Return repr(self).";
-
-    public final static String int___rfloordiv___doc = 
-        "Return value//self.";
-
-    public final static String int___rlshift___doc = 
-        "Return value<<self.";
-
-    public final static String int___rmod___doc = 
-        "Return value%self.";
-
-    public final static String int___rmul___doc = 
-        "Return value*self.";
-
-    public final static String int___ror___doc = 
-        "Return value|self.";
-
-    public final static String int___round___doc = 
-        "Rounding an Integral returns itself.\n" + 
-        "Rounding with an ndigits argument also returns an integer.";
-
-    public final static String int___rpow___doc = 
-        "Return pow(value, self, mod).";
-
-    public final static String int___rrshift___doc = 
-        "Return value>>self.";
-
-    public final static String int___rshift___doc = 
-        "Return self>>value.";
-
-    public final static String int___rsub___doc = 
-        "Return value-self.";
-
-    public final static String int___rtruediv___doc = 
-        "Return value/self.";
-
-    public final static String int___rxor___doc = 
-        "Return value^self.";
-
-    public final static String int___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String int___sizeof___doc = 
-        "Returns size in memory, in bytes";
-
-    public final static String int___str___doc = 
-        "Return str(self).";
-
-    public final static String int___sub___doc = 
-        "Return self-value.";
-
-    public final static String int___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String int___truediv___doc = 
-        "Return self/value.";
-
-    public final static String int___trunc___doc = 
-        "Truncating an Integral returns itself.";
-
-    public final static String int___xor___doc = 
-        "Return self^value.";
-
-    public final static String int_bit_length_doc = 
-        "int.bit_length() -> int\n" + 
-        "\n" + 
-        "Number of bits necessary to represent self in binary.\n" + 
-        ">>> bin(37)\n" + 
-        "'0b100101'\n" + 
-        ">>> (37).bit_length()\n" + 
-        "6";
-
-    public final static String int_conjugate_doc = 
-        "Returns self, the complex conjugate of any int.";
-
-    public final static String int_denominator_doc = 
-        "the denominator of a rational number in lowest terms";
-
-    public final static String int_from_bytes_doc = 
-        "int.from_bytes(bytes, byteorder, *, signed=False) -> int\n" + 
-        "\n" + 
-        "Return the integer represented by the given array of bytes.\n" + 
-        "\n" + 
-        "The bytes argument must be a bytes-like object (e.g. bytes or bytearray).\n" + 
-        "\n" + 
-        "The byteorder argument determines the byte order used to represent the\n" + 
-        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
-        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
-        "significant byte is at the end of the byte array.  To request the native\n" + 
-        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
-        "\n" + 
-        "The signed keyword-only argument indicates whether two's complement is\n" + 
-        "used to represent the integer.";
-
-    public final static String int_imag_doc = 
-        "the imaginary part of a complex number";
-
-    public final static String int_numerator_doc = 
-        "the numerator of a rational number in lowest terms";
-
-    public final static String int_real_doc = 
-        "the real part of a complex number";
-
-    public final static String int_to_bytes_doc = 
-        "int.to_bytes(length, byteorder, *, signed=False) -> bytes\n" + 
-        "\n" + 
-        "Return an array of bytes representing an integer.\n" + 
-        "\n" + 
-        "The integer is represented using length bytes.  An OverflowError is\n" + 
-        "raised if the integer is not representable with the given number of\n" + 
-        "bytes.\n" + 
-        "\n" + 
-        "The byteorder argument determines the byte order used to represent the\n" + 
-        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
-        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
-        "significant byte is at the end of the byte array.  To request the native\n" + 
-        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
-        "\n" + 
-        "The signed keyword-only argument determines whether two's complement is\n" + 
-        "used to represent the integer.  If signed is False and a negative integer\n" + 
-        "is given, an OverflowError is raised.";
-
-    // Docs for <class 'tuple'>
-    public final static String tuple___add___doc = 
-        "Return self+value.";
-
-    public final static String tuple___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String tuple___contains___doc = 
-        "Return key in self.";
-
-    public final static String tuple___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String tuple___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String tuple_doc = 
-        "tuple() -> empty tuple\n" + 
-        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
-        "\n" + 
-        "If the argument is a tuple, the return value is the same object.";
-
-    public final static String tuple___eq___doc = 
-        "Return self==value.";
-
-    public final static String tuple___format___doc = 
-        "default object formatter";
-
-    public final static String tuple___ge___doc = 
-        "Return self>=value.";
-
-    public final static String tuple___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String tuple___getitem___doc = 
-        "Return self[key].";
-
-    public final static String tuple___getnewargs___doc = 
-        "";
-
-    public final static String tuple___gt___doc = 
-        "Return self>value.";
-
-    public final static String tuple___hash___doc = 
-        "Return hash(self).";
-
-    public final static String tuple___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String tuple___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String tuple___le___doc = 
-        "Return self<=value.";
-
-    public final static String tuple___len___doc = 
-        "Return len(self).";
-
-    public final static String tuple___lt___doc = 
-        "Return self<value.";
-
-    public final static String tuple___mul___doc = 
-        "Return self*value.n";
-
-    public final static String tuple___ne___doc = 
-        "Return self!=value.";
-
-    public final static String tuple___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String tuple___reduce___doc = 
-        "helper for pickle";
-
-    public final static String tuple___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String tuple___repr___doc = 
-        "Return repr(self).";
-
-    public final static String tuple___rmul___doc = 
-        "Return self*value.";
-
-    public final static String tuple___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String tuple___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String tuple___str___doc = 
-        "Return str(self).";
-
-    public final static String tuple___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String tuple_count_doc = 
-        "T.count(value) -> integer -- return number of occurrences of value";
-
-    public final static String tuple_index_doc = 
-        "T.index(value, [start, [stop]]) -> integer -- return first index of value.\n" + 
-        "Raises ValueError if the value is not present.";
-
-    // Docs for <class 'str'>
-    public final static String str___add___doc = 
-        "Return self+value.";
-
-    public final static String str___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String str___contains___doc = 
-        "Return key in self.";
-
-    public final static String str___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String str___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String str_doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String str___eq___doc = 
-        "Return self==value.";
-
-    public final static String str___format___doc = 
-        "S.__format__(format_spec) -> str\n" + 
-        "\n" + 
-        "Return a formatted version of S as described by format_spec.";
-
-    public final static String str___ge___doc = 
-        "Return self>=value.";
-
-    public final static String str___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String str___getitem___doc = 
-        "Return self[key].";
-
-    public final static String str___getnewargs___doc = 
-        "";
-
-    public final static String str___gt___doc = 
-        "Return self>value.";
-
-    public final static String str___hash___doc = 
-        "Return hash(self).";
-
-    public final static String str___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String str___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String str___le___doc = 
-        "Return self<=value.";
-
-    public final static String str___len___doc = 
-        "Return len(self).";
-
-    public final static String str___lt___doc = 
-        "Return self<value.";
-
-    public final static String str___mod___doc = 
-        "Return self%value.";
-
-    public final static String str___mul___doc = 
-        "Return self*value.n";
-
-    public final static String str___ne___doc = 
-        "Return self!=value.";
-
-    public final static String str___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String str___reduce___doc = 
-        "helper for pickle";
-
-    public final static String str___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String str___repr___doc = 
-        "Return repr(self).";
-
-    public final static String str___rmod___doc = 
-        "Return value%self.";
-
-    public final static String str___rmul___doc = 
-        "Return self*value.";
-
-    public final static String str___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String str___sizeof___doc = 
-        "S.__sizeof__() -> size of S in memory, in bytes";
-
-    public final static String str___str___doc = 
-        "Return str(self).";
-
-    public final static String str___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String str_capitalize_doc = 
-        "S.capitalize() -> str\n" + 
-        "\n" + 
-        "Return a capitalized version of S, i.e. make the first character\n" + 
-        "have upper case and the rest lower case.";
-
-    public final static String str_casefold_doc = 
-        "S.casefold() -> str\n" + 
-        "\n" + 
-        "Return a version of S suitable for caseless comparisons.";
-
-    public final static String str_center_doc = 
-        "S.center(width[, fillchar]) -> str\n" + 
-        "\n" + 
-        "Return S centered in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space)";
-
-    public final static String str_count_doc = 
-        "S.count(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the number of non-overlapping occurrences of substring sub in\n" + 
-        "string S[start:end].  Optional arguments start and end are\n" + 
-        "interpreted as in slice notation.";
-
-    public final static String str_encode_doc = 
-        "S.encode(encoding='utf-8', errors='strict') -> bytes\n" + 
-        "\n" + 
-        "Encode S using the codec registered for encoding. Default encoding\n" + 
-        "is 'utf-8'. errors may be given to set a different error\n" + 
-        "handling scheme. Default is 'strict' meaning that encoding errors raise\n" + 
-        "a UnicodeEncodeError. Other possible values are 'ignore', 'replace' and\n" + 
-        "'xmlcharrefreplace' as well as any other name registered with\n" + 
-        "codecs.register_error that can handle UnicodeEncodeErrors.";
-
-    public final static String str_endswith_doc = 
-        "S.endswith(suffix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if S ends with the specified suffix, False otherwise.\n" + 
-        "With optional start, test S beginning at that position.\n" + 
-        "With optional end, stop comparing S at that position.\n" + 
-        "suffix can also be a tuple of strings to try.";
-
-    public final static String str_expandtabs_doc = 
-        "S.expandtabs(tabsize=8) -> str\n" + 
-        "\n" + 
-        "Return a copy of S where all tab characters are expanded using spaces.\n" + 
-        "If tabsize is not given, a tab size of 8 characters is assumed.";
-
-    public final static String str_find_doc = 
-        "S.find(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the lowest index in S where substring sub is found,\n" + 
-        "such that sub is contained within S[start:end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String str_format_doc = 
-        "S.format(*args, **kwargs) -> str\n" + 
-        "\n" + 
-        "Return a formatted version of S, using substitutions from args and kwargs.\n" + 
-        "The substitutions are identified by braces ('{' and '}').";
-
-    public final static String str_format_map_doc = 
-        "S.format_map(mapping) -> str\n" + 
-        "\n" + 
-        "Return a formatted version of S, using substitutions from mapping.\n" + 
-        "The substitutions are identified by braces ('{' and '}').";
-
-    public final static String str_index_doc = 
-        "S.index(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like S.find() but raise ValueError when the substring is not found.";
-
-    public final static String str_isalnum_doc = 
-        "S.isalnum() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in S are alphanumeric\n" + 
-        "and there is at least one character in S, False otherwise.";
-
-    public final static String str_isalpha_doc = 
-        "S.isalpha() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in S are alphabetic\n" + 
-        "and there is at least one character in S, False otherwise.";
-
-    public final static String str_isdecimal_doc = 
-        "S.isdecimal() -> bool\n" + 
-        "\n" + 
-        "Return True if there are only decimal characters in S,\n" + 
-        "False otherwise.";
-
-    public final static String str_isdigit_doc = 
-        "S.isdigit() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in S are digits\n" + 
-        "and there is at least one character in S, False otherwise.";
-
-    public final static String str_isidentifier_doc = 
-        "S.isidentifier() -> bool\n" + 
-        "\n" + 
-        "Return True if S is a valid identifier according\n" + 
-        "to the language definition.\n" + 
-        "\n" + 
-        "Use keyword.iskeyword() to test for reserved identifiers\n" + 
-        "such as \"def\" and \"class\".\n" + 
-        "";
-
-    public final static String str_islower_doc = 
-        "S.islower() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in S are lowercase and there is\n" + 
-        "at least one cased character in S, False otherwise.";
-
-    public final static String str_isnumeric_doc = 
-        "S.isnumeric() -> bool\n" + 
-        "\n" + 
-        "Return True if there are only numeric characters in S,\n" + 
-        "False otherwise.";
-
-    public final static String str_isprintable_doc = 
-        "S.isprintable() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in S are considered\n" + 
-        "printable in repr() or S is empty, False otherwise.";
-
-    public final static String str_isspace_doc = 
-        "S.isspace() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in S are whitespace\n" + 
-        "and there is at least one character in S, False otherwise.";
-
-    public final static String str_istitle_doc = 
-        "S.istitle() -> bool\n" + 
-        "\n" + 
-        "Return True if S is a titlecased string and there is at least one\n" + 
-        "character in S, i.e. upper- and titlecase characters may only\n" + 
-        "follow uncased characters and lowercase characters only cased ones.\n" + 
-        "Return False otherwise.";
-
-    public final static String str_isupper_doc = 
-        "S.isupper() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in S are uppercase and there is\n" + 
-        "at least one cased character in S, False otherwise.";
-
-    public final static String str_join_doc = 
-        "S.join(iterable) -> str\n" + 
-        "\n" + 
-        "Return a string which is the concatenation of the strings in the\n" + 
-        "iterable.  The separator between elements is S.";
-
-    public final static String str_ljust_doc = 
-        "S.ljust(width[, fillchar]) -> str\n" + 
-        "\n" + 
-        "Return S left-justified in a Unicode string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String str_lower_doc = 
-        "S.lower() -> str\n" + 
-        "\n" + 
-        "Return a copy of the string S converted to lowercase.";
-
-    public final static String str_lstrip_doc = 
-        "S.lstrip([chars]) -> str\n" + 
-        "\n" + 
-        "Return a copy of the string S with leading whitespace removed.\n" + 
-        "If chars is given and not None, remove characters in chars instead.";
-
-    public final static String str_maketrans_doc = 
-        "Return a translation table usable for str.translate().\n" + 
-        "\n" + 
-        "If there is only one argument, it must be a dictionary mapping Unicode\n" + 
-        "ordinals (integers) or characters to Unicode ordinals, strings or None.\n" + 
-        "Character keys will be then converted to ordinals.\n" + 
-        "If there are two arguments, they must be strings of equal length, and\n" + 
-        "in the resulting dictionary, each character in x will be mapped to the\n" + 
-        "character at the same position in y. If there is a third argument, it\n" + 
-        "must be a string, whose characters will be mapped to None in the result.";
-
-    public final static String str_partition_doc = 
-        "S.partition(sep) -> (head, sep, tail)\n" + 
-        "\n" + 
-        "Search for the separator sep in S, and return the part before it,\n" + 
-        "the separator itself, and the part after it.  If the separator is not\n" + 
-        "found, return S and two empty strings.";
-
-    public final static String str_replace_doc = 
-        "S.replace(old, new[, count]) -> str\n" + 
-        "\n" + 
-        "Return a copy of S with all occurrences of substring\n" + 
-        "old replaced by new.  If the optional argument count is\n" + 
-        "given, only the first count occurrences are replaced.";
-
-    public final static String str_rfind_doc = 
-        "S.rfind(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the highest index in S where substring sub is found,\n" + 
-        "such that sub is contained within S[start:end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String str_rindex_doc = 
-        "S.rindex(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like S.rfind() but raise ValueError when the substring is not found.";
-
-    public final static String str_rjust_doc = 
-        "S.rjust(width[, fillchar]) -> str\n" + 
-        "\n" + 
-        "Return S right-justified in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String str_rpartition_doc = 
-        "S.rpartition(sep) -> (head, sep, tail)\n" + 
-        "\n" + 
-        "Search for the separator sep in S, starting at the end of S, and return\n" + 
-        "the part before it, the separator itself, and the part after it.  If the\n" + 
-        "separator is not found, return two empty strings and S.";
-
-    public final static String str_rsplit_doc = 
-        "S.rsplit(sep=None, maxsplit=-1) -> list of strings\n" + 
-        "\n" + 
-        "Return a list of the words in S, using sep as the\n" + 
-        "delimiter string, starting at the end of the string and\n" + 
-        "working to the front.  If maxsplit is given, at most maxsplit\n" + 
-        "splits are done. If sep is not specified, any whitespace string\n" + 
-        "is a separator.";
-
-    public final static String str_rstrip_doc = 
-        "S.rstrip([chars]) -> str\n" + 
-        "\n" + 
-        "Return a copy of the string S with trailing whitespace removed.\n" + 
-        "If chars is given and not None, remove characters in chars instead.";
-
-    public final static String str_split_doc = 
-        "S.split(sep=None, maxsplit=-1) -> list of strings\n" + 
-        "\n" + 
-        "Return a list of the words in S, using sep as the\n" + 
-        "delimiter string.  If maxsplit is given, at most maxsplit\n" + 
-        "splits are done. If sep is not specified or is None, any\n" + 
-        "whitespace string is a separator and empty strings are\n" + 
-        "removed from the result.";
-
-    public final static String str_splitlines_doc = 
-        "S.splitlines([keepends]) -> list of strings\n" + 
-        "\n" + 
-        "Return a list of the lines in S, breaking at line boundaries.\n" + 
-        "Line breaks are not included in the resulting list unless keepends\n" + 
-        "is given and true.";
-
-    public final static String str_startswith_doc = 
-        "S.startswith(prefix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if S starts with the specified prefix, False otherwise.\n" + 
-        "With optional start, test S beginning at that position.\n" + 
-        "With optional end, stop comparing S at that position.\n" + 
-        "prefix can also be a tuple of strings to try.";
-
-    public final static String str_strip_doc = 
-        "S.strip([chars]) -> str\n" + 
-        "\n" + 
-        "Return a copy of the string S with leading and trailing\n" + 
-        "whitespace removed.\n" + 
-        "If chars is given and not None, remove characters in chars instead.";
-
-    public final static String str_swapcase_doc = 
-        "S.swapcase() -> str\n" + 
-        "\n" + 
-        "Return a copy of S with uppercase characters converted to lowercase\n" + 
-        "and vice versa.";
-
-    public final static String str_title_doc = 
-        "S.title() -> str\n" + 
-        "\n" + 
-        "Return a titlecased version of S, i.e. words start with title case\n" + 
-        "characters, all remaining cased characters have lower case.";
-
-    public final static String str_translate_doc = 
-        "S.translate(table) -> str\n" + 
-        "\n" + 
-        "Return a copy of the string S in which each character has been mapped\n" + 
-        "through the given translation table. The table must implement\n" + 
-        "lookup/indexing via __getitem__, for instance a dictionary or list,\n" + 
-        "mapping Unicode ordinals to Unicode ordinals, strings, or None. If\n" + 
-        "this operation raises LookupError, the character is left untouched.\n" + 
-        "Characters mapped to None are deleted.";
-
-    public final static String str_upper_doc = 
-        "S.upper() -> str\n" + 
-        "\n" + 
-        "Return a copy of S converted to uppercase.";
-
-    public final static String str_zfill_doc = 
-        "S.zfill(width) -> str\n" + 
-        "\n" + 
-        "Pad a numeric string S with zeros on the left, to fill a field\n" + 
-        "of the specified width. The string S is never truncated.";
-
-    // Docs for <class 'property'>
-    public final static String property___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String property___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String property___delete___doc = 
-        "Delete an attribute of instance.";
-
-    public final static String property___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String property_doc = 
-        "property(fget=None, fset=None, fdel=None, doc=None) -> property attribute\n" + 
-        "\n" + 
-        "fget is a function to be used for getting an attribute value, and likewise\n" + 
-        "fset is a function for setting, and fdel a function for del'ing, an\n" + 
-        "attribute.  Typical use is to define a managed attribute x:\n" + 
-        "\n" + 
-        "class C(object):\n" + 
-        "    def getx(self): return self._x\n" + 
-        "    def setx(self, value): self._x = value\n" + 
-        "    def delx(self): del self._x\n" + 
-        "    x = property(getx, setx, delx, \"I'm the 'x' property.\")\n" + 
-        "\n" + 
-        "Decorators make defining new properties or modifying existing ones easy:\n" + 
-        "\n" + 
-        "class C(object):\n" + 
-        "    @property\n" + 
-        "    def x(self):\n" + 
-        "        \"I am the 'x' property.\"\n" + 
-        "        return self._x\n" + 
-        "    @x.setter\n" + 
-        "    def x(self, value):\n" + 
-        "        self._x = value\n" + 
-        "    @x.deleter\n" + 
-        "    def x(self):\n" + 
-        "        del self._x\n" + 
-        "";
-
-    public final static String property___eq___doc = 
-        "Return self==value.";
-
-    public final static String property___format___doc = 
-        "default object formatter";
-
-    public final static String property___ge___doc = 
-        "Return self>=value.";
-
-    public final static String property___get___doc = 
-        "Return an attribute of instance, which is of type owner.";
-
-    public final static String property___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String property___gt___doc = 
-        "Return self>value.";
-
-    public final static String property___hash___doc = 
-        "Return hash(self).";
-
-    public final static String property___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String property___isabstractmethod___doc = 
-        "";
-
-    public final static String property___le___doc = 
-        "Return self<=value.";
-
-    public final static String property___lt___doc = 
-        "Return self<value.";
-
-    public final static String property___ne___doc = 
-        "Return self!=value.";
-
-    public final static String property___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String property___reduce___doc = 
-        "helper for pickle";
-
-    public final static String property___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String property___repr___doc = 
-        "Return repr(self).";
-
-    public final static String property___set___doc = 
-        "Set an attribute of instance to value.";
-
-    public final static String property___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String property___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String property___str___doc = 
-        "Return str(self).";
-
-    public final static String property___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String property_deleter_doc = 
-        "Descriptor to change the deleter on a property.";
-
-    public final static String property_fdel_doc = 
-        "";
-
-    public final static String property_fget_doc = 
-        "";
-
-    public final static String property_fset_doc = 
-        "";
-
-    public final static String property_getter_doc = 
-        "Descriptor to change the getter on a property.";
-
-    public final static String property_setter_doc = 
-        "Descriptor to change the setter on a property.";
-
-    // Docs for <class 'range'>
-    public final static String range___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String range___contains___doc = 
-        "Return key in self.";
-
-    public final static String range___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String range___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String range_doc = 
-        "range(stop) -> range object\n" + 
-        "range(start, stop[, step]) -> range object\n" + 
-        "\n" + 
-        "Return an object that produces a sequence of integers from start (inclusive)\n" + 
-        "to stop (exclusive) by step.  range(i, j) produces i, i+1, i+2, ..., j-1.\n" + 
-        "start defaults to 0, and stop is omitted!  range(4) produces 0, 1, 2, 3.\n" + 
-        "These are exactly the valid indices for a list of 4 elements.\n" + 
-        "When step is given, it specifies the increment (or decrement).";
-
-    public final static String range___eq___doc = 
-        "Return self==value.";
-
-    public final static String range___format___doc = 
-        "default object formatter";
-
-    public final static String range___ge___doc = 
-        "Return self>=value.";
-
-    public final static String range___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String range___getitem___doc = 
-        "Return self[key].";
-
-    public final static String range___gt___doc = 
-        "Return self>value.";
-
-    public final static String range___hash___doc = 
-        "Return hash(self).";
-
-    public final static String range___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String range___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String range___le___doc = 
-        "Return self<=value.";
-
-    public final static String range___len___doc = 
-        "Return len(self).";
-
-    public final static String range___lt___doc = 
-        "Return self<value.";
-
-    public final static String range___ne___doc = 
-        "Return self!=value.";
-
-    public final static String range___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String range___reduce___doc = 
-        "";
-
-    public final static String range___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String range___repr___doc = 
-        "Return repr(self).";
-
-    public final static String range___reversed___doc = 
-        "Return a reverse iterator.";
-
-    public final static String range___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String range___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String range___str___doc = 
-        "Return str(self).";
-
-    public final static String range___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String range_count_doc = 
-        "rangeobject.count(value) -> integer -- return number of occurrences of value";
-
-    public final static String range_index_doc = 
-        "rangeobject.index(value, [start, [stop]]) -> integer -- return index of value.\n" + 
-        "Raise ValueError if the value is not present.";
-
-    public final static String range_start_doc = 
-        "";
-
-    public final static String range_step_doc = 
-        "";
-
-    public final static String range_stop_doc = 
-        "";
-
-    // Docs for <class 'complex'>
-    public final static String complex___abs___doc = 
-        "abs(self)";
-
-    public final static String complex___add___doc = 
-        "Return self+value.";
-
-    public final static String complex___bool___doc = 
-        "self != 0";
-
-    public final static String complex___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String complex___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String complex___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String complex___divmod___doc = 
-        "Return divmod(self, value).";
-
-    public final static String complex_doc = 
-        "complex(real[, imag]) -> complex number\n" + 
-        "\n" + 
-        "Create a complex number from a real part and an optional imaginary part.\n" + 
-        "This is equivalent to (real + imag*1j) where imag defaults to 0.";
-
-    public final static String complex___eq___doc = 
-        "Return self==value.";
-
-    public final static String complex___float___doc = 
-        "float(self)";
-
-    public final static String complex___floordiv___doc = 
-        "Return self//value.";
-
-    public final static String complex___format___doc = 
-        "complex.__format__() -> str\n" + 
-        "\n" + 
-        "Convert to a string according to format_spec.";
-
-    public final static String complex___ge___doc = 
-        "Return self>=value.";
-
-    public final static String complex___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String complex___getnewargs___doc = 
-        "";
-
-    public final static String complex___gt___doc = 
-        "Return self>value.";
-
-    public final static String complex___hash___doc = 
-        "Return hash(self).";
-
-    public final static String complex___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String complex___int___doc = 
-        "int(self)";
-
-    public final static String complex___le___doc = 
-        "Return self<=value.";
-
-    public final static String complex___lt___doc = 
-        "Return self<value.";
-
-    public final static String complex___mod___doc = 
-        "Return self%value.";
-
-    public final static String complex___mul___doc = 
-        "Return self*value.";
-
-    public final static String complex___ne___doc = 
-        "Return self!=value.";
-
-    public final static String complex___neg___doc = 
-        "-self";
-
-    public final static String complex___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String complex___pos___doc = 
-        "+self";
-
-    public final static String complex___pow___doc = 
-        "Return pow(self, value, mod).";
-
-    public final static String complex___radd___doc = 
-        "Return value+self.";
-
-    public final static String complex___rdivmod___doc = 
-        "Return divmod(value, self).";
-
-    public final static String complex___reduce___doc = 
-        "helper for pickle";
-
-    public final static String complex___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String complex___repr___doc = 
-        "Return repr(self).";
-
-    public final static String complex___rfloordiv___doc = 
-        "Return value//self.";
-
-    public final static String complex___rmod___doc = 
-        "Return value%self.";
-
-    public final static String complex___rmul___doc = 
-        "Return value*self.";
-
-    public final static String complex___rpow___doc = 
-        "Return pow(value, self, mod).";
-
-    public final static String complex___rsub___doc = 
-        "Return value-self.";
-
-    public final static String complex___rtruediv___doc = 
-        "Return value/self.";
-
-    public final static String complex___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String complex___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String complex___str___doc = 
-        "Return str(self).";
-
-    public final static String complex___sub___doc = 
-        "Return self-value.";
-
-    public final static String complex___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String complex___truediv___doc = 
-        "Return self/value.";
-
-    public final static String complex_conjugate_doc = 
-        "complex.conjugate() -> complex\n" + 
-        "\n" + 
-        "Return the complex conjugate of its argument. (3-4j).conjugate() == 3+4j.";
-
-    public final static String complex_imag_doc = 
-        "the imaginary part of a complex number";
-
-    public final static String complex_real_doc = 
-        "the real part of a complex number";
-
-    // Docs for <class 'bool'>
-    public final static String bool___abs___doc = 
-        "abs(self)";
-
-    public final static String bool___add___doc = 
-        "Return self+value.";
-
-    public final static String bool___and___doc = 
-        "Return self&value.";
-
-    public final static String bool___bool___doc = 
-        "self != 0";
-
-    public final static String bool___ceil___doc = 
-        "Ceiling of an Integral returns itself.";
-
-    public final static String bool___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String bool___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String bool___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String bool___divmod___doc = 
-        "Return divmod(self, value).";
-
-    public final static String bool_doc = 
-        "bool(x) -> bool\n" + 
-        "\n" + 
-        "Returns True when the argument x is true, False otherwise.\n" + 
-        "The builtins True and False are the only two instances of the class bool.\n" + 
-        "The class bool is a subclass of the class int, and cannot be subclassed.";
-
-    public final static String bool___eq___doc = 
-        "Return self==value.";
-
-    public final static String bool___float___doc = 
-        "float(self)";
-
-    public final static String bool___floor___doc = 
-        "Flooring an Integral returns itself.";
-
-    public final static String bool___floordiv___doc = 
-        "Return self//value.";
-
-    public final static String bool___format___doc = 
-        "";
-
-    public final static String bool___ge___doc = 
-        "Return self>=value.";
-
-    public final static String bool___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String bool___getnewargs___doc = 
-        "";
-
-    public final static String bool___gt___doc = 
-        "Return self>value.";
-
-    public final static String bool___hash___doc = 
-        "Return hash(self).";
-
-    public final static String bool___index___doc = 
-        "Return self converted to an integer, if self is suitable for use as an index into a list.";
-
-    public final static String bool___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String bool___int___doc = 
-        "int(self)";
-
-    public final static String bool___invert___doc = 
-        "~self";
-
-    public final static String bool___le___doc = 
-        "Return self<=value.";
-
-    public final static String bool___lshift___doc = 
-        "Return self<<value.";
-
-    public final static String bool___lt___doc = 
-        "Return self<value.";
-
-    public final static String bool___mod___doc = 
-        "Return self%value.";
-
-    public final static String bool___mul___doc = 
-        "Return self*value.";
-
-    public final static String bool___ne___doc = 
-        "Return self!=value.";
-
-    public final static String bool___neg___doc = 
-        "-self";
-
-    public final static String bool___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String bool___or___doc = 
-        "Return self|value.";
-
-    public final static String bool___pos___doc = 
-        "+self";
-
-    public final static String bool___pow___doc = 
-        "Return pow(self, value, mod).";
-
-    public final static String bool___radd___doc = 
-        "Return value+self.";
-
-    public final static String bool___rand___doc = 
-        "Return value&self.";
-
-    public final static String bool___rdivmod___doc = 
-        "Return divmod(value, self).";
-
-    public final static String bool___reduce___doc = 
-        "helper for pickle";
-
-    public final static String bool___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String bool___repr___doc = 
-        "Return repr(self).";
-
-    public final static String bool___rfloordiv___doc = 
-        "Return value//self.";
-
-    public final static String bool___rlshift___doc = 
-        "Return value<<self.";
-
-    public final static String bool___rmod___doc = 
-        "Return value%self.";
-
-    public final static String bool___rmul___doc = 
-        "Return value*self.";
-
-    public final static String bool___ror___doc = 
-        "Return value|self.";
-
-    public final static String bool___round___doc = 
-        "Rounding an Integral returns itself.\n" + 
-        "Rounding with an ndigits argument also returns an integer.";
-
-    public final static String bool___rpow___doc = 
-        "Return pow(value, self, mod).";
-
-    public final static String bool___rrshift___doc = 
-        "Return value>>self.";
-
-    public final static String bool___rshift___doc = 
-        "Return self>>value.";
-
-    public final static String bool___rsub___doc = 
-        "Return value-self.";
-
-    public final static String bool___rtruediv___doc = 
-        "Return value/self.";
-
-    public final static String bool___rxor___doc = 
-        "Return value^self.";
-
-    public final static String bool___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String bool___sizeof___doc = 
-        "Returns size in memory, in bytes";
-
-    public final static String bool___str___doc = 
-        "Return str(self).";
-
-    public final static String bool___sub___doc = 
-        "Return self-value.";
-
-    public final static String bool___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String bool___truediv___doc = 
-        "Return self/value.";
-
-    public final static String bool___trunc___doc = 
-        "Truncating an Integral returns itself.";
-
-    public final static String bool___xor___doc = 
-        "Return self^value.";
-
-    public final static String bool_bit_length_doc = 
-        "int.bit_length() -> int\n" + 
-        "\n" + 
-        "Number of bits necessary to represent self in binary.\n" + 
-        ">>> bin(37)\n" + 
-        "'0b100101'\n" + 
-        ">>> (37).bit_length()\n" + 
-        "6";
-
-    public final static String bool_conjugate_doc = 
-        "Returns self, the complex conjugate of any int.";
-
-    public final static String bool_denominator_doc = 
-        "the denominator of a rational number in lowest terms";
-
-    public final static String bool_from_bytes_doc = 
-        "int.from_bytes(bytes, byteorder, *, signed=False) -> int\n" + 
-        "\n" + 
-        "Return the integer represented by the given array of bytes.\n" + 
-        "\n" + 
-        "The bytes argument must be a bytes-like object (e.g. bytes or bytearray).\n" + 
-        "\n" + 
-        "The byteorder argument determines the byte order used to represent the\n" + 
-        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
-        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
-        "significant byte is at the end of the byte array.  To request the native\n" + 
-        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
-        "\n" + 
-        "The signed keyword-only argument indicates whether two's complement is\n" + 
-        "used to represent the integer.";
-
-    public final static String bool_imag_doc = 
-        "the imaginary part of a complex number";
-
-    public final static String bool_numerator_doc = 
-        "the numerator of a rational number in lowest terms";
-
-    public final static String bool_real_doc = 
-        "the real part of a complex number";
-
-    public final static String bool_to_bytes_doc = 
-        "int.to_bytes(length, byteorder, *, signed=False) -> bytes\n" + 
-        "\n" + 
-        "Return an array of bytes representing an integer.\n" + 
-        "\n" + 
-        "The integer is represented using length bytes.  An OverflowError is\n" + 
-        "raised if the integer is not representable with the given number of\n" + 
-        "bytes.\n" + 
-        "\n" + 
-        "The byteorder argument determines the byte order used to represent the\n" + 
-        "integer.  If byteorder is 'big', the most significant byte is at the\n" + 
-        "beginning of the byte array.  If byteorder is 'little', the most\n" + 
-        "significant byte is at the end of the byte array.  To request the native\n" + 
-        "byte order of the host system, use `sys.byteorder' as the byte order value.\n" + 
-        "\n" + 
-        "The signed keyword-only argument determines whether two's complement is\n" + 
-        "used to represent the integer.  If signed is False and a negative integer\n" + 
-        "is given, an OverflowError is raised.";
-
-    // Docs for <class 'classmethod'>
-    public final static String classmethod___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String classmethod___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String classmethod___dict___doc = 
-        "";
-
-    public final static String classmethod___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String classmethod_doc = 
-        "classmethod(function) -> method\n" + 
-        "\n" + 
-        "Convert a function to be a class method.\n" + 
-        "\n" + 
-        "A class method receives the class as implicit first argument,\n" + 
-        "just like an instance method receives the instance.\n" + 
-        "To declare a class method, use this idiom:\n" + 
-        "\n" + 
-        "  class C:\n" + 
-        "      def f(cls, arg1, arg2, ...): ...\n" + 
-        "      f = classmethod(f)\n" + 
-        "\n" + 
-        "It can be called either on the class (e.g. C.f()) or on an instance\n" + 
-        "(e.g. C().f()).  The instance is ignored except for its class.\n" + 
-        "If a class method is called for a derived class, the derived class\n" + 
-        "object is passed as the implied first argument.\n" + 
-        "\n" + 
-        "Class methods are different than C++ or Java static methods.\n" + 
-        "If you want those, see the staticmethod builtin.";
-
-    public final static String classmethod___eq___doc = 
-        "Return self==value.";
-
-    public final static String classmethod___format___doc = 
-        "default object formatter";
-
-    public final static String classmethod___func___doc = 
-        "";
-
-    public final static String classmethod___ge___doc = 
-        "Return self>=value.";
-
-    public final static String classmethod___get___doc = 
-        "Return an attribute of instance, which is of type owner.";
-
-    public final static String classmethod___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String classmethod___gt___doc = 
-        "Return self>value.";
-
-    public final static String classmethod___hash___doc = 
-        "Return hash(self).";
-
-    public final static String classmethod___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String classmethod___isabstractmethod___doc = 
-        "";
-
-    public final static String classmethod___le___doc = 
-        "Return self<=value.";
-
-    public final static String classmethod___lt___doc = 
-        "Return self<value.";
-
-    public final static String classmethod___ne___doc = 
-        "Return self!=value.";
-
-    public final static String classmethod___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String classmethod___reduce___doc = 
-        "helper for pickle";
-
-    public final static String classmethod___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String classmethod___repr___doc = 
-        "Return repr(self).";
-
-    public final static String classmethod___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String classmethod___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String classmethod___str___doc = 
-        "Return str(self).";
-
-    public final static String classmethod___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'set'>
-    public final static String set___and___doc = 
-        "Return self&value.";
-
-    public final static String set___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String set___contains___doc = 
-        "x.__contains__(y) <==> y in x.";
-
-    public final static String set___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String set___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String set_doc = 
-        "set() -> new empty set object\n" + 
-        "set(iterable) -> new set object\n" + 
-        "\n" + 
-        "Build an unordered collection of unique elements.";
-
-    public final static String set___eq___doc = 
-        "Return self==value.";
-
-    public final static String set___format___doc = 
-        "default object formatter";
-
-    public final static String set___ge___doc = 
-        "Return self>=value.";
-
-    public final static String set___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String set___gt___doc = 
-        "Return self>value.";
-
-    public final static String set___hash___doc = 
-        "";
-
-    public final static String set___iand___doc = 
-        "Return self&=value.";
-
-    public final static String set___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String set___ior___doc = 
-        "Return self|=value.";
-
-    public final static String set___isub___doc = 
-        "Return self-=value.";
-
-    public final static String set___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String set___ixor___doc = 
-        "Return self^=value.";
-
-    public final static String set___le___doc = 
-        "Return self<=value.";
-
-    public final static String set___len___doc = 
-        "Return len(self).";
-
-    public final static String set___lt___doc = 
-        "Return self<value.";
-
-    public final static String set___ne___doc = 
-        "Return self!=value.";
-
-    public final static String set___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String set___or___doc = 
-        "Return self|value.";
-
-    public final static String set___rand___doc = 
-        "Return value&self.";
-
-    public final static String set___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String set___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String set___repr___doc = 
-        "Return repr(self).";
-
-    public final static String set___ror___doc = 
-        "Return value|self.";
-
-    public final static String set___rsub___doc = 
-        "Return value-self.";
-
-    public final static String set___rxor___doc = 
-        "Return value^self.";
-
-    public final static String set___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String set___sizeof___doc = 
-        "S.__sizeof__() -> size of S in memory, in bytes";
-
-    public final static String set___str___doc = 
-        "Return str(self).";
-
-    public final static String set___sub___doc = 
-        "Return self-value.";
-
-    public final static String set___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String set___xor___doc = 
-        "Return self^value.";
-
-    public final static String set_add_doc = 
-        "Add an element to a set.\n" + 
-        "\n" + 
-        "This has no effect if the element is already present.";
-
-    public final static String set_clear_doc = 
-        "Remove all elements from this set.";
-
-    public final static String set_copy_doc = 
-        "Return a shallow copy of a set.";
-
-    public final static String set_difference_doc = 
-        "Return the difference of two or more sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in this set but not the others.)";
-
-    public final static String set_difference_update_doc = 
-        "Remove all elements of another set from this set.";
-
-    public final static String set_discard_doc = 
-        "Remove an element from a set if it is a member.\n" + 
-        "\n" + 
-        "If the element is not a member, do nothing.";
-
-    public final static String set_intersection_doc = 
-        "Return the intersection of two sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in both sets.)";
-
-    public final static String set_intersection_update_doc = 
-        "Update a set with the intersection of itself and another.";
-
-    public final static String set_isdisjoint_doc = 
-        "Return True if two sets have a null intersection.";
-
-    public final static String set_issubset_doc = 
-        "Report whether another set contains this set.";
-
-    public final static String set_issuperset_doc = 
-        "Report whether this set contains another set.";
-
-    public final static String set_pop_doc = 
-        "Remove and return an arbitrary set element.\n" + 
-        "Raises KeyError if the set is empty.";
-
-    public final static String set_remove_doc = 
-        "Remove an element from a set; it must be a member.\n" + 
-        "\n" + 
-        "If the element is not a member, raise a KeyError.";
-
-    public final static String set_symmetric_difference_doc = 
-        "Return the symmetric difference of two sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in exactly one of the sets.)";
-
-    public final static String set_symmetric_difference_update_doc = 
-        "Update a set with the symmetric difference of itself and another.";
-
-    public final static String set_union_doc = 
-        "Return the union of sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in either set.)";
-
-    public final static String set_update_doc = 
-        "Update a set with the union of itself and others.";
-
-    // Docs for <class 'frozenset'>
-    public final static String frozenset___and___doc = 
-        "Return self&value.";
-
-    public final static String frozenset___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String frozenset___contains___doc = 
-        "x.__contains__(y) <==> y in x.";
-
-    public final static String frozenset___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String frozenset___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String frozenset_doc = 
-        "frozenset() -> empty frozenset object\n" + 
-        "frozenset(iterable) -> frozenset object\n" + 
-        "\n" + 
-        "Build an immutable unordered collection of unique elements.";
-
-    public final static String frozenset___eq___doc = 
-        "Return self==value.";
-
-    public final static String frozenset___format___doc = 
-        "default object formatter";
-
-    public final static String frozenset___ge___doc = 
-        "Return self>=value.";
-
-    public final static String frozenset___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String frozenset___gt___doc = 
-        "Return self>value.";
-
-    public final static String frozenset___hash___doc = 
-        "Return hash(self).";
-
-    public final static String frozenset___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String frozenset___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String frozenset___le___doc = 
-        "Return self<=value.";
-
-    public final static String frozenset___len___doc = 
-        "Return len(self).";
-
-    public final static String frozenset___lt___doc = 
-        "Return self<value.";
-
-    public final static String frozenset___ne___doc = 
-        "Return self!=value.";
-
-    public final static String frozenset___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String frozenset___or___doc = 
-        "Return self|value.";
-
-    public final static String frozenset___rand___doc = 
-        "Return value&self.";
-
-    public final static String frozenset___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String frozenset___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String frozenset___repr___doc = 
-        "Return repr(self).";
-
-    public final static String frozenset___ror___doc = 
-        "Return value|self.";
-
-    public final static String frozenset___rsub___doc = 
-        "Return value-self.";
-
-    public final static String frozenset___rxor___doc = 
-        "Return value^self.";
-
-    public final static String frozenset___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String frozenset___sizeof___doc = 
-        "S.__sizeof__() -> size of S in memory, in bytes";
-
-    public final static String frozenset___str___doc = 
-        "Return str(self).";
-
-    public final static String frozenset___sub___doc = 
-        "Return self-value.";
-
-    public final static String frozenset___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String frozenset___xor___doc = 
-        "Return self^value.";
-
-    public final static String frozenset_copy_doc = 
-        "Return a shallow copy of a set.";
-
-    public final static String frozenset_difference_doc = 
-        "Return the difference of two or more sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in this set but not the others.)";
-
-    public final static String frozenset_intersection_doc = 
-        "Return the intersection of two sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in both sets.)";
-
-    public final static String frozenset_isdisjoint_doc = 
-        "Return True if two sets have a null intersection.";
-
-    public final static String frozenset_issubset_doc = 
-        "Report whether another set contains this set.";
-
-    public final static String frozenset_issuperset_doc = 
-        "Report whether this set contains another set.";
-
-    public final static String frozenset_symmetric_difference_doc = 
-        "Return the symmetric difference of two sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in exactly one of the sets.)";
-
-    public final static String frozenset_union_doc = 
-        "Return the union of sets as a new set.\n" + 
-        "\n" + 
-        "(i.e. all elements that are in either set.)";
-
-    // Docs for <class 'BaseException'>
-    public final static String BaseException___cause___doc = 
-        "exception cause";
-
-    public final static String BaseException___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BaseException___context___doc = 
-        "exception context";
-
-    public final static String BaseException___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BaseException___dict___doc = 
-        "";
-
-    public final static String BaseException___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BaseException_doc = 
-        "Common base class for all exceptions";
-
-    public final static String BaseException___eq___doc = 
-        "Return self==value.";
-
-    public final static String BaseException___format___doc = 
-        "default object formatter";
-
-    public final static String BaseException___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BaseException___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BaseException___gt___doc = 
-        "Return self>value.";
-
-    public final static String BaseException___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BaseException___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BaseException___le___doc = 
-        "Return self<=value.";
-
-    public final static String BaseException___lt___doc = 
-        "Return self<value.";
-
-    public final static String BaseException___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BaseException___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BaseException___reduce___doc = 
-        "";
-
-    public final static String BaseException___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BaseException___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BaseException___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BaseException___setstate___doc = 
-        "";
-
-    public final static String BaseException___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String BaseException___str___doc = 
-        "Return str(self).";
-
-    public final static String BaseException___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BaseException___suppress_context___doc = 
-        "";
-
-    public final static String BaseException___traceback___doc = 
-        "";
-
-    public final static String BaseException_args_doc = 
-        "";
-
-    public final static String BaseException_with_traceback_doc = 
-        "Exception.with_traceback(tb) --\n" + 
-        "    set self.__traceback__ to tb and return self.";
-
-    // Docs for <class 'bytearray'>
-    public final static String bytearray___add___doc = 
-        "Return self+value.";
-
-    public final static String bytearray___alloc___doc = 
-        "B.__alloc__() -> int\n" + 
-        "\n" + 
-        "Return the number of bytes actually allocated.";
-
-    public final static String bytearray___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String bytearray___contains___doc = 
-        "Return key in self.";
-
-    public final static String bytearray___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String bytearray___delitem___doc = 
-        "Delete self[key].";
-
-    public final static String bytearray___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String bytearray_doc = 
-        "bytearray(iterable_of_ints) -> bytearray\n" + 
-        "bytearray(string, encoding[, errors]) -> bytearray\n" + 
-        "bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer\n" + 
-        "bytearray(int) -> bytes array of size given by the parameter initialized with null bytes\n" + 
-        "bytearray() -> empty bytes array\n" + 
-        "\n" + 
-        "Construct a mutable bytearray object from:\n" + 
-        "  - an iterable yielding integers in range(256)\n" + 
-        "  - a text string encoded using the specified encoding\n" + 
-        "  - a bytes or a buffer object\n" + 
-        "  - any object implementing the buffer API.\n" + 
-        "  - an integer";
-
-    public final static String bytearray___eq___doc = 
-        "Return self==value.";
-
-    public final static String bytearray___format___doc = 
-        "default object formatter";
-
-    public final static String bytearray___ge___doc = 
-        "Return self>=value.";
-
-    public final static String bytearray___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String bytearray___getitem___doc = 
-        "Return self[key].";
-
-    public final static String bytearray___gt___doc = 
-        "Return self>value.";
-
-    public final static String bytearray___hash___doc = 
-        "";
-
-    public final static String bytearray___iadd___doc = 
-        "Implement self+=value.";
-
-    public final static String bytearray___imul___doc = 
-        "Implement self*=value.";
-
-    public final static String bytearray___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String bytearray___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String bytearray___le___doc = 
-        "Return self<=value.";
-
-    public final static String bytearray___len___doc = 
-        "Return len(self).";
-
-    public final static String bytearray___lt___doc = 
-        "Return self<value.";
-
-    public final static String bytearray___mod___doc = 
-        "Return self%value.";
-
-    public final static String bytearray___mul___doc = 
-        "Return self*value.n";
-
-    public final static String bytearray___ne___doc = 
-        "Return self!=value.";
-
-    public final static String bytearray___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String bytearray___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String bytearray___reduce_ex___doc = 
-        "Return state information for pickling.";
-
-    public final static String bytearray___repr___doc = 
-        "Return repr(self).";
-
-    public final static String bytearray___rmod___doc = 
-        "Return value%self.";
-
-    public final static String bytearray___rmul___doc = 
-        "Return self*value.";
-
-    public final static String bytearray___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String bytearray___setitem___doc = 
-        "Set self[key] to value.";
-
-    public final static String bytearray___sizeof___doc = 
-        "Returns the size of the bytearray object in memory, in bytes.";
-
-    public final static String bytearray___str___doc = 
-        "Return str(self).";
-
-    public final static String bytearray___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String bytearray_append_doc = 
-        "Append a single item to the end of the bytearray.\n" + 
-        "\n" + 
-        "  item\n" + 
-        "    The item to be appended.";
-
-    public final static String bytearray_capitalize_doc = 
-        "B.capitalize() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with only its first character capitalized (ASCII)\n" + 
-        "and the rest lower-cased.";
-
-    public final static String bytearray_center_doc = 
-        "B.center(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B centered in a string of length width.  Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String bytearray_clear_doc = 
-        "Remove all items from the bytearray.";
-
-    public final static String bytearray_copy_doc = 
-        "Return a copy of B.";
-
-    public final static String bytearray_count_doc = 
-        "B.count(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the number of non-overlapping occurrences of subsection sub in\n" + 
-        "bytes B[start:end].  Optional arguments start and end are interpreted\n" + 
-        "as in slice notation.";
-
-    public final static String bytearray_decode_doc = 
-        "Decode the bytearray using the codec registered for encoding.\n" + 
-        "\n" + 
-        "  encoding\n" + 
-        "    The encoding with which to decode the bytearray.\n" + 
-        "  errors\n" + 
-        "    The error handling scheme to use for the handling of decoding errors.\n" + 
-        "    The default is 'strict' meaning that decoding errors raise a\n" + 
-        "    UnicodeDecodeError. Other possible values are 'ignore' and 'replace'\n" + 
-        "    as well as any other name registered with codecs.register_error that\n" + 
-        "    can handle UnicodeDecodeErrors.";
-
-    public final static String bytearray_endswith_doc = 
-        "B.endswith(suffix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if B ends with the specified suffix, False otherwise.\n" + 
-        "With optional start, test B beginning at that position.\n" + 
-        "With optional end, stop comparing B at that position.\n" + 
-        "suffix can also be a tuple of bytes to try.";
-
-    public final static String bytearray_expandtabs_doc = 
-        "B.expandtabs(tabsize=8) -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B where all tab characters are expanded using spaces.\n" + 
-        "If tabsize is not given, a tab size of 8 characters is assumed.";
-
-    public final static String bytearray_extend_doc = 
-        "Append all the items from the iterator or sequence to the end of the bytearray.\n" + 
-        "\n" + 
-        "  iterable_of_ints\n" + 
-        "    The iterable of items to append.";
-
-    public final static String bytearray_find_doc = 
-        "B.find(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the lowest index in B where subsection sub is found,\n" + 
-        "such that sub is contained within B[start,end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String bytearray_fromhex_doc = 
-        "Create a bytearray object from a string of hexadecimal numbers.\n" + 
-        "\n" + 
-        "Spaces between two numbers are accepted.\n" + 
-        "Example: bytearray.fromhex('B9 01EF') -> bytearray(b'\\\\xb9\\\\x01\\\\xef')";
-
-    public final static String bytearray_hex_doc = 
-        "B.hex() -> string\n" + 
-        "\n" + 
-        "Create a string of hexadecimal numbers from a bytearray object.\n" + 
-        "Example: bytearray([0xb9, 0x01, 0xef]).hex() -> 'b901ef'.";
-
-    public final static String bytearray_index_doc = 
-        "B.index(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like B.find() but raise ValueError when the subsection is not found.";
-
-    public final static String bytearray_insert_doc = 
-        "Insert a single item into the bytearray before the given index.\n" + 
-        "\n" + 
-        "  index\n" + 
-        "    The index where the value is to be inserted.\n" + 
-        "  item\n" + 
-        "    The item to be inserted.";
-
-    public final static String bytearray_isalnum_doc = 
-        "B.isalnum() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are alphanumeric\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytearray_isalpha_doc = 
-        "B.isalpha() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are alphabetic\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytearray_isdigit_doc = 
-        "B.isdigit() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are digits\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytearray_islower_doc = 
-        "B.islower() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in B are lowercase and there is\n" + 
-        "at least one cased character in B, False otherwise.";
-
-    public final static String bytearray_isspace_doc = 
-        "B.isspace() -> bool\n" + 
-        "\n" + 
-        "Return True if all characters in B are whitespace\n" + 
-        "and there is at least one character in B, False otherwise.";
-
-    public final static String bytearray_istitle_doc = 
-        "B.istitle() -> bool\n" + 
-        "\n" + 
-        "Return True if B is a titlecased string and there is at least one\n" + 
-        "character in B, i.e. uppercase characters may only follow uncased\n" + 
-        "characters and lowercase characters only cased ones. Return False\n" + 
-        "otherwise.";
-
-    public final static String bytearray_isupper_doc = 
-        "B.isupper() -> bool\n" + 
-        "\n" + 
-        "Return True if all cased characters in B are uppercase and there is\n" + 
-        "at least one cased character in B, False otherwise.";
-
-    public final static String bytearray_join_doc = 
-        "Concatenate any number of bytes/bytearray objects.\n" + 
-        "\n" + 
-        "The bytearray whose method is called is inserted in between each pair.\n" + 
-        "\n" + 
-        "The result is returned as a new bytearray object.";
-
-    public final static String bytearray_ljust_doc = 
-        "B.ljust(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B left justified in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space).";
-
-    public final static String bytearray_lower_doc = 
-        "B.lower() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with all ASCII characters converted to lowercase.";
-
-    public final static String bytearray_lstrip_doc = 
-        "Strip leading bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip leading ASCII whitespace.";
-
-    public final static String bytearray_maketrans_doc = 
-        "Return a translation table useable for the bytes or bytearray translate method.\n" + 
-        "\n" + 
-        "The returned table will be one where each byte in frm is mapped to the byte at\n" + 
-        "the same position in to.\n" + 
-        "\n" + 
-        "The bytes objects frm and to must be of the same length.";
-
-    public final static String bytearray_partition_doc = 
-        "Partition the bytearray into three parts using the given separator.\n" + 
-        "\n" + 
-        "This will search for the separator sep in the bytearray. If the separator is\n" + 
-        "found, returns a 3-tuple containing the part before the separator, the\n" + 
-        "separator itself, and the part after it.\n" + 
-        "\n" + 
-        "If the separator is not found, returns a 3-tuple containing the original\n" + 
-        "bytearray object and two empty bytearray objects.";
-
-    public final static String bytearray_pop_doc = 
-        "Remove and return a single item from B.\n" + 
-        "\n" + 
-        "  index\n" + 
-        "    The index from where to remove the item.\n" + 
-        "    -1 (the default value) means remove the last item.\n" + 
-        "\n" + 
-        "If no index argument is given, will pop the last item.";
-
-    public final static String bytearray_remove_doc = 
-        "Remove the first occurrence of a value in the bytearray.\n" + 
-        "\n" + 
-        "  value\n" + 
-        "    The value to remove.";
-
-    public final static String bytearray_replace_doc = 
-        "Return a copy with all occurrences of substring old replaced by new.\n" + 
-        "\n" + 
-        "  count\n" + 
-        "    Maximum number of occurrences to replace.\n" + 
-        "    -1 (the default value) means replace all occurrences.\n" + 
-        "\n" + 
-        "If the optional argument count is given, only the first count occurrences are\n" + 
-        "replaced.";
-
-    public final static String bytearray_reverse_doc = 
-        "Reverse the order of the values in B in place.";
-
-    public final static String bytearray_rfind_doc = 
-        "B.rfind(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Return the highest index in B where subsection sub is found,\n" + 
-        "such that sub is contained within B[start,end].  Optional\n" + 
-        "arguments start and end are interpreted as in slice notation.\n" + 
-        "\n" + 
-        "Return -1 on failure.";
-
-    public final static String bytearray_rindex_doc = 
-        "B.rindex(sub[, start[, end]]) -> int\n" + 
-        "\n" + 
-        "Like B.rfind() but raise ValueError when the subsection is not found.";
-
-    public final static String bytearray_rjust_doc = 
-        "B.rjust(width[, fillchar]) -> copy of B\n" + 
-        "\n" + 
-        "Return B right justified in a string of length width. Padding is\n" + 
-        "done using the specified fill character (default is a space)";
-
-    public final static String bytearray_rpartition_doc = 
-        "Partition the bytes into three parts using the given separator.\n" + 
-        "\n" + 
-        "This will search for the separator sep in the bytearray, starting and the end.\n" + 
-        "If the separator is found, returns a 3-tuple containing the part before the\n" + 
-        "separator, the separator itself, and the part after it.\n" + 
-        "\n" + 
-        "If the separator is not found, returns a 3-tuple containing two empty bytearray\n" + 
-        "objects and the original bytearray object.";
-
-    public final static String bytearray_rsplit_doc = 
-        "Return a list of the sections in the bytearray, using sep as the delimiter.\n" + 
-        "\n" + 
-        "  sep\n" + 
-        "    The delimiter according which to split the bytearray.\n" + 
-        "    None (the default value) means split on ASCII whitespace characters\n" + 
-        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
-        "  maxsplit\n" + 
-        "    Maximum number of splits to do.\n" + 
-        "    -1 (the default value) means no limit.\n" + 
-        "\n" + 
-        "Splitting is done starting at the end of the bytearray and working to the front.";
-
-    public final static String bytearray_rstrip_doc = 
-        "Strip trailing bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip trailing ASCII whitespace.";
-
-    public final static String bytearray_split_doc = 
-        "Return a list of the sections in the bytearray, using sep as the delimiter.\n" + 
-        "\n" + 
-        "  sep\n" + 
-        "    The delimiter according which to split the bytearray.\n" + 
-        "    None (the default value) means split on ASCII whitespace characters\n" + 
-        "    (space, tab, return, newline, formfeed, vertical tab).\n" + 
-        "  maxsplit\n" + 
-        "    Maximum number of splits to do.\n" + 
-        "    -1 (the default value) means no limit.";
-
-    public final static String bytearray_splitlines_doc = 
-        "Return a list of the lines in the bytearray, breaking at line boundaries.\n" + 
-        "\n" + 
-        "Line breaks are not included in the resulting list unless keepends is given and\n" + 
-        "true.";
-
-    public final static String bytearray_startswith_doc = 
-        "B.startswith(prefix[, start[, end]]) -> bool\n" + 
-        "\n" + 
-        "Return True if B starts with the specified prefix, False otherwise.\n" + 
-        "With optional start, test B beginning at that position.\n" + 
-        "With optional end, stop comparing B at that position.\n" + 
-        "prefix can also be a tuple of bytes to try.";
-
-    public final static String bytearray_strip_doc = 
-        "Strip leading and trailing bytes contained in the argument.\n" + 
-        "\n" + 
-        "If the argument is omitted or None, strip leading and trailing ASCII whitespace.";
-
-    public final static String bytearray_swapcase_doc = 
-        "B.swapcase() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with uppercase ASCII characters converted\n" + 
-        "to lowercase ASCII and vice versa.";
-
-    public final static String bytearray_title_doc = 
-        "B.title() -> copy of B\n" + 
-        "\n" + 
-        "Return a titlecased version of B, i.e. ASCII words start with uppercase\n" + 
-        "characters, all remaining cased characters have lowercase.";
-
-    public final static String bytearray_translate_doc = 
-        "translate(table, [deletechars])\n" + 
-        "Return a copy with each character mapped by the given translation table.\n" + 
-        "\n" + 
-        "  table\n" + 
-        "    Translation table, which must be a bytes object of length 256.\n" + 
-        "\n" + 
-        "All characters occurring in the optional argument deletechars are removed.\n" + 
-        "The remaining characters are mapped through the given translation table.";
-
-    public final static String bytearray_upper_doc = 
-        "B.upper() -> copy of B\n" + 
-        "\n" + 
-        "Return a copy of B with all ASCII characters converted to uppercase.";
-
-    public final static String bytearray_zfill_doc = 
-        "B.zfill(width) -> copy of B\n" + 
-        "\n" + 
-        "Pad a numeric string B with zeros on the left, to fill a field\n" + 
-        "of the specified width.  B is never truncated.";
-
-    // Docs for <class 'memoryview'>
-    public final static String memoryview___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String memoryview___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String memoryview___delitem___doc = 
-        "Delete self[key].";
-
-    public final static String memoryview___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String memoryview_doc = 
-        "Create a new memoryview object which references the given object.";
-
-    public final static String memoryview___enter___doc = 
-        "";
-
-    public final static String memoryview___eq___doc = 
-        "Return self==value.";
-
-    public final static String memoryview___exit___doc = 
-        "";
-
-    public final static String memoryview___format___doc = 
-        "default object formatter";
-
-    public final static String memoryview___ge___doc = 
-        "Return self>=value.";
-
-    public final static String memoryview___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String memoryview___getitem___doc = 
-        "Return self[key].";
-
-    public final static String memoryview___gt___doc = 
-        "Return self>value.";
-
-    public final static String memoryview___hash___doc = 
-        "Return hash(self).";
-
-    public final static String memoryview___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String memoryview___le___doc = 
-        "Return self<=value.";
-
-    public final static String memoryview___len___doc = 
-        "Return len(self).";
-
-    public final static String memoryview___lt___doc = 
-        "Return self<value.";
-
-    public final static String memoryview___ne___doc = 
-        "Return self!=value.";
-
-    public final static String memoryview___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String memoryview___reduce___doc = 
-        "helper for pickle";
-
-    public final static String memoryview___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String memoryview___repr___doc = 
-        "Return repr(self).";
-
-    public final static String memoryview___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String memoryview___setitem___doc = 
-        "Set self[key] to value.";
-
-    public final static String memoryview___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String memoryview___str___doc = 
-        "Return str(self).";
-
-    public final static String memoryview___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String memoryview_c_contiguous_doc = 
-        "A bool indicating whether the memory is C contiguous.";
-
-    public final static String memoryview_cast_doc = 
-        "Cast a memoryview to a new format or shape.";
-
-    public final static String memoryview_contiguous_doc = 
-        "A bool indicating whether the memory is contiguous.";
-
-    public final static String memoryview_f_contiguous_doc = 
-        "A bool indicating whether the memory is Fortran contiguous.";
-
-    public final static String memoryview_format_doc = 
-        "A string containing the format (in struct module style)\n" + 
-        " for each element in the view.";
-
-    public final static String memoryview_hex_doc = 
-        "Return the data in the buffer as a string of hexadecimal numbers.";
-
-    public final static String memoryview_itemsize_doc = 
-        "The size in bytes of each element of the memoryview.";
-
-    public final static String memoryview_nbytes_doc = 
-        "The amount of space in bytes that the array would use in\n" + 
-        " a contiguous representation.";
-
-    public final static String memoryview_ndim_doc = 
-        "An integer indicating how many dimensions of a multi-dimensional\n" + 
-        " array the memory represents.";
-
-    public final static String memoryview_obj_doc = 
-        "The underlying object of the memoryview.";
-
-    public final static String memoryview_readonly_doc = 
-        "A bool indicating whether the memory is read only.";
-
-    public final static String memoryview_release_doc = 
-        "Release the underlying buffer exposed by the memoryview object.";
-
-    public final static String memoryview_shape_doc = 
-        "A tuple of ndim integers giving the shape of the memory\n" + 
-        " as an N-dimensional array.";
-
-    public final static String memoryview_strides_doc = 
-        "A tuple of ndim integers giving the size in bytes to access\n" + 
-        " each element for each dimension of the array.";
-
-    public final static String memoryview_suboffsets_doc = 
-        "A tuple of integers used internally for PIL-style arrays.";
-
-    public final static String memoryview_tobytes_doc = 
-        "Return the data in the buffer as a byte string.";
-
-    public final static String memoryview_tolist_doc = 
-        "Return the data in the buffer as a list of elements.";
-
-    // Docs for <module 'zipimport' (built-in)>
-    public final static String zipimport_ZipImportError_doc = 
-        "";
-
-    public final static String zipimport_doc = 
-        "zipimport provides support for importing Python modules from Zip archives.\n" + 
-        "\n" + 
-        "This module exports three objects:\n" + 
-        "- zipimporter: a class; its constructor takes a path to a Zip archive.\n" + 
-        "- ZipImportError: exception raised by zipimporter objects. It's a\n" + 
-        "  subclass of ImportError, so it can be caught as ImportError, too.\n" + 
-        "- _zip_directory_cache: a dict, mapping archive paths to zip directory\n" + 
-        "  info dicts, as used in zipimporter._files.\n" + 
-        "\n" + 
-        "It is usually not needed to use the zipimport module explicitly; it is\n" + 
-        "used by the builtin import mechanism for sys.path items that are paths\n" + 
-        "to Zip archives.";
-
-    public final static String zipimport___loader___doc = 
-        "Meta path import for built-in modules.\n" + 
-        "\n" + 
-        "    All methods are either class or static methods to avoid the need to\n" + 
-        "    instantiate the class.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String zipimport___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String zipimport___package___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String zipimport___spec___doc = 
-        "The specification for a module, used for loading.\n" + 
-        "\n" + 
-        "    A module's spec is the source for information about the module.  For\n" + 
-        "    data associated with the module, including source, use the spec's\n" + 
-        "    loader.\n" + 
-        "\n" + 
-        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
-        "    to use when loading the module.  `parent` is the name of the\n" + 
-        "    package the module is in.  The parent is derived from the name.\n" + 
-        "\n" + 
-        "    `is_package` determines if the module is considered a package or\n" + 
-        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
-        "\n" + 
-        "    `origin` is the specific location used by the loader from which to\n" + 
-        "    load the module, if that information is available.  When filename is\n" + 
-        "    set, origin will match.\n" + 
-        "\n" + 
-        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
-        "    When this is True, `__file__` attribute of the module is set.\n" + 
-        "\n" + 
-        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
-        "    corresponds to the `__cached__` attribute.\n" + 
-        "\n" + 
-        "    `submodule_search_locations` is the sequence of path entries to\n" + 
-        "    search when importing submodules.  If set, is_package should be\n" + 
-        "    True--and False otherwise.\n" + 
-        "\n" + 
-        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
-        "    has a non-None value in `submodule_search_locations`, the import\n" + 
-        "    system will consider modules loaded from the spec as packages.\n" + 
-        "\n" + 
-        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
-        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String zipimport__zip_directory_cache_doc = 
-        "dict() -> new empty dictionary\n" + 
-        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
-        "    (key, value) pairs\n" + 
-        "dict(iterable) -> new dictionary initialized as if via:\n" + 
-        "    d = {}\n" + 
-        "    for k, v in iterable:\n" + 
-        "        d[k] = v\n" + 
-        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
-        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
-
-    public final static String zipimport_zipimporter_doc = 
-        "zipimporter(archivepath) -> zipimporter object\n" + 
-        "\n" + 
-        "Create a new zipimporter instance. 'archivepath' must be a path to\n" + 
-        "a zipfile, or to a specific path inside a zipfile. For example, it can be\n" + 
-        "'/tmp/myimport.zip', or '/tmp/myimport.zip/mydirectory', if mydirectory is a\n" + 
-        "valid directory inside the archive.\n" + 
-        "\n" + 
-        "'ZipImportError is raised if 'archivepath' doesn't point to a valid Zip\n" + 
-        "archive.\n" + 
-        "\n" + 
-        "The 'archive' attribute of zipimporter objects contains the name of the\n" + 
-        "zipfile targeted.";
-
-    // Docs for <class 'zipimport.zipimporter'>
-    public final static String zipimporter___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String zipimporter___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String zipimporter___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String zipimporter_doc = 
-        "zipimporter(archivepath) -> zipimporter object\n" + 
-        "\n" + 
-        "Create a new zipimporter instance. 'archivepath' must be a path to\n" + 
-        "a zipfile, or to a specific path inside a zipfile. For example, it can be\n" + 
-        "'/tmp/myimport.zip', or '/tmp/myimport.zip/mydirectory', if mydirectory is a\n" + 
-        "valid directory inside the archive.\n" + 
-        "\n" + 
-        "'ZipImportError is raised if 'archivepath' doesn't point to a valid Zip\n" + 
-        "archive.\n" + 
-        "\n" + 
-        "The 'archive' attribute of zipimporter objects contains the name of the\n" + 
-        "zipfile targeted.";
-
-    public final static String zipimporter___eq___doc = 
-        "Return self==value.";
-
-    public final static String zipimporter___format___doc = 
-        "default object formatter";
-
-    public final static String zipimporter___ge___doc = 
-        "Return self>=value.";
-
-    public final static String zipimporter___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String zipimporter___gt___doc = 
-        "Return self>value.";
-
-    public final static String zipimporter___hash___doc = 
-        "Return hash(self).";
-
-    public final static String zipimporter___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String zipimporter___le___doc = 
-        "Return self<=value.";
-
-    public final static String zipimporter___lt___doc = 
-        "Return self<value.";
-
-    public final static String zipimporter___ne___doc = 
-        "Return self!=value.";
-
-    public final static String zipimporter___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String zipimporter___reduce___doc = 
-        "helper for pickle";
-
-    public final static String zipimporter___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String zipimporter___repr___doc = 
-        "Return repr(self).";
-
-    public final static String zipimporter___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String zipimporter___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String zipimporter___str___doc = 
-        "Return str(self).";
-
-    public final static String zipimporter___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String zipimporter__files_doc = 
-        "";
-
-    public final static String zipimporter_archive_doc = 
-        "";
-
-    public final static String zipimporter_find_loader_doc = 
-        "find_loader(fullname, path=None) -> self, str or None.\n" + 
-        "\n" + 
-        "Search for a module specified by 'fullname'. 'fullname' must be the\n" + 
-        "fully qualified (dotted) module name. It returns the zipimporter\n" + 
-        "instance itself if the module was found, a string containing the\n" + 
-        "full path name if it's possibly a portion of a namespace package,\n" + 
-        "or None otherwise. The optional 'path' argument is ignored -- it's\n" + 
-        " there for compatibility with the importer protocol.";
-
-    public final static String zipimporter_find_module_doc = 
-        "find_module(fullname, path=None) -> self or None.\n" + 
-        "\n" + 
-        "Search for a module specified by 'fullname'. 'fullname' must be the\n" + 
-        "fully qualified (dotted) module name. It returns the zipimporter\n" + 
-        "instance itself if the module was found, or None if it wasn't.\n" + 
-        "The optional 'path' argument is ignored -- it's there for compatibility\n" + 
-        "with the importer protocol.";
-
-    public final static String zipimporter_get_code_doc = 
-        "get_code(fullname) -> code object.\n" + 
-        "\n" + 
-        "Return the code object for the specified module. Raise ZipImportError\n" + 
-        "if the module couldn't be found.";
-
-    public final static String zipimporter_get_data_doc = 
-        "get_data(pathname) -> string with file data.\n" + 
-        "\n" + 
-        "Return the data associated with 'pathname'. Raise IOError if\n" + 
-        "the file wasn't found.";
-
-    public final static String zipimporter_get_filename_doc = 
-        "get_filename(fullname) -> filename string.\n" + 
-        "\n" + 
-        "Return the filename for the specified module.";
-
-    public final static String zipimporter_get_source_doc = 
-        "get_source(fullname) -> source string.\n" + 
-        "\n" + 
-        "Return the source code for the specified module. Raise ZipImportError\n" + 
-        "if the module couldn't be found, return None if the archive does\n" + 
-        "contain the module, but has no source for it.";
-
-    public final static String zipimporter_is_package_doc = 
-        "is_package(fullname) -> bool.\n" + 
-        "\n" + 
-        "Return True if the module specified by fullname is a package.\n" + 
-        "Raise ZipImportError if the module couldn't be found.";
-
-    public final static String zipimporter_load_module_doc = 
-        "load_module(fullname) -> module.\n" + 
-        "\n" + 
-        "Load the module specified by 'fullname'. 'fullname' must be the\n" + 
-        "fully qualified (dotted) module name. It returns the imported\n" + 
-        "module, or raises ZipImportError if it wasn't found.";
-
-    public final static String zipimporter_prefix_doc = 
-        "";
-
-    // Docs for <class 'generator'>
-    public final static String generator___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String generator___del___doc = 
-        "";
-
-    public final static String generator___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String generator___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String generator_doc = 
-        "";
-
-    public final static String generator___eq___doc = 
-        "Return self==value.";
-
-    public final static String generator___format___doc = 
-        "default object formatter";
-
-    public final static String generator___ge___doc = 
-        "Return self>=value.";
-
-    public final static String generator___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String generator___gt___doc = 
-        "Return self>value.";
-
-    public final static String generator___hash___doc = 
-        "Return hash(self).";
-
-    public final static String generator___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String generator___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String generator___le___doc = 
-        "Return self<=value.";
-
-    public final static String generator___lt___doc = 
-        "Return self<value.";
-
-    public final static String generator___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String generator___ne___doc = 
-        "Return self!=value.";
-
-    public final static String generator___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String generator___next___doc = 
-        "Implement next(self).";
-
-    public final static String generator___qualname___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String generator___reduce___doc = 
-        "helper for pickle";
-
-    public final static String generator___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String generator___repr___doc = 
-        "Return repr(self).";
-
-    public final static String generator___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String generator___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String generator___str___doc = 
-        "Return str(self).";
-
-    public final static String generator___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String generator_close_doc = 
-        "close() -> raise GeneratorExit inside generator.";
-
-    public final static String generator_gi_code_doc = 
-        "";
-
-    public final static String generator_gi_frame_doc = 
-        "";
-
-    public final static String generator_gi_running_doc = 
-        "";
-
-    public final static String generator_gi_yieldfrom_doc = 
-        "object being iterated by yield from, or None";
-
-    public final static String generator_send_doc = 
-        "send(arg) -> send 'arg' into generator,\n" + 
-        "return next yielded value or raise StopIteration.";
-
-    public final static String generator_throw_doc = 
-        "throw(typ[,val[,tb]]) -> raise exception in generator,\n" + 
-        "return next yielded value or raise StopIteration.";
-
-    // Docs for <class 'coroutine'>
-    public final static String coroutine___await___doc = 
-        "Return an iterator to be used in await expression.";
-
-    public final static String coroutine___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String coroutine___del___doc = 
-        "";
-
-    public final static String coroutine___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String coroutine___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String coroutine_doc = 
-        "";
-
-    public final static String coroutine___eq___doc = 
-        "Return self==value.";
-
-    public final static String coroutine___format___doc = 
-        "default object formatter";
-
-    public final static String coroutine___ge___doc = 
-        "Return self>=value.";
-
-    public final static String coroutine___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String coroutine___gt___doc = 
-        "Return self>value.";
-
-    public final static String coroutine___hash___doc = 
-        "Return hash(self).";
-
-    public final static String coroutine___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String coroutine___le___doc = 
-        "Return self<=value.";
-
-    public final static String coroutine___lt___doc = 
-        "Return self<value.";
-
-    public final static String coroutine___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String coroutine___ne___doc = 
-        "Return self!=value.";
-
-    public final static String coroutine___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String coroutine___qualname___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String coroutine___reduce___doc = 
-        "helper for pickle";
-
-    public final static String coroutine___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String coroutine___repr___doc = 
-        "Return repr(self).";
-
-    public final static String coroutine___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String coroutine___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String coroutine___str___doc = 
-        "Return str(self).";
-
-    public final static String coroutine___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String coroutine_close_doc = 
-        "close() -> raise GeneratorExit inside coroutine.";
-
-    public final static String coroutine_cr_await_doc = 
-        "object being awaited on, or None";
-
-    public final static String coroutine_cr_code_doc = 
-        "";
-
-    public final static String coroutine_cr_frame_doc = 
-        "";
-
-    public final static String coroutine_cr_running_doc = 
-        "";
-
-    public final static String coroutine_send_doc = 
-        "send(arg) -> send 'arg' into coroutine,\n" + 
-        "return next iterated value or raise StopIteration.";
-
-    public final static String coroutine_throw_doc = 
-        "throw(typ[,val[,tb]]) -> raise exception in coroutine,\n" + 
-        "return next iterated value or raise StopIteration.";
-
-    // Docs for <class 'coroutine_wrapper'>
-    public final static String coroutine_wrapper___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String coroutine_wrapper___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String coroutine_wrapper___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String coroutine_wrapper_doc = 
-        "A wrapper object implementing __await__ for coroutines.";
-
-    public final static String coroutine_wrapper___eq___doc = 
-        "Return self==value.";
-
-    public final static String coroutine_wrapper___format___doc = 
-        "default object formatter";
-
-    public final static String coroutine_wrapper___ge___doc = 
-        "Return self>=value.";
-
-    public final static String coroutine_wrapper___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String coroutine_wrapper___gt___doc = 
-        "Return self>value.";
-
-    public final static String coroutine_wrapper___hash___doc = 
-        "Return hash(self).";
-
-    public final static String coroutine_wrapper___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String coroutine_wrapper___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String coroutine_wrapper___le___doc = 
-        "Return self<=value.";
-
-    public final static String coroutine_wrapper___lt___doc = 
-        "Return self<value.";
-
-    public final static String coroutine_wrapper___ne___doc = 
-        "Return self!=value.";
-
-    public final static String coroutine_wrapper___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String coroutine_wrapper___next___doc = 
-        "Implement next(self).";
-
-    public final static String coroutine_wrapper___reduce___doc = 
-        "helper for pickle";
-
-    public final static String coroutine_wrapper___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String coroutine_wrapper___repr___doc = 
-        "Return repr(self).";
-
-    public final static String coroutine_wrapper___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String coroutine_wrapper___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String coroutine_wrapper___str___doc = 
-        "Return str(self).";
-
-    public final static String coroutine_wrapper___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String coroutine_wrapper_close_doc = 
-        "close() -> raise GeneratorExit inside coroutine.";
-
-    public final static String coroutine_wrapper_send_doc = 
-        "send(arg) -> send 'arg' into coroutine,\n" + 
-        "return next iterated value or raise StopIteration.";
-
-    public final static String coroutine_wrapper_throw_doc = 
-        "throw(typ[,val[,tb]]) -> raise exception in coroutine,\n" + 
-        "return next iterated value or raise StopIteration.";
-
-    // Docs for <class 'function'>
-    public final static String function___annotations___doc = 
-        "";
-
-    public final static String function___call___doc = 
-        "Call self as a function.";
-
-    public final static String function___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String function___closure___doc = 
-        "";
-
-    public final static String function___code___doc = 
-        "";
-
-    public final static String function___defaults___doc = 
-        "";
-
-    public final static String function___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String function___dict___doc = 
-        "";
-
-    public final static String function___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String function_doc = 
-        "function(code, globals[, name[, argdefs[, closure]]])\n" + 
-        "\n" + 
-        "Create a function object from a code object and a dictionary.\n" + 
-        "The optional name string overrides the name from the code object.\n" + 
-        "The optional argdefs tuple specifies the default argument values.\n" + 
-        "The optional closure tuple supplies the bindings for free variables.";
-
-    public final static String function___eq___doc = 
-        "Return self==value.";
-
-    public final static String function___format___doc = 
-        "default object formatter";
-
-    public final static String function___ge___doc = 
-        "Return self>=value.";
-
-    public final static String function___get___doc = 
-        "Return an attribute of instance, which is of type owner.";
-
-    public final static String function___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String function___globals___doc = 
-        "";
-
-    public final static String function___gt___doc = 
-        "Return self>value.";
-
-    public final static String function___hash___doc = 
-        "Return hash(self).";
-
-    public final static String function___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String function___kwdefaults___doc = 
-        "";
-
-    public final static String function___le___doc = 
-        "Return self<=value.";
-
-    public final static String function___lt___doc = 
-        "Return self<value.";
-
-    public final static String function___module___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String function___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String function___ne___doc = 
-        "Return self!=value.";
-
-    public final static String function___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String function___qualname___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String function___reduce___doc = 
-        "helper for pickle";
-
-    public final static String function___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String function___repr___doc = 
-        "Return repr(self).";
-
-    public final static String function___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String function___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String function___str___doc = 
-        "Return str(self).";
-
-    public final static String function___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'code'>
-    public final static String code___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String code___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String code___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String code_doc = 
-        "code(argcount, kwonlyargcount, nlocals, stacksize, flags, codestring,\n" + 
-        "      constants, names, varnames, filename, name, firstlineno,\n" + 
-        "      lnotab[, freevars[, cellvars]])\n" + 
-        "\n" + 
-        "Create a code object.  Not for the faint of heart.";
-
-    public final static String code___eq___doc = 
-        "Return self==value.";
-
-    public final static String code___format___doc = 
-        "default object formatter";
-
-    public final static String code___ge___doc = 
-        "Return self>=value.";
-
-    public final static String code___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String code___gt___doc = 
-        "Return self>value.";
-
-    public final static String code___hash___doc = 
-        "Return hash(self).";
-
-    public final static String code___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String code___le___doc = 
-        "Return self<=value.";
-
-    public final static String code___lt___doc = 
-        "Return self<value.";
-
-    public final static String code___ne___doc = 
-        "Return self!=value.";
-
-    public final static String code___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String code___reduce___doc = 
-        "helper for pickle";
-
-    public final static String code___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String code___repr___doc = 
-        "Return repr(self).";
-
-    public final static String code___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String code___sizeof___doc = 
-        "";
-
-    public final static String code___str___doc = 
-        "Return str(self).";
-
-    public final static String code___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String code_co_argcount_doc = 
-        "";
-
-    public final static String code_co_cellvars_doc = 
-        "";
-
-    public final static String code_co_code_doc = 
-        "";
-
-    public final static String code_co_consts_doc = 
-        "";
-
-    public final static String code_co_filename_doc = 
-        "";
-
-    public final static String code_co_firstlineno_doc = 
-        "";
-
-    public final static String code_co_flags_doc = 
-        "";
-
-    public final static String code_co_freevars_doc = 
-        "";
-
-    public final static String code_co_kwonlyargcount_doc = 
-        "";
-
-    public final static String code_co_lnotab_doc = 
-        "";
-
-    public final static String code_co_name_doc = 
-        "";
-
-    public final static String code_co_names_doc = 
-        "";
-
-    public final static String code_co_nlocals_doc = 
-        "";
-
-    public final static String code_co_stacksize_doc = 
-        "";
-
-    public final static String code_co_varnames_doc = 
-        "";
-
-    // Docs for <class 'types.SimpleNamespace'>
-    public final static String SimpleNamespace___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String SimpleNamespace___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String SimpleNamespace___dict___doc = 
-        "";
-
-    public final static String SimpleNamespace___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String SimpleNamespace_doc = 
-        "A simple attribute-based namespace.\n" + 
-        "\n" + 
-        "SimpleNamespace(**kwargs)";
-
-    public final static String SimpleNamespace___eq___doc = 
-        "Return self==value.";
-
-    public final static String SimpleNamespace___format___doc = 
-        "default object formatter";
-
-    public final static String SimpleNamespace___ge___doc = 
-        "Return self>=value.";
-
-    public final static String SimpleNamespace___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String SimpleNamespace___gt___doc = 
-        "Return self>value.";
-
-    public final static String SimpleNamespace___hash___doc = 
-        "";
-
-    public final static String SimpleNamespace___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String SimpleNamespace___le___doc = 
-        "Return self<=value.";
-
-    public final static String SimpleNamespace___lt___doc = 
-        "Return self<value.";
-
-    public final static String SimpleNamespace___ne___doc = 
-        "Return self!=value.";
-
-    public final static String SimpleNamespace___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String SimpleNamespace___reduce___doc = 
-        "Return state information for pickling";
-
-    public final static String SimpleNamespace___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String SimpleNamespace___repr___doc = 
-        "Return repr(self).";
-
-    public final static String SimpleNamespace___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String SimpleNamespace___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String SimpleNamespace___str___doc = 
-        "Return str(self).";
-
-    public final static String SimpleNamespace___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'frame'>
-    public final static String frame___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String frame___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String frame___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String frame_doc = 
-        "";
-
-    public final static String frame___eq___doc = 
-        "Return self==value.";
-
-    public final static String frame___format___doc = 
-        "default object formatter";
-
-    public final static String frame___ge___doc = 
-        "Return self>=value.";
-
-    public final static String frame___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String frame___gt___doc = 
-        "Return self>value.";
-
-    public final static String frame___hash___doc = 
-        "Return hash(self).";
-
-    public final static String frame___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String frame___le___doc = 
-        "Return self<=value.";
-
-    public final static String frame___lt___doc = 
-        "Return self<value.";
-
-    public final static String frame___ne___doc = 
-        "Return self!=value.";
-
-    public final static String frame___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String frame___reduce___doc = 
-        "helper for pickle";
-
-    public final static String frame___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String frame___repr___doc = 
-        "Return repr(self).";
-
-    public final static String frame___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String frame___sizeof___doc = 
-        "F.__sizeof__() -> size of F in memory, in bytes";
-
-    public final static String frame___str___doc = 
-        "Return str(self).";
-
-    public final static String frame___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String frame_clear_doc = 
-        "F.clear(): clear most references held by the frame";
-
-    public final static String frame_f_back_doc = 
-        "";
-
-    public final static String frame_f_builtins_doc = 
-        "";
-
-    public final static String frame_f_code_doc = 
-        "";
-
-    public final static String frame_f_globals_doc = 
-        "";
-
-    public final static String frame_f_lasti_doc = 
-        "";
-
-    public final static String frame_f_lineno_doc = 
-        "";
-
-    public final static String frame_f_locals_doc = 
-        "";
-
-    public final static String frame_f_trace_doc = 
-        "";
-
-    // Docs for <class 'traceback'>
-    public final static String traceback___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String traceback___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String traceback___dir___doc = 
-        "";
-
-    public final static String traceback_doc = 
-        "";
-
-    public final static String traceback___eq___doc = 
-        "Return self==value.";
-
-    public final static String traceback___format___doc = 
-        "default object formatter";
-
-    public final static String traceback___ge___doc = 
-        "Return self>=value.";
-
-    public final static String traceback___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String traceback___gt___doc = 
-        "Return self>value.";
-
-    public final static String traceback___hash___doc = 
-        "Return hash(self).";
-
-    public final static String traceback___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String traceback___le___doc = 
-        "Return self<=value.";
-
-    public final static String traceback___lt___doc = 
-        "Return self<value.";
-
-    public final static String traceback___ne___doc = 
-        "Return self!=value.";
-
-    public final static String traceback___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String traceback___reduce___doc = 
-        "helper for pickle";
-
-    public final static String traceback___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String traceback___repr___doc = 
-        "Return repr(self).";
-
-    public final static String traceback___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String traceback___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String traceback___str___doc = 
-        "Return str(self).";
-
-    public final static String traceback___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String traceback_tb_frame_doc = 
-        "";
-
-    public final static String traceback_tb_lasti_doc = 
-        "";
-
-    public final static String traceback_tb_lineno_doc = 
-        "";
-
-    public final static String traceback_tb_next_doc = 
-        "";
-
-    // Docs for <class '_sre.SRE_Pattern'>
-    public final static String SRE_Pattern___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String SRE_Pattern___copy___doc = 
-        "";
-
-    public final static String SRE_Pattern___deepcopy___doc = 
-        "";
-
-    public final static String SRE_Pattern___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String SRE_Pattern___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String SRE_Pattern_doc = 
-        "Compiled regular expression objects";
-
-    public final static String SRE_Pattern___eq___doc = 
-        "Return self==value.";
-
-    public final static String SRE_Pattern___format___doc = 
-        "default object formatter";
-
-    public final static String SRE_Pattern___ge___doc = 
-        "Return self>=value.";
-
-    public final static String SRE_Pattern___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String SRE_Pattern___gt___doc = 
-        "Return self>value.";
-
-    public final static String SRE_Pattern___hash___doc = 
-        "Return hash(self).";
-
-    public final static String SRE_Pattern___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String SRE_Pattern___le___doc = 
-        "Return self<=value.";
-
-    public final static String SRE_Pattern___lt___doc = 
-        "Return self<value.";
-
-    public final static String SRE_Pattern___ne___doc = 
-        "Return self!=value.";
-
-    public final static String SRE_Pattern___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String SRE_Pattern___reduce___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Pattern___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Pattern___repr___doc = 
-        "Return repr(self).";
-
-    public final static String SRE_Pattern___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String SRE_Pattern___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String SRE_Pattern___str___doc = 
-        "Return str(self).";
-
-    public final static String SRE_Pattern___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String SRE_Pattern_findall_doc = 
-        "Return a list of all non-overlapping matches of pattern in string.";
-
-    public final static String SRE_Pattern_finditer_doc = 
-        "Return an iterator over all non-overlapping matches for the RE pattern in string.\n" + 
-        "\n" + 
-        "For each match, the iterator returns a match object.";
-
-    public final static String SRE_Pattern_flags_doc = 
-        "";
-
-    public final static String SRE_Pattern_fullmatch_doc = 
-        "Matches against all of the string";
-
-    public final static String SRE_Pattern_groupindex_doc = 
-        "A dictionary mapping group names to group numbers.";
-
-    public final static String SRE_Pattern_groups_doc = 
-        "";
-
-    public final static String SRE_Pattern_match_doc = 
-        "Matches zero or more characters at the beginning of the string.";
-
-    public final static String SRE_Pattern_pattern_doc = 
-        "";
-
-    public final static String SRE_Pattern_scanner_doc = 
-        "";
-
-    public final static String SRE_Pattern_search_doc = 
-        "Scan through string looking for a match, and return a corresponding match object instance.\n" + 
-        "\n" + 
-        "Return None if no position in the string matches.";
-
-    public final static String SRE_Pattern_split_doc = 
-        "Split string by the occurrences of pattern.";
-
-    public final static String SRE_Pattern_sub_doc = 
-        "Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.";
-
-    public final static String SRE_Pattern_subn_doc = 
-        "Return the tuple (new_string, number_of_subs_made) found by replacing the leftmost non-overlapping occurrences of pattern with the replacement repl.";
-
-    // Docs for <class '_sre.SRE_Match'>
-    public final static String SRE_Match___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String SRE_Match___copy___doc = 
-        "";
-
-    public final static String SRE_Match___deepcopy___doc = 
-        "";
-
-    public final static String SRE_Match___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String SRE_Match___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String SRE_Match_doc = 
-        "The result of re.match() and re.search().\n" + 
-        "Match objects always have a boolean value of True.";
-
-    public final static String SRE_Match___eq___doc = 
-        "Return self==value.";
-
-    public final static String SRE_Match___format___doc = 
-        "default object formatter";
-
-    public final static String SRE_Match___ge___doc = 
-        "Return self>=value.";
-
-    public final static String SRE_Match___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String SRE_Match___gt___doc = 
-        "Return self>value.";
-
-    public final static String SRE_Match___hash___doc = 
-        "Return hash(self).";
-
-    public final static String SRE_Match___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String SRE_Match___le___doc = 
-        "Return self<=value.";
-
-    public final static String SRE_Match___lt___doc = 
-        "Return self<value.";
-
-    public final static String SRE_Match___ne___doc = 
-        "Return self!=value.";
-
-    public final static String SRE_Match___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String SRE_Match___reduce___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Match___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Match___repr___doc = 
-        "Return repr(self).";
-
-    public final static String SRE_Match___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String SRE_Match___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String SRE_Match___str___doc = 
-        "Return str(self).";
-
-    public final static String SRE_Match___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String SRE_Match_end_doc = 
-        "Return index of the end of the substring matched by group.";
-
-    public final static String SRE_Match_endpos_doc = 
-        "";
-
-    public final static String SRE_Match_expand_doc = 
-        "Return the string obtained by doing backslash substitution on the string template, as done by the sub() method.";
-
-    public final static String SRE_Match_group_doc = 
-        "group([group1, ...]) -> str or tuple.\n" + 
-        "    Return subgroup(s) of the match by indices or names.\n" + 
-        "    For 0 returns the entire match.";
-
-    public final static String SRE_Match_groupdict_doc = 
-        "Return a dictionary containing all the named subgroups of the match, keyed by the subgroup name.\n" + 
-        "\n" + 
-        "  default\n" + 
-        "    Is used for groups that did not participate in the match.";
-
-    public final static String SRE_Match_groups_doc = 
-        "Return a tuple containing all the subgroups of the match, from 1.\n" + 
-        "\n" + 
-        "  default\n" + 
-        "    Is used for groups that did not participate in the match.";
-
-    public final static String SRE_Match_lastgroup_doc = 
-        "";
-
-    public final static String SRE_Match_lastindex_doc = 
-        "";
-
-    public final static String SRE_Match_pos_doc = 
-        "";
-
-    public final static String SRE_Match_re_doc = 
-        "";
-
-    public final static String SRE_Match_regs_doc = 
-        "";
-
-    public final static String SRE_Match_span_doc = 
-        "For MatchObject m, return the 2-tuple (m.start(group), m.end(group)).";
-
-    public final static String SRE_Match_start_doc = 
-        "Return index of the start of the substring matched by group.";
-
-    public final static String SRE_Match_string_doc = 
-        "";
-
-    // Docs for <class '_sre.SRE_Scanner'>
-    public final static String SRE_Scanner___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String SRE_Scanner___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String SRE_Scanner___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String SRE_Scanner_doc = 
-        "";
-
-    public final static String SRE_Scanner___eq___doc = 
-        "Return self==value.";
-
-    public final static String SRE_Scanner___format___doc = 
-        "default object formatter";
-
-    public final static String SRE_Scanner___ge___doc = 
-        "Return self>=value.";
-
-    public final static String SRE_Scanner___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String SRE_Scanner___gt___doc = 
-        "Return self>value.";
-
-    public final static String SRE_Scanner___hash___doc = 
-        "Return hash(self).";
-
-    public final static String SRE_Scanner___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String SRE_Scanner___le___doc = 
-        "Return self<=value.";
-
-    public final static String SRE_Scanner___lt___doc = 
-        "Return self<value.";
-
-    public final static String SRE_Scanner___ne___doc = 
-        "Return self!=value.";
-
-    public final static String SRE_Scanner___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String SRE_Scanner___reduce___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Scanner___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String SRE_Scanner___repr___doc = 
-        "Return repr(self).";
-
-    public final static String SRE_Scanner___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String SRE_Scanner___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String SRE_Scanner___str___doc = 
-        "Return str(self).";
-
-    public final static String SRE_Scanner___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String SRE_Scanner_match_doc = 
-        "";
-
-    public final static String SRE_Scanner_pattern_doc = 
-        "";
-
-    public final static String SRE_Scanner_search_doc = 
-        "";
-
-    // Docs for <class 'range_iterator'>
-    public final static String range_iterator___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String range_iterator___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String range_iterator___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String range_iterator_doc = 
-        "";
-
-    public final static String range_iterator___eq___doc = 
-        "Return self==value.";
-
-    public final static String range_iterator___format___doc = 
-        "default object formatter";
-
-    public final static String range_iterator___ge___doc = 
-        "Return self>=value.";
-
-    public final static String range_iterator___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String range_iterator___gt___doc = 
-        "Return self>value.";
-
-    public final static String range_iterator___hash___doc = 
-        "Return hash(self).";
-
-    public final static String range_iterator___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String range_iterator___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String range_iterator___le___doc = 
-        "Return self<=value.";
-
-    public final static String range_iterator___length_hint___doc = 
-        "Private method returning an estimate of len(list(it)).";
-
-    public final static String range_iterator___lt___doc = 
-        "Return self<value.";
-
-    public final static String range_iterator___ne___doc = 
-        "Return self!=value.";
-
-    public final static String range_iterator___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String range_iterator___next___doc = 
-        "Implement next(self).";
-
-    public final static String range_iterator___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String range_iterator___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String range_iterator___repr___doc = 
-        "Return repr(self).";
-
-    public final static String range_iterator___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String range_iterator___setstate___doc = 
-        "Set state information for unpickling.";
-
-    public final static String range_iterator___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String range_iterator___str___doc = 
-        "Return str(self).";
-
-    public final static String range_iterator___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'list_iterator'>
-    public final static String list_iterator___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String list_iterator___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String list_iterator___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String list_iterator_doc = 
-        "";
-
-    public final static String list_iterator___eq___doc = 
-        "Return self==value.";
-
-    public final static String list_iterator___format___doc = 
-        "default object formatter";
-
-    public final static String list_iterator___ge___doc = 
-        "Return self>=value.";
-
-    public final static String list_iterator___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String list_iterator___gt___doc = 
-        "Return self>value.";
-
-    public final static String list_iterator___hash___doc = 
-        "Return hash(self).";
-
-    public final static String list_iterator___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String list_iterator___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String list_iterator___le___doc = 
-        "Return self<=value.";
-
-    public final static String list_iterator___length_hint___doc = 
-        "Private method returning an estimate of len(list(it)).";
-
-    public final static String list_iterator___lt___doc = 
-        "Return self<value.";
-
-    public final static String list_iterator___ne___doc = 
-        "Return self!=value.";
-
-    public final static String list_iterator___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String list_iterator___next___doc = 
-        "Implement next(self).";
-
-    public final static String list_iterator___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String list_iterator___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String list_iterator___repr___doc = 
-        "Return repr(self).";
-
-    public final static String list_iterator___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String list_iterator___setstate___doc = 
-        "Set state information for unpickling.";
-
-    public final static String list_iterator___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String list_iterator___str___doc = 
-        "Return str(self).";
-
-    public final static String list_iterator___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'itertools.chain'>
-    public final static String chain___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String chain___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String chain___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String chain_doc = 
-        "chain(*iterables) --> chain object\n" + 
-        "\n" + 
-        "Return a chain object whose .__next__() method returns elements from the\n" + 
-        "first iterable until it is exhausted, then elements from the next\n" + 
-        "iterable, until all of the iterables are exhausted.";
-
-    public final static String chain___eq___doc = 
-        "Return self==value.";
-
-    public final static String chain___format___doc = 
-        "default object formatter";
-
-    public final static String chain___ge___doc = 
-        "Return self>=value.";
-
-    public final static String chain___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String chain___gt___doc = 
-        "Return self>value.";
-
-    public final static String chain___hash___doc = 
-        "Return hash(self).";
-
-    public final static String chain___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String chain___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String chain___le___doc = 
-        "Return self<=value.";
-
-    public final static String chain___lt___doc = 
-        "Return self<value.";
-
-    public final static String chain___ne___doc = 
-        "Return self!=value.";
-
-    public final static String chain___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String chain___next___doc = 
-        "Implement next(self).";
-
-    public final static String chain___reduce___doc = 
-        "Return state information for pickling.";
-
-    public final static String chain___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String chain___repr___doc = 
-        "Return repr(self).";
-
-    public final static String chain___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String chain___setstate___doc = 
-        "Set state information for unpickling.";
-
-    public final static String chain___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String chain___str___doc = 
-        "Return str(self).";
-
-    public final static String chain___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String chain_from_iterable_doc = 
-        "chain.from_iterable(iterable) --> chain object\n" + 
-        "\n" + 
-        "Alternate chain() contructor taking a single iterable argument\n" + 
-        "that evaluates lazily.";
-
-    // Docs for <class 'NoneType'>
-    public final static String NoneType___bool___doc = 
-        "self != 0";
-
-    public final static String NoneType___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String NoneType___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String NoneType___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String NoneType_doc = 
-        "";
-
-    public final static String NoneType___eq___doc = 
-        "Return self==value.";
-
-    public final static String NoneType___format___doc = 
-        "default object formatter";
-
-    public final static String NoneType___ge___doc = 
-        "Return self>=value.";
-
-    public final static String NoneType___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String NoneType___gt___doc = 
-        "Return self>value.";
-
-    public final static String NoneType___hash___doc = 
-        "Return hash(self).";
-
-    public final static String NoneType___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String NoneType___le___doc = 
-        "Return self<=value.";
-
-    public final static String NoneType___lt___doc = 
-        "Return self<value.";
-
-    public final static String NoneType___ne___doc = 
-        "Return self!=value.";
-
-    public final static String NoneType___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String NoneType___reduce___doc = 
-        "helper for pickle";
-
-    public final static String NoneType___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String NoneType___repr___doc = 
-        "Return repr(self).";
-
-    public final static String NoneType___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String NoneType___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String NoneType___str___doc = 
-        "Return str(self).";
-
-    public final static String NoneType___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'NotImplementedType'>
-    public final static String NotImplementedType___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String NotImplementedType___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String NotImplementedType___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String NotImplementedType_doc = 
-        "";
-
-    public final static String NotImplementedType___eq___doc = 
-        "Return self==value.";
-
-    public final static String NotImplementedType___format___doc = 
-        "default object formatter";
-
-    public final static String NotImplementedType___ge___doc = 
-        "Return self>=value.";
-
-    public final static String NotImplementedType___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String NotImplementedType___gt___doc = 
-        "Return self>value.";
-
-    public final static String NotImplementedType___hash___doc = 
-        "Return hash(self).";
-
-    public final static String NotImplementedType___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String NotImplementedType___le___doc = 
-        "Return self<=value.";
-
-    public final static String NotImplementedType___lt___doc = 
-        "Return self<value.";
-
-    public final static String NotImplementedType___ne___doc = 
-        "Return self!=value.";
-
-    public final static String NotImplementedType___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String NotImplementedType___reduce___doc = 
-        "";
-
-    public final static String NotImplementedType___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String NotImplementedType___repr___doc = 
-        "Return repr(self).";
-
-    public final static String NotImplementedType___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String NotImplementedType___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String NotImplementedType___str___doc = 
-        "Return str(self).";
-
-    public final static String NotImplementedType___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class 'ellipsis'>
-    public final static String ellipsis___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String ellipsis___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String ellipsis___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String ellipsis_doc = 
-        "";
-
-    public final static String ellipsis___eq___doc = 
-        "Return self==value.";
-
-    public final static String ellipsis___format___doc = 
-        "default object formatter";
-
-    public final static String ellipsis___ge___doc = 
-        "Return self>=value.";
-
-    public final static String ellipsis___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String ellipsis___gt___doc = 
-        "Return self>value.";
-
-    public final static String ellipsis___hash___doc = 
-        "Return hash(self).";
-
-    public final static String ellipsis___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String ellipsis___le___doc = 
-        "Return self<=value.";
-
-    public final static String ellipsis___lt___doc = 
-        "Return self<value.";
-
-    public final static String ellipsis___ne___doc = 
-        "Return self!=value.";
-
-    public final static String ellipsis___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String ellipsis___reduce___doc = 
-        "";
-
-    public final static String ellipsis___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String ellipsis___repr___doc = 
-        "Return repr(self).";
-
-    public final static String ellipsis___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String ellipsis___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String ellipsis___str___doc = 
-        "Return str(self).";
-
-    public final static String ellipsis___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    // Docs for <class '_multiprocessing.SemLock'>
-    public final static String SemLock_SEM_VALUE_MAX_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String SemLock___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String SemLock___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String SemLock___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String SemLock_doc = 
-        "Semaphore/Mutex type";
-
-    public final static String SemLock___enter___doc = 
-        "enter the semaphore/lock";
-
-    public final static String SemLock___eq___doc = 
-        "Return self==value.";
-
-    public final static String SemLock___exit___doc = 
-        "exit the semaphore/lock";
-
-    public final static String SemLock___format___doc = 
-        "default object formatter";
-
-    public final static String SemLock___ge___doc = 
-        "Return self>=value.";
-
-    public final static String SemLock___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String SemLock___gt___doc = 
-        "Return self>value.";
-
-    public final static String SemLock___hash___doc = 
-        "Return hash(self).";
-
-    public final static String SemLock___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String SemLock___le___doc = 
-        "Return self<=value.";
-
-    public final static String SemLock___lt___doc = 
-        "Return self<value.";
-
-    public final static String SemLock___ne___doc = 
-        "Return self!=value.";
-
-    public final static String SemLock___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String SemLock___reduce___doc = 
-        "helper for pickle";
-
-    public final static String SemLock___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String SemLock___repr___doc = 
-        "Return repr(self).";
-
-    public final static String SemLock___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String SemLock___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String SemLock___str___doc = 
-        "Return str(self).";
-
-    public final static String SemLock___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String SemLock__after_fork_doc = 
-        "rezero the net acquisition count after fork()";
-
-    public final static String SemLock__count_doc = 
-        "num of `acquire()`s minus num of `release()`s for this process";
-
-    public final static String SemLock__get_value_doc = 
-        "get the value of the semaphore";
-
-    public final static String SemLock__is_mine_doc = 
-        "whether the lock is owned by this thread";
-
-    public final static String SemLock__is_zero_doc = 
-        "returns whether semaphore has value zero";
-
-    public final static String SemLock__rebuild_doc = 
-        "";
-
-    public final static String SemLock_acquire_doc = 
-        "acquire the semaphore/lock";
-
-    public final static String SemLock_handle_doc = 
-        "";
-
-    public final static String SemLock_kind_doc = 
-        "";
-
-    public final static String SemLock_maxvalue_doc = 
-        "";
-
-    public final static String SemLock_name_doc = 
-        "";
-
-    public final static String SemLock_release_doc = 
-        "release the semaphore/lock";
-
-    // Docs for <class 'io.IOBase'>
-    public final static String IOBase___abstractmethods___doc = 
-        "";
-
-    public final static String IOBase___class___doc = 
-        "Metaclass for defining Abstract Base Classes (ABCs).\n" + 
-        "\n" + 
-        "    Use this metaclass to create an ABC.  An ABC can be subclassed\n" + 
-        "    directly, and then acts as a mix-in class.  You can also register\n" + 
-        "    unrelated concrete classes (even built-in classes) and unrelated\n" + 
-        "    ABCs as 'virtual subclasses' -- these and their descendants will\n" + 
-        "    be considered subclasses of the registering ABC by the built-in\n" + 
-        "    issubclass() function, but the registering ABC won't show up in\n" + 
-        "    their MRO (Method Resolution Order) nor will method\n" + 
-        "    implementations defined by the registering ABC be callable (not\n" + 
-        "    even via super()).\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String IOBase___del___doc = 
-        "";
-
-    public final static String IOBase___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String IOBase___dict___doc = 
-        "";
-
-    public final static String IOBase___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String IOBase_doc = 
-        "The abstract base class for all I/O classes, acting on streams of\n" + 
-        "bytes. There is no public constructor.\n" + 
-        "\n" + 
-        "This class provides dummy implementations for many methods that\n" + 
-        "derived classes can override selectively; the default implementations\n" + 
-        "represent a file that cannot be read, written or seeked.\n" + 
-        "\n" + 
-        "Even though IOBase does not declare read, readinto, or write because\n" + 
-        "their signatures will vary, implementations and clients should\n" + 
-        "consider those methods part of the interface. Also, implementations\n" + 
-        "may raise UnsupportedOperation when operations they do not support are\n" + 
-        "called.\n" + 
-        "\n" + 
-        "The basic type used for binary data read from or written to a file is\n" + 
-        "bytes. Other bytes-like objects are accepted as method arguments too.\n" + 
-        "In some cases (such as readinto), a writable object is required. Text\n" + 
-        "I/O classes work with str data.\n" + 
-        "\n" + 
-        "Note that calling any method (except additional calls to close(),\n" + 
-        "which are ignored) on a closed stream should raise a ValueError.\n" + 
-        "\n" + 
-        "IOBase (and its subclasses) support the iterator protocol, meaning\n" + 
-        "that an IOBase object can be iterated over yielding the lines in a\n" + 
-        "stream.\n" + 
-        "\n" + 
-        "IOBase also supports the :keyword:`with` statement. In this example,\n" + 
-        "fp is closed after the suite of the with statement is complete:\n" + 
-        "\n" + 
-        "with open('spam.txt', 'r') as fp:\n" + 
-        "    fp.write('Spam and eggs!')\n" + 
-        "";
-
-    public final static String IOBase___enter___doc = 
-        "";
-
-    public final static String IOBase___eq___doc = 
-        "Return self==value.";
-
-    public final static String IOBase___exit___doc = 
-        "";
-
-    public final static String IOBase___format___doc = 
-        "default object formatter";
-
-    public final static String IOBase___ge___doc = 
-        "Return self>=value.";
-
-    public final static String IOBase___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String IOBase___gt___doc = 
-        "Return self>value.";
-
-    public final static String IOBase___hash___doc = 
-        "Return hash(self).";
-
-    public final static String IOBase___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String IOBase___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String IOBase___le___doc = 
-        "Return self<=value.";
-
-    public final static String IOBase___lt___doc = 
-        "Return self<value.";
-
-    public final static String IOBase___module___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String IOBase___ne___doc = 
-        "Return self!=value.";
-
-    public final static String IOBase___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String IOBase___next___doc = 
-        "Implement next(self).";
-
-    public final static String IOBase___reduce___doc = 
-        "helper for pickle";
-
-    public final static String IOBase___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String IOBase___repr___doc = 
-        "Return repr(self).";
-
-    public final static String IOBase___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String IOBase___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String IOBase___str___doc = 
-        "Return str(self).";
-
-    public final static String IOBase___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String IOBase__abc_cache_doc = 
-        "";
-
-    public final static String IOBase__abc_negative_cache_doc = 
-        "";
-
-    public final static String IOBase__abc_negative_cache_version_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String IOBase__abc_registry_doc = 
-        "";
-
-    public final static String IOBase__checkClosed_doc = 
-        "";
-
-    public final static String IOBase__checkReadable_doc = 
-        "";
-
-    public final static String IOBase__checkSeekable_doc = 
-        "";
-
-    public final static String IOBase__checkWritable_doc = 
-        "";
-
-    public final static String IOBase_close_doc = 
-        "Flush and close the IO object.\n" + 
-        "\n" + 
-        "This method has no effect if the file is already closed.";
-
-    public final static String IOBase_closed_doc = 
-        "";
-
-    public final static String IOBase_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String IOBase_flush_doc = 
-        "Flush write buffers, if applicable.\n" + 
-        "\n" + 
-        "This is not implemented for read-only and non-blocking streams.";
-
-    public final static String IOBase_isatty_doc = 
-        "Return whether this is an 'interactive' stream.\n" + 
-        "\n" + 
-        "Return False if it can't be determined.";
-
-    public final static String IOBase_readable_doc = 
-        "Return whether object was opened for reading.\n" + 
-        "\n" + 
-        "If False, read() will raise OSError.";
-
-    public final static String IOBase_readline_doc = 
-        "Read and return a line from the stream.\n" + 
-        "\n" + 
-        "If size is specified, at most size bytes will be read.\n" + 
-        "\n" + 
-        "The line terminator is always b'\\n' for binary files; for text\n" + 
-        "files, the newlines argument to open can be used to select the line\n" + 
-        "terminator(s) recognized.";
-
-    public final static String IOBase_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String IOBase_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Change the stream position to the given byte offset. The offset is\n" + 
-        "interpreted relative to the position indicated by whence.  Values\n" + 
-        "for whence are:\n" + 
-        "\n" + 
-        "* 0 -- start of stream (the default); offset should be zero or positive\n" + 
-        "* 1 -- current stream position; offset may be negative\n" + 
-        "* 2 -- end of stream; offset is usually negative\n" + 
-        "\n" + 
-        "Return the new absolute position.";
-
-    public final static String IOBase_seekable_doc = 
-        "Return whether object supports random access.\n" + 
-        "\n" + 
-        "If False, seek(), tell() and truncate() will raise OSError.\n" + 
-        "This method may need to do a test seek().";
-
-    public final static String IOBase_tell_doc = 
-        "Return current stream position.";
-
-    public final static String IOBase_truncate_doc = 
-        "Truncate file to size bytes.\n" + 
-        "\n" + 
-        "File pointer is left unchanged.  Size defaults to the current IO\n" + 
-        "position as reported by tell().  Returns the new size.";
-
-    public final static String IOBase_writable_doc = 
-        "Return whether object was opened for writing.\n" + 
-        "\n" + 
-        "If False, write() will raise OSError.";
-
-    public final static String IOBase_writelines_doc = 
-        "";
-
-    // Docs for <class 'io.RawIOBase'>
-    public final static String RawIOBase___abstractmethods___doc = 
-        "";
-
-    public final static String RawIOBase___class___doc = 
-        "Metaclass for defining Abstract Base Classes (ABCs).\n" + 
-        "\n" + 
-        "    Use this metaclass to create an ABC.  An ABC can be subclassed\n" + 
-        "    directly, and then acts as a mix-in class.  You can also register\n" + 
-        "    unrelated concrete classes (even built-in classes) and unrelated\n" + 
-        "    ABCs as 'virtual subclasses' -- these and their descendants will\n" + 
-        "    be considered subclasses of the registering ABC by the built-in\n" + 
-        "    issubclass() function, but the registering ABC won't show up in\n" + 
-        "    their MRO (Method Resolution Order) nor will method\n" + 
-        "    implementations defined by the registering ABC be callable (not\n" + 
-        "    even via super()).\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String RawIOBase___del___doc = 
-        "";
-
-    public final static String RawIOBase___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String RawIOBase___dict___doc = 
-        "";
-
-    public final static String RawIOBase___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String RawIOBase_doc = 
-        "Base class for raw binary I/O.";
-
-    public final static String RawIOBase___enter___doc = 
-        "";
-
-    public final static String RawIOBase___eq___doc = 
-        "Return self==value.";
-
-    public final static String RawIOBase___exit___doc = 
-        "";
-
-    public final static String RawIOBase___format___doc = 
-        "default object formatter";
-
-    public final static String RawIOBase___ge___doc = 
-        "Return self>=value.";
-
-    public final static String RawIOBase___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String RawIOBase___gt___doc = 
-        "Return self>value.";
-
-    public final static String RawIOBase___hash___doc = 
-        "Return hash(self).";
-
-    public final static String RawIOBase___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String RawIOBase___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String RawIOBase___le___doc = 
-        "Return self<=value.";
-
-    public final static String RawIOBase___lt___doc = 
-        "Return self<value.";
-
-    public final static String RawIOBase___module___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String RawIOBase___ne___doc = 
-        "Return self!=value.";
-
-    public final static String RawIOBase___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String RawIOBase___next___doc = 
-        "Implement next(self).";
-
-    public final static String RawIOBase___reduce___doc = 
-        "helper for pickle";
-
-    public final static String RawIOBase___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String RawIOBase___repr___doc = 
-        "Return repr(self).";
-
-    public final static String RawIOBase___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String RawIOBase___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String RawIOBase___str___doc = 
-        "Return str(self).";
-
-    public final static String RawIOBase___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String RawIOBase__abc_cache_doc = 
-        "";
-
-    public final static String RawIOBase__abc_negative_cache_doc = 
-        "";
-
-    public final static String RawIOBase__abc_negative_cache_version_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String RawIOBase__abc_registry_doc = 
-        "";
-
-    public final static String RawIOBase__checkClosed_doc = 
-        "";
-
-    public final static String RawIOBase__checkReadable_doc = 
-        "";
-
-    public final static String RawIOBase__checkSeekable_doc = 
-        "";
-
-    public final static String RawIOBase__checkWritable_doc = 
-        "";
-
-    public final static String RawIOBase_close_doc = 
-        "Flush and close the IO object.\n" + 
-        "\n" + 
-        "This method has no effect if the file is already closed.";
-
-    public final static String RawIOBase_closed_doc = 
-        "";
-
-    public final static String RawIOBase_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String RawIOBase_flush_doc = 
-        "Flush write buffers, if applicable.\n" + 
-        "\n" + 
-        "This is not implemented for read-only and non-blocking streams.";
-
-    public final static String RawIOBase_isatty_doc = 
-        "Return whether this is an 'interactive' stream.\n" + 
-        "\n" + 
-        "Return False if it can't be determined.";
-
-    public final static String RawIOBase_read_doc = 
-        "";
-
-    public final static String RawIOBase_readable_doc = 
-        "Return whether object was opened for reading.\n" + 
-        "\n" + 
-        "If False, read() will raise OSError.";
-
-    public final static String RawIOBase_readall_doc = 
-        "Read until EOF, using multiple read() call.";
-
-    public final static String RawIOBase_readinto_doc = 
-        "";
-
-    public final static String RawIOBase_readline_doc = 
-        "Read and return a line from the stream.\n" + 
-        "\n" + 
-        "If size is specified, at most size bytes will be read.\n" + 
-        "\n" + 
-        "The line terminator is always b'\\n' for binary files; for text\n" + 
-        "files, the newlines argument to open can be used to select the line\n" + 
-        "terminator(s) recognized.";
-
-    public final static String RawIOBase_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String RawIOBase_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Change the stream position to the given byte offset. The offset is\n" + 
-        "interpreted relative to the position indicated by whence.  Values\n" + 
-        "for whence are:\n" + 
-        "\n" + 
-        "* 0 -- start of stream (the default); offset should be zero or positive\n" + 
-        "* 1 -- current stream position; offset may be negative\n" + 
-        "* 2 -- end of stream; offset is usually negative\n" + 
-        "\n" + 
-        "Return the new absolute position.";
-
-    public final static String RawIOBase_seekable_doc = 
-        "Return whether object supports random access.\n" + 
-        "\n" + 
-        "If False, seek(), tell() and truncate() will raise OSError.\n" + 
-        "This method may need to do a test seek().";
-
-    public final static String RawIOBase_tell_doc = 
-        "Return current stream position.";
-
-    public final static String RawIOBase_truncate_doc = 
-        "Truncate file to size bytes.\n" + 
-        "\n" + 
-        "File pointer is left unchanged.  Size defaults to the current IO\n" + 
-        "position as reported by tell().  Returns the new size.";
-
-    public final static String RawIOBase_writable_doc = 
-        "Return whether object was opened for writing.\n" + 
-        "\n" + 
-        "If False, write() will raise OSError.";
-
-    public final static String RawIOBase_write_doc = 
-        "";
-
-    public final static String RawIOBase_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.FileIO'>
-    public final static String FileIO___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String FileIO___del___doc = 
-        "";
-
-    public final static String FileIO___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String FileIO___dict___doc = 
-        "";
-
-    public final static String FileIO___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String FileIO_doc = 
-        "Open a file.\n" + 
-        "\n" + 
-        "The mode can be 'r' (default), 'w', 'x' or 'a' for reading,\n" + 
-        "writing, exclusive creation or appending.  The file will be created if it\n" + 
-        "doesn't exist when opened for writing or appending; it will be truncated\n" + 
-        "when opened for writing.  A FileExistsError will be raised if it already\n" + 
-        "exists when opened for creating. Opening a file for creating implies\n" + 
-        "writing so this mode behaves in a similar way to 'w'.Add a '+' to the mode\n" + 
-        "to allow simultaneous reading and writing. A custom opener can be used by\n" + 
-        "passing a callable as *opener*. The underlying file descriptor for the file\n" + 
-        "object is then obtained by calling opener with (*name*, *flags*).\n" + 
-        "*opener* must return an open file descriptor (passing os.open as *opener*\n" + 
-        "results in functionality similar to passing None).";
-
-    public final static String FileIO___enter___doc = 
-        "";
-
-    public final static String FileIO___eq___doc = 
-        "Return self==value.";
-
-    public final static String FileIO___exit___doc = 
-        "";
-
-    public final static String FileIO___format___doc = 
-        "default object formatter";
-
-    public final static String FileIO___ge___doc = 
-        "Return self>=value.";
-
-    public final static String FileIO___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String FileIO___getstate___doc = 
-        "";
-
-    public final static String FileIO___gt___doc = 
-        "Return self>value.";
-
-    public final static String FileIO___hash___doc = 
-        "Return hash(self).";
-
-    public final static String FileIO___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String FileIO___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String FileIO___le___doc = 
-        "Return self<=value.";
-
-    public final static String FileIO___lt___doc = 
-        "Return self<value.";
-
-    public final static String FileIO___ne___doc = 
-        "Return self!=value.";
-
-    public final static String FileIO___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String FileIO___next___doc = 
-        "Implement next(self).";
-
-    public final static String FileIO___reduce___doc = 
-        "helper for pickle";
-
-    public final static String FileIO___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String FileIO___repr___doc = 
-        "Return repr(self).";
-
-    public final static String FileIO___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String FileIO___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String FileIO___str___doc = 
-        "Return str(self).";
-
-    public final static String FileIO___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String FileIO__blksize_doc = 
-        "";
-
-    public final static String FileIO__checkClosed_doc = 
-        "";
-
-    public final static String FileIO__checkReadable_doc = 
-        "";
-
-    public final static String FileIO__checkSeekable_doc = 
-        "";
-
-    public final static String FileIO__checkWritable_doc = 
-        "";
-
-    public final static String FileIO__dealloc_warn_doc = 
-        "";
-
-    public final static String FileIO__finalizing_doc = 
-        "";
-
-    public final static String FileIO_close_doc = 
-        "Close the file.\n" + 
-        "\n" + 
-        "A closed file cannot be used for further I/O operations.  close() may be\n" + 
-        "called more than once without error.";
-
-    public final static String FileIO_closed_doc = 
-        "True if the file is closed";
-
-    public final static String FileIO_closefd_doc = 
-        "True if the file descriptor will be closed by close().";
-
-    public final static String FileIO_fileno_doc = 
-        "Return the underlying file descriptor (an integer).";
-
-    public final static String FileIO_flush_doc = 
-        "Flush write buffers, if applicable.\n" + 
-        "\n" + 
-        "This is not implemented for read-only and non-blocking streams.";
-
-    public final static String FileIO_isatty_doc = 
-        "True if the file is connected to a TTY device.";
-
-    public final static String FileIO_mode_doc = 
-        "String giving the file mode";
-
-    public final static String FileIO_read_doc = 
-        "Read at most size bytes, returned as bytes.\n" + 
-        "\n" + 
-        "Only makes one system call, so less data may be returned than requested.\n" + 
-        "In non-blocking mode, returns None if no data is available.\n" + 
-        "Return an empty bytes object at EOF.";
-
-    public final static String FileIO_readable_doc = 
-        "True if file was opened in a read mode.";
-
-    public final static String FileIO_readall_doc = 
-        "Read all data from the file, returned as bytes.\n" + 
-        "\n" + 
-        "In non-blocking mode, returns as much as is immediately available,\n" + 
-        "or None if no data is available.  Return an empty bytes object at EOF.";
-
-    public final static String FileIO_readinto_doc = 
-        "Same as RawIOBase.readinto().";
-
-    public final static String FileIO_readline_doc = 
-        "Read and return a line from the stream.\n" + 
-        "\n" + 
-        "If size is specified, at most size bytes will be read.\n" + 
-        "\n" + 
-        "The line terminator is always b'\\n' for binary files; for text\n" + 
-        "files, the newlines argument to open can be used to select the line\n" + 
-        "terminator(s) recognized.";
-
-    public final static String FileIO_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String FileIO_seek_doc = 
-        "Move to new file position and return the file position.\n" + 
-        "\n" + 
-        "Argument offset is a byte count.  Optional argument whence defaults to\n" + 
-        "SEEK_SET or 0 (offset from start of file, offset should be >= 0); other values\n" + 
-        "are SEEK_CUR or 1 (move relative to current position, positive or negative),\n" + 
-        "and SEEK_END or 2 (move relative to end of file, usually negative, although\n" + 
-        "many platforms allow seeking beyond the end of a file).\n" + 
-        "\n" + 
-        "Note that not all file objects are seekable.";
-
-    public final static String FileIO_seekable_doc = 
-        "True if file supports random-access.";
-
-    public final static String FileIO_tell_doc = 
-        "Current file position.\n" + 
-        "\n" + 
-        "Can raise OSError for non seekable files.";
-
-    public final static String FileIO_truncate_doc = 
-        "Truncate the file to at most size bytes and return the truncated size.\n" + 
-        "\n" + 
-        "Size defaults to the current file position, as returned by tell().\n" + 
-        "The current file position is changed to the value of size.";
-
-    public final static String FileIO_writable_doc = 
-        "True if file was opened in a write mode.";
-
-    public final static String FileIO_write_doc = 
-        "Write buffer b to file, return number of bytes written.\n" + 
-        "\n" + 
-        "Only makes one system call, so not all of the data may be written.\n" + 
-        "The number of bytes actually written is returned.  In non-blocking mode,\n" + 
-        "returns None if the write would block.";
-
-    public final static String FileIO_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.BufferedReader'>
-    public final static String BufferedReader___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BufferedReader___del___doc = 
-        "";
-
-    public final static String BufferedReader___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BufferedReader___dict___doc = 
-        "";
-
-    public final static String BufferedReader___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BufferedReader_doc = 
-        "Create a new buffered reader using the given readable raw IO object.";
-
-    public final static String BufferedReader___enter___doc = 
-        "";
-
-    public final static String BufferedReader___eq___doc = 
-        "Return self==value.";
-
-    public final static String BufferedReader___exit___doc = 
-        "";
-
-    public final static String BufferedReader___format___doc = 
-        "default object formatter";
-
-    public final static String BufferedReader___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BufferedReader___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BufferedReader___getstate___doc = 
-        "";
-
-    public final static String BufferedReader___gt___doc = 
-        "Return self>value.";
-
-    public final static String BufferedReader___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BufferedReader___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BufferedReader___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String BufferedReader___le___doc = 
-        "Return self<=value.";
-
-    public final static String BufferedReader___lt___doc = 
-        "Return self<value.";
-
-    public final static String BufferedReader___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BufferedReader___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BufferedReader___next___doc = 
-        "Implement next(self).";
-
-    public final static String BufferedReader___reduce___doc = 
-        "helper for pickle";
-
-    public final static String BufferedReader___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BufferedReader___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BufferedReader___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BufferedReader___sizeof___doc = 
-        "";
-
-    public final static String BufferedReader___str___doc = 
-        "Return str(self).";
-
-    public final static String BufferedReader___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BufferedReader__checkClosed_doc = 
-        "";
-
-    public final static String BufferedReader__checkReadable_doc = 
-        "";
-
-    public final static String BufferedReader__checkSeekable_doc = 
-        "";
-
-    public final static String BufferedReader__checkWritable_doc = 
-        "";
-
-    public final static String BufferedReader__dealloc_warn_doc = 
-        "";
-
-    public final static String BufferedReader__finalizing_doc = 
-        "";
-
-    public final static String BufferedReader_close_doc = 
-        "";
-
-    public final static String BufferedReader_closed_doc = 
-        "";
-
-    public final static String BufferedReader_detach_doc = 
-        "";
-
-    public final static String BufferedReader_fileno_doc = 
-        "";
-
-    public final static String BufferedReader_flush_doc = 
-        "";
-
-    public final static String BufferedReader_isatty_doc = 
-        "";
-
-    public final static String BufferedReader_mode_doc = 
-        "";
-
-    public final static String BufferedReader_name_doc = 
-        "";
-
-    public final static String BufferedReader_peek_doc = 
-        "";
-
-    public final static String BufferedReader_raw_doc = 
-        "";
-
-    public final static String BufferedReader_read_doc = 
-        "";
-
-    public final static String BufferedReader_read1_doc = 
-        "";
-
-    public final static String BufferedReader_readable_doc = 
-        "";
-
-    public final static String BufferedReader_readinto_doc = 
-        "";
-
-    public final static String BufferedReader_readinto1_doc = 
-        "";
-
-    public final static String BufferedReader_readline_doc = 
-        "";
-
-    public final static String BufferedReader_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String BufferedReader_seek_doc = 
-        "";
-
-    public final static String BufferedReader_seekable_doc = 
-        "";
-
-    public final static String BufferedReader_tell_doc = 
-        "";
-
-    public final static String BufferedReader_truncate_doc = 
-        "";
-
-    public final static String BufferedReader_writable_doc = 
-        "Return whether object was opened for writing.\n" + 
-        "\n" + 
-        "If False, write() will raise OSError.";
-
-    public final static String BufferedReader_write_doc = 
-        "Write the given buffer to the IO stream.\n" + 
-        "\n" + 
-        "Returns the number of bytes written, which is always the length of b\n" + 
-        "in bytes.\n" + 
-        "\n" + 
-        "Raises BlockingIOError if the buffer is full and the\n" + 
-        "underlying raw stream cannot accept more data at the moment.\n" + 
-        "";
-
-    public final static String BufferedReader_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.BufferedWriter'>
-    public final static String BufferedWriter___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BufferedWriter___del___doc = 
-        "";
-
-    public final static String BufferedWriter___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BufferedWriter___dict___doc = 
-        "";
-
-    public final static String BufferedWriter___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BufferedWriter_doc = 
-        "A buffer for a writeable sequential RawIO object.\n" + 
-        "\n" + 
-        "The constructor creates a BufferedWriter for the given writeable raw\n" + 
-        "stream. If the buffer_size is not given, it defaults to\n" + 
-        "DEFAULT_BUFFER_SIZE.";
-
-    public final static String BufferedWriter___enter___doc = 
-        "";
-
-    public final static String BufferedWriter___eq___doc = 
-        "Return self==value.";
-
-    public final static String BufferedWriter___exit___doc = 
-        "";
-
-    public final static String BufferedWriter___format___doc = 
-        "default object formatter";
-
-    public final static String BufferedWriter___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BufferedWriter___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BufferedWriter___getstate___doc = 
-        "";
-
-    public final static String BufferedWriter___gt___doc = 
-        "Return self>value.";
-
-    public final static String BufferedWriter___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BufferedWriter___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BufferedWriter___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String BufferedWriter___le___doc = 
-        "Return self<=value.";
-
-    public final static String BufferedWriter___lt___doc = 
-        "Return self<value.";
-
-    public final static String BufferedWriter___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BufferedWriter___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BufferedWriter___next___doc = 
-        "Implement next(self).";
-
-    public final static String BufferedWriter___reduce___doc = 
-        "helper for pickle";
-
-    public final static String BufferedWriter___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BufferedWriter___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BufferedWriter___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BufferedWriter___sizeof___doc = 
-        "";
-
-    public final static String BufferedWriter___str___doc = 
-        "Return str(self).";
-
-    public final static String BufferedWriter___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BufferedWriter__checkClosed_doc = 
-        "";
-
-    public final static String BufferedWriter__checkReadable_doc = 
-        "";
-
-    public final static String BufferedWriter__checkSeekable_doc = 
-        "";
-
-    public final static String BufferedWriter__checkWritable_doc = 
-        "";
-
-    public final static String BufferedWriter__dealloc_warn_doc = 
-        "";
-
-    public final static String BufferedWriter__finalizing_doc = 
-        "";
-
-    public final static String BufferedWriter_close_doc = 
-        "";
-
-    public final static String BufferedWriter_closed_doc = 
-        "";
-
-    public final static String BufferedWriter_detach_doc = 
-        "";
-
-    public final static String BufferedWriter_fileno_doc = 
-        "";
-
-    public final static String BufferedWriter_flush_doc = 
-        "";
-
-    public final static String BufferedWriter_isatty_doc = 
-        "";
-
-    public final static String BufferedWriter_mode_doc = 
-        "";
-
-    public final static String BufferedWriter_name_doc = 
-        "";
-
-    public final static String BufferedWriter_raw_doc = 
-        "";
-
-    public final static String BufferedWriter_read_doc = 
-        "Read and return up to n bytes.\n" + 
-        "\n" + 
-        "If the argument is omitted, None, or negative, reads and\n" + 
-        "returns all data until EOF.\n" + 
-        "\n" + 
-        "If the argument is positive, and the underlying raw stream is\n" + 
-        "not 'interactive', multiple raw reads may be issued to satisfy\n" + 
-        "the byte count (unless EOF is reached first).  But for\n" + 
-        "interactive raw streams (as well as sockets and pipes), at most\n" + 
-        "one raw read will be issued, and a short result does not imply\n" + 
-        "that EOF is imminent.\n" + 
-        "\n" + 
-        "Returns an empty bytes object on EOF.\n" + 
-        "\n" + 
-        "Returns None if the underlying raw stream was open in non-blocking\n" + 
-        "mode and no data is available at the moment.\n" + 
-        "";
-
-    public final static String BufferedWriter_read1_doc = 
-        "Read and return up to n bytes, with at most one read() call\n" + 
-        "to the underlying raw stream. A short result does not imply\n" + 
-        "that EOF is imminent.\n" + 
-        "\n" + 
-        "Returns an empty bytes object on EOF.\n" + 
-        "";
-
-    public final static String BufferedWriter_readable_doc = 
-        "Return whether object was opened for reading.\n" + 
-        "\n" + 
-        "If False, read() will raise OSError.";
-
-    public final static String BufferedWriter_readinto_doc = 
-        "";
-
-    public final static String BufferedWriter_readinto1_doc = 
-        "";
-
-    public final static String BufferedWriter_readline_doc = 
-        "Read and return a line from the stream.\n" + 
-        "\n" + 
-        "If size is specified, at most size bytes will be read.\n" + 
-        "\n" + 
-        "The line terminator is always b'\\n' for binary files; for text\n" + 
-        "files, the newlines argument to open can be used to select the line\n" + 
-        "terminator(s) recognized.";
-
-    public final static String BufferedWriter_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String BufferedWriter_seek_doc = 
-        "";
-
-    public final static String BufferedWriter_seekable_doc = 
-        "";
-
-    public final static String BufferedWriter_tell_doc = 
-        "";
-
-    public final static String BufferedWriter_truncate_doc = 
-        "";
-
-    public final static String BufferedWriter_writable_doc = 
-        "";
-
-    public final static String BufferedWriter_write_doc = 
-        "";
-
-    public final static String BufferedWriter_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.BufferedRWPair'>
-    public final static String BufferedRWPair___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BufferedRWPair___del___doc = 
-        "";
-
-    public final static String BufferedRWPair___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BufferedRWPair___dict___doc = 
-        "";
-
-    public final static String BufferedRWPair___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BufferedRWPair_doc = 
-        "A buffered reader and writer object together.\n" + 
-        "\n" + 
-        "A buffered reader object and buffered writer object put together to\n" + 
-        "form a sequential IO object that can read and write. This is typically\n" + 
-        "used with a socket or two-way pipe.\n" + 
-        "\n" + 
-        "reader and writer are RawIOBase objects that are readable and\n" + 
-        "writeable respectively. If the buffer_size is omitted it defaults to\n" + 
-        "DEFAULT_BUFFER_SIZE.";
-
-    public final static String BufferedRWPair___enter___doc = 
-        "";
-
-    public final static String BufferedRWPair___eq___doc = 
-        "Return self==value.";
-
-    public final static String BufferedRWPair___exit___doc = 
-        "";
-
-    public final static String BufferedRWPair___format___doc = 
-        "default object formatter";
-
-    public final static String BufferedRWPair___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BufferedRWPair___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BufferedRWPair___getstate___doc = 
-        "";
-
-    public final static String BufferedRWPair___gt___doc = 
-        "Return self>value.";
-
-    public final static String BufferedRWPair___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BufferedRWPair___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BufferedRWPair___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String BufferedRWPair___le___doc = 
-        "Return self<=value.";
-
-    public final static String BufferedRWPair___lt___doc = 
-        "Return self<value.";
-
-    public final static String BufferedRWPair___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BufferedRWPair___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BufferedRWPair___next___doc = 
-        "Implement next(self).";
-
-    public final static String BufferedRWPair___reduce___doc = 
-        "helper for pickle";
-
-    public final static String BufferedRWPair___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BufferedRWPair___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BufferedRWPair___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BufferedRWPair___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String BufferedRWPair___str___doc = 
-        "Return str(self).";
-
-    public final static String BufferedRWPair___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BufferedRWPair__checkClosed_doc = 
-        "";
-
-    public final static String BufferedRWPair__checkReadable_doc = 
-        "";
-
-    public final static String BufferedRWPair__checkSeekable_doc = 
-        "";
-
-    public final static String BufferedRWPair__checkWritable_doc = 
-        "";
-
-    public final static String BufferedRWPair_close_doc = 
-        "";
-
-    public final static String BufferedRWPair_closed_doc = 
-        "";
-
-    public final static String BufferedRWPair_detach_doc = 
-        "Disconnect this buffer from its underlying raw stream and return it.\n" + 
-        "\n" + 
-        "After the raw stream has been detached, the buffer is in an unusable\n" + 
-        "state.";
-
-    public final static String BufferedRWPair_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String BufferedRWPair_flush_doc = 
-        "";
-
-    public final static String BufferedRWPair_isatty_doc = 
-        "";
-
-    public final static String BufferedRWPair_peek_doc = 
-        "";
-
-    public final static String BufferedRWPair_read_doc = 
-        "";
-
-    public final static String BufferedRWPair_read1_doc = 
-        "";
-
-    public final static String BufferedRWPair_readable_doc = 
-        "";
-
-    public final static String BufferedRWPair_readinto_doc = 
-        "";
-
-    public final static String BufferedRWPair_readinto1_doc = 
-        "";
-
-    public final static String BufferedRWPair_readline_doc = 
-        "Read and return a line from the stream.\n" + 
-        "\n" + 
-        "If size is specified, at most size bytes will be read.\n" + 
-        "\n" + 
-        "The line terminator is always b'\\n' for binary files; for text\n" + 
-        "files, the newlines argument to open can be used to select the line\n" + 
-        "terminator(s) recognized.";
-
-    public final static String BufferedRWPair_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String BufferedRWPair_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Change the stream position to the given byte offset. The offset is\n" + 
-        "interpreted relative to the position indicated by whence.  Values\n" + 
-        "for whence are:\n" + 
-        "\n" + 
-        "* 0 -- start of stream (the default); offset should be zero or positive\n" + 
-        "* 1 -- current stream position; offset may be negative\n" + 
-        "* 2 -- end of stream; offset is usually negative\n" + 
-        "\n" + 
-        "Return the new absolute position.";
-
-    public final static String BufferedRWPair_seekable_doc = 
-        "Return whether object supports random access.\n" + 
-        "\n" + 
-        "If False, seek(), tell() and truncate() will raise OSError.\n" + 
-        "This method may need to do a test seek().";
-
-    public final static String BufferedRWPair_tell_doc = 
-        "Return current stream position.";
-
-    public final static String BufferedRWPair_truncate_doc = 
-        "Truncate file to size bytes.\n" + 
-        "\n" + 
-        "File pointer is left unchanged.  Size defaults to the current IO\n" + 
-        "position as reported by tell().  Returns the new size.";
-
-    public final static String BufferedRWPair_writable_doc = 
-        "";
-
-    public final static String BufferedRWPair_write_doc = 
-        "";
-
-    public final static String BufferedRWPair_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.BufferedRandom'>
-    public final static String BufferedRandom___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BufferedRandom___del___doc = 
-        "";
-
-    public final static String BufferedRandom___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BufferedRandom___dict___doc = 
-        "";
-
-    public final static String BufferedRandom___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BufferedRandom_doc = 
-        "A buffered interface to random access streams.\n" + 
-        "\n" + 
-        "The constructor creates a reader and writer for a seekable stream,\n" + 
-        "raw, given in the first argument. If the buffer_size is omitted it\n" + 
-        "defaults to DEFAULT_BUFFER_SIZE.";
-
-    public final static String BufferedRandom___enter___doc = 
-        "";
-
-    public final static String BufferedRandom___eq___doc = 
-        "Return self==value.";
-
-    public final static String BufferedRandom___exit___doc = 
-        "";
-
-    public final static String BufferedRandom___format___doc = 
-        "default object formatter";
-
-    public final static String BufferedRandom___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BufferedRandom___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BufferedRandom___getstate___doc = 
-        "";
-
-    public final static String BufferedRandom___gt___doc = 
-        "Return self>value.";
-
-    public final static String BufferedRandom___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BufferedRandom___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BufferedRandom___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String BufferedRandom___le___doc = 
-        "Return self<=value.";
-
-    public final static String BufferedRandom___lt___doc = 
-        "Return self<value.";
-
-    public final static String BufferedRandom___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BufferedRandom___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BufferedRandom___next___doc = 
-        "Implement next(self).";
-
-    public final static String BufferedRandom___reduce___doc = 
-        "helper for pickle";
-
-    public final static String BufferedRandom___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BufferedRandom___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BufferedRandom___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BufferedRandom___sizeof___doc = 
-        "";
-
-    public final static String BufferedRandom___str___doc = 
-        "Return str(self).";
-
-    public final static String BufferedRandom___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BufferedRandom__checkClosed_doc = 
-        "";
-
-    public final static String BufferedRandom__checkReadable_doc = 
-        "";
-
-    public final static String BufferedRandom__checkSeekable_doc = 
-        "";
-
-    public final static String BufferedRandom__checkWritable_doc = 
-        "";
-
-    public final static String BufferedRandom__dealloc_warn_doc = 
-        "";
-
-    public final static String BufferedRandom__finalizing_doc = 
-        "";
-
-    public final static String BufferedRandom_close_doc = 
-        "";
-
-    public final static String BufferedRandom_closed_doc = 
-        "";
-
-    public final static String BufferedRandom_detach_doc = 
-        "";
-
-    public final static String BufferedRandom_fileno_doc = 
-        "";
-
-    public final static String BufferedRandom_flush_doc = 
-        "";
-
-    public final static String BufferedRandom_isatty_doc = 
-        "";
-
-    public final static String BufferedRandom_mode_doc = 
-        "";
-
-    public final static String BufferedRandom_name_doc = 
-        "";
-
-    public final static String BufferedRandom_peek_doc = 
-        "";
-
-    public final static String BufferedRandom_raw_doc = 
-        "";
-
-    public final static String BufferedRandom_read_doc = 
-        "";
-
-    public final static String BufferedRandom_read1_doc = 
-        "";
-
-    public final static String BufferedRandom_readable_doc = 
-        "";
-
-    public final static String BufferedRandom_readinto_doc = 
-        "";
-
-    public final static String BufferedRandom_readinto1_doc = 
-        "";
-
-    public final static String BufferedRandom_readline_doc = 
-        "";
-
-    public final static String BufferedRandom_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String BufferedRandom_seek_doc = 
-        "";
-
-    public final static String BufferedRandom_seekable_doc = 
-        "";
-
-    public final static String BufferedRandom_tell_doc = 
-        "";
-
-    public final static String BufferedRandom_truncate_doc = 
-        "";
-
-    public final static String BufferedRandom_writable_doc = 
-        "";
-
-    public final static String BufferedRandom_write_doc = 
-        "";
-
-    public final static String BufferedRandom_writelines_doc = 
-        "";
-
-    // Docs for <class 'io.TextIOBase'>
-    public final static String TextIOBase___abstractmethods___doc = 
-        "";
-
-    public final static String TextIOBase___class___doc = 
-        "Metaclass for defining Abstract Base Classes (ABCs).\n" + 
-        "\n" + 
-        "    Use this metaclass to create an ABC.  An ABC can be subclassed\n" + 
-        "    directly, and then acts as a mix-in class.  You can also register\n" + 
-        "    unrelated concrete classes (even built-in classes) and unrelated\n" + 
-        "    ABCs as 'virtual subclasses' -- these and their descendants will\n" + 
-        "    be considered subclasses of the registering ABC by the built-in\n" + 
-        "    issubclass() function, but the registering ABC won't show up in\n" + 
-        "    their MRO (Method Resolution Order) nor will method\n" + 
-        "    implementations defined by the registering ABC be callable (not\n" + 
-        "    even via super()).\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String TextIOBase___del___doc = 
-        "";
-
-    public final static String TextIOBase___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String TextIOBase___dict___doc = 
-        "";
-
-    public final static String TextIOBase___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String TextIOBase_doc = 
-        "Base class for text I/O.\n" + 
-        "\n" + 
-        "This class provides a character and line based interface to stream\n" + 
-        "I/O. There is no readinto method because Python's character strings\n" + 
-        "are immutable. There is no public constructor.\n" + 
-        "";
-
-    public final static String TextIOBase___enter___doc = 
-        "";
-
-    public final static String TextIOBase___eq___doc = 
-        "Return self==value.";
-
-    public final static String TextIOBase___exit___doc = 
-        "";
-
-    public final static String TextIOBase___format___doc = 
-        "default object formatter";
-
-    public final static String TextIOBase___ge___doc = 
-        "Return self>=value.";
-
-    public final static String TextIOBase___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String TextIOBase___gt___doc = 
-        "Return self>value.";
-
-    public final static String TextIOBase___hash___doc = 
-        "Return hash(self).";
-
-    public final static String TextIOBase___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String TextIOBase___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String TextIOBase___le___doc = 
-        "Return self<=value.";
-
-    public final static String TextIOBase___lt___doc = 
-        "Return self<value.";
-
-    public final static String TextIOBase___module___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String TextIOBase___ne___doc = 
-        "Return self!=value.";
-
-    public final static String TextIOBase___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String TextIOBase___next___doc = 
-        "Implement next(self).";
-
-    public final static String TextIOBase___reduce___doc = 
-        "helper for pickle";
-
-    public final static String TextIOBase___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String TextIOBase___repr___doc = 
-        "Return repr(self).";
-
-    public final static String TextIOBase___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String TextIOBase___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String TextIOBase___str___doc = 
-        "Return str(self).";
-
-    public final static String TextIOBase___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String TextIOBase__abc_cache_doc = 
-        "";
-
-    public final static String TextIOBase__abc_negative_cache_doc = 
-        "";
-
-    public final static String TextIOBase__abc_negative_cache_version_doc = 
-        "int(x=0) -> integer\n" + 
-        "int(x, base=10) -> integer\n" + 
-        "\n" + 
-        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
-        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
-        "numbers, this truncates towards zero.\n" + 
-        "\n" + 
-        "If x is not a number or if base is given, then x must be a string,\n" + 
-        "bytes, or bytearray instance representing an integer literal in the\n" + 
-        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
-        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
-        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
-        ">>> int('0b100', base=0)\n" + 
-        "4";
-
-    public final static String TextIOBase__abc_registry_doc = 
-        "";
-
-    public final static String TextIOBase__checkClosed_doc = 
-        "";
-
-    public final static String TextIOBase__checkReadable_doc = 
-        "";
-
-    public final static String TextIOBase__checkSeekable_doc = 
-        "";
-
-    public final static String TextIOBase__checkWritable_doc = 
-        "";
-
-    public final static String TextIOBase_close_doc = 
-        "Flush and close the IO object.\n" + 
-        "\n" + 
-        "This method has no effect if the file is already closed.";
-
-    public final static String TextIOBase_closed_doc = 
-        "";
-
-    public final static String TextIOBase_detach_doc = 
-        "Separate the underlying buffer from the TextIOBase and return it.\n" + 
-        "\n" + 
-        "After the underlying buffer has been detached, the TextIO is in an\n" + 
-        "unusable state.\n" + 
-        "";
-
-    public final static String TextIOBase_encoding_doc = 
-        "Encoding of the text stream.\n" + 
-        "\n" + 
-        "Subclasses should override.\n" + 
-        "";
-
-    public final static String TextIOBase_errors_doc = 
-        "The error setting of the decoder or encoder.\n" + 
-        "\n" + 
-        "Subclasses should override.\n" + 
-        "";
-
-    public final static String TextIOBase_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String TextIOBase_flush_doc = 
-        "Flush write buffers, if applicable.\n" + 
-        "\n" + 
-        "This is not implemented for read-only and non-blocking streams.";
-
-    public final static String TextIOBase_isatty_doc = 
-        "Return whether this is an 'interactive' stream.\n" + 
-        "\n" + 
-        "Return False if it can't be determined.";
-
-    public final static String TextIOBase_newlines_doc = 
-        "Line endings translated so far.\n" + 
-        "\n" + 
-        "Only line endings translated during reading are considered.\n" + 
-        "\n" + 
-        "Subclasses should override.\n" + 
-        "";
-
-    public final static String TextIOBase_read_doc = 
-        "Read at most n characters from stream.\n" + 
-        "\n" + 
-        "Read from underlying buffer until we have n characters or we hit EOF.\n" + 
-        "If n is negative or omitted, read until EOF.\n" + 
-        "";
-
-    public final static String TextIOBase_readable_doc = 
-        "Return whether object was opened for reading.\n" + 
-        "\n" + 
-        "If False, read() will raise OSError.";
-
-    public final static String TextIOBase_readline_doc = 
-        "Read until newline or EOF.\n" + 
-        "\n" + 
-        "Returns an empty string if EOF is hit immediately.\n" + 
-        "";
-
-    public final static String TextIOBase_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String TextIOBase_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Change the stream position to the given byte offset. The offset is\n" + 
-        "interpreted relative to the position indicated by whence.  Values\n" + 
-        "for whence are:\n" + 
-        "\n" + 
-        "* 0 -- start of stream (the default); offset should be zero or positive\n" + 
-        "* 1 -- current stream position; offset may be negative\n" + 
-        "* 2 -- end of stream; offset is usually negative\n" + 
-        "\n" + 
-        "Return the new absolute position.";
-
-    public final static String TextIOBase_seekable_doc = 
-        "Return whether object supports random access.\n" + 
-        "\n" + 
-        "If False, seek(), tell() and truncate() will raise OSError.\n" + 
-        "This method may need to do a test seek().";
-
-    public final static String TextIOBase_tell_doc = 
-        "Return current stream position.";
-
-    public final static String TextIOBase_truncate_doc = 
-        "Truncate file to size bytes.\n" + 
-        "\n" + 
-        "File pointer is left unchanged.  Size defaults to the current IO\n" + 
-        "position as reported by tell().  Returns the new size.";
-
-    public final static String TextIOBase_writable_doc = 
-        "Return whether object was opened for writing.\n" + 
-        "\n" + 
-        "If False, write() will raise OSError.";
-
-    public final static String TextIOBase_write_doc = 
-        "Write string to stream.\n" + 
-        "Returns the number of characters written (which is always equal to\n" + 
-        "the length of the string).\n" + 
-        "";
-
-    public final static String TextIOBase_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.TextIOWrapper'>
-    public final static String TextIOWrapper__CHUNK_SIZE_doc = 
-        "";
-
-    public final static String TextIOWrapper___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String TextIOWrapper___del___doc = 
-        "";
-
-    public final static String TextIOWrapper___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String TextIOWrapper___dict___doc = 
-        "";
-
-    public final static String TextIOWrapper___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String TextIOWrapper_doc = 
-        "Character and line based layer over a BufferedIOBase object, buffer.\n" + 
-        "\n" + 
-        "encoding gives the name of the encoding that the stream will be\n" + 
-        "decoded or encoded with. It defaults to locale.getpreferredencoding(False).\n" + 
-        "\n" + 
-        "errors determines the strictness of encoding and decoding (see\n" + 
-        "help(codecs.Codec) or the documentation for codecs.register) and\n" + 
-        "defaults to \"strict\".\n" + 
-        "\n" + 
-        "newline controls how line endings are handled. It can be None, '',\n" + 
-        "'\\n', '\\r', and '\\r\\n'.  It works as follows:\n" + 
-        "\n" + 
-        "* On input, if newline is None, universal newlines mode is\n" + 
-        "  enabled. Lines in the input can end in '\\n', '\\r', or '\\r\\n', and\n" + 
-        "  these are translated into '\\n' before being returned to the\n" + 
-        "  caller. If it is '', universal newline mode is enabled, but line\n" + 
-        "  endings are returned to the caller untranslated. If it has any of\n" + 
-        "  the other legal values, input lines are only terminated by the given\n" + 
-        "  string, and the line ending is returned to the caller untranslated.\n" + 
-        "\n" + 
-        "* On output, if newline is None, any '\\n' characters written are\n" + 
-        "  translated to the system default line separator, os.linesep. If\n" + 
-        "  newline is '' or '\\n', no translation takes place. If newline is any\n" + 
-        "  of the other legal values, any '\\n' characters written are translated\n" + 
-        "  to the given string.\n" + 
-        "\n" + 
-        "If line_buffering is True, a call to flush is implied when a call to\n" + 
-        "write contains a newline character.";
-
-    public final static String TextIOWrapper___enter___doc = 
-        "";
-
-    public final static String TextIOWrapper___eq___doc = 
-        "Return self==value.";
-
-    public final static String TextIOWrapper___exit___doc = 
-        "";
-
-    public final static String TextIOWrapper___format___doc = 
-        "default object formatter";
-
-    public final static String TextIOWrapper___ge___doc = 
-        "Return self>=value.";
-
-    public final static String TextIOWrapper___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String TextIOWrapper___getstate___doc = 
-        "";
-
-    public final static String TextIOWrapper___gt___doc = 
-        "Return self>value.";
-
-    public final static String TextIOWrapper___hash___doc = 
-        "Return hash(self).";
-
-    public final static String TextIOWrapper___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String TextIOWrapper___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String TextIOWrapper___le___doc = 
-        "Return self<=value.";
-
-    public final static String TextIOWrapper___lt___doc = 
-        "Return self<value.";
-
-    public final static String TextIOWrapper___ne___doc = 
-        "Return self!=value.";
-
-    public final static String TextIOWrapper___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String TextIOWrapper___next___doc = 
-        "Implement next(self).";
-
-    public final static String TextIOWrapper___reduce___doc = 
-        "helper for pickle";
-
-    public final static String TextIOWrapper___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String TextIOWrapper___repr___doc = 
-        "Return repr(self).";
-
-    public final static String TextIOWrapper___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String TextIOWrapper___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String TextIOWrapper___str___doc = 
-        "Return str(self).";
-
-    public final static String TextIOWrapper___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String TextIOWrapper__checkClosed_doc = 
-        "";
-
-    public final static String TextIOWrapper__checkReadable_doc = 
-        "";
-
-    public final static String TextIOWrapper__checkSeekable_doc = 
-        "";
-
-    public final static String TextIOWrapper__checkWritable_doc = 
-        "";
-
-    public final static String TextIOWrapper__finalizing_doc = 
-        "";
-
-    public final static String TextIOWrapper_buffer_doc = 
-        "";
-
-    public final static String TextIOWrapper_close_doc = 
-        "";
-
-    public final static String TextIOWrapper_closed_doc = 
-        "";
-
-    public final static String TextIOWrapper_detach_doc = 
-        "";
-
-    public final static String TextIOWrapper_encoding_doc = 
-        "";
-
-    public final static String TextIOWrapper_errors_doc = 
-        "";
-
-    public final static String TextIOWrapper_fileno_doc = 
-        "";
-
-    public final static String TextIOWrapper_flush_doc = 
-        "";
-
-    public final static String TextIOWrapper_isatty_doc = 
-        "";
-
-    public final static String TextIOWrapper_line_buffering_doc = 
-        "";
-
-    public final static String TextIOWrapper_name_doc = 
-        "";
-
-    public final static String TextIOWrapper_newlines_doc = 
-        "";
-
-    public final static String TextIOWrapper_read_doc = 
-        "";
-
-    public final static String TextIOWrapper_readable_doc = 
-        "";
-
-    public final static String TextIOWrapper_readline_doc = 
-        "";
-
-    public final static String TextIOWrapper_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String TextIOWrapper_seek_doc = 
-        "";
-
-    public final static String TextIOWrapper_seekable_doc = 
-        "";
-
-    public final static String TextIOWrapper_tell_doc = 
-        "";
-
-    public final static String TextIOWrapper_truncate_doc = 
-        "";
-
-    public final static String TextIOWrapper_writable_doc = 
-        "";
-
-    public final static String TextIOWrapper_write_doc = 
-        "";
-
-    public final static String TextIOWrapper_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.StringIO'>
-    public final static String StringIO___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String StringIO___del___doc = 
-        "";
-
-    public final static String StringIO___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String StringIO___dict___doc = 
-        "";
-
-    public final static String StringIO___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String StringIO_doc = 
-        "Text I/O implementation using an in-memory buffer.\n" + 
-        "\n" + 
-        "The initial_value argument sets the value of object.  The newline\n" + 
-        "argument is like the one of TextIOWrapper's constructor.";
-
-    public final static String StringIO___enter___doc = 
-        "";
-
-    public final static String StringIO___eq___doc = 
-        "Return self==value.";
-
-    public final static String StringIO___exit___doc = 
-        "";
-
-    public final static String StringIO___format___doc = 
-        "default object formatter";
-
-    public final static String StringIO___ge___doc = 
-        "Return self>=value.";
-
-    public final static String StringIO___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String StringIO___getstate___doc = 
-        "";
-
-    public final static String StringIO___gt___doc = 
-        "Return self>value.";
-
-    public final static String StringIO___hash___doc = 
-        "Return hash(self).";
-
-    public final static String StringIO___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String StringIO___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String StringIO___le___doc = 
-        "Return self<=value.";
-
-    public final static String StringIO___lt___doc = 
-        "Return self<value.";
-
-    public final static String StringIO___ne___doc = 
-        "Return self!=value.";
-
-    public final static String StringIO___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String StringIO___next___doc = 
-        "Implement next(self).";
-
-    public final static String StringIO___reduce___doc = 
-        "helper for pickle";
-
-    public final static String StringIO___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String StringIO___repr___doc = 
-        "Return repr(self).";
-
-    public final static String StringIO___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String StringIO___setstate___doc = 
-        "";
-
-    public final static String StringIO___sizeof___doc = 
-        "__sizeof__() -> int\n" + 
-        "size of object in memory, in bytes";
-
-    public final static String StringIO___str___doc = 
-        "Return str(self).";
-
-    public final static String StringIO___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String StringIO__checkClosed_doc = 
-        "";
-
-    public final static String StringIO__checkReadable_doc = 
-        "";
-
-    public final static String StringIO__checkSeekable_doc = 
-        "";
-
-    public final static String StringIO__checkWritable_doc = 
-        "";
-
-    public final static String StringIO_close_doc = 
-        "Close the IO object.\n" + 
-        "\n" + 
-        "Attempting any further operation after the object is closed\n" + 
-        "will raise a ValueError.\n" + 
-        "\n" + 
-        "This method has no effect if the file is already closed.";
-
-    public final static String StringIO_closed_doc = 
-        "";
-
-    public final static String StringIO_detach_doc = 
-        "Separate the underlying buffer from the TextIOBase and return it.\n" + 
-        "\n" + 
-        "After the underlying buffer has been detached, the TextIO is in an\n" + 
-        "unusable state.\n" + 
-        "";
-
-    public final static String StringIO_encoding_doc = 
-        "Encoding of the text stream.\n" + 
-        "\n" + 
-        "Subclasses should override.\n" + 
-        "";
-
-    public final static String StringIO_errors_doc = 
-        "The error setting of the decoder or encoder.\n" + 
-        "\n" + 
-        "Subclasses should override.\n" + 
-        "";
-
-    public final static String StringIO_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String StringIO_flush_doc = 
-        "Flush write buffers, if applicable.\n" + 
-        "\n" + 
-        "This is not implemented for read-only and non-blocking streams.";
-
-    public final static String StringIO_getvalue_doc = 
-        "Retrieve the entire contents of the object.";
-
-    public final static String StringIO_isatty_doc = 
-        "Return whether this is an 'interactive' stream.\n" + 
-        "\n" + 
-        "Return False if it can't be determined.";
-
-    public final static String StringIO_line_buffering_doc = 
-        "";
-
-    public final static String StringIO_newlines_doc = 
-        "";
-
-    public final static String StringIO_read_doc = 
-        "Read at most size characters, returned as a string.\n" + 
-        "\n" + 
-        "If the argument is negative or omitted, read until EOF\n" + 
-        "is reached. Return an empty string at EOF.";
-
-    public final static String StringIO_readable_doc = 
-        "Returns True if the IO object can be read.";
-
-    public final static String StringIO_readline_doc = 
-        "Read until newline or EOF.\n" + 
-        "\n" + 
-        "Returns an empty string if EOF is hit immediately.";
-
-    public final static String StringIO_readlines_doc = 
-        "Return a list of lines from the stream.\n" + 
-        "\n" + 
-        "hint can be specified to control the number of lines read: no more\n" + 
-        "lines will be read if the total size (in bytes/characters) of all\n" + 
-        "lines so far exceeds hint.";
-
-    public final static String StringIO_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Seek to character offset pos relative to position indicated by whence:\n" + 
-        "    0  Start of stream (the default).  pos should be >= 0;\n" + 
-        "    1  Current position - pos must be 0;\n" + 
-        "    2  End of stream - pos must be 0.\n" + 
-        "Returns the new absolute position.";
-
-    public final static String StringIO_seekable_doc = 
-        "Returns True if the IO object can be seeked.";
-
-    public final static String StringIO_tell_doc = 
-        "Tell the current file position.";
-
-    public final static String StringIO_truncate_doc = 
-        "Truncate size to pos.\n" + 
-        "\n" + 
-        "The pos argument defaults to the current file position, as\n" + 
-        "returned by tell().  The current file position is unchanged.\n" + 
-        "Returns the new absolute position.";
-
-    public final static String StringIO_writable_doc = 
-        "Returns True if the IO object can be written.";
-
-    public final static String StringIO_write_doc = 
-        "Write string to file.\n" + 
-        "\n" + 
-        "Returns the number of characters written, which is always equal to\n" + 
-        "the length of the string.";
-
-    public final static String StringIO_writelines_doc = 
-        "";
-
-    // Docs for <class '_io.BytesIO'>
-    public final static String BytesIO___class___doc = 
-        "type(object_or_name, bases, dict)\n" + 
-        "type(object) -> the object's type\n" + 
-        "type(name, bases, dict) -> a new type";
-
-    public final static String BytesIO___del___doc = 
-        "";
-
-    public final static String BytesIO___delattr___doc = 
-        "Implement delattr(self, name).";
-
-    public final static String BytesIO___dict___doc = 
-        "";
-
-    public final static String BytesIO___dir___doc = 
-        "__dir__() -> list\n" + 
-        "default dir() implementation";
-
-    public final static String BytesIO_doc = 
-        "Buffered I/O implementation using an in-memory bytes buffer.";
-
-    public final static String BytesIO___enter___doc = 
-        "";
-
-    public final static String BytesIO___eq___doc = 
-        "Return self==value.";
-
-    public final static String BytesIO___exit___doc = 
-        "";
-
-    public final static String BytesIO___format___doc = 
-        "default object formatter";
-
-    public final static String BytesIO___ge___doc = 
-        "Return self>=value.";
-
-    public final static String BytesIO___getattribute___doc = 
-        "Return getattr(self, name).";
-
-    public final static String BytesIO___getstate___doc = 
-        "";
-
-    public final static String BytesIO___gt___doc = 
-        "Return self>value.";
-
-    public final static String BytesIO___hash___doc = 
-        "Return hash(self).";
-
-    public final static String BytesIO___init___doc = 
-        "Initialize self.  See help(type(self)) for accurate signature.";
-
-    public final static String BytesIO___iter___doc = 
-        "Implement iter(self).";
-
-    public final static String BytesIO___le___doc = 
-        "Return self<=value.";
-
-    public final static String BytesIO___lt___doc = 
-        "Return self<value.";
-
-    public final static String BytesIO___ne___doc = 
-        "Return self!=value.";
-
-    public final static String BytesIO___new___doc = 
-        "Create and return a new object.  See help(type) for accurate signature.";
-
-    public final static String BytesIO___next___doc = 
-        "Implement next(self).";
-
-    public final static String BytesIO___reduce___doc = 
-        "helper for pickle";
-
-    public final static String BytesIO___reduce_ex___doc = 
-        "helper for pickle";
-
-    public final static String BytesIO___repr___doc = 
-        "Return repr(self).";
-
-    public final static String BytesIO___setattr___doc = 
-        "Implement setattr(self, name, value).";
-
-    public final static String BytesIO___setstate___doc = 
-        "";
-
-    public final static String BytesIO___sizeof___doc = 
-        "";
-
-    public final static String BytesIO___str___doc = 
-        "Return str(self).";
-
-    public final static String BytesIO___subclasshook___doc = 
-        "Abstract classes can override this to customize issubclass().\n" + 
-        "\n" + 
-        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
-        "It should return True, False or NotImplemented.  If it returns\n" + 
-        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
-        "overrides the normal algorithm (and the outcome is cached).\n" + 
-        "";
-
-    public final static String BytesIO__checkClosed_doc = 
-        "";
-
-    public final static String BytesIO__checkReadable_doc = 
-        "";
-
-    public final static String BytesIO__checkSeekable_doc = 
-        "";
-
-    public final static String BytesIO__checkWritable_doc = 
-        "";
-
-    public final static String BytesIO_close_doc = 
-        "Disable all I/O operations.";
-
-    public final static String BytesIO_closed_doc = 
-        "True if the file is closed.";
-
-    public final static String BytesIO_detach_doc = 
-        "Disconnect this buffer from its underlying raw stream and return it.\n" + 
-        "\n" + 
-        "After the raw stream has been detached, the buffer is in an unusable\n" + 
-        "state.";
-
-    public final static String BytesIO_fileno_doc = 
-        "Returns underlying file descriptor if one exists.\n" + 
-        "\n" + 
-        "OSError is raised if the IO object does not use a file descriptor.";
-
-    public final static String BytesIO_flush_doc = 
-        "Does nothing.";
-
-    public final static String BytesIO_getbuffer_doc = 
-        "Get a read-write view over the contents of the BytesIO object.";
-
-    public final static String BytesIO_getvalue_doc = 
-        "Retrieve the entire contents of the BytesIO object.";
-
-    public final static String BytesIO_isatty_doc = 
-        "Always returns False.\n" + 
-        "\n" + 
-        "BytesIO objects are not connected to a TTY-like device.";
-
-    public final static String BytesIO_read_doc = 
-        "Read at most size bytes, returned as a bytes object.\n" + 
-        "\n" + 
-        "If the size argument is negative, read until EOF is reached.\n" + 
-        "Return an empty bytes object at EOF.";
-
-    public final static String BytesIO_read1_doc = 
-        "Read at most size bytes, returned as a bytes object.\n" + 
-        "\n" + 
-        "If the size argument is negative or omitted, read until EOF is reached.\n" + 
-        "Return an empty bytes object at EOF.";
-
-    public final static String BytesIO_readable_doc = 
-        "Returns True if the IO object can be read.";
-
-    public final static String BytesIO_readinto_doc = 
-        "Read bytes into buffer.\n" + 
-        "\n" + 
-        "Returns number of bytes read (0 for EOF), or None if the object\n" + 
-        "is set not to block and has no data to read.";
-
-    public final static String BytesIO_readinto1_doc = 
-        "";
-
-    public final static String BytesIO_readline_doc = 
-        "Next line from the file, as a bytes object.\n" + 
-        "\n" + 
-        "Retain newline.  A non-negative size argument limits the maximum\n" + 
-        "number of bytes to return (an incomplete line may be returned then).\n" + 
-        "Return an empty bytes object at EOF.";
-
-    public final static String BytesIO_readlines_doc = 
-        "List of bytes objects, each a line from the file.\n" + 
-        "\n" + 
-        "Call readline() repeatedly and return a list of the lines so read.\n" + 
-        "The optional size argument, if given, is an approximate bound on the\n" + 
-        "total number of bytes in the lines returned.";
-
-    public final static String BytesIO_seek_doc = 
-        "Change stream position.\n" + 
-        "\n" + 
-        "Seek to byte offset pos relative to position indicated by whence:\n" + 
-        "     0  Start of stream (the default).  pos should be >= 0;\n" + 
-        "     1  Current position - pos may be negative;\n" + 
-        "     2  End of stream - pos usually negative.\n" + 
-        "Returns the new absolute position.";
-
-    public final static String BytesIO_seekable_doc = 
-        "Returns True if the IO object can be seeked.";
-
-    public final static String BytesIO_tell_doc = 
-        "Current file position, an integer.";
-
-    public final static String BytesIO_truncate_doc = 
-        "Truncate the file to at most size bytes.\n" + 
-        "\n" + 
-        "Size defaults to the current file position, as returned by tell().\n" + 
-        "The current file position is unchanged.  Returns the new size.";
-
-    public final static String BytesIO_writable_doc = 
-        "Returns True if the IO object can be written.";
-
-    public final static String BytesIO_write_doc = 
-        "Write bytes to file.\n" + 
-        "\n" + 
-        "Return the number of bytes written.";
-
-    public final static String BytesIO_writelines_doc = 
-        "Write lines to the file.\n" + 
-        "\n" + 
-        "Note that newlines are not added.  lines can be any iterable object\n" + 
-        "producing bytes-like objects. This is equivalent to calling write() for\n" + 
-        "each element.";
 
     // Docs for <module 'sys' (built-in)>
     public final static String sys___displayhook___doc = 
@@ -14105,14 +14005,14 @@ public class BuiltinDocs {
         "This function should be used for internal and specialized\n" + 
         "purposes only.";
 
-    public final static String sys__home_doc = 
-        "";
-
-    public final static String sys__mercurial_doc = 
+    public final static String sys__git_doc = 
         "tuple() -> empty tuple\n" + 
         "tuple(iterable) -> tuple initialized from iterable's items\n" + 
         "\n" + 
         "If the argument is a tuple, the return value is the same object.";
+
+    public final static String sys__home_doc = 
+        "";
 
     public final static String sys__xoptions_doc = 
         "dict() -> new empty dictionary\n" + 
@@ -14322,6 +14222,11 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
+    public final static String sys_get_asyncgen_hooks_doc = 
+        "get_asyncgen_hooks()\n" + 
+        "\n" + 
+        "Return a namedtuple of installed asynchronous generators hooks (firstiter, finalizer).";
+
     public final static String sys_get_coroutine_wrapper_doc = 
         "get_coroutine_wrapper()\n" + 
         "\n" + 
@@ -14347,6 +14252,12 @@ public class BuiltinDocs {
         "\n" + 
         "Return the current value of the flags that are used for dlopen calls.\n" + 
         "The flag constants are defined in the os module.";
+
+    public final static String sys_getfilesystemencodeerrors_doc = 
+        "getfilesystemencodeerrors() -> string\n" + 
+        "\n" + 
+        "Return the error mode used to convert Unicode filenames in\n" + 
+        "operating system filenames.";
 
     public final static String sys_getfilesystemencoding_doc = 
         "getfilesystemencoding() -> string\n" + 
@@ -14523,6 +14434,11 @@ public class BuiltinDocs {
         "encoding defaults to sys.getdefaultencoding().\n" + 
         "errors defaults to 'strict'.";
 
+    public final static String sys_set_asyncgen_hooks_doc = 
+        "set_asyncgen_hooks(*, firstiter=None, finalizer=None)\n" + 
+        "\n" + 
+        "Set a finalizer for async generators objects.";
+
     public final static String sys_set_coroutine_wrapper_doc = 
         "set_coroutine_wrapper(wrapper)\n" + 
         "\n" + 
@@ -14691,27 +14607,8 @@ public class BuiltinDocs {
         "list() -> new empty list\n" + 
         "list(iterable) -> new list initialized from iterable's items";
 
-    // Docs for <module 'subprocess' from '/usr/lib/python3.5/subprocess.py'>
-    public final static String subprocess_CalledProcessError_doc = 
-        "This exception is raised when a process run by check_call() or\n" + 
-        "    check_output() returns a non-zero exit status.\n" + 
-        "    The exit status will be stored in the returncode attribute;\n" + 
-        "    check_output() will also store the output in the output attribute.\n" + 
-        "    ";
-
-    public final static String subprocess_CompletedProcess_doc = 
-        "A process that has finished running.\n" + 
-        "\n" + 
-        "    This is returned by run().\n" + 
-        "\n" + 
-        "    Attributes:\n" + 
-        "      args: The list or str args passed to run().\n" + 
-        "      returncode: The exit code of the process, negative for signals.\n" + 
-        "      stdout: The standard output (None if not captured).\n" + 
-        "      stderr: The standard error (None if not captured).\n" + 
-        "    ";
-
-    public final static String subprocess_DEVNULL_doc = 
+    // Docs for <module 'time' (built-in)>
+    public final static String time_CLOCK_MONOTONIC_doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -14727,7 +14624,7 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String subprocess_PIPE_doc = 
+    public final static String time_CLOCK_MONOTONIC_RAW_doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -14743,10 +14640,7 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String subprocess_Popen_doc = 
-        "";
-
-    public final static String subprocess_STDOUT_doc = 
+    public final static String time_CLOCK_PROCESS_CPUTIME_ID_doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -14762,15 +14656,7 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String subprocess_SubprocessError_doc = 
-        "";
-
-    public final static String subprocess_TimeoutExpired_doc = 
-        "This exception is raised when the timeout expires while waiting for a\n" + 
-        "    child process.\n" + 
-        "    ";
-
-    public final static String subprocess__PIPE_BUF_doc = 
+    public final static String time_CLOCK_REALTIME_doc = 
         "int(x=0) -> integer\n" + 
         "int(x, base=10) -> integer\n" + 
         "\n" + 
@@ -14786,797 +14672,39 @@ public class BuiltinDocs {
         ">>> int('0b100', base=0)\n" + 
         "4";
 
-    public final static String subprocess__PLATFORM_DEFAULT_CLOSE_FDS_doc = 
-        "The most base type";
+    public final static String time_CLOCK_THREAD_CPUTIME_ID_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
 
-    public final static String subprocess__PopenSelector_doc = 
-        "Poll-based selector.";
+    public final static String time__STRUCT_TM_ITEMS_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
 
-    public final static String subprocess___all___doc = 
-        "list() -> new empty list\n" + 
-        "list(iterable) -> new list initialized from iterable's items";
-
-    public final static String subprocess___builtins___doc = 
-        "dict() -> new empty dictionary\n" + 
-        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
-        "    (key, value) pairs\n" + 
-        "dict(iterable) -> new dictionary initialized as if via:\n" + 
-        "    d = {}\n" + 
-        "    for k, v in iterable:\n" + 
-        "        d[k] = v\n" + 
-        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
-        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
-
-    public final static String subprocess___cached___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String subprocess_doc = 
-        "subprocess - Subprocesses with accessible I/O streams\n" + 
-        "\n" + 
-        "This module allows you to spawn processes, connect to their\n" + 
-        "input/output/error pipes, and obtain their return codes.  This module\n" + 
-        "intends to replace several older modules and functions:\n" + 
-        "\n" + 
-        "os.system\n" + 
-        "os.spawn*\n" + 
-        "\n" + 
-        "Information about how the subprocess module can be used to replace these\n" + 
-        "modules and functions can be found below.\n" + 
-        "\n" + 
-        "\n" + 
-        "\n" + 
-        "Using the subprocess module\n" + 
-        "===========================\n" + 
-        "This module defines one class called Popen:\n" + 
-        "\n" + 
-        "class Popen(args, bufsize=-1, executable=None,\n" + 
-        "            stdin=None, stdout=None, stderr=None,\n" + 
-        "            preexec_fn=None, close_fds=True, shell=False,\n" + 
-        "            cwd=None, env=None, universal_newlines=False,\n" + 
-        "            startupinfo=None, creationflags=0,\n" + 
-        "            restore_signals=True, start_new_session=False, pass_fds=()):\n" + 
-        "\n" + 
-        "\n" + 
-        "Arguments are:\n" + 
-        "\n" + 
-        "args should be a string, or a sequence of program arguments.  The\n" + 
-        "program to execute is normally the first item in the args sequence or\n" + 
-        "string, but can be explicitly set by using the executable argument.\n" + 
-        "\n" + 
-        "On POSIX, with shell=False (default): In this case, the Popen class\n" + 
-        "uses os.execvp() to execute the child program.  args should normally\n" + 
-        "be a sequence.  A string will be treated as a sequence with the string\n" + 
-        "as the only item (the program to execute).\n" + 
-        "\n" + 
-        "On POSIX, with shell=True: If args is a string, it specifies the\n" + 
-        "command string to execute through the shell.  If args is a sequence,\n" + 
-        "the first item specifies the command string, and any additional items\n" + 
-        "will be treated as additional shell arguments.\n" + 
-        "\n" + 
-        "On Windows: the Popen class uses CreateProcess() to execute the child\n" + 
-        "program, which operates on strings.  If args is a sequence, it will be\n" + 
-        "converted to a string using the list2cmdline method.  Please note that\n" + 
-        "not all MS Windows applications interpret the command line the same\n" + 
-        "way: The list2cmdline is designed for applications using the same\n" + 
-        "rules as the MS C runtime.\n" + 
-        "\n" + 
-        "bufsize will be supplied as the corresponding argument to the io.open()\n" + 
-        "function when creating the stdin/stdout/stderr pipe file objects:\n" + 
-        "0 means unbuffered (read & write are one system call and can return short),\n" + 
-        "1 means line buffered, any other positive value means use a buffer of\n" + 
-        "approximately that size.  A negative bufsize, the default, means the system\n" + 
-        "default of io.DEFAULT_BUFFER_SIZE will be used.\n" + 
-        "\n" + 
-        "stdin, stdout and stderr specify the executed programs' standard\n" + 
-        "input, standard output and standard error file handles, respectively.\n" + 
-        "Valid values are PIPE, an existing file descriptor (a positive\n" + 
-        "integer), an existing file object, and None.  PIPE indicates that a\n" + 
-        "new pipe to the child should be created.  With None, no redirection\n" + 
-        "will occur; the child's file handles will be inherited from the\n" + 
-        "parent.  Additionally, stderr can be STDOUT, which indicates that the\n" + 
-        "stderr data from the applications should be captured into the same\n" + 
-        "file handle as for stdout.\n" + 
-        "\n" + 
-        "On POSIX, if preexec_fn is set to a callable object, this object will be\n" + 
-        "called in the child process just before the child is executed.  The use\n" + 
-        "of preexec_fn is not thread safe, using it in the presence of threads\n" + 
-        "could lead to a deadlock in the child process before the new executable\n" + 
-        "is executed.\n" + 
-        "\n" + 
-        "If close_fds is true, all file descriptors except 0, 1 and 2 will be\n" + 
-        "closed before the child process is executed.  The default for close_fds\n" + 
-        "varies by platform:  Always true on POSIX.  True when stdin/stdout/stderr\n" + 
-        "are None on Windows, false otherwise.\n" + 
-        "\n" + 
-        "pass_fds is an optional sequence of file descriptors to keep open between the\n" + 
-        "parent and child.  Providing any pass_fds implicitly sets close_fds to true.\n" + 
-        "\n" + 
-        "if shell is true, the specified command will be executed through the\n" + 
-        "shell.\n" + 
-        "\n" + 
-        "If cwd is not None, the current directory will be changed to cwd\n" + 
-        "before the child is executed.\n" + 
-        "\n" + 
-        "On POSIX, if restore_signals is True all signals that Python sets to\n" + 
-        "SIG_IGN are restored to SIG_DFL in the child process before the exec.\n" + 
-        "Currently this includes the SIGPIPE, SIGXFZ and SIGXFSZ signals.  This\n" + 
-        "parameter does nothing on Windows.\n" + 
-        "\n" + 
-        "On POSIX, if start_new_session is True, the setsid() system call will be made\n" + 
-        "in the child process prior to executing the command.\n" + 
-        "\n" + 
-        "If env is not None, it defines the environment variables for the new\n" + 
-        "process.\n" + 
-        "\n" + 
-        "If universal_newlines is False, the file objects stdin, stdout and stderr\n" + 
-        "are opened as binary files, and no line ending conversion is done.\n" + 
-        "\n" + 
-        "If universal_newlines is True, the file objects stdout and stderr are\n" + 
-        "opened as a text file, but lines may be terminated by any of '\\n',\n" + 
-        "the Unix end-of-line convention, '\\r', the old Macintosh convention or\n" + 
-        "'\\r\\n', the Windows convention.  All of these external representations\n" + 
-        "are seen as '\\n' by the Python program.  Also, the newlines attribute\n" + 
-        "of the file objects stdout, stdin and stderr are not updated by the\n" + 
-        "communicate() method.\n" + 
-        "\n" + 
-        "In either case, the process being communicated with should start up\n" + 
-        "expecting to receive bytes on its standard input and decode them with\n" + 
-        "the same encoding they are sent in.\n" + 
-        "\n" + 
-        "The startupinfo and creationflags, if given, will be passed to the\n" + 
-        "underlying CreateProcess() function.  They can specify things such as\n" + 
-        "appearance of the main window and priority for the new process.\n" + 
-        "(Windows only)\n" + 
-        "\n" + 
-        "\n" + 
-        "This module also defines some shortcut functions:\n" + 
-        "\n" + 
-        "call(*popenargs, **kwargs):\n" + 
-        "    Run command with arguments.  Wait for command to complete, then\n" + 
-        "    return the returncode attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the Popen constructor.  Example:\n" + 
-        "\n" + 
-        "    >>> retcode = subprocess.call([\"ls\", \"-l\"])\n" + 
-        "\n" + 
-        "check_call(*popenargs, **kwargs):\n" + 
-        "    Run command with arguments.  Wait for command to complete.  If the\n" + 
-        "    exit code was zero then return, otherwise raise\n" + 
-        "    CalledProcessError.  The CalledProcessError object will have the\n" + 
-        "    return code in the returncode attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the Popen constructor.  Example:\n" + 
-        "\n" + 
-        "    >>> subprocess.check_call([\"ls\", \"-l\"])\n" + 
-        "    0\n" + 
-        "\n" + 
-        "getstatusoutput(cmd):\n" + 
-        "    Return (status, output) of executing cmd in a shell.\n" + 
-        "\n" + 
-        "    Execute the string 'cmd' in a shell with 'check_output' and\n" + 
-        "    return a 2-tuple (status, output). Universal newlines mode is used,\n" + 
-        "    meaning that the result with be decoded to a string.\n" + 
-        "\n" + 
-        "    A trailing newline is stripped from the output.\n" + 
-        "    The exit status for the command can be interpreted\n" + 
-        "    according to the rules for the function 'wait'.  Example:\n" + 
-        "\n" + 
-        "    >>> subprocess.getstatusoutput('ls /bin/ls')\n" + 
-        "    (0, '/bin/ls')\n" + 
-        "    >>> subprocess.getstatusoutput('cat /bin/junk')\n" + 
-        "    (256, 'cat: /bin/junk: No such file or directory')\n" + 
-        "    >>> subprocess.getstatusoutput('/bin/junk')\n" + 
-        "    (256, 'sh: /bin/junk: not found')\n" + 
-        "\n" + 
-        "getoutput(cmd):\n" + 
-        "    Return output (stdout or stderr) of executing cmd in a shell.\n" + 
-        "\n" + 
-        "    Like getstatusoutput(), except the exit status is ignored and the return\n" + 
-        "    value is a string containing the command's output.  Example:\n" + 
-        "\n" + 
-        "    >>> subprocess.getoutput('ls /bin/ls')\n" + 
-        "    '/bin/ls'\n" + 
-        "\n" + 
-        "check_output(*popenargs, **kwargs):\n" + 
-        "    Run command with arguments and return its output.\n" + 
-        "\n" + 
-        "    If the exit code was non-zero it raises a CalledProcessError.  The\n" + 
-        "    CalledProcessError object will have the return code in the returncode\n" + 
-        "    attribute and output in the output attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the Popen constructor.  Example:\n" + 
-        "\n" + 
-        "    >>> output = subprocess.check_output([\"ls\", \"-l\", \"/dev/null\"])\n" + 
-        "\n" + 
-        "    There is an additional optional argument, \"input\", allowing you to\n" + 
-        "    pass a string to the subprocess's stdin.  If you use this argument\n" + 
-        "    you may not also use the Popen constructor's \"stdin\" argument.\n" + 
-        "\n" + 
-        "    If universal_newlines is set to True, the \"input\" argument must\n" + 
-        "    be a string rather than bytes, and the return value will be a string.\n" + 
-        "\n" + 
-        "Exceptions\n" + 
-        "----------\n" + 
-        "Exceptions raised in the child process, before the new program has\n" + 
-        "started to execute, will be re-raised in the parent.  Additionally,\n" + 
-        "the exception object will have one extra attribute called\n" + 
-        "'child_traceback', which is a string containing traceback information\n" + 
-        "from the child's point of view.\n" + 
-        "\n" + 
-        "The most common exception raised is OSError.  This occurs, for\n" + 
-        "example, when trying to execute a non-existent file.  Applications\n" + 
-        "should prepare for OSErrors.\n" + 
-        "\n" + 
-        "A ValueError will be raised if Popen is called with invalid arguments.\n" + 
-        "\n" + 
-        "Exceptions defined within this module inherit from SubprocessError.\n" + 
-        "check_call() and check_output() will raise CalledProcessError if the\n" + 
-        "called process returns a non-zero return code.  TimeoutExpired\n" + 
-        "be raised if a timeout was specified and expired.\n" + 
-        "\n" + 
-        "\n" + 
-        "Security\n" + 
-        "--------\n" + 
-        "Unlike some other popen functions, this implementation will never call\n" + 
-        "/bin/sh implicitly.  This means that all characters, including shell\n" + 
-        "metacharacters, can safely be passed to child processes.\n" + 
-        "\n" + 
-        "\n" + 
-        "Popen objects\n" + 
-        "=============\n" + 
-        "Instances of the Popen class have the following methods:\n" + 
-        "\n" + 
-        "poll()\n" + 
-        "    Check if child process has terminated.  Returns returncode\n" + 
-        "    attribute.\n" + 
-        "\n" + 
-        "wait()\n" + 
-        "    Wait for child process to terminate.  Returns returncode attribute.\n" + 
-        "\n" + 
-        "communicate(input=None)\n" + 
-        "    Interact with process: Send data to stdin.  Read data from stdout\n" + 
-        "    and stderr, until end-of-file is reached.  Wait for process to\n" + 
-        "    terminate.  The optional input argument should be data to be\n" + 
-        "    sent to the child process, or None, if no data should be sent to\n" + 
-        "    the child. If the Popen instance was constructed with universal_newlines\n" + 
-        "    set to True, the input argument should be a string and will be encoded\n" + 
-        "    using the preferred system encoding (see locale.getpreferredencoding);\n" + 
-        "    if universal_newlines is False, the input argument should be a\n" + 
-        "    byte string.\n" + 
-        "\n" + 
-        "    communicate() returns a tuple (stdout, stderr).\n" + 
-        "\n" + 
-        "    Note: The data read is buffered in memory, so do not use this\n" + 
-        "    method if the data size is large or unlimited.\n" + 
-        "\n" + 
-        "The following attributes are also available:\n" + 
-        "\n" + 
-        "stdin\n" + 
-        "    If the stdin argument is PIPE, this attribute is a file object\n" + 
-        "    that provides input to the child process.  Otherwise, it is None.\n" + 
-        "\n" + 
-        "stdout\n" + 
-        "    If the stdout argument is PIPE, this attribute is a file object\n" + 
-        "    that provides output from the child process.  Otherwise, it is\n" + 
-        "    None.\n" + 
-        "\n" + 
-        "stderr\n" + 
-        "    If the stderr argument is PIPE, this attribute is file object that\n" + 
-        "    provides error output from the child process.  Otherwise, it is\n" + 
-        "    None.\n" + 
-        "\n" + 
-        "pid\n" + 
-        "    The process ID of the child process.\n" + 
-        "\n" + 
-        "returncode\n" + 
-        "    The child return code.  A None value indicates that the process\n" + 
-        "    hasn't terminated yet.  A negative value -N indicates that the\n" + 
-        "    child was terminated by signal N (POSIX only).\n" + 
-        "\n" + 
-        "\n" + 
-        "Replacing older functions with the subprocess module\n" + 
-        "====================================================\n" + 
-        "In this section, \"a ==> b\" means that b can be used as a replacement\n" + 
-        "for a.\n" + 
-        "\n" + 
-        "Note: All functions in this section fail (more or less) silently if\n" + 
-        "the executed program cannot be found; this module raises an OSError\n" + 
-        "exception.\n" + 
-        "\n" + 
-        "In the following examples, we assume that the subprocess module is\n" + 
-        "imported with \"from subprocess import *\".\n" + 
-        "\n" + 
-        "\n" + 
-        "Replacing /bin/sh shell backquote\n" + 
-        "---------------------------------\n" + 
-        "output=`mycmd myarg`\n" + 
-        "==>\n" + 
-        "output = Popen([\"mycmd\", \"myarg\"], stdout=PIPE).communicate()[0]\n" + 
-        "\n" + 
-        "\n" + 
-        "Replacing shell pipe line\n" + 
-        "-------------------------\n" + 
-        "output=`dmesg | grep hda`\n" + 
-        "==>\n" + 
-        "p1 = Popen([\"dmesg\"], stdout=PIPE)\n" + 
-        "p2 = Popen([\"grep\", \"hda\"], stdin=p1.stdout, stdout=PIPE)\n" + 
-        "output = p2.communicate()[0]\n" + 
-        "\n" + 
-        "\n" + 
-        "Replacing os.system()\n" + 
-        "---------------------\n" + 
-        "sts = os.system(\"mycmd\" + \" myarg\")\n" + 
-        "==>\n" + 
-        "p = Popen(\"mycmd\" + \" myarg\", shell=True)\n" + 
-        "pid, sts = os.waitpid(p.pid, 0)\n" + 
-        "\n" + 
-        "Note:\n" + 
-        "\n" + 
-        "* Calling the program through the shell is usually not required.\n" + 
-        "\n" + 
-        "* It's easier to look at the returncode attribute than the\n" + 
-        "  exitstatus.\n" + 
-        "\n" + 
-        "A more real-world example would look like this:\n" + 
-        "\n" + 
-        "try:\n" + 
-        "    retcode = call(\"mycmd\" + \" myarg\", shell=True)\n" + 
-        "    if retcode < 0:\n" + 
-        "        print(\"Child was terminated by signal\", -retcode, file=sys.stderr)\n" + 
-        "    else:\n" + 
-        "        print(\"Child returned\", retcode, file=sys.stderr)\n" + 
-        "except OSError as e:\n" + 
-        "    print(\"Execution failed:\", e, file=sys.stderr)\n" + 
-        "\n" + 
-        "\n" + 
-        "Replacing os.spawn*\n" + 
-        "-------------------\n" + 
-        "P_NOWAIT example:\n" + 
-        "\n" + 
-        "pid = os.spawnlp(os.P_NOWAIT, \"/bin/mycmd\", \"mycmd\", \"myarg\")\n" + 
-        "==>\n" + 
-        "pid = Popen([\"/bin/mycmd\", \"myarg\"]).pid\n" + 
-        "\n" + 
-        "\n" + 
-        "P_WAIT example:\n" + 
-        "\n" + 
-        "retcode = os.spawnlp(os.P_WAIT, \"/bin/mycmd\", \"mycmd\", \"myarg\")\n" + 
-        "==>\n" + 
-        "retcode = call([\"/bin/mycmd\", \"myarg\"])\n" + 
-        "\n" + 
-        "\n" + 
-        "Vector example:\n" + 
-        "\n" + 
-        "os.spawnvp(os.P_NOWAIT, path, args)\n" + 
-        "==>\n" + 
-        "Popen([path] + args[1:])\n" + 
-        "\n" + 
-        "\n" + 
-        "Environment example:\n" + 
-        "\n" + 
-        "os.spawnlpe(os.P_NOWAIT, \"/bin/mycmd\", \"mycmd\", \"myarg\", env)\n" + 
-        "==>\n" + 
-        "Popen([\"/bin/mycmd\", \"myarg\"], env={\"PATH\": \"/usr/bin\"})\n" + 
-        "";
-
-    public final static String subprocess___file___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String subprocess___loader___doc = 
-        "Concrete implementation of SourceLoader using the file system.";
-
-    public final static String subprocess___name___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String subprocess___package___doc = 
-        "str(object='') -> str\n" + 
-        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
-        "\n" + 
-        "Create a new string object from the given object. If encoding or\n" + 
-        "errors is specified, then the object must expose a data buffer\n" + 
-        "that will be decoded using the given encoding and error handler.\n" + 
-        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
-        "or repr(object).\n" + 
-        "encoding defaults to sys.getdefaultencoding().\n" + 
-        "errors defaults to 'strict'.";
-
-    public final static String subprocess___spec___doc = 
-        "The specification for a module, used for loading.\n" + 
-        "\n" + 
-        "    A module's spec is the source for information about the module.  For\n" + 
-        "    data associated with the module, including source, use the spec's\n" + 
-        "    loader.\n" + 
-        "\n" + 
-        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
-        "    to use when loading the module.  `parent` is the name of the\n" + 
-        "    package the module is in.  The parent is derived from the name.\n" + 
-        "\n" + 
-        "    `is_package` determines if the module is considered a package or\n" + 
-        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
-        "\n" + 
-        "    `origin` is the specific location used by the loader from which to\n" + 
-        "    load the module, if that information is available.  When filename is\n" + 
-        "    set, origin will match.\n" + 
-        "\n" + 
-        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
-        "    When this is True, `__file__` attribute of the module is set.\n" + 
-        "\n" + 
-        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
-        "    corresponds to the `__cached__` attribute.\n" + 
-        "\n" + 
-        "    `submodule_search_locations` is the sequence of path entries to\n" + 
-        "    search when importing submodules.  If set, is_package should be\n" + 
-        "    True--and False otherwise.\n" + 
-        "\n" + 
-        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
-        "    has a non-None value in `submodule_search_locations`, the import\n" + 
-        "    system will consider modules loaded from the spec as packages.\n" + 
-        "\n" + 
-        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
-        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
-        "\n" + 
-        "    ";
-
-    public final static String subprocess__active_doc = 
-        "list() -> new empty list\n" + 
-        "list(iterable) -> new list initialized from iterable's items";
-
-    public final static String subprocess__args_from_interpreter_flags_doc = 
-        "Return a list of command-line arguments reproducing the current\n" + 
-        "    settings in sys.flags and sys.warnoptions.";
-
-    public final static String subprocess__cleanup_doc = 
-        "";
-
-    public final static String subprocess__mswindows_doc = 
-        "bool(x) -> bool\n" + 
-        "\n" + 
-        "Returns True when the argument x is true, False otherwise.\n" + 
-        "The builtins True and False are the only two instances of the class bool.\n" + 
-        "The class bool is a subclass of the class int, and cannot be subclassed.";
-
-    public final static String subprocess__posixsubprocess_doc = 
-        "A POSIX helper for the subprocess module.";
-
-    public final static String subprocess__time_doc = 
-        "monotonic() -> float\n" + 
-        "\n" + 
-        "Monotonic clock, cannot go backward.";
-
-    public final static String subprocess_builtins_doc = 
-        "Built-in functions, exceptions, and other objects.\n" + 
-        "\n" + 
-        "Noteworthy: None is the `nil' object; Ellipsis represents `...' in slices.";
-
-    public final static String subprocess_call_doc = 
-        "Run command with arguments.  Wait for command to complete or\n" + 
-        "    timeout, then return the returncode attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the Popen constructor.  Example:\n" + 
-        "\n" + 
-        "    retcode = call([\"ls\", \"-l\"])\n" + 
-        "    ";
-
-    public final static String subprocess_check_call_doc = 
-        "Run command with arguments.  Wait for command to complete.  If\n" + 
-        "    the exit code was zero then return, otherwise raise\n" + 
-        "    CalledProcessError.  The CalledProcessError object will have the\n" + 
-        "    return code in the returncode attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the call function.  Example:\n" + 
-        "\n" + 
-        "    check_call([\"ls\", \"-l\"])\n" + 
-        "    ";
-
-    public final static String subprocess_check_output_doc = 
-        "Run command with arguments and return its output.\n" + 
-        "\n" + 
-        "    If the exit code was non-zero it raises a CalledProcessError.  The\n" + 
-        "    CalledProcessError object will have the return code in the returncode\n" + 
-        "    attribute and output in the output attribute.\n" + 
-        "\n" + 
-        "    The arguments are the same as for the Popen constructor.  Example:\n" + 
-        "\n" + 
-        "    >>> check_output([\"ls\", \"-l\", \"/dev/null\"])\n" + 
-        "    b'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\\n'\n" + 
-        "\n" + 
-        "    The stdout argument is not allowed as it is used internally.\n" + 
-        "    To capture standard error in the result, use stderr=STDOUT.\n" + 
-        "\n" + 
-        "    >>> check_output([\"/bin/sh\", \"-c\",\n" + 
-        "    ...               \"ls -l non_existent_file ; exit 0\"],\n" + 
-        "    ...              stderr=STDOUT)\n" + 
-        "    b'ls: non_existent_file: No such file or directory\\n'\n" + 
-        "\n" + 
-        "    There is an additional optional argument, \"input\", allowing you to\n" + 
-        "    pass a string to the subprocess's stdin.  If you use this argument\n" + 
-        "    you may not also use the Popen constructor's \"stdin\" argument, as\n" + 
-        "    it too will be used internally.  Example:\n" + 
-        "\n" + 
-        "    >>> check_output([\"sed\", \"-e\", \"s/foo/bar/\"],\n" + 
-        "    ...              input=b\"when in the course of fooman events\\n\")\n" + 
-        "    b'when in the course of barman events\\n'\n" + 
-        "\n" + 
-        "    If universal_newlines=True is passed, the \"input\" argument must be a\n" + 
-        "    string and the return value will be a string rather than bytes.\n" + 
-        "    ";
-
-    public final static String subprocess_errno_doc = 
-        "This module makes available standard errno system symbols.\n" + 
-        "\n" + 
-        "The value of each symbol is the corresponding integer value,\n" + 
-        "e.g., on most systems, errno.ENOENT equals the integer 2.\n" + 
-        "\n" + 
-        "The dictionary errno.errorcode maps numeric codes to symbol names,\n" + 
-        "e.g., errno.errorcode[2] could be the string 'ENOENT'.\n" + 
-        "\n" + 
-        "Symbols that are not relevant to the underlying system are not defined.\n" + 
-        "\n" + 
-        "To map error codes to error messages, use the function os.strerror(),\n" + 
-        "e.g. os.strerror(2) could return 'No such file or directory'.";
-
-    public final static String subprocess_getoutput_doc = 
-        "Return output (stdout or stderr) of executing cmd in a shell.\n" + 
-        "\n" + 
-        "    Like getstatusoutput(), except the exit status is ignored and the return\n" + 
-        "    value is a string containing the command's output.  Example:\n" + 
-        "\n" + 
-        "    >>> import subprocess\n" + 
-        "    >>> subprocess.getoutput('ls /bin/ls')\n" + 
-        "    '/bin/ls'\n" + 
-        "    ";
-
-    public final static String subprocess_getstatusoutput_doc = 
-        "    Return (status, output) of executing cmd in a shell.\n" + 
-        "\n" + 
-        "    Execute the string 'cmd' in a shell with 'check_output' and\n" + 
-        "    return a 2-tuple (status, output). Universal newlines mode is used,\n" + 
-        "    meaning that the result with be decoded to a string.\n" + 
-        "\n" + 
-        "    A trailing newline is stripped from the output.\n" + 
-        "    The exit status for the command can be interpreted\n" + 
-        "    according to the rules for the function 'wait'. Example:\n" + 
-        "\n" + 
-        "    >>> import subprocess\n" + 
-        "    >>> subprocess.getstatusoutput('ls /bin/ls')\n" + 
-        "    (0, '/bin/ls')\n" + 
-        "    >>> subprocess.getstatusoutput('cat /bin/junk')\n" + 
-        "    (256, 'cat: /bin/junk: No such file or directory')\n" + 
-        "    >>> subprocess.getstatusoutput('/bin/junk')\n" + 
-        "    (256, 'sh: /bin/junk: not found')\n" + 
-        "    ";
-
-    public final static String subprocess_io_doc = 
-        "The io module provides the Python interfaces to stream handling. The\n" + 
-        "builtin open function is defined in this module.\n" + 
-        "\n" + 
-        "At the top of the I/O hierarchy is the abstract base class IOBase. It\n" + 
-        "defines the basic interface to a stream. Note, however, that there is no\n" + 
-        "separation between reading and writing to streams; implementations are\n" + 
-        "allowed to raise an OSError if they do not support a given operation.\n" + 
-        "\n" + 
-        "Extending IOBase is RawIOBase which deals simply with the reading and\n" + 
-        "writing of raw bytes to a stream. FileIO subclasses RawIOBase to provide\n" + 
-        "an interface to OS files.\n" + 
-        "\n" + 
-        "BufferedIOBase deals with buffering on a raw byte stream (RawIOBase). Its\n" + 
-        "subclasses, BufferedWriter, BufferedReader, and BufferedRWPair buffer\n" + 
-        "streams that are readable, writable, and both respectively.\n" + 
-        "BufferedRandom provides a buffered interface to random access\n" + 
-        "streams. BytesIO is a simple stream of in-memory bytes.\n" + 
-        "\n" + 
-        "Another IOBase subclass, TextIOBase, deals with the encoding and decoding\n" + 
-        "of streams into text. TextIOWrapper, which extends it, is a buffered text\n" + 
-        "interface to a buffered raw stream (`BufferedIOBase`). Finally, StringIO\n" + 
-        "is an in-memory stream for text.\n" + 
-        "\n" + 
-        "Argument names are not part of the specification, and only the arguments\n" + 
-        "of open() are intended to be used as keyword arguments.\n" + 
-        "\n" + 
-        "data:\n" + 
-        "\n" + 
-        "DEFAULT_BUFFER_SIZE\n" + 
-        "\n" + 
-        "   An int containing the default buffer size used by the module's buffered\n" + 
-        "   I/O classes. open() uses the file's blksize (as obtained by os.stat) if\n" + 
-        "   possible.\n" + 
-        "";
-
-    public final static String subprocess_list2cmdline_doc = 
-        "\n" + 
-        "    Translate a sequence of arguments into a command line\n" + 
-        "    string, using the same rules as the MS C runtime:\n" + 
-        "\n" + 
-        "    1) Arguments are delimited by white space, which is either a\n" + 
-        "       space or a tab.\n" + 
-        "\n" + 
-        "    2) A string surrounded by double quotation marks is\n" + 
-        "       interpreted as a single argument, regardless of white space\n" + 
-        "       contained within.  A quoted string can be embedded in an\n" + 
-        "       argument.\n" + 
-        "\n" + 
-        "    3) A double quotation mark preceded by a backslash is\n" + 
-        "       interpreted as a literal double quotation mark.\n" + 
-        "\n" + 
-        "    4) Backslashes are interpreted literally, unless they\n" + 
-        "       immediately precede a double quotation mark.\n" + 
-        "\n" + 
-        "    5) If backslashes immediately precede a double quotation mark,\n" + 
-        "       every pair of backslashes is interpreted as a literal\n" + 
-        "       backslash.  If the number of backslashes is odd, the last\n" + 
-        "       backslash escapes the next double quotation mark as\n" + 
-        "       described in rule 3.\n" + 
-        "    ";
-
-    public final static String subprocess_os_doc = 
-        "OS routines for NT or Posix depending on what system we're on.\n" + 
-        "\n" + 
-        "This exports:\n" + 
-        "  - all functions from posix, nt or ce, e.g. unlink, stat, etc.\n" + 
-        "  - os.path is either posixpath or ntpath\n" + 
-        "  - os.name is either 'posix', 'nt' or 'ce'.\n" + 
-        "  - os.curdir is a string representing the current directory ('.' or ':')\n" + 
-        "  - os.pardir is a string representing the parent directory ('..' or '::')\n" + 
-        "  - os.sep is the (or a most common) pathname separator ('/' or ':' or '\\\\')\n" + 
-        "  - os.extsep is the extension separator (always '.')\n" + 
-        "  - os.altsep is the alternate pathname separator (None or '/')\n" + 
-        "  - os.pathsep is the component separator used in $PATH etc\n" + 
-        "  - os.linesep is the line separator in text files ('\\r' or '\\n' or '\\r\\n')\n" + 
-        "  - os.defpath is the default search path for executables\n" + 
-        "  - os.devnull is the file path of the null device ('/dev/null', etc.)\n" + 
-        "\n" + 
-        "Programs that import and use 'os' stand a better chance of being\n" + 
-        "portable between different platforms.  Of course, they must then\n" + 
-        "only use functions that are defined by all platforms (e.g., unlink\n" + 
-        "and opendir), and leave all pathname manipulation to os.path\n" + 
-        "(e.g., split and join).\n" + 
-        "";
-
-    public final static String subprocess_run_doc = 
-        "Run command with arguments and return a CompletedProcess instance.\n" + 
-        "\n" + 
-        "    The returned instance will have attributes args, returncode, stdout and\n" + 
-        "    stderr. By default, stdout and stderr are not captured, and those attributes\n" + 
-        "    will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them.\n" + 
-        "\n" + 
-        "    If check is True and the exit code was non-zero, it raises a\n" + 
-        "    CalledProcessError. The CalledProcessError object will have the return code\n" + 
-        "    in the returncode attribute, and output & stderr attributes if those streams\n" + 
-        "    were captured.\n" + 
-        "\n" + 
-        "    If timeout is given, and the process takes too long, a TimeoutExpired\n" + 
-        "    exception will be raised.\n" + 
-        "\n" + 
-        "    There is an optional argument \"input\", allowing you to\n" + 
-        "    pass a string to the subprocess's stdin.  If you use this argument\n" + 
-        "    you may not also use the Popen constructor's \"stdin\" argument, as\n" + 
-        "    it will be used internally.\n" + 
-        "\n" + 
-        "    The other arguments are the same as for the Popen constructor.\n" + 
-        "\n" + 
-        "    If universal_newlines=True is passed, the \"input\" argument must be a\n" + 
-        "    string and stdout/stderr in the returned object will be strings rather than\n" + 
-        "    bytes.\n" + 
-        "    ";
-
-    public final static String subprocess_select_doc = 
-        "This module supports asynchronous I/O on multiple file descriptors.\n" + 
-        "\n" + 
-        "*** IMPORTANT NOTICE ***\n" + 
-        "On Windows, only sockets are supported; on Unix, all file descriptors.";
-
-    public final static String subprocess_selectors_doc = 
-        "Selectors module.\n" + 
-        "\n" + 
-        "This module allows high-level and efficient I/O multiplexing, built upon the\n" + 
-        "`select` module primitives.\n" + 
-        "";
-
-    public final static String subprocess_signal_doc = 
-        "";
-
-    public final static String subprocess_sys_doc = 
-        "This module provides access to some objects used or maintained by the\n" + 
-        "interpreter and to functions that interact strongly with the interpreter.\n" + 
-        "\n" + 
-        "Dynamic objects:\n" + 
-        "\n" + 
-        "argv -- command line arguments; argv[0] is the script pathname if known\n" + 
-        "path -- module search path; path[0] is the script directory, else ''\n" + 
-        "modules -- dictionary of loaded modules\n" + 
-        "\n" + 
-        "displayhook -- called to show results in an interactive session\n" + 
-        "excepthook -- called to handle any uncaught exception other than SystemExit\n" + 
-        "  To customize printing in an interactive session or to install a custom\n" + 
-        "  top-level exception handler, assign other functions to replace these.\n" + 
-        "\n" + 
-        "stdin -- standard input file object; used by input()\n" + 
-        "stdout -- standard output file object; used by print()\n" + 
-        "stderr -- standard error object; used for error messages\n" + 
-        "  By assigning other file objects (or objects that behave like files)\n" + 
-        "  to these, it is possible to redirect all of the interpreter's I/O.\n" + 
-        "\n" + 
-        "last_type -- type of last uncaught exception\n" + 
-        "last_value -- value of last uncaught exception\n" + 
-        "last_traceback -- traceback of last uncaught exception\n" + 
-        "  These three are only available in an interactive session after a\n" + 
-        "  traceback has been printed.\n" + 
-        "\n" + 
-        "Static objects:\n" + 
-        "\n" + 
-        "builtin_module_names -- tuple of module names built into this interpreter\n" + 
-        "copyright -- copyright notice pertaining to this interpreter\n" + 
-        "exec_prefix -- prefix used to find the machine-specific Python library\n" + 
-        "executable -- absolute path of the executable binary of the Python interpreter\n" + 
-        "float_info -- a struct sequence with information about the float implementation.\n" + 
-        "float_repr_style -- string indicating the style of repr() output for floats\n" + 
-        "hash_info -- a struct sequence with information about the hash algorithm.\n" + 
-        "hexversion -- version information encoded as a single integer\n" + 
-        "implementation -- Python implementation information.\n" + 
-        "int_info -- a struct sequence with information about the int implementation.\n" + 
-        "maxsize -- the largest supported length of containers.\n" + 
-        "maxunicode -- the value of the largest Unicode code point\n" + 
-        "platform -- platform identifier\n" + 
-        "prefix -- prefix used to find the Python library\n" + 
-        "thread_info -- a struct sequence with information about the thread implementation.\n" + 
-        "version -- the version of this interpreter as a string\n" + 
-        "version_info -- version information as a named tuple\n" + 
-        "__stdin__ -- the original stdin; don't touch!\n" + 
-        "__stdout__ -- the original stdout; don't touch!\n" + 
-        "__stderr__ -- the original stderr; don't touch!\n" + 
-        "__displayhook__ -- the original displayhook; don't touch!\n" + 
-        "__excepthook__ -- the original excepthook; don't touch!\n" + 
-        "\n" + 
-        "Functions:\n" + 
-        "\n" + 
-        "displayhook() -- print an object to the screen, and save it in builtins._\n" + 
-        "excepthook() -- print an exception and its traceback to sys.stderr\n" + 
-        "exc_info() -- return thread-safe information about the current exception\n" + 
-        "exit() -- exit the interpreter by raising SystemExit\n" + 
-        "getdlopenflags() -- returns flags to be used for dlopen() calls\n" + 
-        "getprofile() -- get the global profiling function\n" + 
-        "getrefcount() -- return the reference count for an object (plus one :-)\n" + 
-        "getrecursionlimit() -- return the max recursion depth for the interpreter\n" + 
-        "getsizeof() -- return the size of an object in bytes\n" + 
-        "gettrace() -- get the global debug tracing function\n" + 
-        "setcheckinterval() -- control how often the interpreter checks for events\n" + 
-        "setdlopenflags() -- set the flags to be used for dlopen() calls\n" + 
-        "setprofile() -- set the global profiling function\n" + 
-        "setrecursionlimit() -- set the max recursion depth for the interpreter\n" + 
-        "settrace() -- set the global debug tracing function\n" + 
-        "";
-
-    public final static String subprocess_threading_doc = 
-        "Thread module emulating a subset of Java's threading model.";
-
-    public final static String subprocess_time_doc = 
+    public final static String time_doc = 
         "This module provides various functions to manipulate time values.\n" + 
         "\n" + 
         "There are two standard representations of time.  One is the number\n" + 
@@ -15621,7 +14749,1066 @@ public class BuiltinDocs {
         "strptime() -- parse string to time tuple according to format specification\n" + 
         "tzset() -- change the local timezone";
 
-    public final static String subprocess_warnings_doc = 
-        "Python part of the warnings subsystem.";
+    public final static String time___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String time___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String time___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String time___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String time_altzone_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String time_asctime_doc = 
+        "asctime([tuple]) -> string\n" + 
+        "\n" + 
+        "Convert a time tuple to a string, e.g. 'Sat Jun 06 16:26:11 1998'.\n" + 
+        "When the time tuple is not present, current time as returned by localtime()\n" + 
+        "is used.";
+
+    public final static String time_clock_doc = 
+        "clock() -> floating point number\n" + 
+        "\n" + 
+        "Return the CPU time or real time since the start of the process or since\n" + 
+        "the first call to clock().  This has as much precision as the system\n" + 
+        "records.";
+
+    public final static String time_clock_getres_doc = 
+        "clock_getres(clk_id) -> floating point number\n" + 
+        "\n" + 
+        "Return the resolution (precision) of the specified clock clk_id.";
+
+    public final static String time_clock_gettime_doc = 
+        "clock_gettime(clk_id) -> floating point number\n" + 
+        "\n" + 
+        "Return the time of the specified clock clk_id.";
+
+    public final static String time_clock_settime_doc = 
+        "clock_settime(clk_id, time)\n" + 
+        "\n" + 
+        "Set the time of the specified clock clk_id.";
+
+    public final static String time_ctime_doc = 
+        "ctime(seconds) -> string\n" + 
+        "\n" + 
+        "Convert a time in seconds since the Epoch to a string in local time.\n" + 
+        "This is equivalent to asctime(localtime(seconds)). When the time tuple is\n" + 
+        "not present, current time as returned by localtime() is used.";
+
+    public final static String time_daylight_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String time_get_clock_info_doc = 
+        "get_clock_info(name: str) -> dict\n" + 
+        "\n" + 
+        "Get information of the specified clock.";
+
+    public final static String time_gmtime_doc = 
+        "gmtime([seconds]) -> (tm_year, tm_mon, tm_mday, tm_hour, tm_min,\n" + 
+        "                       tm_sec, tm_wday, tm_yday, tm_isdst)\n" + 
+        "\n" + 
+        "Convert seconds since the Epoch to a time tuple expressing UTC (a.k.a.\n" + 
+        "GMT).  When 'seconds' is not passed in, convert the current time instead.\n" + 
+        "\n" + 
+        "If the platform supports the tm_gmtoff and tm_zone, they are available as\n" + 
+        "attributes only.";
+
+    public final static String time_localtime_doc = 
+        "localtime([seconds]) -> (tm_year,tm_mon,tm_mday,tm_hour,tm_min,\n" + 
+        "                          tm_sec,tm_wday,tm_yday,tm_isdst)\n" + 
+        "\n" + 
+        "Convert seconds since the Epoch to a time tuple expressing local time.\n" + 
+        "When 'seconds' is not passed in, convert the current time instead.";
+
+    public final static String time_mktime_doc = 
+        "mktime(tuple) -> floating point number\n" + 
+        "\n" + 
+        "Convert a time tuple in local time to seconds since the Epoch.\n" + 
+        "Note that mktime(gmtime(0)) will not generally return zero for most\n" + 
+        "time zones; instead the returned value will either be equal to that\n" + 
+        "of the timezone or altzone attributes on the time module.";
+
+    public final static String time_monotonic_doc = 
+        "monotonic() -> float\n" + 
+        "\n" + 
+        "Monotonic clock, cannot go backward.";
+
+    public final static String time_perf_counter_doc = 
+        "perf_counter() -> float\n" + 
+        "\n" + 
+        "Performance counter for benchmarking.";
+
+    public final static String time_process_time_doc = 
+        "process_time() -> float\n" + 
+        "\n" + 
+        "Process time for profiling: sum of the kernel and user-space CPU time.";
+
+    public final static String time_sleep_doc = 
+        "sleep(seconds)\n" + 
+        "\n" + 
+        "Delay execution for a given number of seconds.  The argument may be\n" + 
+        "a floating point number for subsecond precision.";
+
+    public final static String time_strftime_doc = 
+        "strftime(format[, tuple]) -> string\n" + 
+        "\n" + 
+        "Convert a time tuple to a string according to a format specification.\n" + 
+        "See the library reference manual for formatting codes. When the time tuple\n" + 
+        "is not present, current time as returned by localtime() is used.\n" + 
+        "\n" + 
+        "Commonly used format codes:\n" + 
+        "\n" + 
+        "%Y  Year with century as a decimal number.\n" + 
+        "%m  Month as a decimal number [01,12].\n" + 
+        "%d  Day of the month as a decimal number [01,31].\n" + 
+        "%H  Hour (24-hour clock) as a decimal number [00,23].\n" + 
+        "%M  Minute as a decimal number [00,59].\n" + 
+        "%S  Second as a decimal number [00,61].\n" + 
+        "%z  Time zone offset from UTC.\n" + 
+        "%a  Locale's abbreviated weekday name.\n" + 
+        "%A  Locale's full weekday name.\n" + 
+        "%b  Locale's abbreviated month name.\n" + 
+        "%B  Locale's full month name.\n" + 
+        "%c  Locale's appropriate date and time representation.\n" + 
+        "%I  Hour (12-hour clock) as a decimal number [01,12].\n" + 
+        "%p  Locale's equivalent of either AM or PM.\n" + 
+        "\n" + 
+        "Other codes may be available on your platform.  See documentation for\n" + 
+        "the C library strftime function.\n" + 
+        "";
+
+    public final static String time_strptime_doc = 
+        "strptime(string, format) -> struct_time\n" + 
+        "\n" + 
+        "Parse a string to a time tuple according to a format specification.\n" + 
+        "See the library reference manual for formatting codes (same as\n" + 
+        "strftime()).\n" + 
+        "\n" + 
+        "Commonly used format codes:\n" + 
+        "\n" + 
+        "%Y  Year with century as a decimal number.\n" + 
+        "%m  Month as a decimal number [01,12].\n" + 
+        "%d  Day of the month as a decimal number [01,31].\n" + 
+        "%H  Hour (24-hour clock) as a decimal number [00,23].\n" + 
+        "%M  Minute as a decimal number [00,59].\n" + 
+        "%S  Second as a decimal number [00,61].\n" + 
+        "%z  Time zone offset from UTC.\n" + 
+        "%a  Locale's abbreviated weekday name.\n" + 
+        "%A  Locale's full weekday name.\n" + 
+        "%b  Locale's abbreviated month name.\n" + 
+        "%B  Locale's full month name.\n" + 
+        "%c  Locale's appropriate date and time representation.\n" + 
+        "%I  Hour (12-hour clock) as a decimal number [01,12].\n" + 
+        "%p  Locale's equivalent of either AM or PM.\n" + 
+        "\n" + 
+        "Other codes may be available on your platform.  See documentation for\n" + 
+        "the C library strftime function.\n" + 
+        "";
+
+    public final static String time_struct_time_doc = 
+        "The time value as returned by gmtime(), localtime(), and strptime(), and\n" + 
+        " accepted by asctime(), mktime() and strftime().  May be considered as a\n" + 
+        " sequence of 9 integers.\n" + 
+        "\n" + 
+        " Note that several fields' values are not the same as those defined by\n" + 
+        " the C language standard for struct tm.  For example, the value of the\n" + 
+        " field tm_year is the actual year, not year - 1900.  See individual\n" + 
+        " fields' descriptions for details.";
+
+    public final static String time_time_doc = 
+        "time() -> floating point number\n" + 
+        "\n" + 
+        "Return the current time in seconds since the Epoch.\n" + 
+        "Fractions of a second may be present if the system clock provides them.";
+
+    public final static String time_timezone_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String time_tzname_doc = 
+        "tuple() -> empty tuple\n" + 
+        "tuple(iterable) -> tuple initialized from iterable's items\n" + 
+        "\n" + 
+        "If the argument is a tuple, the return value is the same object.";
+
+    public final static String time_tzset_doc = 
+        "tzset()\n" + 
+        "\n" + 
+        "Initialize, or reinitialize, the local timezone to the value stored in\n" + 
+        "os.environ['TZ']. The TZ environment variable should be specified in\n" + 
+        "standard Unix timezone format as documented in the tzset man page\n" + 
+        "(eg. 'US/Eastern', 'Europe/Amsterdam'). Unknown timezones will silently\n" + 
+        "fall back to UTC. If the TZ environment variable is not set, the local\n" + 
+        "timezone is set to the systems best guess of wallclock time.\n" + 
+        "Changing the TZ environment variable without calling tzset *may* change\n" + 
+        "the local timezone used by methods such as localtime, but this behaviour\n" + 
+        "should not be relied on.";
+
+    // Docs for <module 'zipimport' (built-in)>
+    public final static String zipimport_ZipImportError_doc = 
+        "";
+
+    public final static String zipimport_doc = 
+        "zipimport provides support for importing Python modules from Zip archives.\n" + 
+        "\n" + 
+        "This module exports three objects:\n" + 
+        "- zipimporter: a class; its constructor takes a path to a Zip archive.\n" + 
+        "- ZipImportError: exception raised by zipimporter objects. It's a\n" + 
+        "  subclass of ImportError, so it can be caught as ImportError, too.\n" + 
+        "- _zip_directory_cache: a dict, mapping archive paths to zip directory\n" + 
+        "  info dicts, as used in zipimporter._files.\n" + 
+        "\n" + 
+        "It is usually not needed to use the zipimport module explicitly; it is\n" + 
+        "used by the builtin import mechanism for sys.path items that are paths\n" + 
+        "to Zip archives.";
+
+    public final static String zipimport___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String zipimport___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String zipimport___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String zipimport___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String zipimport__zip_directory_cache_doc = 
+        "dict() -> new empty dictionary\n" + 
+        "dict(mapping) -> new dictionary initialized from a mapping object's\n" + 
+        "    (key, value) pairs\n" + 
+        "dict(iterable) -> new dictionary initialized as if via:\n" + 
+        "    d = {}\n" + 
+        "    for k, v in iterable:\n" + 
+        "        d[k] = v\n" + 
+        "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
+        "    in the keyword argument list.  For example:  dict(one=1, two=2)";
+
+    public final static String zipimport_zipimporter_doc = 
+        "zipimporter(archivepath) -> zipimporter object\n" + 
+        "\n" + 
+        "Create a new zipimporter instance. 'archivepath' must be a path to\n" + 
+        "a zipfile, or to a specific path inside a zipfile. For example, it can be\n" + 
+        "'/tmp/myimport.zip', or '/tmp/myimport.zip/mydirectory', if mydirectory is a\n" + 
+        "valid directory inside the archive.\n" + 
+        "\n" + 
+        "'ZipImportError is raised if 'archivepath' doesn't point to a valid Zip\n" + 
+        "archive.\n" + 
+        "\n" + 
+        "The 'archive' attribute of zipimporter objects contains the name of the\n" + 
+        "zipfile targeted.";
+
+    // Docs for <module '_hashlib' from '/usr/lib/python3.6/lib-dynload/_hashlib.cpython-36m-x86_64-linux-gnu.so'>
+    public final static String _hashlib_HASH_doc = 
+        "A hash represents the object used to calculate a checksum of a\n" + 
+        "string of information.\n" + 
+        "\n" + 
+        "Methods:\n" + 
+        "\n" + 
+        "update() -- updates the current digest with an additional string\n" + 
+        "digest() -- return the current digest value\n" + 
+        "hexdigest() -- return the current digest as a string of hexadecimal digits\n" + 
+        "copy() -- return a copy of the current hash object\n" + 
+        "\n" + 
+        "Attributes:\n" + 
+        "\n" + 
+        "name -- the hash algorithm being used by this object\n" + 
+        "digest_size -- number of bytes in this hashes output\n" + 
+        "";
+
+    public final static String _hashlib_doc = 
+        "";
+
+    public final static String _hashlib___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _hashlib___loader___doc = 
+        "Loader for extension modules.\n" + 
+        "\n" + 
+        "    The constructor is designed to work with FileFinder.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _hashlib___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _hashlib___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _hashlib___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _hashlib_new_doc = 
+        "Return a new hash object using the named algorithm.\n" + 
+        "An optional string argument may be provided and will be\n" + 
+        "automatically hashed.\n" + 
+        "\n" + 
+        "The MD5 and SHA1 algorithms are always supported.\n" + 
+        "";
+
+    public final static String _hashlib_openssl_md5_doc = 
+        "Returns a md5 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_openssl_md_meth_names_doc = 
+        "frozenset() -> empty frozenset object\n" + 
+        "frozenset(iterable) -> frozenset object\n" + 
+        "\n" + 
+        "Build an immutable unordered collection of unique elements.";
+
+    public final static String _hashlib_openssl_sha1_doc = 
+        "Returns a sha1 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_openssl_sha224_doc = 
+        "Returns a sha224 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_openssl_sha256_doc = 
+        "Returns a sha256 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_openssl_sha384_doc = 
+        "Returns a sha384 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_openssl_sha512_doc = 
+        "Returns a sha512 hash object; optionally initialized with a string";
+
+    public final static String _hashlib_pbkdf2_hmac_doc = 
+        "pbkdf2_hmac(hash_name, password, salt, iterations, dklen=None) -> key\n" + 
+        "\n" + 
+        "Password based key derivation function 2 (PKCS #5 v2.0) with HMAC as\n" + 
+        "pseudorandom function.";
+
+    public final static String _hashlib_scrypt_doc = 
+        "scrypt password-based key derivation function.";
+
+    // Docs for <module 'io' (built-in)>
+    public final static String io_BlockingIOError_doc = 
+        "I/O operation would block.";
+
+    public final static String io_BufferedRWPair_doc = 
+        "A buffered reader and writer object together.\n" + 
+        "\n" + 
+        "A buffered reader object and buffered writer object put together to\n" + 
+        "form a sequential IO object that can read and write. This is typically\n" + 
+        "used with a socket or two-way pipe.\n" + 
+        "\n" + 
+        "reader and writer are RawIOBase objects that are readable and\n" + 
+        "writeable respectively. If the buffer_size is omitted it defaults to\n" + 
+        "DEFAULT_BUFFER_SIZE.";
+
+    public final static String io_BufferedRandom_doc = 
+        "A buffered interface to random access streams.\n" + 
+        "\n" + 
+        "The constructor creates a reader and writer for a seekable stream,\n" + 
+        "raw, given in the first argument. If the buffer_size is omitted it\n" + 
+        "defaults to DEFAULT_BUFFER_SIZE.";
+
+    public final static String io_BufferedReader_doc = 
+        "Create a new buffered reader using the given readable raw IO object.";
+
+    public final static String io_BufferedWriter_doc = 
+        "A buffer for a writeable sequential RawIO object.\n" + 
+        "\n" + 
+        "The constructor creates a BufferedWriter for the given writeable raw\n" + 
+        "stream. If the buffer_size is not given, it defaults to\n" + 
+        "DEFAULT_BUFFER_SIZE.";
+
+    public final static String io_BytesIO_doc = 
+        "Buffered I/O implementation using an in-memory bytes buffer.";
+
+    public final static String io_DEFAULT_BUFFER_SIZE_doc = 
+        "int(x=0) -> integer\n" + 
+        "int(x, base=10) -> integer\n" + 
+        "\n" + 
+        "Convert a number or string to an integer, or return 0 if no arguments\n" + 
+        "are given.  If x is a number, return x.__int__().  For floating point\n" + 
+        "numbers, this truncates towards zero.\n" + 
+        "\n" + 
+        "If x is not a number or if base is given, then x must be a string,\n" + 
+        "bytes, or bytearray instance representing an integer literal in the\n" + 
+        "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" + 
+        "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" + 
+        "Base 0 means to interpret the base from the string as an integer literal.\n" + 
+        ">>> int('0b100', base=0)\n" + 
+        "4";
+
+    public final static String io_FileIO_doc = 
+        "Open a file.\n" + 
+        "\n" + 
+        "The mode can be 'r' (default), 'w', 'x' or 'a' for reading,\n" + 
+        "writing, exclusive creation or appending.  The file will be created if it\n" + 
+        "doesn't exist when opened for writing or appending; it will be truncated\n" + 
+        "when opened for writing.  A FileExistsError will be raised if it already\n" + 
+        "exists when opened for creating. Opening a file for creating implies\n" + 
+        "writing so this mode behaves in a similar way to 'w'.Add a '+' to the mode\n" + 
+        "to allow simultaneous reading and writing. A custom opener can be used by\n" + 
+        "passing a callable as *opener*. The underlying file descriptor for the file\n" + 
+        "object is then obtained by calling opener with (*name*, *flags*).\n" + 
+        "*opener* must return an open file descriptor (passing os.open as *opener*\n" + 
+        "results in functionality similar to passing None).";
+
+    public final static String io_IncrementalNewlineDecoder_doc = 
+        "Codec used when reading a file in universal newlines mode.\n" + 
+        "\n" + 
+        "It wraps another incremental decoder, translating \\r\\n and \\r into \\n.\n" + 
+        "It also records the types of newlines encountered.  When used with\n" + 
+        "translate=False, it ensures that the newline sequence is returned in\n" + 
+        "one piece. When used with decoder=None, it expects unicode strings as\n" + 
+        "decode input and translates newlines without first invoking an external\n" + 
+        "decoder.";
+
+    public final static String io_StringIO_doc = 
+        "Text I/O implementation using an in-memory buffer.\n" + 
+        "\n" + 
+        "The initial_value argument sets the value of object.  The newline\n" + 
+        "argument is like the one of TextIOWrapper's constructor.";
+
+    public final static String io_TextIOWrapper_doc = 
+        "Character and line based layer over a BufferedIOBase object, buffer.\n" + 
+        "\n" + 
+        "encoding gives the name of the encoding that the stream will be\n" + 
+        "decoded or encoded with. It defaults to locale.getpreferredencoding(False).\n" + 
+        "\n" + 
+        "errors determines the strictness of encoding and decoding (see\n" + 
+        "help(codecs.Codec) or the documentation for codecs.register) and\n" + 
+        "defaults to \"strict\".\n" + 
+        "\n" + 
+        "newline controls how line endings are handled. It can be None, '',\n" + 
+        "'\\n', '\\r', and '\\r\\n'.  It works as follows:\n" + 
+        "\n" + 
+        "* On input, if newline is None, universal newlines mode is\n" + 
+        "  enabled. Lines in the input can end in '\\n', '\\r', or '\\r\\n', and\n" + 
+        "  these are translated into '\\n' before being returned to the\n" + 
+        "  caller. If it is '', universal newline mode is enabled, but line\n" + 
+        "  endings are returned to the caller untranslated. If it has any of\n" + 
+        "  the other legal values, input lines are only terminated by the given\n" + 
+        "  string, and the line ending is returned to the caller untranslated.\n" + 
+        "\n" + 
+        "* On output, if newline is None, any '\\n' characters written are\n" + 
+        "  translated to the system default line separator, os.linesep. If\n" + 
+        "  newline is '' or '\\n', no translation takes place. If newline is any\n" + 
+        "  of the other legal values, any '\\n' characters written are translated\n" + 
+        "  to the given string.\n" + 
+        "\n" + 
+        "If line_buffering is True, a call to flush is implied when a call to\n" + 
+        "write contains a newline character.";
+
+    public final static String io_UnsupportedOperation_doc = 
+        "";
+
+    public final static String io__BufferedIOBase_doc = 
+        "Base class for buffered IO objects.\n" + 
+        "\n" + 
+        "The main difference with RawIOBase is that the read() method\n" + 
+        "supports omitting the size argument, and does not have a default\n" + 
+        "implementation that defers to readinto().\n" + 
+        "\n" + 
+        "In addition, read(), readinto() and write() may raise\n" + 
+        "BlockingIOError if the underlying raw stream is in non-blocking\n" + 
+        "mode and not ready; unlike their raw counterparts, they will never\n" + 
+        "return None.\n" + 
+        "\n" + 
+        "A typical implementation should not inherit from a RawIOBase\n" + 
+        "implementation, but wrap one.\n" + 
+        "";
+
+    public final static String io__IOBase_doc = 
+        "The abstract base class for all I/O classes, acting on streams of\n" + 
+        "bytes. There is no public constructor.\n" + 
+        "\n" + 
+        "This class provides dummy implementations for many methods that\n" + 
+        "derived classes can override selectively; the default implementations\n" + 
+        "represent a file that cannot be read, written or seeked.\n" + 
+        "\n" + 
+        "Even though IOBase does not declare read, readinto, or write because\n" + 
+        "their signatures will vary, implementations and clients should\n" + 
+        "consider those methods part of the interface. Also, implementations\n" + 
+        "may raise UnsupportedOperation when operations they do not support are\n" + 
+        "called.\n" + 
+        "\n" + 
+        "The basic type used for binary data read from or written to a file is\n" + 
+        "bytes. Other bytes-like objects are accepted as method arguments too.\n" + 
+        "In some cases (such as readinto), a writable object is required. Text\n" + 
+        "I/O classes work with str data.\n" + 
+        "\n" + 
+        "Note that calling any method (except additional calls to close(),\n" + 
+        "which are ignored) on a closed stream should raise a ValueError.\n" + 
+        "\n" + 
+        "IOBase (and its subclasses) support the iterator protocol, meaning\n" + 
+        "that an IOBase object can be iterated over yielding the lines in a\n" + 
+        "stream.\n" + 
+        "\n" + 
+        "IOBase also supports the :keyword:`with` statement. In this example,\n" + 
+        "fp is closed after the suite of the with statement is complete:\n" + 
+        "\n" + 
+        "with open('spam.txt', 'r') as fp:\n" + 
+        "    fp.write('Spam and eggs!')\n" + 
+        "";
+
+    public final static String io__RawIOBase_doc = 
+        "Base class for raw binary I/O.";
+
+    public final static String io__TextIOBase_doc = 
+        "Base class for text I/O.\n" + 
+        "\n" + 
+        "This class provides a character and line based interface to stream\n" + 
+        "I/O. There is no readinto method because Python's character strings\n" + 
+        "are immutable. There is no public constructor.\n" + 
+        "";
+
+    public final static String io_doc = 
+        "The io module provides the Python interfaces to stream handling. The\n" + 
+        "builtin open function is defined in this module.\n" + 
+        "\n" + 
+        "At the top of the I/O hierarchy is the abstract base class IOBase. It\n" + 
+        "defines the basic interface to a stream. Note, however, that there is no\n" + 
+        "separation between reading and writing to streams; implementations are\n" + 
+        "allowed to raise an IOError if they do not support a given operation.\n" + 
+        "\n" + 
+        "Extending IOBase is RawIOBase which deals simply with the reading and\n" + 
+        "writing of raw bytes to a stream. FileIO subclasses RawIOBase to provide\n" + 
+        "an interface to OS files.\n" + 
+        "\n" + 
+        "BufferedIOBase deals with buffering on a raw byte stream (RawIOBase). Its\n" + 
+        "subclasses, BufferedWriter, BufferedReader, and BufferedRWPair buffer\n" + 
+        "streams that are readable, writable, and both respectively.\n" + 
+        "BufferedRandom provides a buffered interface to random access\n" + 
+        "streams. BytesIO is a simple stream of in-memory bytes.\n" + 
+        "\n" + 
+        "Another IOBase subclass, TextIOBase, deals with the encoding and decoding\n" + 
+        "of streams into text. TextIOWrapper, which extends it, is a buffered text\n" + 
+        "interface to a buffered raw stream (`BufferedIOBase`). Finally, StringIO\n" + 
+        "is an in-memory stream for text.\n" + 
+        "\n" + 
+        "Argument names are not part of the specification, and only the arguments\n" + 
+        "of open() are intended to be used as keyword arguments.\n" + 
+        "\n" + 
+        "data:\n" + 
+        "\n" + 
+        "DEFAULT_BUFFER_SIZE\n" + 
+        "\n" + 
+        "   An int containing the default buffer size used by the module's buffered\n" + 
+        "   I/O classes. open() uses the file's blksize (as obtained by os.stat) if\n" + 
+        "   possible.\n" + 
+        "";
+
+    public final static String io___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String io___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String io___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String io___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String io_open_doc = 
+        "Open file and return a stream.  Raise IOError upon failure.\n" + 
+        "\n" + 
+        "file is either a text or byte string giving the name (and the path\n" + 
+        "if the file isn't in the current working directory) of the file to\n" + 
+        "be opened or an integer file descriptor of the file to be\n" + 
+        "wrapped. (If a file descriptor is given, it is closed when the\n" + 
+        "returned I/O object is closed, unless closefd is set to False.)\n" + 
+        "\n" + 
+        "mode is an optional string that specifies the mode in which the file\n" + 
+        "is opened. It defaults to 'r' which means open for reading in text\n" + 
+        "mode.  Other common values are 'w' for writing (truncating the file if\n" + 
+        "it already exists), 'x' for creating and writing to a new file, and\n" + 
+        "'a' for appending (which on some Unix systems, means that all writes\n" + 
+        "append to the end of the file regardless of the current seek position).\n" + 
+        "In text mode, if encoding is not specified the encoding used is platform\n" + 
+        "dependent: locale.getpreferredencoding(False) is called to get the\n" + 
+        "current locale encoding. (For reading and writing raw bytes use binary\n" + 
+        "mode and leave encoding unspecified.) The available modes are:\n" + 
+        "\n" + 
+        "========= ===============================================================\n" + 
+        "Character Meaning\n" + 
+        "--------- ---------------------------------------------------------------\n" + 
+        "'r'       open for reading (default)\n" + 
+        "'w'       open for writing, truncating the file first\n" + 
+        "'x'       create a new file and open it for writing\n" + 
+        "'a'       open for writing, appending to the end of the file if it exists\n" + 
+        "'b'       binary mode\n" + 
+        "'t'       text mode (default)\n" + 
+        "'+'       open a disk file for updating (reading and writing)\n" + 
+        "'U'       universal newline mode (deprecated)\n" + 
+        "========= ===============================================================\n" + 
+        "\n" + 
+        "The default mode is 'rt' (open for reading text). For binary random\n" + 
+        "access, the mode 'w+b' opens and truncates the file to 0 bytes, while\n" + 
+        "'r+b' opens the file without truncation. The 'x' mode implies 'w' and\n" + 
+        "raises an `FileExistsError` if the file already exists.\n" + 
+        "\n" + 
+        "Python distinguishes between files opened in binary and text modes,\n" + 
+        "even when the underlying operating system doesn't. Files opened in\n" + 
+        "binary mode (appending 'b' to the mode argument) return contents as\n" + 
+        "bytes objects without any decoding. In text mode (the default, or when\n" + 
+        "'t' is appended to the mode argument), the contents of the file are\n" + 
+        "returned as strings, the bytes having been first decoded using a\n" + 
+        "platform-dependent encoding or using the specified encoding if given.\n" + 
+        "\n" + 
+        "'U' mode is deprecated and will raise an exception in future versions\n" + 
+        "of Python.  It has no effect in Python 3.  Use newline to control\n" + 
+        "universal newlines mode.\n" + 
+        "\n" + 
+        "buffering is an optional integer used to set the buffering policy.\n" + 
+        "Pass 0 to switch buffering off (only allowed in binary mode), 1 to select\n" + 
+        "line buffering (only usable in text mode), and an integer > 1 to indicate\n" + 
+        "the size of a fixed-size chunk buffer.  When no buffering argument is\n" + 
+        "given, the default buffering policy works as follows:\n" + 
+        "\n" + 
+        "* Binary files are buffered in fixed-size chunks; the size of the buffer\n" + 
+        "  is chosen using a heuristic trying to determine the underlying device's\n" + 
+        "  \"block size\" and falling back on `io.DEFAULT_BUFFER_SIZE`.\n" + 
+        "  On many systems, the buffer will typically be 4096 or 8192 bytes long.\n" + 
+        "\n" + 
+        "* \"Interactive\" text files (files for which isatty() returns True)\n" + 
+        "  use line buffering.  Other text files use the policy described above\n" + 
+        "  for binary files.\n" + 
+        "\n" + 
+        "encoding is the name of the encoding used to decode or encode the\n" + 
+        "file. This should only be used in text mode. The default encoding is\n" + 
+        "platform dependent, but any encoding supported by Python can be\n" + 
+        "passed.  See the codecs module for the list of supported encodings.\n" + 
+        "\n" + 
+        "errors is an optional string that specifies how encoding errors are to\n" + 
+        "be handled---this argument should not be used in binary mode. Pass\n" + 
+        "'strict' to raise a ValueError exception if there is an encoding error\n" + 
+        "(the default of None has the same effect), or pass 'ignore' to ignore\n" + 
+        "errors. (Note that ignoring encoding errors can lead to data loss.)\n" + 
+        "See the documentation for codecs.register or run 'help(codecs.Codec)'\n" + 
+        "for a list of the permitted encoding error strings.\n" + 
+        "\n" + 
+        "newline controls how universal newlines works (it only applies to text\n" + 
+        "mode). It can be None, '', '\\n', '\\r', and '\\r\\n'.  It works as\n" + 
+        "follows:\n" + 
+        "\n" + 
+        "* On input, if newline is None, universal newlines mode is\n" + 
+        "  enabled. Lines in the input can end in '\\n', '\\r', or '\\r\\n', and\n" + 
+        "  these are translated into '\\n' before being returned to the\n" + 
+        "  caller. If it is '', universal newline mode is enabled, but line\n" + 
+        "  endings are returned to the caller untranslated. If it has any of\n" + 
+        "  the other legal values, input lines are only terminated by the given\n" + 
+        "  string, and the line ending is returned to the caller untranslated.\n" + 
+        "\n" + 
+        "* On output, if newline is None, any '\\n' characters written are\n" + 
+        "  translated to the system default line separator, os.linesep. If\n" + 
+        "  newline is '' or '\\n', no translation takes place. If newline is any\n" + 
+        "  of the other legal values, any '\\n' characters written are translated\n" + 
+        "  to the given string.\n" + 
+        "\n" + 
+        "If closefd is False, the underlying file descriptor will be kept open\n" + 
+        "when the file is closed. This does not work when a file name is given\n" + 
+        "and must be True in that case.\n" + 
+        "\n" + 
+        "A custom opener can be used by passing a callable as *opener*. The\n" + 
+        "underlying file descriptor for the file object is then obtained by\n" + 
+        "calling *opener* with (*file*, *flags*). *opener* must return an open\n" + 
+        "file descriptor (passing os.open as *opener* results in functionality\n" + 
+        "similar to passing None).\n" + 
+        "\n" + 
+        "open() returns a file object whose type depends on the mode, and\n" + 
+        "through which the standard file operations such as reading and writing\n" + 
+        "are performed. When open() is used to open a file in a text mode ('w',\n" + 
+        "'r', 'wt', 'rt', etc.), it returns a TextIOWrapper. When used to open\n" + 
+        "a file in a binary mode, the returned class varies: in read binary\n" + 
+        "mode, it returns a BufferedReader; in write binary and append binary\n" + 
+        "modes, it returns a BufferedWriter, and in read/write mode, it returns\n" + 
+        "a BufferedRandom.\n" + 
+        "\n" + 
+        "It is also possible to use a string or bytearray as a file for both\n" + 
+        "reading and writing. For strings StringIO can be used like a file\n" + 
+        "opened in a text mode, and for bytes a BytesIO can be used like a file\n" + 
+        "opened in a binary mode.";
+
+    // Docs for <module '_json' from '/usr/lib/python3.6/lib-dynload/_json.cpython-36m-x86_64-linux-gnu.so'>
+    public final static String _json_doc = 
+        "json speedups\n" + 
+        "";
+
+    public final static String _json___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _json___loader___doc = 
+        "Loader for extension modules.\n" + 
+        "\n" + 
+        "    The constructor is designed to work with FileFinder.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _json___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _json___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _json___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _json_encode_basestring_doc = 
+        "encode_basestring(string) -> string\n" + 
+        "\n" + 
+        "Return a JSON representation of a Python string";
+
+    public final static String _json_encode_basestring_ascii_doc = 
+        "encode_basestring_ascii(string) -> string\n" + 
+        "\n" + 
+        "Return an ASCII-only JSON representation of a Python string";
+
+    public final static String _json_make_encoder_doc = 
+        "_iterencode(obj, _current_indent_level) -> iterable";
+
+    public final static String _json_make_scanner_doc = 
+        "JSON scanner object";
+
+    public final static String _json_scanstring_doc = 
+        "scanstring(string, end, strict=True) -> (string, end)\n" + 
+        "\n" + 
+        "Scan the string s for a JSON string. End is the index of the\n" + 
+        "character in s after the quote that started the JSON string.\n" + 
+        "Unescapes all valid JSON string escape sequences and raises ValueError\n" + 
+        "on attempt to decode an invalid string. If strict is False then literal\n" + 
+        "control characters are allowed in the string.\n" + 
+        "\n" + 
+        "Returns a tuple of the decoded string and the index of the character in s\n" + 
+        "after the end quote.";
 
 }

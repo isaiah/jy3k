@@ -1,9 +1,10 @@
 /* Generated file, do not modify.  See jython/src/templates/gderived.py. */
 package org.python.core;
 
-import java.io.Serializable;
-import org.python.core.finalization.FinalizeTrigger;
 import org.python.core.finalization.FinalizablePyObjectDerived;
+import org.python.core.finalization.FinalizeTrigger;
+
+import java.io.Serializable;
 
 public class PyBaseExceptionDerived extends PyBaseException implements Slotted,FinalizablePyObjectDerived,TraverseprocDerived {
 

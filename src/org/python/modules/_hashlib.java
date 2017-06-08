@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.python.core.BuiltinDocs;
 import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyArray;
@@ -17,9 +18,13 @@ import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
 import org.python.core.util.StringUtil;
+import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedModule;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
+import org.python.expose.ModuleInit;
 
 /**
  * The Python _hashlib module: provides hashing algorithms via
@@ -28,7 +33,8 @@ import org.python.expose.ExposedType;
  * The 'openssl' method prefix is to match CPython and provide what the pure python
  * hashlib.py module expects.
  */
-public class _hashlib implements ClassDictInit {
+@ExposedModule
+public class _hashlib {
 
     /** A mapping of Python algorithm names to MessageDigest names. */
     private static final Map<String, String> algorithmMap = new HashMap<String, String>() {{
@@ -39,18 +45,14 @@ public class _hashlib implements ClassDictInit {
             put("sha512", "sha-512");
     }};
 
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("__name__", Py.newString("_hashlib"));
-        dict.__setitem__("algorithmMap", null);
-        dict.__setitem__("classDictInit", null);
+    @ModuleInit
+    public static void init(PyObject dict) {
         PyList list = new PyList(algorithmMap.keySet());
         dict.__setitem__("openssl_md_meth_names", new PyFrozenSet(list));
+        dict.__setitem__("HASH", Hash.TYPE);
     }
 
-    public static PyObject new$(String name) {
-        return new$(name, null);
-    }
-
+    @ExposedFunction(names = "new", defaults = {"null"})
     public static PyObject new$(String name, PyObject obj) {
         name = name.toLowerCase();
         // NOTE: we're not disallowing other MessageDigest algorithms
@@ -65,50 +67,32 @@ public class _hashlib implements ClassDictInit {
         return hash;
     }
 
-    public static PyObject openssl_md5() {
-        return openssl_md5(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_md5(PyObject obj) {
         return new$("md5", obj);
     }
 
-    public static PyObject openssl_sha1() {
-        return openssl_sha1(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_sha1(PyObject obj) {
         return new$("sha1", obj);
     }
 
-    public static PyObject openssl_sha224() {
-        return openssl_sha224(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_sha224(PyObject obj) {
         return new$("sha224", obj);
     }
 
-    public static PyObject openssl_sha256() {
-        return openssl_sha256(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_sha256(PyObject obj) {
         return new$("sha256", obj);
     }
 
-    public static PyObject openssl_sha384() {
-        return openssl_sha384(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_sha384(PyObject obj) {
         return new$("sha384", obj);
     }
 
-    public static PyObject openssl_sha512() {
-        return openssl_sha512(null);
-    }
-
+    @ExposedFunction(defaults = {"null"})
     public static PyObject openssl_sha512(PyObject obj) {
         return new$("sha512", obj);
     }
@@ -117,7 +101,7 @@ public class _hashlib implements ClassDictInit {
      * A generic wrapper around a MessageDigest.
      */
     @Untraversable
-    @ExposedType(name = "_hashlib.HASH")
+    @ExposedType(name = "_hashlib.HASH", doc = BuiltinDocs._hashlib_HASH_doc)
     public static class Hash extends PyObject {
 
         public static final PyType TYPE = PyType.fromClass(Hash.class);

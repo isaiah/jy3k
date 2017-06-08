@@ -2,6 +2,7 @@
 package org.python.modules;
 
 import org.python.Version;
+import org.python.bootstrap.Import;
 import org.python.core.BytecodeLoader;
 import org.python.core.PyBytes;
 import org.python.core.PyStringMap;
@@ -35,19 +36,20 @@ public class _imp {
     public static PyObject create_builtin(PyObject spec) {
         PyObject name = spec.__getattr__("name");
         String modName = PyObject.asName(name);
-        for (String newmodule : Setup.newbuiltinModules) {
+        for (String newmodule : Setup.builtinModules) {
             if (modName.equals(newmodule.split(":")[0])) {
                 return new PyModule(modName, new PyStringMap());
             }
         }
-        return imp.loadBuiltin(modName);
+        throw Py.RuntimeError("builtin module not found");
+//        return imp.loadBuiltin(modName);
     }
 
     @ExposedFunction
     public static int exec_builtin(PyObject mod) {
         String name = mod.__findattr__("__name__").toString();
         String classname = null;
-        for (String newmodule : Setup.newbuiltinModules) {
+        for (String newmodule : Setup.builtinModules) {
             if (name.equals(newmodule.split(":")[0])) {
                 classname = className(newmodule) + "$PyExposer";
                 break;
@@ -209,7 +211,7 @@ public class _imp {
         } else {
             throw Py.TypeError("bytes object expected for data");
         }
-        byte[] bytes = imp.compileSource(name.toString(), new ByteArrayInputStream(source), path.toString());
+        byte[] bytes = Import.compileSource(name.toString(), new ByteArrayInputStream(source), path.toString());
         return new PyBytes(bytes);
     }
 

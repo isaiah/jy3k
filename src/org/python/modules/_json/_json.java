@@ -2,6 +2,7 @@
 package org.python.modules._json;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.BuiltinModule;
 import org.python.core.ClassDictInit;
 import org.python.core.Py;
@@ -13,6 +14,8 @@ import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;
 import org.python.core.Untraversable;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
 import java.util.Iterator;
 
@@ -22,27 +25,15 @@ import java.util.Iterator;
  *
  * (Retained comments use the standard commenting convention for C.)
  */
-public class _json implements ClassDictInit {
+@ExposedModule(doc = BuiltinDocs._json_doc)
+public class _json {
 
-    public static final PyBytes __doc__ = new PyBytes("Port of _json C module.");
-    public static final PyObject module = Py.newString("_json");
-
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("__name__", new PyBytes("_json"));
-        dict.__setitem__("__doc__", __doc__);
+    @ModuleInit
+    public static void init(PyObject dict) {
         dict.__setitem__("encode_basestring_ascii", new EncodeBasestringAsciiFunction());
         dict.__setitem__("make_encoder", Encoder.TYPE);
         dict.__setitem__("make_scanner", Scanner.TYPE);
         dict.__setitem__("scanstring", new ScanstringFunction());
-        dict.__setitem__("__module__", new PyBytes("_json"));
-
-        // ensure __module__ is set properly in these modules,
-        // based on how the module name lookups are chained
-        Encoder.TYPE.setName("_json.Encoder");
-        Scanner.TYPE.setName("_json.Scanner");
-
-        // Hide from Python
-        dict.__setitem__("classDictInit", null);
     }
 
     private static PyObject errmsg_fn;
@@ -84,12 +75,6 @@ public class _json implements ClassDictInit {
         ScanstringFunction() {
             super("scanstring", 2, 4, "scanstring");
         }
-
-        @Override
-        public PyObject getModule() {
-            return module;
-        }
-
 
         @Override
         public PyObject __call__(PyObject s, PyObject end) {
@@ -311,11 +296,6 @@ public class _json implements ClassDictInit {
     static class EncodeBasestringAsciiFunction extends PyBuiltinFunctionNarrow {
         EncodeBasestringAsciiFunction() {
             super("encode_basestring_ascii", 1, 1, "encode_basestring_ascii");
-        }
-
-        @Override
-        public PyObject getModule() {
-            return module;
         }
 
         @Override

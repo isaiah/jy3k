@@ -26,7 +26,7 @@ public class ModuleExposeTask extends Task {
 
     @Override
     public void execute() throws BuildException {
-        for (String mod : Setup.newbuiltinModules) {
+        for (String mod : Setup.builtinModules) {
             InputStream in = getClass().getClassLoader()
                     .getResourceAsStream(className(mod).replace('.', '/') + ".class");
             ExposedModuleProcessor ice = new ExposedModuleProcessor(in);

@@ -1,16 +1,16 @@
 package org.python.modules.random;
 
-import org.python.core.ClassDictInit;
-import org.python.core.Py;
 import org.python.core.PyObject;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
-public class RandomModule implements ClassDictInit {
+@ExposedModule(name = "_random")
+public class RandomModule {
 
     private RandomModule() {}
 
-    public static void classDictInit(PyObject dict) {
-        dict.invoke("clear");
+    @ModuleInit
+    public static void init(PyObject dict) {
         dict.__setitem__("Random", PyRandom.TYPE);
-        dict.__setitem__("__name__", Py.newString("_random"));
     }
 }

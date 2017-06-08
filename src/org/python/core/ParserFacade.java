@@ -270,7 +270,7 @@ public class ParserFacade {
         return new ExpectedEncodingBufferedReader(bufferedReader, null);
     }
 
-    static ExpectedEncodingBufferedReader prepBufReader(InputStream input,
+    public static ExpectedEncodingBufferedReader prepBufReader(InputStream input,
                                                         CompilerFlags cflags,
                                                         String filename,
                                                         boolean fromString)

@@ -6,11 +6,21 @@ import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
+import org.python.expose.ExposedConst;
+import org.python.expose.ExposedFunction;
+import org.python.expose.ExposedModule;
 
+@ExposedModule
 public class cmath {
 
-    public static final PyFloat pi = new PyFloat(Math.PI);
-    public static final PyFloat e = new PyFloat(Math.E);
+    @ExposedConst
+    public static final double pi = Math.PI;
+
+    @ExposedConst
+    public static final double e = Math.E;
+
+    @ExposedConst
+    public static final double tau = 6.283185307179586;
 
     /** 2<sup>-&#189;</sup> (Ref: Abramowitz &amp; Stegun [1972], p2). */
     private static final double ROOT_HALF = 0.70710678118654752440;
@@ -61,6 +71,7 @@ public class cmath {
      * @param w
      * @return cos<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex acos(PyObject w) {
         return _acos(complexFromPyObject(w));
     }
@@ -125,6 +136,7 @@ public class cmath {
      * @param w
      * @return cosh<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex acosh(PyObject w) {
         return _acosh(complexFromPyObject(w));
     }
@@ -205,6 +217,7 @@ public class cmath {
      * @param w
      * @return sin<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex asin(PyObject w) {
         return asinOrAsinh(complexFromPyObject(w), false);
     }
@@ -217,6 +230,7 @@ public class cmath {
      * @param w
      * @return sinh<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex asinh(PyObject w) {
         return asinOrAsinh(complexFromPyObject(w), true);
     }
@@ -318,6 +332,7 @@ public class cmath {
      * @param w
      * @return tan<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex atan(PyObject w) {
         return atanOrAtanh(complexFromPyObject(w), false);
     }
@@ -330,6 +345,7 @@ public class cmath {
      * @param w
      * @return tanh<sup>-1</sup><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex atanh(PyObject w) {
         return atanOrAtanh(complexFromPyObject(w), true);
     }
@@ -448,6 +464,7 @@ public class cmath {
      * @param z
      * @return cos <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex cos(PyObject z) {
         return cosOrCosh(complexFromPyObject(z), false);
     }
@@ -458,6 +475,7 @@ public class cmath {
      * @param z
      * @return cosh <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex cosh(PyObject z) {
         return cosOrCosh(complexFromPyObject(z), true);
     }
@@ -549,6 +567,7 @@ public class cmath {
      * @param z
      * @return e<sup>z</sup>
      */
+    @ExposedFunction
     public static PyComplex exp(PyObject z) {
         PyComplex zz = complexFromPyObject(z);
         double x = zz.real, y = zz.imag, r, u, v;
@@ -604,11 +623,13 @@ public class cmath {
         return exceptNaN(new PyComplex(u, v), zz);
     }
 
+    @ExposedFunction
     public static double phase(PyObject in) {
         PyComplex x = complexFromPyObject(in);
         return Math.atan2(x.imag, x.real);
     }
 
+    @ExposedFunction
     public static PyTuple polar(PyObject in) {
         PyComplex z = complexFromPyObject(in);
         double phi = Math.atan2(z.imag, z.real);
@@ -624,6 +645,7 @@ public class cmath {
      * @param phi angle
      * @return
      */
+    @ExposedFunction
     public static PyComplex rect(double r, double phi) {
         double x, y;
 
@@ -659,6 +681,7 @@ public class cmath {
      *
      * @return <code>true</code> if in.real or in.imag is positive or negative infinity
      */
+    @ExposedFunction
     public static boolean isinf(PyObject in) {
         PyComplex x = complexFromPyObject(in);
         return Double.isInfinite(x.real) || Double.isInfinite(x.imag);
@@ -669,6 +692,7 @@ public class cmath {
      *
      * @return <code>true</code> if in.real or in.imag is nan.
      */
+    @ExposedFunction
     public static boolean isnan(PyObject in) {
         PyComplex x = complexFromPyObject(in);
         return Double.isNaN(x.real) || Double.isNaN(x.imag);
@@ -697,6 +721,7 @@ public class cmath {
      * @param w
      * @return log<sub>10</sub><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex log10(PyObject w) {
         PyComplex ww = complexFromPyObject(w);
         double u = ww.real, v = ww.imag;
@@ -716,7 +741,11 @@ public class cmath {
      * @param b
      * @return log<sub>b</sub><i>w</i>
      */
+    @ExposedFunction
     public static PyComplex log(PyObject w, PyObject b) {
+        if (b == null) {
+            return log(w);
+        }
         PyComplex ww = complexFromPyObject(w), bb = complexFromPyObject(b), z;
         double u = ww.real, v = ww.imag, br = bb.real, bi = bb.imag, x, y;
         // Natural log of w is (x,y)
@@ -801,6 +830,7 @@ public class cmath {
      * @param z
      * @return sin <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex sin(PyObject z) {
         return sinOrSinh(complexFromPyObject(z), false);
     }
@@ -811,6 +841,7 @@ public class cmath {
      * @param z
      * @return sinh <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex sinh(PyObject z) {
         return sinOrSinh(complexFromPyObject(z), true);
     }
@@ -909,6 +940,7 @@ public class cmath {
      * @param w to square-root
      * @return <i>w<sup>&#189;</sup></i>
      */
+    @ExposedFunction
     public static PyComplex sqrt(PyObject w) {
         /*
          * All the difficult parts are written for the first quadrant only (+,+), then the true sign
@@ -1017,6 +1049,7 @@ public class cmath {
      * @param z
      * @return tan <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex tan(PyObject z) {
         return tanOrTanh(complexFromPyObject(z), false);
     }
@@ -1027,6 +1060,7 @@ public class cmath {
      * @param z
      * @return tanh <i>z</i>
      */
+    @ExposedFunction
     public static PyComplex tanh(PyObject z) {
         return tanOrTanh(complexFromPyObject(z), true);
     }

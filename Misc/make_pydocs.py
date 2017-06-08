@@ -4,7 +4,16 @@ import re
 import itertools
 import builtins
 import _multiprocessing
+import _json
+import _hashlib
+import _io
+import posix
+import errno
+import array
 import sys
+import time
+import csv
+import zipimport
 
 def print_doc(out, obj, meth):
     if meth == '__doc__':
@@ -79,8 +88,19 @@ type(NotImplemented),
 type(Ellipsis),
 _multiprocessing.SemLock,
 io.TextIOBase,
+io.BufferedReader,
+io.BufferedWriter,
 # modules
-sys
+array,
+csv,
+errno,
+posix,
+sys,
+time,
+zipimport,
+_hashlib,
+_io,
+_json,
 ]
 
 outfile = open("BuiltinDocs.java", "w")

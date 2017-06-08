@@ -1,12 +1,13 @@
 package org.python.modules;
 
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
-import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
-public class _systemrestart implements ClassDictInit {
+@ExposedModule
+public class _systemrestart {
     /**
      * Jython-specific exception for restarting the interpreter. Currently
      * supported only by jython.java, when executing a file (i.e,
@@ -16,14 +17,14 @@ public class _systemrestart implements ClassDictInit {
      */
     public static PyObject SystemRestart;
 
-    public static void classDictInit(PyObject dict) {
-        SystemRestart = Py.makeClass(
+    @ModuleInit
+    public static void init(PyObject dict) {
+        dict.__setitem__("SystemRestart", Py.makeClass(
                 "_systemrestart.SystemRestart",
                 new PyStringMap() {{
                     __setitem__("__doc__",
                             Py.newString("Request to restart the interpreter. " +
                                          "(Jython-specific)"));
-                }}, Py.BaseException);
-        dict.__delitem__("classDictInit");
+                }}, Py.BaseException));
     }
 }

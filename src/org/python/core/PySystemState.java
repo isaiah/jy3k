@@ -130,6 +130,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     public PyObject sysdict;
     public Map<String, PyModule> modules_reloading;
     private ReentrantLock importLock;
+    public PyObject importFunc;
     private ClassLoader syspathJavaLoader;
     public PyList path;
 
@@ -1079,6 +1080,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
         // Finish up standard Python initialization...
         Py.defaultSystemState = new PySystemState();
+        Py.defaultSystemState.importFunc = getDefaultBuiltins().__finditem__("__import__");
         Py.setSystemState(Py.defaultSystemState);
         if (classLoader != null) {
             Py.defaultSystemState.setClassLoader(classLoader);
@@ -1350,10 +1352,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         for (String builtinModule : Setup.builtinModules) {
             addBuiltin(builtinModule);
         }
-        for (String builtinModule : Setup.newbuiltinModules) {
-            addBuiltin(builtinModule);
-        }
-
 
         // add builtins specified in the registry file
         String builtinprop = props.getProperty("python.modules.builtin", "");

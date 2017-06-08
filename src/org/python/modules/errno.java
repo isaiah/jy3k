@@ -5,6 +5,7 @@ import jnr.constants.Constant;
 import jnr.constants.ConstantSet;
 import jnr.constants.platform.Errno;
 import jnr.posix.util.Platform;
+import org.python.core.BuiltinDocs;
 import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
@@ -12,6 +13,8 @@ import org.python.core.PyObject;
 import org.python.core.PyBytes;
 import org.python.core.PyUnicode;
 import org.python.core.imp;
+import org.python.expose.ExposedModule;
+import org.python.expose.ModuleInit;
 
 /**
  * The Python errno module.
@@ -19,23 +22,13 @@ import org.python.core.imp;
  * Errno constants can be accessed from Java code via
  * {@link jnr.constants.platform.Errno}, e.g. Errno.ENOENT.
  */
-public class errno implements ClassDictInit {
-
-    public static final PyBytes __doc__ = Py.newString(
-        "This module makes available standard errno system symbols.\n\n"
-        + "The value of each symbol is the corresponding integer value,\n"
-        + "e.g., on most systems, errno.ENOENT equals the integer 2.\n\n"
-        + "The dictionary errno.errorcode maps numeric codes to symbol names,\n"
-        + "e.g., errno.errorcode[2] could be the string 'ENOENT'.\n\n"
-        + "Symbols that are not relevant to the underlying system are not defined.\n\n"
-        + "To map error codes to error messages, use the function os.strerror(),\n"
-        + "e.g. os.strerror(2) could return 'No such file or directory'.");
-
+@ExposedModule(doc = BuiltinDocs.errno_doc)
+public class errno {
     /** Reverse mapping of codes to names. */
     public static final PyObject errorcode = new PyDictionary();
 
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("name", new PyUnicode("errno"));
+    @ModuleInit
+    public static void init(PyObject dict) {
         if (Platform.IS_WINDOWS) {
             initWindows(dict);
         } else {
@@ -45,9 +38,6 @@ public class errno implements ClassDictInit {
         // XXX: necessary?
         addCode(dict, "ESOCKISBLOCKING", 20000, "Socket is in blocking mode");
         addCode(dict, "EGETADDRINFOFAILED", 20001, "getaddrinfo failed");
-
-        // Hide from Python
-        dict.__setitem__("classDictInit", null);
     }
 
     /**

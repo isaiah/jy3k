@@ -1556,21 +1556,21 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_index_doc)
-    final int str_index(PyObject subObj, PyObject start, PyObject end) {
+    public final int str_index(PyObject subObj, PyObject start, PyObject end) {
         final PyUnicode sub = coerceToUnicode(subObj);
         // Now use the mechanics of the PyBytes on the UTF-16 of the PyUnicode.
         return checkIndex(Encoding._find(getString(), sub.getString(), start, end, __len__()));
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_index_doc)
-    final int str_rindex(PyObject subObj, PyObject start, PyObject end) {
+    public final int str_rindex(PyObject subObj, PyObject start, PyObject end) {
         final PyUnicode sub = coerceToUnicode(subObj);
         // Now use the mechanics of the PyBytes on the UTF-16 of the PyUnicode.
         return checkIndex(Encoding._rfind(getString(), sub.getString(), start, end, __len__()));
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_count_doc)
-    final int str_count(PyObject subObj, PyObject start, PyObject end) {
+    public final int str_count(PyObject subObj, PyObject start, PyObject end) {
         final PyUnicode sub = coerceToUnicode(subObj);
         if (isBasicPlane()) {
             return Encoding._count(getString(), sub.getString(), start, end, __len__());
