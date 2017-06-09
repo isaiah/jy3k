@@ -7,14 +7,22 @@ import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
 import org.python.core.PyDict;
+import org.python.core.PyDictionary;
+import org.python.core.PyFrame;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
+import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by isaiah on 08.06.17.
@@ -203,4 +211,68 @@ public class Import {
         }
     }
 
+    /// The following methods can be found in Python/cevel.c
+    // import_name
+    public static PyObject importName(PyFrame f, String name, String[] from, int level) {
+        List<PyObject> fromList;
+        if (from == null) {
+            fromList = Py.EmptyTuple;
+        } else {
+            fromList = Stream.of(from).map(fname -> new PyUnicode(fname)).collect(Collectors.toList());
+        }
+
+        PyObject importFunc = f.f_builtins.__finditem__("__import__");
+        if (importFunc == null) {
+            throw Py.ImportError("__import__ not found");
+        }
+
+        /** Fast path for not overloaded __import__. */
+        if (importFunc == Py.getSystemState().importFunc) {
+            return importModuleLevelObject(new PyUnicode(name), f.f_globals, new PyTuple(fromList), level);
+        }
+        return importFunc.__call__(new PyObject[] {new PyUnicode(name), f.f_globals, new PyTuple(fromList), new PyLong(level)});
+    }
+
+    // import_from
+    public static PyObject importFrom(PyObject v, String name) {
+        PyObject x = v.__findattr__(name);
+        if (x != null) {
+            return x;
+        }
+        PyObject pkgname = v.__getattr__("__name__");
+        PyObject fullmodname = new PyUnicode(((PyUnicode) pkgname).getString() +
+                "." + name);
+        x = Py.getSystemState().modules.__finditem__(fullmodname);
+        if (x != null) {
+            return x;
+        }
+        throw Py.ImportError("cannot import module " + name);
+    }
+
+    // import_all_from
+    public static void importAllFrom(PyFrame f, PyObject v) {
+        PyObject locals = f.f_locals;
+        PyObject all = v.__findattr__("__all__");
+        PyObject dict;
+        boolean skipLeadingUnderscore = false;
+        if (all == null) {
+            dict = v.__findattr__("__dict__");
+            if (dict == null) {
+                throw Py.ImportError("from-import-* object has no __dict__ and no __all__");
+            }
+            if (dict instanceof PyDictionary) {
+                all = ((PyDictionary) dict).keys_as_list();
+            } else {
+                all = ((PyStringMap) dict).keys();
+            }
+            skipLeadingUnderscore = true;
+        }
+        for (PyObject name: all.asIterable()) {
+            if (skipLeadingUnderscore && ((PyUnicode) name).getString().startsWith("_")) {
+                continue;
+            }
+            PyObject value = v.__getattr__((PyUnicode) name);
+            locals.__setitem__(name, value);
+        }
+    }
 }

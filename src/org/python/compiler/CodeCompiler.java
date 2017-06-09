@@ -111,6 +111,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import static org.python.compiler.CompilerConstants.*;
 import static org.python.util.CodegenUtils.*;
@@ -799,27 +800,21 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitImport(Import node) throws Exception {
         setline(node);
         for (alias a : node.getInternalNames()) {
-            String asname;
+            String asname, name = a.getInternalName();
             if (a.getInternalAsname() != null) {
-                String name = a.getInternalName();
                 asname = a.getInternalAsname();
-                code.ldc(name);
-                loadFrame();
-                code.iconst(0);
-                code.invokestatic(p(imp.class), "importOneAs",
-                        sig(PyObject.class, String.class, PyFrame.class, Integer.TYPE));
             } else {
-                String name = a.getInternalName();
                 asname = name;
                 if (asname.indexOf('.') > 0) {
                     asname = asname.substring(0, asname.indexOf('.'));
                 }
-                code.ldc(name);
-                loadFrame();
-                code.iconst(0);
-                code.invokestatic(p(imp.class), "importOne",
-                        sig(PyObject.class, String.class, PyFrame.class, Integer.TYPE));
             }
+            loadFrame();
+            code.ldc(name);
+            code.aconst_null();
+            code.iconst(0);
+            code.invokestatic(p(org.python.bootstrap.Import.class), "importName",
+                    sig(PyObject.class,  PyFrame.class, String.class, String[].class, Integer.TYPE));
             set(new Name(a, asname, expr_contextType.Store));
         }
         return null;
@@ -827,55 +822,38 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitImportFrom(ImportFrom node) throws Exception {
-        Future.checkFromFuture(node); // future stmt support
-        setline(node);
-        code.ldc(node.getInternalModule());
         java.util.List<alias> aliases = node.getInternalNames();
+        setline(node);
+        loadFrame();
+        code.ldc(node.getInternalModule());
+        loadStrings(code, aliases.stream().map(a -> a.getInternalName()).collect(Collectors.toList()));
+        code.iconst(node.getInternalLevel());
+        code.invokestatic(p(org.python.bootstrap.Import.class), "importName",
+                sig(PyObject.class,  PyFrame.class, String.class, String[].class, Integer.TYPE));
         if (aliases == null || aliases.size() == 0) {
             throw Py.SyntaxError(node.getToken(), "Internel parser error", module.getFilename());
         } else if (aliases.size() == 1 && aliases.get(0).getInternalName().equals("*")) {
             if (my_scope.func_level > 0) {
                 module.error("import * only allowed at module level", false, node);
-
-                if (my_scope.contains_ns_free_vars) {
-                    module.error("import * is not allowed in function '" + my_scope.scope_name
-                                    + "' because it contains a nested function with free variables", true,
-                            node);
-                }
-            }
-            if (my_scope.func_level > 1) {
-                module.error("import * is not allowed in function '" + my_scope.scope_name
-                        + "' because it is a nested function", true, node);
             }
 
             loadFrame();
-            code.iconst(node.getInternalLevel());
-            code.invokestatic(p(imp.class), "importAll",
-                    sig(Void.TYPE, String.class, PyFrame.class, Integer.TYPE));
+            code.swap();
+            code.invokestatic(p(org.python.bootstrap.Import.class), "importAllFrom",
+                    sig(Void.TYPE, PyFrame.class, PyObject.class));
 
         } else {
-            java.util.List<String> fromNames = new ArrayList<String>(); // [names.size()];
-            java.util.List<String> asnames = new ArrayList<String>(); // [names.size()];
-            for (int i = 0; i < aliases.size(); i++) {
-                fromNames.add(aliases.get(i).getInternalName());
-                asnames.add(aliases.get(i).getInternalAsname());
-                if (asnames.get(i) == null) {
-                    asnames.set(i, fromNames.get(i));
+            for (alias asName: aliases) {
+                String from = asName.getInternalName();
+                String as = asName.getInternalAsname();
+                if (as == null) {
+                    as = from;
                 }
-            }
-            loadStrings(code, fromNames);
-
-            loadFrame();
-            code.iconst(node.getInternalLevel());
-            code.invokestatic(
-                    p(imp.class),
-                    "importFrom",
-                    sig(PyObject[].class, String.class, String[].class, PyFrame.class, Integer.TYPE));
-            for (int i = 0; i < aliases.size(); i++) {
                 code.dup();
-                code.iconst(i);
-                code.aaload();
-                set(new Name(aliases.get(i), asnames.get(i), expr_contextType.Store));
+                code.ldc(from);
+                code.invokestatic(p(org.python.bootstrap.Import.class), "importFrom",
+                        sig(PyObject.class,  PyObject.class, String.class));
+                set(new Name(node, as, expr_contextType.Store));
             }
             code.pop();
         }

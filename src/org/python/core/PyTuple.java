@@ -36,6 +36,10 @@ public class PyTuple extends PySequenceList implements List {
         this(TYPE, elements);
     }
 
+    public PyTuple(Collection<? extends PyObject> elements) {
+        this(TYPE, elements.toArray(new PyObject[0]));
+    }
+
     public PyTuple(PyType subtype, PyObject[] elements) {
         this(subtype, elements, -1);
     }

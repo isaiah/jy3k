@@ -1142,7 +1142,10 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             PyObject _frozen_importlib = imp.loadFromCompiled("_frozen_importlib", _frozen_importlib_input, "_bootstrap.py", "_frozen_importlib.class");
             imp.loadFromCompiled("_frozen_importlib_external", _frozen_importlib_external_input, "_bootstrap_external.py", "_frozen_importlib_external.class");
             Py.defaultSystemState.importlib = _frozen_importlib;
-            _frozen_importlib.invoke("_install", sysmod, imp.loadBuiltin("_imp"));
+            spec = new PyModuleDef("_imp");
+            PyObject _impMod = _imp.create_builtin(spec);
+            _imp.exec_builtin(_impMod);
+            _frozen_importlib.invoke("_install", sysmod, _impMod);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
