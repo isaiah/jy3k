@@ -198,20 +198,21 @@ public class _imp {
     /**
      * Compile python source code to java bytecode
      * @param data python source
-     * @param path source file path
+     * @param filename source file path
      * @return bytes object
      */
     @ExposedFunction
-    public static final PyObject _compile_source(PyObject name, PyObject data, PyObject path) {
+    public static final PyObject _compile_source(PyObject name, PyObject data, PyObject filename) {
         byte[] source;
         if (data instanceof PyBytes) {
+            byte[] a = new byte[]{1,2};
             source = ((PyBytes) data).toBytes();
         } else if (data instanceof PyUnicode) {
             source = ((PyUnicode) data).getString().getBytes();
         } else {
             throw Py.TypeError("bytes object expected for data");
         }
-        byte[] bytes = Import.compileSource(name.toString(), new ByteArrayInputStream(source), path.toString());
+        byte[] bytes = Import.compileSource(name.toString(), new ByteArrayInputStream(source), filename.toString());
         return new PyBytes(bytes);
     }
 

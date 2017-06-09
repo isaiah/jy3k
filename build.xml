@@ -457,6 +457,7 @@
       </javac>
 
       <!-- java files used by tests -->
+      <!--
       <javac srcdir="${test.source.dir}"
         destdir="${compile.dir}"
         target="${jdk.target.version}"
@@ -480,15 +481,17 @@
         <compilerarg line="${javac.Xlint}"/>
         <classpath refid="test.classpath" />
       </javac>
+      -->
       <!--
       <copy file="${source.dir}/org/python/modules/ucnhash.dat"
         todir="${compile.dir}/org/python/modules"
         preservelastmodified="true" />
         -->
 
-      <copy todir="${compile.dir}" preservelastmodified="true">
+      <copy todir="${compile.dir}" preservelastmodified="true" flatten="true">
         <fileset dir="${source.dir}">
           <include name="**/*.properties" />
+          <include name="**/_frozen_*" />
         </fileset>
       </copy>
       <!-- grammar must now be up to date -->

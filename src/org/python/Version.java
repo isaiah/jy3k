@@ -66,14 +66,8 @@ public class Version {
      */
     private static void loadProperties() {
         boolean loaded = false;
-        final String versionProperties = "/home/isaiah/codes/jylang/build/classes/org/python/version.properties";
-        InputStream in = null;
-        try {
-            in = new FileInputStream(versionProperties);
-        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-        }
-        //= Version.class.getResourceAsStream(versionProperties);
+        final String versionProperties = "/org/python/version.properties";
+        InputStream in = Version.class.getResourceAsStream(versionProperties);
         if (in != null) {
             try {
                 Properties properties = new Properties();

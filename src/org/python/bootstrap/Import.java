@@ -1,18 +1,23 @@
 package org.python.bootstrap;
 
 import org.python.Version;
+import org.python.core.BytecodeLoader;
 import org.python.core.CompareOp;
 import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
+import org.python.core.PyCode;
 import org.python.core.PyDict;
 import org.python.core.PyDictionary;
+import org.python.core.PyException;
 import org.python.core.PyFrame;
 import org.python.core.PyLong;
+import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
+import org.python.core.PyTableCode;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
@@ -25,7 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by isaiah on 08.06.17.
+ * Python/import.c
  */
 public class Import {
     private static final String importlib_filename = "_bootstrap.py";
@@ -179,6 +184,74 @@ public class Import {
         ReentrantLock importLock = interp.getImportLock();
         importLock.lock();
     }
+
+    public static final byte[] findFrozen(String name) throws IOException {
+        return Import.class.getResourceAsStream("/" + name).readAllBytes();
+    }
+
+    public static boolean importFrozenModuleObject(String name) {
+        byte[] bytes;
+        try {
+            bytes = findFrozen(name);
+        } catch (IOException e) {
+            throw Py.ImportError("frozen module not found " + name);
+        }
+        PyCode code = BytecodeLoader.makeCode(name + Version.PY_CACHE_TAG, bytes, name + ".py");
+        PyModule module = addModule(name);
+
+        if (!(code instanceof PyTableCode)) {
+            throw Py.TypeError(String.format("expected TableCode, got %s", code.getType().fastGetName()));
+        }
+        try {
+            PyFrame f = new PyFrame((PyTableCode) code, module.__dict__, module.__dict__);
+            code.call(Py.getThreadState(), f);
+            return true;
+        } catch (Throwable t) {
+            removeModule(name);
+            throw t;
+        }
+    }
+
+    /**
+     * If the given name is found in sys.modules, the entry from there is returned. Otherwise a new
+     * PyModule is created for the name and added to sys.modules
+     */
+    public static PyModule addModule(String name) {
+        name = name.intern();
+        PyObject modules = Py.getSystemState().modules;
+        PyModule module = (PyModule)modules.__finditem__(name);
+        if (module != null) {
+            return module;
+        }
+        module = new PyModule(name, null);
+        PyModule builtins = (PyModule)modules.__finditem__("builtins");
+        PyObject __dict__ = module.__getattr__("__dict__");
+        __dict__.__setitem__("__builtins__", builtins);
+        __dict__.__setitem__("__package__", Py.None);
+        modules.__setitem__(name, module);
+        return module;
+    }
+
+    /**
+     * Remove name form sys.modules if it's there.
+     *
+     * @param name the module name
+     */
+    private static void removeModule(String name) {
+        name = name.intern();
+        PyObject modules = Py.getSystemState().modules;
+        if (modules.__finditem__(name) != null) {
+            try {
+                modules.__delitem__(name);
+            } catch (PyException pye) {
+                // another thread may have deleted it
+                if (!pye.match(Py.KeyError)) {
+                    throw pye;
+                }
+            }
+        }
+    }
+
 
     /**
      * Code copied from imp.java
