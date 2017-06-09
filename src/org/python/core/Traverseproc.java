@@ -285,7 +285,6 @@ import org.python.modules.gc;
  *   BaseBytes                       - no refs, untraversable<br>
  *   BaseDictionaryView              - Traverseproc<br>
  *   BaseSet                         - Traverseproc<br>
- *   ClasspathPyImporter             - no refs, untraversable<br>
  *   ContextGuard:                   - no PyObject<br>
  *     ContextCode                   - Traverseproc<br>
  *     GeneratorContextManager       - Traverseproc<br>

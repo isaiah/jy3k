@@ -7,7 +7,6 @@
 # lines; one for their expose, and one for their derived class.
 
 BaseException.derived:org.python.core.PyBaseExceptionDerived
-ClasspathPyImporter.derived:org.python.core.ClasspathPyImporterDerived
 JavaImporter.derived:org.python.core.JavaImporterDerived
 PyBZ2File.derived:org.python.modules.bz2.PyBZ2FileDerived
 PyBZ2Compressor.derived:org.python.modules.bz2.PyBZ2CompressorDerived

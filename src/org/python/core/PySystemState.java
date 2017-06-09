@@ -3,7 +3,6 @@ package org.python.core;
 
 import jnr.posix.util.Platform;
 import org.python.Version;
-import org.python.bootstrap.Frozen;
 import org.python.bootstrap.Import;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
@@ -18,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -205,15 +203,12 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         argv = (PyList)defaultArgv.repeat(1);
         path = (PyList)defaultPath.repeat(1);
         path.append(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY));
-//        path.append(Py.newUnicode(ClasspathPyImporter.PYCLASSPATH_PREFIX));
         executable = defaultExecutable;
         builtins = getDefaultBuiltins();
         platform = defaultPlatform;
 
         meta_path = new PyList();
         path_hooks = new PyList();
-        //path_hooks.append(PyZipImporter.TYPE);
-//        path_hooks.append(ClasspathPyImporter.TYPE);
 
         path_importer_cache = new PyDictionary();
         path_importer_cache.__setitem__(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY), new JavaImporter());
