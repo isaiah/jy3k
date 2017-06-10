@@ -3,10 +3,11 @@ import types
 import re
 import itertools
 import builtins
-import _multiprocessing
-import _json
+import _functools
 import _hashlib
 import _io
+import _json
+import _multiprocessing
 import posix
 import errno
 import array
@@ -94,10 +95,12 @@ io.BufferedWriter,
 array,
 csv,
 errno,
+itertools,
 posix,
 sys,
 time,
 zipimport,
+_functools,
 _hashlib,
 _io,
 _json,

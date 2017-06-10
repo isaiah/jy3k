@@ -145,8 +145,13 @@ public class Import {
                 boolean initializing = value.__bool__();
                 if (initializing) {
                     aquireLock(interp);
-                    value = interp.importlib.invoke("_lock_unlock_module", absName);
-                    // if (value == null) goto error;
+                    try {
+                        value = interp.importlib.invoke("_lock_unlock_module", absName);
+                        // if (value == null) goto error;
+                    } catch (PyException pye) {
+                        removeImportlibFrames(pye);
+                        throw pye;
+                    }
                 }
             }
         } else {
@@ -154,33 +159,7 @@ public class Import {
             try {
                 mod = interp.importlib.invoke("_find_and_load", absName, interp.importFunc);
             } catch (PyException pye) {
-                /**
-                 * remove trackback that from '_bootstrap.py' or '_bootstrap_external.py' in case of ImportError
-                 * or marked with _call_with_frames_removed otherwise
-                 * FIXME: this works almost as good as CPython, but I (isaiah) am yet to find a way to remove the first frame,
-                 * as there is not pointer to pointer trick in java.
-                 */
-                PyTraceback outer_link = null;
-                PyTraceback base_tb = pye.traceback;
-                PyTraceback tb = base_tb;
-                PyTraceback prev_link = base_tb;
-                boolean in_importlib = false;
-                boolean always_trim = pye.match(Py.ImportError);
-                while (tb != null) {
-                    PyTraceback next = (PyTraceback) tb.tb_next;
-                    PyBaseCode code = tb.tb_frame.f_code;
-                    boolean now_in_importlib = code.co_filename.equals(importlib_filename)
-                            || code.co_filename.equals(external_filename);
-                    if (now_in_importlib && !in_importlib) {
-                        outer_link = prev_link;
-                    }
-                    in_importlib = now_in_importlib;
-                    if (in_importlib && (always_trim || code.co_name.equals(remove_frames))) {
-                        outer_link.tb_next = next;
-                    }
-                    prev_link = tb;
-                    tb = next;
-                }
+                removeImportlibFrames(pye);
                 throw pye;
             }
             if (mod == null) {
@@ -473,6 +452,36 @@ public class Import {
             }
             PyObject value = v.__getattr__((PyUnicode) name);
             locals.__setitem__(name, value);
+        }
+    }
+
+    /**
+     * remove trackback that from '_bootstrap.py' or '_bootstrap_external.py' in case of ImportError
+     * or marked with _call_with_frames_removed otherwise
+     * FIXME: this works almost as good as CPython, but yet to find a way to remove the first frame,
+     * as there is not pointer to pointer trick in java.
+     */
+    private static void removeImportlibFrames(PyException pye) {
+        PyTraceback outer_link = null;
+        PyTraceback base_tb = pye.traceback;
+        PyTraceback tb = base_tb;
+        PyTraceback prev_link = base_tb;
+        boolean in_importlib = false;
+        boolean always_trim = pye.match(Py.ImportError);
+        while (tb != null) {
+            PyTraceback next = (PyTraceback) tb.tb_next;
+            PyBaseCode code = tb.tb_frame.f_code;
+            boolean now_in_importlib = code.co_filename.equals(importlib_filename)
+                    || code.co_filename.equals(external_filename);
+            if (now_in_importlib && !in_importlib) {
+                outer_link = prev_link;
+            }
+            in_importlib = now_in_importlib;
+            if (in_importlib && (always_trim || code.co_name.equals(remove_frames))) {
+                outer_link.tb_next = next;
+            }
+            prev_link = tb;
+            tb = next;
         }
     }
 }

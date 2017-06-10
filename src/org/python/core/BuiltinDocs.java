@@ -11009,6 +11009,250 @@ public class BuiltinDocs {
         "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" + 
         "    in the keyword argument list.  For example:  dict(one=1, two=2)";
 
+    // Docs for <module 'itertools' (built-in)>
+    public final static String itertools_doc = 
+        "Functional tools for creating and using iterators.\n" + 
+        "\n" + 
+        "Infinite iterators:\n" + 
+        "count(start=0, step=1) --> start, start+step, start+2*step, ...\n" + 
+        "cycle(p) --> p0, p1, ... plast, p0, p1, ...\n" + 
+        "repeat(elem [,n]) --> elem, elem, elem, ... endlessly or up to n times\n" + 
+        "\n" + 
+        "Iterators terminating on the shortest input sequence:\n" + 
+        "accumulate(p[, func]) --> p0, p0+p1, p0+p1+p2\n" + 
+        "chain(p, q, ...) --> p0, p1, ... plast, q0, q1, ... \n" + 
+        "chain.from_iterable([p, q, ...]) --> p0, p1, ... plast, q0, q1, ... \n" + 
+        "compress(data, selectors) --> (d[0] if s[0]), (d[1] if s[1]), ...\n" + 
+        "dropwhile(pred, seq) --> seq[n], seq[n+1], starting when pred fails\n" + 
+        "groupby(iterable[, keyfunc]) --> sub-iterators grouped by value of keyfunc(v)\n" + 
+        "filterfalse(pred, seq) --> elements of seq where pred(elem) is False\n" + 
+        "islice(seq, [start,] stop [, step]) --> elements from\n" + 
+        "       seq[start:stop:step]\n" + 
+        "starmap(fun, seq) --> fun(*seq[0]), fun(*seq[1]), ...\n" + 
+        "tee(it, n=2) --> (it1, it2 , ... itn) splits one iterator into n\n" + 
+        "takewhile(pred, seq) --> seq[0], seq[1], until pred fails\n" + 
+        "zip_longest(p, q, ...) --> (p[0], q[0]), (p[1], q[1]), ... \n" + 
+        "\n" + 
+        "Combinatoric generators:\n" + 
+        "product(p, q, ... [repeat=1]) --> cartesian product\n" + 
+        "permutations(p[, r])\n" + 
+        "combinations(p, r)\n" + 
+        "combinations_with_replacement(p, r)\n" + 
+        "";
+
+    public final static String itertools___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String itertools___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String itertools___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String itertools___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String itertools__grouper_doc = 
+        "";
+
+    public final static String itertools__tee_doc = 
+        "Iterator wrapped to make it copyable";
+
+    public final static String itertools__tee_dataobject_doc = 
+        "Data container common to multiple tee objects.";
+
+    public final static String itertools_accumulate_doc = 
+        "accumulate(iterable[, func]) --> accumulate object\n" + 
+        "\n" + 
+        "Return series of accumulated sums (or other binary function results).";
+
+    public final static String itertools_chain_doc = 
+        "chain(*iterables) --> chain object\n" + 
+        "\n" + 
+        "Return a chain object whose .__next__() method returns elements from the\n" + 
+        "first iterable until it is exhausted, then elements from the next\n" + 
+        "iterable, until all of the iterables are exhausted.";
+
+    public final static String itertools_combinations_doc = 
+        "combinations(iterable, r) --> combinations object\n" + 
+        "\n" + 
+        "Return successive r-length combinations of elements in the iterable.\n" + 
+        "\n" + 
+        "combinations(range(4), 3) --> (0,1,2), (0,1,3), (0,2,3), (1,2,3)";
+
+    public final static String itertools_combinations_with_replacement_doc = 
+        "combinations_with_replacement(iterable, r) --> combinations_with_replacement object\n" + 
+        "\n" + 
+        "Return successive r-length combinations of elements in the iterable\n" + 
+        "allowing individual elements to have successive repeats.\n" + 
+        "combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC";
+
+    public final static String itertools_compress_doc = 
+        "compress(data, selectors) --> iterator over selected data\n" + 
+        "\n" + 
+        "Return data elements corresponding to true selector elements.\n" + 
+        "Forms a shorter iterator from selected data elements using the\n" + 
+        "selectors to choose the data elements.";
+
+    public final static String itertools_count_doc = 
+        "count(start=0, step=1) --> count object\n" + 
+        "\n" + 
+        "Return a count object whose .__next__() method returns consecutive values.\n" + 
+        "Equivalent to:\n" + 
+        "\n" + 
+        "    def count(firstval=0, step=1):\n" + 
+        "        x = firstval\n" + 
+        "        while 1:\n" + 
+        "            yield x\n" + 
+        "            x += step\n" + 
+        "";
+
+    public final static String itertools_cycle_doc = 
+        "cycle(iterable) --> cycle object\n" + 
+        "\n" + 
+        "Return elements from the iterable until it is exhausted.\n" + 
+        "Then repeat the sequence indefinitely.";
+
+    public final static String itertools_dropwhile_doc = 
+        "dropwhile(predicate, iterable) --> dropwhile object\n" + 
+        "\n" + 
+        "Drop items from the iterable while predicate(item) is true.\n" + 
+        "Afterwards, return every element until the iterable is exhausted.";
+
+    public final static String itertools_filterfalse_doc = 
+        "filterfalse(function or None, sequence) --> filterfalse object\n" + 
+        "\n" + 
+        "Return those items of sequence for which function(item) is false.\n" + 
+        "If function is None, return the items that are false.";
+
+    public final static String itertools_groupby_doc = 
+        "groupby(iterable[, keyfunc]) -> create an iterator which returns\n" + 
+        "(key, sub-iterator) grouped by each value of key(value).\n" + 
+        "";
+
+    public final static String itertools_islice_doc = 
+        "islice(iterable, stop) --> islice object\n" + 
+        "islice(iterable, start, stop[, step]) --> islice object\n" + 
+        "\n" + 
+        "Return an iterator whose next() method returns selected values from an\n" + 
+        "iterable.  If start is specified, will skip all preceding elements;\n" + 
+        "otherwise, start defaults to zero.  Step defaults to one.  If\n" + 
+        "specified as another value, step determines how many values are \n" + 
+        "skipped between successive calls.  Works like a slice() on a list\n" + 
+        "but returns an iterator.";
+
+    public final static String itertools_permutations_doc = 
+        "permutations(iterable[, r]) --> permutations object\n" + 
+        "\n" + 
+        "Return successive r-length permutations of elements in the iterable.\n" + 
+        "\n" + 
+        "permutations(range(3), 2) --> (0,1), (0,2), (1,0), (1,2), (2,0), (2,1)";
+
+    public final static String itertools_product_doc = 
+        "product(*iterables, repeat=1) --> product object\n" + 
+        "\n" + 
+        "Cartesian product of input iterables.  Equivalent to nested for-loops.\n" + 
+        "\n" + 
+        "For example, product(A, B) returns the same as:  ((x,y) for x in A for y in B).\n" + 
+        "The leftmost iterators are in the outermost for-loop, so the output tuples\n" + 
+        "cycle in a manner similar to an odometer (with the rightmost element changing\n" + 
+        "on every iteration).\n" + 
+        "\n" + 
+        "To compute the product of an iterable with itself, specify the number\n" + 
+        "of repetitions with the optional repeat keyword argument. For example,\n" + 
+        "product(A, repeat=4) means the same as product(A, A, A, A).\n" + 
+        "\n" + 
+        "product('ab', range(3)) --> ('a',0) ('a',1) ('a',2) ('b',0) ('b',1) ('b',2)\n" + 
+        "product((0,1), (0,1), (0,1)) --> (0,0,0) (0,0,1) (0,1,0) (0,1,1) (1,0,0) ...";
+
+    public final static String itertools_repeat_doc = 
+        "repeat(object [,times]) -> create an iterator which returns the object\n" + 
+        "for the specified number of times.  If not specified, returns the object\n" + 
+        "endlessly.";
+
+    public final static String itertools_starmap_doc = 
+        "starmap(function, sequence) --> starmap object\n" + 
+        "\n" + 
+        "Return an iterator whose values are returned from the function evaluated\n" + 
+        "with an argument tuple taken from the given sequence.";
+
+    public final static String itertools_takewhile_doc = 
+        "takewhile(predicate, iterable) --> takewhile object\n" + 
+        "\n" + 
+        "Return successive entries from an iterable as long as the \n" + 
+        "predicate evaluates to true for each entry.";
+
+    public final static String itertools_tee_doc = 
+        "tee(iterable, n=2) --> tuple of n independent iterators.";
+
+    public final static String itertools_zip_longest_doc = 
+        "zip_longest(iter1 [,iter2 [...]], [fillvalue=None]) --> zip_longest object\n" + 
+        "\n" + 
+        "Return a zip_longest object whose .__next__() method returns a tuple where\n" + 
+        "the i-th element comes from the i-th iterable argument.  The .__next__()\n" + 
+        "method continues until the longest iterable in the argument sequence\n" + 
+        "is exhausted and then it raises StopIteration.  When the shorter iterables\n" + 
+        "are exhausted, the fillvalue is substituted in their place.  The fillvalue\n" + 
+        "defaults to None or can be specified by a keyword argument.\n" + 
+        "";
+
     // Docs for <module 'posix' (built-in)>
     public final static String posix_CLD_CONTINUED_doc = 
         "int(x=0) -> integer\n" + 
@@ -15155,6 +15399,113 @@ public class BuiltinDocs {
         "\n" + 
         "The 'archive' attribute of zipimporter objects contains the name of the\n" + 
         "zipfile targeted.";
+
+    // Docs for <module '_functools' (built-in)>
+    public final static String _functools_doc = 
+        "Tools that operate on functions.";
+
+    public final static String _functools___loader___doc = 
+        "Meta path import for built-in modules.\n" + 
+        "\n" + 
+        "    All methods are either class or static methods to avoid the need to\n" + 
+        "    instantiate the class.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _functools___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _functools___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _functools___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _functools__lru_cache_wrapper_doc = 
+        "Create a cached callable that wraps another function.\n" + 
+        "\n" + 
+        "user_function:      the function being cached\n" + 
+        "\n" + 
+        "maxsize:  0         for no caching\n" + 
+        "          None      for unlimited cache size\n" + 
+        "          n         for a bounded cache\n" + 
+        "\n" + 
+        "typed:    False     cache f(3) and f(3.0) as identical calls\n" + 
+        "          True      cache f(3) and f(3.0) as distinct calls\n" + 
+        "\n" + 
+        "cache_info_type:    namedtuple class with the fields:\n" + 
+        "                        hits misses currsize maxsize\n" + 
+        "";
+
+    public final static String _functools_cmp_to_key_doc = 
+        "Convert a cmp= function into a key= function.";
+
+    public final static String _functools_partial_doc = 
+        "partial(func, *args, **keywords) - new function with partial application\n" + 
+        "    of the given arguments and keywords.\n" + 
+        "";
+
+    public final static String _functools_reduce_doc = 
+        "reduce(function, sequence[, initial]) -> value\n" + 
+        "\n" + 
+        "Apply a function of two arguments cumulatively to the items of a sequence,\n" + 
+        "from left to right, so as to reduce the sequence to a single value.\n" + 
+        "For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5]) calculates\n" + 
+        "((((1+2)+3)+4)+5).  If initial is present, it is placed before the items\n" + 
+        "of the sequence in the calculation, and serves as a default when the\n" + 
+        "sequence is empty.";
 
     // Docs for <module '_hashlib' from '/usr/lib/python3.6/lib-dynload/_hashlib.cpython-36m-x86_64-linux-gnu.so'>
     public final static String _hashlib_HASH_doc = 
