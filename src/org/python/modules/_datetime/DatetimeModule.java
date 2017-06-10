@@ -2,10 +2,11 @@ package org.python.modules._datetime;
 
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.core.imp;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
+import org.python.modules.time.PyTimeTuple;
+import org.python.modules.time.TimeModule;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -43,19 +44,17 @@ public class DatetimeModule {
 
     /** shared implementation between date, datetime and time */
     public static final PyObject build_struct_time(LocalDate date, LocalTime time, int dstflag) {
-        PyObject timeModule = imp.importName("time", true);
         int[] originArgs = { date.getYear(), date.getMonthValue(), date.getDayOfMonth(), time.getHour(),
                 time.getMinute(), time.getSecond(), date.getDayOfWeek().getValue() - 1, date.getDayOfYear(), dstflag };
         PyObject[] args = new PyObject[originArgs.length];
         for(int i = 0; i < args.length; i++) {
             args[i] = new PyLong(originArgs[i]);
         }
-        return timeModule.invoke("struct_time", args);
+        return new PyTimeTuple(args);
     }
 
     public static final PyObject wrap_strftime(PyObject format, PyObject tuple) {
-        PyObject time = imp.importName("time", true);
-        return time.invoke("strftime", format, tuple);
+        return TimeModule.strftime(format.toString(), tuple);
     }
 
 //    private static final int weekday(int y, int m, int d) {

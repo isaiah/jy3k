@@ -1258,7 +1258,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         rig.process();
         String module = "encodings";
         File src = new File("/tmp/foo.py");
-        byte[] bytes = org.python.core.imp.compileSource(module, src);
+//        byte[] bytes = org.python.core.imp.compileSource(module, src);
         BuildAstVisitor v = new BuildAstVisitor("<string>");
 
         ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
@@ -1272,7 +1272,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         new Lower().visit(ast);
         new AnnotationsCreator().visit(ast);
         System.out.println(ast.toStringTree());
-        FileOutputStream out = new FileOutputStream("/tmp/foo.class");
-        out.write(bytes);
+//        FileOutputStream out = new FileOutputStream("/tmp/foo.class");
+//        out.write(bytes);
     }
 }

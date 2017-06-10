@@ -427,7 +427,7 @@ public class jython {
         // Close all sockets -- not all of their operations are stopped by
         // Thread.interrupt (in particular pre-nio sockets)
         try {
-            imp.load("socket").__findattr__("_closeActiveSockets").__call__();
+//            imp.load("socket").__findattr__("_closeActiveSockets").__call__();
         } catch (PyException pye) {
             // continue
         }

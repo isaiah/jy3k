@@ -935,13 +935,13 @@ public final class Py {
 
     private static PyObject initExc(String alias, String name, PyObject exceptions,
                                     PyObject dict) {
-        PyObject tmp = exceptions.__getattr__(name);
+        PyObject tmp = exceptions.__getitem__(name);
         dict.__setitem__(alias, tmp);
         return tmp;
     }
 
     static void initClassExceptions(PyObject dict) {
-        PyObject exc = imp.load("__builtin__");
+        PyObject exc = Py.getSystemState().builtins;
 
         BaseException = initExc("BaseException", exc, dict);
         Exception = initExc("Exception", exc, dict);
@@ -1050,7 +1050,7 @@ public final class Py {
         }
         if (!syspathJavaLoaderRestricted) {
             try {
-                classLoader = imp.getSyspathJavaLoader();
+                classLoader = Py.getSystemState().getSyspathJavaLoader();
                 if (classLoader != null && reason != null) {
                     writeDebug("import", "trying " + name + " as " + reason +
                             " in SysPathJavaLoader");

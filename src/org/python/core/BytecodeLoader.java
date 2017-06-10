@@ -82,7 +82,7 @@ public class BytecodeLoader {
 
         public Loader() {
             super(new URL[0]);
-            parents.add(imp.getSyspathJavaLoader());
+            parents.add(Py.getSystemState().getSyspathJavaLoader());
         }
 
         public void addParent(ClassLoader referent) {

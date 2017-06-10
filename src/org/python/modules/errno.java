@@ -84,15 +84,4 @@ public class errno {
         dict.__setitem__(nameObj, codeObj);
         errorcode.__setitem__(codeObj, nameObj);
     }
-
-    /**
-     * @deprecated Use jnr.constants.platform.Errno.valueOf(code).toString() (or
-     *             os.strerror from Python) instead.
-     */
-    @Deprecated
-    public static PyObject strerror(PyObject code) {
-        Py.warning(Py.DeprecationWarning,
-                   "The errno.strerror function is deprecated, use os.strerror.");
-        return imp.load("os").__getattr__("strerror").__call__(code);
-    }
 }

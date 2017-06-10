@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyIterator;
@@ -16,32 +17,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.count", base = PyObject.class, doc = count.count_doc)
+@ExposedType(name = "itertools.count", base = PyObject.class)
 public class count extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(count.class);
+
     private PyIterator iter;
     private PyObject counter;
     private PyObject stepper;
-
-    private static PyObject NumberClass;
-    private static synchronized PyObject getNumberClass() {
-        if (NumberClass == null) {
-            NumberClass = imp.importName("numbers", true).__getattr__("Number");
-        }
-        return NumberClass;
-    }
-
-    public static final String count_doc =
-        "count(start=0, step=1) --> count object\n\n" +
-        "Return a count object whose .next() method returns consecutive values.\n" +
-        "  Equivalent to:\n" +
-        "\n" +
-        "      def count(firstval=0, step=1):\n" +
-        "      x = firstval\n" +
-        "      while 1:\n" +
-        "          yield x\n" +
-        "          x += step\n";
 
     public count(PyType subType) {
         super(subType);
@@ -71,32 +53,12 @@ public class count extends PyIterator {
         count___init__(start, step);
     }
 
-    // TODO: move into Py, although NumberClass import time resolution becomes
-    // TODO: a bit trickier
-    private static PyObject getNumber(PyObject obj) {
-        if (Py.isInstance(obj, getNumberClass())) {
-            return obj;
-        }
-        try {
-            PyObject intObj = obj.__int__();
-            if (Py.isInstance(obj, getNumberClass())) {
-                return intObj;
-            }
-            throw Py.TypeError("a number is required");
-        } catch (PyException exc) {
-            if (exc.match(Py.ValueError)) {
-                throw Py.TypeError("a number is required");
-            }
-            throw exc;
-        }
-    }
-
     @ExposedNew
     @ExposedMethod
     final void count___init__(final PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("count", args, kwds, new String[] {"start", "step"}, 0);
-        PyObject start = getNumber(ap.getPyObject(0, Py.Zero));
-        PyObject step = getNumber(ap.getPyObject(1, Py.One));
+        PyObject start = ap.getPyObject(0, Py.Zero);
+        PyObject step = ap.getPyObject(1, Py.One);
         count___init__(start, step);
     }
 
@@ -105,13 +67,11 @@ public class count extends PyIterator {
         stepper = step;
 
         iter = new PyIterator() {
-
             public PyObject __next__() {
                 PyObject result = counter;
                 counter = counter._add(stepper);
                 return result;
             }
-
         };
     }
 

@@ -278,7 +278,7 @@ public class _warnings {
             warningsModule = imp.importName("warnings", true);
             if (warningsModule == null) return null;
         }
-        warningsModule = Py.getSystemState().modules.__getitem__(new PyUnicode("warnings"));
+        warningsModule = Py.getSystemState().modules.__getitem__("warnings");
         return warningsModule.__findattr__(attr);
     }
 

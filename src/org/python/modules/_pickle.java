@@ -13,7 +13,6 @@
 package org.python.modules;
 
 import org.python.bootstrap.Import;
-import org.python.core.ClassDictInit;
 import org.python.core.Exceptions;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
@@ -36,9 +35,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.core.BuiltinModule;
 import org.python.core.codecs;
-import org.python.core.imp;
 import org.python.core.stringlib.Encoding;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
@@ -1297,8 +1294,7 @@ public class _pickle {
         // For use with JPython1.1.x
         //PyObject modules = Py.getSystemState().modules;
 
-        PyObject sys = imp.importName("sys", true);
-        PyObject modules = sys.__findattr__("modules");
+        PyObject modules = Py.getSystemState().modules;
         PyObject keylist = modules.invoke("keys");
 
         int len = keylist.__len__();

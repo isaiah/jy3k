@@ -2,11 +2,16 @@ package org.python.util;
 
 import org.apache.tools.ant.BuildException;
 import org.python.Version;
+import org.python.bootstrap.Import;
 import org.python.core.PyException;
 import org.python.core.PySystemState;
 import org.python.core.imp;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -37,7 +42,7 @@ public class JycompileAntTask extends GlobMatchingTask {
     private void filter(File[] files) {
         for (File src : files) {
             if (src.isDirectory()) {
-                if (!src.toPath().endsWith(imp.CACHEDIR) && !src.toPath().endsWith("test") && !src.toPath().endsWith("tests")) {
+                if (!src.toPath().endsWith(Import.CACHEDIR) && !src.toPath().endsWith("test") && !src.toPath().endsWith("tests")) {
                     filter(src.listFiles());
                 }
                 continue;
@@ -46,7 +51,7 @@ public class JycompileAntTask extends GlobMatchingTask {
                 continue;
             }
             Path classPath = src.toPath().resolveSibling(
-                    Paths.get(imp.CACHEDIR, src.getName().substring(0, src.getName().length() - 3) + "." + Version.PY_CACHE_TAG + ".class"));
+                    Paths.get(Import.CACHEDIR, src.getName().substring(0, src.getName().length() - 3) + "." + Version.PY_CACHE_TAG + ".class"));
             File classFile = classPath.toFile();
             if (classFile.exists() && classFile.lastModified() > src.lastModified())
                 continue;
@@ -71,9 +76,9 @@ public class JycompileAntTask extends GlobMatchingTask {
                 String compiledFilePath = name.replace('.', File.separatorChar);
                 Path classPath = Paths.get(compiledFilePath);
                 if (src.getName().endsWith("__init__.py")) {
-                    classPath = classPath.resolve(Paths.get(imp.CACHEDIR, "__init__"));
+                    classPath = classPath.resolve(Paths.get(Import.CACHEDIR, "__init__"));
                 } else {
-                    Path cache = Paths.get(imp.CACHEDIR, classPath.getFileName().toString());
+                    Path cache = Paths.get(Import.CACHEDIR, classPath.getFileName().toString());
                     if (classPath.getParent() == null) {
                         classPath = cache;
                     } else {
@@ -99,16 +104,19 @@ public class JycompileAntTask extends GlobMatchingTask {
     protected void compile(File src, File compiled, String moduleName) {
         byte[] bytes;
         try {
-            bytes = imp.compileSource(moduleName, src);
-        } catch (PyException pye) {
-            pye.printStackTrace();
+            bytes = Import.compileSource(moduleName, new FileInputStream(src), moduleName);
+        } catch (Exception e) {
             throw new BuildException("Compile failed; see the compiler error output for details.");
         }
         File dir = compiled.getParentFile();
         if (!dir.exists() && !compiled.getParentFile().mkdirs()) {
             throw new BuildException("Unable to make directory for compiled file: " + compiled);
         }
-        imp.cacheCompiledSource(src.getAbsolutePath(), compiled.getAbsolutePath(), bytes);
+        try (FileOutputStream fop = new FileOutputStream(compiled)) {
+            fop.write(bytes);
+        } catch (IOException e) {
+            throw new BuildException("Unable to write to source cache file due to " + e);
+        }
     }
 
     protected static final String getModuleName(File f) {

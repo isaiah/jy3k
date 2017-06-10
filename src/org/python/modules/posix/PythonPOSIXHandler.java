@@ -4,6 +4,9 @@ package org.python.modules.posix;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import jnr.constants.platform.Errno;
 import jnr.posix.POSIXHandler;
@@ -47,13 +50,9 @@ public class PythonPOSIXHandler implements POSIXHandler {
     }
 
     public String[] getEnv() {
-        PyObject items = imp.load("os").__getattr__("environ").invoke("items");
-        String[] env = new String[items.__len__()];
-        int i = 0;
-        for (PyObject item : items.asIterable()) {
-            env[i++] = String.format("%s=%s", item.__getitem__(0), item.__getitem__(1));
-        }
-        return env;
+        Map<String, String> envs = System.getenv();
+        List<String> pairs = envs.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.toList());
+        return pairs.toArray(new String[0]);
     }
 
     public InputStream getInputStream() {

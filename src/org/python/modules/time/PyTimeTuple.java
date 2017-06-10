@@ -49,7 +49,7 @@ public class PyTimeTuple extends PyTuple {
         tm_isdst = Py.False;
     }
 
-    PyTimeTuple(PyObject... vals) {
+    public PyTimeTuple(PyObject... vals) {
         super(TYPE, vals);
         if (vals.length == 1 && vals[0] instanceof PySequence) {
             vals = (PyObject[]) vals[0].__tojava__(PyObject[].class);
