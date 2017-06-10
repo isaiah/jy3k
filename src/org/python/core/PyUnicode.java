@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import static org.python.core.stringlib.Encoding.encode_UnicodeEscape;
 
@@ -1782,57 +1783,21 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     final PyUnicode unicodeJoin(PyObject obj) {
-        PySequence seq = fastSequence(obj, "");
-        // A codec may be invoked to convert str objects to Unicode, and so it's possible
-        // to call back into Python code during PyUnicode_FromObject(), and so it's
-        // possible for a sick codec to change the size of fseq (if seq is a list).
-        // Therefore we have to keep refetching the size -- can't assume seqlen is
-        // invariant.
-        int seqLen = seq.__len__();
-        // If empty sequence, return u""
-        if (seqLen == 0) {
-            return new PyUnicode();
-        }
-
-        // If singleton sequence with an exact Unicode, return that
+        StringJoiner joiner = new StringJoiner(getString());
         PyObject item;
-        if (seqLen == 1) {
-            item = seq.pyget(0);
-            if (item.getType() == PyUnicode.TYPE) {
-                return (PyUnicode)item;
+        PyObject iter = obj.__iter__();
+        try {
+            for (int i = 0; (item = iter.__next__()) != null; i++) {
+                if (!(item instanceof PyUnicode)) {
+                    throw Py.TypeError(String.format("sequence item %d: expected str instance, %s found",
+                            i, item.getType().fastGetName()));
+                }
+                joiner.add(((PyUnicode) item).getString());
             }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) throw e;
         }
-
-        String sep = null;
-        if (seqLen > 1) {
-            sep = getString();
-        }
-
-        // At least two items to join, or one that isn't exact Unicode
-        long size = 0;
-        int sepLen = getString().length();
-        StringBuilder buf = new StringBuilder();
-        String itemString;
-        for (int i = 0; i < seqLen; i++) {
-            item = seq.pyget(i);
-            // Convert item to Unicode
-            if (!(item instanceof PyUnicode)) {
-                throw Py.TypeError(String.format("sequence item %d: expected string or Unicode,"
-                        + " %.80s found", i, item.getType().fastGetName()));
-            }
-            itemString = ((PyUnicode)item).getString();
-
-            if (i != 0) {
-                size += sepLen;
-                buf.append(sep);
-            }
-            size += itemString.length();
-            if (size > Integer.MAX_VALUE) {
-                throw Py.OverflowError("join() result is too long for a Python string");
-            }
-            buf.append(itemString);
-        }
-        return new PyUnicode(buf.toString());
+        return new PyUnicode(joiner.toString());
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_startswith_doc)

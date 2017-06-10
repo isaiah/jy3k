@@ -753,8 +753,15 @@ public class PyObjectDerived extends PyObject implements Slotted,FinalizablePyOb
     public PyObject __iter__() {
         PyType self_type=getType();
         PyObject impl=self_type.lookup("__iter__");
-        if (impl!=null)
-            return impl.__get__(this,self_type).__call__();
+        if (impl!=null) {
+            PyObject iter=impl.__get__(this,self_type).__call__();
+            PyType type=iter.getType();
+            PyObject next=type.lookup("__next__");
+            if (next==null) {
+                throw Py.TypeError(String.format("iter() returned non-iterator of type %s",type.fastGetName()));
+            }
+            return iter;
+        }
         impl=self_type.lookup("__getitem__");
         if (impl==null)
             return super.__iter__();

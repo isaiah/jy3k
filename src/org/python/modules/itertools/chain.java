@@ -1,28 +1,29 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
-import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyIterator;
+import org.python.core.PyIter;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.Visitproc;
 import org.python.expose.ExposedClassMethod;
-import org.python.expose.ExposedNew;
 import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
+import java.util.Arrays;
+
 @ExposedType(name = "itertools.chain", base = PyObject.class, doc = BuiltinDocs.chain_doc)
-public class chain extends PyIterator {
+public class chain extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(chain.class);
-    private itertools.ItertoolsIterator iter;
+    private PyObject source;
+    private PyObject active;
 
     public chain() {
-        super();
+        super(TYPE);
     }
 
     public chain(PyType subType) {
@@ -30,8 +31,8 @@ public class chain extends PyIterator {
     }
 
     public chain(PyObject iterable) {
-        super();
-        chain___init__(iterable.__iter__());
+        super(TYPE);
+        source = iterable;
     }
 
     @ExposedClassMethod
@@ -45,50 +46,12 @@ public class chain extends PyIterator {
     @ExposedNew
     @ExposedMethod
     final void chain___init__(final PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("chain", args, kwds, "iterables");
-        ap.noKeywords();
-
-        //ArgParser always returns a PyTuple - I wonder why we make it pass back a PyObject?
-        PyTuple tuple = (PyTuple)ap.getList(0);
-        chain___init__(tuple.__iter__());
-    }
-
-    private void chain___init__(final PyObject superIterator) {
-
-        iter = new itertools.ItertoolsIterator() {
-            PyObject currentIterator = superIterator.__next__().__iter__();
-
-            public PyObject __next__() {
-                PyObject res;
-                try {
-                    res = currentIterator.__next__();
-                } catch (PyException e) {
-                    if (e.match(Py.StopIteration)) {
-                        currentIterator = superIterator.__next__().__iter__();
-                        return __next__();
-                    }
-                    throw e;
-                }
-                if (res == null) {
-                    PyObject next = superIterator.__next__();
-                    if (next == null) {
-                        throw Py.StopIteration();
-                    }
-                    currentIterator = next.__iter__();
-                    return __next__();
-                }
-                return res;
-            }
-        };
+        source = new PyIter(Arrays.asList(args));
     }
 
     @Override
+    @ExposedMethod(names = "__iter__", doc = BuiltinDocs.chain___iter___doc)
     public PyObject __iter__() {
-        return chain___iter__();
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.chain___iter___doc)
-    final PyObject chain___iter__() {
         return this;
     }
 
@@ -99,21 +62,32 @@ public class chain extends PyIterator {
 
     @ExposedMethod(doc = BuiltinDocs.chain___next___doc)
     final PyObject chain___next__() {
-        return iter.__next__();
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
+        if (source == null) {
+            throw Py.StopIteration();
         }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+        if (active == null) {
+            PyObject iterable = source.__next__();
+            if (iterable == null) {
+                source = null;
+                throw Py.StopIteration();
+            }
+            active = iterable.__iter__();
+            if (active == null) {
+                source = null;
+                throw Py.StopIteration();
+            }
+        }
+        try {
+            PyObject item = active.__next__();
+            if (item != null) {
+                return item;
+            }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
+            }
+        }
+        active = null;
+        return chain___next__();
     }
 }
