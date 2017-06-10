@@ -792,12 +792,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         setline(node);
         for (alias a : node.getInternalNames()) {
             String asname, name = a.getInternalName();
+            int dot = name.indexOf('.');
+            boolean aliased = false;
             if (a.getInternalAsname() != null) {
                 asname = a.getInternalAsname();
+                aliased = true;
             } else {
-                asname = name;
-                if (asname.indexOf('.') > 0) {
-                    asname = asname.substring(0, asname.indexOf('.'));
+                if (dot > 0) {
+                    asname = name.substring(0, dot);
+                } else {
+                    asname = name;
                 }
             }
             loadFrame();
@@ -806,6 +810,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.iconst(0);
             code.invokestatic(p(org.python.bootstrap.Import.class), "importName",
                     sig(PyObject.class,  PyFrame.class, String.class, String[].class, Integer.TYPE));
+            if (aliased) {
+                while(dot > 0) {
+                    int nextDot = name.indexOf('.', ++dot);
+                    String attrName;
+                    if (nextDot > 0) {
+                        attrName = name.substring(dot, nextDot);
+                    } else {
+                        attrName = name.substring(dot);
+                    }
+                    code.ldc(attrName);
+                    code.invokevirtual(p(PyObject.class), "__getattr__", sig(PyObject.class, String.class));
+                    dot = nextDot;
+                }
+            }
             set(new Name(a, asname, expr_contextType.Store));
         }
         return null;
