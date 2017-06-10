@@ -125,7 +125,7 @@ public class PyTeeIterator extends PyIterator {
     }
 
     @ExposedMethod
-    public final PyObject tee_next() {
+    public final PyObject tee___next__() {
         return next();
     }
     
