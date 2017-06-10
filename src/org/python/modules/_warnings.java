@@ -1,5 +1,6 @@
 package org.python.modules;
 
+import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
@@ -11,7 +12,6 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
@@ -275,8 +275,7 @@ public class _warnings {
     private static final PyObject getWarningsAttr(String attr, boolean tryImport) {
         PyObject warningsModule;
         if (tryImport) {
-            warningsModule = imp.importName("warnings", true);
-            if (warningsModule == null) return null;
+            Import.importModule("warnings");
         }
         warningsModule = Py.getSystemState().modules.__getitem__("warnings");
         return warningsModule.__findattr__(attr);

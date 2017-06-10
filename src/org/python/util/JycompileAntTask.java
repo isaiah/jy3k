@@ -3,13 +3,10 @@ package org.python.util;
 import org.apache.tools.ant.BuildException;
 import org.python.Version;
 import org.python.bootstrap.Import;
-import org.python.core.PyException;
 import org.python.core.PySystemState;
-import org.python.core.imp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;

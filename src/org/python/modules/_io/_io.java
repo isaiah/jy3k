@@ -1,6 +1,7 @@
 /* Copyright (c)2012 Jython Developers */
 package org.python.modules._io;
 
+import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
@@ -10,7 +11,6 @@ import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.core.io.IOBase;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedFunction;
@@ -175,7 +175,7 @@ public class _io {
         } else {
             // We are buffering, so wrap raw into a buffered file
             PyObject bufferType = null;
-            PyObject io = imp.load("io");
+            PyObject io = Import.importModule("io");
 
             if (mode.updating) {
                 bufferType = io.__getattr__("BufferedRandom");

@@ -353,6 +353,63 @@ public class Import {
             }
         }
     }
+        /**
+     * Selects the parent class loader for Jython, to be used for dynamically loaded classes and
+     * resources. Chooses between the current and context classloader based on the following
+     * criteria:
+     *
+     * <ul>
+     * <li>If both are the same classloader, return that classloader.
+     * <li>If either is null, then the non-null one is selected.
+     * <li>If both are not null, and a parent/child relationship can be determined, then the child
+     * is selected.
+     * <li>If both are not null and not on a parent/child relationship, then the current class
+     * loader is returned (since it is likely for the context class loader to <b>not</b> see the
+     * Jython classes)
+     * </ul>
+     *
+     * @return the parent class loader for Jython or null if both the current and context
+     *         classloaders are null.
+     */
+    public static ClassLoader getParentClassLoader() {
+        ClassLoader current = Import.class.getClassLoader();
+        ClassLoader context = Thread.currentThread().getContextClassLoader();
+        if (context == current) {
+            return current;
+        }
+        if (context == null) {
+            return current;
+        }
+        if (current == null) {
+            return context;
+        }
+        if (isParentClassLoader(context, current)) {
+            return current;
+        }
+        if (isParentClassLoader(current, context)) {
+            return context;
+        }
+        return current;
+    }
+
+    private static boolean isParentClassLoader(ClassLoader suspectedParent, ClassLoader child) {
+        try {
+            ClassLoader parent = child.getParent();
+            if (suspectedParent == parent) {
+                return true;
+            }
+            if (parent == null || parent == child) {
+                // We reached the boot class loader
+                return false;
+            }
+            return isParentClassLoader(suspectedParent, parent);
+
+        } catch (SecurityException e) {
+            return false;
+        }
+    }
+
+    /** END imp.java */
 
     /// The following methods can be found in Python/cevel.c
     // import_name

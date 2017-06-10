@@ -24,7 +24,6 @@ import org.python.core.PyFile;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
-import org.python.core.imp;
 import org.python.core.io.RawIOBase;
 import org.python.util.PythonInterpreter;
 

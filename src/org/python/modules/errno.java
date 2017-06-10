@@ -6,13 +6,9 @@ import jnr.constants.ConstantSet;
 import jnr.constants.platform.Errno;
 import jnr.posix.util.Platform;
 import org.python.core.BuiltinDocs;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
-import org.python.core.PyBytes;
-import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
 

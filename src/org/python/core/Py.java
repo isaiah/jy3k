@@ -1060,7 +1060,7 @@ public final class Py {
             }
         }
         if (syspathJavaLoaderRestricted) {
-            classLoader = imp.getParentClassLoader();
+            classLoader = Import.getParentClassLoader();
             if (classLoader != null && reason != null) {
                 writeDebug("import", "trying " + name + " as " + reason +
                         " in Jython's parent class loader");
@@ -1254,7 +1254,7 @@ public final class Py {
         // directly from Java (eg through clamp).
         importSiteIfSelected();
 
-        PyObject mod = imp.importName(module.intern(), false);
+        PyObject mod = Import.importModule(module.intern());
         PyType pyc = (PyType) mod.__getattr__(pyclass.intern());
 
 
@@ -1788,7 +1788,7 @@ public final class Py {
         if (Options.importSite) {
             try {
                 // Ensure site-packages are available
-                imp.load("site");
+                Import.importModule("site");
                 return true;
             } catch (PyException pye) {
                 if (pye.match(Py.ImportError)) {
@@ -1805,9 +1805,8 @@ public final class Py {
                             ((PyBaseException) pye.value).args.__getitem__(0),
                             sys.path,
                             sys.prefix), "site");
-                } else {
-                    throw pye;
                 }
+                throw pye;
             }
         }
         return false;

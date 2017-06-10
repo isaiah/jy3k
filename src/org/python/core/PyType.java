@@ -2,6 +2,7 @@
 package org.python.core;
 
 import com.google.common.collect.MapMaker;
+import org.python.bootstrap.Import;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedDelete;
@@ -1930,7 +1931,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             if (underlying_class != null) {
                 return PyType.fromClass(underlying_class, false);
             }
-            PyObject mod = imp.importName(module.intern(), false);
+            PyObject mod = Import.importModule(module);
             PyObject pytyp = mod.__getattr__(name.intern());
             if (!(pytyp instanceof PyType)) {
                 throw Py.TypeError(module + "." + name + " must be a type for deserialization");

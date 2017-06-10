@@ -2,9 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
-import org.python.core.BuiltinDocs;
 import org.python.core.Py;
-import org.python.core.PyException;
 import org.python.core.PyIterator;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
@@ -12,7 +10,6 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Visitproc;
-import org.python.core.imp;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;

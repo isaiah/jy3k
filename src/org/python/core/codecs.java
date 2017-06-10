@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.python.bootstrap.Import;
 import org.python.core.util.StringUtil;
 import org.python.modules._codecs;
 
@@ -1837,7 +1838,7 @@ public class codecs {
                         builtinErrorHandler + "_errors"));
             }
             try {
-                imp.load("encodings");
+                Import.importModule("encodings");
             } catch (PyException exc) {
                 if (exc.type != Py.ImportError) {
                     throw exc;

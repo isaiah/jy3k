@@ -10,7 +10,6 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;

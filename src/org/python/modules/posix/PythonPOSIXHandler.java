@@ -1,20 +1,17 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.posix;
 
+import jnr.constants.platform.Errno;
+import jnr.posix.POSIXHandler;
+import org.python.core.Options;
+import org.python.core.Py;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import jnr.constants.platform.Errno;
-import jnr.posix.POSIXHandler;
-
-import org.python.core.imp;
-import org.python.core.Options;
-import org.python.core.Py;
-import org.python.core.PyObject;
 
 
 /**

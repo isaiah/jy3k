@@ -3,7 +3,6 @@ package org.python.util;
 
 import org.python.Version;
 import org.python.bootstrap.Import;
-import org.python.core.CodeFlag;
 import org.python.core.CompileMode;
 import org.python.core.Options;
 import org.python.core.Py;
@@ -15,9 +14,7 @@ import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.core.util.RelativeFile;
-import org.python.modules._systemrestart;
 import org.python.modules.posix.PosixModule;
 import org.python.modules.thread._thread;
 

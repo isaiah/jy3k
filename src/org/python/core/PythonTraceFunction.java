@@ -2,6 +2,8 @@
 package org.python.core;
 
 
+import org.python.bootstrap.Import;
+
 class PythonTraceFunction extends TraceFunction implements Traverseproc {
 
     PyObject tracefunc;
@@ -11,7 +13,7 @@ class PythonTraceFunction extends TraceFunction implements Traverseproc {
     }
 
     private TraceFunction safeCall(PyFrame frame, String label, PyObject arg) {
-        synchronized(imp.class) {
+        synchronized(Import.class) {
             synchronized(this) {
                 ThreadState ts = Py.getThreadState();
                 if(ts.tracing)

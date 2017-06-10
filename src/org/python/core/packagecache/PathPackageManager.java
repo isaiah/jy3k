@@ -10,7 +10,6 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
-import org.python.core.imp;
 import org.python.core.util.RelativeFile;
 
 import java.io.BufferedInputStream;
@@ -49,7 +48,7 @@ public abstract class PathPackageManager extends CachedJarsPackageManager {
 
             File f = new RelativeFile(dir, child);
             try {
-                if (f.isDirectory() && imp.caseok(f, name)) {
+                if (f.isDirectory()) {
                     /*
                      * Figure out if we have a directory a mixture of python and
                      * java or just an empty directory (which means Java) or a
