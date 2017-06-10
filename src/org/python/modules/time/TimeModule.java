@@ -520,18 +520,16 @@ public class TimeModule {
         return new PyUnicode(s);
     }
 
-    /**
-     * Calls _strptime.strptime(), for cases that our SimpleDateFormat backed
-     * strptime can't handle.
-     */
-    private static PyObject pystrptime(PyObject data_string, PyObject format) {
-        return imp.importName("_strptime", true)
-                .invoke("_strptime_time", data_string, format);
-    }
-
     @ExposedFunction(defaults = {"null"})
-    public static PyObject strptime(PyObject dataString, PyObject format) {
-        return pystrptime(dataString, format);
+    public static PyObject strptime(PyObject dateString, PyObject format) {
+        DateTimeFormatter formatter;
+        if (format == null) {
+            formatter = DateTimeFormatter.BASIC_ISO_DATE;
+        } else {
+            formatter = DateTimeFormatter.ofPattern(format.toString());
+        }
+        LocalDateTime dateTime = LocalDateTime.parse(dateString.asString(), formatter);
+        return new PyTimeTuple(dateTime);
     }
 
     public static final DateTimeFormatter DEFAULT_FORMAT_PY = DateTimeFormatter.ofPattern("E MMM ppd HH:mm:ss y");

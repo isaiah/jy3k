@@ -4,6 +4,7 @@ package org.python.modules.time;
 import org.python.core.CompareOp;
 import org.python.core.Py;
 import org.python.core.PyList;
+import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PySequence;
@@ -15,6 +16,8 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
+
+import java.time.LocalDateTime;
 
 /**
  * struct_time of the time module.
@@ -30,6 +33,21 @@ public class PyTimeTuple extends PyTuple {
     public final int n_sequence_fields = 9, n_fields = 9, n_unnamed_fields = 0;
     
     public static final PyType TYPE = PyType.fromClass(PyTimeTuple.class);
+
+    PyTimeTuple(LocalDateTime dateTime) {
+        super(TYPE);
+        PyObject[] vals = new PyObject[9];
+
+        tm_year = new PyLong(dateTime.getYear());
+        tm_mon = new PyLong(dateTime.getMonthValue());
+        tm_mday = new PyLong(dateTime.getDayOfMonth());
+        tm_hour = new PyLong(dateTime.getHour());
+        tm_min = new PyLong(dateTime.getMinute());
+        tm_sec = new PyLong(dateTime.getSecond());
+        tm_wday = new PyLong(dateTime.getDayOfWeek().getValue());
+        tm_yday = new PyLong(dateTime.getDayOfYear());
+        tm_isdst = Py.False;
+    }
 
     PyTimeTuple(PyObject... vals) {
         super(TYPE, vals);
