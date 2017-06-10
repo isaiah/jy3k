@@ -1,5 +1,6 @@
 package org.python.modules.sre;
 
+import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -67,7 +68,7 @@ public class PySRE_Pattern extends PyObject {
             this.reg = Pattern.compile(pattern, javaFlags);
         } catch (PatternSyntaxException e) {
             PyType error;
-            PyObject re = imp.importName("sre_constants", true);
+            PyObject re = Import.importModule("sre_constants");
             error = (PyType) re.__getattr__("error");
             throw new PyException(error, new PyTuple(new PyUnicode(e.getMessage()), new PyUnicode(pattern)));
         }
@@ -268,7 +269,7 @@ public class PySRE_Pattern extends PyObject {
     }
 
     private PyObject call(String module, String function, PyObject... args) {
-        PyObject sre = imp.importName(module, true);
+        PyObject sre = Import.importModule(module);
         return sre.invoke(function, args);
     }
 
