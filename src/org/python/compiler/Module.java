@@ -417,7 +417,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     Map<Constant, Constant> constants;
 
     public Module(String name, String filename, boolean linenumbers) {
-        this(name, filename, linenumbers, org.python.core.imp.NO_MTIME);
+        this(name, filename, linenumbers, -1);
     }
 
     public Module(String name, String filename, boolean linenumbers, long mtime) {
@@ -439,7 +439,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     public Module(String name) {
-        this(name, name + ".py", true, org.python.core.imp.NO_MTIME);
+        this(name, name + ".py", true, -1);
     }
 
     private Constant findConstant(Constant c) {
@@ -526,20 +526,20 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.areturn();
     }
 
-    public void addMain() throws IOException {
-        Code c = classfile.addMethod("main", //
-                sig(Void.TYPE, String[].class), ACC_PUBLIC | ACC_STATIC);
-        c.new_(classfile.name);
-        c.dup();
-        c.ldc(classfile.name);
-        c.invokespecial(classfile.name, "<init>", sig(Void.TYPE, String.class));
-        c.invokevirtual(classfile.name, "getMain", sig(PyCode.class));
-        c.invokestatic(p(CodeLoader.class), CodeLoader.SIMPLE_FACTORY_METHOD_NAME,
-                sig(CodeBootstrap.class, PyCode.class));
-        c.aload(0);
-        c.invokestatic(p(Py.class), "runMain", sig(Void.TYPE, CodeBootstrap.class, String[].class));
-        c.return_();
-    }
+//    public void addMain() throws IOException {
+//        Code c = classfile.addMethod("main", //
+//                sig(Void.TYPE, String[].class), ACC_PUBLIC | ACC_STATIC);
+//        c.new_(classfile.name);
+//        c.dup();
+//        c.ldc(classfile.name);
+//        c.invokespecial(classfile.name, "<init>", sig(Void.TYPE, String.class));
+//        c.invokevirtual(classfile.name, "getMain", sig(PyCode.class));
+//        c.invokestatic(p(CodeLoader.class), CodeLoader.SIMPLE_FACTORY_METHOD_NAME,
+//                sig(CodeBootstrap.class, PyCode.class));
+//        c.aload(0);
+//        c.invokestatic(p(Py.class), "runMain", sig(Void.TYPE, CodeBootstrap.class, String[].class));
+//        c.return_();
+//    }
 
     public void addBootstrap() throws IOException {
         Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME, //
@@ -610,7 +610,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     public void write(OutputStream stream) throws IOException {
         addInit();
         addRunnable();
-        addMain();
+//        addMain();
         addBootstrap();
 
         addFunctions();
@@ -683,8 +683,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,
             boolean linenumbers, CompilerFlags cflags) throws Exception {
-        compile(node, ostream, name, filename, linenumbers, cflags,
-                org.python.core.imp.NO_MTIME);
+        compile(node, ostream, name, filename, linenumbers, cflags, -1);
     }
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,

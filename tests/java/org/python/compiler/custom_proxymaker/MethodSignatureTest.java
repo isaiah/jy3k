@@ -10,7 +10,6 @@ import java.lang.reflect.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.python.util.ProxyCompiler;
 
 public class MethodSignatureTest {
 	Class<?> proxy;

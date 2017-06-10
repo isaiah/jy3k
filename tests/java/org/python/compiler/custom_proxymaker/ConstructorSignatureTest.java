@@ -9,7 +9,6 @@ import static org.junit.Assert.*;
 import java.lang.reflect.*;
 
 import org.junit.*;
-import org.python.util.ProxyCompiler;
 
 import java.awt.Container;
 import javax.swing.BoxLayout;

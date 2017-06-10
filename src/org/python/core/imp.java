@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.python.Version;
+import org.python.bootstrap.Import;
 import org.python.compiler.Module;
 import org.python.core.util.FileUtil;
 import org.python.core.util.PlatformUtil;
@@ -1086,9 +1087,7 @@ public class imp {
                         PyObject nameObj = module.__findattr__("__name__");
                         if (nameObj != null) {
                             String submodName = nameObj.__str__().toString() + '.' + sname;
-                            value =
-                                    BuiltinModule
-                                            .__import__(submodName, null, null, nonEmptyFromlist);
+                            value = Import.importModuleLevel(submodName, null, nonEmptyFromlist, 0);
                         }
                     }
                     locals.__setitem__(sname, value);

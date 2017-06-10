@@ -7,7 +7,6 @@ package org.python.compiler.custom_proxymaker;
 import static org.junit.Assert.*;
 
 import org.junit.*;
-import org.python.util.ProxyCompiler;
 
 public class ClassAnnotationTest {
     

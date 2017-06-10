@@ -2,7 +2,6 @@ package org.python.modules;
 
 import org.python.core.BaseSet;
 import org.python.core.Py;
-import org.python.core.PyBytecode;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyDictionary;
@@ -226,22 +225,6 @@ public class marshal {
                 for (PyObject item : set.asIterable()) {
                     write_object(item, depth + 1);
                 }
-            } else if (v instanceof PyBytecode) {
-                PyBytecode code = (PyBytecode) v;
-                write_byte(TYPE_CODE);
-                write_int(code.co_argcount);
-                write_int(code.co_nlocals);
-                write_int(code.co_stacksize);
-                write_int(code.co_flags.toBits());
-                write_object(Py.newString(new String(code.co_code)), depth + 1);
-                write_object(new PyTuple(code.co_consts), depth + 1);
-                write_strings(code.co_names, depth + 1);
-                write_strings(code.co_varnames, depth + 1);
-                write_strings(code.co_freevars, depth + 1);
-                write_strings(code.co_cellvars, depth + 1);
-                write_object(Py.newString(code.co_name), depth + 1);
-                write_int(code.co_firstlineno);
-                write_object(Py.newString(new String(code.co_lnotab)), depth + 1);
             } else {
                 write_byte(TYPE_UNKNOWN);
             }
@@ -507,32 +490,6 @@ public class marshal {
                         return new PyFrozenSet(v);
                     }
                 }
-
-
-                case TYPE_CODE: {
-                    // XXX - support restricted execution mode? not certain if this is just legacy
-                    int argcount = read_int();
-                    int nlocals = read_int();
-                    int stacksize = read_int();
-                    int flags = read_int();
-                    String code = read_object_notnull(depth + 1).toString();
-                    PyObject consts[] = ((PyTuple) read_object_notnull(depth + 1)).getArray();
-                    String names[] = read_strings(depth + 1);
-                    String varnames[] = read_strings(depth + 1);
-                    String freevars[] = read_strings(depth + 1);
-                    String cellvars[] = read_strings(depth + 1);
-                    String filename = read_object_notnull(depth + 1).toString();
-                    String name = read_object_notnull(depth + 1).toString();
-                    int firstlineno = read_int();
-                    String lnotab = read_object_notnull(depth + 1).toString();
-
-                    return new PyBytecode(
-                            argcount, nlocals, stacksize, flags,
-                            code, consts, names, varnames,
-                            filename, name, firstlineno, lnotab,
-                            cellvars, freevars);
-                }
-
                 default:
                     throw Py.ValueError("bad marshal data");
             }

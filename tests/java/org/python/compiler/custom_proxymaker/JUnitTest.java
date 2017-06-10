@@ -7,7 +7,6 @@ package org.python.compiler.custom_proxymaker;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
-import org.python.util.ProxyCompiler;
 
 public class JUnitTest {
     @Test

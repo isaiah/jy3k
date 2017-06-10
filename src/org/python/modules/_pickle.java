@@ -12,6 +12,7 @@
 
 package org.python.modules;
 
+import org.python.bootstrap.Import;
 import org.python.core.ClassDictInit;
 import org.python.core.Exceptions;
 import org.python.core.Py;
@@ -2151,7 +2152,7 @@ public class _pickle {
 
     private static PyObject importModule(String name) {
         PyObject fromlist = new PyTuple(new PyUnicode("__doc__"));
-        return BuiltinModule.__import__(name, Py.None, Py.None, fromlist);
+        return Import.importModuleLevel(name, Py.None, fromlist, 0);
     }
 
     private static PyObject getJavaFunc(String name, String methodName) {

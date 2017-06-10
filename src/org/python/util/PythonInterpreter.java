@@ -285,10 +285,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         Py.flushLine();
     }
 
-    public void execfile(java.io.InputStream s) {
-        execfile(s, "<iostream>");
-    }
-
     public void execfile(java.io.InputStream s, String name) {
         setSystemState();
         Py.runCode(Py.compile_flags(s, name, CompileMode.exec, cflags), null, getLocals());

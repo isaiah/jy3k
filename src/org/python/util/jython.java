@@ -2,6 +2,7 @@
 package org.python.util;
 
 import org.python.Version;
+import org.python.bootstrap.Import;
 import org.python.core.CodeFlag;
 import org.python.core.CompileMode;
 import org.python.core.Options;
@@ -192,7 +193,7 @@ public class jython {
 
     private static boolean runModule(InteractiveConsole interp, String moduleName, boolean set_argv0) {
         // PEP 338 - Execute module as a script
-        PyObject runpy = imp.importName("runpy", true);
+        PyObject runpy = Import.importModule("runpy");
         PyObject runmodule = runpy.__findattr__("_run_module_as_main");
         runmodule.__call__(Py.newUnicode(moduleName), Py.newBoolean(set_argv0));
         return true;
@@ -214,14 +215,14 @@ public class jython {
         CommandLineOptions opts = new CommandLineOptions();
         if (!opts.parse(args)) {
             if (opts.version) {
-                System.err.println("Jython " + Version.PY_VERSION);
+                System.err.println("Jylang " + Version.PY_VERSION);
                 System.exit(0);
             }
             if (opts.help) {
                 System.err.println(usage);
             } else if (!opts.runCommand && !opts.runModule) {
                 System.err.print(usageHeader);
-                System.err.println("Try `jython -h' for more information.");
+                System.err.println("Try `jylang -h' for more information.");
             }
 
             int exitcode = opts.help ? 0 : -1;
@@ -260,13 +261,6 @@ public class jython {
             addWarnings(warnOptionsFromEnv(), warnoptions);
         }
         systemState.setWarnoptions(warnoptions);
-
-        // Make sure warnings module is loaded if there are warning options
-        // Not sure this is needed, but test_warnings.py expects this
-        if (warnoptions.size() > 0) {
-            imp.load("warnings");
-        }
-
         // Now create an interpreter
         if (!opts.interactive) {
             // Not (really) interactive, so do not use console prompts

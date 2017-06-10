@@ -40,7 +40,7 @@ public class _json {
 
     private static synchronized PyObject get_errmsg_fn() {
         if (errmsg_fn == null) {
-            PyObject json = BuiltinModule.__import__("json");
+            PyObject json = Py.getSystemState().builtins.__finditem__("json");
             if (json != null) {
                 PyObject decoder = json.__findattr__("decoder");
                 if (decoder != null) {

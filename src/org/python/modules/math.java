@@ -499,12 +499,6 @@ public class math {
         }
     }
 
-    @ExposedFunction
-    public static double fsum(final PyObject iterable) {
-        PyFloat result = (PyFloat) BuiltinModule.__import__("_fsum").invoke("fsum", iterable);
-        return result.asDouble();
-    }
-
     private static double calculateLongLog(PyLong v) {
         int exp[] = new int[1];
         double x = v.scaledDoubleValue(exp);

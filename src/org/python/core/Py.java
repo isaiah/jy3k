@@ -10,6 +10,7 @@ import jnr.posix.util.Platform;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.python.antlr.base.mod;
+import org.python.bootstrap.Import;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.core.generator.PyCoroutine;
@@ -697,7 +698,7 @@ public final class Py {
         }
         PyObject mod;
         try {
-            mod = BuiltinModule.__import__("warnings");
+            mod = Import.importModuleLevel("warnings", null, null, 0);
         } catch (PyException e) {
             if (e.match(ImportError)) {
                 return null;
@@ -706,6 +707,30 @@ public final class Py {
         }
         warnings_mod = mod;
         return mod;
+    }
+
+    public static PyCode newCode(int argcount, String varnames[],
+                                 String filename, String name,
+                                 int firstlineno,
+                                 boolean args, boolean keywords,
+                                 PyFunctionTable funcs, int func_id,
+                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
+                                 int npurecell, int kwonlyargcount, int moreflags) {
+        return new PyTableCode(argcount, varnames,
+                filename, name, firstlineno, args, keywords,
+                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                kwonlyargcount, moreflags);
+    }
+
+
+
+    public static PyObject newJavaFunc(Class<?> cls, String name) {
+        try {
+            Method m = cls.getMethod(name, new Class<?>[]{PyObject[].class, String[].class});
+            return new JavaFunc(m);
+        } catch (NoSuchMethodException e) {
+            throw Py.JavaError(e);
+        }
     }
 
     private static String warn_hcategory(PyObject category) {
@@ -901,135 +926,6 @@ public final class Py {
 
     public static PyBoolean newBoolean(boolean t) {
         return t ? Py.True : Py.False;
-    }
-
-    public static PyObject newDate(Date date) {
-        if (date == null) {
-            return Py.None;
-        }
-        PyObject datetimeModule = BuiltinModule.__import__("datetime");
-        PyObject dateClass = datetimeModule.__getattr__("date");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        return dateClass.__call__(newInteger(cal.get(Calendar.YEAR)),
-                newInteger(cal.get(Calendar.MONTH) + 1),
-                newInteger(cal.get(Calendar.DAY_OF_MONTH)));
-
-    }
-
-    public static PyObject newTime(Time time) {
-        if (time == null) {
-            return Py.None;
-        }
-        PyObject datetimeModule = BuiltinModule.__import__("datetime");
-        PyObject timeClass = datetimeModule.__getattr__("time");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(time);
-        return timeClass.__call__(newInteger(cal.get(Calendar.HOUR_OF_DAY)),
-                newInteger(cal.get(Calendar.MINUTE)),
-                newInteger(cal.get(Calendar.SECOND)),
-                newInteger(cal.get(Calendar.MILLISECOND) *
-                        1000));
-    }
-
-    public static PyObject newDatetime(Timestamp timestamp) {
-        if (timestamp == null) {
-            return Py.None;
-        }
-        PyObject datetimeModule = BuiltinModule.__import__("datetime");
-        PyObject datetimeClass = datetimeModule.__getattr__("datetime");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(timestamp);
-        return datetimeClass.__call__(new PyObject[]{
-                newInteger(cal.get(Calendar.YEAR)),
-                newInteger(cal.get(Calendar.MONTH) + 1),
-                newInteger(cal.get(Calendar.DAY_OF_MONTH)),
-                newInteger(cal.get(Calendar.HOUR_OF_DAY)),
-                newInteger(cal.get(Calendar.MINUTE)),
-                newInteger(cal.get(Calendar.SECOND)),
-                newInteger(timestamp.getNanos() / 1000)});
-    }
-
-    public static PyObject newDecimal(String decimal) {
-        if (decimal == null) {
-            return Py.None;
-        }
-        PyObject decimalModule = BuiltinModule.__import__("decimal");
-        PyObject decimalClass = decimalModule.__getattr__("Decimal");
-        return decimalClass.__call__(newUnicode(decimal));
-    }
-
-    public static PyCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names,
-                                 int npurecell, int kwonlyargcount, int moreflags) {
-        return new PyTableCode(argcount, varnames,
-                filename, name, 0, args, keywords, funcs,
-                func_id, cellvars, freevars, names, null,
-                npurecell, kwonlyargcount, moreflags);
-    }
-
-    public static PyCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names,
-                                 int npurecell, int kwonlyargcount, int moreflags) {
-        return new PyTableCode(argcount, varnames,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, names, null,
-                npurecell, kwonlyargcount, moreflags);
-    }
-
-    public static PyCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
-                                 int npurecell, int kwonlyargcount, int moreflags) {
-        return new PyTableCode(argcount, varnames,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, names, consts, npurecell,
-                kwonlyargcount, moreflags);
-    }
-
-
-    // --
-    public static PyCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id) {
-        return new PyTableCode(argcount, varnames,
-                filename, name, 0, args, keywords, funcs,
-                func_id);
-    }
-
-    public static PyCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id) {
-        return new PyTableCode(argcount, varnames,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id);
-    }
-
-    public static PyCode newJavaCode(Class<?> cls, String name) {
-        return new JavaCode(newJavaFunc(cls, name));
-    }
-
-    public static PyObject newJavaFunc(Class<?> cls, String name) {
-        try {
-            Method m = cls.getMethod(name, new Class<?>[]{PyObject[].class, String[].class});
-            return new JavaFunc(m);
-        } catch (NoSuchMethodException e) {
-            throw Py.JavaError(e);
-        }
     }
 
     private static PyObject initExc(String name, PyObject exceptions,
@@ -1372,36 +1268,6 @@ public final class Py {
         JyAttribute.setAttr(instance, JyAttribute.JAVA_PROXY_ATTR, proxy);
         proxy._setPyInstance(instance);
         proxy._setPySystemState(ts.systemState);
-    }
-
-    /**
-     * Initializes a default PythonInterpreter and runs the code from
-     * {@link PyRunnable#getMain} as __main__
-     * <p>
-     * Called by the code generated in {@link org.python.compiler.Module#addMain()}
-     */
-    public static void runMain(PyRunnable main, String[] args) throws Exception {
-        runMain(new PyRunnableBootstrap(main), args);
-    }
-
-    /**
-     * Initializes a default PythonInterpreter and runs the code loaded from the
-     * {@link CodeBootstrap} as __main__ Called by the code generated in
-     * {@link org.python.compiler.Module#addMain()}
-     */
-    public static void runMain(CodeBootstrap main, String[] args)
-            throws Exception {
-        PySystemState.initialize(null, null, args, main.getClass().getClassLoader());
-        try {
-            imp.createFromCode("__main__", CodeLoader.loadCode(main));
-        } catch (PyException e) {
-            Py.getSystemState().callExitFunc();
-            if (e.match(Py.SystemExit)) {
-                return;
-            }
-            throw e;
-        }
-        Py.getSystemState().callExitFunc();
     }
 
     //XXX: this needs review to make sure we are cutting out all of the Java
@@ -1916,13 +1782,6 @@ public final class Py {
         }
         // Decide if System.in is interactive
         return System.console() != null;
-//        try {
-//            POSIX posix = POSIXFactory.getPOSIX();
-//            FileDescriptor in = FileDescriptor.in;
-//            return posix.isatty(in);
-//        } catch (SecurityException ex) {
-//            return false;
-//        }
     }
 
     public static boolean importSiteIfSelected() {

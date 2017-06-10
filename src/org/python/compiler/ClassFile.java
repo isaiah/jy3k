@@ -18,6 +18,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import org.python.bootstrap.Import;
 import org.python.core.imp;
 import org.python.compiler.ProxyCodeHelpers.AnnotationDescr;
 
@@ -74,11 +75,11 @@ public class ClassFile
 
     public ClassFile(String name) {
         this(name, "java/lang/Object", Opcodes.ACC_SYNCHRONIZED | Opcodes.ACC_PUBLIC,
-                org.python.core.imp.NO_MTIME);
+                -1);
     }
 
     public ClassFile(String name, String superclass, int access) {
-        this(name, superclass, access, org.python.core.imp.NO_MTIME);
+        this(name, superclass, access, -1);
     }
     public ClassFile(String name, String superclass, int access, long mtime) {
         this.name = fixName(name);
@@ -196,7 +197,7 @@ public class ClassFile
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
         // XXX: should imp.java really house this value or should imp.java point into
         // org.python.compiler?
-        av.visit("value", Integer.valueOf(imp.getAPIVersion()));
+        av.visit("value", Integer.valueOf(Import.API_VERSION));
         av.visitEnd();
 
         av = cw.visitAnnotation("Lorg/python/compiler/MTime;", true);

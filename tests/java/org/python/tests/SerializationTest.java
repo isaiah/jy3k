@@ -31,7 +31,6 @@ import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.modules._csv.PyDialect;
 import org.python.util.PythonInterpreter;
-import org.python.util.PythonObjectInputStream;
 
 public class SerializationTest extends TestCase {
 

@@ -1,6 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import org.python.bootstrap.Import;
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedDelete;
 import org.python.expose.ExposedGet;
@@ -3874,7 +3875,7 @@ public class PyObject implements Serializable {
         if (proto >= 2) {
             res = reduce_2();
         } else {
-            PyObject copyreg = BuiltinModule.__import__("copyreg", null, null, Py.EmptyTuple);
+            PyObject copyreg = Import.importModuleLevel("copyreg", null, Py.EmptyTuple, 0);
             PyObject copyreg_reduce = copyreg.__findattr__("_reduce_ex");
             res = copyreg_reduce.__call__(this, new PyLong(proto));
         }
@@ -3933,7 +3934,7 @@ public class PyObject implements Serializable {
             return slotnames;
         }
 
-        PyObject copyreg = BuiltinModule.__import__("copyreg", null, null, Py.EmptyTuple);
+        PyObject copyreg = Import.importModuleLevel("copyreg", null, Py.EmptyTuple, 0);
         PyObject copyreg_slotnames = copyreg.__findattr__("_slotnames");
         slotnames = copyreg_slotnames.__call__(cls);
         if (null != slotnames && Py.None != slotnames && (!(slotnames instanceof PyList))) {
@@ -4012,7 +4013,7 @@ public class PyObject implements Serializable {
             dictitems = invoke("iteritems");
         }
 
-        PyObject copyreg = BuiltinModule.__import__("copyreg", null, null, Py.EmptyTuple);
+        PyObject copyreg = Import.importModuleLevel("copyreg", null, Py.EmptyTuple, 0);
         PyObject newobj = copyreg.__findattr__("__newobj__");
 
         n = ((PyTuple)args).size();

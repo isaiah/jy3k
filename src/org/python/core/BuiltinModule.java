@@ -894,51 +894,6 @@ public class BuiltinModule {
         }
     }
 
-    public static PyObject __import__(String name) {
-        return __import__(name, null, null, null, imp.DEFAULT_LEVEL);
-    }
-
-    public static PyObject __import__(String name, PyObject globals) {
-        return __import__(name, globals, null, null, imp.DEFAULT_LEVEL);
-    }
-
-    public static PyObject __import__(String name, PyObject globals, PyObject locals) {
-        return __import__(name, globals, locals, null, imp.DEFAULT_LEVEL);
-    }
-
-    public static PyObject __import__(String name, PyObject globals, PyObject locals,
-                                      PyObject fromlist) {
-        return __import__(name, globals, locals, fromlist, imp.DEFAULT_LEVEL);
-    }
-
-    public static PyObject __import__(String name, PyObject globals, PyObject locals,
-                                      PyObject fromlist, int level) {
-        PyFrame frame = Py.getFrame();
-        PyObject builtins;
-        if (frame != null && frame.f_builtins != null) {
-            builtins = frame.f_builtins;
-        } else {
-            builtins = Py.getSystemState().builtins;
-        }
-
-        PyObject __import__ = builtins.__finditem__("__import__");
-        if (__import__ == null) {
-            return null;
-        }
-
-        PyObject[] args;
-        if (level < 0) {
-        	// for backward compatibility provide only 4 arguments
-        	args = new PyObject[] {new PyUnicode(name), globals, locals,
-        			fromlist};
-        } else {
-        	args = new PyObject[] {new PyUnicode(name), globals, locals,
-        			fromlist, Py.newInteger(level)};
-        }
-        PyObject module = __import__.__call__(args);
-        return module;
-    }
-
     /**
      * Return an interned String from name, raising a TypeError when conversion fails.
      *
