@@ -7,19 +7,23 @@ import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
+import org.python.core.PyBaseCode;
 import org.python.core.PyCode;
 import org.python.core.PyDict;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
+import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyTableCode;
+import org.python.core.PyTraceback;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
+import org.python.core.ThreadState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,6 +45,7 @@ public class Import {
     private static final String UNKNOWN_SOURCEFILE = "<unknown>";
 
     public static final int NO_MTIME = -1;
+    public static final int API_VERSION = 37;
 
     public static final int DEFAULT_LEVEL = 0;
 
@@ -110,6 +115,10 @@ public class Import {
         return absName;
     }
 
+    public static PyObject importModuleLevel(String name, PyObject globals, PyObject fromList, int level) {
+        return importModuleLevelObject(new PyUnicode(name), globals, fromList, level);
+    }
+
     public static PyObject importModuleLevelObject(PyObject name, PyObject globals, PyObject fromList, int level) {
         PySystemState interp = Py.getSystemState();
         PyObject absName;
@@ -142,7 +151,38 @@ public class Import {
             }
         } else {
             aquireLock(interp);
-            mod = interp.importlib.invoke("_find_and_load", absName, interp.importFunc);
+            try {
+                mod = interp.importlib.invoke("_find_and_load", absName, interp.importFunc);
+            } catch (PyException pye) {
+                /**
+                 * remove trackback that from '_bootstrap.py' or '_bootstrap_external.py' in case of ImportError
+                 * or marked with _call_with_frames_removed otherwise
+                 * FIXME: this works almost as good as CPython, but I (isaiah) am yet to find a way to remove the first frame,
+                 * as there is not pointer to pointer trick in java.
+                 */
+                PyTraceback outer_link = null;
+                PyTraceback base_tb = pye.traceback;
+                PyTraceback tb = base_tb;
+                PyTraceback prev_link = base_tb;
+                boolean in_importlib = false;
+                boolean always_trim = pye.match(Py.ImportError);
+                while (tb != null) {
+                    PyTraceback next = (PyTraceback) tb.tb_next;
+                    PyBaseCode code = tb.tb_frame.f_code;
+                    boolean now_in_importlib = code.co_filename.equals(importlib_filename)
+                            || code.co_filename.equals(external_filename);
+                    if (now_in_importlib && !in_importlib) {
+                        outer_link = prev_link;
+                    }
+                    in_importlib = now_in_importlib;
+                    if (in_importlib && (always_trim || code.co_name.equals(remove_frames))) {
+                        outer_link.tb_next = next;
+                    }
+                    prev_link = tb;
+                    tb = next;
+                }
+                throw pye;
+            }
             if (mod == null) {
                 return finalMod;
             }
@@ -190,13 +230,14 @@ public class Import {
     }
 
     public static boolean importFrozenModuleObject(String name) {
+        String filename = name.endsWith("_external") ? external_filename : importlib_filename;
         byte[] bytes;
         try {
             bytes = findFrozen(name);
         } catch (IOException e) {
             throw Py.ImportError("frozen module not found " + name);
         }
-        PyCode code = BytecodeLoader.makeCode(name + Version.PY_CACHE_TAG, bytes, name + ".py");
+        PyCode code = BytecodeLoader.makeCode(name + Version.PY_CACHE_TAG, bytes, filename);
         PyModule module = addModule(name);
 
         if (!(code instanceof PyTableCode)) {
@@ -210,6 +251,35 @@ public class Import {
             removeModule(name);
             throw t;
         }
+    }
+
+    /**
+     * Import a module, either built-in, frozen, or external, and return
+     * it's module object
+     */
+    public static PyObject importModule(String name) {
+        PyObject moduleName = new PyUnicode(name);
+        PyObject globals = null, builtins, importFunc;
+        ThreadState ts = Py.getThreadState();
+        if (ts.frame != null) {
+            globals = ts.frame.f_globals;
+        }
+        if (globals != null) {
+            builtins = globals.__finditem__("__builtins__");
+        } else {
+            /** No globals -- use standard builtins and fake globals */
+            builtins = importModuleLevel("builtins", null, null, 0);
+            globals = new PyStringMap();
+            globals.__setitem__("builtins", builtins);
+        }
+        /** Get the __import__ function from builtins */
+        if (builtins instanceof PyDict) {
+            importFunc = builtins.__getitem__("__import__");
+        } else {
+            importFunc = builtins.__getattr__("__import__");
+        }
+        PyObject r = importFunc.__call__(moduleName, globals, new PyList(), new PyLong(0));
+        return r;
     }
 
     /**
