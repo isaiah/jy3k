@@ -498,7 +498,6 @@ import org.python.modules.gc;
  *     ItertoolsIterator             - no refs, extends PyIterator, abstract class<br>
  *     FilterIterator                - Traverseproc, extends ItertoolsIterator<br>
  *     WhileIterator                 - Traverseproc, extends ItertoolsIterator
- *   izip                            - Traverseproc (with call to super)<br>
  *   izipLongest                     - Traverseproc (with call to super)<br>
  *   permutations                    - Traverseproc (with call to super)<br>
  *   product                         - Traverseproc (with call to super)<br>

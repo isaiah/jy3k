@@ -1,6 +1,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyIterator;
@@ -12,23 +13,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.islice", base = PyObject.class, doc = islice.islice_doc)
+@ExposedType(name = "itertools.islice", base = PyObject.class, doc = BuiltinDocs.itertools_islice_doc)
 public class islice extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(islice.class);
+
     private itertools.ItertoolsIterator iter;
-
-    public static final String islice_doc =
-        "islice(iterable, [start,] stop [, step]) --> islice object\n\n" +
-        "Return an iterator whose next() method returns selected values from an\n" +
-        "iterable.  If start is specified, will skip all preceding elements;\n" +
-        "otherwise, start defaults to zero.  Step defaults to one.  If\n" +
-        "specified as another value, step determines how many values are \n" +
-        "skipped between successive calls.  Works like a slice() on a list\n" +
-        "but returns an iterator.";
-
     public islice() {
-        super();
+        super(TYPE);
     }
 
     public islice(PyType subType) {
@@ -39,8 +30,8 @@ public class islice extends PyIterator {
      * @see #islice___init__(PyObject, PyObject, PyObject, PyObject) startObj defaults to 0 and stepObj to 1
      */
     public islice(PyObject iterable, PyObject stopObj) {
-        super();
-        islice___init__(iterable, new PyLong(0), stopObj, new PyLong(1));
+        super(TYPE);
+        islice___init__(iterable, Py.Zero, stopObj, Py.One);
     }
 
     /**
@@ -49,7 +40,7 @@ public class islice extends PyIterator {
     public islice(PyObject iterable, PyObject start,
                                     PyObject stopObj) {
         super();
-        islice___init__(iterable, start, stopObj, new PyLong(1));
+        islice___init__(iterable, start, stopObj, Py.One);
     }
 
     @ExposedNew
@@ -128,14 +119,10 @@ public class islice extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = {"__next__"})
+    public PyObject __next__() {
+        return doNext(iter.__next__());
     }
 
 

@@ -1,4 +1,4 @@
-base_class: izip
+base_class: zip_longest
 want_dict: true
 ctr:
 incl: object

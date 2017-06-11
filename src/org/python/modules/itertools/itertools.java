@@ -2,9 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.BuiltinDocs;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyException;
 import org.python.core.PyIterator;
 import org.python.core.PyNone;
@@ -48,11 +46,9 @@ public class itertools {
         dict.__setitem__("count", count.TYPE);
         dict.__setitem__("dropwhile", dropwhile.TYPE);
         dict.__setitem__("groupby", groupby.TYPE);
-        dict.__setitem__("imap", imap.TYPE);
         dict.__setitem__("filterfalse", filterfalse.TYPE);
         dict.__setitem__("islice", islice.TYPE);
-        dict.__setitem__("izip", izip.TYPE);
-        dict.__setitem__("izip_longest", izipLongest.TYPE);
+        dict.__setitem__("zip_longest", zip_longest.TYPE);
         dict.__setitem__("permutations", permutations.TYPE);
         dict.__setitem__("product", product.TYPE);
         dict.__setitem__("repeat", repeat.TYPE);

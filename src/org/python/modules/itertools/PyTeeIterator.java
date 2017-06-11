@@ -124,11 +124,7 @@ public class PyTeeIterator extends PyIterator {
         return new PyTeeIterator(teeData);
     }
 
-    @ExposedMethod
-    public final PyObject tee___next__() {
-        return next();
-    }
-    
+    @ExposedMethod(names = "__next__")
     public PyObject __next__() {
         PyObject obj = teeData.getItem(position++);
         if (obj == null) {

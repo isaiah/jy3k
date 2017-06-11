@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -11,20 +12,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.compress", base = PyObject.class, doc = compress.compress_doc)
+@ExposedType(name = "itertools.compress", base = PyObject.class, doc = BuiltinDocs.itertools_compress_doc)
 public class compress extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(compress.class);
     private itertools.ItertoolsIterator iter;
 
-    public static final String compress_doc =
-        "compress(data, selectors) --> iterator over selected data\n\n" +
-        "Return data elements corresponding to true selector elements.\n" +
-        "Forms a shorter iterator from selected data elements using the\n" +
-        "selectors to choose the data elements.";
-
     public compress() {
-        super();
+        super(TYPE);
     }
 
     public compress(PyType subType) {
@@ -32,7 +26,7 @@ public class compress extends PyIterator {
     }
 
     public compress(PyObject dataIterable, PyObject selectorsIterable) {
-        super();
+        super(TYPE);
         compress___init__(dataIterable.__iter__(), selectorsIterable.__iter__());
     }
 
@@ -68,16 +62,17 @@ public class compress extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

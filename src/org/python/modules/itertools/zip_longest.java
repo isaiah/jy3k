@@ -1,6 +1,7 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -11,34 +12,25 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.izip_longest", base = PyObject.class,
-    doc = izipLongest.izip_longest_doc)
-public class izipLongest extends PyIterator {
+@ExposedType(name = "itertools.zip_longest", base = PyObject.class,
+    doc = BuiltinDocs.itertools_zip_longest_doc)
+public class zip_longest extends PyIterator {
 
-    public static final PyType TYPE = PyType.fromClass(izipLongest.class);
+    public static final PyType TYPE = PyType.fromClass(zip_longest.class);
     private PyIterator iter;
 
-    public izipLongest() {
-        super();
+    public zip_longest() {
+        super(TYPE);
     }
 
-    public izipLongest(PyType subType) {
+    public zip_longest(PyType subType) {
         super(subType);
     }
 
-    public izipLongest(PyObject[] iterables, PyObject fillvalue) {
-        super();
-        izipLongest___init__(iterables, fillvalue);
+    public zip_longest(PyObject[] iterables, PyObject fillvalue) {
+        super(TYPE);
+        zip_longest___init__(iterables, fillvalue);
     }
-
-    public static final String izip_longest_doc =
-        "izip_longest(iter1 [,iter2 [...]], [fillvalue=None]) --> izip_longest object\n\n" +
-        "Return an izip_longest object whose .next() method returns a tuple where\n" +
-        "the i-th element comes from the i-th iterable argument.  The .next()\n" +
-        "method continues until the longest iterable in the argument sequence\n" +
-        "is exhausted and then it raises StopIteration.  When the shorter iterables\n" +
-        "are exhausted, the fillvalue is substituted in their place.  The fillvalue\n" +
-        "defaults to None or can be specified by a keyword argument.";
 
     /**
      * Create an iterator that returns items from the iterable while <code>predicate(item)</code>
@@ -46,7 +38,7 @@ public class izipLongest extends PyIterator {
      */
     @ExposedNew
     @ExposedMethod
-    final void izipLongest___init__(PyObject[] args, String[] kwds) {
+    final void zip_longest___init__(PyObject[] args, String[] kwds) {
 
         PyObject[] iterables;
         PyObject fillvalue;
@@ -61,10 +53,10 @@ public class izipLongest extends PyIterator {
         }
         //XXX error checking on args
 
-        izipLongest___init__(iterables, fillvalue);
+        zip_longest___init__(iterables, fillvalue);
     }
 
-    private void izipLongest___init__(final PyObject[] iterables, final PyObject fillvalue) {
+    private void zip_longest___init__(final PyObject[] iterables, final PyObject fillvalue) {
         final PyObject iterators[] = new PyObject[iterables.length];
         final boolean exhausted[] = new boolean[iterables.length];
         for (int i = 0; i < iterables.length; i++) {
@@ -101,16 +93,17 @@ public class izipLongest extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

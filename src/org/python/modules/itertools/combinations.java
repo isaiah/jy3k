@@ -1,6 +1,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -11,19 +12,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.combinations", base = PyObject.class, doc = combinations.combinations_doc)
+@ExposedType(name = "itertools.combinations", base = PyObject.class, doc = BuiltinDocs.itertools_combinations_doc)
 public class combinations extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(combinations.class);
     private PyIterator iter;
 
-    public static final String combinations_doc =
-        "combinations(iterable, r) --> combinations object\n\n" +
-        "Return successive r-length combinations of elements in the iterable.\n\n" +
-        "combinations(range(4), 3) --> (0,1,2), (0,1,3), (0,2,3), (1,2,3)";
-
     public combinations() {
-        super();
+        super(TYPE);
     }
 
     public combinations(PyType subType) {
@@ -31,7 +26,7 @@ public class combinations extends PyIterator {
     }
 
     public combinations(PyObject iterable, int r) {
-        super();
+        super(TYPE);
         combinations___init__(iterable, r);
     }
 
@@ -82,17 +77,18 @@ public class combinations extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
-    
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
+
     /* Traverseproc implementation */
     @Override
     public int traverse(Visitproc visit, Object arg) {

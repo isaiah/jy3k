@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyType;
@@ -10,14 +11,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.takewhile", base = PyObject.class, doc = takewhile.takewhile_doc)
+@ExposedType(name = "itertools.takewhile", base = PyObject.class, doc = BuiltinDocs.itertools_takewhile_doc)
 public class takewhile extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(takewhile.class);
     private PyIterator iter;
 
     public takewhile() {
-        super();
+        super(TYPE);
     }
 
     public takewhile(PyType subType) {
@@ -25,14 +25,9 @@ public class takewhile extends PyIterator {
     }
 
     public takewhile(PyObject predicate, PyObject iterable) {
-        super();
+        super(TYPE);
         takewhile___init__(predicate, iterable);
     }
-
-    public static final String takewhile_doc =
-        "takewhile(predicate, iterable) --> takewhile object\n\n" +
-        "Return successive entries from an iterable as long as the\n" +
-        "predicate evaluates to true for each entry.";
 
     /**
      * Create an iterator that returns items from the iterable while <code>predicate(item)</code>
@@ -52,16 +47,17 @@ public class takewhile extends PyIterator {
         iter = new itertools.WhileIterator(predicate, iterable, false);
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

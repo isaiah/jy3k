@@ -1,6 +1,7 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -11,19 +12,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.starmap", base = PyObject.class, doc = starmap.starmap_doc)
+@ExposedType(name = "itertools.starmap", base = PyObject.class, doc = BuiltinDocs.itertools_starmap_doc)
 public class starmap extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(starmap.class);
     private PyIterator iter;
 
-    public static final String starmap_doc =
-        "starmap(function, sequence) --> starmap object\n\n" +
-        "Return an iterator whose values are returned from the function evaluated\n" +
-        "with an argument tuple taken from the given sequence.";
-
     public starmap() {
-        super();
+        super(TYPE);
     }
 
     public starmap(PyType subType) {
@@ -31,7 +26,7 @@ public class starmap extends PyIterator {
     }
 
     public starmap(PyObject callable, PyObject iterator) {
-        super();
+        super(TYPE);
         starmap___init__(callable, iterator);
     }
 
@@ -74,16 +69,17 @@ public class starmap extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

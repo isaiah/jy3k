@@ -119,13 +119,15 @@ public class repeat extends PyIterator {
     }
 
     @Override
-    public PyObject __next__() {
-        return iter.__next__();
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
-    @ExposedMethod
-    public PyObject repeat___next__() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
     }
 
     /* Traverseproc implementation */

@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyType;
@@ -10,14 +11,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.dropwhile", base = PyObject.class, doc = dropwhile.dropwhile_doc)
+@ExposedType(name = "itertools.dropwhile", base = PyObject.class, doc = BuiltinDocs.itertools_dropwhile_doc)
 public class dropwhile extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(dropwhile.class);
     private PyIterator iter;
 
     public dropwhile() {
-        super();
+        super(TYPE);
     }
 
     public dropwhile(PyType subType) {
@@ -25,14 +25,9 @@ public class dropwhile extends PyIterator {
     }
 
     public dropwhile(PyObject predicate, PyObject iterable) {
-        super();
+        super(TYPE);
         dropwhile___init__(predicate, iterable);
     }
-
-    public static final String dropwhile_doc =
-        "dropwhile(predicate, iterable) --> dropwhile object\n\n" +
-        "Drop items from the iterable while predicate(item) is true.\n" +
-        "Afterwards, return every element until the iterable is exhausted.";
 
     /**
      * Create an iterator that drops items from the iterable while <code>predicate(item)</code>
@@ -52,16 +47,17 @@ public class dropwhile extends PyIterator {
         iter = new itertools.WhileIterator(predicate, iterable, true);
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

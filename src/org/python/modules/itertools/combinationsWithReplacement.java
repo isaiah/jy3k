@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -13,20 +14,13 @@ import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
 @ExposedType(name = "itertools.combinations_with_replacement", base = PyObject.class,
-    doc = combinationsWithReplacement.combinations_with_replacement_doc)
+    doc = BuiltinDocs.itertools_combinations_with_replacement_doc)
 public class combinationsWithReplacement extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(combinationsWithReplacement.class);
     private itertools.ItertoolsIterator iter;
 
-    public static final String combinations_with_replacement_doc =
-        "combinations_with_replacement(iterable, r) --> combinations_with_replacement object\n\n" +
-        "Return successive r-length combinations of elements in the iterable\n" +
-        "allowing individual elements to have successive repeats.\n" +
-        "combinations_with_replacement('ABC', 2) --> AA AB AC BB BC CC";
-
     public combinationsWithReplacement() {
-        super();
+        super(TYPE);
     }
 
     public combinationsWithReplacement(PyType subType) {
@@ -34,7 +28,7 @@ public class combinationsWithReplacement extends PyIterator {
     }
 
     public combinationsWithReplacement(PyObject iterable, int r) {
-        super();
+        super(TYPE);
         combinationsWithReplacement___init__(iterable, r);
     }
 
@@ -85,16 +79,17 @@ public class combinationsWithReplacement extends PyIterator {
         };
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override

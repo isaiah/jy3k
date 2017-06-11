@@ -26,9 +26,7 @@ dropwhile.derived:org.python.modules.itertools.dropwhileDerived
 groupby.derived:org.python.modules.itertools.groupbyDerived
 filterfalse.derived:org.python.modules.itertools.filterfalseDerived
 islice.derived:org.python.modules.itertools.isliceDerived
-izip.derived:org.python.modules.itertools.izipDerived
-izipLongest.derived:org.python.modules.itertools.izipLongestDerived
-islice.derived:org.python.modules.itertools.isliceDerived
+zip_longest.derived:org.python.modules.itertools.zip_longestDerived
 PyTeeIterator.derived:org.python.modules.itertools.PyTeeIteratorDerived
 product.derived:org.python.modules.itertools.productDerived
 permutations.derived:org.python.modules.itertools.permutationsDerived

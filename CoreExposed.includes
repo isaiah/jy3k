@@ -121,11 +121,9 @@ org/python/modules/itertools/cycle.class
 org/python/modules/itertools/count.class
 org/python/modules/itertools/dropwhile.class
 org/python/modules/itertools/groupby.class
-org/python/modules/itertools/ifilterfalse.class
-org/python/modules/itertools/ifilter.class
+org/python/modules/itertools/filterfalse.class
 org/python/modules/itertools/islice.class
-org/python/modules/itertools/izip.class
-org/python/modules/itertools/izipLongest.class
+org/python/modules/itertools/zip_longest.class
 org/python/modules/itertools/permutations.class
 org/python/modules/itertools/product.class
 org/python/modules/itertools/repeat.class

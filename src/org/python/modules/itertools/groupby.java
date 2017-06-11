@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
@@ -13,14 +14,13 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.groupby", base = PyObject.class, doc = groupby.groupby_doc)
+@ExposedType(name = "itertools.groupby", base = PyObject.class, doc = BuiltinDocs.itertools_groupby_doc)
 public class groupby extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(groupby.class);
     private PyIterator iter;
 
     public groupby() {
-        super();
+        super(TYPE);
     }
 
     public groupby(PyType subType) {
@@ -28,18 +28,14 @@ public class groupby extends PyIterator {
     }
 
     public groupby(PyObject iterable) {
-        super();
+        super(TYPE);
         groupby___init__(iterable, Py.None);
     }
 
     public groupby(PyObject iterable, PyObject keyfunc) {
-        super();
+        super(TYPE);
         groupby___init__(iterable, keyfunc);
     }
-
-    public static final String groupby_doc =
-        "groupby(iterable[, keyfunc]) -> create an iterator which returns\n" +
-        "(key, sub-iterator) grouped by each value of key(value).";
 
     /**
      * Creates an iterator that returns the items of the iterable for which
@@ -110,14 +106,9 @@ public class groupby extends PyIterator {
         };
     }
 
+    @ExposedMethod(names = {"__next__"})
     public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
-    @Override
-    public PyObject next() {
-        return doNext(__next__());
+        return doNext(iter.__next__());
     }
 
 

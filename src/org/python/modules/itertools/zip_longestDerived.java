@@ -6,7 +6,7 @@ import org.python.core.*;
 import org.python.core.finalization.FinalizeTrigger;
 import org.python.core.finalization.FinalizablePyObjectDerived;
 
-public class izipLongestDerived extends izipLongest implements Slotted,FinalizablePyObjectDerived,TraverseprocDerived {
+public class zip_longestDerived extends zip_longest implements Slotted,FinalizablePyObjectDerived,TraverseprocDerived {
 
     public PyObject getSlot(int index) {
         return slots[index];
@@ -73,7 +73,7 @@ public class izipLongestDerived extends izipLongest implements Slotted,Finalizab
         dict=new PyStringMap();
     }
 
-    public izipLongestDerived(PyType subtype) {
+    public zip_longestDerived(PyType subtype) {
         super(subtype);
         slots=new PyObject[subtype.getNumSlots()];
         dict=subtype.instDict();
@@ -754,8 +754,15 @@ public class izipLongestDerived extends izipLongest implements Slotted,Finalizab
     public PyObject __iter__() {
         PyType self_type=getType();
         PyObject impl=self_type.lookup("__iter__");
-        if (impl!=null)
-            return impl.__get__(this,self_type).__call__();
+        if (impl!=null) {
+            PyObject iter=impl.__get__(this,self_type).__call__();
+            PyType type=iter.getType();
+            PyObject next=type.lookup("__next__");
+            if (next==null) {
+                throw Py.TypeError(String.format("iter() returned non-iterator of type %s",type.fastGetName()));
+            }
+            return iter;
+        }
         impl=self_type.lookup("__getitem__");
         if (impl==null)
             return super.__iter__();
@@ -937,11 +944,7 @@ public class izipLongestDerived extends izipLongest implements Slotted,Finalizab
     public PyObject richCompare(PyObject other,CompareOp op) {
         PyType type=getType();
         PyObject meth=type.lookup(op.meth());
-        PyObject res=meth.__get__(this,type).__call__(other);
-        if (res!=Py.NotImplemented) {
-            return res;
-        }
-        return super.richCompare(other,op);
+        return meth.__get__(this,type).__call__(other);
     }
 
     public PyObject __index__() {

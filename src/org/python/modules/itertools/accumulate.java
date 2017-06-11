@@ -3,12 +3,10 @@ package org.python.modules.itertools;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
-import org.python.core.PyException;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedModule;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
@@ -33,6 +31,9 @@ public class accumulate extends PyObject {
     @ExposedNew
     final static PyObject accumulate_new(PyNewWrapper new_, boolean init, PyType subtype,
                                   PyObject[] args, String[] keywords) {
+        if (args.length > 2) {
+            throw Py.TypeError(String.format("accumulate() takes at most 2 arguments (%d given)", args.length));
+        }
         ArgParser ap = new ArgParser("accumulate", args, keywords, "iterable", "func");
         PyObject iterable = ap.getPyObject(0);
         PyObject func = ap.getPyObject(1, null);
@@ -44,6 +45,9 @@ public class accumulate extends PyObject {
     public PyObject __next__() {
         PyObject val, newtotal;
         val = iter.__next__();
+        if (val == null) {
+            throw Py.StopIteration();
+        }
         if (total == null) {
             total = val;
             return total;
@@ -53,11 +57,15 @@ public class accumulate extends PyObject {
         } else {
             newtotal = binop.__call__(total, val);
         }
-        if (newtotal == null) {
-            throw Py.StopIteration();
-        }
+
         total = newtotal;
         return newtotal;
+    }
+
+    @Override
+    @ExposedMethod(names = {"__iter__"})
+    public PyObject __iter__() {
+        return this;
     }
 
     @ExposedMethod

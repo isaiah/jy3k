@@ -1,23 +1,24 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
+
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedNew;
 import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
 @ExposedType(name = "itertools.filterfalse", base = PyObject.class,
-    doc = filterfalse.filterfalse_doc)
+    doc = BuiltinDocs.itertools_filterfalse_doc)
 public class filterfalse extends PyIterator {
-
     public static final PyType TYPE = PyType.fromClass(filterfalse.class);
     private PyIterator iter;
 
     public filterfalse() {
-        super();
+        super(TYPE);
     }
 
     public filterfalse(PyType subType) {
@@ -25,14 +26,9 @@ public class filterfalse extends PyIterator {
     }
 
     public filterfalse(PyObject predicate, PyObject iterable) {
-        super();
+        super(TYPE);
         filterfalse___init__(predicate, iterable);
     }
-
-    public static final String filterfalse_doc =
-        "'filterfalse(function or None, sequence) --> filterfalse object\n\n" +
-        "Return those items of sequence for which function(item) is false.\n" +
-        "If function is None, return the items that are false.'";
 
     /**
      * Creates an iterator that returns the items of the iterable for which
@@ -53,16 +49,17 @@ public class filterfalse extends PyIterator {
         iter = new itertools.FilterIterator(predicate, iterable, false);
     }
 
-    public PyObject __next__() {
-        return iter.__next__();
-    }
-
-    @ExposedMethod
     @Override
-    public PyObject next() {
-        return doNext(__next__());
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
+    @ExposedMethod(names = "__next__")
+    @Override
+    public PyObject __next__() {
+        return doNext(iter.__next__());
+    }
 
     /* Traverseproc implementation */
     @Override
