@@ -6,6 +6,8 @@ import org.python.core.CompareOp;
 import org.python.core.Py;
 import org.python.core.PyBuiltinFunctionSet;
 import org.python.core.PyBytes;
+import org.python.core.PyException;
+import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PySlice;
@@ -56,7 +58,6 @@ class OperatorFunctions extends PyBuiltinFunctionSet
         case 19: return Py.newBoolean(arg1.isSequenceType());
         case 32: return arg1.__invert__();
         case 52: return arg1.__index__();
-        case 53: return Py.newLong(arg1.__len__());
         default:
             throw info.unexpectedCall(1, false);
         }
@@ -103,7 +104,6 @@ class OperatorFunctions extends PyBuiltinFunctionSet
         case 49: return arg1._isub(arg2);
         case 50: return arg1._itruediv(arg2);
         case 51: return arg1._ixor(arg2);
-        case 53: return Py.newLong(arg1.__len__());
         default:
             throw info.unexpectedCall(2, false);
         }
@@ -136,54 +136,24 @@ class OperatorFunctions extends PyBuiltinFunctionSet
 @ExposedModule(name = "_operator")
 public class operator
 {
-    public static PyBytes __doc__ = new PyBytes(
-        "Operator interface.\n"+
-        "\n"+
-        "This module exports a set of functions implemented in C "+
-                "corresponding\n"+
-        "to the intrinsic operators of Python.  For example, "+
-                "operator.add(x, y)\n"+
-        "is equivalent to the expression x+y.  The function names "+
-                "are those\n"+
-        "used for special class methods; variants without leading "+
-                "and trailing\n"+
-        "'__' are also provided for convenience.\n");
-
     @ModuleInit
     public static void init(PyObject dict) {
-        dict.__setitem__("__add__", new OperatorFunctions("__add__", 0, 2));
         dict.__setitem__("add", new OperatorFunctions("add", 0, 2));
-        dict.__setitem__("__concat__", new OperatorFunctions("__concat__", 0, 2));
         dict.__setitem__("concat", new OperatorFunctions("concat", 0, 2));
-        dict.__setitem__("__and__", new OperatorFunctions("__and__", 1, 2));
         dict.__setitem__("and_", new OperatorFunctions("and_", 1, 2));
-        dict.__setitem__("__truediv__", new OperatorFunctions("__div__", 2, 2));
         dict.__setitem__("div", new OperatorFunctions("div", 2, 2));
-        dict.__setitem__("__lshift__", new OperatorFunctions("__lshift__", 3, 2));
         dict.__setitem__("lshift", new OperatorFunctions("lshift", 3, 2));
-        dict.__setitem__("__mod__", new OperatorFunctions("__mod__", 4, 2));
         dict.__setitem__("mod", new OperatorFunctions("mod", 4, 2));
-        dict.__setitem__("__mul__", new OperatorFunctions("__mul__", 5, 2));
         dict.__setitem__("mul", new OperatorFunctions("mul", 5, 2));
-        dict.__setitem__("__repeat__", new OperatorFunctions("__repeat__", 5, 2));
         dict.__setitem__("repeat", new OperatorFunctions("repeat", 5, 2));
-        dict.__setitem__("__or__", new OperatorFunctions("__or__", 6, 2));
         dict.__setitem__("or_", new OperatorFunctions("or_", 6, 2));
-        dict.__setitem__("__rshift__", new OperatorFunctions("__rshift__", 7, 2));
         dict.__setitem__("rshift", new OperatorFunctions("rshift", 7, 2));
-        dict.__setitem__("__sub__", new OperatorFunctions("__sub__", 8, 2));
         dict.__setitem__("sub", new OperatorFunctions("sub", 8, 2));
-        dict.__setitem__("__xor__", new OperatorFunctions("__xor__", 9, 2));
         dict.__setitem__("xor", new OperatorFunctions("xor", 9, 2));
-        dict.__setitem__("__abs__", new OperatorFunctions("__abs__", 10, 1));
         dict.__setitem__("abs", new OperatorFunctions("abs", 10, 1));
-        dict.__setitem__("__inv__", new OperatorFunctions("__inv__", 11, 1));
         dict.__setitem__("inv", new OperatorFunctions("inv", 11, 1));
-        dict.__setitem__("__neg__", new OperatorFunctions("__neg__", 12, 1));
         dict.__setitem__("neg", new OperatorFunctions("neg", 12, 1));
-        dict.__setitem__("__not__", new OperatorFunctions("__not__", 13, 1));
         dict.__setitem__("not_", new OperatorFunctions("not_", 13, 1));
-        dict.__setitem__("__pos__", new OperatorFunctions("__pos__", 14, 1));
         dict.__setitem__("pos", new OperatorFunctions("pos", 14, 1));
         dict.__setitem__("truth", new OperatorFunctions("truth", 15, 1));
         dict.__setitem__("isCallable", new OperatorFunctions("isCallable", 16, 1));
@@ -191,80 +161,78 @@ public class operator
         dict.__setitem__("isNumberType", new OperatorFunctions("isNumberType", 18, 1));
         dict.__setitem__("isSequenceType", new OperatorFunctions("isSequenceType", 19, 1));
         dict.__setitem__("contains", new OperatorFunctions("contains", 20, 2));
-        dict.__setitem__("__contains__", new OperatorFunctions("__contains__", 20, 2));
         dict.__setitem__("sequenceIncludes", new OperatorFunctions("sequenceIncludes", 20, 2));
-        dict.__setitem__("__delitem__", new OperatorFunctions("__delitem__", 21, 2));
         dict.__setitem__("delitem", new OperatorFunctions("delitem", 21, 2));
-        dict.__setitem__("__delslice__", new OperatorFunctions("__delslice__", 22, 3));
         dict.__setitem__("delslice", new OperatorFunctions("delslice", 22, 3));
-        dict.__setitem__("__getitem__", new OperatorFunctions("__getitem__", 23, 2));
         dict.__setitem__("getitem", new OperatorFunctions("getitem", 23, 2));
-        dict.__setitem__("__getslice__", new OperatorFunctions("__getslice__", 24, 3));
         dict.__setitem__("getslice", new OperatorFunctions("getslice", 24, 3));
-        dict.__setitem__("__setitem__", new OperatorFunctions("__setitem__", 25, 3));
         dict.__setitem__("setitem", new OperatorFunctions("setitem", 25, 3));
-        dict.__setitem__("__setslice__", new OperatorFunctions("__setslice__", 26, 4));
         dict.__setitem__("setslice", new OperatorFunctions("setslice", 26, 4));
         dict.__setitem__("ge", new OperatorFunctions("ge", 27, 2));
-        dict.__setitem__("__ge__", new OperatorFunctions("__ge__", 27, 2));
         dict.__setitem__("le", new OperatorFunctions("le", 28, 2));
-        dict.__setitem__("__le__", new OperatorFunctions("__le__", 28, 2));
         dict.__setitem__("eq", new OperatorFunctions("eq", 29, 2));
-        dict.__setitem__("__eq__", new OperatorFunctions("__eq__", 29, 2));
         dict.__setitem__("floordiv", new OperatorFunctions("floordiv", 30, 2));
-        dict.__setitem__("__floordiv__", new OperatorFunctions("__floordiv__", 30, 2));
         dict.__setitem__("gt", new OperatorFunctions("gt", 31, 2));
-        dict.__setitem__("__gt__", new OperatorFunctions("__gt__", 31, 2));
         dict.__setitem__("invert", new OperatorFunctions("invert", 32, 1));
-        dict.__setitem__("__invert__", new OperatorFunctions("__invert__", 32, 1));
         dict.__setitem__("lt", new OperatorFunctions("lt", 33, 2));
-        dict.__setitem__("__lt__", new OperatorFunctions("__lt__", 33, 2));
         dict.__setitem__("ne", new OperatorFunctions("ne", 34, 2));
-        dict.__setitem__("__ne__", new OperatorFunctions("__ne__", 34, 2));
         dict.__setitem__("truediv", new OperatorFunctions("truediv", 35, 2));
-        dict.__setitem__("__truediv__", new OperatorFunctions("__truediv__", 35, 2));
         dict.__setitem__("pow", new OperatorFunctions("pow", 36, 2));
-        dict.__setitem__("__pow__", new OperatorFunctions("pow", 36, 2));
         dict.__setitem__("is_", new OperatorFunctions("is_", 37, 2));
         dict.__setitem__("is_not", new OperatorFunctions("is_not", 38, 2));
 
-        dict.__setitem__("__iadd__", new OperatorFunctions("__iadd__", 39, 2));
         dict.__setitem__("iadd", new OperatorFunctions("iadd", 39, 2));
-        dict.__setitem__("__iconcat__", new OperatorFunctions("__iconcat__", 39, 2));
         dict.__setitem__("iconcat", new OperatorFunctions("iconcat", 39, 2));
-        dict.__setitem__("__iand__", new OperatorFunctions("__iand__", 40, 2));
         dict.__setitem__("iand", new OperatorFunctions("iand", 40, 2));
-        dict.__setitem__("__idiv__", new OperatorFunctions("__idiv__", 41, 2));
         dict.__setitem__("idiv", new OperatorFunctions("idiv", 41, 2));
-        dict.__setitem__("__ifloordiv__", new OperatorFunctions("__ifloordiv__", 42, 2));
         dict.__setitem__("ifloordiv", new OperatorFunctions("ifloordiv", 42, 2));
-        dict.__setitem__("__ilshift__", new OperatorFunctions("__ilshift__", 43, 2));
         dict.__setitem__("ilshift", new OperatorFunctions("ilshift", 43, 2));
-        dict.__setitem__("__imod__", new OperatorFunctions("__imod__", 44, 2));
         dict.__setitem__("imod", new OperatorFunctions("imod", 44, 2));
-        dict.__setitem__("__imul__", new OperatorFunctions("__imul__", 45, 2));
         dict.__setitem__("imul", new OperatorFunctions("imul", 45, 2));
-        dict.__setitem__("__irepeat__", new OperatorFunctions("__irepeat__", 45, 2));
         dict.__setitem__("irepeat", new OperatorFunctions("irepeat", 45, 2));
-        dict.__setitem__("__ior__", new OperatorFunctions("__ior__", 46, 2));
         dict.__setitem__("ior", new OperatorFunctions("ior", 46, 2));
-        dict.__setitem__("__ipow__", new OperatorFunctions("__ipow__", 47, 2));
         dict.__setitem__("ipow", new OperatorFunctions("ipow", 47, 2));
-        dict.__setitem__("__irshift__", new OperatorFunctions("__irshift__", 48, 2));
         dict.__setitem__("irshift", new OperatorFunctions("irshift", 48, 2));
-        dict.__setitem__("__isub__", new OperatorFunctions("__isub__", 49, 2));
         dict.__setitem__("isub", new OperatorFunctions("isub", 49, 2));
-        dict.__setitem__("__itruediv__", new OperatorFunctions("__itruediv__", 50, 2));
         dict.__setitem__("itruediv", new OperatorFunctions("itruediv", 50, 2));
-        dict.__setitem__("__ixor__", new OperatorFunctions("__ixor__", 51, 2));
         dict.__setitem__("ixor", new OperatorFunctions("ixor", 51, 2));
-        dict.__setitem__("__index__", new OperatorFunctions("__index__", 52, 1));
         dict.__setitem__("index", new OperatorFunctions("index", 52, 1));
-        dict.__setitem__("length_hint", new OperatorFunctions("length_hint", 53, 1, 2));
 
         dict.__setitem__("attrgetter", PyAttrGetter.TYPE);
         dict.__setitem__("itemgetter", PyItemGetter.TYPE);
         dict.__setitem__("methodcaller", PyMethodCaller.TYPE);
+    }
+
+    @ExposedFunction(defaults = {"0"})
+    public static PyObject length_hint(PyObject o, int defaultVal) {
+        PyObject res;
+        try {
+            return new PyLong(o.__len__());
+        } catch (PyException e) {
+            if (!e.match(Py.TypeError)) {
+                throw e;
+            }
+        }
+        PyObject hint = o.__findattr__("__length_hint__");
+        if (hint == null) {
+            return new PyLong(defaultVal);
+        }
+        try {
+            res = hint.__call__();
+        } catch (PyException e) {
+            if (e.match(Py.TypeError)) {
+                return new PyLong(defaultVal);
+            }
+            throw e;
+        }
+        if (res == Py.NotImplemented) {
+            return new PyLong(defaultVal);
+        }
+        if (!(res instanceof PyLong)) {
+            throw Py.TypeError(String.format("__length_hint__ must be an integer, not %s", res.getType().fastGetName()));
+        }
+        return res;
+
     }
 
     @ExposedFunction
@@ -468,14 +436,6 @@ public class operator
         public String name;
         public PyObject[] args;
         public String[] keywords;
-
-        @ExposedGet
-        public static PyBytes __doc__ = new PyBytes(
-                "methodcaller(name, ...) --> methodcaller object\n\n"
-                    + "Return a callable object that calls the given method on its operand.\n"
-                    + "After, f = methodcaller('name'), the call f(r) returns r.name().\n"
-                    + "After, g = methodcaller('name', 'date', foo=1), the call g(r) returns\n"
-                    + "r.name('date', foo=1)");
 
         public PyMethodCaller(String name, PyObject[] args, String[] keywords) {
             this.name = name;
