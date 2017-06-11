@@ -37,7 +37,7 @@ public class chain extends PyObject {
 
     @ExposedClassMethod
     public static final PyObject from_iterable(PyType type, PyObject iterable) {
-        return new chain(iterable);
+        return new chain(iterable.__iter__());
     }
 
     /**
