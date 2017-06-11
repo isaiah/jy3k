@@ -2,8 +2,10 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -13,7 +15,7 @@ import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.repeat", base = PyObject.class, doc = repeat.repeat_doc)
+@ExposedType(name = "itertools.repeat", base = PyObject.class, doc = BuiltinDocs.itertools_repeat_doc)
 public class repeat extends PyIterator {
 
     public static final PyType TYPE = PyType.fromClass(repeat.class);
@@ -21,13 +23,8 @@ public class repeat extends PyIterator {
     private PyObject object;
     private int counter;
 
-    public static final String repeat_doc =
-        "'repeat(element [,times]) -> create an iterator which returns the element\n" +
-        "for the specified number of times.  If not specified, returns the element\n" +
-        "endlessly.";
-
     public repeat() {
-        super();
+        super(TYPE);
     }
 
     public repeat(PyType subType) {
@@ -35,12 +32,12 @@ public class repeat extends PyIterator {
     }
 
     public repeat(PyObject object) {
-        super();
+        super(TYPE);
         repeat___init__(object);
     }
 
     public repeat(PyObject object, int times) {
-        super();
+        super(TYPE);
         repeat___init__(object, times);
     }
 
@@ -67,8 +64,7 @@ public class repeat extends PyIterator {
         this.object = object;
         if (times < 0) {
             counter = 0;
-        }
-        else {
+        } else {
             counter = times;
         }
         iter = new PyIterator() {
@@ -103,14 +99,6 @@ public class repeat extends PyIterator {
     }
 
     @ExposedMethod
-    public int __len__() {
-        if (counter < 0) {
-            throw Py.TypeError("object of type 'itertools.repeat' has no len()");
-        }
-        return counter;
-    }
-
-    @ExposedMethod
     public PyUnicode __repr__() {
         if (counter >= 0) {
             return (PyUnicode) (Py.newUnicode("repeat(%r, %d)").
@@ -122,16 +110,23 @@ public class repeat extends PyIterator {
         }
     }
 
+    @ExposedMethod
+    public PyObject repeat___length_hint__() {
+        if (counter >= 0) {
+            return new PyLong(counter);
+        }
+        throw Py.TypeError("len() of unsized object");
+    }
+
+    @Override
     public PyObject __next__() {
         return iter.__next__();
     }
 
     @ExposedMethod
-    @Override
-    public PyObject next() {
+    public PyObject repeat___next__() {
         return doNext(__next__());
     }
-
 
     /* Traverseproc implementation */
     @Override

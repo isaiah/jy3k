@@ -49,7 +49,7 @@ public class accumulate extends PyObject {
             return total;
         }
         if (binop == null) {
-            newtotal = total.__add__(val);
+            newtotal = total._add(val);
         } else {
             newtotal = binop.__call__(total, val);
         }

@@ -2,6 +2,7 @@
 package org.python.modules.itertools;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyLong;
@@ -9,13 +10,12 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.core.Visitproc;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 
-@ExposedType(name = "itertools.count", base = PyObject.class)
-public class count extends PyIterator {
+@ExposedType(name = "itertools.count", base = PyObject.class, doc = BuiltinDocs.itertools_count_doc)
+public class count extends PyObject {
     public static final PyType TYPE = PyType.fromClass(count.class);
 
     private PyIterator iter;
@@ -56,6 +56,9 @@ public class count extends PyIterator {
         ArgParser ap = new ArgParser("count", args, kwds, new String[] {"start", "step"}, 0);
         PyObject start = ap.getPyObject(0, Py.Zero);
         PyObject step = ap.getPyObject(1, Py.One);
+        if (!start.isNumberType() || !step.isNumberType()) {
+            throw Py.TypeError("a number is required");
+        }
         count___init__(start, step);
     }
 
@@ -104,44 +107,15 @@ public class count extends PyIterator {
         return Py.newUnicode(String.format("count(%s, %s)", counter, stepper));
     }
 
+    @Override
+    @ExposedMethod(names = "__next__")
     public PyObject __next__() {
         return iter.__next__();
     }
 
-    @ExposedMethod
-    public final PyObject count___next__() {
-        return doNext(__next__());
-    }
-
-
-    /* Traverseproc implementation */
     @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal;
-        if (iter != null) {
-            retVal = visit.visit(iter, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (counter != null) {
-            retVal = visit.visit(counter, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (stepper != null) {
-            retVal = visit.visit(stepper, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        return super.traverse(visit, arg);
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || counter == ob
-            || stepper == ob || super.refersDirectlyTo(ob));
+    @ExposedMethod(names = {"__iter__"})
+    public PyObject __iter__() {
+        return this;
     }
 }

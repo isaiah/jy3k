@@ -39,6 +39,7 @@ public class itertools {
 
     @ModuleInit
     public static void init(PyObject dict) {
+        dict.__setitem__("accumulate", accumulate.TYPE);
         dict.__setitem__("chain", chain.TYPE);
         dict.__setitem__("combinations", combinations.TYPE);
         dict.__setitem__("combinations_with_replacement", combinationsWithReplacement.TYPE);
