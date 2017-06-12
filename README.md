@@ -1,4 +1,4 @@
-Jylang: A fork of jython
+Dynpy: python with invokedynamic
 
 # Requirements
 
@@ -6,19 +6,13 @@ JDK9
 
 # Summary
 
-A python compatible language on JVM.
+A Python3 compatible language on JVM.
+
+The main goal is to implement Python3 on mordern JVM, utilising invokedynamic.
+Most of the architecture aspect are inspired by Nashorn.
 
 This started as an effort to upgrade jython to python3k, and it quickly turn
 into a personal experimental project.
-
-# Goals
-
-1. Be compatible with cpython 3, at the time being 3.6.0, but as new versions of
-cpython come out, this project will always target the lastest version of
-cpython, depends on when it can be in a state for release.
-
-2. JVM language interoperation
-
 
 # Non-Goals
 
@@ -41,7 +35,7 @@ the io layer of the host platform.
 [] `invokedynamic`: JDK9 have `jdk.dynalink` builtin, maybe the most fun
 project.
 
-# References
+# Related works
 
-nashorn: http://openjdk.java.net/projects/nashorn/
-JRuby: https://github.com/jruby/jruby/
+jython: https://github.com/jython/jython3
+zippy: https://github.com/securesystemslab/zippy
