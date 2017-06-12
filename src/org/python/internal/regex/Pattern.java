@@ -2629,14 +2629,15 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
         }
         for (;;) {
             switch (ch) {
-                case '[':
-                    curr = clazz(true);
-                    if (prev == null)
-                        prev = curr;
-                    else
-                        prev = prev.union(curr);
-                    ch = peek();
-                    continue;
+                /** character classes cannot be nested in pyhton */
+//                case '[':
+//                    curr = clazz(true);
+//                    if (prev == null)
+//                        prev = curr;
+//                    else
+//                        prev = prev.union(curr);
+//                    ch = peek();
+//                    continue;
                 case '&':
                     ch = next();
                     if (ch == '&') {
@@ -2684,6 +2685,8 @@ loop:   for(int x=0, offset=0; x<nCodePoints; x++, offset+=len) {
                         throw error("Unclosed character class");
                     break;
                 case ']':
+                    if (temp[cursor - 1] == '[')
+                        break;
                     inCharacterClass = false;
                     if (prev != null || hasBits) {
                         if (consume)
