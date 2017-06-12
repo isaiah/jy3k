@@ -305,27 +305,32 @@ public class struct {
 
 
         int get_int(PyObject value) {
-            try {
+            if (value instanceof PyLong) {
                 return value.asInt();
-            } catch (PyException ex) {
-                throw StructError("required argument is not an integer");
+            } else if (value.isIndex()) {
+                try {
+                    return value.asIndex();
+                } catch (PyException ex) {
+                    throw StructError("required argument is not an integer");
+                }
             }
+            throw StructError("required argument is not an integer");
         }
 
         long get_long(PyObject value) {
             if (value instanceof PyLong){
-                Object v = value.__tojava__(Long.TYPE);
-                if (v == Py.NoConversion) {
-                    throw StructError("long int too long to convert");
+                try {
+                    return ((PyLong) value).getValue().longValueExact();
+                } catch (ArithmeticException e) {
+                    throw StructError("argument out of range");
                 }
-                return ((Long) v).longValue();
             } else
                 return get_int(value);
         }
 
         BigInteger get_ulong(PyObject value) {
             if (value instanceof PyLong){
-                BigInteger v = (BigInteger)value.__tojava__(BigInteger.class);
+                BigInteger v = ((PyLong) value).getValue();
                 if (v.compareTo(PyLong.MAX_ULONG) > 0){
                     throw StructError("unsigned long int too long to convert");
                 }
@@ -372,13 +377,19 @@ public class struct {
 
 
     static class ByteStream {
-        char[] data;
+        byte[] data;
         int len;
         int pos;
 
         ByteStream() {
-            data = new char[10];
+            data = new byte[10];
             len = 0;
+            pos = 0;
+        }
+
+        ByteStream(byte[] bytes) {
+            data = bytes;
+            len = bytes.length;
             pos = 0;
         }
 
@@ -388,12 +399,9 @@ public class struct {
         
         ByteStream(String s, int offset) {
             int size = s.length() - offset;
-            data = new char[size];
-            s.getChars(offset, s.length(), data, 0);
+            data = s.getBytes();
             len = size;
             pos = 0;
-            
-//            System.out.println("s.length()=" + s.length() + ",offset=" + offset + ",size=" + size + ",data=" + Arrays.toString(data));
         }
 
         int readByte() {
@@ -415,7 +423,7 @@ public class struct {
 
         private void ensureCapacity(int l) {
             if (pos + l >= data.length) {
-                char[] b = new char[(pos + l) * 2];
+                byte[] b = new byte[(pos + l) * 2];
                 System.arraycopy(data, 0, b, 0, pos);
                 data = b;
             }
@@ -424,7 +432,7 @@ public class struct {
 
         void writeByte(int b) {
             ensureCapacity(1);
-            data[pos++] = (char)(b & 0xFF);
+            data[pos++] = (byte)(b & 0xFF);
         }
 
 
@@ -530,7 +538,11 @@ public class struct {
 
     static class ByteFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
-            buf.writeByte(get_int(value));
+            int val = get_int(value);
+            if (val > Byte.MAX_VALUE || val < Byte.MIN_VALUE) {
+                throw StructError("byte format requires -128 <= number <= 127");
+            }
+            buf.writeByte(val);
         }
 
         Object unpack(ByteStream buf) {
@@ -542,6 +554,15 @@ public class struct {
     }
 
     static class UnsignedByteFormatDef extends ByteFormatDef {
+        void pack(ByteStream buf, PyObject value) {
+            int val = get_int(value);
+            if (val < 0 || val > 0xFF) {
+                throw StructError("ubyte format requires 0 <= number <= 255");
+            }
+
+            buf.writeByte(val);
+        }
+
         Object unpack(ByteStream buf) {
             return Py.newInteger(buf.readByte());
         }
@@ -572,6 +593,9 @@ public class struct {
     static class LEShortFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
             int v = get_int(value);
+            if (v > Short.MAX_VALUE || v < Short.MIN_VALUE) {
+                throw StructError("short format requires (-0x7fff - 1) <= number <= 0x7fff");
+            }
             buf.writeByte(v & 0xFF);
             buf.writeByte((v >> 8) & 0xFF);
         }
@@ -585,7 +609,16 @@ public class struct {
         }
     }
 
-    static class LEUnsignedShortFormatDef extends LEShortFormatDef {
+    static class LEUnsignedShortFormatDef extends FormatDef {
+        void pack(ByteStream buf, PyObject value) {
+            int v = get_int(value);
+            if (v > 0xFFFF || v < 0) {
+                throw StructError("ushort format requires 0 <= number <= (0x7fff * 2 + 1)");
+            }
+            buf.writeByte(v & 0xFF);
+            buf.writeByte((v >> 8) & 0xFF);
+        }
+
         Object unpack(ByteStream buf) {
             int v = buf.readByte() |
                    (buf.readByte() << 8);
@@ -597,6 +630,9 @@ public class struct {
     static class BEShortFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
             int v = get_int(value);
+            if (v > Short.MAX_VALUE || v < Short.MIN_VALUE) {
+                throw StructError("short format requires (-0x7fff - 1) <= number <= 0x7fff");
+            }
             buf.writeByte((v >> 8) & 0xFF);
             buf.writeByte(v & 0xFF);
         }
@@ -611,7 +647,16 @@ public class struct {
     }
 
 
-    static class BEUnsignedShortFormatDef extends BEShortFormatDef {
+    static class BEUnsignedShortFormatDef extends FormatDef {
+        void pack(ByteStream buf, PyObject value) {
+            int v = get_int(value);
+            if (v > 0xFFFF || v < 0) {
+                throw StructError("ushort format requires 0 <= number <= (0x7fff * 2 + 1)");
+            }
+            buf.writeByte((v >> 8) & 0xFF);
+            buf.writeByte(v & 0xFF);
+        }
+
         Object unpack(ByteStream buf) {
             int v = (buf.readByte() << 8) |
                      buf.readByte();
@@ -634,7 +679,11 @@ public class struct {
 
     static class LEUnsignedIntFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
-            LEwriteInt(buf, (int)(get_long(value) & 0xFFFFFFFF));
+            long v = get_long(value);
+            if (v < 0 || v > 0xFFFFFFFFL) {
+                throw StructError("argument out of range");
+            }
+            LEwriteInt(buf, (int)(v & 0xFFFFFFFF));
         }
 
         Object unpack(ByteStream buf) {
@@ -659,8 +708,13 @@ public class struct {
 
     static class BEUnsignedIntFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
-            BEwriteInt(buf, (int)(get_long(value) & 0xFFFFFFFF));
+            long v = get_long(value);
+            if (v < 0 || v > 0xFFFFFFFFL) {
+                throw StructError("argument out of range");
+            }
+            BEwriteInt(buf, (int)(v & 0xFFFFFFFF));
         }
+
         Object unpack(ByteStream buf) {
             long v = BEreadInt(buf);
             if (v < 0)
@@ -696,7 +750,7 @@ public class struct {
     static class BEUnsignedLongFormatDef extends FormatDef {
         void pack(ByteStream buf, PyObject value) {
             BigInteger bi = get_ulong(value);
-            if (bi.compareTo(BigInteger.valueOf(0)) < 0) {
+            if (bi.compareTo(BigInteger.ZERO) < 0) {
                 throw StructError("can't convert negative long to unsigned");
             }
             long lvalue = bi.longValue(); // underflow is OK -- the bits are correct
@@ -880,6 +934,8 @@ public class struct {
         new BEUnsignedIntFormatDef()    .init('L', 4, 4),
         new BELongFormatDef()           .init('q', 8, 8),
         new BEUnsignedLongFormatDef()   .init('Q', 8, 8),
+        new BELongFormatDef()           .init('n', 8, 8),
+        new BEUnsignedLongFormatDef()   .init('N', 8, 8),
         new BEFloatFormatDef()          .init('f', 4, 4),
         new BEDoubleFormatDef()         .init('d', 8, 8),
         new PointerFormatDef()          .init('P')
@@ -988,8 +1044,9 @@ public class struct {
 
         FormatDef[] f = whichtable(format);
         int size = calcsize(format, f);
-        
-        return new PyBytes(pack(format, f, size, 1, args).toString());
+
+        ByteStream bytes = pack(format, f, size, 1, args);
+        return new PyBytes(bytes.data, 0, bytes.size());
     }
     
     // xxx - may need to consider doing a generic arg parser here
@@ -1017,7 +1074,7 @@ public class struct {
             throw StructError("pack_into requires a buffer of at least " + res.pos + " bytes, got " + buffer.__len__());
         }
         for (int i = 0; i < res.pos; i++, offset++) {
-            char val = res.data[i];
+            byte val = res.data[i];
             buffer.set(offset, val);
         }
     }
@@ -1078,10 +1135,10 @@ public class struct {
 
     @ExposedFunction
     public static PyTuple unpack(String format, PyObject buffer) {
-        String string = ((PyArray) buffer).tostring();
+        byte[] string = Py.unwrapBuffer(buffer);
         FormatDef[] f = whichtable(format);
         int size = calcsize(format, f);
-        int len = string.length();
+        int len = string.length;
         if (size != len) 
             throw StructError("unpack str size does not match format");
          return unpack(f, size, format, new ByteStream(string));
