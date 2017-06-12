@@ -73,7 +73,7 @@ org/python/core/generator/PyAsyncGenWrappedValue.class
 org/python/core/generator/PyCoroutine.class
 org/python/core/generator/PyCoroutineWrapper.class
 org/python/core/generator/PyGenerator.class
-org/python/modules/PyStruct.class
+org/python/modules/_struct/PyStruct.class
 org/python/modules/PyNamespace.class
 org/python/jsr223/PyScriptEngineScope.class
 org/python/modules/cjkcodecs/PyMultibyteCodec.class

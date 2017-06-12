@@ -1,5 +1,5 @@
 /* Generated file, do not modify.  See jython/src/templates/gderived.py. */
-package org.python.modules;
+package org.python.modules._struct;
 
 import java.io.Serializable;
 import org.python.core.*;

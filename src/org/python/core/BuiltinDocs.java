@@ -16162,4 +16162,169 @@ public class BuiltinDocs {
         "Returns a tuple of the decoded string and the index of the character in s\n" + 
         "after the end quote.";
 
+    // Docs for <module '_struct' from '/usr/lib/python3.6/lib-dynload/_struct.cpython-36m-x86_64-linux-gnu.so'>
+    public final static String _struct_Struct_doc = 
+        "Struct(fmt) --> compiled struct object\n" + 
+        "\n" + 
+        "Return a new Struct object which writes and reads binary data according to\n" + 
+        "the format string fmt.  See help(struct) for more on format strings.";
+
+    public final static String _struct_doc = 
+        "Functions to convert between Python values and C structs.\n" + 
+        "Python bytes objects are used to hold the data representing the C struct\n" + 
+        "and also as format strings (explained below) to describe the layout of data\n" + 
+        "in the C struct.\n" + 
+        "\n" + 
+        "The optional first format char indicates byte order, size and alignment:\n" + 
+        "  @: native order, size & alignment (default)\n" + 
+        "  =: native order, std. size & alignment\n" + 
+        "  <: little-endian, std. size & alignment\n" + 
+        "  >: big-endian, std. size & alignment\n" + 
+        "  !: same as >\n" + 
+        "\n" + 
+        "The remaining chars indicate types of args and must match exactly;\n" + 
+        "these can be preceded by a decimal repeat count:\n" + 
+        "  x: pad byte (no data); c:char; b:signed byte; B:unsigned byte;\n" + 
+        "  ?: _Bool (requires C99; if not available, char is used instead)\n" + 
+        "  h:short; H:unsigned short; i:int; I:unsigned int;\n" + 
+        "  l:long; L:unsigned long; f:float; d:double; e:half-float.\n" + 
+        "Special cases (preceding decimal count indicates length):\n" + 
+        "  s:string (array of char); p: pascal string (with count byte).\n" + 
+        "Special cases (only available in native format):\n" + 
+        "  n:ssize_t; N:size_t;\n" + 
+        "  P:an integer type that is wide enough to hold a pointer.\n" + 
+        "Special case (not in native mode unless 'long long' in platform C):\n" + 
+        "  q:long long; Q:unsigned long long\n" + 
+        "Whitespace between formats is ignored.\n" + 
+        "\n" + 
+        "The variable struct.error is an exception raised on errors.\n" + 
+        "";
+
+    public final static String _struct___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _struct___loader___doc = 
+        "Loader for extension modules.\n" + 
+        "\n" + 
+        "    The constructor is designed to work with FileFinder.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _struct___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _struct___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String _struct___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String _struct__clearcache_doc = 
+        "Clear the internal cache.";
+
+    public final static String _struct_calcsize_doc = 
+        "calcsize(fmt) -> integer\n" + 
+        "\n" + 
+        "Return size in bytes of the struct described by the format string fmt.";
+
+    public final static String _struct_error_doc = 
+        "";
+
+    public final static String _struct_iter_unpack_doc = 
+        "iter_unpack(fmt, buffer) -> iterator(v1, v2, ...)\n" + 
+        "\n" + 
+        "Return an iterator yielding tuples unpacked from the given bytes\n" + 
+        "source according to the format string, like a repeated invocation of\n" + 
+        "unpack_from().  Requires that the bytes length be a multiple of the\n" + 
+        "format struct size.";
+
+    public final static String _struct_pack_doc = 
+        "pack(fmt, v1, v2, ...) -> bytes\n" + 
+        "\n" + 
+        "Return a bytes object containing the values v1, v2, ... packed according\n" + 
+        "to the format string fmt.  See help(struct) for more on format strings.";
+
+    public final static String _struct_pack_into_doc = 
+        "pack_into(fmt, buffer, offset, v1, v2, ...)\n" + 
+        "\n" + 
+        "Pack the values v1, v2, ... according to the format string fmt and write\n" + 
+        "the packed bytes into the writable buffer buf starting at offset.  Note\n" + 
+        "that the offset is a required argument.  See help(struct) for more\n" + 
+        "on format strings.";
+
+    public final static String _struct_unpack_doc = 
+        "unpack(fmt, buffer) -> (v1, v2, ...)\n" + 
+        "\n" + 
+        "Return a tuple containing values unpacked according to the format string\n" + 
+        "fmt.  The buffer's size in bytes must be calcsize(fmt). See help(struct)\n" + 
+        "for more on format strings.";
+
+    public final static String _struct_unpack_from_doc = 
+        "unpack_from(fmt, buffer, offset=0) -> (v1, v2, ...)\n" + 
+        "\n" + 
+        "Return a tuple containing values unpacked according to the format string\n" + 
+        "fmt.  The buffer's size, minus offset, must be at least calcsize(fmt).\n" + 
+        "See help(struct) for more on format strings.";
+
 }

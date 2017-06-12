@@ -176,6 +176,7 @@ sre_parse.py
 stat.py
 string.py
 stringprep.py
+struct.py
 subprocess.py
 symbol.py
 sysconfig.py

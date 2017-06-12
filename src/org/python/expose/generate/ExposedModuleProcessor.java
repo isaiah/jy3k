@@ -32,14 +32,9 @@ public class ExposedModuleProcessor implements Opcodes, PyTypes {
 
     private Type onType;
 
-    public ExposedModuleProcessor(InputStream in) {
+    public ExposedModuleProcessor(InputStream in) throws IOException {
         initializer = null;
-        ClassReader cr = null;
-        try {
-            cr = new ClassReader(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ClassReader cr = new ClassReader(in);
         cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES);
         cr.accept(new ModuleProcessor(cw), 0);
     }

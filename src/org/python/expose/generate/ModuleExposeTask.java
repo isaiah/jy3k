@@ -29,7 +29,13 @@ public class ModuleExposeTask extends Task {
         for (String mod : Setup.builtinModules) {
             InputStream in = getClass().getClassLoader()
                     .getResourceAsStream(className(mod).replace('.', '/') + ".class");
-            ExposedModuleProcessor ice = new ExposedModuleProcessor(in);
+            ExposedModuleProcessor ice;
+            try {
+                ice = new ExposedModuleProcessor(in);
+            } catch (IOException e) {
+                System.out.println(String.format("expose builtin module: %s is not found", mod));
+                throw new BuildException(e);
+            }
             for(MethodExposer exposer : ice.getMethodExposers()) {
                 generate(exposer);
             }

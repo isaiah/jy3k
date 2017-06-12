@@ -1,4 +1,4 @@
-package org.python.modules;
+package org.python.modules._struct;
 
 import org.python.core.ArgParser;
 import org.python.core.Py;
@@ -25,7 +25,7 @@ public class PyStruct extends PyObject {
     @ExposedGet
     public final int size;
     
-    private final struct.FormatDef[] format_def;
+    private final _struct.FormatDef[] format_def;
 
     @ExposedGet(name = "__class__")
     @Override
@@ -40,8 +40,8 @@ public class PyStruct extends PyObject {
     public PyStruct(PyType type, PyUnicode format) {
         super(type);
         this.format = format.toString();
-        this.format_def = struct.whichtable(this.format);
-        this.size = struct.calcsize(this.format, this.format_def);
+        this.format_def = _struct.whichtable(this.format);
+        this.size = _struct.calcsize(this.format, this.format_def);
     }
 
     @ExposedNew
@@ -59,12 +59,12 @@ public class PyStruct extends PyObject {
 
     @ExposedMethod
     public String pack(PyObject[] args, String[] kwds) {
-        return struct.pack(format, format_def, size, 0, args).toString();
+        return _struct.pack(format, format_def, size, 0, args).toString();
     }
     
     @ExposedMethod
     final void pack_into(PyObject[] args, String[] kwds) {
-        struct.pack_into(format, format_def, size, 0, args);
+        _struct.pack_into(format, format_def, size, 0, args);
     }
   
     @ExposedMethod
@@ -77,8 +77,8 @@ public class PyStruct extends PyObject {
         else
             throw Py.TypeError("unpack of a str or array");
         if (size != s.length()) 
-            throw struct.StructError("unpack str size does not match format");
-        return struct.unpack(format_def, size, format, new struct.ByteStream(s));
+            throw _struct.StructError("unpack str size does not match format");
+        return _struct.unpack(format_def, size, format, new _struct.ByteStream(s));
     }
     
     // xxx - also support byte[], java.nio.(Byte)Buffer at some point?
@@ -86,7 +86,7 @@ public class PyStruct extends PyObject {
     public PyTuple unpack_from(PyObject string, int offset) {
         String s = string.toString();
         if (size >= (s.length() - offset + 1))
-            throw struct.StructError("unpack_from str size does not match format");
-        return struct.unpack(format_def, size, format, new struct.ByteStream(s, offset));
+            throw _struct.StructError("unpack_from str size does not match format");
+        return _struct.unpack(format_def, size, format, new _struct.ByteStream(s, offset));
     }
 }

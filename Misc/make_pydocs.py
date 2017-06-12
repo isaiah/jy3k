@@ -11,6 +11,7 @@ import _multiprocessing
 import posix
 import errno
 import array
+import _struct
 import sys
 import time
 import csv
@@ -104,6 +105,7 @@ _functools,
 _hashlib,
 _io,
 _json,
+_struct,
 ]
 
 outfile = open("BuiltinDocs.java", "w")

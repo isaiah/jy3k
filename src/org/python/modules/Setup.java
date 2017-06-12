@@ -70,7 +70,7 @@ public class Setup {
             "math",
             "parser:org.python.modules.parser.ParserModule",
             "posix:org.python.modules.posix.PosixModule",
-            "struct",
+            "_struct:org.python.modules._struct._struct",
             "subprocess:org.python.modules.subprocess.SubprocessModule",
             "synchronize",
             "sys:org.python.modules.sys.SysModule",
