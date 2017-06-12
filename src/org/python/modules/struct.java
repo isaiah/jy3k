@@ -9,6 +9,7 @@
 package org.python.modules;
 
 import org.python.core.Py;
+import org.python.core.PyArray;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -17,13 +18,11 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
-
-import java.math.BigInteger;
-import org.python.core.ClassDictInit;
-import org.python.core.PyArray;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
+
+import java.math.BigInteger;
 
 /**
  * This module performs conversions between Python values and C
@@ -264,6 +263,12 @@ public class struct {
      * string describing what is wrong.
      */
     public static final PyObject error = Py.makeClass("error", exceptionNamespace(), Py.Exception);
+
+    @ModuleInit
+    public static void init(PyObject dict) {
+        dict.__setitem__("error", error);
+        dict.__setitem__("Struct", PyStruct.TYPE);
+    }
 
     static class FormatDef {
         char name;
@@ -1130,11 +1135,5 @@ public class struct {
         dict.__setitem__("__module__", new PyBytes("struct"));
         return dict;
     }
-
-    @ModuleInit
-    public static void classDictInit(PyObject dict) {
-        dict.__setitem__("Struct", PyStruct.TYPE);
-    }
-
 }
 

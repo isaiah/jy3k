@@ -10,8 +10,8 @@ import org.python.expose.ExposedModule;
 /**
  * Created by isaiah on 3/24/17.
  */
-@ExposedModule(name="_sre_compile", doc="Native implementation of sre_compile")
-public class _sre_compile {
+@ExposedModule(name="_sre", doc="Native implementation of sre_compile")
+public class _sre {
 
     @ExposedFunction
     public static PyObject compile(PyObject[] args, String[] keywords) {
