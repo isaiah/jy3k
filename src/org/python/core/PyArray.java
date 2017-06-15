@@ -1627,6 +1627,13 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
         }
     }
 
+    public void set(int i, byte value) {
+        if (!(typecode.equals("b") || typecode.equals("B"))) {
+            throw Py.TypeError("Type not compatible with array type");
+        }
+        Array.setByte(data, i, value);
+    }
+
     public void set(int i, char value) {
         if ("c".equals(typecode) || type == Integer.TYPE || type == Long.TYPE) {
             Array.setChar(data, i, value);
