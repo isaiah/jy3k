@@ -199,11 +199,11 @@ public class FormatDef implements Packer, Unpacker {
         double x;
         int s = 1;
         if (buf.order() == ByteOrder.LITTLE_ENDIAN) {
-            secondbyte = buf.get();
-            firstbyte = buf.get();
+            secondbyte = buf.get() & 0xFF;
+            firstbyte = buf.get() & 0xFF;
         } else {
-            firstbyte = buf.get();
-            secondbyte = buf.get();
+            firstbyte = buf.get() & 0xFF;
+            secondbyte = buf.get() & 0xFF;
         }
 
         /* First byte */

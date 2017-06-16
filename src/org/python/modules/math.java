@@ -9,7 +9,6 @@ import org.python.core.PyFloat;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
-import org.python.core.BuiltinModule;
 import org.python.expose.ExposedConst;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
@@ -30,9 +29,12 @@ public class math {
     private static final double EIGHT = 8.0;
     static final double LN2 = 0.693147180559945309417232121458; // Ref OEIS A002162
 
-    private static final double INF = Double.POSITIVE_INFINITY;
+    @ExposedConst
+    public static final double INF = Double.POSITIVE_INFINITY;
     private static final double NINF = Double.NEGATIVE_INFINITY;
-    private static final double NAN = Double.NaN;
+
+    @ExposedConst
+    public static final double nan = Double.NaN;
     private static final BigInteger MAX_LONG_BIGINTEGER = new BigInteger(
             String.valueOf(Long.MAX_VALUE));
     private static final BigInteger MIN_LONG_BIGINTEGER = new BigInteger(
@@ -227,7 +229,7 @@ public class math {
             return v;
         }
         if (isnan(v) || isnan(w)) {
-            return NAN;
+            return nan;
         }
         if (v == ZERO) {
             if (w == ZERO) {
@@ -340,7 +342,7 @@ public class math {
     @ExposedFunction
     public static double fmod(double v, double w) {
         if (isnan(v) || isnan(w)) {
-            return NAN;
+            return nan;
         }
         if (isinf(w)) {
             return v;
