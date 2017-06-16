@@ -140,6 +140,9 @@ public class FormatDef implements Packer, Unpacker {
 
 
     static ByteOrder byteOrder(String pfmt) {
+        if (pfmt.isEmpty()) {
+            return ByteOrder.BIG_ENDIAN;
+        }
         char c = pfmt.charAt(0);
         return c == '<' ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
     }
