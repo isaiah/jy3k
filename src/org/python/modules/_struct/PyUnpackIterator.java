@@ -22,6 +22,9 @@ public class PyUnpackIterator extends PyObject {
 
     public PyUnpackIterator(PyStruct struct, PyObject buffer) {
         super(TYPE);
+        if (struct.size == 0) {
+            throw StructError("cannot iteratively unpack with a struct of length 0");
+        }
         byte[] bytes = Py.unwrapBuffer(buffer);
         if (bytes.length % struct.size != 0) {
             throw StructError(String.format("iterative unpacking requires a bytes length multiple of %d", struct.size));
