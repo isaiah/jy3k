@@ -353,7 +353,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     private static String coerce(PyObject o) {
         if (o instanceof PyBytes) {
-            return o.toString();
+            return ((PyBytes) o).getString();
+        } else if (o instanceof PyByteArray) {
+            return o.asString();
         }
         return null;
     }
