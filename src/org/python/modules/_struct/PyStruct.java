@@ -164,12 +164,13 @@ public class PyStruct extends PyObject {
                 buffer.put(Arrays.copyOfRange(bytes, 0, Math.min(bytes.length, code.repeat)));
             } else if (code.format == 'p') {
                 if (!(v instanceof PyBytes || v instanceof PyByteArray)) {
-                    throw StructError("argument for 's' must be a bytes object");
+                    throw StructError("argument for 'p' must be a bytes object");
                 }
                 byte[] bytes = v.asString().getBytes();
                 int n = Math.min(0xFF, bytes.length);
+                n = Math.min(n, code.repeat - 1);
                 buffer.put((byte) n);
-                buffer.put(Arrays.copyOfRange(bytes, 0, Math.min(n, code.repeat - 1)));
+                buffer.put(Arrays.copyOfRange(bytes, 0, Math.min(bytes.length, code.repeat - 1)));
             } else {
                 for (int j = 0; j < code.repeat; j++) {
                     code.fmtdef.pack(buffer, v);
@@ -232,6 +233,11 @@ public class PyStruct extends PyObject {
                 buf.get(new byte[code.repeat]);
             } else if (code.format == 's') {
                 byte[] bytes = new byte[code.repeat];
+                buf.get(bytes);
+                results[i++] = new PyBytes(bytes);
+            } else if (code.format == 'p') {
+                int len = buf.get() & 0xFF;
+                byte[] bytes = new byte[len];
                 buf.get(bytes);
                 results[i++] = new PyBytes(bytes);
             } else {
