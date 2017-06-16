@@ -77,7 +77,6 @@ public class PyStruct extends PyObject {
         this.format = fmt;
         int size = 0;
         int len = 0;
-        int ncodes = 0;
 
         int f_len = fmt.length();
         List<FormatCode> codes = new ArrayList<>();
@@ -98,8 +97,9 @@ public class PyStruct extends PyObject {
                         throw StructError("overflow in item count");
                     num = x;
                 }
-                if (j >= f_len)
-                    break;
+                if (j >= f_len) {
+                    throw StructError("repeat count given without format specifier");
+                }
             }
 
             FormatDef e = FormatDef.getentry(c);
@@ -108,15 +108,11 @@ public class PyStruct extends PyObject {
                 case 's':
                 case 'p':
                     len++;
-                    ncodes++;
                     break;
                 case 'x':
                     break;
                 default:
                     len += num;
-                    if (num > 0) {
-                        ncodes++;
-                    }
                     break;
             }
 
@@ -126,9 +122,6 @@ public class PyStruct extends PyObject {
             size += x;
             if (x/itemsize != num || size < 0)
                 throw StructError("total struct size too long");
-        }
-        if (codes.isEmpty()) {
-            throw StructError("repeat count given without format specifier");
         }
         this.byteOrder = FormatDef.byteOrder(fmt);
         this.size = size;
@@ -153,8 +146,15 @@ public class PyStruct extends PyObject {
 
     private ByteBuffer pack(PyObject[] args) {
         ByteBuffer buffer = ByteBuffer.allocate(size);
+        buffer.order(byteOrder);
         int i = 0;
         for (FormatCode code: codes) {
+            if (code.format == 'x') {
+                for (int j = 0; j < code.repeat; j++) {
+                    buffer.put((byte) 0);
+                }
+                continue;
+            }
             PyObject v = args[i++];
             if (code.format == 's') {
                 if (!(v instanceof PyBytes || v instanceof PyByteArray)) {
@@ -212,28 +212,32 @@ public class PyStruct extends PyObject {
   
     @ExposedMethod
     public PyTuple unpack(PyObject source) {
-        String s;
-        if (source instanceof PyUnicode)
-            s = ((PyUnicode) source).getString();
-        else if (source instanceof PyBytes)
-            s = ((PyBytes) source).getString();
-        else if (source instanceof PyArray)
-            s = ((PyArray)source).tostring();
-        else
-            throw Py.TypeError("unpack of a str or array");
-        if (size != s.length()) 
+        byte[] bytes = Py.unwrapBuffer(source);
+        if (size != bytes.length)
             throw StructError("unpack str size does not match format");
-        ByteBuffer buf = ByteBuffer.wrap(s.getBytes());
-
+        ByteBuffer buf = ByteBuffer.wrap(bytes);
         return unpack(buf);
     }
 
     private PyTuple unpack(ByteBuffer buf) {
+        buf.order(byteOrder);
         PyObject[] results = new PyObject[len];
         int i = 0;
         for (FormatCode code: codes) {
-            for (int j = 0; j < code.repeat; j++) {
-                results[i++] = code.fmtdef.unpack(buf);
+            if (code.repeat == 0) {
+                results[i++] = Py.EmptyByte;
+                continue;
+            }
+            if (code.format == 'x') {
+                buf.get(new byte[code.repeat]);
+            } else if (code.format == 's') {
+                byte[] bytes = new byte[code.repeat];
+                buf.get(bytes);
+                results[i++] = new PyBytes(bytes);
+            } else {
+                for (int j = 0; j < code.repeat; j++) {
+                    results[i++] = code.fmtdef.unpack(buf);
+                }
             }
         }
         return new PyTuple(results);

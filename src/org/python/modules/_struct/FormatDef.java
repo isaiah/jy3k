@@ -173,7 +173,7 @@ public class FormatDef implements Packer, Unpacker {
        skipped by C optimisation in little-endian architectures (gcc >= 2.91
        does this). */
     static PyObject nu_char(ByteBuffer buf) {
-        return new PyBytes(buf.getChar());
+        return new PyBytes((char) buf.get());
     }
 
     static PyObject nu_byte(ByteBuffer buf) {
@@ -181,7 +181,7 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     static PyObject nu_ubyte(ByteBuffer buf) {
-        return new PyLong(buf.get());
+        return new PyLong(buf.get() & 0xFF);
     }
 
     static PyObject nu_short(ByteBuffer buf) {
@@ -189,7 +189,7 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     static PyObject nu_ushort(ByteBuffer buf) {
-        return new PyLong(buf.getShort());
+        return new PyLong(buf.getShort() & 0xFFFF);
     }
 
     static PyObject nu_halffloat(ByteBuffer buf) {
@@ -242,7 +242,7 @@ public class FormatDef implements Packer, Unpacker {
 
     static PyObject nu_uint(ByteBuffer buf) {
         long v = buf.getInt();
-        return new PyLong(v);
+        return new PyLong(v & 0xFFFFFFFFl);
     }
 
     static PyObject nu_long(ByteBuffer buf) {
@@ -293,7 +293,8 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     private static void np_char(ByteBuffer buf, PyObject v) {
-        buf.put(((PyBytes) v).getString().getBytes());
+        String s = ((PyBytes) v).getString();
+        s.chars().forEach(c -> buf.put((byte) c));
     }
 
     private static void np_short(ByteBuffer buf, PyObject v) {
