@@ -503,8 +503,12 @@ public class FormatDef implements Packer, Unpacker {
         }
     }
 
-    private static void np_float(ByteBuffer buf, PyObject v) {
-        buf.putFloat((float) get_double(v));
+    private static void np_float(ByteBuffer buf, PyObject val) {
+        float v = (float) ((PyFloat) val).getValue();
+        if (Float.isInfinite(v)) {
+            throw Py.OverflowError("float is too big to pack with f format");
+        }
+        buf.putFloat((float) v);
     }
 
     private static void np_double(ByteBuffer buf, PyObject v) {

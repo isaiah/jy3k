@@ -256,8 +256,12 @@ public class PyStruct extends PyObject {
     @ExposedMethod(defaults = {"0"})
     public PyTuple unpack_from(PyObject string, int offset) {
         byte[] bytes = Py.unwrapBuffer(string);
-        if (size <= (bytes.length - offset + 1))
+        if (offset < 0) {
+            offset += bytes.length;
+        }
+        if (offset < 0 || bytes.length < size + offset) {
             throw _struct.StructError("unpack_from str size does not match format");
+        }
         ByteBuffer buf = ByteBuffer.wrap(bytes, offset, size);
         return unpack(buf);
     }
