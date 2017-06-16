@@ -1,5 +1,6 @@
 package org.python.modules._struct;
 
+import org.python.antlr.ast.For;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyArray;
@@ -81,10 +82,14 @@ public class PyStruct extends PyObject {
         int f_len = fmt.length();
         List<FormatCode> codes = new ArrayList<>();
 
+        this.byteOrder = FormatDef.byteOrder(fmt);
+        char tableIndicator = '@';
         for (int j = 0; j < f_len; j++) {
             char c = fmt.charAt(j);
-            if (j == 0 && (c=='@' || c=='<' || c=='>' || c=='=' || c=='!'))
+            if (j == 0 && (c=='@' || c=='<' || c=='>' || c=='=' || c=='!')) {
+                tableIndicator = c;
                 continue;
+            }
             if (Character.isWhitespace(c))
                 continue;
             int num = 1;
@@ -102,7 +107,7 @@ public class PyStruct extends PyObject {
                 }
             }
 
-            FormatDef e = FormatDef.getentry(c);
+            FormatDef e = FormatDef.getentry(c, tableIndicator);
             codes.add(new FormatCode(e, num, c));
             switch(c) {
                 case 's':
@@ -123,7 +128,6 @@ public class PyStruct extends PyObject {
             if (x/itemsize != num || size < 0)
                 throw StructError("total struct size too long");
         }
-        this.byteOrder = FormatDef.byteOrder(fmt);
         this.size = size;
         this.len = len;
         this.codes = codes.toArray(new FormatCode[0]);

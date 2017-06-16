@@ -88,24 +88,8 @@ public class FormatDef implements Packer, Unpacker {
         return value.asDouble();
     }
 
-    static FormatDef getentry(char c) {
+    static FormatDef getentry(char c, char tableIndicator) {
         switch (c) {
-//        new PadFormatDef()              .init('x', 1, 0),
-//        new ByteFormatDef()             .init('b', 1, 0),
-//        new UnsignedByteFormatDef()     .init('B', 1, 0),
-//        new CharFormatDef()             .init('c', 1, 0),
-//        new StringFormatDef()           .init('s', 1, 0),
-//        new PascalStringFormatDef()     .init('p', 1, 0),
-//        new LEShortFormatDef()          .init('h', 2, 0),
-//        new LEUnsignedShortFormatDef()  .init('H', 2, 0),
-//        new LEIntFormatDef()            .init('i', 4, 0),
-//        new LEUnsignedIntFormatDef()    .init('I', 4, 0),
-//        new LEIntFormatDef()            .init('l', 4, 0),
-//        new LEUnsignedIntFormatDef()    .init('L', 4, 0),
-//        new LELongFormatDef()           .init('q', 8, 0),
-//        new LEUnsignedLongFormatDef()   .init('Q', 8, 0),
-//        new LEFloatFormatDef()          .init('f', 4, 0),
-//        new LEDoubleFormatDef()         .init('d', 8, 0),
             case 'b':
                 return f_byte;
             case 'B':
@@ -135,8 +119,15 @@ public class FormatDef implements Packer, Unpacker {
             case 'Q':
                 return f_ulong;
             case 'n':
+                if (tableIndicator == '@') {
+                    return f_size_t;
+                }
+                break;
             case 'N':
-                return f_size_t;
+                if (tableIndicator == '@') {
+                    return f_ssize_t;
+                }
+                break;
             case 'f':
                 return f_float;
             case 'd':
@@ -144,7 +135,6 @@ public class FormatDef implements Packer, Unpacker {
             case 'P':
                 return f_pointer;
         }
-
         throw StructError("bad char in struct format");
     }
 
@@ -242,7 +232,7 @@ public class FormatDef implements Packer, Unpacker {
 
     static PyObject nu_uint(ByteBuffer buf) {
         long v = buf.getInt();
-        return new PyLong(v & 0xFFFFFFFFl);
+        return new PyLong(v & 0xFFFFFFFFL);
     }
 
     static PyObject nu_long(ByteBuffer buf) {
@@ -254,7 +244,7 @@ public class FormatDef implements Packer, Unpacker {
     static PyObject nu_ulong(ByteBuffer buf) {
         BigInteger b = BigInteger.valueOf(buf.getLong());
         if (b.signum() < 0) {
-            b.add(TWO_64);
+            b = b.add(TWO_64);
         }
         return new PyLong(b);
     }
@@ -463,13 +453,13 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     private static void np_long(ByteBuffer buf, PyObject v) {
-        long lvalue  = get_long(v);
+        long lvalue = get_long(v);
         buf.putLong(lvalue);
     }
 
     private static void np_ulong(ByteBuffer buf, PyObject v) {
         BigInteger bi = get_ulong(v);
-        if (bi.compareTo(BigInteger.ZERO) < 0) {
+        if (bi.signum() < 0) {
             throw StructError("can't convert negative long to unsigned");
         }
         long lvalue = bi.longValue(); // underflow is OK -- the bits are correct
@@ -477,7 +467,40 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     private static void np_size_t(ByteBuffer buf, PyObject v) {
-        buf.putLong(v.asLong());
+        if ((v instanceof PyLong)) {
+            try {
+                long val = ((PyLong) v).getValue().longValueExact();
+                buf.putLong(val);
+            } catch (ArithmeticException e) {
+                throw Py.OverflowError("argument out of range");
+            }
+        } else if(v.isIndex()) {
+            buf.putLong(v.asIndex());
+        } else {
+            throw StructError("required argument is not an integer");
+        }
+    }
+
+    private static void np_ssize_t(ByteBuffer buf, PyObject v) {
+        if ((v instanceof PyLong)) {
+            try {
+                BigInteger val = ((PyLong) v).getValue();
+                if (val.signum() < 0 || val.bitLength() > 0x40) {
+                    throw Py.OverflowError("argument out of range");
+                }
+                buf.putLong(val.longValue());
+            } catch (ArithmeticException e) {
+                throw Py.OverflowError("argument out of range");
+            }
+        } else if(v.isIndex()) {
+            long val = v.asIndex();
+            if (val < 0) {
+                throw Py.OverflowError("argument out of range");
+            }
+            buf.putLong(val);
+        } else {
+            throw StructError("required argument is not an integer");
+        }
     }
 
     private static void np_float(ByteBuffer buf, PyObject v) {
@@ -506,6 +529,7 @@ public class FormatDef implements Packer, Unpacker {
             f_long  = new FormatDef(8, FormatDef::np_long, FormatDef::nu_long),
             f_ulong  = new FormatDef(8, FormatDef::np_ulong, FormatDef::nu_ulong),
             f_size_t  = new FormatDef(8, FormatDef::np_size_t, FormatDef::nu_size_t),
+            f_ssize_t  = new FormatDef(8, FormatDef::np_ssize_t, FormatDef::nu_ulong),
             f_float  = new FormatDef(4, FormatDef::np_float, FormatDef::nu_float),
             f_double  = new FormatDef(8, FormatDef::np_double, FormatDef::nu_double),
             f_pointer  = new FormatDef(8, FormatDef::np_long, FormatDef::nu_long);
