@@ -659,7 +659,7 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_mkdir_doc, defaults = {"0777"})
     public static void mkdir(PyObject path, int mode) {
-        if (os == OS.NT) {
+//        if (os == OS.NT) {
             try {
                 Path nioPath = absolutePath(path);
                 // Windows does not use any mode attributes in creating a directory;
@@ -675,9 +675,9 @@ public class PosixModule {
         // Further work on mapping mode to PosixAttributes would have to be done
         // for non Windows platforms. In addition, posix.mkdir would still be necessary
         // for mode bits like stat.S_ISGID
-        } else if (posix.mkdir(absolutePath(path).toString(), mode) < 0) {
-            throw errorFromErrno(path);
-        }
+//        } else if (posix.mkdir(absolutePath(path).toString(), mode) < 0) {
+//            throw errorFromErrno(path);
+//        }
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_open_doc, defaults = {"0777"})

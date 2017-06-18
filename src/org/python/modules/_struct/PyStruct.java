@@ -47,6 +47,11 @@ public class PyStruct extends PyObject {
         return TYPE;
     }
 
+    public PyStruct(PyType subType, PyObject format) {
+        super(subType);
+        Struct___init__(((PyUnicode) format).getString());
+    }
+
     public PyStruct(String format) {
         super(TYPE);
         Struct___init__(format);
