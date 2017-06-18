@@ -197,6 +197,8 @@ public class PySRE_Pattern extends PyObject {
                 sb.append(s.substring(pos));
                 break;
             }
+            /* Append the unmatched part */
+            sb.append(s.substring(pos, matcher.start()));
             pos = matcher.end();
             if (replCallable) {
                 PyObject match = new PySRE_Match(matcher, args[1], this);
