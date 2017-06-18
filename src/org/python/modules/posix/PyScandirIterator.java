@@ -18,16 +18,18 @@ import java.util.Iterator;
 public class PyScandirIterator extends PyObject {
     private Iterator<Path> iter;
     private DirectoryStream<Path> stream;
-    public PyScandirIterator(DirectoryStream<Path> dirs) {
+    private boolean bytes;
+    public PyScandirIterator(DirectoryStream<Path> dirs, boolean bytes) {
         this.iter = dirs.iterator();
         this.stream = dirs;
+        this.bytes = bytes;
     }
 
     @Override
     @ExposedMethod(names = "__next__")
     public PyObject __next__() {
         if (!iter.hasNext()) throw Py.StopIteration();
-        return new PyDirEntry(iter.next());
+        return new PyDirEntry(iter.next(), bytes);
     }
 
     @Override

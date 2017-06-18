@@ -3,6 +3,7 @@ package org.python.modules.posix;
 import jnr.constants.platform.Errno;
 import org.python.core.ArgParser;
 import org.python.core.Py;
+import org.python.core.PyBytes;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
@@ -25,10 +26,12 @@ public class PyDirEntry extends PyObject {
     private static final PyType TYPE = PyType.fromClass(PyDirEntry.class);
 
     private Path entry;
+    private boolean bytes;
 
-    public PyDirEntry(Path entry) {
+    public PyDirEntry(Path entry, boolean bytes) {
         super(TYPE);
         this.entry = entry;
+        this.bytes = bytes;
     }
 
     @ExposedMethod
@@ -76,7 +79,11 @@ public class PyDirEntry extends PyObject {
 
     @ExposedGet(name = "name")
     public PyObject getName() {
-        return new PyUnicode(entry.getFileName().toString());
+        String name = entry.getFileName().toString();
+        if (bytes) {
+            return new PyBytes(name);
+        }
+        return new PyUnicode(name);
     }
 
     @Override

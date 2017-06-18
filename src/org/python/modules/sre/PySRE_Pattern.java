@@ -200,7 +200,12 @@ public class PySRE_Pattern extends PyObject {
             pos = matcher.end();
             if (replCallable) {
                 PyObject match = new PySRE_Match(matcher, args[1], this);
-                replacement = ((PyUnicode) filter.__call__(match)).getString();
+                PyObject replacementObj = filter.__call__(match);
+                if (replacementObj instanceof PyBytes) {
+                    replacement = ((PyBytes) replacementObj).getString();
+                } else {
+                    replacement = ((PyUnicode) replacementObj).getString();
+                }
             }
             sb.append(replacement);
             /** if the search only matches a fixed position, abort */

@@ -605,11 +605,24 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_scandir_doc)
     public static PyObject scandir(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("scandir", args, keywords, "path");
-        String path = ap.getString(0, System.getProperty("user.home"));
+        PyObject pathObj;
+        String path;
+        boolean bytes = false;
+        if (args.length > 0) {
+            pathObj = args[0];
+            if (pathObj instanceof PyBytes) {
+                path = ((PyBytes) pathObj).getString();
+                bytes = true;
+            } else {
+                path = ((PyUnicode) pathObj).getString();
+            }
+        } else {
+            path = System.getProperty("user.home");
+        }
         Path p = absolutePath(path);
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(p);
-            return new PyScandirIterator(stream);
+            return new PyScandirIterator(stream, bytes);
         } catch (NotDirectoryException e) {
             throw Py.OSError(Errno.ENOENT, path);
         } catch (IOException e) {
