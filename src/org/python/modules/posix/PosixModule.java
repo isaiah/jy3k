@@ -607,11 +607,9 @@ public class PosixModule {
         ArgParser ap = new ArgParser("scandir", args, keywords, "path");
         String path = ap.getString(0, System.getProperty("user.home"));
         Path p = absolutePath(path);
-        List<Path> paths = new ArrayList<Path>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
-            for (Path f: stream) {
-                paths.add(f);
-            }
+        try {
+            DirectoryStream<Path> stream = Files.newDirectoryStream(p);
+            return new PyScandirIterator(stream);
         } catch (NotDirectoryException e) {
             throw Py.OSError(Errno.ENOENT, path);
         } catch (IOException e) {
@@ -619,7 +617,6 @@ public class PosixModule {
         } catch (SecurityException e) {
             throw Py.OSError(Errno.EACCES, path);
         }
-        return new PyScandirIterator(paths.iterator());
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_lseek_doc)
