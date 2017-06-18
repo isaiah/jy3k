@@ -961,7 +961,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         java.util.List<expr> exprs = ctx.test().stream()
                 .map(testContext -> (expr) visit(testContext))
                 .collect(Collectors.toList());
-        if (exprs.size() == 1) return exprs.get(0);
+        if (ctx.COMMA().isEmpty()) return exprs.get(0);
         return new Tuple(ctx.getStart(), exprs, exprContextType);
     }
 

@@ -738,7 +738,7 @@ exprlist
 
 /// testlist: test (',' test)* [',']
 testlist
- : test ( ',' test )* ','?
+ : test ( COMMA test )* COMMA?
  ;
 
 /// dictorsetmaker: ( ((test ':' test | '**' expr)
