@@ -572,11 +572,10 @@ public class Encoding {
     public static String asUTF16StringOrError(PyObject obj) {
         // PyUnicode accepted here. Care required in the client if obj is not basic plane.
         String ret = asUTF16StringOrNull(obj);
-        if (ret != null) {
-            return ret;
-        } else {
+        if (ret == null) {
             throw Py.TypeError(String.format("must be bytes or a tuple of bytes, not '%s'", obj.getType().fastGetName()));
         }
+        return ret;
     }
 
         /**

@@ -437,8 +437,11 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @ExposedMethod(doc = BuiltinDocs.bytes___contains___doc)
     final boolean bytes___contains__(PyObject o) {
+        if (o instanceof PyLong) {
+            return getString().contains(String.valueOf(Character.toChars(o.asInt())));
+        }
         String other = asUTF16StringOrError(o);
-        return getString().indexOf(other) >= 0;
+        return getString().contains(other);
     }
 
     @Override
