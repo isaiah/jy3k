@@ -1062,7 +1062,7 @@ class PrintFunction extends PyBuiltinFunction {
         System.arraycopy(args, 0, values, 0, argslen - kwlen);
         PyObject keyValues[] = new PyObject[kwlen];
         System.arraycopy(args, argslen - kwlen, keyValues, 0, kwlen);
-        ArgParser ap = new ArgParser("print", keyValues, kwds, new String[] {"sep", "end", "file"});
+        ArgParser ap = new ArgParser("print", keyValues, kwds, new String[] {"sep", "end", "file", "flush"});
         for (PyObject keyValue: keyValues) {
             if (keyValue instanceof PyUnicode) {
                 //If "file" is passed in as PyUnicode, that's OK as it will error later.
@@ -1072,11 +1072,12 @@ class PrintFunction extends PyBuiltinFunction {
         String sep = ap.getString(0, null);
         String end = ap.getString(1, null);
         PyObject file = ap.getPyObject(2, null);
-        return print(values, sep, end, file, useUnicode);
+        boolean flush = ap.getBoolean(3, false);
+        return print(values, sep, end, file, useUnicode, flush);
     }
 
     private static PyObject print(PyObject values[], String sep, String end,
-                                  PyObject file, boolean useUnicode) {
+                                  PyObject file, boolean useUnicode, boolean flush) {
         StdoutWrapper out;
         if (file != null && file != Py.None) {
             out = new FixedFileWrapper(file);
@@ -1110,6 +1111,9 @@ class PrintFunction extends PyBuiltinFunction {
             }
 
             out.print(values, sepObject, endObject);
+            if (flush) {
+                out.flush();
+            }
         }
         return Py.None;
     }

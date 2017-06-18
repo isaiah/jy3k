@@ -200,6 +200,14 @@ public class ArgParser {
         return value.asIndex();
     }
 
+    public boolean getBoolean(int pos, boolean def) {
+        PyObject value = getOptionalArg(pos);
+        if (value == null) {
+            return def;
+        }
+        return value.__bool__();
+    }
+
     /**
      * Return a required argument as a PyObject.
      * 

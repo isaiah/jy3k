@@ -52,7 +52,9 @@ public class StdoutWrapper extends OutputStream {
             try {
                 out.invoke("flush");
             } catch (PyException pye) {
-                // ok
+                if (!pye.match(Py.AttributeError)) {
+                    throw pye;
+                }
             }
         }
     }
