@@ -28,6 +28,7 @@ import org.python.antlr.ast.Return;
 import org.python.antlr.ast.SetComp;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Try;
+import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
@@ -38,6 +39,7 @@ import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -50,14 +52,87 @@ import static org.python.compiler.CompilerConstants.RETURN;
  * Such as:
  * code copying/inlining of finallies
  * expand augassign to normal assign + binop
- * lower for loop
+ * lower comprehensions: convert to anonymous function call
  */
 public class Lower extends Visitor {
+    private int counter;
+
+    /**
+     * Turn
+     *
+     * while True:
+     *    ...
+     *
+     * into
+     *
+     * loop:
+     *    ...
+     *
+     * Because we can more effectively compile loop, into something like for(;;){} in java, instead of looking
+     * for the global value True and then turn it into boolean in every loop
+     * @param node
+     * @return
+     *
+     * TODO
+     */
+    @Override
+    public Object visitWhile(While node) throws Exception {
+        return super.visitWhile(node);
+    }
+
+    /** Convert for loop to a infinite loop
+     * a = 0
+     * for x in y:
+     *     a += x
+     * else:
+     *     a = 0
+     *
+     * turns into
+     *
+     * a = 0
+     * it = iter(y)
+     * loop:
+     *     try:
+     *         x = next(it)
+     *     except StopIteration:
+     *         break
+     *     else:
+     *         a += x
+     * else:
+     *     a = 0
+     *
+     * @param node
+     * @return
+     * @throws Exception
+     * FIXME there is a bug, we cannot differentiate normal break and break result of StopIteration
+     */
+//    @Override
+//    public Object visitFor(For node) throws Exception {
+//        traverse(node);
+//        String tmp = "(tmp)" + counter++;
+//        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
+//        Attribute iter = new Attribute(node, node.getInternalIter(), "__iter__", expr_contextType.Load);
+//        Call callIter = new Call(node, iter, null, null);
+//        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
+//        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
+//        Attribute next = new Attribute(node, loadTmp, "__next__", expr_contextType.Load);
+//        Call callNext = new Call(node, next, null, null);
+//        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
+//        Break _break = new Break(node);
+//        excepthandler handler = new ExceptHandler(node, new Name(node, "StopIteration", expr_contextType.Load),
+//                null, Arrays.asList(_break));
+//        Try tryNode = new Try(node, Arrays.asList(setElt), Arrays.asList(handler),
+//                node.getInternalBody(), null);
+//        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
+//                Arrays.asList(tryNode), node.getInternalOrelse());
+//        node.replaceSelf(setTmp, loop);
+//        return null;
+//    }
      /**
       * convert list comprehension into an anonymous function call
       * [x for x in range(10)]
       *
-      * becomes (pseudo code)
+      * turns into (pseudo code)
       *
       * lambda (elt):
       *   _tmp = []
@@ -162,7 +237,6 @@ public class Lower extends Visitor {
         traverse(node);
         expr left = node.getInternalTarget().copy();
         ((Context) left).setContext(expr_contextType.Load);
-        operatorType op = node.getInternalOp();
         BinOp binOp = new BinOp(node, left, node.getInternalOp(), node.getInternalValue());
         binOp.setInplace(true);
         expr target = node.getInternalTarget().copy();

@@ -1013,9 +1013,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         setline(node);
 
         // Do test
-        visit(node.getInternalTest());
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
-        code.ifne(start_loop);
+        expr test = node.getInternalTest();
+        if (test instanceof NameConstant && ((NameConstant) test).getInternalValue().equals("True")) {
+            // optimisation for while True loop
+            code.goto_(start_loop);
+        } else {
+            visit(test);
+            code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+            code.ifne(start_loop);
+        }
 
         finishLoop(savebcf);
 
@@ -1191,8 +1197,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // get the next element from the list
         code.aload(iter_tmp);
         code.invokevirtual(p(PyObject.class), "__next__", sig(PyObject.class));
-//        code.ldc("__next__");
-//        code.invokestatic(p(Py.class), "invoke", sig(PyObject.class, PyObject.class, String.class));
 
         code.astore(expr_tmp);
         // if no more elements then fall through
@@ -2218,11 +2222,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitNameConstant(NameConstant node) throws Exception {
         String name = node.getInternalValue();
-        if (!name.equals("None")) {
+        if (name.equals("None")) {
+            getNone();
+        } else {
             loadFrame();
             emitGetGlobal(name);
-        } else {
-            getNone();
         }
         return null;
     }
