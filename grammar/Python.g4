@@ -791,9 +791,9 @@ comp_iter
  | comp_if
  ;
 
-/// comp_for: 'for' exprlist 'in' or_test [comp_iter]
+/// comp_for: [ASYNC] 'for' exprlist 'in' or_test [comp_iter]
 comp_for
- : FOR exprlist IN or_test comp_iter?
+ : ASYNC? FOR exprlist IN or_test comp_iter?
  ;
 
 /// comp_if: 'if' test_nocond [comp_iter]

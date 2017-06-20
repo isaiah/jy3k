@@ -379,8 +379,8 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
             throw new ParseException("'await' outside function", node);
         } else if (cur.comprehension) {
             throw new ParseException("'await' expressions in comprehensions are not supported", node);
-        } else if (!cur.async) {
-            throw new ParseException("invalid syntax", node);
+//        } else if (!cur.async) {
+//            throw new ParseException("invalid syntax", node);
         }
         traverse(node);
         return null;

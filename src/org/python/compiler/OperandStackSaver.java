@@ -1,6 +1,7 @@
 package org.python.compiler;
 
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AnalyzerAdapter;
 import org.objectweb.asm.commons.InstructionAdapter;
@@ -21,10 +22,13 @@ public class OperandStackSaver extends InstructionAdapter {
     private int tmpIndex;
     private List<Label> yields;
 
-    public OperandStackSaver(AnalyzerAdapter analyzer) {
-        super(ASM5, analyzer);
-        this.analyzer = analyzer;
+    public OperandStackSaver(MethodVisitor visitor) {
+        super(ASM5, visitor);
         this.yields = new ArrayList<>();
+    }
+
+    public void setAnalyzer(AnalyzerAdapter analyzer) {
+        this.analyzer = analyzer;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class OperandStackSaver extends InstructionAdapter {
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (opcode == INVOKESTATIC) {
             if (name.equals(SAVE_OPRANDS.symbolName())) {
-                 if (analyzer.locals == null) {
+                 if (analyzer.stack == null || analyzer.stack.isEmpty()) {
                      return;
                  }
                 tmpIndex = analyzer.locals.size();

@@ -38,7 +38,9 @@ public class CoroutineFixer extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(owner, access, name, desc, mv);
-        return new OperandStackSaver(analyzerAdapter);
+        OperandStackSaver instrumentor =  new OperandStackSaver(mv);
+        AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(owner, access, name, desc, instrumentor);
+        instrumentor.setAnalyzer(analyzerAdapter);
+        return analyzerAdapter;
     }
 }
