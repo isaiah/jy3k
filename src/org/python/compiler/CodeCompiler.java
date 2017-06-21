@@ -3,7 +3,6 @@ package org.python.compiler;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Method;
 import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
@@ -29,10 +28,10 @@ import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Ellipsis;
 import org.python.antlr.ast.ExceptHandler;
+import org.python.antlr.ast.ExitFor;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.ExtSlice;
-import org.python.antlr.ast.For;
 import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
@@ -61,7 +60,6 @@ import org.python.antlr.ast.Try;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
-import org.python.antlr.ast.With;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.YieldFrom;
 import org.python.antlr.ast.alias;
@@ -77,8 +75,6 @@ import org.python.core.AsyncContextManager;
 import org.python.core.AsyncIterator;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
-import org.python.core.ContextGuard;
-import org.python.core.ContextManager;
 import org.python.core.Py;
 import org.python.core.PyCode;
 import org.python.core.PyDictionary;
@@ -93,7 +89,6 @@ import org.python.core.PyTraceback;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
-import org.python.core.generator.PyCoroutine;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -122,7 +117,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private ScopeInfo my_scope;
     private boolean optimizeGlobals = true;
     private String className;
-    private Deque<Label> continueLabels, breakLabels;
+    private Deque<Label> continueLabels, breakLabels, exitLabels;
     private Deque<ExceptionHandler> exceptionHandlers;
 
     final static Method contextGuard_getManager =
@@ -147,6 +142,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         continueLabels = new LinkedList<>();
         breakLabels = new LinkedList<>();
+        exitLabels = new LinkedList<>();
         exceptionHandlers = new LinkedList<>();
         stack = new LinkedList<>();
     }
@@ -540,13 +536,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public Object visitExitFor(ExitFor node) throws Exception {
+        code.goto_(exitLabels.peek());
+        return null;
+    }
+
+    @Override
     public Object visitBreak(Break node) throws Exception {
         // setline(node); Not needed here...
         if (breakLabels.isEmpty()) {
             throw Py.SyntaxError(node.getToken(), "'break' outside loop", module.getFilename());
         }
 
-        doFinallysDownTo(bcfLevel);
+//        doFinallysDownTo(bcfLevel);
 
         code.goto_(breakLabels.peek());
         return null;
@@ -559,7 +561,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             throw Py.SyntaxError(node.getToken(), "'continue' not properly in loop", module.getFilename());
         }
 
-        doFinallysDownTo(bcfLevel);
+//        doFinallysDownTo(bcfLevel);
 
         code.goto_(continueLabels.peek());
         return Exit;
@@ -755,7 +757,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             tmp = code.getReturnLocal();
             code.astore(tmp);
         }
-        doFinallysDownTo(0);
+//        doFinallysDownTo(0);
 
         setLastI(-1);
 
@@ -990,6 +992,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public int beginLoop() {
         continueLabels.push(new Label());
         breakLabels.push(new Label());
+        exitLabels.push(new Label());
         int savebcf = bcfLevel;
         bcfLevel = exceptionHandlers.size();
         return savebcf;
@@ -998,6 +1001,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public void finishLoop(int savebcf) {
         continueLabels.pop();
         breakLabels.pop();
+        exitLabels.pop();
         bcfLevel = savebcf;
     }
 
@@ -1006,6 +1010,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         int savebcf = beginLoop();
         Label continue_loop = continueLabels.peek();
         Label break_loop = breakLabels.peek();
+        Label exit_loop = exitLabels.peek();
 
         Label start_loop = new Label();
 
@@ -1028,7 +1033,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
             code.ifne(start_loop);
         }
-
+        code.mark(exit_loop);
         finishLoop(savebcf);
 
         if (node.getInternalOrelse() != null) {
@@ -1160,85 +1165,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.freeLocal(expr_tmp);
 
         code.trycatch(start, end, handler, p(PyException.class));
-        return null;
-    }
-
-    @Override
-    public Object visitFor(For node) throws Exception {
-        int savebcf = beginLoop();
-        Label continue_loop = continueLabels.peek();
-        Label break_loop = breakLabels.peek();
-        Label finish_loop = new Label();
-        Label start_loop = new Label();
-        Label next_loop = new Label();
-        Label start = new Label();
-        Label end = new Label();
-        Label handler = new Label();
-        setline(node);
-
-        // parse the list
-        visit(node.getInternalIter());
-
-        int iter_tmp = code.getLocal(p(PyObject.class));
-
-        // set up the loop iterator
-        code.invokevirtual(p(PyObject.class), "__iter__", sig(PyObject.class));
-        code.astore(iter_tmp);
-
-        int expr_tmp = code.getLocal(p(PyObject.class));
-        // do check at end of loop. Saves one opcode ;-)
-        code.goto_(next_loop);
-
-        code.mark(start_loop);
-        // set iter variable to current entry in list
-        set(node.getInternalTarget(), expr_tmp);
-
-        // evaluate for body
-        suite(node.getInternalBody());
-
-        code.mark(continue_loop);
-
-        code.mark(next_loop);
-        code.mark(start);
-        setline(node);
-        // get the next element from the list
-        code.aload(iter_tmp);
-        code.invokevirtual(p(PyObject.class), "__next__", sig(PyObject.class));
-
-        code.astore(expr_tmp);
-        // if no more elements then fall through
-        code.aload(expr_tmp);
-        // this is still necessary before all builtin __next__ methods throw StopIteration
-        code.ifnull(finish_loop);
-        code.goto_(start_loop);
-        code.mark(end);
-        code.mark(handler);
-        int exc = code.getLocal(p(Throwable.class));
-        code.astore(exc);
-        code.aload(exc);
-        code.checkcast(p(PyException.class));
-        code.getstatic(p(Py.class), "StopIteration", ci(PyObject.class));
-        code.invokevirtual(p(PyException.class), "match", sig(Boolean.TYPE, PyObject.class));
-        code.ifne(finish_loop);
-        code.aload(exc);
-        code.athrow();
-        code.freeLocal(exc);
-
-        finishLoop(savebcf);
-
-        code.mark(finish_loop);
-        if (node.getInternalOrelse() != null) {
-            // Do else clause if provided
-            suite(node.getInternalOrelse());
-        }
-
-        code.mark(break_loop);
-
-        code.freeLocal(iter_tmp);
-        code.freeLocal(expr_tmp);
-
-        code.trycatch(start, end, handler, p(PyException.class));
-        // Probably need to detect "guaranteed exits"
         return null;
     }
 

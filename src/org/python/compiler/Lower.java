@@ -13,6 +13,7 @@ import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.DictComp;
 import org.python.antlr.ast.ExceptHandler;
+import org.python.antlr.ast.ExitFor;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
@@ -36,14 +37,12 @@ import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
 import org.python.antlr.ast.comprehension;
 import org.python.antlr.ast.expr_contextType;
-import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.unaryopType;
 import org.python.antlr.ast.withitem;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,29 +61,6 @@ import static org.python.compiler.CompilerConstants.RETURN;
  */
 public class Lower extends Visitor {
     private int counter;
-
-    /**
-     * Turn
-     *
-     * while True:
-     *    ...
-     *
-     * into
-     *
-     * loop:
-     *    ...
-     *
-     * Because we can more effectively compile loop, into something like for(;;){} in java, instead of looking
-     * for the global value True and then turn it into boolean in every loop
-     * @param node
-     * @return
-     *
-     * TODO
-     */
-    @Override
-    public Object visitWhile(While node) throws Exception {
-        return super.visitWhile(node);
-    }
 
     /** Convert for loop to a infinite loop
      * a = 0
@@ -110,30 +86,29 @@ public class Lower extends Visitor {
      * @param node
      * @return
      * @throws Exception
-     * FIXME there is a bug, we cannot differentiate normal break and break result of StopIteration
      */
-//    @Override
-//    public Object visitFor(For node) throws Exception {
-//        traverse(node);
-//        String tmp = "(tmp)" + counter++;
-//        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
-//        Attribute iter = new Attribute(node, node.getInternalIter(), "__iter__", expr_contextType.Load);
-//        Call callIter = new Call(node, iter, null, null);
-//        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
-//        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
-//        Attribute next = new Attribute(node, loadTmp, "__next__", expr_contextType.Load);
-//        Call callNext = new Call(node, next, null, null);
-//        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
-//        Break _break = new Break(node);
-//        excepthandler handler = new ExceptHandler(node, new Name(node, "StopIteration", expr_contextType.Load),
-//                null, Arrays.asList(_break));
-//        Try tryNode = new Try(node, Arrays.asList(setElt), Arrays.asList(handler),
-//                node.getInternalBody(), null);
-//        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
-//                Arrays.asList(tryNode), node.getInternalOrelse());
-//        node.replaceSelf(setTmp, loop);
-//        return node;
-//    }
+    @Override
+    public Object visitFor(For node) throws Exception {
+        traverse(node);
+        String tmp = "(tmp)" + counter++;
+        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
+        Attribute iter = new Attribute(node, node.getInternalIter(), "__iter__", expr_contextType.Load);
+        Call callIter = new Call(node, iter, null, null);
+        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
+        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
+        Attribute next = new Attribute(node, loadTmp, "__next__", expr_contextType.Load);
+        Call callNext = new Call(node, next, null, null);
+        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
+        stmt _breakFor = new ExitFor(node);
+        excepthandler handler = new ExceptHandler(node, new Name(node, "StopIteration", expr_contextType.Load),
+                null, Arrays.asList(_breakFor));
+        Try tryNode = new Try(node, Arrays.asList(setElt), Arrays.asList(handler),
+                node.getInternalBody(), null);
+        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
+                Arrays.asList(tryNode), node.getInternalOrelse());
+        node.replaceSelf(setTmp, loop);
+        return node;
+    }
 
     /**
      * Convert a with statement to a equivalent try/catch clause
@@ -227,21 +202,21 @@ public class Lower extends Visitor {
       */
     @Override
     public Object visitListComp(ListComp node) throws Exception {
-        traverse(node);
+//        traverse(node);
         org.python.antlr.ast.List emptyList = new org.python.antlr.ast.List(node, null, expr_contextType.Load);
         return visitComp(emptyList, "append", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
     public Object visitSetComp(SetComp node) throws Exception {
-        traverse(node);
+//        traverse(node);
         org.python.antlr.ast.Set emptySet = new org.python.antlr.ast.Set(node, null);
         return visitComp(emptySet, "add", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
     public Object visitDictComp(DictComp node) throws Exception {
-        traverse(node);
+//        traverse(node);
         org.python.antlr.ast.Dict emptyDict = new org.python.antlr.ast.Dict(node, null, null);
         return visitComp(emptyDict, "__setitem__", node, node.getInternalGenerators(), node.getInternalKey(), node.getInternalValue());
     }
@@ -277,6 +252,7 @@ public class Lower extends Visitor {
         Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
         expr result = new Call(node, lambda, asList(getIter), null);
 
+        traverse(result);
         node.replaceSelf(result);
         return node;
     }
@@ -431,6 +407,7 @@ public class Lower extends Visitor {
         Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
         expr result = new Call(node, lambda, asList(getIter), null);
 
+        traverse(result);
         node.replaceSelf(result);
         return node;
     }

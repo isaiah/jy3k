@@ -169,14 +169,14 @@ public class PyRange extends PySequence {
         return range_reverse();
     }
 
-    private final PyIterator range_iter() {
+    private final PyObject range_iter() {
         if (extraLong) {
             return new PyLongRangeIter(BigInteger.ZERO, start, step, len);
         }
         return new PyXRangeIter(0, start.longValue(), step.longValue(), len.longValue());
     }
 
-    private final PyIterator range_reverse() {
+    private final PyObject range_reverse() {
         if (extraLong) {
             return new PyLongRangeIter(BigInteger.ZERO,
                     start.add(len.subtract(BigInteger.ONE)).multiply(step),   // start
@@ -237,21 +237,21 @@ public class PyRange extends PySequence {
         }
     }
 
-    @Override
-    public Object __tojava__(Class<?> c) {
-        if (c.isAssignableFrom(Iterable.class)) {
-            return new JavaIterator(range_iter());
-        }
-        if (c.isAssignableFrom(Iterator.class)) {
-            return (new JavaIterator(range_iter())).iterator();
-        }
-        if (c.isAssignableFrom(Collection.class)) {
-            List<Object> list = new ArrayList<>();
-            for (Object obj : new JavaIterator(range_iter())) {
-                list.add(obj);
-            }
-            return list;
-        }
-        return super.__tojava__(c);
-    }
+//    @Override
+//    public Object __tojava__(Class<?> c) {
+//        if (c.isAssignableFrom(Iterable.class)) {
+//            return new JavaIterator(range_iter());
+//        }
+//        if (c.isAssignableFrom(Iterator.class)) {
+//            return (new JavaIterator(range_iter())).iterator();
+//        }
+//        if (c.isAssignableFrom(Collection.class)) {
+//            List<Object> list = new ArrayList<>();
+//            for (Object obj : new JavaIterator(range_iter())) {
+//                list.add(obj);
+//            }
+//            return list;
+//        }
+//        return super.__tojava__(c);
+//    }
 }

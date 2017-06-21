@@ -8,7 +8,7 @@ import org.python.expose.ExposedType;
  * Specially optimized xrange iterator.
  */
 @ExposedType(name = "range_iterator", base = PyObject.class, isBaseType = false)
-public class PyXRangeIter extends PyIterator {
+public class PyXRangeIter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyXRangeIter.class);
 
     private long index;
@@ -24,21 +24,24 @@ public class PyXRangeIter extends PyIterator {
         this.len = len;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
-    final PyObject range_iterator___next__() {
-        return super.next();
+    @Override
+    @ExposedMethod(names = "__iter__")
+    public PyObject __iter__() {
+        return this;
     }
 
     @Override
+    @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
     public PyObject __next__() {
         if (index < len) {
-            return Py.newInteger(start + index++ * step);
+            return new PyLong(start + index++ * step);
         }
 
-        return null;
+        throw Py.StopIteration();
     }
 
     @Override
+    @ExposedMethod(names = "__length_hint__")
     public int __len__() {
         return (int) len;
     }
