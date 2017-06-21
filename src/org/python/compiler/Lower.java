@@ -28,21 +28,27 @@ import org.python.antlr.ast.Return;
 import org.python.antlr.ast.SetComp;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Try;
+import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
+import org.python.antlr.ast.With;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
 import org.python.antlr.ast.comprehension;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.operatorType;
+import org.python.antlr.ast.unaryopType;
+import org.python.antlr.ast.withitem;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.python.compiler.CompilerConstants.EXCINFO;
 import static org.python.compiler.CompilerConstants.RETURN;
 
 /**
@@ -126,8 +132,82 @@ public class Lower extends Visitor {
 //        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
 //                Arrays.asList(tryNode), node.getInternalOrelse());
 //        node.replaceSelf(setTmp, loop);
-//        return null;
+//        return node;
 //    }
+
+    /**
+     * Convert a with statement to a equivalent try/catch clause
+     * https://www.python.org/dev/peps/pep-0343/
+     * @param node
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Object visitWith(With node) throws Exception {
+        traverse(node);
+        stmt enterStmt;
+        withitem item = node.getInternalItems().get(0);
+        String mgr = "(mgr)" + counter;
+        Name setMgr = new Name(node, mgr, expr_contextType.Store);
+        Name getMgr = new Name(node, mgr, expr_contextType.Load);
+        Assign assignMgr = new Assign(node, Arrays.asList(setMgr), item.getInternalContext_expr());
+        Attribute getEnter = new Attribute(node, getMgr, "__enter__", expr_contextType.Load);
+        Call enter = new Call(node, getEnter, null, null);
+        if (item.getInternalOptional_vars() == null) {
+            enterStmt = new Expr(node, enter);
+        } else {
+            enterStmt = new Assign(node, Arrays.asList(item.getInternalOptional_vars()), enter);
+        }
+        Attribute getExit = new Attribute(node, getMgr, "__exit__", expr_contextType.Load);
+        expr none = new NameConstant(node, "None");
+        Expr _exit = new Expr(node, new Call(node, getExit, Arrays.asList(none, none, none), null));
+        // This is a hint for the code generator, equals *sys.exc_info()
+        expr excinfo = new NameConstant(node, EXCINFO.symbolName());
+        expr _exitWithExcinfo = new Call(node, getExit, Arrays.asList(excinfo), null);
+        expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
+        stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
+        excepthandler handler = new ExceptHandler(node, null, null, Arrays.asList(ifStmt));
+        Try innerTry = new Try(node, node.getInternalBody(), Arrays.asList(handler), null, null);
+        Visitor withBodyVisitor = new Visitor() {
+            // skip function definition
+            @Override
+            public Object visitFunctionDef(FunctionDef node) {
+                return node;
+            }
+
+            @Override
+            public Object visitBreak(Break node) {
+                node.replaceSelf(asList(_exit, node.copy()));
+                return node;
+            }
+
+            @Override
+            public Object visitContinue(Continue node) {
+                node.replaceSelf(asList(_exit, node.copy()));
+                return node;
+            }
+
+            @Override
+            public Object visitReturn(Return node) {
+                expr value = node.getInternalValue();
+                // no return expression, or returns a primitive literal
+                if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
+                    node.replaceSelf(asList(_exit, node.copy()));
+                } else {
+                    Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
+                    Assign assign = new Assign(value.getToken(), asList(resultNode), value);
+                    resultNode = resultNode.copy();
+                    resultNode.setContext(expr_contextType.Load);
+                    node.replaceSelf(assign, _exit, new Return(node.getToken(), resultNode));
+                }
+                return node;
+            }
+        };
+        node.traverse(withBodyVisitor);
+        node.replaceSelf(assignMgr, enterStmt, innerTry);
+        return node;
+    }
+
      /**
       * convert list comprehension into an anonymous function call
       * [x for x in range(10)]

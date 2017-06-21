@@ -424,14 +424,6 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitWith(With node) throws Exception {
-        cur.max_with_count++;
-        traverse(node);
-
-        return null;
-    }
-
-    @Override
     public Object visitExceptHandler(ExceptHandler node) throws Exception {
         traverse(node);
         if (node.getInternalName() != null) {

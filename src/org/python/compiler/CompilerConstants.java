@@ -5,6 +5,7 @@ package org.python.compiler;
  */
 public enum  CompilerConstants {
     ANNOT("__annotations__"),
+    EXCINFO("exc_info"),
     GEN("__gen"),
     ITER("iter"),
     SAVE_OPRANDS("__save_operands__"),

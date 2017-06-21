@@ -89,6 +89,7 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PySet;
 import org.python.core.PySlice;
+import org.python.core.PyTraceback;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
@@ -162,6 +163,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public void getNone() throws IOException {
         code.getstatic(p(Py.class), "None", ci(PyObject.class));
+    }
+
+    public void getExcInfo() throws Exception {
+        int exc = code.getLocal(p(PyException.class));
+        loadThreadState();
+        code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
+        code.astore(exc);
+        code.aload(exc);
+        code.getfield(p(PyException.class), "type", ci(PyObject.class));
+        code.aload(exc);
+        code.getfield(p(PyException.class), "value", ci(PyObject.class));
+        code.aload(exc);
+        code.getfield(p(PyException.class), "traceback", ci(PyTraceback.class));
+        code.freeLocal(exc);
     }
 
     public void loadFrame() throws Exception {
@@ -254,15 +269,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // END preparse
 
         optimizeGlobals = checkOptimizeGlobals(fast_locals, my_scope);
-
-        if (my_scope.max_with_count > 0) {
-            // allocate for all the with-exits we will have in the frame;
-            // this allows yield and with to happily co-exist
-            loadFrame();
-            code.iconst(my_scope.max_with_count);
-            code.anewarray(p(PyObject.class));
-            code.putfield(p(PyFrame.class), "f_exits", ci(PyObject[].class));
-        }
 
         Object exit = visit(node);
         if (exit == null) {
@@ -1055,41 +1061,42 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         int expr_tmp = code.getLocal(p(PyObject.class));
         // iter = type(iter).__aiter__(iter)
         code.invokestatic(p(AsyncIterator.class), "getIter", sig(Object.class, PyObject.class));
-        code.dup();
+//        code.dup();
         code.astore(iter_tmp);
-        // initialize target var with null
         code.aconst_null();
         code.astore(expr_tmp);
-        saveLocals();
-        // __aiter__ expect asynchronous iterator directly after 3.5.2
-        code.instanceof_(p(PyCoroutine.class));
-        Label newAIter = new Label();
-        code.ifeq(newAIter);
-        setLastI(++yield_count);
-        loadFrame();
-        code.aload(iter_tmp);
-        code.checkcast(p(PyObject.class));
-        code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-
-        loadFrame();
-        code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.areturn();
-        yield_count++;
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-        restoreLocals();
-
-        // restore return value from subgenerator
-        code.new_(p(AsyncIterator.class));
-        code.dup();
-        loadFrame();
-        code.invokevirtual(p(PyFrame.class), "getf_stacktop", sig(PyObject.class));
-        code.invokespecial(p(AsyncIterator.class), "<init>", sig(Void.TYPE, PyObject.class));
-        code.astore(iter_tmp);
-        saveLocals();
-
-        code.mark(newAIter);
         code.goto_(next_loop);
+        // initialize target var with null
+//        code.aconst_null();
+//        code.astore(expr_tmp);
+//        saveLocals();
+//        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
+//        // __aiter__ expect asynchronous iterator directly after 3.5.2
+//        code.instanceof_(p(PyCoroutine.class));
+//        code.ifeq(next_loop);
+//        setLastI(++yield_count);
+//        loadFrame();
+//        code.aload(iter_tmp);
+//        code.checkcast(p(PyObject.class));
+//        code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
+//        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
+//
+//        loadFrame();
+//        code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
+//        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
+//        yield_count++;
+//        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
+//        restoreLocals();
+//        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
+//
+//        // restore return value from subgenerator
+//        code.new_(p(AsyncIterator.class));
+//        code.dup();
+//        loadFrame();
+//        code.invokevirtual(p(PyFrame.class), "getf_stacktop", sig(PyObject.class));
+//        code.invokespecial(p(AsyncIterator.class), "<init>", sig(Void.TYPE, PyObject.class));
+//        code.astore(iter_tmp);
+//        saveLocals();
 
         code.mark(start_loop);
         // set iter variable to current entry in list
@@ -1101,14 +1108,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         code.mark(next_loop);
         code.mark(start);
-        setline(node);
-        restoreLocals();
+        saveLocals();
         // TARGET = await type(iter).__anext__(iter)
+        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         code.aload(iter_tmp);
         code.checkcast(p(AsyncIterator.class));
         code.invokevirtual(p(AsyncIterator.class), "__anext__", sig(PyObject.class));
-        yield_count++;
-        setLastI(yield_count);
+        setLastI(++yield_count);
         loadFrame();
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
@@ -1116,10 +1122,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.areturn();
+        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         yield_count++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-//        restoreLocals();
+        restoreLocals();
+        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
         // restore return value from subgenerator
         loadFrame();
@@ -1662,9 +1669,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         sig(PyObject.class, ThreadState.class));
                 break;
             case 1:
-                visit(values.get(0));
-                code.invokevirtual(p(PyObject.class), "__call__",
-                        sig(PyObject.class, ThreadState.class, PyObject.class));
+                expr arg = values.get(0);
+                visit(arg);
+                if (arg instanceof NameConstant && ((NameConstant) arg).getInternalValue().equals(EXCINFO.symbolName())) {
+                    // special case for sys.excinfo hack, used by desugared "With" stmt
+                    code.invokevirtual(p(PyObject.class), "__call__",
+                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
+                } else {
+                    code.invokevirtual(p(PyObject.class), "__call__",
+                            sig(PyObject.class, ThreadState.class, PyObject.class));
+                }
                 break;
             case 2:
                 visit(values.get(0));
@@ -2224,6 +2238,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         String name = node.getInternalValue();
         if (name.equals("None")) {
             getNone();
+        } else if (name.equals(EXCINFO.symbolName())) {
+            getExcInfo();
         } else {
             loadFrame();
             emitGetGlobal(name);
@@ -2417,21 +2433,22 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadThreadState();
         code.invokeinterface(p(AsyncContextManager.class),
                 "__aenter__", sig(PyObject.class, ThreadState.class), true);
-        yield_count++;
-        setLastI(yield_count);
+        setLastI(++yield_count);
         code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
         loadFrame();
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
         saveLocals();
+        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.areturn();
+        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         yield_count++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
+        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
         // restore return value from subgenerator
         loadFrame();
@@ -2462,13 +2479,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 compiler.code.aconst_null();
                 compiler.code.invokeinterface(p(AsyncContextManager.class),
                         "__aexit__", sig(PyObject.class, ThreadState.class, PyException.class), true);
-                compiler.yield_count++;
-                compiler.setLastI(compiler.yield_count);
+                compiler.setLastI(++compiler.yield_count);
                 compiler.code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
                 compiler.loadFrame();
                 compiler.code.swap();
                 compiler.code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
                 compiler.saveLocals();
+                compiler.code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
                 compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
                 compiler.loadFrame();
@@ -2477,6 +2494,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 compiler.yield_count++;
                 compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
                 compiler.restoreLocals();
+                compiler.code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
                 // restore return value from subgenerator
                 compiler.loadFrame();
@@ -2536,20 +2554,21 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokeinterface(p(AsyncContextManager.class),
                 "__aexit__", sig(PyObject.class, ThreadState.class, PyException.class), true);
 
-        yield_count++;
-        setLastI(yield_count);
+        setLastI(++yield_count);
         code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
         loadFrame();
         code.swap();
         code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
         saveLocals();
+        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.areturn();
+        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         yield_count++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
+        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
         restoreLocals();
 
         // restore return value from subgenerator
@@ -2568,124 +2587,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.checkcast(p(Throwable.class));
         code.athrow();
 
-        code.mark(label_end);
-        code.freeLocal(mgr_tmp);
-
-        handler.addExceptionHandlers(label_catch);
-        return null;
-    }
-
-    @Override
-    public Object visitWith(With node) throws Exception {
-        // AST is converted such that every context only has one item
-        withitem item = node.getInternalItems().get(0);
-        final Label label_body_start = new Label();
-        final Label label_body_end = new Label();
-        final Label label_catch = new Label();
-        final Label label_catch_end = new Label();
-        final Label label_end = new Label();
-
-        // mgr = (EXPR)
-        visit(item.getInternalContext_expr());
-
-        // wrap the manager with the ContextGuard (or get it directly if it
-        // supports the ContextManager interface)
-        code.invokestatic(Type.getType(ContextGuard.class).getInternalName(),
-                contextGuard_getManager.getName(), contextGuard_getManager.getDescriptor());
-        code.dup();
-
-        final int mgr_tmp = code.getLocal(Type.getType(ContextManager.class).getInternalName());
-        code.astore(mgr_tmp);
-
-        // value = mgr.__enter__()
-        loadThreadState();
-        code.invokeinterface(Type.getType(ContextManager.class).getInternalName(),
-                __enter__.getName(), __enter__.getDescriptor(), true);
-        int value_tmp = code.getLocal(p(PyObject.class));
-        code.astore(value_tmp);
-
-        // exc = True # not necessary, since we don't exec finally if exception
-
-        // FINALLY (preparation)
-        // ordinarily with a finally, we need to duplicate the code. that's not the case
-        // here
-        // # The normal and non-local-goto cases are handled here
-        // if exc: # implicit
-        // exit(None, None, None)
-        ExceptionHandler normalExit = new ExceptionHandler() {
-
-            @Override
-            public boolean isFinallyHandler() {
-                return true;
-            }
-
-            @Override
-            public void finalBody(CodeCompiler compiler) throws Exception {
-                compiler.code.aload(mgr_tmp);
-                loadThreadState();
-                compiler.code.aconst_null();
-                compiler.code.invokeinterface(Type.getType(ContextManager.class).getInternalName(),
-                        __exit__.getName(), __exit__.getDescriptor(), true);
-                compiler.code.pop();
-            }
-        };
-        exceptionHandlers.push(normalExit);
-
-        // try-catch block here
-        ExceptionHandler handler = new ExceptionHandler();
-        exceptionHandlers.push(handler);
-        handler.exceptionStarts.addElement(label_body_start);
-
-        // VAR = value # Only if "as VAR" is present
-        code.mark(label_body_start);
-        if (item.getInternalOptional_vars() != null) {
-            set(item.getInternalOptional_vars(), value_tmp);
-        }
-        code.freeLocal(value_tmp);
-
-        // BLOCK + FINALLY if non-local-goto
-        Object blockResult = suite(node.getInternalBody());
-        normalExit.bodyDone = true;
-        exceptionHandlers.pop();
-        exceptionHandlers.pop();
-        code.mark(label_body_end);
-        handler.exceptionEnds.addElement(label_body_end);
-
-        // FINALLY if *not* non-local-goto
-        if (blockResult == NoExit) {
-            // BLOCK would have generated FINALLY for us if it exited (due to a break,
-            // continue or return)
-            inlineFinally(normalExit);
-            code.goto_(label_end);
-        }
-
-        // CATCH
-        code.mark(label_catch);
-
-        loadFrame();
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
-        code.aload(mgr_tmp);
-        code.swap();
-        loadThreadState();
-        code.swap();
-        code.invokeinterface(Type.getType(ContextManager.class).getInternalName(),
-                __exit__.getName(), __exit__.getDescriptor(), true);
-        // # The exceptional case is handled here
-        // exc = False # implicit
-        // if not exit(*sys.exc_info()):
-        code.ifne(label_catch_end);
-        // raise
-        // # The exception is swallowed if __exit__() returns true
-        doRaise();
-        code.dup();
-        loadFrame();
-        code.invokevirtual(p(PyException.class), "tracebackHere", sig(Void.TYPE, PyFrame.class), false);
-        popException(); // pop before reraise
-        code.athrow();
-
-        code.mark(label_catch_end);
-        popException(); // pop to swallow the exception
         code.mark(label_end);
         code.freeLocal(mgr_tmp);
 
