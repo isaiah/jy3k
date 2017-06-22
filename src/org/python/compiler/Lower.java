@@ -3,8 +3,10 @@ package org.python.compiler;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Break;
@@ -62,26 +64,74 @@ import static org.python.compiler.CompilerConstants.RETURN;
 public class Lower extends Visitor {
     private int counter;
 
+    /**
+     * Desugar async for, see PEP-492
+     *
+     *  async for TARGET in ITER:
+     *      BLOCK
+     *  else:
+     *      BLOCK2
+     *
+     * which is semantically equivalent to:
+     *
+     *  iter = (ITER)
+     *  iter = type(iter).__aiter__(iter)
+     *  running = True
+     *  while running:
+     *      try:
+     *          TARGET = await type(iter).__anext__(iter)
+     *      except StopAsyncIteration:
+     *          running = False
+     *      else:
+     *          BLOCK
+     *  else:
+     *     BLOCK2
+     * @param node
+     * @return
+     */
+    @Override
+    public Object visitAsyncFor(AsyncFor node) throws Exception {
+        traverse(node);
+        String tmp = "(tmp)" + counter++;
+        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
+        Attribute iter = new Attribute(node, node.getInternalIter(), "__aiter__", expr_contextType.Load);
+        Call callIter = new Call(node, iter, null, null);
+        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
+        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
+        Attribute next = new Attribute(node, loadTmp, "__anext__", expr_contextType.Load);
+        Call callNext = new Call(node, next, null, null);
+        Await await = new Await(node, callNext);
+        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), await);
+        stmt _breakFor = new ExitFor(node);
+        excepthandler handler = new ExceptHandler(node, new Name(node, "StopAsyncIteration", expr_contextType.Load),
+                null, Arrays.asList(_breakFor));
+        Try tryNode = new Try(node, Arrays.asList(setElt), Arrays.asList(handler),
+                node.getInternalBody(), null);
+        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
+                Arrays.asList(tryNode), node.getInternalOrelse());
+        node.replaceSelf(setTmp, loop);
+        return node;
+    }
+
     /** Convert for loop to a infinite loop
-     * a = 0
-     * for x in y:
-     *     a += x
+     * for TARGET in ITER:
+     *     BLOCK
      * else:
-     *     a = 0
+     *     BLOCK2
      *
      * turns into
      *
-     * a = 0
-     * it = iter(y)
-     * loop:
+     * it = y.__iter__()
+     * running = True
+     * while running:
      *     try:
-     *         x = next(it)
+     *         TARGET = next(it)
      *     except StopIteration:
-     *         break
+     *         running = False
      *     else:
-     *         a += x
+     *         BLOCK
      * else:
-     *     a = 0
+     *     BLOCK2
      *
      * @param node
      * @return
