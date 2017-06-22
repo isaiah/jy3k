@@ -4,6 +4,10 @@ Dynpy: python with invokedynamic
 
 JDK9
 
+# Build requirement
+
+Python 3.5+
+
 # Summary
 
 A Python3 compatible language on JVM.
