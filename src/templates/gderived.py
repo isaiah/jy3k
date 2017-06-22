@@ -232,6 +232,7 @@ def process(fn, outfile, lazy=False):
     if (lazy and
         os.path.exists(outfile) and 
         os.stat(fn).st_mtime < os.stat(outfile).st_mtime):
+        print(outfile)
         return
     print('Processing %s into %s' % (fn, outfile))
     gen = Gen()
@@ -286,9 +287,33 @@ def add_imports(gen, fn, result):
 
     return '\n'.join(f())
 
+def load_mappings():
+    scriptdir = os.path.dirname(os.path.abspath(__file__))
+    gensrcdir = os.path.join(os.path.dirname(os.path.dirname(scriptdir)),
+            'build', 'gensrc')
+    mappings = {}
+
+    for line in open(os.path.join(scriptdir, 'mappings')):
+        if line.strip() is '' or line.startswith('#'):
+            continue
+        tmpl, klass = line.strip().split(':')
+
+        mappings[tmpl] = (os.path.join(scriptdir, tmpl),
+                          os.path.join(gensrcdir, *klass.split('.')) + '.java')
+    return mappings
+
+
+def usage():
+    print("""Usage: python %s [--lazy|--help] <template> <outfile>
+
+If lazy is given, a template is only processed if its modtime is
+greater than outfile.  If outfile isn't specified, the outfile from
+mappings for the given template is used.  If template isn't given, all
+templates from mappings are processed.""" % sys.argv[0])
+
 
 if __name__ == '__main__':
-    from gexpose import load_mappings, usage
+    from multiprocessing import Pool, TimeoutError
     lazy = False
     if len(sys.argv) > 4:
         usage()
@@ -301,9 +326,15 @@ if __name__ == '__main__':
             lazy = True
             sys.argv.remove('--lazy')
     if len(sys.argv) == 1:
-        for template, mapping in load_mappings().items():
-            if template.endswith('derived'):
-                process(mapping[0], mapping[1], lazy)
+        with Pool(processes=8) as pool:
+            results = []
+            for template, mapping in load_mappings().items():
+                if template.endswith('derived'):
+                    res = pool.apply_async(process, (mapping[0], mapping[1], lazy))
+                    results.append(res)
+            for x in results:
+                x.get(timeout=60)
+
     elif len(sys.argv) == 2:
         mapping = load_mappings()[sys.argv[1]]
         process(mapping[0], mapping[1], lazy)

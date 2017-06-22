@@ -762,10 +762,12 @@ extra_fields = { "FunctionDef": ["split"], "Expr": ["print"], 'Name': ['expr'], 
 
 if __name__ == "__main__":
     import getopt
+    from os.path import dirname, join, abspath
 
     usage = "Usage: python %s [-o outdir] [grammar]" % sys.argv[0]
 
-    OUT_DIR = '../src/org/python/antlr/'
+    scriptdir = dirname(abspath(__file__))
+    OUT_DIR = join(dirname(scriptdir), 'src', 'org', 'python', 'antlr')
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'o:')
     except:

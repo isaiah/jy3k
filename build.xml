@@ -134,6 +134,7 @@
     <property name="test.source.dir" value="${jython.base.dir}/tests/java" />
     <property name="test.shell.dir" value="${jython.base.dir}/tests/shell" />
     <property name="templates.dir" value="${source.dir}/templates" />
+    <property name="asdl.dir" value="${basedir}/ast" />
     <property name="python.lib" value="${jython.base.dir}/lib-python/3.6.0" />
     <property name="bugtests.dir" value="${jython.base.dir}/bugtests" />
     <property name="templates.lazy" value="true" />
@@ -369,7 +370,16 @@
     </replace>
   </target>
 
-  <target name="template" depends="checkout">
+  <target name="asdl_antlr" depends="prepare-output"
+    description="Generates ast node files from ast/Python.asdl">
+    <exec executable="python" failifexecutionfails="true">
+      <arg value="${asdl.dir}/asdl_antlr.py"/>
+      <arg value="${asdl.dir}/Python.asdl"/>
+    </exec>
+  </target>
+
+  <target name="template" depends="prepare-output"
+    description="Generates *Derived.java files with src/templates/gderived.py">
     <exec executable="python" failifexecutionfails="true">
       <arg value="${templates.dir}/gderived.py"/>
       <arg value="--lazy"/>
@@ -494,7 +504,7 @@
     </taskdef>
 
     <expose srcdir="${compile.dir}"
-      destdir="${exposed.dir}" 
+      destdir="${exposed.dir}"
       includesfile="${jython.base.dir}/CoreExposed.includes"/>
     <expose_module destdir="${exposed.dir}"/>
   </target>
