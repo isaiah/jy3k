@@ -232,7 +232,11 @@
     <!-- do not hard delete ${work.dir}, since it could be ${basedir} -->
     <!-- deletes all files and subdirectories of ${output.dir}, without ${output.dir} itself. -->
     <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${output.dir}" includes="**/*" />
+      <fileset dir="${output.dir}" includes="**/*">
+        <not>
+          <filename name="**/*Derived.java"/>
+        </not>
+      </fileset>
     </delete>
     <!-- deletes all files and subdirectories of ${dist.dir}, without ${dist.dir} itself. -->
     <delete includeemptydirs="true" failonerror="false">
