@@ -108,8 +108,8 @@ def CHOICE(*regexes):
 
 def collect_simple():
   global _pattern,_actions
-  patts = [ x for x in globals().items() if x[0].startswith('t_') ]
-  patts.sort(lambda x,y: -cmp(len(x[1]),len(y[1])))
+  patts = [ x for x in list(globals().items()) if x[0].startswith('t_') ]
+  patts.sort(key=lambda x: -len(x[1]))
   patterns = []
   for name,patt in patts:
       type = name[2:]
@@ -143,7 +143,7 @@ def finish_setup():
     _pattern = re.compile(_pattern,re.VERBOSE)
     groupindex = _pattern.groupindex
     actions = _actions
-    for name,action in actions.items():
+    for name,action in list(actions.items()):
         del actions[name]
         actions[groupindex[name]] = action
 
@@ -347,7 +347,7 @@ class JavaLexer:
         self.s = s
 
     def error(self,ch):
-        raise Exception,"Illegal character %s" % repr(ch)
+        raise Exception("Illegal character %s" % repr(ch))
 
     def scan(self):   
         ignore = _ignore
@@ -406,14 +406,14 @@ java_tokens = _Bag()
 
 def concrete_toks():
     toks = java_tokens
-    for name,t_patt in globals().items():
-        if (name.startswith('t_') and isinstance(t_patt,types.StringType)
+    for name,t_patt in list(globals().items()):
+        if (name.startswith('t_') and isinstance(t_patt, str)
             and not name.endswith('LITERAL')):
             name = name[2:]
             val = t_patt.replace('\\','')
             if re.match(t_patt,val):
                 setattr(toks,name,Token(name,val))
-    for val,name in _reserved.items():
+    for val,name in list(_reserved.items()):
         if not name.endswith('LITERAL'):
             setattr(toks,name,Token(name,val))
 

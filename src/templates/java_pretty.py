@@ -201,7 +201,7 @@ class NodeVisitTracker: # !!! polish
     def cur(self):
         return self.children[self.index]
 
-    def next(self):
+    def __next__(self):
         index = self.index
         if index == self.stop-1:
             return self.right
@@ -615,9 +615,9 @@ public class B extends C {
 }"""
 
 def test():
-    for name,test in globals().items():
+    for name,test in list(globals().items()):
         if name.startswith('TEST_'):
-            print name
+            print(name)
             if isinstance(test,tuple):
                 start, source = test
                 pretty(source,start)

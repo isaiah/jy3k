@@ -2,9 +2,9 @@
 """
  Java parser
 """
-
+from __future__ import print_function
 import sys
-import new
+import types
 
 from spark import GenericParser
 
@@ -74,7 +74,7 @@ class Node:
         tbl = self._term_table
         if tbl is EMPTYTABLE:
             tbl = self._term_table = build_term_table(self._spec)
-        return tbl.has_key(at)
+        return at in tbl
 
     def __getattr__(self,term):
         if term == 'spec': return self._spec
@@ -85,7 +85,7 @@ class Node:
             try:
                 return self.children[self._term_table[term]]
             except KeyError:
-                raise AttributeError,term
+                raise AttributeError(term)
 
     def __getitem__(self,at): # at := term-name [+'_'+index] |(term-name,index)
         try:
@@ -122,14 +122,15 @@ class TakesBlock(Statement):
 
 # java_nodes synthetic module populated with node classes
 
-java_nodes = new.module('java_nodes')
+java_nodes = types.ModuleType('java_nodes')
 _node_classes = java_nodes.__dict__
 sys.modules['java_nodes'] = java_nodes
 
 def node_maker(name,supercl=None):
     cl = _node_classes.get(name,None)
     if cl is None:
-        cl = new.classobj(name,(globals()[supercl],),{'__module__': 'java_nodes'})
+        cl = types.new_class(name, (globals()[supercl],))
+        cl.__module__ = 'java_nodes'
         _node_classes[name] = cl
     return cl
 
@@ -141,7 +142,7 @@ class Dummy:
         pass
     def make_action(self): # return action function
         def action(self,spec,args):
-            print args
+            print(args)
         return action
 
 class Nop:
@@ -227,7 +228,7 @@ def setup_a_rules_to_p_funcs(ns):
         action = action_maker.make_action()
         name = 'p_%s' % name
         # cannot set __name__ on a function and spark uses func.__name__ to gather rule name so
-        ns[name] = new.function(action.func_code,action.func_globals,name,action.func_defaults,action.func_closure)
+        ns[name] = types.FunctionType(action.__code__,action.__globals__,name,action.__defaults__,action.__closure__)
         if hasattr(action,'_spec'): # copy _spec
             ns[name]._spec = action._spec
         if hasattr(action,'making'): # copy making
@@ -272,7 +273,7 @@ class JavaParser(GenericParser):
     }
 
     def error(self, token):
-        raise JavaSyntaxError, "Syntax error at or near `%s' token, line %d" % (token, token.lineno)
+        raise JavaSyntaxError("Syntax error at or near `%s' token, line %d" % (token, token.lineno))
 
 
     def resolve(self,list):
@@ -281,7 +282,7 @@ class JavaParser(GenericParser):
             if 'PlaceholderFragment' in list:
                 resolved = 'PlaceholderFragment'
             else:
-                print 'AMB',list,'DEFAULT!',list[0]
+                print('AMB',list,'DEFAULT!',list[0])
                 return list[0]
         return resolved
     
@@ -1235,25 +1236,25 @@ def check():
             for x in r[1]:
                 if x[1].islower():
                     rhs[x] = 1
-    print "- UNDEFINED -"
+    print("- UNDEFINED -")
     for x in rhs.keys():
-        if not lhs.has_key(x):
-            print x
-    print "- UNUSED -"
+        if x not in lhs:
+            print(x)
+    print("- UNUSED -")
     for x in lhs.keys():
-        if x != "START" and not rhs.has_key(x):
-            print x
-    print "- TO DEFINE -"
+        if x != "START" and x not in rhs:
+            print(x)
+    print("- TO DEFINE -")
     c = 0
     defined = 0
     for x in TO_DEFINE.split():
         if x.startswith('-'): continue
         c += 1
-        if not lhs.has_key(x):
-            print x
+        if x not in lhs:
+            print(x)
         else:
             defined += 1
-    print "%d done of %d, %d to go" % (defined,c,c-defined)
+    print("%d done of %d, %d to go" % (defined,c,c-defined))
 
 
 # - * -
@@ -1279,15 +1280,11 @@ def scheme(rule_spec):
             count[term] = count.get(term,0) + 1
         else:
             scm.append(term)
-    for term,cnt in count.items():
-        if cnt == 1:
-            del count[term]
-        else:
-            count[term] = 0
+    count = {term: 0 for term, cnt in count.items() if cnt != 1}
     sign = []
     for term in rule_spec:
         if term[1].islower():
-            if not count.has_key(term):
+            if term not in count:
                 sign.append(term)
             else:
                 sign.append("%s_%d" % (term,count[term]))
@@ -1319,23 +1316,23 @@ def ast_defs(echo=1,set=0):
 
     for name,node_class in java_nodes.__dict__.items():
         if not name.startswith('_'):
-            if echo: print name
+            if echo: print(name)
             schemes = {}
             ambiguous_keys = {}
             if issubclass(node_class,Seq):
                 if echo:
-                    print "  >Seq<",
+                    print("  >Seq<", end=' ')
                 separator = {}
                 for rule in name2rules[name]:
                     for term in rule[1]:
                         if term.isupper():
                             separator[term] = 1
                 if len(separator) == 1:
-                    separator = separator.keys()[0]
-                    if echo: print separator
+                    separator = list(separator.keys())[0]
+                    if echo: print(separator)
                     schemes['sep'] = separator
                 else:
-                    if echo: print                            
+                    if echo: print()
                 seqs.append(name)
             
             for rule in name2rules[name]:
@@ -1343,9 +1340,9 @@ def ast_defs(echo=1,set=0):
                 sign,scm = scheme(spec)
                 key = sign2key(sign)
                 amb_key = 0
-                if ambiguous_keys.has_key(key):
+                if key in ambiguous_keys:
                     amb_key = 1
-                if schemes.has_key(key):
+                if key in schemes:
                     amb_key = 1
                     ambiguous_keys[key] = 1
                     other_scm = schemes[key][1]
@@ -1367,13 +1364,13 @@ def ast_defs(echo=1,set=0):
                     if key == 'sep': continue
                     sign,scm,spec = scheme_inst
                     to_show = fill(scm,sign)
-                    print "%c  %s" % (len(sign)==len(key) and ' ' or 'a',' '.join(to_show),)
+                    print("%c  %s" % (len(sign)==len(key) and ' ' or 'a',' '.join(to_show),))
             if fixed_spec:
                 key = list(fixed_spec)
                 key.sort()
                 key = tuple(key)
                 schemes = { key: (list(fixed_spec),['_']*len(fixed_spec),fixed_spec) }
-                if echo: print "  >FIXED: %s<" % ' '.join(fixed_spec)
+                if echo: print("  >FIXED: %s<" % ' '.join(fixed_spec))
 
             if not fixed_spec:
                 length2keys = {}
@@ -1383,14 +1380,14 @@ def ast_defs(echo=1,set=0):
                 for length,keys in length2keys.items():
                     if len(keys) == 1:
                         schemes[length] = schemes[keys[0]]
-                        if echo: print " ",length,":",keys[0]
+                        if echo: print(" ",length,":",keys[0])
             
             node_class2schemes[node_class] = schemes
 
     if echo:
-        print "- Seqs -"
+        print("- Seqs -")
         for name in seqs:
-            print name
+            print(name)
 
     if set:
         global _node_class2schemes
@@ -1416,7 +1413,7 @@ def make(node_class,*args,**kw):
     if issubclass(node_class,Seq) and len(kw)==0:
         if len(args) == 1 and type(args[0]) is type([]):
             args = args[0]
-        if schemes.has_key('sep'):
+        if 'sep' in schemes:
            sep = schemes['sep']
            if len(args) >= 2:
                if not (isinstance(args[1],Token) and args[1].type == sep):
@@ -1436,7 +1433,7 @@ def make(node_class,*args,**kw):
         except KeyError:
             raise UnknownScheme
     else:
-        key = kw.keys()
+        key = list(kw.keys())
         key.sort()
         try:
             sign,scm,spec = schemes[tuple(key)]
@@ -1453,20 +1450,20 @@ def make(node_class,*args,**kw):
             children.append(args[j])
             j += 1
         else:
-            children.append(getattr(java_tokens,el))
-            
+            children.append(getattr(java_tokens, el))
+
     return node_class(spec,children)
 
 def join_seq_nodes(*args):
     kind = None
     for seq in args:
         if not isinstance(seq,Seq):
-            raise Exception,"expected seq node"
+            raise Exception("expected seq node")
         if kind is None:
             kind = seq.__class__
         else:
             if kind is not seq.__class__:
-                raise Exception,"expected same seq node kind"
+                raise Exception("expected same seq node kind")
     if _node_class2schemes is None:
         ast_defs(echo=0,set=1)
     sep = _node_class2schemes[kind].get('sep',None)

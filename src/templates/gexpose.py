@@ -65,13 +65,13 @@ class Gen:
         self.statements = []
 
     def debug(self,bindings):
-        for name,val in bindings.items():
+        for name,val in list(bindings.items()):
             if isinstance(val,JavaTemplate):
-                print "%s:" % name
-                print val.texpand({})
+                print("%s:" % name)
+                print(val.texpand({}))
 
     def invalid(self,dire,value):
-        raise Exception,"invalid '%s': %s" % (dire,value)
+        raise Exception("invalid '%s': %s" % (dire,value))
 
     def get_aux(self,name):
         if self.auxiliary is None:
@@ -253,7 +253,7 @@ class Gen:
         proto_body_jt = JavaTemplate(body)
         everything,dfls = self.parse_sig('expose_meth',sig)
 
-        dfls = map(JavaTemplate,dfls)
+        dfls = list(map(JavaTemplate,dfls))
 
         tot = len(everything)
         rng = len(dfls)+1
@@ -282,7 +282,7 @@ class Gen:
             body_jt = proto_body_jt.tbind(new_body_bindings)
             if conv_errors:
                 cases = JavaTemplate(jast_make(jast.SwitchBlockStatementGroups))
-                for err,indexes in conv_errors.items():
+                for err,indexes in list(conv_errors.items()):
                     suite = JavaTemplate('msg = "%s"; break; ' % err).fragment.BlockStatements
                     cases += java_templating.switchgroup(indexes,suite)
                 bindings = {'cases': cases, 'unsafe_body': body_jt }
@@ -329,7 +329,7 @@ class Gen:
         type_class = getattr(self,'type_class',None)
         type_name = getattr(self,'type_name',None)
         if type_class is None or type_name is None:
-            raise Exception,"type_class or type_name not defined"
+            raise Exception("type_class or type_name not defined")
         parms = parm.strip().split(None,1)
         if len(parms) not in (1,2):
             self.invalid(name,parm)
@@ -357,11 +357,11 @@ class Gen:
         self.statements.append(expose.tbind(expose_bindings))
 
     def dire_expose_cmeth(self,name,parm,body):
-	if body is None:
-	    body = 'return `concat`(`deleg_prefix,`name)((PyType)getSelf(),`all);'
+        if body is None:
+            body = 'return `concat`(`deleg_prefix,`name)((PyType)getSelf(),`all);'
         parm, prefix, body = self.expose_meth_body(name, parm, body)
         expose = self.get_aux('expose_narrow_cmeth')
-	type_class = getattr(self, 'type_class', None)
+        type_class = getattr(self, 'type_class', None)
 
         parms = parm.strip().split(None,1)
         if len(parms) not in (1,2):
@@ -379,7 +379,7 @@ class Gen:
         body_bindings = self.global_bindings.copy()
         body_bindings.update(expose_bindings)
 
-	call_meths_bindings['call_meths'] = self.get_aux('call_cmeths').tbind({'typ': type_class})
+        call_meths_bindings['call_meths'] = self.get_aux('call_cmeths').tbind({'typ': type_class})
 
         inst_call_meths,minargs,maxargs = self.handle_expose_meth_sig(parms[1],call_meths_bindings,body,body_bindings)
 
@@ -547,15 +547,15 @@ class Gen:
 
 def process(fn, mergefile=None, lazy=False):
     if lazy and mergefile and os.stat(fn).st_mtime < os.stat(mergefile).st_mtime:
-	return
-    print mergefile
+        return
+    print(mergefile)
     gen = Gen()
     directives.execute(directives.load(fn),gen)
     result = gen.generate()
     if mergefile is None:
-        print result
+        print(result)
     else:
-	print 'Merging %s into %s' % (fn, mergefile)
+        print('Merging %s into %s' % (fn, mergefile))
         result = merge(mergefile, result)
     #gen.debug()
     
@@ -590,46 +590,47 @@ def merge(filename, generated):
 
 def load_mappings():
     scriptdir = os.path.dirname(os.path.abspath(__file__))
-    srcdir = os.path.dirname(scriptdir)
+    gensrcdir = os.path.join(os.path.dirname(os.path.dirname(scriptdir)),
+            'build', 'gensrc')
     mappings = {}
 
     for line in open(os.path.join(scriptdir, 'mappings')):
-	if line.strip() is '' or line.startswith('#'):
-	    continue
-	tmpl, klass = line.strip().split(':')
-									   
-	mappings[tmpl] = (os.path.join(scriptdir, tmpl),
-			  os.path.join(srcdir, *klass.split('.')) + '.java')
+        if line.strip() is '' or line.startswith('#'):
+            continue
+        tmpl, klass = line.strip().split(':')
+
+        mappings[tmpl] = (os.path.join(scriptdir, tmpl),
+                          os.path.join(gensrcdir, *klass.split('.')) + '.java')
     return mappings
 
-    
+
 def usage():
-    print """Usage: python %s [--lazy|--help] <template> <outfile>
+    print("""Usage: python %s [--lazy|--help] <template> <outfile>
 
 If lazy is given, a template is only processed if its modtime is
 greater than outfile.  If outfile isn't specified, the outfile from
 mappings for the given template is used.  If template isn't given, all
-templates from mappings are processed.""" % sys.argv[0]
+templates from mappings are processed.""" % sys.argv[0])
 
 if __name__ == '__main__':
     lazy = False
     if len(sys.argv) > 4:
         usage()
-	sys.exit(1)
+        sys.exit(1)
     if len(sys.argv) >= 2:
-	if '--help' in sys.argv:
-	    usage()
-	    sys.exit(0)
-	elif '--lazy' in sys.argv:
-	    lazy = True
-	    sys.argv.remove('--lazy')
+        if '--help' in sys.argv:
+            usage()
+            sys.exit(0)
+        elif '--lazy' in sys.argv:
+            lazy = True
+            sys.argv.remove('--lazy')
     mappings = load_mappings()
     if len(sys.argv) == 1:
-	for template, mapping in mappings.items():
-	    if template.endswith('expose'):
-		process(mapping[0], mapping[1], lazy)
+        for template, mapping in list(mappings.items()):
+            if template.endswith('expose'):
+                process(mapping[0], mapping[1], lazy)
     elif len(sys.argv) == 2:
-	mapping = mappings[sys.argv[1]]
+        mapping = mappings[sys.argv[1]]
         process(mapping[0], mapping[1], lazy)
     else:
         process(sys.argv[1], sys.argv[2], lazy)

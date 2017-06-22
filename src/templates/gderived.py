@@ -2,16 +2,18 @@
 import sys
 import os
 import re
-
-scriptdir = os.path.dirname(__file__)
+import pathlib
+from os.path import dirname, join
 
 import directives
 import java_parser
 import java_templating
 from java_templating import JavaTemplate, jast_make, jast
 
-org_python_dir = os.path.join(os.path.dirname(os.path.abspath(scriptdir)),
-                              'org', 'python')
+scriptdir = dirname(__file__)
+print(scriptdir)
+build_dir = join(dirname(dirname(scriptdir)), 'build', 'gensrc')
+org_python_dir = join(build_dir, 'org', 'python')
 core_dir = os.path.join(org_python_dir, 'core')
 
 DERIVED_HEADER = """\
@@ -26,14 +28,12 @@ import org.python.core.finalization.FinalizablePyObjectDerived;"""
 modif_re = re.compile(r"(?:\((\w+)\))?(\w+)")
 
 
-# os.path.samefile unavailable on Windows before Python v3.2
-if hasattr(os.path, "samefile"):
-    # Good: available on this platform
-    os_path_samefile = os.path.samefile
-else:
-    def os_path_samefile(a, b):
-        'Files are considered the same if their absolute paths are equal'
-        return os.path.abspath(a)==os.path.abspath(b)
+def os_path_samefile(a, b):
+    'Files are considered the same if their absolute paths are equal'
+    try:
+        return os.path.samefile(a, b)
+    except:
+        return False
 
 class Gen:
 
@@ -56,7 +56,7 @@ class Gen:
                                      'strfy': java_templating.strfy }
         else:
             self.global_bindings = bindings
-            
+
         if priority_order:
             self.priority_order = priority_order
 
@@ -73,11 +73,11 @@ class Gen:
     def debug(self, bindings):
         for name, val in bindings.items():
             if isinstance(val, JavaTemplate):
-                print "%s:" % name
-                print val.texpand({})
+                print("%s:" % name)
+                print(val.texpand({}))
 
     def invalid(self, dire, value):
-        raise Exception,"invalid '%s': %s" % (dire, value)
+        raise Exception("invalid '%s': %s" % (dire, value))
 
     def get_aux(self, name):
         if self.auxiliary is None:
@@ -106,13 +106,13 @@ class Gen:
         templ_name = parsed_name.group(2)
         if templ_kind is None:
             templ_kind = 'Fragment'
-        
+
         templ = JavaTemplate(body,
                                              parms=':'.join(parms[1:]),
                                              bindings = self.global_bindings,
                                              start = templ_kind)
         self.global_bindings[templ_name] = templ
-            
+
     def dire_base_class(self, name, parm, body):
         if body is not None:
             self.invalid(name, 'non-empty body')
@@ -136,10 +136,10 @@ class Gen:
             self.invalid(name, 'non-empty body')
 
         def load():
-            for d in directives.load(parm.strip()+'.derived'):
+            for d in directives.load(os.path.join(scriptdir, parm.strip()+'.derived')):
                 if d.name not in ('noinherit', 'import'):
                     yield d
-                
+
         included_directives = list(load())
         directives.execute(included_directives, self)
 
@@ -197,8 +197,8 @@ class Gen:
                                             'rettype_name':
                                              JavaTemplate(java_parser.make_qualid(rettype_name)),
                                             'rettype': JavaTemplate(rettype_class)}))
-            
-            
+
+
     def dire_binary(self, name, parm, body):
         if body is not None:
             self.invalid(name, 'non-empty body')
@@ -233,13 +233,15 @@ def process(fn, outfile, lazy=False):
         os.path.exists(outfile) and 
         os.stat(fn).st_mtime < os.stat(outfile).st_mtime):
         return
-    print 'Processing %s into %s' % (fn, outfile)
+    print('Processing %s into %s' % (fn, outfile))
     gen = Gen()
     directives.execute(directives.load(fn), gen)
     result = gen.generate()
     result = hack_derived_header(outfile, result)
     result = add_imports(gen, outfile, result)
-    print >> open(outfile, 'w'), result
+    if not os.path.exists(outfile):
+        pathlib.Path(os.path.dirname(outfile)).mkdir(parents=True, exist_ok=True)
+    print(result, file=open(outfile, 'w'))
     #gen.debug()
 
 def hack_derived_header(fn, result):
@@ -250,7 +252,7 @@ def hack_derived_header(fn, result):
     if os_path_samefile(parent, core_dir):
         return result
 
-    print 'Fixing header for: %s' % fn
+    print('Fixing header for: %s' % fn)
     dirs = []
     while True:
         parent, tail = os.path.split(parent)
@@ -264,13 +266,13 @@ def hack_derived_header(fn, result):
             header = DERIVED_HEADER % '.'.join(dirs)
             result[0:num - 1] = header.splitlines()
             break
-    
+
     return '\n'.join(result)
 
 def add_imports(gen, fn, result):
     if not gen.added_imports:
         return result
-    print 'Adding imports for: %s' % fn
+    print('Adding imports for: %s' % fn)
     result = result.splitlines()
 
     def f():
@@ -281,9 +283,9 @@ def add_imports(gen, fn, result):
                 for addition in gen.added_imports:
                     yield "import %s;" % (addition,)
             yield line
-    
+
     return '\n'.join(f())
-        
+
 
 if __name__ == '__main__':
     from gexpose import load_mappings, usage

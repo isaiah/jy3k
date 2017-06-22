@@ -1,5 +1,5 @@
 # copyright 2004-2005 Samuele Pedroni
-import cStringIO
+import io
 
 import java_parser
 from java_parser import UnknownScheme, make as jast_make
@@ -13,7 +13,7 @@ from java_pretty import JavaPretty, NodeVisitTracker
 class JavaTemplatePretty(JavaPretty):
 
     bindings = {}
-        
+
     # -*-
     # placeholders, fragments
 
@@ -35,7 +35,7 @@ class JavaTemplatePretty(JavaPretty):
                         if isinstance(frag,jast.OneProtectedFragment):
                             frag = frag.Fragment
                         args.append(JavaTemplate(frag,bindings=self.bindings))
-                    paren.append(node.Placeholder.RPAREN)                        
+                    paren.append(node.Placeholder.RPAREN)
                 else:
                     args = None
 
@@ -47,7 +47,7 @@ class JavaTemplatePretty(JavaPretty):
                     self.emit_tok(plh,'ia')
                     self.emit_tok(paren[0],'i')
                 else:
-                    self.emit_tok(plh,'i')                    
+                    self.emit_tok(plh,'i')
 
                 kind,r = binding.tvisit(self,args=args,paren=paren,
                                         expect=to_expect,
@@ -70,7 +70,7 @@ class JavaTemplatePretty(JavaPretty):
                     self.nl()
                 return r
         return plh_visit
-               
+
     visit_BlockStatementPlaceholder = make_generic_plh_visit(
         ('BlockStatements','Expression'),
         add_semicolon=('Expression',))
@@ -102,13 +102,13 @@ class JavaTemplatePretty(JavaPretty):
 
     visit_TypePlaceholder = make_generic_plh_visit(
         ('TypeOrVOID',))
-   
+
     visit_PrimaryPlaceholder = make_generic_plh_visit(
         ('Primary',))
 
     visit_SelectorPlaceholder = make_generic_plh_visit(
         ('Selector',))
-    
+
 
 # - * -
 
@@ -122,10 +122,10 @@ def recast(fragment,paren,expect):
         if recast_func:
             node = recast_func(fragment,paren)
             if node is not None: return kind,node
-    raise Exception,"cannot recast %s as %s" % (spec,"|".join(expect))
+    raise Exception("cannot recast %s as %s" % (spec,"|".join(expect)))
 
 def fill_recast_table():
-   for name,func in globals().items():
+   for name,func in list(globals().items()):
        if name.startswith('recast_'):
            spec,kind = name[len('recast_'):].split('__')
            if spec == '':
@@ -213,7 +213,7 @@ def recast___ClassBodyDeclarations(frag,paren):
     return jast_make(jast.ClassBodyDeclarations)
 
 def recast_CLASS_LBRACE_ClassBodyDeclarations_RBRACE__ClassBodyDeclarations(frag,paren):
-    # comments !!!    
+    # comments !!!
     return frag.ClassBodyDeclarations
 
 def recast_VOID_LPAREN_FormalParameterListOpt_RPAREN__FormalParameterInSeq(frag,paren):
@@ -233,7 +233,7 @@ def recast_SwitchBlockStatementGroups__SwitchBlockStatementGroupInSeq(frag,paren
 fill_recast_table()
 
 # - * -
-        
+
 class JavaTemplate:
 
     def __init__(self,frag,parms='',bindings=None,start='Fragment'):
@@ -244,10 +244,10 @@ class JavaTemplate:
             #print frag
             try:
                 fragment = java_parser.parse(frag,start=start)
-            except java_parser.JavaSyntaxError,e:
-                print frag
+            except java_parser.JavaSyntaxError as e:
+                print(frag)
                 raise
-            #print ">>"            
+            #print ">>"
         if (not isinstance(fragment,jast.Fragment) and
             not isinstance(fragment,jast.PlaceholderFragment)):
             child_name = fragment.__class__.__name__
@@ -259,15 +259,15 @@ class JavaTemplate:
                 fragment = jast.Fragment((child_name,),[fragment])
 
         self.fragment = fragment
-            
+
         if not parms:
             self.parms = []
         else:
             if isinstance(parms,str):
-	        self.parms = parms.split(':')
+                self.parms = parms.split(':')
             else:
                 self.parms = parms
-        
+
         if bindings is None:
             self.bindings = {}
         else:
@@ -279,19 +279,19 @@ class JavaTemplate:
             if not isinstance(child,java_parser.Token):
                 return child,i
             i += 1
-        raise Exception,"at least a non-terminal expected"
+        raise Exception("at least a non-terminal expected")
 
     def _getseqnode(self):
         for child in self.fragment.children:
             if isinstance(child,java_parser.Seq):
                 return child
         return None
-            
+
     def __add__(self,other):
         if not isinstance(other,JavaTemplate):
-            raise Exception,"expected template"
+            raise Exception("expected template")
         if self.parms or other.parms or self.bindings or other.bindings:
-            raise Exception,"cannot add non bare templates"
+            raise Exception("cannot add non bare templates")
         self_seq = self._getseqnode()
         other_seq = other._getseqnode()
         return self.__class__(java_parser.join_seq_nodes(self_seq,other_seq))
@@ -314,7 +314,7 @@ class JavaTemplate:
     def texpand(self,bindings,output = None,nindent=0):
         if output is None:
             to_string = 1
-            output = cStringIO.StringIO()
+            output = io.StringIO()
         else:
             to_string = 0
         pretty = JavaTemplatePretty(output)
@@ -334,7 +334,7 @@ class JavaTemplate:
 
     def __str__(self):
         return self.texpand({})
- 
+
     def tvisit(self,visitor,args=None,paren=[],bindings=None,expect=None,ctxt=None):
         before = []
         after = []
@@ -357,18 +357,18 @@ class JavaTemplate:
             visitor.bindings = new_bindings
             for tok,ctl in before:
                 visitor.emit_tok(tok,ctl)
-                
+
             r = visitor.visit(node,ctxt)
-            
+
             for tok,ctl in after:
-                visitor.emit_tok(tok,ctl)           
+                visitor.emit_tok(tok,ctl)
         finally:
             visitor.bindings = saved
         if expect:
             return kind,r
 
 def texpand(fragment,bindings):
-    output = cStringIO.StringIO()
+    output = io.StringIO()
     pretty = JavaTemplatePretty(output)
     pretty.bindings = bindings
     pretty.visit(fragment)
@@ -382,7 +382,7 @@ class Concat:
         for arg in args:
             dummy, frag = recast(arg.fragment,[],('Identifier',))
             if isinstance(frag,jast.Identifier):
-                frag = frag.IDENTIFIER.value               
+                frag = frag.IDENTIFIER.value
             elif isinstance(frag,jast.IdentifierPlaceholder):
                 frag = texpand(frag,arg.bindings)
                 if not frag:
@@ -390,8 +390,8 @@ class Concat:
                 if frag[0] == "`": # !!!
                     self_eval = 1
             else:
-                raise Exception,"can't concat into an identifier: %s" % arg
-            
+                raise Exception("can't concat into an identifier: %s" % arg)
+
             frags.append(frag)
 
         if not self_eval:
@@ -408,18 +408,18 @@ class Strfy:
 
     def tvisit(self,visitor,args=None,paren=[],bindings=None,expect=None,ctxt=None):
         if len(args) != 1:
-            raise Exception,"strfy expects one arg"
+            raise Exception("strfy expects one arg")
         self_eval = 0
         arg = args[0]
         dummy, frag = recast(arg.fragment,[],('Identifier',))
         if isinstance(frag,jast.Identifier):
-            frag = frag.IDENTIFIER.value               
+            frag = frag.IDENTIFIER.value
         elif isinstance(frag,jast.IdentifierPlaceholder):
             frag = texpand(frag,arg.bindings)
             if frag and frag[0] == "`": # !!!
                 self_eval = 1
         else:
-            raise Exception,"can't recast as identifier for strfy: %s" % arg
+            raise Exception("can't recast as identifier for strfy: %s" % arg)
 
         if not self_eval:
             frag = '"%s"' % frag
@@ -436,9 +436,9 @@ class CSub:
 
     def tvisit(self,visitor,args=None,paren=[],bindings=None,expect=None,ctxt=None):
         if args:
-            raise Exception,"csub expects no arguments"
+            raise Exception("csub expects no arguments")
         if not paren:
-            raise Exception,"csub expects parenthesis"
+            raise Exception("csub expects parenthesis")
         bindings = visitor.bindings
         visitor.emit_tok(paren[0],'a', subst=bindings)
         visitor.emit_tok(paren[1],'i', subst=bindings)
@@ -466,16 +466,16 @@ def switchgroup(vals,suite):
 def fragments():
     proto_parser = java_parser.JavaParser()
     to_show = []
-    for rule,name in proto_parser.rule2name.items():
+    for rule,name in list(proto_parser.rule2name.items()):
         if 'Fragment' in rule[0]:
             to_show.append((
                 rule[0],
                 "%-50s [%s]"  % ("%s ::= %s" % (rule[0],' '.join(rule[1])),name)))
     to_show.sort(lambda x,y: cmp(x[0],y[0]))
     for rule0,txt in to_show:
-        print txt
+        print(txt)
 
-    
+
 
 def check():
     c = 0
@@ -484,10 +484,10 @@ def check():
         if 'Placeholder' in name:
             c  += 1
             if not hasattr(JavaTemplatePretty,'visit_%s' % name):
-                print "missing support for %s" % name
+                print("missing support for %s" % name)
             else:
                 supported += 1
-    print "%s/%s" % (supported,c)
+    print("%s/%s" % (supported,c))
 
 
 
@@ -518,7 +518,7 @@ def commas(templ):
 def test4():
     jt = JavaTemplate("int `cat`(a,`x);")
     assert jt.texpand({'cat': concat, 'x': JavaTemplate('b')}) == 'int ab;';
-    jt = JavaTemplate("int `cat`(a,`cat`(b,`x));")  
+    jt = JavaTemplate("int `cat`(a,`cat`(b,`x));")
     assert jt.texpand({'cat': concat, 'x': JavaTemplate('c')}) == 'int abc;';
     jt = JavaTemplate("int `cat`(a,`cat`(b,`x`(c)));")
     assert jt.texpand({'cat': concat, 'x':
@@ -527,12 +527,12 @@ def test4():
     assert jt.texpand({'cat': concat, 'x':
                        JavaTemplate('`cat`(y,`y)',
                                     bindings={'cat': concat},parms='y')}) == 'int abyc;';
-    
+
 def test3():
     templ=jt("{ `a`([`b],1); }")
     inner=jt("{ `a(`b);  }","a:b")
-    print templ.texpand({'a': inner,'b': jt('foo')})
-                        
+    print(templ.texpand({'a': inner,'b': jt('foo')}))
+
 def test2():
     templs = ["`x `y","a `x `y","`x  a `y","`x `y a"]
 
@@ -543,7 +543,7 @@ def test2():
     frags = []
     for xx,xy,yx,yy in gen(['1','2','3','4']):
         frags.append((xx,jt(xx),xy,jt(xy),yx,jt(yx),yy,jt(yy)))
-        
+
     for top in templs:
         ttop = jt(subst(commas(top),"`x`([`xx],[`xy])","`y`([`yx],[`yy])"))
         for x in templs:
@@ -575,7 +575,7 @@ def test2():
 def test1():
     frags = []
     for triplet in gen(['1','2','3']):
-        ttriplet = map(jt,triplet)
+        ttriplet = list(map(jt,triplet))
         frags.append((triplet,ttriplet))
     for fixed in gen(['a','b','c','d']):
         ex = "%s `a %s `b %s `c %s" % fixed
@@ -585,23 +585,23 @@ def test1():
                      .replace("`b",triplet[1])
                      .replace("`c",triplet[2]))
             expected =  commas(expected)
-            res = tex.texpand(dict(zip(('a','b','c'),ttriplet)))
+            res = tex.texpand(dict(list(zip(('a','b','c'),ttriplet))))
             assert expected == res
 
 def test():
-    print jt("{ a(); b(); }").texpand({})
+    print(jt("{ a(); b(); }").texpand({}))
 
     templs =  [jt("{ `a; }"),jt("{ x(); `a; }"),
                       jt("{ `a; y(); }"),jt("{ x(); `a; y(); }")]
     for frag in [jt("{ a(); b(); }"),jt("`b"),jt(""),
                      jt("a();"),jt("a(); b();")]:
         for templ in templs:
-            print templ.texpand({'a': frag})
+            print(templ.texpand({'a': frag}))
 
     templs = [jt("1,2,`x,4"),jt("`x,4"),jt("1,`x"),jt("1,`x,4")]
     for frag in [jt(""),jt("3"),jt("3,3")]:
         for tex in templs:
-            print tex.texpand({'x': frag})
+            print(tex.texpand({'x': frag}))
 
     tcl = jt("class A { `a; }")
     tcl1 = jt("class A { `a; static {} }")
@@ -611,8 +611,8 @@ def test():
     for frag in [jt(""),jt("class { final int A = 2;}"),
                   jt("class { final int A = 2; final int B = 3; }")]:
         for templ in [tcl,tintf,tcl1,tintf1]:
-            print templ.texpand({'a': frag})
-                  
+            print(templ.texpand({'a': frag}))
+
     tmh0 = jt("interface I { int m(`x); }")
     tmh1 = jt("interface I { int m(`x,int b); }")
     tmh2 = jt("interface I { int m(int a,`x); }")
@@ -621,10 +621,10 @@ def test():
     for frag in [jt("void()"),jt("void(int x)"),
                   jt("void(int x,int y)")]:
         for templ in [tmh0,tmh1,tmh2,tmh3]:
-            print templ.texpand({'x': frag})
+            print(templ.texpand({'x': frag}))
 
     with_comments = []
-    
+
     with_comments.append(JavaTemplate("""
 {
  {
@@ -635,7 +635,7 @@ def test():
 }
 """))
 
-    
+
     with_comments.append(JavaTemplate("""
 {
  {
@@ -669,16 +669,16 @@ def test():
 """))
 
     for templ in with_comments:
-        print templ.texpand({'csub': csub, 'ok': "OK"})
+        print(templ.texpand({'csub': csub, 'ok': "OK"}))
 
-    print (JavaTemplate("a(); b();")+JavaTemplate("c(); d();")).texpand({}) 
-    print (JavaTemplate("a,b")+JavaTemplate("c,d")).texpand({})
-    
+    print((JavaTemplate("a(); b();")+JavaTemplate("c(); d();")).texpand({}))
+    print((JavaTemplate("a,b")+JavaTemplate("c,d")).texpand({}))
+
     test1()
-    print 'TEST1'
+    print('TEST1')
     test2()
-    print 'TEST2'
+    print('TEST2')
     test3()
-    print 'TEST3'
+    print('TEST3')
     test4()
-    print 'TEST4'    
+    print('TEST4')

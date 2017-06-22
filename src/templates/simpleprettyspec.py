@@ -1,7 +1,7 @@
 # copyright 2004-2005 Samuele Pedroni
 import sys
 import types
-import cStringIO
+import io
 
 class MiniIndentPrinter:
 
@@ -9,7 +9,7 @@ class MiniIndentPrinter:
         self.out = output
         self.col = 0
         self.indent_step = 4
-        
+
     def writeln(self,text):
         self.out.write(' '*self.col)
         self.out.write(text)
@@ -20,25 +20,25 @@ class MiniIndentPrinter:
 
     def dedent(self):
         self.col -= self.indent_step
-        
+
 class PrettySpec:
 
     def __getitem__(self,parms):
-        if not isinstance(parms,types.TupleType):
+        if not isinstance(parms,tuple):
             parms = (parms,)
         return self.evoke(parms)
-            
+
     def evoke(self,parms):
         return self.__class__(parms)
 
     def visit_spec_seq(self,printer,seq,in_repeat=0,active=1):
         for elem in seq:
-            if isinstance(elem,types.StringType):
+            if isinstance(elem, str):
                 count = len(elem.split())
-                for i in xrange(count):
+                for i in range(count):
                     if active:
                         printer.writeln("last = tracker.visit_cur_forward()")
-                        printer.writeln("effect |= last")                        
+                        printer.writeln("effect |= last")
                     else:
                         printer.writeln("tracker.skip()")
             else:
@@ -46,7 +46,7 @@ class PrettySpec:
                     elem.active(printer,in_repeat)
                 else:
                     elem.passive(printer,in_repeat)
-                    
+
     def active(self,printer,in_repeat):
         pass
 
@@ -61,7 +61,7 @@ class ExpectSkipPrettySpec(PrettySpec):
     passive = active
 
 p_expect_skip = ExpectSkipPrettySpec()
-    
+
 
 class SpacerPrettySpec(PrettySpec):
     def __init__(self,spacer,effect=0):
@@ -84,14 +84,14 @@ class RepeatPrettySpec(PrettySpec):
 
     def active(self,printer,in_repeat):
         if in_repeat:
-            raise Exception,"cannot nest p_repeat in p_repeat"
+            raise Exception("cannot nest p_repeat in p_repeat")
         printer.writeln("while not tracker.exhausted():")
         printer.indent()
         self.visit_spec_seq(printer,self.spec_seq,in_repeat=1)
         printer.dedent()
 
     def passive(self,printer,in_repeat):
-        raise Exception,"cannot nest p_repeat inside p_dependent"
+        raise Exception("cannot nest p_repeat inside p_dependent")
 
 p_repeat = RepeatPrettySpec()
 
@@ -119,9 +119,9 @@ class DependentPrettySpec(PrettySpec):
         printer.writeln("else:")
         printer.indent()
         printer.writeln("pass")
-        self.visit_spec_seq(printer,self.spec_seq,in_repeat=in_repeat,active=0)        
+        self.visit_spec_seq(printer,self.spec_seq,in_repeat=in_repeat,active=0)
         printer.dedent()
-            
+
 p_dependent = DependentPrettySpec(PrettySpec)
 
 P_LAST = PrettySpec()
@@ -135,7 +135,7 @@ class MainPrettySpec(PrettySpec):
             last = 1
         caller_globals = sys._getframe(2).f_globals
         #print caller_globals['__name__']
-        buf = cStringIO.StringIO()
+        buf = io.StringIO()
         printer = MiniIndentPrinter(buf)
         printer.writeln("def visit_Foo(self,node,ctxt):")
         printer.indent()
@@ -146,12 +146,12 @@ class MainPrettySpec(PrettySpec):
         if last:
             printer.writeln("return last")
         else:
-            printer.writeln("return effect")                
-        printer.dedent()        
+            printer.writeln("return effect")
+        printer.dedent()
         defsource = buf.getvalue()
         ns = {}
         #print defsource
-        exec defsource in caller_globals,ns
+        exec(defsource, caller_globals,ns)
         return ns['visit_Foo']
-        
+
 simplepretty = MainPrettySpec()

@@ -68,36 +68,28 @@ z
 """
 
     for directive in parse(v.splitlines(1)):
-        print "%s: %s" % (directive.name,directive.parm)
+        print("%s: %s" % (directive.name,directive.parm))
         body = directive.body
         if body and body.endswith('\n'):
             body = body[:-1]
-        print body
-        
+        print(body)
+
 def execute(directives,processor):
     priority_order = processor.priority_order
-    def cmp_directive(dire1,dire2):
-        name1 = dire1.name
-        name2 = dire2.name
-        if name1 == name2:
-            return 0
+    def cmp_directive(dire):
+        name = dire.name
         try:
-            i1 = priority_order.index(name1)
+            return priority_order.index(name)
         except ValueError:
-            i1 = -1
-        try:
-            i2 = priority_order.index(name2)
-        except ValueError:
-            i2 = -1
-        return i1-i2
+            return -1
     directives = directives[:]
-    directives.sort(cmp_directive)
+    directives.sort(key=cmp_directive)
     for dire in directives:
         if dire.name not in priority_order:
-            raise Exception,"unexpected directive: %s" % dire.name
+            raise Exception("unexpected directive: %s" % dire.name)
         action = getattr(processor,'dire_%s' % dire.name,None)
         if action is None:
-            raise Exception,"unsupported directive: %s" % dire.name
+            raise Exception("unsupported directive: %s" % dire.name)
         action(dire.name,dire.parm,dire.body)
 
 def load(fn):
@@ -107,10 +99,6 @@ def load(fn):
     finally:
         f.close()
     return parse(lines)
-        
-            
-    
-        
+
 if __name__ == '__main__':
     test()
-    
