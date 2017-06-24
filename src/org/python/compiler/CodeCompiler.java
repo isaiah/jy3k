@@ -10,9 +10,7 @@ import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
-import org.python.antlr.ast.AsyncFor;
 import org.python.antlr.ast.AsyncFunctionDef;
-import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
@@ -66,13 +64,9 @@ import org.python.antlr.ast.alias;
 import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.keyword;
-import org.python.antlr.ast.withitem;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.antlr.base.stmt;
-import org.python.core.AsyncContextGuard;
-import org.python.core.AsyncContextManager;
-import org.python.core.AsyncIterator;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
@@ -96,7 +90,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -1081,109 +1074,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         code.aload(exc);
         code.athrow();
-    }
-
-//    public Object visitTryFinally(Try node) throws Exception {
-//        if (node.getInternalFinalbody() == null) {
-//            return visitTry(node);
-//        }
-//        Label start = new Label();
-//        Label end = new Label();
-//        Label handlerStart = new Label();
-//        Label finallyEnd = new Label();
-//
-//        Object ret;
-//
-//        ExceptionHandler inFinally = new ExceptionHandler(node);
-//
-//        // Do protected suite
-//        exceptionHandlers.push(inFinally);
-//
-//        int excLocal = code.getLocal(p(Throwable.class));
-//        code.aconst_null();
-//        code.astore(excLocal);
-//
-//        code.mark(start);
-//        inFinally.exceptionStarts.addElement(start);
-//
-//        visitTry(node);
-////        ret = suite(node.getInternalBody());
-//
-//        code.mark(end);
-//        inFinally.exceptionEnds.addElement(end);
-//        inFinally.bodyDone = true;
-//
-//        exceptionHandlers.pop();
-//
-////        if (ret == NoExit) {
-//        inlineFinally(inFinally);
-//        code.goto_(finallyEnd);
-////        }
-//
-//        // Handle any Exceptions that get thrown in suite
-//        code.mark(handlerStart);
-//        code.astore(excLocal);
-//
-//        code.aload(excLocal);
-//        loadFrame();
-//
-//        code.invokestatic(p(Py.class), "setException",
-//                sig(PyException.class, Throwable.class, PyFrame.class));
-//        code.pop();
-//
-//        inlineFinally(inFinally);
-////        popException();
-//        code.aload(excLocal);
-//        code.checkcast(p(Throwable.class));
-//        code.athrow();
-//
-//        code.mark(finallyEnd);
-//
-//        code.freeLocal(excLocal);
-//
-//        inFinally.addExceptionHandlers(handlerStart);
-//        // According to any JVM verifiers, this code block might not return
-//        return null;
-//    }
-//
-    private void inlineFinally(ExceptionHandler handler) throws Exception {
-        if (!handler.bodyDone) {
-            // end the previous exception block so inlined finally code doesn't
-            // get covered by our exception handler.
-            Label end = new Label();
-            code.mark(end);
-            handler.exceptionEnds.addElement(end);
-            // also exiting the try: portion of this particular finally
-        }
-        if (handler.isFinallyHandler()) {
-            handler.finalBody(this);
-        }
-    }
-
-    private void reenterProtectedBody(ExceptionHandler handler) throws Exception {
-        // restart exception coverage
-        Label restart = new Label();
-        code.mark(restart);
-        handler.exceptionStarts.addElement(restart);
-    }
-
-    /**
-     * Inline the finally handling code for levels down to the levelth parent (0 means all). This
-     * takes care to avoid having more nested finallys catch Exceptions throw by the parent finally
-     * code. This also pops off all the handlers above level temporarily.
-     */
-    private void doFinallysDownTo(int level) throws Exception {
-        Stack<ExceptionHandler> poppedHandlers = new Stack<ExceptionHandler>();
-        while (exceptionHandlers.size() > level) {
-            ExceptionHandler handler = exceptionHandlers.pop();
-            inlineFinally(handler);
-            poppedHandlers.push(handler);
-        }
-        while (poppedHandlers.size() > 0) {
-            ExceptionHandler handler = poppedHandlers.pop();
-            reenterProtectedBody(handler);
-            exceptionHandlers.push(handler);
-        }
     }
 
     @Override
@@ -2210,192 +2100,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitStr(Str node) throws Exception {
         module.constant(node).get(code);
-        return null;
-    }
-
-    @Override
-    public Object visitAsyncWith(AsyncWith node) throws Exception {
-        // AST is converted such that every context only has one item
-        withitem item = node.getInternalItems().get(0);
-        final Label label_body_start = new Label();
-        final Label label_body_end = new Label();
-        final Label label_catch = new Label();
-        final Label label_end = new Label();
-
-        // mgr = (EXPR)
-        visit(item.getInternalContext_expr());
-
-        // wrap the manager with the AsyncContextGuard (or get it directly if it
-        // supports the AsyncContextManager interface)
-        code.invokestatic(p(AsyncContextGuard.class),
-                "getManager", sig(AsyncContextManager.class, PyObject.class));
-        code.dup();
-
-        final int mgr_tmp = code.getLocal(p(AsyncContextManager.class));
-        code.astore(mgr_tmp);
-
-        // value = mgr.__enter__()
-        loadThreadState();
-        code.invokeinterface(p(AsyncContextManager.class),
-                "__aenter__", sig(PyObject.class, ThreadState.class), true);
-        setLastI(++yield_count);
-        code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
-        loadFrame();
-        code.swap();
-        code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-        saveLocals();
-        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-
-        loadFrame();
-        code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
-        yield_count++;
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-        restoreLocals();
-        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
-
-        // restore return value from subgenerator
-        loadFrame();
-        code.invokevirtual(p(PyFrame.class), "getf_stacktop", sig(PyObject.class));
-        int value_tmp = code.getLocal(p(PyObject.class));
-        code.astore(value_tmp);
-
-        // exc = True # not necessary, since we don't exec finally if exception
-
-        // FINALLY (preparation)
-        // ordinarily with a finally, we need to duplicate the code. that's not the case
-        // here
-        // # The normal and non-local-goto cases are handled here
-        // if exc: # implicit
-        // exit(None, None, None)
-        ExceptionHandler normalExit = new ExceptionHandler() {
-
-            @Override
-            public boolean isFinallyHandler() {
-                return true;
-            }
-
-            @Override
-            public void finalBody(CodeCompiler compiler) throws Exception {
-                compiler.restoreLocals();
-                compiler.code.aload(mgr_tmp);
-                compiler.loadThreadState();
-                compiler.code.aconst_null();
-                compiler.code.invokeinterface(p(AsyncContextManager.class),
-                        "__aexit__", sig(PyObject.class, ThreadState.class, PyException.class), true);
-                compiler.setLastI(++compiler.yield_count);
-                compiler.code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
-                compiler.loadFrame();
-                compiler.code.swap();
-                compiler.code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-                compiler.saveLocals();
-                compiler.code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
-                compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-
-                compiler.loadFrame();
-                compiler.code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-                compiler.code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
-                compiler.yield_count++;
-                compiler.code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-                compiler.restoreLocals();
-                compiler.code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
-
-                // restore return value from subgenerator
-                compiler.loadFrame();
-                compiler.code.invokevirtual(p(PyFrame.class), "getf_stacktop", sig(PyObject.class));
-                compiler.code.pop();
-            }
-        };
-        exceptionHandlers.push(normalExit);
-
-        // try-catch block here
-        ExceptionHandler handler = new ExceptionHandler();
-        exceptionHandlers.push(handler);
-        handler.exceptionStarts.addElement(label_body_start);
-
-        // VAR = value # Only if "as VAR" is present
-        code.mark(label_body_start);
-        if (item.getInternalOptional_vars() != null) {
-            set(item.getInternalOptional_vars(), value_tmp);
-        }
-        code.freeLocal(value_tmp);
-
-        // BLOCK + FINALLY if non-local-goto
-        Object blockResult = suite(node.getInternalBody());
-        normalExit.bodyDone = true;
-        exceptionHandlers.pop();
-        exceptionHandlers.pop();
-        code.mark(label_body_end);
-        handler.exceptionEnds.addElement(label_body_end);
-
-        // FINALLY if *not* non-local-goto
-        if (blockResult == NoExit) {
-            // BLOCK would have generated FINALLY for us if it exited (due to a break,
-            // continue or return)
-            inlineFinally(normalExit);
-            code.goto_(label_end);
-        }
-//        code.freeLocal(value_tmp);
-
-        // BLOCK + FINALLY if non-local-goto
-//        normalExit.bodyDone = true;
-//        exceptionHandlers.pop();
-//        exceptionHandlers.pop();
-//        code.mark(label_body_end);
-//        handler.exceptionEnds.addElement(label_body_end);
-
-        // CATCH
-        code.mark(label_catch);
-
-        loadFrame();
-        code.invokestatic(p(Py.class), "setException",
-                sig(PyException.class, Throwable.class, PyFrame.class));
-        restoreLocals();
-        code.aload(mgr_tmp);
-        code.swap();
-        loadThreadState();
-        code.swap();
-        code.invokeinterface(p(AsyncContextManager.class),
-                "__aexit__", sig(PyObject.class, ThreadState.class, PyException.class), true);
-
-        setLastI(++yield_count);
-        code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
-        loadFrame();
-        code.swap();
-        code.putfield(p(PyFrame.class), "f_yieldfrom", ci(PyObject.class));
-        saveLocals();
-        code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-
-        loadFrame();
-        code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
-        code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
-        yield_count++;
-        code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-        code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
-        restoreLocals();
-
-        // restore return value from subgenerator
-        loadFrame();
-        code.invokevirtual(p(PyFrame.class), "getf_stacktop", sig(PyObject.class));
-        // # The exceptional case is handled here
-        // exc = False # implicit
-        // if not exit(*sys.exc_info()):
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
-        code.ifne(label_end);
-        // raise
-        // # The exception is swallowed if exit() returns true
-        // Note: cannot use doRaise here
-        code.aload(mgr_tmp);
-        code.invokeinterface(p(AsyncContextManager.class), "exception", sig(PyException.class), true);
-        code.checkcast(p(Throwable.class));
-        code.athrow();
-
-        code.mark(label_end);
-        code.freeLocal(mgr_tmp);
-
-        handler.addExceptionHandlers(label_catch);
         return null;
     }
 
