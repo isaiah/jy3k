@@ -193,7 +193,8 @@ public class Lower extends Visitor {
         expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
         stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
         excepthandler handler = new ExceptHandler(node, null, null, Arrays.asList(ifStmt));
-        Try innerTry = new Try(node, node.getInternalBody(), Arrays.asList(handler), null, null);
+        Block body = new Block(node, node.getInternalBody());
+        Try innerTry = new Try(node, asList(body, _exit), Arrays.asList(handler), null, null);
         Visitor withBodyVisitor = new Visitor() {
             // skip function definition
             @Override
@@ -203,13 +204,13 @@ public class Lower extends Visitor {
 
             @Override
             public Object visitBreak(Break node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
             @Override
             public Object visitContinue(Continue node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
@@ -218,7 +219,7 @@ public class Lower extends Visitor {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
-                    node.replaceSelf(asList(_exit, node.copy()));
+                    node.replaceSelf(_exit, node.copy());
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);
@@ -283,7 +284,8 @@ public class Lower extends Visitor {
         expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
         stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
         excepthandler handler = new ExceptHandler(node, null, null, Arrays.asList(ifStmt));
-        Try innerTry = new Try(node, node.getInternalBody(), Arrays.asList(handler), null, null);
+        Block body = new Block(node, node.getInternalBody());
+        Try innerTry = new Try(node, asList(body, _exit), Arrays.asList(handler), null, null);
         Visitor withBodyVisitor = new Visitor() {
             // skip function definition
             @Override
@@ -293,13 +295,13 @@ public class Lower extends Visitor {
 
             @Override
             public Object visitBreak(Break node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
             @Override
             public Object visitContinue(Continue node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
@@ -308,7 +310,7 @@ public class Lower extends Visitor {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
-                    node.replaceSelf(asList(_exit, node.copy()));
+                    node.replaceSelf(_exit, node.copy());
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);
