@@ -58,6 +58,17 @@ public class SysModule {
     }
 
     @ExposedFunction
+    public static PyObject set_coroutine_wrapper(PyObject wrapper) {
+        Py.getSystemState().setCoroutineWrapper(wrapper);
+        return Py.None;
+    }
+
+    @ExposedFunction
+    public static PyObject get_coroutine_wrapper() {
+        return Py.getSystemState().getCoroutineWrapper();
+    }
+
+    @ExposedFunction
     public static void settrace(PyObject tracefunc) {
         Py.getSystemState().settrace(tracefunc);
     }
