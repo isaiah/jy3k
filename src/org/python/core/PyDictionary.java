@@ -623,6 +623,12 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         }
 
         @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
         @ExposedMethod(names = "__next__")
         public PyObject __next__() {
             if (!iterator.hasNext()) {
