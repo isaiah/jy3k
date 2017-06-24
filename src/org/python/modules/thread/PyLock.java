@@ -1,18 +1,21 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.modules.thread;
 
-import org.python.core.PyObject;
-import org.python.core.ContextManager;
 import org.python.core.Py;
-import org.python.core.ThreadState;
-import org.python.core.PyException;
+import org.python.core.PyObject;
+import org.python.core.PyType;
 import org.python.core.Untraversable;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedType;
 
 @Untraversable
 @ExposedType(name = "_thread.lock")
-public class PyLock extends PyObject implements ContextManager {
+public class PyLock extends PyObject {
+    public static PyType TYPE = PyType.fromClass(PyLock.class);
+
+    PyLock() {
+        super(TYPE);
+    }
 
     private boolean locked = false;
 
@@ -59,22 +62,12 @@ public class PyLock extends PyObject implements ContextManager {
 
     @ExposedMethod
     public PyObject lock___enter__() {
-        return __enter__(Py.getThreadState());
-    }
-
-    @Override
-    public PyObject __enter__(ThreadState ts) {
         acquire();
         return this;
     }
 
     @ExposedMethod
     public boolean lock___exit__(PyObject type, PyObject value, PyObject traceback) {
-        return __exit__(Py.getThreadState(), null);
-    }
-
-    @Override
-    public boolean __exit__(ThreadState ts, PyException exception) {
         release();
         return false;
     }

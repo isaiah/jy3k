@@ -580,6 +580,12 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         }
 
         @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
         @ExposedMethod(names = "__next__")
         public PyObject __next__() {
             if (iterator.hasNext()) {
@@ -606,6 +612,12 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         public KeysIter(Set<Object> s) {
             iterator = s.iterator();
             size = s.size();
+        }
+
+        @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
         }
 
         @Override
@@ -637,6 +649,11 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             size = s.size();
         }
 
+        @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
 
         @Override
         @ExposedMethod(names = "__length_hint__")
@@ -647,7 +664,10 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         @Override
         @ExposedMethod(names = "__next__")
         public PyObject __next__() {
-            return itemTuple(iterator.next());
+            if (iterator.hasNext()) {
+                return itemTuple(iterator.next());
+            }
+            throw Py.StopIteration();
         }
     }
 
