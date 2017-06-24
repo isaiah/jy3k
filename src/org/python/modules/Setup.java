@@ -38,6 +38,7 @@ public class Setup {
             "_datetime:org.python.modules._datetime.DatetimeModule",
             "_functools:org.python.modules._functools._functools",
             "_hashlib",
+            "_heapq",
             "_imp:org.python.modules._imp",
             "_io:org.python.modules._io._io",
             "_json:org.python.modules._json._json",

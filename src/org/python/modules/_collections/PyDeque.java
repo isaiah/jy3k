@@ -655,7 +655,8 @@ public class PyDeque extends PyObject implements Traverseproc {
         }
     }
 
-    private class PyDequeIter extends PyIterator {
+    @ExposedType(name = "_deque_iterator")
+    class PyDequeIter extends PyObject {
 
         private Node lastReturned = header;
         private long startState;
@@ -665,6 +666,13 @@ public class PyDeque extends PyObject implements Traverseproc {
         }
 
         @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
+        @ExposedMethod(names = "__next__")
         public PyObject __next__() {
             synchronized (PyDeque.this) {
                 if (startState != state) {
@@ -674,35 +682,7 @@ public class PyDeque extends PyObject implements Traverseproc {
                     lastReturned = lastReturned.right;
                     return lastReturned.data;
                 }
-                return null;
-            }
-        }
-
-
-        /* Traverseproc implementation */
-        @Override
-        public int traverse(Visitproc visit, Object arg) {
-            int retVal = super.traverse(visit, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-            /* On first thought one would traverse the circular list
-             * starting with lastReturned. However due to synchronization
-             * it is guaranteed that this would traverse the same objects
-             * as starting with header would do. So we can simply call the
-             * traverse-method of PyDeque.this.
-             */
-            return PyDeque.this.traverse(visit, arg);
-        }
-
-        @Override
-        public boolean refersDirectlyTo(PyObject ob) throws UnsupportedOperationException {
-            if (ob == null) {
-                return false;
-            } else if (super.refersDirectlyTo(ob)) {
-                return true;
-            } else {
-                throw new UnsupportedOperationException();
+                throw Py.StopIteration();
             }
         }
     }

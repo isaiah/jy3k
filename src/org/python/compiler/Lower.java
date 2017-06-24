@@ -3,8 +3,11 @@ package org.python.compiler;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.AsyncFor;
+import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.Await;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Block;
 import org.python.antlr.ast.Break;
@@ -62,26 +65,74 @@ import static org.python.compiler.CompilerConstants.RETURN;
 public class Lower extends Visitor {
     private int counter;
 
+    /**
+     * Desugar async for, see PEP-492
+     *
+     *  async for TARGET in ITER:
+     *      BLOCK
+     *  else:
+     *      BLOCK2
+     *
+     * which is semantically equivalent to:
+     *
+     *  iter = (ITER)
+     *  iter = type(iter).__aiter__(iter)
+     *  running = True
+     *  while running:
+     *      try:
+     *          TARGET = await type(iter).__anext__(iter)
+     *      except StopAsyncIteration:
+     *          running = False
+     *      else:
+     *          BLOCK
+     *  else:
+     *     BLOCK2
+     * @param node
+     * @return
+     */
+    @Override
+    public Object visitAsyncFor(AsyncFor node) throws Exception {
+        traverse(node);
+        String tmp = "(tmp)" + counter++;
+        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
+        Attribute iter = new Attribute(node, node.getInternalIter(), "__aiter__", expr_contextType.Load);
+        Call callIter = new Call(node, iter, null, null);
+        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
+        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
+        Attribute next = new Attribute(node, loadTmp, "__anext__", expr_contextType.Load);
+        Call callNext = new Call(node, next, null, null);
+        Await await = new Await(node, callNext);
+        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), await);
+        stmt _breakFor = new ExitFor(node);
+        excepthandler handler = new ExceptHandler(node, new Name(node, "StopAsyncIteration", expr_contextType.Load),
+                null, Arrays.asList(_breakFor));
+        Try tryNode = new Try(node, Arrays.asList(setElt), Arrays.asList(handler),
+                node.getInternalBody(), null);
+        While loop = new While(node, new Name(node, "True", expr_contextType.Load),
+                Arrays.asList(tryNode), node.getInternalOrelse());
+        node.replaceSelf(setTmp, loop);
+        return node;
+    }
+
     /** Convert for loop to a infinite loop
-     * a = 0
-     * for x in y:
-     *     a += x
+     * for TARGET in ITER:
+     *     BLOCK
      * else:
-     *     a = 0
+     *     BLOCK2
      *
      * turns into
      *
-     * a = 0
-     * it = iter(y)
-     * loop:
+     * it = y.__iter__()
+     * running = True
+     * while running:
      *     try:
-     *         x = next(it)
+     *         TARGET = next(it)
      *     except StopIteration:
-     *         break
+     *         running = False
      *     else:
-     *         a += x
+     *         BLOCK
      * else:
-     *     a = 0
+     *     BLOCK2
      *
      * @param node
      * @return
@@ -142,7 +193,8 @@ public class Lower extends Visitor {
         expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
         stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
         excepthandler handler = new ExceptHandler(node, null, null, Arrays.asList(ifStmt));
-        Try innerTry = new Try(node, node.getInternalBody(), Arrays.asList(handler), null, null);
+        Block body = new Block(node, node.getInternalBody());
+        Try innerTry = new Try(node, asList(body, _exit), Arrays.asList(handler), null, null);
         Visitor withBodyVisitor = new Visitor() {
             // skip function definition
             @Override
@@ -152,13 +204,13 @@ public class Lower extends Visitor {
 
             @Override
             public Object visitBreak(Break node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
             @Override
             public Object visitContinue(Continue node) {
-                node.replaceSelf(asList(_exit, node.copy()));
+                node.replaceSelf(_exit, node.copy());
                 return node;
             }
 
@@ -167,7 +219,98 @@ public class Lower extends Visitor {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
-                    node.replaceSelf(asList(_exit, node.copy()));
+                    node.replaceSelf(_exit, node.copy());
+                } else {
+                    Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
+                    Assign assign = new Assign(value.getToken(), asList(resultNode), value);
+                    resultNode = resultNode.copy();
+                    resultNode.setContext(expr_contextType.Load);
+                    node.replaceSelf(assign, _exit, new Return(node.getToken(), resultNode));
+                }
+                return node;
+            }
+        };
+        node.traverse(withBodyVisitor);
+        node.replaceSelf(assignMgr, enterStmt, innerTry);
+        return node;
+    }
+
+    /**
+     * async with EXPR as VAR:
+     *     BLOCK
+     *
+     * which is semantically equivalent to:
+     *
+     * mgr = (EXPR)
+     * aexit = type(mgr).__aexit__
+     * aenter = type(mgr).__aenter__(mgr)
+     * exc = True
+
+     * VAR = await aenter
+     * try:
+     *     BLOCK
+     * except:
+     *     if not await aexit(mgr, *sys.exc_info()):
+     *         raise
+     * else:
+     *     await aexit(mgr, None, None, None)
+     *
+     * @param node
+     * @return
+     */
+    @Override
+    public Object visitAsyncWith(AsyncWith node) throws Exception {
+        traverse(node);
+        stmt enterStmt;
+        withitem item = node.getInternalItems().get(0);
+        String mgr = "(mgr)" + counter;
+        Name setMgr = new Name(node, mgr, expr_contextType.Store);
+        Name getMgr = new Name(node, mgr, expr_contextType.Load);
+        Assign assignMgr = new Assign(node, Arrays.asList(setMgr), item.getInternalContext_expr());
+        Attribute getEnter = new Attribute(node, getMgr, "__aenter__", expr_contextType.Load);
+        expr enter = new Await(node, new Call(node, getEnter, null, null));
+        if (item.getInternalOptional_vars() == null) {
+            enterStmt = new Expr(node, enter);
+        } else {
+            enterStmt = new Assign(node, Arrays.asList(item.getInternalOptional_vars()), enter);
+        }
+        Attribute getExit = new Attribute(node, getMgr, "__aexit__", expr_contextType.Load);
+        expr none = new NameConstant(node, "None");
+        expr aexit = new Await(node, new Call(node, getExit, Arrays.asList(none, none, none), null));
+        Expr _exit = new Expr(node, aexit);
+        // This is a hint for the code generator, equals *sys.exc_info()
+        expr excinfo = new NameConstant(node, EXCINFO.symbolName());
+        expr _exitWithExcinfo = new Await(node, new Call(node, getExit, Arrays.asList(excinfo), null));
+        expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
+        stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
+        excepthandler handler = new ExceptHandler(node, null, null, Arrays.asList(ifStmt));
+        Block body = new Block(node, node.getInternalBody());
+        Try innerTry = new Try(node, asList(body, _exit), Arrays.asList(handler), null, null);
+        Visitor withBodyVisitor = new Visitor() {
+            // skip function definition
+            @Override
+            public Object visitFunctionDef(FunctionDef node) {
+                return node;
+            }
+
+            @Override
+            public Object visitBreak(Break node) {
+                node.replaceSelf(_exit, node.copy());
+                return node;
+            }
+
+            @Override
+            public Object visitContinue(Continue node) {
+                node.replaceSelf(_exit, node.copy());
+                return node;
+            }
+
+            @Override
+            public Object visitReturn(Return node) {
+                expr value = node.getInternalValue();
+                // no return expression, or returns a primitive literal
+                if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
+                    node.replaceSelf(_exit, node.copy());
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);

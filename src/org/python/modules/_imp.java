@@ -169,8 +169,8 @@ public class _imp {
         try{
             ReentrantLock importLock = Py.getSystemState().getImportLock();
             // XXX (isaiah) remove this once we sort it out
-            if (importLock.isLocked())
-                importLock.unlock();
+//            if (importLock.isLocked())
+            importLock.unlock();
         } catch(IllegalMonitorStateException e){
             throw Py.RuntimeError("not holding the import lock");
         }

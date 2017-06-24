@@ -74,7 +74,7 @@ public class repeat extends PyIterator {
                     counter--;
                     return object;
                 }
-                return null;
+                throw Py.StopIteration();
             }
 
         };

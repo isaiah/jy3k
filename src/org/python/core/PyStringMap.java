@@ -567,39 +567,107 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         protected abstract PyObject stringMapNext();
     }
 
-    private class ValuesIter extends StringMapIter<PyObject> {
+    @ExposedType(name = "values_iter")
+    class ValuesIter extends PyObject {
+        public final PyType TYPE = PyType.fromClass(ValuesIter.class);
+
+        private final Iterator<PyObject> iterator;
+        private final int size;
 
         public ValuesIter(Collection<PyObject> c) {
-            super(c);
+            iterator = c.iterator();
+            size = c.size();
         }
 
         @Override
-        public PyObject stringMapNext() {
-            return iterator.next();
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
+        @ExposedMethod(names = "__next__")
+        public PyObject __next__() {
+            if (iterator.hasNext()) {
+                return iterator.next();
+            }
+            throw Py.StopIteration();
+        }
+
+        @Override
+        @ExposedMethod(names = "__length_hint__")
+        public int __len__() {
+            return size;
         }
     }
 
-    private class KeysIter extends StringMapIter<Object> {
+    @ExposedType(name = "keys_iter")
+    class KeysIter extends PyObject {
+        public final PyType TYPE = PyType.fromClass(KeysIter.class);
+
+        private final Iterator<Object> iterator;
+
+        private final int size;
 
         public KeysIter(Set<Object> s) {
-            super(s);
+            iterator = s.iterator();
+            size = s.size();
         }
 
         @Override
-        protected PyObject stringMapNext() {
-            return keyToPy(iterator.next());
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
+        @ExposedMethod(names = "__next__")
+        public PyObject __next__() {
+            if (iterator.hasNext()) {
+                return keyToPy(iterator.next());
+            }
+            throw Py.StopIteration();
+        }
+
+        @Override
+        @ExposedMethod(names = "__length_hint__")
+        public int __len__() {
+            return size;
         }
     }
 
-    private class ItemsIter extends StringMapIter<Entry<Object, PyObject>> {
+    @ExposedType(name = "items_iter")
+    class ItemsIter extends PyObject {
+        public final PyType TYPE = PyType.fromClass(ItemsIter.class);
+
+        private final Iterator<Entry<Object, PyObject>> iterator;
+
+        private final int size;
 
         public ItemsIter(Set<Entry<Object, PyObject>> s) {
-            super(s);
+            iterator = s.iterator();
+            size = s.size();
         }
 
         @Override
-        public PyObject stringMapNext() {
-            return itemTuple(iterator.next());
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
+        @ExposedMethod(names = "__length_hint__")
+        public int __len__() {
+            return size;
+        }
+
+        @Override
+        @ExposedMethod(names = "__next__")
+        public PyObject __next__() {
+            if (iterator.hasNext()) {
+                return itemTuple(iterator.next());
+            }
+            throw Py.StopIteration();
         }
     }
 

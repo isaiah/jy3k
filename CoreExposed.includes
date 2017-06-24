@@ -56,6 +56,9 @@ org/python/core/PySlice.class
 org/python/core/PySlot.class
 org/python/core/PyStaticMethod.class
 org/python/core/PyStringMap.class
+org/python/core/PyStringMap$ValuesIter.class
+org/python/core/PyStringMap$KeysIter.class
+org/python/core/PyStringMap$ItemsIter.class
 org/python/core/PySuper.class
 org/python/core/PyTableCode.class
 org/python/core/PyTraceback.class
@@ -86,6 +89,7 @@ org/python/modules/_blake2/PyBlake2s.class
 org/python/modules/_codecs$EncodingMap.class
 org/python/modules/_collections/PyDefaultDict.class
 org/python/modules/_collections/PyDeque.class
+org/python/modules/_collections/PyDeque$PyDequeIter.class
 org/python/modules/_csv/PyDialect.class
 org/python/modules/_csv/PyReader.class
 org/python/modules/_csv/PyWriter.class

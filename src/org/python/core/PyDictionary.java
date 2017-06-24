@@ -610,7 +610,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_valueiterator")
-    class ValuesIter extends PyIterator {
+    static class ValuesIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(ValuesIter.class);
 
         private final Iterator<PyObject> iterator;
@@ -623,21 +623,29 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         }
 
         @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
+        }
+
+        @Override
+        @ExposedMethod(names = "__next__")
         public PyObject __next__() {
             if (!iterator.hasNext()) {
-                return null;
+                throw Py.StopIteration();
             }
             return iterator.next();
         }
 
         @Override
+        @ExposedMethod(names = "__length_hint__")
         public int __len__() {
             return size;
         }
     }
 
     @ExposedType(name = "dict_itemiterator")
-    class ItemsIter extends PyIterator {
+    static class ItemsIter extends PyObject {
 
         private final Iterator<Entry<PyObject, PyObject>> iterator;
 
@@ -649,12 +657,19 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         }
 
         @Override
+        @ExposedMethod(names = "__next__")
         public PyObject __next__() {
             if (!iterator.hasNext()) {
-                return null;
+                throw Py.StopIteration();
             }
             Entry<PyObject, PyObject> entry = iterator.next();
             return new PyTuple(entry.getKey(), entry.getValue());
+        }
+
+        @Override
+        @ExposedMethod(names = "__iter__")
+        public PyObject __iter__() {
+            return this;
         }
 
         @Override

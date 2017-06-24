@@ -125,6 +125,11 @@ public class islice extends PyIterator {
         return doNext(iter.__next__());
     }
 
+    @Override
+    @ExposedMethod(names = {"__iter__"})
+    public PyObject __iter__() {
+        return this;
+    }
 
     /* Traverseproc implementation */
     @Override

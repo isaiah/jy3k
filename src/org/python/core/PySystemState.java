@@ -157,15 +157,13 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     private PyObject __displayhook__, __excepthook__;
 
-    public PyObject last_value = Py.None;
-    public PyObject last_type = Py.None;
-    public PyObject last_traceback = Py.None;
-
     public PyObject __name__ = new PyUnicode("sys");
 
     public PyObject __dict__;
 
     private int recursionlimit = 1000;
+
+    private PyObject coroutine_wrapper;
 
     private codecs.CodecState codecState;
 
@@ -462,6 +460,15 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         }
         this.recursionlimit = recursionlimit;
     }
+
+    public PyObject getCoroutineWrapper() {
+        return this.coroutine_wrapper;
+    }
+
+    public void setCoroutineWrapper(PyObject wrapper) {
+        this.coroutine_wrapper = wrapper;
+    }
+
 
     public PyObject gettrace() {
         ThreadState ts = Py.getThreadState();
@@ -1830,24 +1837,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
                 return retVal;
             }
         }
-        if (last_value != null) {
-            retVal = visit.visit(last_value, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (last_type != null) {
-            retVal = visit.visit(last_type, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (last_traceback != null) {
-            retVal = visit.visit(last_traceback, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
         if (__name__ != null) {
             retVal = visit.visit(__name__, arg);
             if (retVal != 0) {
@@ -1864,7 +1853,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             || ob == meta_path || ob == path_hooks || ob == path_importer_cache
             || ob == ps1 || ob == ps2 || ob == executable
             || ob == __displayhook__ || ob == __excepthook__
-            || ob ==  last_value || ob == last_type || ob == last_traceback
             || ob ==__name__ || ob == __dict__);
     }
 
