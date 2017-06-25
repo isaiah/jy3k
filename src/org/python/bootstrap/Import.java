@@ -135,7 +135,7 @@ public class Import {
             absName = name;
         }
         PyObject mod = interp.modules.__finditem__(absName);
-        if (mod != null) {
+        if (mod != null && mod != Py.None) {
             PyObject value = null;
             PyObject spec = mod.__getattr__("__spec__");
             if (spec != null) {

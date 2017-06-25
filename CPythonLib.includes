@@ -13,7 +13,7 @@ encodings/**
 ensurepip/**
 html/**
 http/**
-importlib/*
+importlib/**
 logging/*
 multiprocessing/*
 test/**
