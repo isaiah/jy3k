@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.python.modules.sre.SRE_STATE.*;
-
 /**
  * Created by isaiah on 3/24/17.
  */
@@ -51,16 +49,16 @@ public class PySRE_Pattern extends PyObject {
         String pattern = getString(s);
         int flag = flags.asInt();
         int javaFlags = 0;
-        if ((flag & SRE_STATE.SRE_FLAG_MULTILINE) != 0) {
+        if ((flag & _sre.FLAG_MULTILINE) != 0) {
             javaFlags |= Pattern.MULTILINE;
         }
-        if ((flag & SRE_STATE.SRE_FLAG_VERBOSE) != 0) {
+        if ((flag & _sre.FLAG_VERBOSE) != 0) {
             javaFlags |= Pattern.COMMENTS;
         }
-        if ((flag & SRE_FLAG_IGNORECASE) != 0) {
+        if ((flag & _sre.FLAG_IGNORECASE) != 0) {
             javaFlags |= Pattern.CASE_INSENSITIVE;
         }
-        if ((flag & SRE_FLAG_DOTALL) != 0) {
+        if ((flag & _sre.FLAG_DOTALL) != 0) {
             javaFlags |= Pattern.DOTALL;
         }
         try {
@@ -283,15 +281,15 @@ public class PySRE_Pattern extends PyObject {
         return isByte ? new PyBytes(s) : new PyUnicode(s);
     }
         private static FlagName[] flagNames = {
-            new FlagName("re.TEMPLATE", SRE_FLAG_TEMPLATE),
-            new FlagName("re.IGNORECASE", SRE_FLAG_IGNORECASE),
-            new FlagName("re.LOCALE", SRE_FLAG_LOCALE),
-            new FlagName("re.MULTILINE", SRE_FLAG_MULTILINE),
-            new FlagName("re.DOTALL", SRE_FLAG_DOTALL),
-            new FlagName("re.UNICODE", SRE_FLAG_UNICODE),
-            new FlagName("re.VERBOSE", SRE_FLAG_VERBOSE),
-            new FlagName("re.DEBUG", SRE_FLAG_DEBUG),
-            new FlagName("re.ASCII", SRE_FLAG_ASCII),
+            new FlagName("re.TEMPLATE", _sre.FLAG_TEMPLATE),
+            new FlagName("re.IGNORECASE", _sre.FLAG_IGNORECASE),
+            new FlagName("re.LOCALE", _sre.FLAG_LOCALE),
+            new FlagName("re.MULTILINE", _sre.FLAG_MULTILINE),
+            new FlagName("re.DOTALL", _sre.FLAG_DOTALL),
+            new FlagName("re.UNICODE", _sre.FLAG_UNICODE),
+            new FlagName("re.VERBOSE", _sre.FLAG_VERBOSE),
+            new FlagName("re.DEBUG", _sre.FLAG_DEBUG),
+            new FlagName("re.ASCII", _sre.FLAG_ASCII),
     };
 
     static class FlagName {
