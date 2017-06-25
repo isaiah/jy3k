@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public class Blake2s {
 
-    int MAX_DIGEST_LENGTH = 32;
-    int BLOCK_LENGTH = 64;
-    int MAX_KEY_LENGTH = 32;
-    long[] IV = {
+    public static final int MAX_DIGEST_LENGTH = 32;
+    public static final int BLOCK_LENGTH = 64;
+    public static final int MAX_KEY_LENGTH = 32;
+    public static final long[] IV = {
             0x6a09e667,
             0xbb67ae85,
             0x3c6ef372,

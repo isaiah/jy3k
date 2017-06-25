@@ -6,6 +6,8 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.expose.ExposedConst;
+import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
@@ -14,6 +16,9 @@ import org.python.internal.blake2.Blake2b;
 @ExposedType(name = "_blake2.blake2b")
 public class PyBlake2b extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyBlake2b.class);
+
+    @ExposedGet
+    public int block_size = Blake2b.Spec.block_bytes;
 
     private Blake2b blake;
     public PyBlake2b() {
