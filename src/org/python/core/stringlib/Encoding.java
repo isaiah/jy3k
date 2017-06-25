@@ -1,9 +1,5 @@
 package org.python.core.stringlib;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import com.ibm.icu.lang.UCharacter;
 import org.python.core.BufferProtocol;
 import org.python.core.Py;
@@ -15,7 +11,6 @@ import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;
@@ -23,6 +18,8 @@ import org.python.modules.sys.SysModule;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -341,48 +338,40 @@ public class Encoding {
             if (count < 0) {
                 count = (oldLen == 0) ? len + 1 : len;
             }
-            return Joiner.on(newPiece).join(Pattern.compile(oldPiece, Pattern.LITERAL).split(s, count + 1));
+            return String.join(newPiece, Pattern.compile(oldPiece, Pattern.LITERAL).split(s, count + 1));
         }
     }
 
     public static final boolean isLowercase(CharSequence s) {
-        return s.length() != 0 && CharMatcher.JAVA_LOWER_CASE.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(Character::isLowerCase);
     }
 
     public static final boolean isUppercase(CharSequence s) {
-        return s.length() != 0 && CharMatcher.JAVA_UPPER_CASE.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(Character::isUpperCase);
     }
 
     public static final boolean isAlpha(CharSequence s) {
-        return s.length() != 0 && CharMatcher.JAVA_LETTER.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(Character::isAlphabetic);
     }
 
     public static final boolean isAlnum(CharSequence s) {
-        return s.length() != 0 && CharMatcher.JAVA_LETTER_OR_DIGIT.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(ch -> Character.isAlphabetic(ch) || Character.isDigit(ch));
     }
 
     public static final boolean isDecimal(CharSequence s) {
-        return s.length() != 0 && CharMatcher.forPredicate(new Predicate<Character>() {
-            @Override
-            public boolean apply(Character ch) {
-                return Character.getType(ch) == Character.DECIMAL_DIGIT_NUMBER;
-            }
-        }).matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(ch -> Character.getType(ch) == Character.DECIMAL_DIGIT_NUMBER);
     }
 
     public static final boolean isDigit(CharSequence s) {
-        return s.length() != 0 && CharMatcher.DIGIT.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(Character::isDigit);
     }
 
     public static final boolean isNumeric(CharSequence s) {
-        return s.length() != 0 && CharMatcher.forPredicate(new Predicate<Character>() {
-            @Override
-            public boolean apply(Character ch) {
-                int type = Character.getType(ch);
-                return type == Character.DECIMAL_DIGIT_NUMBER || type == Character.LETTER_NUMBER
+        return s.length() != 0 && s.chars().allMatch(ch -> {
+            int type = Character.getType(ch);
+            return type == Character.DECIMAL_DIGIT_NUMBER || type == Character.LETTER_NUMBER
                         || type == Character.OTHER_NUMBER;
-            }
-        }).matchesAllOf(s);
+        });
     }
 
     public static final boolean isTitle(CharSequence s) {
@@ -419,7 +408,7 @@ public class Encoding {
     }
 
     public static final boolean isSpace(CharSequence s) {
-        return s.length() != 0 && CharMatcher.WHITESPACE.matchesAllOf(s);
+        return s.length() != 0 && s.chars().allMatch(Character::isWhitespace);
     }
 
     public static PyObject format(CharSequence s, PyObject formatSpec, boolean bytes) {
@@ -683,7 +672,7 @@ public class Encoding {
      *            parts).
      * @return list(str) result
      */
-    public static final List<CharSequence> _rsplit(CharSequence s, String sep, int maxsplit) {
+    public static final Collection<CharSequence> _rsplit(CharSequence s, String sep, int maxsplit) {
         if (sep == null) {
             // Split on runs of whitespace
             return rsplitfields(s, maxsplit);
@@ -705,7 +694,7 @@ public class Encoding {
      * @param maxsplit limit on the number of splits (if &gt;=0)
      * @return <code>PyList</code> of split sections
      */
-    public static List<CharSequence> rsplitfields(CharSequence s, int maxsplit) {
+    public static Collection<CharSequence> rsplitfields(CharSequence s, int maxsplit) {
         /*
          * Result built here (in reverse) is a list of split parts, exactly as required for
          * s.rsplit(None, maxsplit). If there are to be n splits, there will be n+1 elements.
@@ -757,7 +746,8 @@ public class Encoding {
             end = index;
         }
 
-        return Lists.reverse(list);
+        Collections.reverse(list);
+        return list;
     }
 
     /**
@@ -771,7 +761,7 @@ public class Encoding {
      * @param maxsplit limit on the number of splits (if &gt;=0)
      * @return <code>PyList</code> of split sections
      */
-    public static final List<CharSequence> rsplitfields(CharSequence s, String sep, int maxsplit) {
+    public static final Collection<CharSequence> rsplitfields(CharSequence s, String sep, int maxsplit) {
         /*
          * Result built here (in reverse) is a list of split parts, exactly as required for
          * s.rsplit(sep, maxsplit). If there are to be n splits, there will be n+1 elements.
@@ -820,7 +810,8 @@ public class Encoding {
             list.add(s.subSequence(0, end));
         }
 
-        return Lists.reverse(list);
+        Collections.reverse(list);
+        return list;
     }
 
         /**
@@ -1122,7 +1113,7 @@ public class Encoding {
      *            parts).
      * @return list(str) result
      */
-    public static final List<CharSequence> _split(CharSequence s, String sep, int maxsplit) {
+    public static final Collection<CharSequence> _split(CharSequence s, String sep, int maxsplit) {
         if (sep == null) {
             // Split on runs of whitespace
             return splitfields(s, maxsplit);
@@ -1211,7 +1202,7 @@ public class Encoding {
      * @param maxsplit limit on the number of splits (if &gt;=0)
      * @return <code>PyList</code> of split sections
      */
-    public static final List<CharSequence> splitfields(CharSequence s, String sep, int maxsplit) {
+    public static final Collection<CharSequence> splitfields(CharSequence s, String sep, int maxsplit) {
         /*
          * Result built here is a list of split parts, exactly as required for s.split(sep), or to
          * produce the result of s.replace(sep, r) by a subsequent call r.join(L). If there are to

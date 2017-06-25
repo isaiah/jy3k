@@ -4,12 +4,10 @@
  */
 package org.python.core;
 
-import com.google.common.base.Joiner;
 import org.python.core.generator.PyAsyncGenerator;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
 import org.python.modules._systemrestart;
-import com.google.common.base.CharMatcher;
 
 import java.util.ArrayList;
 
@@ -290,7 +288,7 @@ public abstract class PyBaseCode extends PyCode {
                                 co_name,
                                 Py.newUnicode(keyword).encode("ascii", "replace")));
                     }
-                    if (CharMatcher.ASCII.matchesAllOf(keyword)) {
+                    if (keyword.chars().allMatch(c -> c < 127)) {
                         kwdict.__setitem__(keyword, value);
                     } else {
                         kwdict.__setitem__(Py.newUnicode(keyword), value);
@@ -322,7 +320,7 @@ public abstract class PyBaseCode extends PyCode {
             }
             if (!missingKwArg.isEmpty()) {
                 throw Py.TypeError(String.format("%.200s() missing %d keyword-only %s: '%s'", co_name, missingKwArg.size(),
-                        missingKwArg.size() > 1 ? "arguments" : "argument", Joiner.on(',').join(missingKwArg)));
+                        missingKwArg.size() > 1 ? "arguments" : "argument", String.join(",", missingKwArg)));
             }
 
             if (argcount < co_argcount) {

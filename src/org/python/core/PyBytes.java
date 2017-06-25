@@ -1,8 +1,6 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.python.core.buffer.BaseBuffer;
 import org.python.core.buffer.SimpleStringBuffer;
 import org.python.core.stringlib.Encoding;
@@ -18,13 +16,13 @@ import org.python.expose.MethodType;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static org.python.core.stringlib.Encoding.asUTF16StringOrError;
 
@@ -640,13 +638,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return toPyList(Encoding._split(getString(), Encoding.asStringNullOrError(sep, "sep"), maxsplit));
     }
 
-    private static PyList toPyList(List<CharSequence> list) {
-        return new PyList(Lists.transform(list, new Function<CharSequence, PyBytes>() {
-            @Override
-            public PyBytes apply(CharSequence charSequence) {
-                return new PyBytes(charSequence);
-            }
-        }));
+    private static PyList toPyList(Collection<CharSequence> list) {
+        return new PyList(list.stream().map(PyBytes::new).collect(Collectors.toList()));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_split_doc)
@@ -655,13 +648,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         PyObject sep = ap.getPyObject(0, Py.None);
         int maxsplit = ap.getInt(1, -1);
         // Split on specified string or whitespace if sep == null
-        List<CharSequence> list = Encoding._rsplit(getString(), Encoding.asStringNullOrError(sep, "sep"), maxsplit);
-        return new PyList(Lists.transform(list, new Function<CharSequence, PyBytes>() {
-            @Override
-            public PyBytes apply(CharSequence charSequence) {
-                return new PyBytes(charSequence);
-            }
-        }));
+        Collection<CharSequence> list = Encoding._rsplit(getString(), Encoding.asStringNullOrError(sep, "sep"), maxsplit);
+        return new PyList(list.stream().map(PyBytes::new).collect(Collectors.toList()));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_partition_doc)
@@ -717,12 +705,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         ArgParser arg = new ArgParser("splitlines", args, keywords, "keepends");
         boolean keepends = arg.getPyObject(0, Py.False).__bool__();
 
-        return new PyList(Lists.transform(Encoding.splitlines(getString(), keepends), new Function<CharSequence, PyBytes>() {
-            @Override
-            public PyBytes apply(CharSequence charSequence) {
-                return new PyBytes(charSequence);
-            }
-        }));
+        return toPyList(Encoding.splitlines(getString(), keepends));
     }
 
     /**

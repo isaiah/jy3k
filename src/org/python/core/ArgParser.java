@@ -1,12 +1,8 @@
 package org.python.core;
 
-import com.google.common.base.Joiner;
 import org.python.antlr.AST;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

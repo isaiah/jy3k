@@ -1,8 +1,5 @@
 package org.python.modules.sys;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.expose.ExposedGet;
@@ -31,8 +28,6 @@ public class HashInfo extends PyObject {
     @ExposedGet(doc = "small string optimization cutoff")
     public int cutoff;
 
-    private HashFunction defaultHashFunc = Hashing.sha1();
-
     public HashInfo() {
         width = 32;
         modulus = (1 << 31) - 1;
@@ -40,7 +35,7 @@ public class HashInfo extends PyObject {
         nan = 0;
         imag = 0xf4243;
         algorithm = "SHA-1";
-        hash_bits = defaultHashFunc.bits();
+        hash_bits = 64;
         seed_bits = 128; // xxx
         cutoff = 0;
     }

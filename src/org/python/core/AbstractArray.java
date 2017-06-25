@@ -1,14 +1,10 @@
 package org.python.core;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Shorts;
-
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Abstract class that manages bulk structural and data operations
@@ -306,7 +302,7 @@ public abstract class AbstractArray implements Serializable{
                     for (int i = 0, j = 0; i < size; j++) {
                         byte b1 = Array.getByte(base, i++);
                         byte b2 = Array.getByte(base, i++);
-                        Array.setShort(copy, j, Shorts.fromBytes(b1, b2));
+                        Array.setShort(copy, j, (short)(b1 << 8 | b2 & 255));
                     }
                 } else if (type == Integer.TYPE) {
                     for (int i = 0, j = 0; i < size; j++) {
@@ -314,7 +310,7 @@ public abstract class AbstractArray implements Serializable{
                         byte b2 = Array.getByte(base, i++);
                         byte b3 = Array.getByte(base, i++);
                         byte b4 = Array.getByte(base, i++);
-                        Array.setInt(copy, j, Ints.fromBytes(b1, b2, b3, b4));
+                        Array.setInt(copy, j, ByteBuffer.wrap(new byte[]{b1, b2, b3, b4}).getInt());
                     }
                 }
             }

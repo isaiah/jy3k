@@ -1,7 +1,6 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import com.google.common.base.CharMatcher;
 import jline.console.UserInterruptException;
 import jnr.constants.Constant;
 import jnr.constants.platform.Errno;
@@ -31,11 +30,7 @@ import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.List;
@@ -890,14 +885,6 @@ public final class Py {
 
     public static PySet newSet(PyObject[] elements) {
         return new PySet(elements);
-    }
-    public static PyBytes newStringUTF8(String s) {
-        if (CharMatcher.ASCII.matchesAllOf(s)) {
-            // ascii of course is a subset of UTF-8
-            return Py.newString(s);
-        } else {
-            return Py.newString(codecs.PyUnicode_EncodeUTF8(s, null));
-        }
     }
 
     public static PyStringMap newStringMap() {

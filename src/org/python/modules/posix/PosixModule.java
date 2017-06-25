@@ -1425,7 +1425,7 @@ public class PosixModule {
                     }
                 }
                 int mode = attributes_to_mode(attributes);
-                String extension = com.google.common.io.Files.getFileExtension(absolutePath.toString());
+                String extension = getExtension(absolutePath.getFileName().toString());
                 if (extension.equals("bat") || extension.equals("cmd") || extension.equals("exe") || extension.equals("com")) {
                     mode |= 0111;
                 }
@@ -1437,6 +1437,15 @@ public class PosixModule {
             } catch (SecurityException ex) {
                 throw Py.OSError(Errno.EACCES, path);
             }
+        }
+
+        // https://stackoverflow.com/a/15998870
+        private static final String getExtension(final String filename) {
+            if (filename == null) return null;
+            final String afterLastSlash = filename.substring(filename.lastIndexOf('/') + 1);
+            final int afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1;
+            final int dotIndex = afterLastSlash.indexOf('.', afterLastBackslash);
+            return (dotIndex == -1) ? "" : afterLastSlash.substring(dotIndex + 1);
         }
     }
 
