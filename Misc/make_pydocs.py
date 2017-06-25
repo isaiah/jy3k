@@ -1,3 +1,4 @@
+import binascii
 import io
 import types
 import re
@@ -100,6 +101,7 @@ itertools,
 posix,
 sys,
 time,
+binascii,
 zipimport,
 _functools,
 _hashlib,

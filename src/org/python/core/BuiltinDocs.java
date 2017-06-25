@@ -15288,6 +15288,158 @@ public class BuiltinDocs {
         "the local timezone used by methods such as localtime, but this behaviour\n" + 
         "should not be relied on.";
 
+    // Docs for <module 'binascii' from '/usr/lib/python3.6/lib-dynload/binascii.cpython-36m-x86_64-linux-gnu.so'>
+    public final static String binascii_Error_doc = 
+        "";
+
+    public final static String binascii_Incomplete_doc = 
+        "";
+
+    public final static String binascii_doc = 
+        "Conversion between binary data and ASCII";
+
+    public final static String binascii___file___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String binascii___loader___doc = 
+        "Loader for extension modules.\n" + 
+        "\n" + 
+        "    The constructor is designed to work with FileFinder.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String binascii___name___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String binascii___package___doc = 
+        "str(object='') -> str\n" + 
+        "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" + 
+        "\n" + 
+        "Create a new string object from the given object. If encoding or\n" + 
+        "errors is specified, then the object must expose a data buffer\n" + 
+        "that will be decoded using the given encoding and error handler.\n" + 
+        "Otherwise, returns the result of object.__str__() (if defined)\n" + 
+        "or repr(object).\n" + 
+        "encoding defaults to sys.getdefaultencoding().\n" + 
+        "errors defaults to 'strict'.";
+
+    public final static String binascii___spec___doc = 
+        "The specification for a module, used for loading.\n" + 
+        "\n" + 
+        "    A module's spec is the source for information about the module.  For\n" + 
+        "    data associated with the module, including source, use the spec's\n" + 
+        "    loader.\n" + 
+        "\n" + 
+        "    `name` is the absolute name of the module.  `loader` is the loader\n" + 
+        "    to use when loading the module.  `parent` is the name of the\n" + 
+        "    package the module is in.  The parent is derived from the name.\n" + 
+        "\n" + 
+        "    `is_package` determines if the module is considered a package or\n" + 
+        "    not.  On modules this is reflected by the `__path__` attribute.\n" + 
+        "\n" + 
+        "    `origin` is the specific location used by the loader from which to\n" + 
+        "    load the module, if that information is available.  When filename is\n" + 
+        "    set, origin will match.\n" + 
+        "\n" + 
+        "    `has_location` indicates that a spec's \"origin\" reflects a location.\n" + 
+        "    When this is True, `__file__` attribute of the module is set.\n" + 
+        "\n" + 
+        "    `cached` is the location of the cached bytecode file, if any.  It\n" + 
+        "    corresponds to the `__cached__` attribute.\n" + 
+        "\n" + 
+        "    `submodule_search_locations` is the sequence of path entries to\n" + 
+        "    search when importing submodules.  If set, is_package should be\n" + 
+        "    True--and False otherwise.\n" + 
+        "\n" + 
+        "    Packages are simply modules that (may) have submodules.  If a spec\n" + 
+        "    has a non-None value in `submodule_search_locations`, the import\n" + 
+        "    system will consider modules loaded from the spec as packages.\n" + 
+        "\n" + 
+        "    Only finders (see importlib.abc.MetaPathFinder and\n" + 
+        "    importlib.abc.PathEntryFinder) should modify ModuleSpec instances.\n" + 
+        "\n" + 
+        "    ";
+
+    public final static String binascii_a2b_base64_doc = 
+        "Decode a line of base64 data.";
+
+    public final static String binascii_a2b_hex_doc = 
+        "Binary data of hexadecimal representation.\n" + 
+        "\n" + 
+        "hexstr must contain an even number of hex digits (upper or lower case).\n" + 
+        "This function is also available as \"unhexlify()\".";
+
+    public final static String binascii_a2b_hqx_doc = 
+        "Decode .hqx coding.";
+
+    public final static String binascii_a2b_qp_doc = 
+        "Decode a string of qp-encoded data.";
+
+    public final static String binascii_a2b_uu_doc = 
+        "Decode a line of uuencoded data.";
+
+    public final static String binascii_b2a_base64_doc = 
+        "Base64-code line of data.";
+
+    public final static String binascii_b2a_hex_doc = 
+        "Hexadecimal representation of binary data.\n" + 
+        "\n" + 
+        "The return value is a bytes object.  This function is also\n" + 
+        "available as \"hexlify()\".";
+
+    public final static String binascii_b2a_hqx_doc = 
+        "Encode .hqx data.";
+
+    public final static String binascii_b2a_qp_doc = 
+        "Encode a string using quoted-printable encoding.\n" + 
+        "\n" + 
+        "On encoding, when istext is set, newlines are not encoded, and white\n" + 
+        "space at end of lines is.  When istext is not set, \\r and \\n (CR/LF)\n" + 
+        "are both encoded.  When quotetabs is set, space and tabs are encoded.";
+
+    public final static String binascii_b2a_uu_doc = 
+        "Uuencode line of data.";
+
+    public final static String binascii_crc32_doc = 
+        "Compute CRC-32 incrementally.";
+
+    public final static String binascii_crc_hqx_doc = 
+        "Compute CRC-CCITT incrementally.";
+
+    public final static String binascii_hexlify_doc = 
+        "Hexadecimal representation of binary data.\n" + 
+        "\n" + 
+        "The return value is a bytes object.";
+
+    public final static String binascii_rlecode_hqx_doc = 
+        "Binhex RLE-code binary data.";
+
+    public final static String binascii_rledecode_hqx_doc = 
+        "Decode hexbin RLE-coded string.";
+
+    public final static String binascii_unhexlify_doc = 
+        "Binary data of hexadecimal representation.\n" + 
+        "\n" + 
+        "hexstr must contain an even number of hex digits (upper or lower case).";
+
     // Docs for <module 'zipimport' (built-in)>
     public final static String zipimport_ZipImportError_doc = 
         "";

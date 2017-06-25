@@ -11,6 +11,7 @@ package org.python.modules;
 
 import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
@@ -19,6 +20,7 @@ import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.core.PyUnicode;
 import org.python.core.util.StringUtil;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
@@ -131,10 +133,8 @@ import java.util.regex.Pattern;
  * @version binascii.java,v 1.6 1999/02/20 11:37:07 fb Exp
 
  */
-@ExposedModule(doc = binascii.__doc__)
+@ExposedModule(doc = BuiltinDocs.binascii_doc)
 public class binascii {
-
-    public static final String __doc__ = "Conversion between binary data and ASCII";
 
     public static final PyObject Error = Py.makeClass("Error", exceptionNamespace(), Py.Exception);
 
@@ -148,7 +148,7 @@ public class binascii {
 
     public static PyObject exceptionNamespace() {
         PyObject dict = new PyStringMap();
-        dict.__setitem__("__module__", new PyBytes("binascii"));
+        dict.__setitem__("__module__", new PyUnicode("binascii"));
         return dict;
     }
 
@@ -272,13 +272,7 @@ public class binascii {
         0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
     };
 
-    public static final String __doc__a2b_uu = "(ascii) -> bin. Decode a line of uuencoded data";
-    /**
-     * Convert a single line of uuencoded data back to binary and return the
-     * binary data. Lines normally contain 45 (binary) bytes, except for the
-     * last line. Line data may be followed by whitespace.
-     */
-    @ExposedFunction(doc = __doc__a2b_uu)
+    @ExposedFunction(doc = BuiltinDocs.binascii_a2b_uu_doc)
     public static PyBytes a2b_uu(PyObject obj) {
         int leftbits = 0;
         int leftchar = 0;
@@ -346,13 +340,7 @@ public class binascii {
         return new PyBytes(bin_data.toString());
     }
 
-    public static final String __doc__b2a_uu = "(bin) -> ascii. Uuencode line of data";
-    /**
-     * Convert binary data to a line of ASCII characters, the return value
-     * is the converted line, including a newline char. The length of
-     * <i>data</i> should be at most 45.
-     */
-    @ExposedFunction(doc = __doc__b2a_uu)
+    @ExposedFunction(doc = BuiltinDocs.binascii_b2a_uu_doc)
     public static PyBytes b2a_uu(PyObject obj) {
         int leftbits = 0;
         char this_ch;
@@ -418,15 +406,7 @@ public class binascii {
         return ret;
     }
 
-
-
-    public static final String __doc__a2b_base64 = "(ascii) -> bin. Decode a line of base64 data";
-
-    /**
-     * Convert a block of base64 data back to binary and return the
-     * binary data. More than one line may be passed at a time.
-     */
-    @ExposedFunction(doc = __doc__a2b_base64)
+    @ExposedFunction(doc = BuiltinDocs.binascii_a2b_base64_doc)
     public static PyBytes a2b_base64(PyObject obj) {
         int leftbits = 0;
         char this_ch;
@@ -486,12 +466,7 @@ public class binascii {
         return new PyBytes(bin_data.toString());
     }
 
-    public static final String __doc__b2a_base64 = "(bin) -> ascii. Base64-code line of data";
-    /**
-     * Convert binary data to a line of ASCII characters in base64 coding.
-     * The return value is the converted line, including a newline char.
-     */
-    @ExposedFunction(doc = __doc__b2a_base64)
+    @ExposedFunction(doc = BuiltinDocs.binascii_b2a_base64_doc)
     public static PyBytes b2a_base64(PyObject obj) {
         int leftbits = 0;
         char this_ch;
@@ -533,14 +508,7 @@ public class binascii {
         return new PyBytes(ascii_data.toString());
     }
 
-    public static final String __doc__a2b_hqx = "ascii -> bin, done. Decode .hqx coding";
-    /**
-     * Convert binhex4 formatted ASCII data to binary, without doing
-     * RLE-decompression. The string should contain a complete number of
-     * binary bytes, or (in case of the last portion of the binhex4 data)
-     * have the remaining bits zero.
-     */
-    @ExposedFunction(doc = __doc__a2b_hqx)
+    @ExposedFunction(doc = BuiltinDocs.binascii_a2b_hqx_doc)
     public static PyTuple a2b_hqx(PyObject obj) {
         int leftbits = 0;
         char this_ch;
@@ -588,12 +556,7 @@ public class binascii {
         return new PyTuple(new PyBytes(bin_data.toString()), Py.newInteger(done ? 1 : 0));
     }
 
-    public static final String __doc__rlecode_hqx = "Binhex RLE-code binary data";
-    /**
-     * Perform binhex4 style RLE-compression on <i>data</i> and return the
-     * result.
-     */
-    @ExposedFunction(doc = __doc__rlecode_hqx)
+    @ExposedFunction(doc = BuiltinDocs.binascii_rlecode_hqx_doc)
     public static PyBytes rlecode_hqx(PyObject obj) {
 
         PyBuffer in_data = coerceParam(obj);
@@ -633,13 +596,7 @@ public class binascii {
         return new PyBytes(out_data.toString());
     }
 
-    public static final String __doc__b2a_hqx = "Encode .hqx data";
-    /**
-     * Perform hexbin4 binary-to-ASCII translation and return the
-     * resulting string. The argument should already be RLE-coded, and have a
-     * length divisible by 3 (except possibly the last fragment).
-     */
-    @ExposedFunction(doc = __doc__b2a_hqx)
+    @ExposedFunction(doc = BuiltinDocs.binascii_b2a_hqx_doc)
     public static PyBytes b2a_hqx(PyObject obj) {
         int leftbits = 0;
         char this_ch;
@@ -673,16 +630,7 @@ public class binascii {
         return new PyBytes(ascii_data.toString());
     }
 
-    public static final String __doc__rledecode_hqx = "Decode hexbin RLE-coded string";
-    /**
-     * Perform RLE-decompression on the data, as per the binhex4
-     * standard. The algorithm uses <tt>0x90</tt> after a byte as a repeat
-     * indicator, followed by a count. A count of <tt>0</tt> specifies a byte
-     * value of <tt>0x90</tt>. The routine returns the decompressed data,
-     * unless data input data ends in an orphaned repeat indicator, in which
-     * case the <tt>Incomplete</tt> exception is raised.
-     */
-    @ExposedFunction(doc = __doc__rledecode_hqx)
+    @ExposedFunction(doc = BuiltinDocs.binascii_rledecode_hqx_doc)
     static public PyBytes rledecode_hqx(PyObject obj) {
         char in_byte, in_repeat;
         
@@ -744,14 +692,7 @@ public class binascii {
         return new PyBytes(out_data.toString());
     }
 
-
-
-    public static final String __doc__crc_hqx = "(data, oldcrc) -> newcrc. Compute hqx CRC incrementally";
-    /**
-     * Compute the binhex4 crc value of <i>data</i>, starting with an initial
-     * <i>crc</i> and returning the result.
-     */
-    @ExposedFunction(doc = __doc__crc_hqx)
+    @ExposedFunction(doc = BuiltinDocs.binascii_crc_hqx_doc)
     public static int crc_hqx(PyObject obj, int crc) {
         PyBuffer bin_data = coerceParam(obj);
         int len = bin_data.getLen();
@@ -840,13 +781,9 @@ static long[] crc_32_tab = new long[] {
     }
 
 
-    private static char[] hexdigit = "0123456789abcdef".toCharArray();
+    private final static char[] hexdigit = "0123456789abcdef".toCharArray();
 
-    public static final String __doc__b2a_hex =
-        "b2a_hex(data) -> s; Hexadecimal representation of binary data.\n" +
-        "\n" +
-        "This function is also available as \"hexlify()\".";
-    @ExposedFunction(doc = __doc__b2a_hex)
+    @ExposedFunction(doc = BuiltinDocs.binascii_b2a_hex_doc)
     public static PyBytes b2a_hex(PyObject obj) {
         PyBuffer argbuf = coerceParam(obj);
         int arglen = argbuf.getLen();
@@ -867,48 +804,38 @@ static long[] crc_32_tab = new long[] {
     }
 
 
-    @ExposedFunction
+    @ExposedFunction(doc = BuiltinDocs.binascii_hexlify_doc)
     public static PyBytes hexlify(PyObject obj) {
         return b2a_hex(obj);
     }
 
-
-    public static final String __doc__a2b_hex =
-        "a2b_hex(hexstr) -> s; Binary data of hexadecimal representation.\n" +
-        "\n" +
-        "hexstr must contain an even number of hex digits "+
-        "(upper or lower case).\n"+
-        "This function is also available as \"unhexlify()\"";
-    @ExposedFunction(doc = __doc__a2b_hex)
-    public static PyBytes a2b_hex(PyObject obj) {
-        PyBuffer argbuf = coerceParam(obj);
-        int arglen = argbuf.getLen();
+    @ExposedFunction(doc = BuiltinDocs.binascii_a2b_hex_doc)
+    public static PyObject a2b_hex(PyObject obj) {
+        byte[] argbuf;
+        if (obj instanceof PyUnicode) {
+            argbuf = ((PyUnicode) obj).getString().getBytes();
+        } else {
+            argbuf = Py.unwrapBuffer(obj);
+        }
+        int arglen = argbuf.length;
 
         StringBuilder retbuf = new StringBuilder(arglen/2);
-        /* XXX What should we do about strings with an odd length?  Should
-         * we add an implicit leading zero, or a trailing zero?  For now,
-         * raise an exception.
-         */
-        try {
-            if (arglen % 2 != 0)
-                throw Py.TypeError("Odd-length string");
+        if (arglen % 2 != 0)
+            throw Py.TypeError("Odd-length string");
 
-            for (int i = 0; i < arglen; i += 2) {
-                int top = Character.digit(argbuf.intAt(i), 16);
-                int bot = Character.digit(argbuf.intAt(i+1), 16);
-                if (top == -1 || bot == -1)
-                    throw Py.TypeError("Non-hexadecimal digit found");
-                retbuf.append((char) ((top << 4) + bot));
-            }
-        } finally {
-            argbuf.release();
+        for (int i = 0; i < arglen;) {
+            int top = Character.digit(argbuf[i++], 16);
+            int bot = Character.digit(argbuf[i++], 16);
+            if (top == -1 || bot == -1)
+                throw Py.TypeError("Non-hexadecimal digit found");
+            retbuf.append((char) ((top << 4) + bot));
         }
         return new PyBytes(retbuf.toString());
     }
 
 
-    @ExposedFunction
-    public static PyBytes unhexlify(PyObject obj) {
+    @ExposedFunction(doc = BuiltinDocs.binascii_unhexlify_doc)
+    public static PyObject unhexlify(PyObject obj) {
         return a2b_hex(obj);
     }
 
@@ -936,8 +863,7 @@ static long[] crc_32_tab = new long[] {
         return val;
     }
 
-    public static final String __doc__a2b_qp = "Decode a string of qp-encoded data";
-    @ExposedFunction(doc = __doc__a2b_qp)
+    @ExposedFunction(doc = BuiltinDocs.binascii_a2b_qp_doc)
     public static PyBytes a2b_qp(PyObject[] arg, String[] kws)
     {
         ArgParser ap = new ArgParser("a2b_qp", arg, kws, new String[] {"s", "header"});
@@ -983,13 +909,7 @@ static long[] crc_32_tab = new long[] {
     final private static Pattern RN_TO_N = Pattern.compile("\r\n");
     final private static Pattern N_TO_RN = Pattern.compile("(?<!\r)\n");
     
-    public static final String __doc__b2a_qp = "b2a_qp(data, quotetabs=0, istext=1, header=0) -> s;\n"
-    		+ "Encode a string using quoted-printable encoding.\n\n"
-    		+ "On encoding, when istext is set, newlines are not encoded, and white\n"
-    		+ "space at end of lines is.  When istext is not set, \r and \n (CR/LF) are\n"
-    		+ "both encoded.  When quotetabs is set, space and tabs are encoded.";
-
-    @ExposedFunction(doc = __doc__b2a_qp)
+    @ExposedFunction(doc = BuiltinDocs.binascii_b2a_qp_doc)
     public static PyBytes b2a_qp(PyObject[] arg, String[] kws) {
         ArgParser ap = new ArgParser("b2a_qp", arg, kws, new String[] {"s", "quotetabs", "istext", "header"});
         boolean quotetabs = getIntFlagAsBool(ap, 1, 0, "an integer is required");
@@ -1095,20 +1015,4 @@ static long[] crc_32_tab = new long[] {
         }
         return ((BufferProtocol) obj).getBuffer(PyBUF.SIMPLE);
     }
-    
-/*
-    public static void main(String[] args) {
-        String l = b2a_uu("Hello");
-        System.out.println(l);
-        System.out.println(a2b_uu(l));
-
-        l = b2a_base64("Hello");
-        System.out.println(l);
-        System.out.println(a2b_base64(l));
-
-        l = b2a_hqx("Hello-");
-        System.out.println(l);
-        System.out.println(a2b_hqx(l));
-    }
-*/
 }
