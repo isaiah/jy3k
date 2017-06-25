@@ -21,9 +21,6 @@ import org.python.expose.ExposedNew;
 import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
 
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.ComputationException;
-import com.google.common.base.Function;
 import org.python.core.BuiltinDocs;
 
 /**

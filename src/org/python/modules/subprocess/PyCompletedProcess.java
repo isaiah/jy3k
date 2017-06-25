@@ -1,6 +1,5 @@
 package org.python.modules.subprocess;
 
-import com.google.common.io.ByteStreams;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyLong;
@@ -46,7 +45,7 @@ public class PyCompletedProcess extends PyObject {
         InputStream out = proc.getInputStream();
         byte[] buf = new byte[0];
         try {
-            buf = ByteStreams.toByteArray(out);
+            buf = out.readAllBytes();
             return new PyBytes(new String(buf));
         } catch (IOException e) {
             return Py.None;
@@ -58,7 +57,7 @@ public class PyCompletedProcess extends PyObject {
         InputStream out = proc.getErrorStream();
         byte[] buf = new byte[0];
         try {
-            buf = ByteStreams.toByteArray(out);
+            buf = out.readAllBytes();
             return new PyBytes(new String(buf));
         } catch (IOException e) {
             return Py.None;

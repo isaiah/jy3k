@@ -1,6 +1,5 @@
 package org.python.modules._io;
 
-import com.google.common.io.ByteStreams;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -58,7 +57,7 @@ public class PyBufferedReader extends PyObject {
             }
         }
         try {
-            buf = ByteStreams.toByteArray(input);
+            buf = input.readAllBytes();
             return new PyBytes(new String(buf));
         } catch (IOException e) {
             throw Py.IOError(e);
