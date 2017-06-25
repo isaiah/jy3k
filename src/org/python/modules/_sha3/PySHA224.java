@@ -22,9 +22,11 @@ public class PySHA224 extends PyObject {
     private MessageDigest md;
 
     @ExposedGet
-    public int block_size;
+    public final int block_size = 144;
+
     @ExposedGet
     public int digest_size;
+
     @ExposedGet
     public String name;
 
@@ -34,6 +36,8 @@ public class PySHA224 extends PyObject {
         super(TYPE);
         try {
             md = MessageDigest.getInstance("SHA3-224");
+            name = md.getAlgorithm();
+            digest_size = md.getDigestLength();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

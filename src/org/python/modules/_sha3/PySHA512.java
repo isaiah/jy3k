@@ -22,9 +22,11 @@ public class PySHA512 extends PyObject {
     private MessageDigest md;
 
     @ExposedGet
-    public int block_size;
+    public int block_size = 72;
+
     @ExposedGet
     public int digest_size;
+
     @ExposedGet
     public String name;
 
@@ -32,6 +34,8 @@ public class PySHA512 extends PyObject {
         super(TYPE);
         try {
             md = MessageDigest.getInstance("SHA3-512");
+            name = md.getAlgorithm();
+            digest_size = md.getDigestLength();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

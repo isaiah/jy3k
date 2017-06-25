@@ -6,6 +6,7 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
@@ -15,7 +16,20 @@ import org.python.internal.blake2.Blake2s;
 public class PyBlake2s extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyBlake2s.class);
 
+    @ExposedGet
+    public final int SALT_SIZE = _blake2module.BLAKE2S_SALT_SIZE;
+
+    @ExposedGet
+    public final int digest_size = Blake2s.MAX_DIGEST_LENGTH;
+
+    @ExposedGet
+    public final int block_size = Blake2s.BLOCK_LENGTH;
+
+    @ExposedGet
+    public final String name = "blake2s";
+
     private Blake2s blake;
+
     public PyBlake2s(int digestLength, byte[] key) {
         super(TYPE);
         blake = new Blake2s(digestLength, key);
@@ -24,7 +38,7 @@ public class PyBlake2s extends PyObject {
     @ExposedNew
     public static PyObject _new(PyNewWrapper new_, boolean init, PyType subtype,
                                 PyObject[] args, String[] keywords) {
-        PyBlake2s blake = new PyBlake2s(64, new byte[0]);
+        PyBlake2s blake = new PyBlake2s(_blake2module.BLAKE2S_MAX_DIGEST_SIZE, new byte[0]);
         if (args.length > 0) {
             blake.blake2s_update(args[0]);
         }

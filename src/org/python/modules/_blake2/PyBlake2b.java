@@ -18,7 +18,16 @@ public class PyBlake2b extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyBlake2b.class);
 
     @ExposedGet
-    public int block_size = Blake2b.Spec.block_bytes;
+    public final int SALT_SIZE = _blake2module.BLAKE2B_SALT_SIZE;
+
+    @ExposedGet
+    public final int digest_size = Blake2b.Spec.max_digest_bytes;
+
+    @ExposedGet
+    public final int block_size = Blake2b.Spec.block_bytes;
+
+    @ExposedGet
+    public final String name = "blake2b";
 
     private Blake2b blake;
     public PyBlake2b() {

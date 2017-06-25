@@ -5,9 +5,6 @@ import org.python.core.PyUnicode;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
 
-/**
- * Created by isaiah on 5/1/17.
- */
 @ExposedModule(name = "_sha3")
 public class _sha3module {
 

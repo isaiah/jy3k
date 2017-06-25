@@ -2,10 +2,13 @@ package org.python.modules._sha3;
 
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
+import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.internal.keccak.KeccackSponge;
 import org.python.internal.keccak.Shake128;
@@ -14,11 +17,20 @@ import org.python.internal.keccak.Shake128;
 public class PyShake128 extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyShake128.class);
 
+    @ExposedGet
+    public final String name = "shake_128";
+
     private KeccackSponge keccak;
 
     public PyShake128() {
         super(TYPE);
         keccak = new Shake128();
+    }
+
+    @ExposedNew
+    public static PyObject _new(PyNewWrapper new_, boolean init, PyType subtype,
+                                PyObject[] args, String[] keywords) {
+        return new PyShake128();
     }
 
     @ExposedMethod

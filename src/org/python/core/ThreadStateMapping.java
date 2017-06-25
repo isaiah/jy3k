@@ -8,12 +8,7 @@ class ThreadStateMapping {
     private static final Map<Thread, ThreadState> cachedThreadState =
         new MapMaker().weakKeys().weakValues().makeMap();
 
-    private static ThreadLocal<Object[]> scopedThreadState= new ThreadLocal<Object[]>() {
-        @Override
-        protected Object[] initialValue() {
-            return new Object[1];
-        }
-    };
+    private static ThreadLocal<Object[]> scopedThreadState= ThreadLocal.withInitial(() -> new Object[1]);
 
     public ThreadState getThreadState(PySystemState newSystemState) {
         Object scoped = scopedThreadState.get()[0];
