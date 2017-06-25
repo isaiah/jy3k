@@ -159,7 +159,7 @@ public class PyRawIOBase extends PyIOBase {
                 } while (curr.__bool__());
 
                 // Stitch it all together
-                return Py.EmptyByte.join(list);
+                return Py.EmptyByte.bytes_join(list);
             }
         }
     }

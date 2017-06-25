@@ -636,7 +636,7 @@ public class PyUnicode extends PySequence implements Iterable {
             }
             if (S instanceof PyBytes) {
                 if (S.getType() != PyBytes.TYPE && encoding == null && errors == null) {
-                    return ((PyBytes) S).__unicode__();
+                    return new PyUnicode((PyBytes) S);
                 }
                 PyObject decoded = codecs.decode((PyBytes)S, encoding, errors);
                 if (decoded instanceof PyUnicode) {

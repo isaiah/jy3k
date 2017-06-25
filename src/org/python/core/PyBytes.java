@@ -298,10 +298,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyUnicode("b" + Encoding.encode_UnicodeEscape(getString(), true));
     }
 
-    public PyUnicode __unicode__() {
-        return new PyUnicode(this);
-    }
-
     @Override
     public int __len__() {
         return bytes___len__();
@@ -422,7 +418,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @Override
     protected PyObject pyget(int i) {
-        // Method is overridden in PyUnicode, so definitely a PyBytes
         return new PyLong(string.charAt(i));
     }
 
@@ -580,18 +575,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.atocx(getString());
     }
 
-    // Add in methods from string module
-    public String lower() {
-        return bytes_lower();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_lower_doc)
     final String bytes_lower() {
         return getString().toLowerCase(Locale.ROOT);
-    }
-
-    public String upper() {
-        return bytes_uuper();
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_upper_doc)
@@ -599,56 +585,14 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return getString().toUpperCase(Locale.ROOT);
     }
 
-    public String title() {
-        return bytes_title();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_title_doc)
     final String bytes_title() {
         return Encoding.title(getString());
     }
 
-    public String swapcase() {
-        return bytes_swapcase();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_swapcase_doc)
     final String bytes_swapcase() {
         return Encoding.swapcase(getString());
-    }
-
-    /**
-     * Equivalent of Python <code>str.strip()</code> with no argument, meaning strip whitespace. Any
-     * whitespace byte/character will be discarded from either end of this <code>str</code>.
-     *
-     * @return a new String, stripped of the whitespace characters/bytes
-     */
-    public String strip() {
-        return Encoding._strip(getString()).toString();
-    }
-
-    /**
-     * Equivalent of Python <code>str.strip()</code>.
-     *
-     * @param stripChars characters to strip from either end of this str/bytes, or null
-     * @return a new String, stripped of the specified characters/bytes
-     */
-    public String strip(String stripChars) {
-        return Encoding._strip(getString(), stripChars).toString();
-    }
-
-    /**
-     * Equivalent of Python <code>str.strip()</code>. Any byte/character matching one of those in
-     * <code>stripChars</code> will be discarded from either end of this <code>str</code>. If
-     * <code>stripChars == null</code>, whitespace will be stripped. If <code>stripChars</code> is a
-     * <code>PyUnicode</code>, the result will also be a <code>PyUnicode</code>.
-     *
-     * @param stripChars characters to strip from either end of this str/bytes, or null
-     * @return a new <code>PyBytes</code> (or {@link PyUnicode}), stripped of the specified
-     *         characters/bytes
-     */
-    public PyObject strip(PyObject stripChars) {
-        return bytes_strip(stripChars);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_strip_doc)
@@ -663,40 +607,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    /**
-     * Equivalent of Python <code>str.lstrip()</code> with no argument, meaning strip whitespace.
-     * Any whitespace byte/character will be discarded from the left of this <code>str</code>.
-     *
-     * @return a new String, stripped of the whitespace characters/bytes
-     */
-    public String lstrip() {
-        return Encoding._lstrip(getString()).toString();
-    }
-
-    /**
-     * Equivalent of Python <code>str.lstrip()</code>.
-     *
-     * @param stripChars characters to strip from the left end of this str/bytes, or null
-     * @return a new String, stripped of the specified characters/bytes
-     */
-    public String lstrip(String stripChars) {
-        return Encoding._lstrip(getString(), stripChars).toString();
-    }
-
-    /**
-     * Equivalent of Python <code>str.lstrip()</code>. Any byte/character matching one of those in
-     * <code>stripChars</code> will be discarded from the left end of this <code>str</code>. If
-     * <code>stripChars == null</code>, whitespace will be stripped. If <code>stripChars</code> is a
-     * <code>PyUnicode</code>, the result will also be a <code>PyUnicode</code>.
-     *
-     * @param stripChars characters to strip from the left end of this str/bytes, or null
-     * @return a new <code>PyBytes</code> (or {@link PyUnicode}), stripped of the specified
-     *         characters/bytes
-     */
-    public PyObject lstrip(PyObject stripChars) {
-        return bytes_lstrip(stripChars);
-    }
-
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_lstrip_doc)
     final PyObject bytes_lstrip(PyObject chars) {
         if (chars instanceof PyUnicode) {
@@ -707,40 +617,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
             // Strip specified characters or whitespace if stripChars == null
             return new PyBytes(Encoding._lstrip(getString(), stripChars), true);
         }
-    }
-
-    /**
-     * Equivalent of Python <code>str.rstrip()</code> with no argument, meaning strip whitespace.
-     * Any whitespace byte/character will be discarded from the right end of this <code>str</code>.
-     *
-     * @return a new String, stripped of the whitespace characters/bytes
-     */
-    public String rstrip() {
-        return Encoding._rstrip(getString());
-    }
-
-    /**
-     * Equivalent of Python <code>str.rstrip()</code>.
-     *
-     * @param stripChars characters to strip from either end of this str/bytes, or null
-     * @return a new String, stripped of the specified characters/bytes
-     */
-    public String rstrip(String stripChars) {
-        return Encoding._rstrip(getString(), stripChars);
-    }
-
-    /**
-     * Equivalent of Python <code>str.rstrip()</code>. Any byte/character matching one of those in
-     * <code>stripChars</code> will be discarded from the right end of this <code>str</code>. If
-     * <code>stripChars == null</code>, whitespace will be stripped. If <code>stripChars</code> is a
-     * <code>PyUnicode</code>, the result will also be a <code>PyUnicode</code>.
-     *
-     * @param stripChars characters to strip from the right end of this str/bytes, or null
-     * @return a new <code>PyBytes</code> (or {@link PyUnicode}), stripped of the specified
-     *         characters/bytes
-     */
-    public PyObject rstrip(PyObject stripChars) {
-        return bytes_rstrip(stripChars);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_rstrip_doc)
@@ -755,65 +631,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    /**
-     * Equivalent to Python <code>str.split()</code>, splitting on runs of whitespace.
-     *
-     * @return list(str) result
-     */
-    public PyList split() {
-        return toPyList(Encoding._split(getString(), null, -1));
-    }
-
-    /**
-     * Equivalent to Python <code>str.split()</code>, splitting on a specified string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @return list(str) result
-     */
-    public PyList split(String sep) {
-        return toPyList(Encoding._split(getString(), sep, -1));
-    }
-
-    /**
-     * Equivalent to Python <code>str.split()</code>, splitting on a specified string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @param maxsplit maximum number of splits to make (there may be <code>maxsplit+1</code>
-     *            parts).
-     * @return list(str) result
-     */
-    public PyList split(String sep, int maxsplit) {
-        return toPyList(Encoding._split(getString(), sep, maxsplit));
-    }
-
-    /**
-     * Equivalent to Python <code>str.split()</code> returning a {@link PyList} of
-     * <code>PyBytes</code>s (or <code>PyUnicode</code>s). The <code>str</code> will be split at
-     * each occurrence of <code>sep</code>. If <code>sep == null</code>, whitespace will be used as
-     * the criterion. If <code>sep</code> has zero length, a Python <code>ValueError</code> is
-     * raised.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @return list(str) result
-     */
-    public PyList split(PyObject sep) {
-        return bytes_split(new PyObject[]{sep}, Py.NoKeywords);
-    }
-
-    /**
-     * As {@link #split(PyObject)} but if <code>maxsplit</code> &gt;=0 and there are more feasible
-     * splits than <code>maxsplit</code>, the last element of the list contains the rest of the
-     * string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @param maxsplit maximum number of splits to make (there may be <code>maxsplit+1</code>
-     *            parts).
-     * @return list(str) result
-     */
-    public PyList split(PyObject sep, PyObject maxsplit) {
-        return bytes_split(new PyObject[]{sep, maxsplit}, Py.NoKeywords);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_split_doc)
     final PyList bytes_split(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("split", args, keywords, "sep", "maxsplit");
@@ -823,37 +640,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return toPyList(Encoding._split(getString(), Encoding.asStringNullOrError(sep, "sep"), maxsplit));
     }
 
-    /**
-     * Equivalent to Python <code>str.rsplit()</code>, splitting on runs of whitespace.
-     *
-     * @return list(str) result
-     */
-    public PyList rsplit() {
-        return toPyList(Encoding._rsplit(getString(), null, -1));
-    }
-
-    /**
-     * Equivalent to Python <code>str.rsplit()</code>, splitting on a specified string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @return list(str) result
-     */
-    public PyList rsplit(String sep) {
-        return toPyList(Encoding._rsplit(getString(), sep, -1));
-    }
-
-    /**
-     * Equivalent to Python <code>str.rsplit()</code>, splitting on a specified string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @param maxsplit maximum number of splits to make (there may be <code>maxsplit+1</code>
-     *            parts).
-     * @return list(str) result
-     */
-    public PyList rsplit(String sep, int maxsplit) {
-        return toPyList(Encoding._rsplit(getString(), sep, maxsplit));
-    }
-
     private static PyList toPyList(List<CharSequence> list) {
         return new PyList(Lists.transform(list, new Function<CharSequence, PyBytes>() {
             @Override
@@ -861,34 +647,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 return new PyBytes(charSequence);
             }
         }));
-    }
-
-    /**
-     * Equivalent to Python <code>str.rsplit()</code> returning a {@link PyList} of
-     * <code>PyBytes</code>s (or <code>PyUnicode</code>s). The <code>str</code> will be split at
-     * each occurrence of <code>sep</code>, working from the right. If <code>sep == null</code>,
-     * whitespace will be used as the criterion. If <code>sep</code> has zero length, a Python
-     * <code>ValueError</code> is raised.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @return list(str) result
-     */
-    public PyList rsplit(PyObject sep) {
-        return bytes_rsplit(new PyObject[]{sep}, Py.NoKeywords);
-    }
-
-    /**
-     * As {@link #rsplit(PyObject)} but if <code>maxsplit</code> &gt;=0 and there are more feasible
-     * splits than <code>maxsplit</code> the last element of the list contains the rest of the
-     * string.
-     *
-     * @param sep string to use as separator (or <code>null</code> if to split on whitespace)
-     * @param maxsplit maximum number of splits to make (there may be <code>maxsplit+1</code>
-     *            parts).
-     * @return list(str) result
-     */
-    public PyList rsplit(PyObject sep, PyObject maxsplit) {
-        return bytes_rsplit(new PyObject[]{sep, maxsplit}, Py.NoKeywords);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_split_doc)
@@ -904,18 +662,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 return new PyBytes(charSequence);
             }
         }));
-    }
-
-    /**
-     * Equivalent to Python <code>str.partition()</code>, splits the <code>PyBytes</code> at the
-     * first occurrence of <code>sepObj</code> returning a {@link PyTuple} containing the part
-     * before the separator, the separator itself, and the part after the separator.
-     *
-     * @param sepObj str, unicode or object implementing {@link BufferProtocol}
-     * @return tuple of parts
-     */
-    public PyTuple partition(PyObject sepObj) {
-        return bytes_partition(sepObj);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_partition_doc)
@@ -943,18 +689,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    /**
-     * Equivalent to Python <code>str.rpartition()</code>, splits the <code>PyBytes</code> at the
-     * last occurrence of <code>sepObj</code> returning a {@link PyTuple} containing the part before
-     * the separator, the separator itself, and the part after the separator.
-     *
-     * @param sepObj str, unicode or object implementing {@link BufferProtocol}
-     * @return tuple of parts
-     */
-    public PyTuple rpartition(PyObject sepObj) {
-        return bytes_rpartition(sepObj);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_rpartition_doc)
     final PyTuple bytes_rpartition(PyObject sepObj) {
 
@@ -976,14 +710,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 return new PyTuple(Py.EmptyByte, Py.EmptyByte, this);
             }
         }
-    }
-
-    public PyList splitlines() {
-        return splitlines(false);
-    }
-
-    public PyList splitlines(boolean keepends) {
-        return bytes_splitlines(new PyObject[]{Py.newBoolean(keepends)}, new String[]{});
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_splitlines_doc)
@@ -1013,131 +739,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(getString().substring(begin, end), true);
     }
 
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found. Raises
-     * <code>ValueError</code> if the substring is not found.
-     *
-     * @param sub substring to find.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int index(PyObject sub) {
-        return bytes_index(sub, null, null);
-    }
-
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:]</code>. Raises
-     * <code>ValueError</code> if the substring is not found.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int index(PyObject sub, PyObject start) throws PyException {
-        return bytes_index(sub, start, null);
-    }
-
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:end]</code>. Arguments
-     * <code>start</code> and <code>end</code> are interpreted as in slice notation, with null or
-     * {@link Py#None} representing "missing". Raises <code>ValueError</code> if the substring is
-     * not found.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int index(PyObject sub, PyObject start, PyObject end) throws PyException {
-        return checkIndex(bytes_index(sub, start, end));
-    }
-
-    /** Equivalent to {@link #index(PyObject)} specialized to <code>String</code>. */
-    public int index(String sub) {
-        return index(sub, null, null);
-    }
-
-    /** Equivalent to {@link #index(PyObject, PyObject)} specialized to <code>String</code>. */
-    public int index(String sub, PyObject start) {
-        return index(sub, start, null);
-    }
-
-    /**
-     * Equivalent to {@link #index(PyObject, PyObject, PyObject)} specialized to <code>String</code>
-     * .
-     */
-    public int index(String sub, PyObject start, PyObject end) {
-        return checkIndex(Encoding._find(getString(), sub, start, end, __len__()));
-    }
-
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_index_doc)
     final int bytes_index(PyObject subObj, PyObject start, PyObject end) {
         return checkIndex(bytes_find(subObj, start, end));
-    }
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found. Raises
-     * <code>ValueError</code> if the substring is not found.
-     *
-     * @param sub substring to find.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int rindex(PyObject sub) {
-        return bytes_rindex(sub, null, null);
-    }
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:]</code>. Raises
-     * <code>ValueError</code> if the substring is not found.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int rindex(PyObject sub, PyObject start) throws PyException {
-        return bytes_rindex(sub, start, null);
-    }
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:end]</code>. Arguments
-     * <code>start</code> and <code>end</code> are interpreted as in slice notation, with null or
-     * {@link Py#None} representing "missing". Raises <code>ValueError</code> if the substring is
-     * not found.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return index of <code>sub</code> in this object.
-     * @throws PyException(ValueError) if not found.
-     */
-    public int rindex(PyObject sub, PyObject start, PyObject end) throws PyException {
-        return checkIndex(bytes_rindex(sub, start, end));
-    }
-
-    /** Equivalent to {@link #rindex(PyObject)} specialized to <code>String</code>. */
-    public int rindex(String sub) {
-        return rindex(sub, null, null);
-    }
-
-    /** Equivalent to {@link #rindex(PyObject, PyObject)} specialized to <code>String</code>. */
-    public int rindex(String sub, PyObject start) {
-        return rindex(sub, start, null);
-    }
-
-    /**
-     * Equivalent to {@link #rindex(PyObject, PyObject, PyObject)} specialized to
-     * <code>String</code>.
-     */
-    public int rindex(String sub, PyObject start, PyObject end) {
-        return checkIndex(Encoding._rfind(getString(), sub, start, end, __len__()));
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_rindex_doc)
@@ -1162,60 +766,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    /**
-     * Return the number of non-overlapping occurrences of substring <code>sub</code>.
-     *
-     * @param sub substring to find.
-     * @return count of occurrences.
-     */
-    public int count(PyObject sub) {
-        return count(sub, null, null);
-    }
-
-    /**
-     * Return the number of non-overlapping occurrences of substring <code>sub</code> in the range
-     * <code>[start:]</code>.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @return count of occurrences.
-     */
-    public int count(PyObject sub, PyObject start) {
-        return count(sub, start, null);
-    }
-
-    /**
-     * Return the number of non-overlapping occurrences of substring <code>sub</code> in the range
-     * <code>[start:end]</code>. Optional arguments <code>start</code> and <code>end</code> are
-     * interpreted as in slice notation.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return count of occurrences.
-     */
-    public int count(PyObject sub, PyObject start, PyObject end) {
-        return bytes_count(sub, start, end);
-    }
-
-    /** Equivalent to {@link #count(PyObject)} specialized to <code>String</code>. */
-    public int count(String sub) {
-        return count(sub, null, null);
-    }
-
-    /** Equivalent to {@link #count(PyObject, PyObject)} specialized to <code>String</code>. */
-    public int count(String sub, PyObject start) {
-        return count(sub, start, null);
-    }
-
-    /**
-     * Equivalent to {@link #count(PyObject, PyObject, PyObject)} specialized to <code>String</code>
-     * .
-     */
-    public int count(String sub, PyObject start, PyObject end) {
-        return Encoding._count(getString(), sub, start, end, __len__());
-    }
-
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_count_doc)
     final int bytes_count(PyObject subObj, PyObject start, PyObject end) {
         if (subObj instanceof PyUnicode) {
@@ -1227,60 +777,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found.
-     *
-     * @param sub substring to find.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int find(PyObject sub) {
-        return find(sub, null, null);
-    }
-
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:]</code>.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int find(PyObject sub, PyObject start) {
-        return find(sub, start, null);
-    }
-
-    /**
-     * Return the lowest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:end]</code>. Arguments
-     * <code>start</code> and <code>end</code> are interpreted as in slice notation, with null or
-     * {@link Py#None} representing "missing".
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int find(PyObject sub, PyObject start, PyObject end) {
-        return bytes_find(sub, start, end);
-    }
-
-    /** Equivalent to {@link #find(PyObject)} specialized to <code>String</code>. */
-    public int find(String sub) {
-        return find(sub, null, null);
-    }
-
-    /** Equivalent to {@link #find(PyObject, PyObject)} specialized to <code>String</code>. */
-    public int find(String sub, PyObject start) {
-        return find(sub, start, null);
-    }
-
-    /**
-     * Equivalent to {@link #find(PyObject, PyObject, PyObject)} specialized to <code>String</code>.
-     */
-    public int find(String sub, PyObject start, PyObject end) {
-        return Encoding._find(getString(), sub, start, end, __len__());
-    }
-
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_find_doc)
     final int bytes_find(PyObject subObj, PyObject start, PyObject end) {
         if (subObj instanceof PyUnicode) {
@@ -1290,61 +786,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
             String sub = Encoding.asStringOrError(subObj);
             return Encoding._find(getString(), sub, start, end, __len__());
         }
-    }
-
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found.
-     *
-     * @param sub substring to find.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int rfind(PyObject sub) {
-        return rfind(sub, null, null);
-    }
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:]</code>.
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int rfind(PyObject sub, PyObject start) {
-        return rfind(sub, start, null);
-    }
-
-    /**
-     * Return the highest index in the string where substring <code>sub</code> is found, such that
-     * <code>sub</code> is contained in the slice <code>s[start:end]</code>. Arguments
-     * <code>start</code> and <code>end</code> are interpreted as in slice notation, with null or
-     * {@link Py#None} representing "missing".
-     *
-     * @param sub substring to find.
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return index of <code>sub</code> in this object or -1 if not found.
-     */
-    public int rfind(PyObject sub, PyObject start, PyObject end) {
-        return bytes_rfind(sub, start, end);
-    }
-
-    /** Equivalent to {@link #find(PyObject)} specialized to <code>String</code>. */
-    public int rfind(String sub) {
-        return rfind(sub, null, null);
-    }
-
-    /** Equivalent to {@link #find(PyObject, PyObject)} specialized to <code>String</code>. */
-    public int rfind(String sub, PyObject start) {
-        return rfind(sub, start, null);
-    }
-
-    /**
-     * Equivalent to {@link #find(PyObject, PyObject, PyObject)} specialized to <code>String</code>.
-     */
-    public int rfind(String sub, PyObject start, PyObject end) {
-        return Encoding._rfind(getString(), sub, start, end, __len__());
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_rfind_doc)
@@ -1376,14 +817,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return fillchar.charAt(0);
     }
 
-    public PyBytes ljust(int width) {
-        return bytes_ljust(width, null);
-    }
-
-    public PyBytes ljust(int width, String padding) {
-        return bytes_ljust(width, padding);
-    }
-
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_ljust_doc)
     final PyBytes bytes_ljust(int width, String fillchar) {
         char pad = parse_fillchar("ljust", fillchar);
@@ -1394,10 +827,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(getString() + padding(n, pad));
     }
 
-    public PyBytes rjust(int width) {
-        return bytes_rjust(width, null);
-    }
-
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_rjust_doc)
     final PyBytes bytes_rjust(int width, String fillchar) {
         char pad = parse_fillchar("rjust", fillchar);
@@ -1406,10 +835,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
             return this;
         }
         return new PyBytes(padding(n, pad) + getString());
-    }
-
-    public PyBytes center(int width) {
-        return bytes_center(width, null);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_center_doc)
@@ -1427,21 +852,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(padding(half, pad) + getString() + padding(n - half, pad));
     }
 
-    public PyBytes zfill(int width) {
-        return bytes_zfill(width);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_zfill_doc)
     final PyBytes bytes_zfill(int width) {
         return new PyBytes(Encoding.zfill(getString(), width).toString());
-    }
-
-    public PyBytes expandtabs() {
-        return bytes_expandtabs(8);
-    }
-
-    public PyBytes expandtabs(int tabsize) {
-        return bytes_expandtabs(tabsize);
     }
 
     @ExposedMethod(defaults = "8", doc = BuiltinDocs.bytes_expandtabs_doc)
@@ -1449,41 +862,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(Encoding.expandtabs(getString(), tabsize));
     }
 
-    public PyBytes capitalize() {
-        return bytes_capitalize();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_capitalize_doc)
     final PyBytes bytes_capitalize() {
         return new PyBytes(Encoding.capitalize(getString()));
-    }
-
-    /**
-     * Equivalent to Python str.replace(old, new), returning a copy of the string with all
-     * occurrences of substring old replaced by new. If either argument is a {@link PyUnicode} (or
-     * this object is), the result will be a <code>PyUnicode</code>.
-     *
-     * @param oldPiece to replace where found.
-     * @param newPiece replacement text.
-     * @return PyBytes (or PyUnicode if any string is one), this string after replacements.
-     */
-    public PyBytes replace(PyObject oldPiece, PyObject newPiece) {
-        return bytes_replace(oldPiece, newPiece, -1);
-    }
-
-    /**
-     * Equivalent to Python str.replace(old, new[, count]), returning a copy of the string with all
-     * occurrences of substring old replaced by new. If argument <code>count</code> is nonnegative,
-     * only the first <code>count</code> occurrences are replaced. If either argument is a
-     * {@link PyUnicode} (or this object is), the result will be a <code>PyUnicode</code>.
-     *
-     * @param oldPiece to replace where found.
-     * @param newPiece replacement text.
-     * @param count maximum number of replacements to make, or -1 meaning all of them.
-     * @return PyBytes (or PyUnicode if any string is one), this string after replacements.
-     */
-    public PyBytes replace(PyObject oldPiece, PyObject newPiece, int count) {
-        return bytes_replace(oldPiece, newPiece, count);
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.bytes_replace_doc)
@@ -1498,12 +879,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
     }
 
-    public PyBytes join(PyObject seq) {
-        return bytes_join(seq);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_join_doc)
-    final PyBytes bytes_join(PyObject obj) {
+    public final PyBytes bytes_join(PyObject obj) {
         PySequence seq = fastSequence(obj, "");
         int seqLen = seq.__len__();
         if (seqLen == 0) {
@@ -1535,50 +912,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(buf.toString(), true); // Guaranteed to be byte-like
     }
 
-    /**
-     * Equivalent to the Python <code>str.startswith</code> method testing whether a string starts
-     * with a specified prefix. <code>prefix</code> can also be a tuple of prefixes to look for.
-     *
-     * @param prefix string to check for (or a <code>PyTuple</code> of them).
-     * @return <code>true</code> if this string slice starts with a specified prefix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean startswith(PyObject prefix) {
-        return bytes_startswith(prefix, null, null);
-    }
-
-    /**
-     * Equivalent to the Python <code>str.startswith</code> method, testing whether a string starts
-     * with a specified prefix, where a sub-range is specified by <code>[start:]</code>.
-     * <code>start</code> is interpreted as in slice notation, with null or {@link Py#None}
-     * representing "missing". <code>prefix</code> can also be a tuple of prefixes to look for.
-     *
-     * @param prefix string to check for (or a <code>PyTuple</code> of them).
-     * @param start start of slice.
-     * @return <code>true</code> if this string slice starts with a specified prefix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean startswith(PyObject prefix, PyObject start) {
-        return bytes_startswith(prefix, start, null);
-    }
-
-    /**
-     * Equivalent to the Python <code>str.startswith</code> method, testing whether a string starts
-     * with a specified prefix, where a sub-range is specified by <code>[start:end]</code>.
-     * Arguments <code>start</code> and <code>end</code> are interpreted as in slice notation, with
-     * null or {@link Py#None} representing "missing". <code>prefix</code> can also be a tuple of
-     * prefixes to look for.
-     *
-     * @param prefix string to check for (or a <code>PyTuple</code> of them).
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return <code>true</code> if this string slice starts with a specified prefix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean startswith(PyObject prefix, PyObject start, PyObject end) {
-        return bytes_startswith(prefix, start, end);
-    }
-
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_startswith_doc)
     final boolean bytes_startswith(PyObject prefix, PyObject startObj, PyObject endObj) {
         if (prefix instanceof PyUnicode) {
@@ -1587,116 +920,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.startswith(getString(), prefix, startObj, endObj, __len__());
     }
 
-    /**
-     * Equivalent to the Python <code>str.endswith</code> method, testing whether a string ends with
-     * a specified suffix. <code>suffix</code> can also be a tuple of suffixes to look for.
-     *
-     * @param suffix string to check for (or a <code>PyTuple</code> of them).
-     * @return <code>true</code> if this string slice ends with a specified suffix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean endswith(PyObject suffix) {
-        return bytes_endswith(suffix, null, null);
-    }
-
-    /**
-     * Equivalent to the Python <code>str.endswith</code> method, testing whether a string ends with
-     * a specified suffix, where a sub-range is specified by <code>[start:]</code>.
-     * <code>start</code> is interpreted as in slice notation, with null or {@link Py#None}
-     * representing "missing". <code>suffix</code> can also be a tuple of suffixes to look for.
-     *
-     * @param suffix string to check for (or a <code>PyTuple</code> of them).
-     * @param start start of slice.
-     * @return <code>true</code> if this string slice ends with a specified suffix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean endswith(PyObject suffix, PyObject start) {
-        return bytes_endswith(suffix, start, null);
-    }
-
-    /**
-     * Equivalent to the Python <code>str.endswith</code> method, testing whether a string ends with
-     * a specified suffix, where a sub-range is specified by <code>[start:end]</code>. Arguments
-     * <code>start</code> and <code>end</code> are interpreted as in slice notation, with null or
-     * {@link Py#None} representing "missing". <code>suffix</code> can also be a tuple of suffixes
-     * to look for.
-     *
-     * @param suffix string to check for (or a <code>PyTuple</code> of them).
-     * @param start start of slice.
-     * @param end end of slice.
-     * @return <code>true</code> if this string slice ends with a specified suffix, otherwise
-     *         <code>false</code>.
-     */
-    public boolean endswith(PyObject suffix, PyObject start, PyObject end) {
-        return bytes_endswith(suffix, start, end);
-    }
-
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_endswith_doc)
     final boolean bytes_endswith(PyObject suffix, PyObject startObj, PyObject endObj) {
         return Encoding.endswith(getString(), suffix, startObj, endObj, __len__());
-    }
-
-    /**
-     * Many of the string methods deal with slices specified using Python slice semantics:
-     * endpoints, which are <code>PyObject</code>s, may be <code>null</code> or <code>None</code>
-     * (meaning default to one end or the other) or may be negative (meaning "from the end").
-     * Meanwhile, the implementation methods need integer indices, both within the array, and
-     * <code>0&lt;=start&lt;=end&lt;=N</code> the length of the array.
-     * <p>
-     * This method first translates the Python slice <code>startObj</code> and <code>endObj</code>
-     * according to the slice semantics for null and negative values, and stores these in elements 2
-     * and 3 of the result. Then, since the end points of the range may lie outside this sequence's
-     * bounds (in either direction) it reduces them to the nearest points satisfying
-     * <code>0&lt;=start&lt;=end&lt;=N</code>, and stores these in elements [0] and [1] of the
-     * result.
-     *
-     * @param startObj Python start of slice
-     * @param endObj Python end of slice
-     * @return a 4 element array of two range-safe indices, and two original indices.
-     */
-    protected int[] translateIndices(PyObject startObj, PyObject endObj) {
-        return Encoding.translateIndices(getString(), startObj, endObj, __len__());
-    }
-
-    /**
-     * Equivalent to Python <code>str.translate</code> returning a copy of this string where the
-     * characters have been mapped through the translation <code>table</code>. <code>table</code>
-     * must be equivalent to a string of length 256 (if it is not <code>null</code>).
-     *
-     * @param table of character (byte) translations (or <code>null</code>)
-     * @return transformed byte string
-     */
-    public PyBytes translate(PyObject table) {
-        return translate(table, null);
-    }
-
-    /**
-     * Equivalent to Python <code>str.translate</code> returning a copy of this string where all
-     * characters (bytes) occurring in the argument <code>deletechars</code> are removed (if it is
-     * not <code>null</code>), and the remaining characters have been mapped through the translation
-     * <code>table</code>. <code>table</code> must be equivalent to a string of length 256 (if it is
-     * not <code>null</code>).
-     *
-     * @param table of character (byte) translations (or <code>null</code>)
-     * @param deletechars set of characters to remove (or <code>null</code>)
-     * @return transformed byte string
-     */
-    public PyBytes translate(PyObject table, PyObject deletechars) {
-        return bytes_translate(table, deletechars);
-    }
-
-    /**
-     * Equivalent to {@link #translate(PyObject)} specialized to <code>String</code>.
-     */
-    public PyBytes translate(String table) {
-        return _translate(table, null);
-    }
-
-    /**
-     * Equivalent to {@link #translate(PyObject, PyObject)} specialized to <code>String</code>.
-     */
-    public PyBytes translate(String table, String deletechars) {
-        return _translate(table, deletechars);
     }
 
     @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_translate_doc)
@@ -1747,12 +973,26 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(buf.toString());
     }
 
-    public static PyObject maketrans(PyUnicode fromstr, PyUnicode tostr) {
-        return bytes_maketrans(TYPE, fromstr, tostr, null);
-    }
+    @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_fromhex_doc)
+    static final PyObject bytes_fromhex(PyType type, PyObject obj) {
+        byte[] argbuf;
+        if (obj instanceof PyUnicode) {
+            argbuf = ((PyUnicode) obj).getString().getBytes();
+        } else {
+            argbuf = Py.unwrapBuffer(obj);
+        }
+        int arglen = argbuf.length;
 
-    public static PyObject maketrans(PyUnicode fromstr, PyUnicode tostr, PyUnicode other) {
-        return bytes_maketrans(TYPE, fromstr, tostr, other);
+        StringBuilder retbuf = new StringBuilder(arglen/2);
+
+        for (int i = 0; i < arglen;) {
+            int top = Character.digit(argbuf[i++], 16);
+            int bot = Character.digit(argbuf[i++], 16);
+            if (top == -1 || bot == -1)
+                throw Py.TypeError("Non-hexadecimal digit found");
+            retbuf.append((char) ((top << 4) + bot));
+        }
+        return new PyBytes(retbuf.toString());
     }
 
     @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_maketrans_doc)
@@ -1775,17 +1015,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(new String(res, StandardCharsets.ISO_8859_1));
     }
 
-    public boolean islower() {
-        return bytes_islower();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_islower_doc)
     final boolean bytes_islower() {
         return Encoding.isLowercase(getString());
-    }
-
-    public boolean isupper() {
-        return bytes_isupper();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isupper_doc)
@@ -1793,17 +1025,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.isUppercase(getString());
     }
 
-    public boolean isalpha() {
-        return bytes_isalpha();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_isalpha_doc)
     final boolean bytes_isalpha() {
         return Encoding.isAlpha(getString());
-    }
-
-    public boolean isalnum() {
-        return bytes_isalnum();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isalnum_doc)
@@ -1811,25 +1035,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.isAlnum(getString());
     }
 
-    private boolean _isalnum(char ch) {
-        // This can ever be entirely compatible with CPython. In CPython
-        // The type is not used, the numeric property is determined from
-        // the presense of digit, decimal or numeric fields. These fields
-        // are not available in exactly the same way in java.
-        return Character.isLetterOrDigit(ch) || Character.getType(ch) == Character.LETTER_NUMBER;
-    }
-
-    public boolean isdecimal() {
-        return bytes_isdecimal();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.str_isdecimal_doc)
     final boolean bytes_isdecimal() {
         return Encoding.isDecimal(getString());
-    }
-
-    public boolean isdigit() {
-        return bytes_isdigit();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isdigit_doc)
@@ -1837,26 +1045,14 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.isDigit(getString());
     }
 
-    public boolean isnumeric() {
-        return bytes_isnumeric();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.str_isnumeric_doc)
     final boolean bytes_isnumeric() {
         return Encoding.isNumeric(getString());
     }
 
-    public boolean istitle() {
-        return bytes_istitle();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes_istitle_doc)
     final boolean bytes_istitle() {
         return Encoding.isTitle(getString());
-    }
-
-    public boolean isspace() {
-        return bytes_isspace();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isspace_doc)

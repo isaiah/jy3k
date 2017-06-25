@@ -594,7 +594,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
                 if (curr.__bool__()) {
                     list.add(curr);
                 }
-                return Py.EmptyByte.join(list);
+                return Py.EmptyByte.bytes_join(list);
             }
 
         } else {
