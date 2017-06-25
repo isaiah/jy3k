@@ -952,6 +952,11 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @Override
+    public PyObject _is(PyObject o) {
+        return new PyBoolean(o instanceof PyUnicode && ((PyUnicode) o).getString().equals(getString()));
+    }
+
+    @Override
     public boolean __contains__(PyObject o) {
         return str___contains__(o);
     }

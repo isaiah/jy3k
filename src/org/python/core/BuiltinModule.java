@@ -1122,7 +1122,7 @@ class PrintFunction extends PyBuiltinFunction {
 @Untraversable
 class MaxFunction extends PyBuiltinFunction {
     MaxFunction() {
-        super("max", BuiltinDocs.builtins_map_doc);
+        super("max", BuiltinDocs.builtins_max_doc);
     }
 
     @Override
