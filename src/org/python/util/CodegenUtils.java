@@ -86,15 +86,15 @@ public class CodegenUtils {
     /**
      * Create a method signature from the given param types and return values
      */
-    public static String sig(Class retval, Class... params) {
+    public static String sig(final Class<?> retval, final Class<?>... params) {
         return sigParams(params) + ci(retval);
     }
 
-    public static String sig(Class retval, String descriptor, Class... params) {
+    public static String sig(final Class<?> retval, String descriptor, final Class<?>... params) {
         return sigParams(descriptor, params) + ci(retval);
     }
 
-    public static String sigParams(Class... params) {
+    public static String sigParams(final Class<?>... params) {
         StringBuilder signature = new StringBuilder("(");
         
         for (int i = 0; i < params.length; i++) {

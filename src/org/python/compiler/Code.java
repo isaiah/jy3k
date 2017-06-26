@@ -1,16 +1,14 @@
 package org.python.compiler;
 
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Vector;
-
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.InstructionAdapter;
+
+import java.util.Arrays;
+import java.util.BitSet;
 
 public class Code extends MethodVisitor implements Opcodes {
     String sig;
@@ -20,7 +18,7 @@ public class Code extends MethodVisitor implements Opcodes {
     int returnLocal;
     BitSet finallyLocals = new java.util.BitSet();
     private InstructionAdapter inst;
-    
+
     //XXX: I'd really like to get sig and access out of here since MethodVistitor
     //     should already have this information.
     public Code(MethodVisitor mv, String sig, int access) {

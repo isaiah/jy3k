@@ -1,6 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.compiler;
 
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.Method;
@@ -83,6 +84,7 @@ import org.python.core.PyTraceback;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
+import org.python.core.linker.Bootstrap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,6 +99,8 @@ import static org.python.compiler.CompilerConstants.*;
 import static org.python.util.CodegenUtils.*;
 
 public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
+    private static final Handle LINKERBOOTSTRAP = new Handle(H_INVOKESTATIC, Bootstrap.BOOTSTRAP.getClassName(),
+            Bootstrap.BOOTSTRAP.getName(), Bootstrap.BOOTSTRAP.getDescriptor(), false);
 
     private static final Object Exit = Integer.valueOf(1);
     private static final Object NoExit = null;
@@ -113,12 +117,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private Deque<Label> continueLabels, breakLabels, exitLabels;
     private Deque<ExceptionHandler> exceptionHandlers;
 
-    final static Method contextGuard_getManager =
-            Method.getMethod("org.python.core.ContextManager getManager (org.python.core.PyObject)");
-    final static Method __enter__ =
-            Method.getMethod("org.python.core.PyObject __enter__ (org.python.core.ThreadState)");
-    final static Method __exit__ =
-            Method.getMethod("boolean __exit__ (org.python.core.ThreadState,org.python.core.PyException)");
     /*
      * break/continue finally's level. This is the lowest level in the exceptionHandlers which
      * should be executed at break or continue. It is saved/updated/restored when compiling loops. A
@@ -1597,19 +1595,22 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitAttribute(Attribute node) throws Exception {
         visit(node.getInternalValue());
-        code.ldc(getName(node.getInternalAttr()));
+//        code.ldc(getName(node.getInternalAttr()));
         expr_contextType ctx = node.getInternalCtx();
 
         switch (ctx) {
             case Del:
+                code.ldc(getName(node.getInternalAttr()));
                 code.invokevirtual(p(PyObject.class), "__delattr__", sig(Void.TYPE, String.class));
                 return null;
             case Load:
-                code.invokevirtual(p(PyObject.class), "__getattr__",
-                        sig(PyObject.class, String.class));
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, new Object[0]);
+//                code.invokevirtual(p(PyObject.class), "__getattr__",
+//                        sig(PyObject.class, String.class));
                 return null;
             case Param:
             case Store:
+                code.ldc(getName(node.getInternalAttr()));
                 code.aload(temporary);
                 code.invokevirtual(p(PyObject.class), "__setattr__",
                         sig(Void.TYPE, String.class, PyObject.class));
