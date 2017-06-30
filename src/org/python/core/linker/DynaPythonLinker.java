@@ -35,7 +35,22 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                     mh = lookup.findVirtual(self.getClass(), "__getattr__",
                             MethodType.methodType(PyObject.class, String.class));
                     mh = MethodHandles.insertArguments(mh, 1, name);
+                } else if (namespace == StandardNamespace.ELEMENT) {
+                    mh = lookup.findVirtual(self.getClass(), "__getitem__",
+                            MethodType.methodType(PyObject.class, PyObject.class));
                 }
+                break;
+            case SET:
+                if (namespace == StandardNamespace.PROPERTY) {
+                    mh = lookup.findVirtual(self.getClass(), "__setattr__",
+                            MethodType.methodType(void.class, String.class, PyObject.class));
+                    mh = MethodHandles.insertArguments(mh, 1, name);
+                } else if (namespace == StandardNamespace.ELEMENT) {
+                     mh = lookup.findVirtual(self.getClass(), "__setitem__",
+                            MethodType.methodType(void.class, PyObject.class, PyObject.class));
+                }
+                break;
+            case CALL:
                 break;
             default:
                 mh = lookup.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, PyObject[].class, String[].class));

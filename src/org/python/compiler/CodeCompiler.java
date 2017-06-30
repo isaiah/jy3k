@@ -4,7 +4,6 @@ package org.python.compiler;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.commons.Method;
 import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnnAssign;
@@ -101,6 +100,11 @@ import static org.python.util.CodegenUtils.*;
 public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private static final Handle LINKERBOOTSTRAP = new Handle(H_INVOKESTATIC, Bootstrap.BOOTSTRAP.getClassName(),
             Bootstrap.BOOTSTRAP.getName(), Bootstrap.BOOTSTRAP.getDescriptor(), false);
+
+    private static final char ESCAPE_C = '\\';
+    private static final char NULL_ESCAPE_C = '=';
+    /** Operation that without a name, such as GET_ELEMENT */
+    private static final String EMPTY_NAME = String.valueOf(new char[]{ESCAPE_C, NULL_ESCAPE_C});
 
     private static final Object Exit = Integer.valueOf(1);
     private static final Object NoExit = null;
@@ -1413,15 +1417,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitCall(Call node) throws Exception {
         java.util.List<expr> starargs = new ArrayList<>();
         java.util.List<expr> kwargs = new ArrayList<>();
-        java.util.List<String> keys = new ArrayList<String>();
+        java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = node.getInternalArgs();
         boolean stararg = values.stream().anyMatch(val -> val instanceof Starred);
-//        for (int i = 0; i < node.getInternalArgs().size(); i++) {
-//            expr arg = node.getInternalArgs().get(i);
-//            if (arg instanceof Starred) {
-//                stararg = true;
-//                break;
-//        }
 
         java.util.List<keyword> keywords = node.getInternalKeywords();
         for (int i = 0; i < keywords.size(); i++) {
@@ -1564,14 +1562,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.invokevirtual(p(PyObject.class), "__delitem__", sig(Void.TYPE, PyObject.class));
                 return null;
             case Load:
-                code.invokevirtual(p(PyObject.class), "__getitem__",
-                        sig(PyObject.class, PyObject.class));
+                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_ELEMENT);
+//                code.invokevirtual(p(PyObject.class), "__getitem__",
+//                        sig(PyObject.class, PyObject.class));
                 return null;
             case Param:
             case Store:
                 code.aload(value);
-                code.invokevirtual(p(PyObject.class), "__setitem__",
-                        sig(Void.TYPE, PyObject.class, PyObject.class));
+                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(void.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_ELEMENT);
+//                code.invokevirtual(p(PyObject.class), "__setitem__",
+//                        sig(Void.TYPE, PyObject.class, PyObject.class));
                 return null;
         }
         return null;
@@ -1604,16 +1604,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.invokevirtual(p(PyObject.class), "__delattr__", sig(Void.TYPE, String.class));
                 return null;
             case Load:
-                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, new Object[0]);
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
 //                code.invokevirtual(p(PyObject.class), "__getattr__",
 //                        sig(PyObject.class, String.class));
                 return null;
             case Param:
             case Store:
-                code.ldc(getName(node.getInternalAttr()));
                 code.aload(temporary);
-                code.invokevirtual(p(PyObject.class), "__setattr__",
-                        sig(Void.TYPE, String.class, PyObject.class));
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(void.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_PROPERTY);
+//                code.invokevirtual(p(PyObject.class), "__setattr__",
+//                        sig(Void.TYPE, String.class, PyObject.class));
                 return null;
         }
         return null;
