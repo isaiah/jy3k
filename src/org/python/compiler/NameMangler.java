@@ -1,6 +1,7 @@
 package org.python.compiler;
 
 import org.python.antlr.Visitor;
+import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Name;
@@ -16,6 +17,15 @@ public class NameMangler extends Visitor {
     public Object visitClassDef(ClassDef classDef) throws Exception {
         String prefix = "_" + classDef.getInternalName();
         Visitor visitor = new Visitor() {
+            @Override
+            public Object visitAttribute(Attribute node) {
+                String name = node.getInternalAttr();
+                if (name.startsWith("__") && !name.endsWith("__")) {
+                    node.setInternalAttr(prefix + name);
+                }
+                return node;
+            }
+
             @Override
             public Object visitName(Name node) {
                 String name = node.getInternalId();

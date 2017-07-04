@@ -1418,6 +1418,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<expr> kwargs = new ArrayList<>();
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = node.getInternalArgs();
+        boolean stararg = values.stream().anyMatch(a -> a instanceof Starred);
 
         java.util.List<keyword> keywords = node.getInternalKeywords();
         for (int i = 0; i < keywords.size(); i++) {
@@ -1435,13 +1436,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         if (node.getInternalFunc() instanceof Attribute
-                && keys.isEmpty() && kwargs.isEmpty()) {
+                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
             return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
         }
 
         visit(node.getInternalFunc());
 
-        if (!kwargs.isEmpty()) {
+        if (stararg || !kwargs.isEmpty()) {
             loadList(code, values);
             loadStrings(code, keys);
             loadArray(code, kwargs);
