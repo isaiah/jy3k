@@ -533,16 +533,8 @@ public class PyObject implements Serializable {
 
     public PyObject _callextra(List<PyObject> arglist,
                                String[] keywords,
-                               PyObject[] starargsArray,
                                PyObject[] kwargsArray) {
         PyObject[] args = arglist.toArray(new PyObject[0]);
-        return _callextra(args, keywords, starargsArray, kwargsArray);
-    }
-
-    public PyObject _callextra(PyObject[] args,
-                               String[] keywords,
-                               PyObject[] starargsArray,
-                               PyObject[] kwargsArray) {
 
         int argslen = args.length;
 
@@ -555,46 +547,34 @@ public class PyObject implements Serializable {
             name = getType().fastGetName() + " ";
         }
         for (PyObject kwargs : kwargsArray) {
-            PyObject keys = kwargs.__findattr__("keys");
-            if(keys == null)
-                throw Py.TypeError(name
-                        + "argument after ** must be a mapping");
-            for (String keyword : keywords)
-                if (kwargs.__finditem__(keyword) != null)
-                    throw Py.TypeError(
-                        name
-                            + "got multiple values for "
-                            + "keyword argument '"
-                            + keyword
-                            + "'");
             argslen += kwargs.__len__();
         }
-        List<PyObject> starObjs = null;
-        for (PyObject starargs : starargsArray) {
-            starObjs = new ArrayList<>();
-            PyObject iter = Py.iter(starargs, name + "argument after * must be a sequence");
-            for (PyObject cur = null; ((cur = iter.__next__()) != null); ) {
-                starObjs.add(cur);
-            }
-            argslen += starObjs.size();
-        }
+//        List<PyObject> starObjs = null;
+//        for (PyObject starargs : starargsArray) {
+//            starObjs = new ArrayList<>();
+//            PyObject iter = Py.iter(starargs, name + "argument after * must be a sequence");
+//            for (PyObject cur = null; ((cur = iter.__next__()) != null); ) {
+//                starObjs.add(cur);
+//            }
+//            argslen += starObjs.size();
+//        }
         PyObject[] newargs = new PyObject[argslen];
-        int argidx = args.length - keywords.length;
-        System.arraycopy(args, 0, newargs, 0, argidx);
-        if(starObjs != null) {
-            Iterator<PyObject> it = starObjs.iterator();
-            while(it.hasNext()) {
-                newargs[argidx++] = it.next();
-            }
-        }
-        System.arraycopy(args,
-                         args.length - keywords.length,
-                         newargs,
-                         argidx,
-                         keywords.length);
-        argidx += keywords.length;
-
+        int argidx = args.length;
+//        System.arraycopy(args, 0, newargs, 0, argidx);
+//        if(starObjs != null) {
+//            Iterator<PyObject> it = starObjs.iterator();
+//            while(it.hasNext()) {
+//                newargs[argidx++] = it.next();
+//            }
+//        }
+//        System.arraycopy(args,
+//                         args.length - keywords.length,
+//                         newargs,
+//                         argidx,
+//                         keywords.length);
+//
         for (PyObject kwargs : kwargsArray) {
+
             String[] newkeywords =
                 new String[keywords.length + kwargs.__len__()];
             System.arraycopy(keywords, 0, newkeywords, 0, keywords.length);
@@ -612,12 +592,12 @@ public class PyObject implements Serializable {
             }
             keywords = newkeywords;
         }
-
-        if (newargs.length != argidx) {
-            args = new PyObject[argidx];
-            System.arraycopy(newargs, 0, args, 0, argidx);
-        } else
-            args = newargs;
+//
+//        if (newargs.length != argidx) {
+//            args = new PyObject[argidx];
+//            System.arraycopy(newargs, 0, args, 0, argidx);
+//        } else
+//            args = newargs;
         return __call__(args, keywords);
     }
 

@@ -1415,11 +1415,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitCall(Call node) throws Exception {
-        java.util.List<expr> starargs = new ArrayList<>();
         java.util.List<expr> kwargs = new ArrayList<>();
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = node.getInternalArgs();
-        boolean stararg = values.stream().anyMatch(val -> val instanceof Starred);
 
         java.util.List<keyword> keywords = node.getInternalKeywords();
         for (int i = 0; i < keywords.size(); i++) {
@@ -1437,22 +1435,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         if (node.getInternalFunc() instanceof Attribute
-                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
+                && keys.isEmpty() && kwargs.isEmpty()) {
             return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
         }
 
         visit(node.getInternalFunc());
 
-        if (stararg || !kwargs.isEmpty()) {
+        if (!kwargs.isEmpty()) {
             loadList(code, values);
             loadStrings(code, keys);
-            loadArray(code, starargs);
             loadArray(code, kwargs);
             code.invokevirtual(
                     p(PyObject.class),
                     "_callextra",
-                    sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class,
-                            PyObject[].class));
+                    sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class));
         } else if (keys.size() > 0) {
             loadThreadState();
             loadArray(code, values);
