@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class PyType extends PyObject implements Serializable, Traverseproc {
 
     public static final PyType TYPE = fromClass(PyType.class);
-    private static final PyType JAVA_TYPE = PyType.fromClass(Class.class);
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:
@@ -135,7 +134,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
             // special case for PyStringMap so that it types as a dict
 //            PyType psmType = PyType.fromClass(PyStringMap.class);
-            if (objType == PyStringMap.TYPE) {
+            if (obj instanceof PyStringMap) {
                 return PyDictionary.TYPE;
             }
             return objType;
@@ -185,7 +184,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         // Use PyType as the metaclass for Python subclasses of Java classes rather than
         // PyJavaType.  Using PyJavaType as metaclass exposes the java.lang.Object methods
         // on the type, which doesn't make sense for python subclasses.
-        if (metatype == JAVA_TYPE) {
+        if (metatype == PyType.fromClass(Class.class)) {
             metatype = TYPE;
         }
 
