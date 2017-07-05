@@ -610,7 +610,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_valueiterator")
-    static class ValuesIter extends PyObject {
+    public static class ValuesIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(ValuesIter.class);
 
         private final Iterator<PyObject> iterator;
@@ -645,7 +645,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_itemiterator")
-    static class ItemsIter extends PyObject {
+    public static class ItemsIter extends PyObject {
 
         private final Iterator<Entry<PyObject, PyObject>> iterator;
 
@@ -679,7 +679,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_values", base = PyObject.class, doc = "")
-    class PyDictionaryViewValues extends BaseDictionaryView {
+    public class PyDictionaryViewValues extends BaseDictionaryView {
         public final PyType TYPE = PyType.fromClass(PyDictionaryViewValues.class);
 
         public PyDictionaryViewValues(PyDictionary dvDict) {
@@ -708,7 +708,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_keys", base = PyObject.class)
-    class PyDictionaryViewKeys extends BaseDictionaryView {
+    public class PyDictionaryViewKeys extends BaseDictionaryView {
         public final PyType TYPE = PyType.fromClass(PyDictionaryViewKeys.class);
 
         public PyDictionaryViewKeys(PyDictionary dvDict) {
@@ -820,7 +820,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_items")
-    class PyDictionaryViewItems extends BaseDictionaryView {
+    public class PyDictionaryViewItems extends BaseDictionaryView {
         public final PyType TYPE = PyType.fromClass(PyDictionaryViewItems.class);
 
         public PyDictionaryViewItems(PyDictionary dvDict) {

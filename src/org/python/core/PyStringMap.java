@@ -568,7 +568,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedType(name = "values_iter")
-    class ValuesIter extends PyObject {
+    public class ValuesIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(ValuesIter.class);
 
         private final Iterator<PyObject> iterator;
@@ -602,7 +602,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedType(name = "keys_iter")
-    class KeysIter extends PyObject {
+    public class KeysIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(KeysIter.class);
 
         private final Iterator<Object> iterator;
@@ -637,7 +637,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedType(name = "items_iter")
-    class ItemsIter extends PyObject {
+    public class ItemsIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(ItemsIter.class);
 
         private final Iterator<Entry<Object, PyObject>> iterator;

@@ -41,7 +41,6 @@ public class _imp {
             }
         }
         throw Py.RuntimeError("builtin module not found");
-//        return imp.loadBuiltin(modName);
     }
 
     @ExposedFunction

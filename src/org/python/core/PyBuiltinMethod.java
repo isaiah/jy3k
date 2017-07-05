@@ -28,7 +28,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             try {
                 bindable = (PyBuiltinMethod)clone();
             } catch(CloneNotSupportedException e) {
-                throw new RuntimeException("Didn't expect PyBuiltinMethodto throw " +
+                throw new RuntimeException("Didn't expect PyBuiltinMethod to throw " +
                                            "CloneNotSupported since it implements Cloneable", e);
             }
             bindable.self = bindTo;

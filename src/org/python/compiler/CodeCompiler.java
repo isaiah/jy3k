@@ -1435,10 +1435,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         }
 
-        if (node.getInternalFunc() instanceof Attribute
-                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
-            return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
-        }
+//        if (node.getInternalFunc() instanceof Attribute
+//                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
+//            return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
+//        }
 
         visit(node.getInternalFunc());
 
@@ -1464,9 +1464,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                             sig(PyObject.class, ThreadState.class));
                     break;
                 case 1:
-                    visit(values.get(0));
-                    code.invokevirtual(p(PyObject.class), "__call__",
-                            sig(PyObject.class, ThreadState.class, PyObject.class));
+                    expr arg = values.get(0);
+                    visit(arg);
+                    if (arg instanceof NameConstant && ((NameConstant) arg).getInternalValue().equals(EXCINFO.symbolName())) {
+                        // special case for sys.excinfo hack, used by desugared "With" stmt
+                        code.invokevirtual(p(PyObject.class), "__call__",
+                                sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
+                    } else {
+                        code.invokevirtual(p(PyObject.class), "__call__",
+                                sig(PyObject.class, ThreadState.class, PyObject.class));
+                    }
                     break;
                 case 2:
                     visit(values.get(0));
