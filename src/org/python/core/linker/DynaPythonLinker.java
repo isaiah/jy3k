@@ -14,11 +14,13 @@ import org.python.core.PyObject;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.SwitchPoint;
 
 /**
  * The dynamic linker implementation for Python objects
  */
 public class DynaPythonLinker implements GuardingDynamicLinker {
+
     @Override
     public GuardedInvocation getGuardedInvocation(LinkRequest linkRequest, LinkerServices linkerServices) throws Exception {
         final Object self = linkRequest.getReceiver();
@@ -32,7 +34,8 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
         switch (baseOperation) {
             case GET:
                 if (namespace == StandardNamespace.PROPERTY) {
-                    mh = lookup.findVirtual(self.getClass(), "__getattr__",
+                    Class<?> receiverClass = self.getClass();
+                    mh = lookup.findVirtual(receiverClass, "__getattr__",
                             MethodType.methodType(PyObject.class, String.class));
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
@@ -56,6 +59,7 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                 mh = lookup.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, PyObject[].class, String[].class));
         }
 
-        return new GuardedInvocation(mh);
+//        return new GuardedInvocation(mh);
+        return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
     }
 }

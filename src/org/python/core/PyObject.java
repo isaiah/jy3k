@@ -560,7 +560,8 @@ public class PyObject implements Serializable {
 //        }
         PyObject[] newargs = new PyObject[argslen];
         int argidx = args.length;
-//        System.arraycopy(args, 0, newargs, 0, argidx);
+        if (argslen > args.length)
+            System.arraycopy(args, 0, newargs, 0, argidx);
 //        if(starObjs != null) {
 //            Iterator<PyObject> it = starObjs.iterator();
 //            while(it.hasNext()) {
@@ -592,8 +593,11 @@ public class PyObject implements Serializable {
             }
             keywords = newkeywords;
         }
+        if (newargs.length > args.length)
+            args = newargs;
 //
-//        if (newargs.length != argidx) {
+//        if (newargs.length == argidx) {
+//            args = newargs;
 //            args = new PyObject[argidx];
 //            System.arraycopy(newargs, 0, args, 0, argidx);
 //        } else

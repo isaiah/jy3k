@@ -78,7 +78,6 @@ public class Bootstrap {
 
     private static Operation parseOperation(String name, int flags) {
         return OPERATIONS[flags].named(name);
-//        return GET.withNamespace(PROPERTY).named(name);
     }
 
     public static Call staticCallNoLookup(final Class<?> clazz, final String name, final Class<?> rtype, final Class<?> ...ptypes) {
