@@ -152,11 +152,19 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_FUNCTION.getInternalName(),
                 "klazz",
                 CLASS.getDescriptor());
+        /** Set original method signature */
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(Type.getMethodDescriptor(returnType));
+        mv.visitLdcInsn(Type.getMethodDescriptor(returnType, args));
         mv.visitFieldInsn(PUTFIELD,
                 BUILTIN_FUNCTION.getInternalName(),
-                "rtype",
+                "methodDescriptor",
+                STRING.getDescriptor());
+        /** Set default values */
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(String.join(",", defaults));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "defaultVals",
                 STRING.getDescriptor());
         endConstructor();
     }

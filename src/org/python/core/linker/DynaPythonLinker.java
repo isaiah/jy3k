@@ -71,20 +71,28 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                     if (((PyBuiltinMethod) self).isStatic) {
                         String funcname = ((PyBuiltinCallable) self).info.getName();
                         Class<?> klazz = ((PyBuiltinMethod) self).klazz;
-                        String rtype = ((PyBuiltinMethod) self).rtype;
-                        MethodType methodType = MethodType.fromMethodDescriptorString(rtype, null);
+                        String descriptor = ((PyBuiltinMethod) self).methodDescriptor;
+                        MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
                         mh = LOOKUP.findStatic(klazz, funcname, methodType);
+                        if (methodType.parameterCount() > 0) {
+                            int i = 0;
+                            String[] defaults = ((PyBuiltinMethod) self).defaultVals.split(",");
+                            for (Class<?> paramType : methodType.parameterArray()) {
+                                mh = MethodHandles.insertArguments(mh, i, getDefaultValue(defaults[i++], paramType));
+                            }
+                        }
                         /** Drop self for static method */
                         mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
-                        if (methodType.returnType() == int.class) {
+                        Class<?> returnType = methodType.returnType();
+                        if (returnType == int.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
-                        } else if (methodType.returnType() == long.class) {
+                        } else if (returnType == long.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_LONG);
-                        } else if (methodType.returnType() == String.class) {
+                        } else if (returnType == String.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_UNICODE);
-                        } else if (methodType.returnType() == double.class) {
+                        } else if (returnType == double.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_DOUBLE);
-                        } else if (methodType.returnType() == float.class) {
+                        } else if (returnType == float.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
                         }
 //                    } else {
@@ -101,5 +109,22 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
 
 //        return new GuardedInvocation(mh);
         return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+    }
+
+    private Object getDefaultValue(String def, Class<?> arg) {
+        if (def == "null") {
+            return Py.None;
+        } else if (arg == int.class) {
+            return Integer.valueOf(def);
+        } else if (arg == long.class) {
+            return Long.valueOf(def);
+        } else if (arg == String.class) {
+            return def;
+        } else if (arg == double.class) {
+            return Double.valueOf(def);
+        } else if (arg == float.class) {
+            return Float.valueOf(def);
+        }
+        return def;
     }
 }

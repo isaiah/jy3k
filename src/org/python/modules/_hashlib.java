@@ -61,7 +61,7 @@ public class _hashlib {
         }
 
         Hash hash = new Hash(name);
-        if (obj != null) {
+        if (obj != Py.None) {
             hash.update(obj);
         }
         return hash;

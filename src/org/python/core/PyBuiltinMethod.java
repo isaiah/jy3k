@@ -6,6 +6,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         Cloneable, Traverseproc {
 
     protected PyObject self;
+    public String defaultVals;
 
     protected PyBuiltinMethod(PyType type, PyObject self, Info info) {
         super(type, info);
