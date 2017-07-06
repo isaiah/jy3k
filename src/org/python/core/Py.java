@@ -711,12 +711,28 @@ public final class Py {
                                  PyFunctionTable funcs, int func_id,
                                  String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
                                  int npurecell, int kwonlyargcount, int moreflags) {
-        return new PyTableCode(argcount, varnames,
+        PyTableCode code = new PyTableCode(argcount, varnames,
                 filename, name, firstlineno, args, keywords,
                 funcs, func_id, cellvars, freevars, names, consts, npurecell,
                 kwonlyargcount, moreflags);
+        return code;
     }
 
+    public static PyCode newCode(int argcount, String varnames[],
+                                 String filename, String name,
+                                 int firstlineno,
+                                 boolean args, boolean keywords,
+                                 PyFunctionTable funcs, int func_id,
+                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
+                                 int npurecell, int kwonlyargcount, int moreflags, Class<?> klazz, String funcname) {
+        PyTableCode code = new PyTableCode(argcount, varnames,
+                filename, name, firstlineno, args, keywords,
+                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                kwonlyargcount, moreflags);
+        code.klazz = klazz;
+        code.funcname = funcname;
+        return code;
+    }
 
 
     public static PyObject newJavaFunc(Class<?> cls, String name) {

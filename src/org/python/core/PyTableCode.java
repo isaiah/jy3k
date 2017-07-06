@@ -10,8 +10,6 @@ import org.python.expose.ExposedGet;
 import org.python.expose.ExposedType;
 import org.python.modules._systemrestart;
 
-import java.util.ArrayList;
-
 @Untraversable
 @ExposedType(name = "code", base = PyObject.class, doc = BuiltinDocs.code_doc)
 public class PyTableCode extends PyBaseCode
@@ -20,6 +18,8 @@ public class PyTableCode extends PyBaseCode
     PyFunctionTable funcs;
     int func_id;
     public String co_code = ""; // only used by inspect
+    public Class<?> klazz;
+    public String funcname;
 
     public PyTableCode(int argcount, String varnames[],
                        String filename, String name,

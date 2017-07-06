@@ -146,6 +146,18 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_FUNCTION.getInternalName(),
                 "isStatic",
                 BOOLEAN.getDescriptor());
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(onType);
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_FUNCTION.getInternalName(),
+                "klazz",
+                CLASS.getDescriptor());
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(Type.getMethodDescriptor(returnType));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_FUNCTION.getInternalName(),
+                "rtype",
+                STRING.getDescriptor());
         endConstructor();
     }
 

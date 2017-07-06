@@ -10,11 +10,14 @@ import org.python.expose.ExposedType;
 @ExposedType(name = "builtin_function_or_method", isBaseType = false)
 public abstract class PyBuiltinCallable extends PyObject {
 
-    protected Info info;
+    public Info info;
 
     protected String doc;
 
-    protected boolean isStatic;
+    public boolean isStatic;
+
+    public Class<?> klazz;
+    public String rtype;
 
     protected PyBuiltinCallable(PyType type, Info info) {
         super(type);

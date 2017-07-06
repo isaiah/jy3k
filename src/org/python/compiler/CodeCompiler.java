@@ -1435,11 +1435,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         }
 
-//        if (node.getInternalFunc() instanceof Attribute
-//                && keys.isEmpty() && !stararg && kwargs.isEmpty()) {
-//            return invokeNoKeywords((Attribute) node.getInternalFunc(), values);
-//        }
-
         visit(node.getInternalFunc());
 
         if (stararg || !kwargs.isEmpty()) {
@@ -1457,11 +1452,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.invokevirtual(p(PyObject.class), "__call__",
                     sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
         } else {
-            loadThreadState();
+            if (values.size() != 0)
+                loadThreadState();
             switch (values.size()) {
                 case 0:
-                    code.invokevirtual(p(PyObject.class), "__call__",
-                            sig(PyObject.class, ThreadState.class));
+                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//                    code.invokevirtual(p(PyObject.class), "__call__",
+//                            sig(PyObject.class, ThreadState.class));
                     break;
                 case 1:
                     expr arg = values.get(0);

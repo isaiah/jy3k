@@ -4,13 +4,11 @@ import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.DynamicLinker;
 import jdk.dynalink.DynamicLinkerFactory;
 import jdk.dynalink.Operation;
-import jdk.dynalink.StandardNamespace;
 import jdk.dynalink.StandardOperation;
 import jdk.dynalink.linker.GuardingDynamicLinker;
 import jdk.dynalink.support.SimpleRelinkableCallSite;
 import org.objectweb.asm.MethodVisitor;
 import org.python.compiler.Code;
-import org.python.compiler.CodeCompiler;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandle;

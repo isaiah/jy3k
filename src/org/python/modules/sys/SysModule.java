@@ -27,8 +27,8 @@ public class SysModule {
         dict.__setitem__("float_info", new FloatInfo());
     }
 
-    @ExposedFunction(names = "exc_info", doc = BuiltinDocs.sys_exc_info_doc)
-    public static PyObject sys_exc_info() {
+    @ExposedFunction(doc = BuiltinDocs.sys_exc_info_doc)
+    public static PyObject exc_info() {
         PyException exc = Py.getThreadState().exceptions.peek();
         if (exc == null) {
             return new PyTuple(Py.None, Py.None, Py.None);
