@@ -65,7 +65,7 @@ public class PyCoroutine extends PyGenerator {
     }
 
     @ExposedMethod(doc = BuiltinDocs.coroutine_close_doc)
-    final PyObject coroutine_close() {
+    public final PyObject coroutine_close() {
         return generator_close();
     }
 

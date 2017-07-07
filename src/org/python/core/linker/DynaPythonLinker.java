@@ -10,6 +10,7 @@ import jdk.dynalink.linker.GuardingDynamicLinker;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFloat;
@@ -35,6 +36,8 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
     static final MethodHandle W_UNICODE = MH.findStatic(LOOKUP, Py.class, "newUnicode", MethodType.methodType(PyUnicode.class, String.class));
     static final MethodHandle W_DOUBLE = MH.findStatic(LOOKUP, Py.class, "newFloat", MethodType.methodType(PyFloat.class, double.class));
     static final MethodHandle W_FLOAT = MH.findStatic(LOOKUP, Py.class, "newFloat", MethodType.methodType(PyFloat.class, float.class));
+    static final MethodHandle W_BOOLEAN = MH.findStatic(LOOKUP, Py.class, "newBoolean", MethodType.methodType(PyBoolean.class, boolean.class));
+    static final MethodHandle W_VOID = MethodHandles.constant(PyObject.class, Py.None);
 
     @Override
     public GuardedInvocation getGuardedInvocation(LinkRequest linkRequest, LinkerServices linkerServices) throws Exception {
@@ -68,11 +71,12 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                 break;
             case CALL:
                 if (self instanceof PyBuiltinMethod) {
+                    String funcname = ((PyBuiltinMethod) self).methodName;
+                    Class<?> klazz = ((PyBuiltinMethod) self).klazz;
+                    String descriptor = ((PyBuiltinMethod) self).methodDescriptor;
+                    MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
+                    Class<?> returnType = methodType.returnType();
                     if (((PyBuiltinMethod) self).isStatic) {
-                        String funcname = ((PyBuiltinCallable) self).info.getName();
-                        Class<?> klazz = ((PyBuiltinMethod) self).klazz;
-                        String descriptor = ((PyBuiltinMethod) self).methodDescriptor;
-                        MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
                         mh = LOOKUP.findStatic(klazz, funcname, methodType);
                         if (methodType.parameterCount() > 0) {
                             int i = 0;
@@ -81,9 +85,8 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                                 mh = MethodHandles.insertArguments(mh, i, getDefaultValue(defaults[i++], paramType));
                             }
                         }
-                        /** Drop self for static method */
+                        /** Drop receiver for static method */
                         mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
-                        Class<?> returnType = methodType.returnType();
                         if (returnType == int.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
                         } else if (returnType == long.class) {
@@ -95,11 +98,42 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
                         } else if (returnType == float.class) {
                             mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
                         }
-//                    } else {
-//                        PyObject realSelf = ((PyBuiltinCallable) self).getSelf();
-//                        mh = LOOKUP.findVirtual(realSelf.getClass(), name, MethodType.methodType(PyObject.class));
-                        break;
+                    } else {
+                        PyObject realSelf = ((PyBuiltinCallable) self).getSelf();
+                        mh = LOOKUP.findVirtual(klazz, funcname, methodType);
+                        if (methodType.parameterCount() > 0) {
+                            String defaultVals = ((PyBuiltinMethod) self).defaultVals;
+                            if (defaultVals.equals("")) {
+                                if (descriptor.equals("([Lorg/python/core/PyObject;[Ljava/lang/String;)V")) {
+                                    mh = MethodHandles.insertArguments(mh, 1, Py.EmptyObjects, Py.NoKeywords);
+                                }
+                            } else {
+                                int i = 1;
+                                String[] defaults = defaultVals.split(",");
+                                for (Class<?> paramType : methodType.parameterArray()) {
+                                    mh = MethodHandles.insertArguments(mh, i, getDefaultValue(defaults[i++], paramType));
+                                }
+                            }
+                        }
+                        mh = MethodHandles.insertArguments(mh, 0, realSelf);
+                        mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
+                        if (returnType == int.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
+                        } else if (returnType == long.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_LONG);
+                        } else if (returnType == String.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_UNICODE);
+                        } else if (returnType == double.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_DOUBLE);
+                        } else if (returnType == float.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
+                        } else if (returnType == boolean.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_BOOLEAN);
+                        } else if (returnType == void.class) {
+                            mh = MethodHandles.filterReturnValue(mh, W_VOID);
+                        }
                     }
+                    break;
                 }
                 mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class));
                 break;
@@ -111,7 +145,7 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
         return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
     }
 
-    private Object getDefaultValue(String def, Class<?> arg) {
+    private static Object getDefaultValue(String def, Class<?> arg) {
         if (def == "null") {
             return Py.None;
         } else if (arg == int.class) {
@@ -124,6 +158,8 @@ public class DynaPythonLinker implements GuardingDynamicLinker {
             return Double.valueOf(def);
         } else if (arg == float.class) {
             return Float.valueOf(def);
+        } else if (arg == PyUnicode.class || arg == PyObject.class) {
+            return new PyUnicode(def);
         }
         return def;
     }

@@ -120,6 +120,35 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_FUNCTION.getInternalName(),
                 "isStatic",
                 BOOLEAN.getDescriptor());
+
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(onType);
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_FUNCTION.getInternalName(),
+                "klazz",
+                CLASS.getDescriptor());
+        /** Set original method signature */
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(Type.getMethodDescriptor(returnType, args));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_FUNCTION.getInternalName(),
+                "methodDescriptor",
+                STRING.getDescriptor());
+        /** Set default values */
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(String.join(",", defaults));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "defaultVals",
+                STRING.getDescriptor());
+
+        /** Set the original method name */
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(methodName);
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "methodName",
+                STRING.getDescriptor());
         endConstructor();
     }
 
@@ -146,6 +175,7 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_FUNCTION.getInternalName(),
                 "isStatic",
                 BOOLEAN.getDescriptor());
+
         mv.visitVarInsn(ALOAD, 0);
         mv.visitLdcInsn(onType);
         mv.visitFieldInsn(PUTFIELD,
@@ -165,6 +195,14 @@ public abstract class MethodExposer extends Exposer {
         mv.visitFieldInsn(PUTFIELD,
                 BUILTIN_METHOD.getInternalName(),
                 "defaultVals",
+                STRING.getDescriptor());
+
+        /** Set the original method name */
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(methodName);
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "methodName",
                 STRING.getDescriptor());
         endConstructor();
     }

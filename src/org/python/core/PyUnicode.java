@@ -986,7 +986,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.str___rmul___doc)
-    final PyObject str___rmul__(PyObject o) {
+    public final PyObject str___rmul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -999,7 +999,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.str___add___doc)
-    final PyObject str___add__(PyObject other) {
+    public final PyObject str___add__(PyObject other) {
         PyUnicode otherUnicode;
         if (other instanceof PyUnicode) {
             otherUnicode = (PyUnicode)other;
@@ -1012,17 +1012,17 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_lower_doc)
-    final PyObject str_lower() {
+    public final PyObject str_lower() {
         return new PyUnicode(getString().toLowerCase());
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_upper_doc)
-    final PyObject str_upper() {
+    public final PyObject str_upper() {
         return new PyUnicode(getString().toUpperCase());
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_title_doc)
-    final PyObject str_title() {
+    public final PyObject str_title() {
         if (isBasicPlane()) {
             return new PyUnicode(Encoding.title(getString()));
         }
@@ -1047,7 +1047,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_swapcase_doc)
-    final PyObject str_swapcase() {
+    public final PyObject str_swapcase() {
         if (isBasicPlane()) {
             return new PyUnicode(Encoding.swapcase(getString()));
         }
@@ -1144,7 +1144,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_strip_doc)
-    final PyObject str_strip(PyObject sepObj) {
+    public final PyObject str_strip(PyObject sepObj) {
 
         PyUnicode sep = coerceStripSepToUnicode(sepObj);
 
@@ -1165,7 +1165,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_lstrip_doc)
-    final PyObject str_lstrip(PyObject sepObj) {
+    public final PyObject str_lstrip(PyObject sepObj) {
 
         PyUnicode sep = coerceStripSepToUnicode(sepObj);
 
@@ -1185,7 +1185,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_rstrip_doc)
-    final PyObject str_rstrip(PyObject sepObj) {
+    public final PyObject str_rstrip(PyObject sepObj) {
 
         PyUnicode sep = coerceStripSepToUnicode(sepObj);
 
@@ -1210,7 +1210,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_partition_doc)
-    final PyTuple str_partition(PyObject sepObj) {
+    public final PyTuple str_partition(PyObject sepObj) {
         PyUnicode strObj = this;
         String str = strObj.getString();
 
@@ -1480,7 +1480,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_rpartition_doc)
-    final PyTuple str_rpartition(PyObject sep) {
+    public final PyTuple str_rpartition(PyObject sep) {
         return unicodeRpartition(coerceToUnicode(sep));
     }
 
@@ -1507,7 +1507,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "-1"}, doc = BuiltinDocs.str_split_doc)
-    final PyList str_split(PyObject sepObj, int maxsplit) {
+    public final PyList str_split(PyObject sepObj, int maxsplit) {
         PyUnicode sep = coerceToUnicodeOrNull(sepObj);
         Collection<CharSequence> list;
         if (sep != null) {
@@ -1519,7 +1519,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "-1"}, doc = BuiltinDocs.str_rsplit_doc)
-    final PyList str_rsplit(PyObject sepObj, int maxsplit) {
+    public final PyList str_rsplit(PyObject sepObj, int maxsplit) {
         PyUnicode sep = coerceToUnicodeOrNull(sepObj);
         Collection<CharSequence> list;
         if (sep != null) {
@@ -1531,7 +1531,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_splitlines_doc)
-    final PyList str_splitlines(PyObject[] args, String[] keywords) {
+    public final PyList str_splitlines(PyObject[] args, String[] keywords) {
         ArgParser arg = new ArgParser("splitlines", args, keywords, "keepends");
         boolean keepends = arg.getPyObject(0, Py.False).__bool__();
         if (isBasicPlane()) {
@@ -1592,13 +1592,13 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_find_doc)
-    final int str_find(PyObject subObj, PyObject start, PyObject end) {
+    public final int str_find(PyObject subObj, PyObject start, PyObject end) {
         int found = Encoding._find(getString(), coerceToUnicode(subObj).getString(), start, end, __len__());
         return found < 0 ? -1 : translator.codePointIndex(found);
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_rfind_doc)
-    final int str_rfind(PyObject subObj, PyObject start, PyObject end) {
+    public final int str_rfind(PyObject subObj, PyObject start, PyObject end) {
         int found = Encoding._rfind(getString(), coerceToUnicode(subObj).getString(), start, end, __len__());
         return found < 0 ? -1 : translator.codePointIndex(found);
     }
@@ -1622,7 +1622,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_ljust_doc)
-    final PyObject str_ljust(int width, String padding) {
+    public final PyObject str_ljust(int width, String padding) {
         int n = width - getCodePointCount();
         if (n <= 0) {
             return new PyUnicode(getString());
@@ -1632,7 +1632,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_rjust_doc)
-    final PyObject str_rjust(int width, String padding) {
+    public final PyObject str_rjust(int width, String padding) {
         int n = width - getCodePointCount();
         if (n <= 0) {
             return new PyUnicode(getString());
@@ -1642,7 +1642,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.str_center_doc)
-    final PyObject str_center(int width, String padding) {
+    public final PyObject str_center(int width, String padding) {
         int n = width - getCodePointCount();
         if (n <= 0) {
             return new PyUnicode(getString());
@@ -1656,7 +1656,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_zfill_doc)
-    final PyObject str_zfill(int width) {
+    public final PyObject str_zfill(int width) {
         int n = getCodePointCount();
         if (n >= width) {
             return new PyUnicode(getString());
@@ -1695,12 +1695,12 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "8", doc = BuiltinDocs.str_expandtabs_doc)
-    final PyObject str_expandtabs(int tabsize) {
+    public final PyObject str_expandtabs(int tabsize) {
         return new PyUnicode(Encoding.expandtabs(getString(), tabsize));
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_capitalize_doc)
-    final PyObject str_capitalize() {
+    public final PyObject str_capitalize() {
         if (getString().length() == 0) {
             return this;
         }
@@ -1721,7 +1721,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.str_replace_doc)
-    final PyObject str_replace(PyObject oldPieceObj, PyObject newPieceObj, int count) {
+    public final PyObject str_replace(PyObject oldPieceObj, PyObject newPieceObj, int count) {
 
         // Convert other argument types to PyUnicode (or error)
         PyUnicode newPiece = coerceToUnicode(newPieceObj);
@@ -1773,7 +1773,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_join_doc)
-    final PyUnicode str_join(PyObject seq) {
+    public final PyUnicode str_join(PyObject seq) {
         return unicodeJoin(seq);
     }
 
@@ -1796,7 +1796,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_startswith_doc)
-    final boolean str_startswith(PyObject prefix, PyObject start, PyObject end) {
+    public final boolean str_startswith(PyObject prefix, PyObject start, PyObject end) {
         if (prefix instanceof PyTuple) {
             for (PyObject prefixObj : ((PyTuple) prefix).getArray()) {
                 if (!(prefixObj instanceof PyUnicode)) {
@@ -1812,7 +1812,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_endswith_doc)
-    final boolean str_endswith(PyObject suffix, PyObject start, PyObject end) {
+    public final boolean str_endswith(PyObject suffix, PyObject start, PyObject end) {
         if (!(suffix instanceof PyUnicode) && !(suffix instanceof PyTuple)) {
             throw Py.TypeError(String.format("endswith first arg must be str or a tuple of str, not %s",
                     suffix.getType().fastGetName()));
@@ -1821,7 +1821,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_translate_doc)
-    final PyObject str_translate(PyObject table) {
+    public final PyObject str_translate(PyObject table) {
         return _codecs.translateCharmap(this, "ignore", table);
     }
 
@@ -1861,7 +1861,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_islower_doc)
-    final boolean str_islower() {
+    public final boolean str_islower() {
         if (isBasicPlane()) {
             return Encoding.isLowercase(getString().trim());
         }
@@ -1869,7 +1869,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isupper_doc)
-    final boolean str_isupper() {
+    public final boolean str_isupper() {
         if (isBasicPlane()) {
             return Encoding.isUppercase(getString().trim());
         }
@@ -1877,7 +1877,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isidentifier_doc)
-    final boolean str_isidentifier() {
+    public final boolean str_isidentifier() {
         if (getCodePointCount() == 0) {
             return false;
         }
@@ -1895,7 +1895,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isalpha_doc)
-    final boolean str_isalpha() {
+    public final boolean str_isalpha() {
         if (isBasicPlane()) {
             return Encoding.isAlpha(getString());
         }
@@ -1903,7 +1903,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isalnum_doc)
-    final boolean str_isalnum() {
+    public final boolean str_isalnum() {
         if (isBasicPlane()) {
             return Encoding.isAlnum(getString());
         }
@@ -1912,7 +1912,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isdecimal_doc)
-    final boolean str_isdecimal() {
+    public final boolean str_isdecimal() {
         if (isBasicPlane()) {
             return Encoding.isDecimal(getString());
         }
@@ -1920,7 +1920,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isdigit_doc)
-    final boolean str_isdigit() {
+    public final boolean str_isdigit() {
         if (isBasicPlane()) {
             return Encoding.isDigit(getString());
         }
@@ -1928,7 +1928,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isnumeric_doc)
-    final boolean str_isnumeric() {
+    public final boolean str_isnumeric() {
         if (isBasicPlane()) {
             return Encoding.isNumeric(getString());
         }
@@ -1940,7 +1940,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_istitle_doc)
-    final boolean str_istitle() {
+    public final boolean str_istitle() {
         if (isBasicPlane()) {
             return Encoding.isTitle(getString());
         }
@@ -1971,7 +1971,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isspace_doc)
-    final boolean str_isspace() {
+    public final boolean str_isspace() {
         if (isBasicPlane()) {
             return Encoding.isSpace(getString());
         }
@@ -2007,7 +2007,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_encode_doc)
-    final PyBytes str_encode(PyObject[] args, String[] keywords) {
+    public final PyBytes str_encode(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("encode", args, keywords, "encoding", "errors");
         String encoding = ap.getString(0, "UTF-8");
         String errors = ap.getString(1, null);
@@ -2015,7 +2015,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str___getnewargs___doc)
-    final PyTuple str___getnewargs__() {
+    public final PyTuple str___getnewargs__() {
         return new PyTuple(new PyUnicode(this.getString()));
     }
 
@@ -2025,7 +2025,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.str___format___doc)
-    final PyObject str___format__(PyObject formatSpec) {
+    public final PyObject str___format__(PyObject formatSpec) {
         return Encoding.format(getString(), formatSpec, false);
     }
 
@@ -2043,7 +2043,7 @@ public class PyUnicode extends PySequence implements Iterable {
 */
 
     @ExposedMethod(doc = BuiltinDocs.str_format_doc)
-    final PyObject str_format(PyObject[] args, String[] keywords) {
+    public final PyObject str_format(PyObject[] args, String[] keywords) {
         try {
             return new PyUnicode(buildFormattedString(args, keywords, null, null));
         } catch (IllegalArgumentException e) {

@@ -52,10 +52,8 @@ public class InstanceMethodExposer extends MethodExposer {
         if ((access & ACC_STATIC) != 0) {
             throwInvalid("@ExposedMethod can't be applied to static methods");
         }
-        if (isWide(args)) {
-            if (defaults.length > 0) {
-                throwInvalid("Can't have defaults on a method that takes PyObject[], String[]");
-            }
+        if (isWide(args) && defaults.length > 0) {
+            throwInvalid("Can't have defaults on a method that takes PyObject[], String[]");
         }
         this.type = type;
     }

@@ -199,7 +199,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___delitem___doc)
-    final void stringmap___delitem__(PyObject key) {
+    public final void stringmap___delitem__(PyObject key) {
         if (key instanceof PyUnicode) {
             __delitem__(((PyUnicode)key).internedString());
         } else {
@@ -211,17 +211,17 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_items_doc)
-    final PyObject stringmap_items() {
+    public final PyObject stringmap_items() {
         return new ItemsIter(table.entrySet());
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_keys_doc)
-    final PyObject stringmap_keys() {
+    public final PyObject stringmap_keys() {
         return new KeysIter(table.keySet());
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_values_doc)
-    final PyObject stringmap_values() {
+    public final PyObject stringmap_values() {
         return new ValuesIter(table.values());
     }
 
@@ -233,7 +233,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_clear_doc)
-    final void stringmap_clear() {
+    public final void stringmap_clear() {
         table.clear();
     }
 
@@ -243,7 +243,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(names = {"__repr__", "__str__"}, doc = BuiltinDocs.dict___str___doc)
-    final String stringmap_toString() {
+    public final String stringmap_toString() {
         ThreadState ts = Py.getThreadState();
         if (!ts.enterRepr(this)) {
             return "{...}";

@@ -59,27 +59,27 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___or___doc)
-    final PyObject set___or__(PyObject o) {
+    public final PyObject set___or__(PyObject o) {
         return baseset___or__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___xor___doc)
-    final PyObject set___xor__(PyObject o) {
+    public final PyObject set___xor__(PyObject o) {
         return baseset___xor__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___sub___doc)
-    final PyObject set___sub__(PyObject o) {
+    public final PyObject set___sub__(PyObject o) {
         return baseset___sub__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___and___doc)
-    final PyObject set___and__(PyObject o) {
+    public final PyObject set___and__(PyObject o) {
         return baseset___and__(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
-    final PyObject set___iter__() {
+    public final PyObject set___iter__() {
         return baseset___iter__();
     }
 
