@@ -14,12 +14,12 @@ public class PyFastSequenceIter extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(PyFastSequenceIter.class);
 
     private PySequence seq;
-
-    private int index;
+    public int index;
 
     public PyFastSequenceIter(PySequence seq) {
         super(TYPE);
         this.seq = seq;
+        index = 0;
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_iterator___next___doc)
@@ -39,7 +39,6 @@ public class PyFastSequenceIter extends PyIterator {
         }
 
         PyObject result = seq.seq___finditem__(index++);
-
         if (result == null) {
             seq = null;
         }

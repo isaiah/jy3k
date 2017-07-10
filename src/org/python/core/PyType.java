@@ -125,7 +125,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedNew
-    static final PyObject type___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    public static final PyObject type___new__(PyNewWrapper new_, boolean init, PyType subtype,
                                         PyObject[] args, String[] keywords) {
         // Special case: type(x) should return x.getType()
         if (args.length == 1 && keywords.length == 0) {
@@ -935,8 +935,8 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.type_mro_doc)
-    final PyList type_mro(PyObject o) {
-        if (o == null) {
+    public final PyList type_mro(PyObject o) {
+        if (o == Py.None || o == null) {
             return new PyList(computeMro());
         }
         return new PyList(((PyType)o).computeMro());
@@ -1422,7 +1422,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___getattribute___doc)
-    final PyObject type___getattribute__(PyObject name) {
+    public final PyObject type___getattribute__(PyObject name) {
         String n = asName(name);
         PyObject ret = type___findattr_ex__(n);
         if (ret == null) {
@@ -1659,7 +1659,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___call___doc)
-    final PyObject type___call__(PyObject[] args, String[] keywords) {
+    public final PyObject type___call__(PyObject[] args, String[] keywords) {
         PyObject new_ = lookup("__new__");
         if (!instantiable || new_ == null) {
             throw Py.TypeError(String.format("cannot create '%.100s' instances", name));

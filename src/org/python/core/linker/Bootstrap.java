@@ -28,7 +28,8 @@ import static org.python.util.CodegenUtils.sig;
  */
 public class Bootstrap {
     public static final Call BOOTSTRAP = staticCallNoLookup(Bootstrap.class, "bootstrap", CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, int.class);
-    private static final GuardingDynamicLinker pythonLinker = new DynaPythonLinker();
+    private static final GuardingDynamicLinker DYNA_PYTHON_LINKER = new DynaPythonLinker();
+    private static final GuardingDynamicLinker PYOBJ_LINKER = new PyObjectLinker();
 
     private static final DynamicLinker dynamicLinker = createDynamicLinker();
 
@@ -62,7 +63,7 @@ public class Bootstrap {
 
     private static DynamicLinker createDynamicLinker() {
          final DynamicLinkerFactory factory = new DynamicLinkerFactory();
-         factory.setPrioritizedLinker(pythonLinker);
+         factory.setPrioritizedLinkers(DYNA_PYTHON_LINKER, PYOBJ_LINKER);
          return factory.createLinker();
      }
 

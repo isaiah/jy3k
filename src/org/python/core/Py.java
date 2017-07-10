@@ -1405,7 +1405,7 @@ public final class Py {
             displayException(exc.type, exc.value, exc.traceback, file);
         }
 
-        ts.exceptions.pop();
+//        ts.exceptions.pop();
     }
 
     // PyErr_Display
@@ -2559,22 +2559,23 @@ public final class Py {
                 expandBases.add(base);
             } else {
                 PyObject iter = Py.iter(base, name + "argument after * must be a sequence");
-                for (PyObject cur = iter.__next__(); cur != null; ) {
-                    if (cur instanceof PySequence) {
-                        PyObject baseIter = cur.__iter__();
-                        for (cur = baseIter.__next__(); cur != null; ) {
-                            expandBases.add(cur);
-                            cur = baseIter.__next__();
+                PyObject cur;
+                for (;;) {
+                    try {
+                        cur = iter.__next__();
+                        if (cur == null) break;
+                    } catch (PyException e) {
+                        if (e.match(Py.StopIteration)) {
+                            break;
                         }
-                    } else {
-                        expandBases.add(cur);
+                        throw e;
                     }
-                    cur = iter.__next__();
+                    expandBases.add(cur);
                 }
             }
         }
 
-        bases =new PyObject[expandBases.size()];
+        bases = new PyObject[expandBases.size()];
         expandBases.toArray(bases);
         return bases;
     }

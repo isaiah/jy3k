@@ -63,6 +63,7 @@ org/python/core/PySuper.class
 org/python/core/PyTableCode.class
 org/python/core/PyTraceback.class
 org/python/core/PyTuple.class
+org/python/core/PyTupleIterator.class
 org/python/core/PyType.class
 org/python/core/PyUnicode.class
 org/python/core/PyRange.class

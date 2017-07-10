@@ -407,6 +407,7 @@ public class jython {
                     interp.interact(null, null);
                 }
             } catch (Throwable t) {
+                t.printStackTrace(System.err);
                 Py.printException(t);
             }
         }
