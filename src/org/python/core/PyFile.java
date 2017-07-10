@@ -162,7 +162,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
 
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.TextIOBase___init___doc)
-    final void file___init__(PyObject[] args, String[] kwds) {
+    public final void file___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("file", args, kwds, new String[] {"name", "mode", "buffering"},
                                      1);
         PyObject name = ap.getPyObject(0);
@@ -345,12 +345,12 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod
-    final synchronized PyUnicode file_read1(int size) {
+    public final synchronized PyUnicode file_read1(int size) {
         return file_read(size);
     }
 
     @ExposedMethod(defaults = {"-1"}, doc = BuiltinDocs.TextIOBase_read_doc)
-    final synchronized PyUnicode file_read(int size) {
+    public final synchronized PyUnicode file_read(int size) {
         checkClosed();
         return new PyUnicode(file.read(size));
     }
@@ -376,7 +376,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
 //    }
 
     @ExposedMethod(defaults = {"-1"}, doc = BuiltinDocs.TextIOBase_readline_doc)
-    final synchronized PyUnicode file_readline(int max) {
+    public final synchronized PyUnicode file_readline(int max) {
         checkClosed();
         return new PyUnicode(file.readline(max));
     }
@@ -390,7 +390,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.TextIOBase_readlines_doc)
-    final synchronized PyObject file_readlines(int sizehint) {
+    public final synchronized PyObject file_readlines(int sizehint) {
         checkClosed();
         PyList list = new PyList();
         int count = 0;
@@ -421,7 +421,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase___next___doc)
-    final PyObject file___next__() {
+    public final PyObject file___next__() {
         checkClosed();
         String next = file.readline(-1);
         if (next.length() == 0) {
@@ -432,7 +432,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
 
     @ExposedMethod(names = {"__enter__", "__iter__", "xreadlines"},
                    doc = BuiltinDocs.TextIOBase___iter___doc)
-    final PyObject file_self() {
+    public final PyObject file_self() {
         checkClosed();
         return this;
     }
@@ -455,7 +455,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_readable_doc)
-    final PyObject file_readable() {
+    public final PyObject file_readable() {
         return Py.newBoolean(reading || universal);
     }
 
@@ -464,12 +464,12 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_writable_doc)
-    final PyObject file_writable() {
+    public final PyObject file_writable() {
         return Py.newBoolean(writing || appending || universal);
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_write_doc)
-    final void file_write(PyObject obj) {
+    public final void file_write(PyObject obj) {
         file_write(asWritable(obj, null));
     }
 
@@ -484,7 +484,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_writelines_doc)
-    final synchronized void file_writelines(PyObject lines) {
+    public final synchronized void file_writelines(PyObject lines) {
         checkClosed();
         PyObject iter = Py.iter(lines, "writelines() requires an iterable argument");
         for (PyObject item = null; (item = iter.__next__()) != null;) {
@@ -536,7 +536,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_tell_doc)
-    final synchronized long file_tell() {
+    public final synchronized long file_tell() {
         checkClosed();
         return file.tell();
     }
@@ -550,12 +550,12 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_seekable_doc)
-    final PyObject file_seekable() {
+    public final PyObject file_seekable() {
         return Py.True;
     }
 
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.TextIOBase_seek_doc)
-    final synchronized void file_seek(long pos, int how) {
+    public final synchronized void file_seek(long pos, int how) {
         checkClosed();
         file.seek(pos, how);
     }
@@ -569,7 +569,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_flush_doc)
-    final synchronized void file_flush() {
+    public final synchronized void file_flush() {
         checkClosed();
         file.flush();
     }
@@ -579,7 +579,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_close_doc)
-    final synchronized void file_close() {
+    public final synchronized void file_close() {
         if (closer != null) {
             closer.close();
             closer = null;
@@ -593,7 +593,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase___exit___doc)
-    final void file___exit__(PyObject type, PyObject value, PyObject traceback) {
+    public final void file___exit__(PyObject type, PyObject value, PyObject traceback) {
         close();
     }
 
@@ -602,7 +602,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.TextIOBase_truncate_doc)
-    final void file_truncate(PyObject position) {
+    public final void file_truncate(PyObject position) {
         if (position == null) {
             file_truncate();
             return;
@@ -631,7 +631,7 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_isatty_doc)
-    final boolean file_isatty() {
+    public final boolean file_isatty() {
         return file.isatty();
     }
 
@@ -640,12 +640,12 @@ public class PyFile extends PyObject implements FinalizableBuiltin, Traverseproc
     }
 
     @ExposedMethod(doc = BuiltinDocs.TextIOBase_fileno_doc)
-    final PyObject file_fileno() {
+    public final PyObject file_fileno() {
         return PyJavaType.wrapJavaObject(file.fileno());
     }
 
     @ExposedMethod(names = {"__str__", "__repr__"}, doc = BuiltinDocs.TextIOBase___str___doc)
-    final String file_toString() {
+    public final String file_toString() {
         String state = file.closed() ? "closed" : "open";
         String id = Py.idstr(this);
         String escapedName;

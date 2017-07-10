@@ -376,7 +376,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.frame_clear_doc)
-    final PyObject frame_clear() {
+    public final PyObject frame_clear() {
         f_locals = null;
         // XXX clean associated generator?
         return Py.None;

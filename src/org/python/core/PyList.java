@@ -616,7 +616,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_reverse_doc)
-    final synchronized void list_reverse() {
+    public final synchronized void list_reverse() {
         Collections.reverse(list);
         gListAllocatedStatus = list.size();
     }
@@ -923,7 +923,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_clear_doc)
-    final PyObject list_clear() {
+    public final PyObject list_clear() {
         clear();
         return Py.None;
     }

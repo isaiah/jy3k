@@ -56,7 +56,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedMethod(doc = BuiltinDocs.generator_send_doc)
-    final PyObject generator_send(PyObject value) {
+    public final PyObject generator_send(PyObject value) {
         if (gi_frame == null) {
             if (this instanceof PyAsyncGenerator) {
                 throw Py.StopAsyncIteration();
@@ -75,7 +75,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedMethod(names="throw", defaults={"null", "null"}, doc = BuiltinDocs.generator_throw_doc)
-    final PyObject generator_throw$(PyObject type, PyObject value, PyObject tb) {
+    public final PyObject generator_throw$(PyObject type, PyObject value, PyObject tb) {
         if (tb == Py.None) {
             tb = null;
         } else if (tb != null && !(tb instanceof PyTraceback)) {
@@ -142,7 +142,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedMethod(doc = BuiltinDocs.generator_close_doc)
-    final PyObject generator_close() {
+    public final PyObject generator_close() {
         PyException pye = null;
         PyObject retval;
         if (gi_frame == null) {
@@ -185,7 +185,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedMethod(doc = BuiltinDocs.generator___next___doc)
-    final PyObject generator___next__() {
+    public final PyObject generator___next__() {
         return gen_send_ex(Py.getThreadState(), Py.None);
     }
 
@@ -195,7 +195,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedMethod(doc = BuiltinDocs.generator___iter___doc)
-    final PyObject generator___iter__() {
+    public final PyObject generator___iter__() {
         return this;
     }
 
@@ -254,17 +254,17 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     @ExposedGet(name = "__name__")
-    final String getName() {
+    public final String getName() {
         return gi_code.co_name;
     }
 
     @ExposedGet(name = "__qualname__")
-    final String getQualname() {
+    public final String getQualname() {
         return gi_code.co_name;
     }
 
     @ExposedGet(name = "gi_yieldfrom")
-    final PyObject getgi_yieldfrom() {
+    public final PyObject getgi_yieldfrom() {
         return gi_frame.f_yieldfrom;
     }
 

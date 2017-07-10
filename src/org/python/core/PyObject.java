@@ -146,7 +146,7 @@ public class PyObject implements Serializable {
     protected final void finalize() throws Throwable {}
 
     @ExposedMethod(doc = BuiltinDocs.object___init___doc)
-    final void object___init__(PyObject[] args, String[] keywords) {
+    public final void object___init__(PyObject[] args, String[] keywords) {
     }
 
     @ExposedGet(name = "__class__")
@@ -234,7 +234,7 @@ public class PyObject implements Serializable {
     // occurs during regression testing.  XXX: more detail for this comment
     // is needed.
     @ExposedMethod(names = "__str__", doc = BuiltinDocs.object___str___doc)
-    final PyUnicode object__str__() {
+    public final PyUnicode object__str__() {
 //        return __repr__();
         return new PyUnicode(toString());
     }
@@ -244,7 +244,7 @@ public class PyObject implements Serializable {
     }
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.object___repr___doc)
-    final PyUnicode object___repr__() {
+    public final PyUnicode object___repr__() {
         return new PyUnicode(toString());
     }
 

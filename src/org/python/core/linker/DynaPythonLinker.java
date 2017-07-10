@@ -113,7 +113,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                                 int i = 0;
                                 String[] defaults = defaultVals.split(",");
                                 for (Class<?> paramType : methodType.parameterArray()) {
-                                    mh = MethodHandles.insertArguments(mh, i + 1, getDefaultValue(defaults[i++], paramType));
+                                    // position 1 because the next argument is always at position 1
+                                    mh = MethodHandles.insertArguments(mh, 1, getDefaultValue(defaults[i++], paramType));
                                 }
                             }
                         }
@@ -149,10 +150,10 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     }
 
     private static Object getDefaultValue(String def, Class<?> arg) {
-        if (def == "null") {
+        if (def.equals("null")) {
             return Py.None;
         } else if (arg == int.class) {
-            return Integer.valueOf(def);
+            return Integer.valueOf(def).intValue();
         } else if (arg == long.class) {
             return Long.valueOf(def);
         } else if (arg == String.class) {
@@ -163,6 +164,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
             return Float.valueOf(def);
         } else if (arg == PyUnicode.class || arg == PyObject.class) {
             return new PyUnicode(def);
+        } else if (arg == boolean.class) {
+            return Boolean.valueOf(def);
         }
         return def;
     }

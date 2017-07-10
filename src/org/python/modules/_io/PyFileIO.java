@@ -198,7 +198,7 @@ public class PyFileIO extends PyRawIOBase {
      * Create a {@link PyFileIO} and its <code>FileIO</code> delegate from the arguments.
      */
     @ExposedNew
-    static PyObject FileIO___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    public static PyObject FileIO___new__(PyNewWrapper new_, boolean init, PyType subtype,
             PyObject[] args, String[] keywords) {
 
         ArgParser ap = new ArgParser("FileIO", args, keywords, openArgs, 1);
@@ -239,7 +239,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = readinto_doc)
-    final PyLong FileIO_readinto(PyObject buf) {
+    public final PyLong FileIO_readinto(PyObject buf) {
         int count;
         if (!readable) {            // ... (or closed)
             throw tailoredValueError("read");
@@ -282,7 +282,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = write_doc)
-    final PyLong FileIO_write(PyObject buf) {
+    public final PyLong FileIO_write(PyObject buf) {
         int count;
         if (!writable) {            // ... (or closed)
             throw tailoredValueError("writ");
@@ -323,7 +323,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(defaults = "0", doc = seek_doc)
-    final long FileIO_seek(long pos, int whence) {
+    public final long FileIO_seek(long pos, int whence) {
         if (__closed) {
             throw closedValueError();
         }
@@ -345,7 +345,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(defaults = "null", doc = truncate_doc)
-    final long FileIO_truncate(PyObject size) {
+    public final long FileIO_truncate(PyObject size) {
         return (size != null) ? _truncate(size.asLong()) : _truncate();
     }
 
@@ -379,7 +379,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod
-    final synchronized void FileIO_close() {
+    public final synchronized void FileIO_close() {
         // Close this object to further input (also calls flush)
         super.close();
         // Now close downstream (if required to)
@@ -397,7 +397,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = seekable_doc)
-    final boolean FileIO_seekable() {
+    public final boolean FileIO_seekable() {
         if (__closed) {
             throw closedValueError();
         }
@@ -415,7 +415,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = readable_doc)
-    final boolean FileIO_readable() {
+    public final boolean FileIO_readable() {
         if (__closed) {
             throw closedValueError();
         }
@@ -428,7 +428,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = writable_doc)
-    final boolean FileIO_writable() {
+    public final boolean FileIO_writable() {
         if (__closed) {
             throw closedValueError();
         }
@@ -441,7 +441,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = fileno_doc)
-    final PyObject FileIO_fileno() {
+    public final PyObject FileIO_fileno() {
         return PyJavaType.wrapJavaObject(ioDelegate.fileno());
     }
 
@@ -451,7 +451,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = isatty_doc)
-    final boolean FileIO_isatty() {
+    public final boolean FileIO_isatty() {
         if (__closed) {
             throw closedValueError();
         }
@@ -466,7 +466,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(doc = "Flush write buffers.")
-    final void FileIO_flush() {
+    public final void FileIO_flush() {
         if (writable()) {
             // Check for *downstream* close. (Locally, closed means "closed to client actions".)
             ioDelegate.checkClosed();
@@ -475,7 +475,7 @@ public class PyFileIO extends PyRawIOBase {
     }
 
     @ExposedMethod(names = {"__str__", "__repr__"}, doc = BuiltinDocs.object___str___doc)
-    final String FileIO_toString() {
+    public final String FileIO_toString() {
         if (closed()) {
             return "<_io.FileIO [closed]>";
         } else {

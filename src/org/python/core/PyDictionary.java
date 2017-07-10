@@ -204,7 +204,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___setitem___doc)
-    final void dict___setitem__(PyObject key, PyObject value) {
+    public final void dict___setitem__(PyObject key, PyObject value) {
         getMap().put(key, value);
     }
 
@@ -214,7 +214,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___delitem___doc)
-    final void dict___delitem__(PyObject key) {
+    public final void dict___delitem__(PyObject key) {
         Object ret = getMap().remove(key);
         if (ret == null) {
             throw Py.KeyError(key.toString());
@@ -237,7 +237,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(names = {"__repr__", "__str__"}, doc = BuiltinDocs.dict___str___doc)
-    final String dict_toString() {
+    public final String dict_toString() {
         ThreadState ts = Py.getThreadState();
         if (!ts.enterRepr(this)) {
             return "{...}";
@@ -301,7 +301,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___contains___doc)
-    final boolean dict___contains__(PyObject o) {
+    public final boolean dict___contains__(PyObject o) {
         return getMap().containsKey(o);
     }
 
@@ -340,7 +340,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_copy_doc)
-    final PyDictionary dict_copy() {
+    public final PyDictionary dict_copy() {
         return new PyDictionary(getMap()); // no need to clone()
     }
 
@@ -352,7 +352,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_clear_doc)
-    final void dict_clear() {
+    public final void dict_clear() {
         getMap().clear();
     }
 
@@ -366,7 +366,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_update_doc)
-    final void dict_update(PyObject[] args, String[] keywords) {
+    public final void dict_update(PyObject[] args, String[] keywords) {
         updateCommon(args, keywords, "update");
     }
 
