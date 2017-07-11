@@ -192,13 +192,13 @@ public class InteractiveConsole extends InteractiveInterpreter {
      * different implementation.
      */
     public String raw_input(PyObject prompt) {
-        return BuiltinModule.raw_input(prompt).toString();
+        return BuiltinModule.raw_input1(prompt).toString();
     }
 
     /**
      * Write a prompt and read a line from a file.
      */
     public String raw_input(PyObject prompt, PyObject file) {
-        return BuiltinModule.raw_input(prompt, file).toString();
+        return BuiltinModule.raw_input2(prompt, file).toString();
     }
 }

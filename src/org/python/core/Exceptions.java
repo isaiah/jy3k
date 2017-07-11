@@ -737,7 +737,7 @@ public class Exceptions {
     }
 
     @Untraversable
-    static class BoundStaticJavaMethod extends PyBuiltinMethod {
+    public static class BoundStaticJavaMethod extends PyBuiltinMethod {
 
         /** The Java Method to be bound. Its signature must be:
          * (PyObject, PyObject[], String[])PyObject. */

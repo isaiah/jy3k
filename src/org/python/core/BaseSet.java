@@ -322,7 +322,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             other = new PySet(other);
         }
 
-        if (size() <= BuiltinModule.len(other)) {
+        if (size() <= other.__len__()) {
             little = this;
             big = other;
         } else {

@@ -1429,7 +1429,7 @@ public final class Py {
         if (tb instanceof PyTraceback) {
             stderr.print(((PyTraceback) tb).dumpStack());
         }
-        if (Py.SyntaxError != null && BuiltinModule.isinstance(value, Py.SyntaxError)) {
+        if (Py.SyntaxError != null && isInstance(value, Py.SyntaxError)) {
             PyObject filename = value.__findattr__("filename");
             PyObject text = value.__findattr__("text");
             PyObject lineno = value.__findattr__("lineno");

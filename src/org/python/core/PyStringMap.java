@@ -97,7 +97,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___len___doc)
-    final int stringmap___len__() {
+    public final int stringmap___len__() {
         return table.size();
     }
 
@@ -137,7 +137,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___getitem___doc)
-    final PyObject stringmap___getitem__(PyObject key) {
+    public final PyObject stringmap___getitem__(PyObject key) {
         if (key instanceof PyUnicode) {
             return __getitem__(((PyUnicode)key).internedString());
         } else {
@@ -156,7 +156,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___iter___doc)
-    final PyObject stringmap___iter__() {
+    public final PyObject stringmap___iter__() {
         return stringmap_keys();
     }
 
@@ -175,7 +175,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___setitem___doc)
-    final void stringmap___setitem__(PyObject key, PyObject value) {
+    public final void stringmap___setitem__(PyObject key, PyObject value) {
         if (value == null) {
             table.remove(pyToKey(key));
         } else if (key instanceof PyUnicode) {
@@ -276,7 +276,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___contains___doc)
-    final boolean stringmap___contains__(PyObject o) {
+    public final boolean stringmap___contains__(PyObject o) {
         return table.containsKey(pyToKey(o));
     }
 
@@ -293,7 +293,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_get_doc)
-    final PyObject stringmap_get(PyObject key, PyObject defaultObj) {
+    public final PyObject stringmap_get(PyObject key, PyObject defaultObj) {
         PyObject obj = __finditem__(key);
         return obj == null ? defaultObj : obj;
     }
@@ -316,7 +316,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_copy_doc)
-    final PyStringMap stringmap_copy() {
+    public final PyStringMap stringmap_copy() {
         return new PyStringMap(table);
     }
 
@@ -329,7 +329,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
      * Insert all the key:value pairs from <code>dict</code> into this mapping.
      */
     @ExposedMethod(doc = BuiltinDocs.dict_update_doc)
-    final void stringmap_update(PyObject[] args, String[] keywords) {
+    public final void stringmap_update(PyObject[] args, String[] keywords) {
         int nargs = args.length - keywords.length;
         if (nargs > 1) {
             throw PyBuiltinCallable.DefaultInfo.unexpectedCall(nargs, false, "update", 0, 1);
@@ -429,7 +429,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_setdefault_doc)
-    final PyObject stringmap_setdefault(PyObject key, PyObject failobj) {
+    public final PyObject stringmap_setdefault(PyObject key, PyObject failobj) {
         Object internedKey = (key instanceof PyUnicode) ? ((PyUnicode)key).internedString() : key;
         PyObject oldValue = table.putIfAbsent(internedKey, failobj);
         return oldValue == null ? failobj : oldValue;
@@ -443,7 +443,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_popitem_doc)
-    final PyObject stringmap_popitem() {
+    public final PyObject stringmap_popitem() {
         Iterator<Entry<Object, PyObject>> it = table.entrySet().iterator();
         if (!it.hasNext()) {
             throw Py.KeyError("popitem(): dictionary is empty");

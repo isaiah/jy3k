@@ -1,13 +1,73 @@
 package org.python.core;
 
+import org.python.bootstrap.QuadFunction;
+import org.python.bootstrap.TriFunction;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 @Untraversable
 public class PyBuiltinFunctionNarrow extends PyBuiltinFunction {
+    private Supplier<PyObject> call;
+    private Function<PyObject, PyObject> func;
+    private BiFunction<PyObject, PyObject, PyObject> biFunc;
+    private TriFunction<PyObject, PyObject, PyObject, PyObject> triFunc;
+    private QuadFunction<PyObject, PyObject, PyObject, PyObject, PyObject> quadFunction;
+    private Function<PyObject[], PyObject> varargFunc;
+    private BiFunction<PyObject[], String[], PyObject> wideFunc;
 
     protected PyBuiltinFunctionNarrow(String name, int minargs, int maxargs, String doc) {
         super(name, minargs, maxargs, doc);
     }
 
+    public static PyBuiltinFunctionNarrow named(String name, String doc) {
+        return new PyBuiltinFunctionNarrow(name, 0,0, doc);
+    }
+
+    public PyBuiltinFunctionNarrow with(Supplier<PyObject> func) {
+        updateArgs(0);
+        this.call = func;
+        return this;
+    }
+
+    public PyBuiltinFunctionNarrow with(Function<PyObject, PyObject> func) {
+        updateArgs(1);
+        this.func = func;
+        return this;
+    }
+
+    public PyBuiltinFunctionNarrow with(BiFunction<PyObject, PyObject, PyObject> func) {
+        updateArgs(2);
+        this.biFunc = func;
+        return this;
+    }
+    public PyBuiltinFunctionNarrow with(TriFunction<PyObject, PyObject, PyObject, PyObject> func) {
+        updateArgs(3);
+        this.triFunc = func;
+        return this;
+    }
+
+    public PyBuiltinFunctionNarrow with(QuadFunction<PyObject, PyObject, PyObject, PyObject, PyObject> func) {
+        updateArgs(4);
+        this.quadFunction = func;
+        return this;
+    }
+
+    public PyBuiltinFunctionNarrow vararg(Function<PyObject[], PyObject> func) {
+        this.varargFunc = func;
+        return this;
+    }
+
+    public PyBuiltinFunctionNarrow wide(BiFunction<PyObject[], String[], PyObject> func) {
+        this.wideFunc = func;
+        return this;
+    }
+
+
     public PyObject fancyCall(PyObject[] args) {
+        if (varargFunc != null) return varargFunc.apply(args);
+        if (wideFunc != null) return wideFunc.apply(Py.EmptyObjects, Py.NoKeywords);
         throw info.unexpectedCall(args.length, false);
     }
 
@@ -31,29 +91,51 @@ public class PyBuiltinFunctionNarrow extends PyBuiltinFunction {
 
     public PyObject __call__(PyObject[] args, String[] kws) {
         if (kws.length != 0) {
+            if (wideFunc != null) return wideFunc.apply(args, kws);
             throw Py.TypeError(fastGetName() + "() takes no keyword arguments");
         }
+        if (varargFunc != null) return varargFunc.apply(args);
         return __call__(args);
     }
 
 
     public PyObject __call__() {
+        if (this.call != null) return call.get();
+        if (wideFunc != null) return wideFunc.apply(Py.EmptyObjects, Py.NoKeywords);
         throw info.unexpectedCall(0, false);
     }
 
     public PyObject __call__(PyObject arg1) {
+        if (this.func != null) return func.apply(arg1);
+        if (wideFunc != null) return wideFunc.apply(new PyObject[]{arg1}, Py.NoKeywords);
         throw info.unexpectedCall(1, false);
     }
 
     public PyObject __call__(PyObject arg1, PyObject arg2) {
+        if (this.biFunc != null) return biFunc.apply(arg1, arg2);
+        if (wideFunc != null) return wideFunc.apply(new PyObject[]{arg1, arg2}, Py.NoKeywords);
         throw info.unexpectedCall(2, false);
     }
 
     public PyObject __call__(PyObject arg1, PyObject arg2, PyObject arg3) {
+        if (this.triFunc != null) return triFunc.apply(arg1, arg2, arg3);
+        if (wideFunc != null) return wideFunc.apply(new PyObject[]{arg1, arg2, arg3}, Py.NoKeywords);
         throw info.unexpectedCall(3, false);
     }
 
     public PyObject __call__(PyObject arg1, PyObject arg2, PyObject arg3, PyObject arg4) {
+        if (quadFunction != null) return quadFunction.apply(arg1, arg2, arg3, arg4);
+        if (wideFunc != null) return wideFunc.apply(new PyObject[]{arg1, arg2, arg3, arg4}, Py.NoKeywords);
         throw info.unexpectedCall(4, false);
     }
+
+    private void updateArgs(int args) {
+        if (info.getMinargs() > args) {
+            info.setMinargs(args);
+        }
+        if (info.getMaxargs() < args) {
+            info.setMaxargs(args);
+        }
+    }
+
 }

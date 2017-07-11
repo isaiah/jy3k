@@ -89,7 +89,11 @@ public abstract class PyBuiltinCallable extends PyObject {
 
         int getMaxargs();
 
+        void setMaxargs(int maxArgs);
+
         int getMinargs();
+
+        void setMinargs(int minArgs);
 
         PyException unexpectedCall(int nargs, boolean keywords);
     }
@@ -118,8 +122,18 @@ public abstract class PyBuiltinCallable extends PyObject {
             return maxargs;
         }
 
+        @Override
+        public void setMaxargs(int maxArgs) {
+            maxargs = maxArgs;
+        }
+
         public int getMinargs() {
             return minargs;
+        }
+
+        @Override
+        public void setMinargs(int minArgs) {
+            minargs = minArgs;
         }
 
         public static boolean check(int nargs, int minargs, int maxargs) {
