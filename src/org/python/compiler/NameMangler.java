@@ -2,11 +2,13 @@ package org.python.compiler;
 
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
+import org.python.antlr.base.stmt;
 
 /**
  * Mangle identifiers prefixed with leading underscores
@@ -18,12 +20,12 @@ public class NameMangler extends Visitor {
         String prefix = "_" + classDef.getInternalName();
         Visitor visitor = new Visitor() {
             @Override
-            public Object visitAttribute(Attribute node) {
+            public Object visitAttribute(Attribute node) throws Exception {
                 String name = node.getInternalAttr();
                 if (name.startsWith("__") && !name.endsWith("__")) {
                     node.setInternalAttr(prefix + name);
                 }
-                return node;
+                return super.visitAttribute(node);
             }
 
             @Override
@@ -42,6 +44,10 @@ public class NameMangler extends Visitor {
 
             @Override
             public Object visitFunctionDef(FunctionDef node) throws Exception {
+                String name = node.getInternalName();
+                if (name.startsWith("__") && !name.endsWith("__")) {
+                    node.setInternalName(prefix + name);
+                }
                 arguments args = node.getInternalArgs();
                 if (args != null) {
                     mangling(args.getInternalVararg());
