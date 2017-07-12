@@ -3,7 +3,6 @@ package org.python.util;
 
 import org.python.core.BuiltinModule;
 import org.python.core.Py;
-import org.python.core.PyBuiltinFunctionSet;
 import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
@@ -51,37 +50,8 @@ public class InteractiveConsole extends InteractiveInterpreter {
      * @param filename name with which to label this console input (e.g. in error messages).
      */
     public InteractiveConsole(PyObject locals, String filename) {
-        this(locals, filename, false);
-    }
-
-    /**
-     * Full-feature constructor for an interactive console, which will "run" when
-     * {@link #interact()} is called. This version allows the caller to replace the built-in
-     * raw_input() methods with {@link #raw_input(PyObject)} and
-     * {@link #raw_input(PyObject, PyObject)}, which may be overridden in a sub-class.
-     *
-     * @param locals dictionary to use, or if <code>null</code>, a new empty one will be created
-     * @param filename name with which to label this console input
-     * @param replaceRawInput if true, hook this class's <code>raw_input</code> into the built-ins.
-     */
-    public InteractiveConsole(PyObject locals, String filename, boolean replaceRawInput) {
         super(locals);
         this.filename = filename;
-        if (replaceRawInput) {
-            PyObject newRawInput = new PyBuiltinFunctionSet("raw_input", 0, 0, 1) {
-
-                @Override
-                public PyObject __call__() {
-                    return __call__(Py.EmptyByte);
-                }
-
-                @Override
-                public PyObject __call__(PyObject prompt) {
-                    return Py.newString(raw_input(prompt));
-                }
-            };
-            Py.getSystemState().getBuiltins().__setitem__("raw_input", newRawInput);
-        }
     }
 
     /**

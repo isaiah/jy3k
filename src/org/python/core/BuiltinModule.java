@@ -8,15 +8,8 @@ import org.python.antlr.base.mod;
 import org.python.bootstrap.Import;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.IntegerFormatter;
-import org.python.core.util.RelativeFile;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * The builtin module. All builtin functions are defined here
@@ -62,73 +55,73 @@ public class BuiltinModule {
         dict.__setitem__("__debug__", Py.One);
 
         // TODO: redo the builtin function stuff to possibly use enum
-        dict.__setitem__("abs", PyBuiltinFunctionNarrow.named( "abs", BuiltinDocs.builtins_abs_doc).with(BuiltinModule::abs));
-        dict.__setitem__("ascii", PyBuiltinFunctionNarrow.named( "ascii", BuiltinDocs.builtins_ascii_doc).with(BuiltinModule::ascii));
-        dict.__setitem__("callable", PyBuiltinFunctionNarrow.named( "callable", BuiltinDocs.builtins_callable_doc).with(BuiltinModule::callable));
-        dict.__setitem__("chr", PyBuiltinFunctionNarrow.named( "chr", BuiltinDocs.builtins_chr_doc).with(BuiltinModule::chr));
-        dict.__setitem__("globals", PyBuiltinFunctionNarrow.named( "globals", BuiltinDocs.builtins_globals_doc).with(BuiltinModule::globals));
-        dict.__setitem__("hash", PyBuiltinFunctionNarrow.named( "hash", BuiltinDocs.builtins_hash_doc).with(BuiltinModule::hash));
-        dict.__setitem__("id", PyBuiltinFunctionNarrow.named( "id", BuiltinDocs.builtins_id_doc).with(BuiltinModule::id));
-        dict.__setitem__("isinstance", PyBuiltinFunctionNarrow.named( "isinstance", BuiltinDocs.builtins_isinstance_doc).with(BuiltinModule::isinstance));
-        dict.__setitem__("len", PyBuiltinFunctionNarrow.named( "len", BuiltinDocs.builtins_len_doc).with(BuiltinModule::len));
-        dict.__setitem__("ord", PyBuiltinFunctionNarrow.named( "ord", BuiltinDocs.builtins_ord_doc).with(BuiltinModule::ord));
-        dict.__setitem__("sum", PyBuiltinFunctionNarrow.named( "sum", BuiltinDocs.builtins_sum_doc)
+        dict.__setitem__("abs", PyBuiltinFunction.named( "abs", BuiltinDocs.builtins_abs_doc).with(BuiltinModule::abs));
+        dict.__setitem__("ascii", PyBuiltinFunction.named( "ascii", BuiltinDocs.builtins_ascii_doc).with(BuiltinModule::ascii));
+        dict.__setitem__("callable", PyBuiltinFunction.named( "callable", BuiltinDocs.builtins_callable_doc).with(BuiltinModule::callable));
+        dict.__setitem__("chr", PyBuiltinFunction.named( "chr", BuiltinDocs.builtins_chr_doc).with(BuiltinModule::chr));
+        dict.__setitem__("globals", PyBuiltinFunction.named( "globals", BuiltinDocs.builtins_globals_doc).with(BuiltinModule::globals));
+        dict.__setitem__("hash", PyBuiltinFunction.named( "hash", BuiltinDocs.builtins_hash_doc).with(BuiltinModule::hash));
+        dict.__setitem__("id", PyBuiltinFunction.named( "id", BuiltinDocs.builtins_id_doc).with(BuiltinModule::id));
+        dict.__setitem__("isinstance", PyBuiltinFunction.named( "isinstance", BuiltinDocs.builtins_isinstance_doc).with(BuiltinModule::isinstance));
+        dict.__setitem__("len", PyBuiltinFunction.named( "len", BuiltinDocs.builtins_len_doc).with(BuiltinModule::len));
+        dict.__setitem__("ord", PyBuiltinFunction.named( "ord", BuiltinDocs.builtins_ord_doc).with(BuiltinModule::ord));
+        dict.__setitem__("sum", PyBuiltinFunction.named( "sum", BuiltinDocs.builtins_sum_doc)
                 .with(BuiltinModule::sum1)
                 .with(BuiltinModule::sum2));
-        dict.__setitem__("delattr", PyBuiltinFunctionNarrow.named( "delattr", BuiltinDocs.builtins_delattr_doc).with(BuiltinModule::delattr));
-        dict.__setitem__("dir", PyBuiltinFunctionNarrow.named( "dir", BuiltinDocs.builtins_dir_doc)
+        dict.__setitem__("delattr", PyBuiltinFunction.named( "delattr", BuiltinDocs.builtins_delattr_doc).with(BuiltinModule::delattr));
+        dict.__setitem__("dir", PyBuiltinFunction.named( "dir", BuiltinDocs.builtins_dir_doc)
                 .with(BuiltinModule::dir0)
                 .with(BuiltinModule::dir1));
-        dict.__setitem__("divmod", PyBuiltinFunctionNarrow.named( "divmod", BuiltinDocs.builtins_divmod_doc).with(BuiltinModule::divmod));
-        dict.__setitem__("eval", PyBuiltinFunctionNarrow.named( "eval", BuiltinDocs.builtins_eval_doc)
+        dict.__setitem__("divmod", PyBuiltinFunction.named( "divmod", BuiltinDocs.builtins_divmod_doc).with(BuiltinModule::divmod));
+        dict.__setitem__("eval", PyBuiltinFunction.named( "eval", BuiltinDocs.builtins_eval_doc)
                 .with(BuiltinModule::eval1)
                 .with(BuiltinModule::eval2)
                 .with(BuiltinModule::eval3));
-        dict.__setitem__("getattr", PyBuiltinFunctionNarrow.named( "getattr", BuiltinDocs.builtins_getattr_doc)
+        dict.__setitem__("getattr", PyBuiltinFunction.named( "getattr", BuiltinDocs.builtins_getattr_doc)
                 .with(BuiltinModule::getattr2)
                 .with(BuiltinModule::getattr3));
-        dict.__setitem__("hasattr", PyBuiltinFunctionNarrow.named( "hasattr", BuiltinDocs.builtins_hasattr_doc).with(BuiltinModule::hasattr));
-        dict.__setitem__("hex", PyBuiltinFunctionNarrow.named( "hex", BuiltinDocs.builtins_hex_doc).with(BuiltinModule::hex));
-        dict.__setitem__("issubclass", PyBuiltinFunctionNarrow.named(
+        dict.__setitem__("hasattr", PyBuiltinFunction.named( "hasattr", BuiltinDocs.builtins_hasattr_doc).with(BuiltinModule::hasattr));
+        dict.__setitem__("hex", PyBuiltinFunction.named( "hex", BuiltinDocs.builtins_hex_doc).with(BuiltinModule::hex));
+        dict.__setitem__("issubclass", PyBuiltinFunction.named(
                 "issubclass", BuiltinDocs.builtins_issubclass_doc).with(BuiltinModule::issubclass));
-        dict.__setitem__("iter", PyBuiltinFunctionNarrow.named( "iter", BuiltinDocs.builtins_iter_doc)
+        dict.__setitem__("iter", PyBuiltinFunction.named( "iter", BuiltinDocs.builtins_iter_doc)
                 .with(BuiltinModule::iter1)
                 .with(BuiltinModule::iter2));
-        dict.__setitem__("locals", PyBuiltinFunctionNarrow.named( "locals", BuiltinDocs.builtins_locals_doc).with(BuiltinModule::locals));
-        dict.__setitem__("max", PyBuiltinFunctionNarrow.named( "max", BuiltinDocs.builtins_max_doc).wide(BuiltinModule::max));
-        dict.__setitem__("min", PyBuiltinFunctionNarrow.named( "min", BuiltinDocs.builtins_min_doc).wide(BuiltinModule::min));
-        dict.__setitem__("oct", PyBuiltinFunctionNarrow.named( "oct", BuiltinDocs.builtins_oct_doc).with(BuiltinModule::oct));
-        dict.__setitem__("pow", PyBuiltinFunctionNarrow.named( "pow", BuiltinDocs.builtins_pow_doc)
+        dict.__setitem__("locals", PyBuiltinFunction.named( "locals", BuiltinDocs.builtins_locals_doc).with(BuiltinModule::locals));
+        dict.__setitem__("max", PyBuiltinFunction.named( "max", BuiltinDocs.builtins_max_doc).wide(BuiltinModule::max));
+        dict.__setitem__("min", PyBuiltinFunction.named( "min", BuiltinDocs.builtins_min_doc).wide(BuiltinModule::min));
+        dict.__setitem__("oct", PyBuiltinFunction.named( "oct", BuiltinDocs.builtins_oct_doc).with(BuiltinModule::oct));
+        dict.__setitem__("pow", PyBuiltinFunction.named( "pow", BuiltinDocs.builtins_pow_doc)
                 .with(BuiltinModule::pow2)
                 .with(BuiltinModule::pow3));
-        dict.__setitem__("input", PyBuiltinFunctionNarrow.named( "input", BuiltinDocs.builtins_input_doc)
+        dict.__setitem__("input", PyBuiltinFunction.named( "input", BuiltinDocs.builtins_input_doc)
                 .with(BuiltinModule::raw_input0)
                 .with(BuiltinModule::raw_input1)
                 .with(BuiltinModule::raw_input2));
-        dict.__setitem__("round", PyBuiltinFunctionNarrow.named( "round", BuiltinDocs.builtins_round_doc).wide(BuiltinModule::round));
-        dict.__setitem__("repr", PyBuiltinFunctionNarrow.named( "repr", BuiltinDocs.builtins_repr_doc).with(BuiltinModule::repr));
-        dict.__setitem__("setattr", PyBuiltinFunctionNarrow.named( "setattr", BuiltinDocs.builtins_setattr_doc).with(BuiltinModule::setattr));
-        dict.__setitem__("vars", PyBuiltinFunctionNarrow.named( "vars", BuiltinDocs.builtins_vars_doc)
+        dict.__setitem__("round", PyBuiltinFunction.named( "round", BuiltinDocs.builtins_round_doc).wide(BuiltinModule::round));
+        dict.__setitem__("repr", PyBuiltinFunction.named( "repr", BuiltinDocs.builtins_repr_doc).with(BuiltinModule::repr));
+        dict.__setitem__("setattr", PyBuiltinFunction.named( "setattr", BuiltinDocs.builtins_setattr_doc).with(BuiltinModule::setattr));
+        dict.__setitem__("vars", PyBuiltinFunction.named( "vars", BuiltinDocs.builtins_vars_doc)
                 .with(BuiltinModule::vars0)
                 .with(BuiltinModule::vars1));
-        dict.__setitem__("compile", PyBuiltinFunctionNarrow.named( "compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::compile));
-        dict.__setitem__("open", PyBuiltinFunctionNarrow.named( "open", BuiltinDocs.builtins_open_doc).wide(_io::open));
-        dict.__setitem__("reversed", PyBuiltinFunctionNarrow.named( "reversed", BuiltinDocs.builtins_reversed_doc)
+        dict.__setitem__("compile", PyBuiltinFunction.named( "compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::compile));
+        dict.__setitem__("open", PyBuiltinFunction.named( "open", BuiltinDocs.builtins_open_doc).wide(_io::open));
+        dict.__setitem__("reversed", PyBuiltinFunction.named( "reversed", BuiltinDocs.builtins_reversed_doc)
                 .with(BuiltinModule::reversed));
-        dict.__setitem__("exec", PyBuiltinFunctionNarrow.named( "exec", BuiltinDocs.builtins_exec_doc)
+        dict.__setitem__("exec", PyBuiltinFunction.named( "exec", BuiltinDocs.builtins_exec_doc)
                 .with(BuiltinModule::exec1)
                 .with(BuiltinModule::exec2)
                 .with(BuiltinModule::exec3));
-        dict.__setitem__("__import__", PyBuiltinFunctionNarrow.named( "__import__", BuiltinDocs.builtins___import___doc).wide(BuiltinModule::import$));
-        dict.__setitem__("sorted", PyBuiltinFunctionNarrow.named( "sorted", BuiltinDocs.builtins_sorted_doc).wide(BuiltinModule::sorted));
-        dict.__setitem__("all", PyBuiltinFunctionNarrow.named( "all", BuiltinDocs.builtins_all_doc).with(BuiltinModule::all));
-        dict.__setitem__("any", PyBuiltinFunctionNarrow.named( "any", BuiltinDocs.builtins_any_doc).with(BuiltinModule::any));
-        dict.__setitem__("format", PyBuiltinFunctionNarrow.named( "format", BuiltinDocs.builtins_format_doc)
+        dict.__setitem__("__import__", PyBuiltinFunction.named( "__import__", BuiltinDocs.builtins___import___doc).wide(BuiltinModule::import$));
+        dict.__setitem__("sorted", PyBuiltinFunction.named( "sorted", BuiltinDocs.builtins_sorted_doc).wide(BuiltinModule::sorted));
+        dict.__setitem__("all", PyBuiltinFunction.named( "all", BuiltinDocs.builtins_all_doc).with(BuiltinModule::all));
+        dict.__setitem__("any", PyBuiltinFunction.named( "any", BuiltinDocs.builtins_any_doc).with(BuiltinModule::any));
+        dict.__setitem__("format", PyBuiltinFunction.named( "format", BuiltinDocs.builtins_format_doc)
                 .with(BuiltinModule::format1)
                 .with(BuiltinModule::format2));
-        dict.__setitem__("print", PyBuiltinFunctionNarrow.named( "print", BuiltinDocs.builtins_print_doc).wide(BuiltinModule::print));
-        dict.__setitem__("next", PyBuiltinFunctionNarrow.named( "next", BuiltinDocs.builtins_next_doc).wide(BuiltinModule::next));
-        dict.__setitem__("bin", PyBuiltinFunctionNarrow.named( "bin", BuiltinDocs.builtins_bin_doc).wide(BuiltinModule::bin));
+        dict.__setitem__("print", PyBuiltinFunction.named( "print", BuiltinDocs.builtins_print_doc).wide(BuiltinModule::print));
+        dict.__setitem__("next", PyBuiltinFunction.named( "next", BuiltinDocs.builtins_next_doc).wide(BuiltinModule::next));
+        dict.__setitem__("bin", PyBuiltinFunction.named( "bin", BuiltinDocs.builtins_bin_doc).wide(BuiltinModule::bin));
     }
 
     public static void fillWithBuiltinExceptions(PyObject dict) {
@@ -942,7 +935,7 @@ public class BuiltinModule {
         throw Py.TypeError(function + "(): attribute name must be string");
     }
 
-        static PyObject max_min(PyObject o, PyObject key, PyObject defaultVal, CompareOp op) {
+    static PyObject max_min(PyObject o, PyObject key, PyObject defaultVal, CompareOp op) {
         PyObject max = null;
         PyObject maxKey = null;
         for (PyObject item : o.asIterable()) {
@@ -966,27 +959,4 @@ public class BuiltinModule {
         return max;
     }
 }
-
-@Untraversable
-class ImportFunction extends PyBuiltinFunction {
-    ImportFunction() {
-        super("__import__", BuiltinDocs.builtins___import___doc);
-    }
-
-    @Override
-    public PyObject __call__(PyObject args[], String keywords[]) {
-        ArgParser ap = new ArgParser("__import__", args, keywords,
-                                     new String[] {"name", "globals", "locals", "fromlist",
-                                                   "level"},
-                                     1);
-        PyObject name = ap.getPyObject(0);
-        PyObject globals = ap.getPyObject(1, null);
-        PyObject fromlist = ap.getPyObject(3, Py.EmptyTuple);
-        int level = ap.getInt(4, Import.DEFAULT_LEVEL);
-        return Import.importModuleLevelObject(name, globals, fromlist, level);
-    }
-}
-
-
-
 

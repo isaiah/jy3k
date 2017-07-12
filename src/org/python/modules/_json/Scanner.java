@@ -17,7 +17,6 @@ import org.python.expose.ExposedType;
 @ExposedType(name = "_json.Scanner", base = PyObject.class)
 public class Scanner extends PyObject implements Traverseproc {
     public static final PyType TYPE = PyType.fromClass(Scanner.class);
-    final String encoding;
     final boolean strict;
     final PyObject object_hook;
     final PyObject pairs_hook;
@@ -27,7 +26,6 @@ public class Scanner extends PyObject implements Traverseproc {
 
     public Scanner(PyObject context) {
         super(TYPE);
-        encoding = "utf-8";
         strict = context.__getattr__("strict").__bool__();
         object_hook = context.__getattr__("object_hook");
         pairs_hook = context.__getattr__("object_pairs_hook");
@@ -78,7 +76,7 @@ public class Scanner extends PyObject implements Traverseproc {
                 if (str.getInt(idx) != '"') {
                     _json.raise_errmsg("Expecting property name", pystr, idx);
                 }
-                PyTuple key_idx = _json.scanstring(pystr, idx + 1, encoding, strict);
+                PyTuple key_idx = _json.scanstring(pystr, idx + 1, strict);
                 key = key_idx.pyget(0);
                 idx = key_idx.pyget(1).asInt();
 
@@ -197,7 +195,7 @@ public class Scanner extends PyObject implements Traverseproc {
         switch (str.getInt(idx)) {
             case '"':
                 /* string */
-                return _json.scanstring(pystr, idx + 1, encoding, strict);
+                return _json.scanstring(pystr, idx + 1, strict);
             case '{':
                 /* object */
                 return _parse_object(pystr, idx + 1);

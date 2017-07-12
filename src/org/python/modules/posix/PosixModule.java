@@ -18,7 +18,6 @@ import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
-import org.python.core.PyBuiltinFunctionNarrow;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -30,7 +29,6 @@ import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
-import org.python.core.Untraversable;
 import org.python.core.io.FileIO;
 import org.python.core.io.IOBase;
 import org.python.core.io.RawIOBase;
@@ -66,7 +64,6 @@ import java.nio.file.NotLinkException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.DosFileAttributes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -140,17 +137,6 @@ public class PosixModule {
         dict.__setitem__("environ", getEnviron());
         dict.__setitem__("error", Py.OSError);
         dict.__setitem__("stat_result", PyStatResult.TYPE);
-
-        // Faster call paths, because __call__ is defined
-        dict.__setitem__("fstat", new FstatFunction());
-        if (os == OS.NT) {
-            WindowsStatFunction stat = new WindowsStatFunction();
-            dict.__setitem__("lstat", stat);
-            dict.__setitem__("stat", stat);
-        } else {
-            dict.__setitem__("lstat", new LstatFunction());
-            dict.__setitem__("stat", new StatFunction());
-        }
 
         // Hide from Python
         Hider.hideFunctions(PosixModule.class, dict, os, nativePosix);
@@ -1310,166 +1296,59 @@ public class PosixModule {
 
     }
 
-    @Untraversable
-    static class LstatFunction extends PyBuiltinFunctionNarrow {
-        LstatFunction() {
-            super("lstat", 1, 1,
-                  "lstat(path) -> stat result\n\n" +
-                  "Like stat(path), but do not follow symbolic links.");
-        }
-
-        @Override
-        public PyObject __call__(PyObject path) {
-            Path absolutePath = absolutePath(path);
-            try {
-                Map<String, Object> attributes = Files.readAttributes(
-                        absolutePath, "unix:*", LinkOption.NOFOLLOW_LINKS);
-//                Boolean isSymbolicLink = (Boolean) attributes.get("isSymbolicLink");
-//                if (isSymbolicLink != null && isSymbolicLink.booleanValue() && path.toString().endsWith("/")) {
-//                    // Chase the symbolic link, but do not follow further - this is a special case for lstat
-//                    Path symlink = Files.readSymbolicLink(absolutePath);
-//                    symlink = absolutePath.getParent().resolve(symlink);
-//                    attributes = Files.readAttributes(
-//                            symlink, "unix:*", LinkOption.NOFOLLOW_LINKS);
-//
-//                } else {
-//                    checkTrailingSlash(path, attributes);
-//                }
-                return PyStatResult.fromUnixFileAttributes(attributes);
-            } catch (NoSuchFileException ex) {
-                throw Py.OSError(Errno.ENOENT, path);
-            } catch (IOException ioe) {
-                throw Py.OSError(Errno.EBADF, path);
-            } catch (SecurityException ex) {
-                throw Py.OSError(Errno.EACCES, path);
-            }
+    @ExposedFunction
+    public static final PyObject lstat(PyObject path) {
+        Path absolutePath = absolutePath(path);
+        try {
+            Map<String, Object> attributes = Files.readAttributes(
+                    absolutePath, "unix:*", LinkOption.NOFOLLOW_LINKS);
+            return PyStatResult.fromUnixFileAttributes(attributes);
+        } catch (NoSuchFileException ex) {
+            throw Py.OSError(Errno.ENOENT, path);
+        } catch (IOException ioe) {
+            throw Py.OSError(Errno.EBADF, path);
+        } catch (SecurityException ex) {
+            throw Py.OSError(Errno.EACCES, path);
         }
     }
 
-    @Untraversable
-    static class StatFunction extends PyBuiltinFunctionNarrow {
-        StatFunction() {
-            super("stat", 1, 1,
-                  "stat(path) -> stat result\n\n" +
-                  "Perform a stat system call on the given path.\n\n" +
-                  "Note that some platforms may return only a small subset of the\n" +
-                  "standard fields");
+    @ExposedFunction(doc = BuiltinDocs.posix_stat_doc)
+    public static PyObject stat(PyObject path) {
+        // posix file descriptor
+        if (path instanceof PyLong) {
+            return PyStatResult.fromFileStat(posix.fstat(path.asInt()));
         }
-
-        @Override
-        public PyObject __call__(PyObject path) {
-            // posix file descriptor
-            if (path instanceof PyLong) {
-                return PyStatResult.fromFileStat(posix.fstat(path.asInt()));
-            }
-            Object fileIO = path.__tojava__(FileIO.class);
-            if (fileIO != Py.NoConversion) {
-                return PyStatResult.fromFileStat(posix.fstat(getFD(path).getIntFD()));
-            }
-            Path absolutePath = absolutePath(path);
-            try {
-                Map<String, Object> attributes = Files.readAttributes(absolutePath, "unix:*");
-                checkTrailingSlash(path, attributes);
-                return PyStatResult.fromUnixFileAttributes(attributes);
-            } catch (NoSuchFileException ex) {
-                throw Py.OSError(Errno.ENOENT, path);
-            } catch (IOException ioe) {
-                throw Py.OSError(Errno.EBADF, path);
-            } catch (SecurityException ex) {
-                throw Py.OSError(Errno.EACCES, path);
-            }
+        Object fileIO = path.__tojava__(FileIO.class);
+        if (fileIO != Py.NoConversion) {
+            return PyStatResult.fromFileStat(posix.fstat(getFD(path).getIntFD()));
+        }
+        Path absolutePath = absolutePath(path);
+        try {
+            Map<String, Object> attributes = Files.readAttributes(absolutePath, "unix:*");
+            checkTrailingSlash(path, attributes);
+            return PyStatResult.fromUnixFileAttributes(attributes);
+        } catch (NoSuchFileException ex) {
+            throw Py.OSError(Errno.ENOENT, path);
+        } catch (IOException ioe) {
+            throw Py.OSError(Errno.EBADF, path);
+        } catch (SecurityException ex) {
+            throw Py.OSError(Errno.EACCES, path);
         }
     }
 
-    // Follows the approach taken by posixmodule.c for a Windows specific stat;
-    // in particular this is driven by the fact that Windows CRT does not properly handle
-    // daylight savings time in timestamps.
-    //
-    // Another advantage is setting the st_mode the same as CPython would return.
-    @Untraversable
-    static class WindowsStatFunction extends PyBuiltinFunctionNarrow {
-        private final static int _S_IFDIR = 0x4000;
-        private final static int _S_IFREG = 0x8000;
-        WindowsStatFunction() {
-            super("stat", 1, 1,
-                    "stat(path) -> stat result\n\n" +
-                            "Perform a stat system call on the given path.\n\n" +
-                            "Note that some platforms may return only a small subset of the\n" +
-                            "standard fields"); // like this one!
-        }
-
-        static int attributes_to_mode(DosFileAttributes attr) {
-            int m = 0;
-            if (attr.isDirectory()) {
-                m |= _S_IFDIR | 0111; /* IFEXEC for user,group,other */
+    @ExposedFunction(doc = BuiltinDocs.posix_fstat_doc)
+    public static final PyObject fstat(PyObject fdObj) {
+        try {
+            FDUnion fd = getFD(fdObj);
+            FileStat stat;
+            if (fd.isIntFD()) {
+                stat = posix.fstat(fd.intFD);
             } else {
-                m |= _S_IFREG;
-        }
-            if (attr.isReadOnly()) {
-                m |= 0444;
-            } else {
-                m |= 0666;
+                stat = posix.fstat(fd.javaFD);
             }
-            return m;
-        }
-
-        @Override
-        public PyObject __call__(PyObject path) {
-            Path absolutePath = absolutePath(path);
-            try {
-                DosFileAttributes attributes = Files.readAttributes(absolutePath, DosFileAttributes.class);
-                if (!attributes.isDirectory()) {
-                    String pathStr = path.toString();
-                    if (pathStr.endsWith(File.separator) || pathStr.endsWith("/")) {
-                        throw Py.OSError(Errno.ENOTDIR, path);
-                    }
-                }
-                int mode = attributes_to_mode(attributes);
-                String extension = getExtension(absolutePath.getFileName().toString());
-                if (extension.equals("bat") || extension.equals("cmd") || extension.equals("exe") || extension.equals("com")) {
-                    mode |= 0111;
-                }
-                return PyStatResult.fromDosFileAttributes(mode, attributes);
-            } catch (NoSuchFileException ex) {
-                throw Py.OSError(Errno.ENOENT, path);
-            } catch (IOException ioe) {
-                throw Py.OSError(Errno.EBADF, path);
-            } catch (SecurityException ex) {
-                throw Py.OSError(Errno.EACCES, path);
-            }
-        }
-
-        // https://stackoverflow.com/a/15998870
-        private static final String getExtension(final String filename) {
-            if (filename == null) return null;
-            final String afterLastSlash = filename.substring(filename.lastIndexOf('/') + 1);
-            final int afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1;
-            final int dotIndex = afterLastSlash.indexOf('.', afterLastBackslash);
-            return (dotIndex == -1) ? "" : afterLastSlash.substring(dotIndex + 1);
-        }
-    }
-
-    @Untraversable
-    static class FstatFunction extends PyBuiltinFunctionNarrow {
-        FstatFunction() {
-            super("fstat", 1, 1,
-                    "fstat(fd) -> stat result\\n\\nLike stat(), but for an open file descriptor.");
-        }
-
-        @Override
-        public PyObject __call__(PyObject fdObj) {
-            try {
-                FDUnion fd = getFD(fdObj);
-                FileStat stat;
-                if (fd.isIntFD()) {
-                    stat = posix.fstat(fd.intFD);
-                } else {
-                    stat = posix.fstat(fd.javaFD);
-                }
-                return PyStatResult.fromFileStat(stat);
-            } catch (PyException ex) {
-                throw Py.OSError(Errno.EBADF);
-            }
+            return PyStatResult.fromFileStat(stat);
+        } catch (PyException ex) {
+            throw Py.OSError(Errno.EBADF);
         }
     }
 }

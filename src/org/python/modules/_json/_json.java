@@ -1,19 +1,15 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._json;
 
-import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
-import org.python.core.BuiltinModule;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
-import org.python.core.PyBuiltinFunctionNarrow;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;
-import org.python.core.Untraversable;
+import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
 
@@ -30,10 +26,8 @@ public class _json {
 
     @ModuleInit
     public static void init(PyObject dict) {
-        dict.__setitem__("encode_basestring_ascii", new EncodeBasestringAsciiFunction());
         dict.__setitem__("make_encoder", Encoder.TYPE);
         dict.__setitem__("make_scanner", Scanner.TYPE);
-        dict.__setitem__("scanstring", new ScanstringFunction());
     }
 
     private static PyObject errmsg_fn;
@@ -70,51 +64,9 @@ public class _json {
         }
     }
 
-    @Untraversable
-    static class ScanstringFunction extends PyBuiltinFunctionNarrow {
-        ScanstringFunction() {
-            super("scanstring", 2, 4, "scanstring");
-        }
-
-        @Override
-        public PyObject __call__(PyObject s, PyObject end) {
-            return __call__(s, end, new PyBytes("utf-8"), Py.True);
-        }
-
-        @Override
-        public PyObject __call__(PyObject s, PyObject end, PyObject encoding) {
-            return __call__(s, end, encoding, Py.True);
-        }
-
-        @Override
-        public PyObject __call__(PyObject[] args, String[] kwds) {
-            ArgParser ap = new ArgParser("scanstring", args, kwds, new String[]{
-                    "s", "end", "encoding", "strict"}, 2);
-            return __call__(
-                    ap.getPyObject(0),
-                    ap.getPyObject(1),
-                    ap.getPyObject(2, new PyBytes("utf-8")),
-                    ap.getPyObject(3, Py.True));
-        }
-
-        @Override
-        public PyObject __call__(PyObject s, PyObject end, PyObject encoding, PyObject strict) {
-            // but rethrow in case it does work - see the test case for issue 362
-            int end_idx = end.asIndex(Py.OverflowError);
-            boolean is_strict = strict.__bool__();
-            if (s instanceof PyBytes) {
-                return scanstring((PyBytes) s, end_idx,
-                        encoding == Py.None ? null : encoding.toString(), is_strict);
-            } else {
-                throw Py.TypeError(String.format(
-                        "first argument must be a string, not %.80s",
-                        s.getType().fastGetName()));
-            }
-        }
-
-    }
-
-    static PyTuple scanstring(PyBytes pystr, int end, String encoding, boolean strict) {
+    @ExposedFunction(defaults = {"true"})
+    public static PyTuple scanstring(PyObject obj, int end, boolean strict) {
+        PyUnicode pystr = (PyUnicode) obj;
         int len = pystr.__len__();
         int begin = end - 1;
         if (end < 0 || len <= end) {
@@ -143,8 +95,6 @@ public class _json {
                 PyObject strchunk = pystr.getslice(end, next);
                 if (strchunk instanceof PyUnicode) {
                     chunks.append(strchunk);
-                } else {
-                    chunks.append(codecs.decode((PyBytes) strchunk, encoding, null));
                 }
             }
             next++;
@@ -292,19 +242,8 @@ public class _json {
         return new PyTuple(Py.EmptyUnicode.join(chunks), Py.newInteger(end));
     }
 
-    @Untraversable
-    static class EncodeBasestringAsciiFunction extends PyBuiltinFunctionNarrow {
-        EncodeBasestringAsciiFunction() {
-            super("encode_basestring_ascii", 1, 1, "encode_basestring_ascii");
-        }
-
-        @Override
-        public PyObject __call__(PyObject pystr) {
-            return encode_basestring_ascii(pystr);
-        }
-    }
-
-    static PyBytes encode_basestring_ascii(PyObject pystr) {
+    @ExposedFunction
+    public static PyBytes encode_basestring_ascii(PyObject pystr) {
         if (pystr instanceof PyUnicode) {
             return ascii_escape((PyUnicode) pystr);
         } else if (pystr instanceof PyBytes) {

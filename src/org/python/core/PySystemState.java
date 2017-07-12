@@ -216,8 +216,8 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 //        initstdio();
 //        initEncoding();
 
-        __displayhook__ = new PySystemStateFunctions("displayhook", 10, 1, 1);
-        __excepthook__ = new PySystemStateFunctions("excepthook", 30, 3, 3);
+        __displayhook__ = PyBuiltinFunction.named("displayhook", "").with(PySystemState::displayhook);
+        __excepthook__ = PyBuiltinFunction.named("displayhook", "").with(PySystemState::excepthook);
 
         if (builtins == null) {
             builtins = getDefaultBuiltins();
@@ -1545,24 +1545,26 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     // Not public by design. We can't rebind the displayhook if
     // a reflected function is inserted in the class dict.
 
-    static void displayhook(PyObject o) {
+    static PyObject displayhook(PyObject o) {
         /* Print value except if None */
         /* After printing, also assign to '_' */
         /* Before, set '_' to None to avoid recursion */
         if (o == Py.None) {
-            return;
+            return o;
         }
 
         PyObject currentBuiltins = Py.getSystemState().getBuiltins();
         currentBuiltins.__setitem__("_", Py.None);
         Py.stdout.println(o.__repr__());
         currentBuiltins.__setitem__("_", o);
+        return Py.None;
     }
 
-    static void excepthook(PyObject type, PyObject val, PyObject tb) {
+    public static PyObject excepthook(PyObject type, PyObject val, PyObject tb) {
         PyBaseException value = null;
         if (val != Py.None) value = (PyBaseException) val;
         Py.PyErr_Display(type, value, tb);
+        return Py.None;
     }
 
     public static PyTuple exc_info() {
@@ -1866,38 +1868,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
      * @param resourceClosers to be called in turn
      */
 }
-
-
-@Untraversable
-class PySystemStateFunctions extends PyBuiltinFunctionSet {
-
-    PySystemStateFunctions(String name, int index, int minargs, int maxargs) {
-        super(name, index, minargs, maxargs);
-    }
-
-    @Override
-    public PyObject __call__(PyObject arg) {
-        switch (index) {
-            case 10:
-                PySystemState.displayhook(arg);
-                return Py.None;
-            default:
-                throw info.unexpectedCall(1, false);
-        }
-    }
-
-    @Override
-    public PyObject __call__(PyObject arg1, PyObject arg2, PyObject arg3) {
-        switch (index) {
-            case 30:
-                PySystemState.excepthook(arg1, arg2, arg3);
-                return Py.None;
-            default:
-                throw info.unexpectedCall(3, false);
-        }
-    }
-}
-
 
 /**
  * Value of a class or instance variable when the corresponding attribute is deleted. Used only in
