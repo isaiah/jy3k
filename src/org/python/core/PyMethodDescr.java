@@ -29,8 +29,18 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
         return maxargs;
     }
 
+    @Override
+    public void setMaxargs(int maxArgs) {
+        maxargs = maxArgs;
+    }
+
     public int getMinargs() {
         return minargs;
+    }
+
+    @Override
+    public void setMinargs(int minArgs) {
+        minargs = minArgs;
     }
 
     @Override

@@ -117,7 +117,7 @@ public class PyList extends PySequenceList implements List {
 
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.list___init___doc)
-    final void list___init__(PyObject[] args, String[] kwds) {
+    public final void list___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("list", args, kwds, new String[]{"sequence"}, 0);
         PyObject seq = ap.getPyObject(0, null);
         clear();
@@ -148,7 +148,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___len___doc)
-    final synchronized int list___len__() {
+    public final synchronized int list___len__() {
         return size();
     }
 
@@ -274,7 +274,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___imul___doc)
-    final synchronized PyObject list___imul__(PyObject o) {
+    public final synchronized PyObject list___imul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -312,7 +312,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___mul___doc)
-    final synchronized PyObject list___mul__(PyObject o) {
+    public final synchronized PyObject list___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -325,7 +325,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___rmul___doc)
-    final synchronized PyObject list___rmul__(PyObject o) {
+    public final synchronized PyObject list___rmul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -338,7 +338,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___add___doc)
-    final synchronized PyObject list___add__(PyObject o) {
+    public final synchronized PyObject list___add__(PyObject o) {
         PyList sum = null;
         if (o instanceof PySequenceList && !(o instanceof PyTuple)) {
             if (o instanceof PyList) {
@@ -370,7 +370,7 @@ public class PyList extends PySequenceList implements List {
 
     //XXX: needs __doc__
     @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject list___radd__(PyObject o) {
+    public final synchronized PyObject list___radd__(PyObject o) {
         // Support adding java.util.List, but prevent adding PyTuple.
         // 'o' should never be a PyNewList since __add__ is defined.
         PyList sum = null;
@@ -387,22 +387,22 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___contains___doc)
-    final synchronized boolean list___contains__(PyObject o) {
+    public final synchronized boolean list___contains__(PyObject o) {
         return object___contains__(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___delitem___doc)
-    final synchronized void list___delitem__(PyObject index) {
+    public final synchronized void list___delitem__(PyObject index) {
         seq___delitem__(index);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___setitem___doc)
-    final synchronized void list___setitem__(PyObject o, PyObject def) {
+    public final synchronized void list___setitem__(PyObject o, PyObject def) {
         seq___setitem__(o, def);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___getitem___doc)
-    final synchronized PyObject list___getitem__(PyObject o) {
+    public final synchronized PyObject list___getitem__(PyObject o) {
         PyObject ret = seq___finditem__(o);
         if (ret == null) {
             throw Py.IndexError("index out of range: " + o);
@@ -426,7 +426,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___reversed___doc)
-    final synchronized PyIterator list___reversed__() {
+    public final synchronized PyIterator list___reversed__() {
         return new PyReversedIterator(this);
     }
 
@@ -444,7 +444,7 @@ public class PyList extends PySequenceList implements List {
 
     //XXX: needs __doc__
     @ExposedMethod(names = "__repr__")
-    final synchronized String list_toString() {
+    public final synchronized String list_toString() {
         ThreadState ts = Py.getThreadState();
         if (!ts.enterRepr(this)) {
             return "[...]";
@@ -465,7 +465,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_copy_doc)
-    final synchronized PyObject list_copy() {
+    public final synchronized PyObject list_copy() {
         return getslice(0, __len__());
     }
 
@@ -480,7 +480,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_append_doc)
-    final synchronized void list_append(PyObject o) {
+    public final synchronized void list_append(PyObject o) {
         pyadd(o);
         gListAllocatedStatus = list.size();
     }
@@ -496,7 +496,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_count_doc)
-    final synchronized int list_count(PyObject o) {
+    public final synchronized int list_count(PyObject o) {
         int count = 0;
         for (PyObject item : list) {
             if (o.do_richCompareBool(item, CompareOp.EQ)) {
@@ -525,7 +525,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.list_index_doc)
-    final synchronized int list_index(PyObject o, PyObject start, PyObject stop) {
+    public final synchronized int list_index(PyObject o, PyObject start, PyObject stop) {
         int startInt = start == null ? 0 : PySlice.calculateSliceIndex(start);
         int stopInt = stop == null ? size() : PySlice.calculateSliceIndex(stop);
         return list_index(o, startInt, stopInt);
@@ -577,7 +577,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_insert_doc)
-    final synchronized void list_insert(int index, PyObject o) {
+    public final synchronized void list_insert(int index, PyObject o) {
         if (index < 0) {
             index = Math.max(0, size() + index);
         }
@@ -601,7 +601,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_remove_doc)
-    final synchronized void list_remove(PyObject o) {
+    public final synchronized void list_remove(PyObject o) {
         del(_index(o, "list.remove(x): x not in list", 0, size()));
         gListAllocatedStatus = list.size();
     }
@@ -639,7 +639,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.list_pop_doc)
-    final synchronized PyObject list_pop(int n) {
+    public final synchronized PyObject list_pop(int n) {
         int length = size();
         if (length == 0) {
             throw Py.IndexError("pop from empty list");
@@ -666,7 +666,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_extend_doc)
-    final synchronized void list_extend(PyObject o) {
+    public final synchronized void list_extend(PyObject o) {
         if (o instanceof PyList) {
             list.addAll(((PyList) o).list);
         } else {
@@ -683,7 +683,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___iadd___doc)
-    final synchronized PyObject list___iadd__(PyObject o) {
+    public final synchronized PyObject list___iadd__(PyObject o) {
         PyType oType = o.getType();
         if (oType == TYPE || oType == PyTuple.TYPE || this == o) {
             extend(fastSequence(o, "argument must be iterable"));
@@ -702,15 +702,9 @@ public class PyList extends PySequenceList implements List {
      * to use calls to the methods sort() and reverse() than to use the built-in function sort()
      * with a comparison function that reverses the ordering of the elements.
      *
-     * @param compare
-     *            the comparison function.
-     */
-    /**
-     * Sort the items of the list in place. Items is compared with the normal relative comparison
-     * operators.
      */
     @ExposedMethod(doc = BuiltinDocs.list_sort_doc)
-    final synchronized void list_sort(PyObject[] args, String[] kwds) {
+    public final synchronized void list_sort(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("list", args, kwds, new String[]{"key", "reverse"}, 0);
         PyObject key = ap.getPyObject(0, Py.None);
         PyObject reverse = ap.getPyObject(1, Py.False);
@@ -864,7 +858,7 @@ public class PyList extends PySequenceList implements List {
         gListAllocatedStatus = -1;
 
         int size = list.size();
-        final ArrayList<KV> decorated = new ArrayList<KV>(size);
+        final ArrayList<KV> decorated = new ArrayList<>(size);
         for (PyObject value : list) {
             decorated.add(new KV(key.__call__(value), value));
         }
@@ -891,7 +885,7 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___hash___doc)
-    final synchronized int list___hash__() {
+    public final synchronized int list___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }
 

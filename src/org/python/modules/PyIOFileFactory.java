@@ -13,7 +13,7 @@ public class PyIOFileFactory {
         Object f = file.__tojava__(cStringIO.StringIO.class);
         if (f != Py.NoConversion) {
             return new cStringIOFile(file);
-        } else if (BuiltinModule.isinstance(file, PyFile.TYPE)) {
+        } else if (Py.isInstance(file, PyFile.TYPE)) {
             return new FileIOFile(file);
         } else {
             return new ObjectIOFile(file);

@@ -67,7 +67,7 @@ public class PyBuiltinFunctionNarrow extends PyBuiltinFunction {
 
     public PyObject fancyCall(PyObject[] args) {
         if (varargFunc != null) return varargFunc.apply(args);
-        if (wideFunc != null) return wideFunc.apply(Py.EmptyObjects, Py.NoKeywords);
+        if (wideFunc != null) return wideFunc.apply(args, Py.NoKeywords);
         throw info.unexpectedCall(args.length, false);
     }
 

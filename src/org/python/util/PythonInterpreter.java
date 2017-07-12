@@ -241,20 +241,13 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         setErr(new PyFile(outStream));
     }
 
-    /**
-     * Evaluates a string as a Python expression and returns the result.
-     */
-    public PyObject eval(String s) {
-        setSystemState();
-        return BuiltinModule.eval(new PyBytes(s), getLocals());
-    }
 
     /**
      * Evaluates a Python code object and returns the result.
      */
     public PyObject eval(PyObject code) {
         setSystemState();
-        return BuiltinModule.eval(code, getLocals());
+        return Py.runCode((PyCode) code, getLocals(), null);
     }
 
     /**
@@ -272,16 +265,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     public void exec(PyObject code) {
         setSystemState();
         Py.exec(code, getLocals(), null);
-        Py.flushLine();
-    }
-
-    /**
-     * Executes a file of Python source in the local namespace.
-     */
-    public void execfile(String filename) {
-        PyObject locals = getLocals();
-        setSystemState();
-        BuiltinModule.execfile_flags(filename, locals, locals, cflags);
         Py.flushLine();
     }
 

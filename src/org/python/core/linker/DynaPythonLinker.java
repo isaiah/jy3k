@@ -106,7 +106,10 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                         if (methodType.parameterCount() > 0) {
                             String defaultVals = ((PyBuiltinMethod) self).defaultVals;
                             if (defaultVals.equals("")) {
-                                if (descriptor.equals("([Lorg/python/core/PyObject;[Ljava/lang/String;)V")) {
+                                // wide call
+                                if (methodType.parameterCount() == 2
+                                        && methodType.parameterType(0) == PyObject[].class
+                                        && methodType.parameterType(1) == String[].class) {
                                     mh = MethodHandles.insertArguments(mh, 1, Py.EmptyObjects, Py.NoKeywords);
                                 }
                             } else {

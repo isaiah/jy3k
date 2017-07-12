@@ -2671,7 +2671,7 @@ public final class Py {
         }
     }
 
-    static PyObject[] make_array(PyObject iterable) {
+    public static PyObject[] make_array(PyObject iterable) {
         // Guess result size and allocate space. The typical make_array arg supports
         // __len__, with one exception being generators, so avoid the overhead of an
         // exception from __len__ in their case

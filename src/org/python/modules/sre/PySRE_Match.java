@@ -46,8 +46,8 @@ public class PySRE_Match extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Match_start(PyObject[] args, String[] keywords) {
-        int index = args.length == 0 ? 0 : getIndex(args[0]);
-        return new PyLong(matcher.start(index));
+        int group = args.length == 0 ? 0 : getIndex(args[0]);
+        return new PyLong(matcher.start(group));
     }
 
     @ExposedMethod

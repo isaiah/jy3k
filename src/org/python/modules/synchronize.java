@@ -4,11 +4,9 @@
  */
 package org.python.modules;
 
-import org.python.core.BuiltinModule;
-import org.python.core.PyDictionary;
-import org.python.core.PyObject;
-import org.python.core.PyMethod;
 import org.python.core.Py;
+import org.python.core.PyMethod;
+import org.python.core.PyObject;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.expose.ExposedFunction;
@@ -26,7 +24,7 @@ public class synchronize {
     public static PyObject apply_synchronized(PyObject syncObject, PyObject callable,
                                               PyObject args, String[] kws) {
         synchronized (_getSync(syncObject)) {
-            return BuiltinModule.apply(callable, args);
+            return callable.__call__(Py.make_array(args));
         }
     }
 
