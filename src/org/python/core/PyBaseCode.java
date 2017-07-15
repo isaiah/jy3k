@@ -10,6 +10,8 @@ import org.python.core.generator.PyGenerator;
 import org.python.modules._systemrestart;
 
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public abstract class PyBaseCode extends PyCode {
 
@@ -101,11 +103,15 @@ public abstract class PyBaseCode extends PyCode {
         return ret;
     }
 
+    private boolean extractArg(int arg) {
+        return co_argcount == arg && co_kwonlyargcount == 0 && !varargs && !varkwargs;
+    }
+
     @Override
     public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
                          PyDictionary kw_defaults, PyObject closure)
     {
-        if (co_argcount != 0 || co_kwonlyargcount != 0 || varargs || varkwargs || !kw_defaults.isEmpty())
+        if (!extractArg(0))
             return call(state, Py.EmptyObjects, Py.NoKeywords, globals, defaults,
                         kw_defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
@@ -123,7 +129,7 @@ public abstract class PyBaseCode extends PyCode {
     public PyObject call(ThreadState state, PyObject arg1, PyObject globals, PyObject[] defaults,
                          PyDictionary kw_defaults, PyObject closure)
     {
-        if (co_argcount != 1 || varargs || varkwargs || !kw_defaults.isEmpty())
+        if (!extractArg(1))
             return call(state, new PyObject[] {arg1},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
@@ -142,7 +148,7 @@ public abstract class PyBaseCode extends PyCode {
     public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
                          PyObject[] defaults, PyDictionary kw_defaults, PyObject closure)
     {
-        if (co_argcount != 2 || varargs || varkwargs || !kw_defaults.isEmpty())
+        if (!extractArg(2))
             return call(state, new PyObject[] {arg1, arg2},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
@@ -163,7 +169,7 @@ public abstract class PyBaseCode extends PyCode {
                          PyObject globals, PyObject[] defaults, PyDictionary kw_defaults,
                          PyObject closure)
     {
-        if (co_argcount != 3 || varargs || varkwargs || !kw_defaults.isEmpty())
+        if (!extractArg(3))
             return call(state, new PyObject[] {arg1, arg2, arg3},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
@@ -184,7 +190,7 @@ public abstract class PyBaseCode extends PyCode {
     public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
                          PyObject arg3, PyObject arg4, PyObject globals,
                          PyObject[] defaults, PyDictionary kw_defaults, PyObject closure) {
-        if (co_argcount != 4 || varargs || varkwargs || !kw_defaults.isEmpty())
+        if (!extractArg(4))
             return call(state, new PyObject[]{arg1, arg2, arg3, arg4},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
@@ -214,128 +220,148 @@ public abstract class PyBaseCode extends PyCode {
         return call(state, os, keywords, globals, defaults, kw_defaults, closure);
     }
 
-    @Override
-    public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals,
-                         PyObject[] defs, PyDictionary kw_defaults, PyObject closure) {
-        final PyFrame frame = new PyFrame(this, globals);
+    public int paramCount() {
         int paramCount = co_argcount + co_kwonlyargcount;
         if (varargs) paramCount++;
         if (varkwargs) paramCount++;
-        final int argcount = args.length - kws.length;
+        return paramCount;
+    }
 
-        if ((paramCount > 0) || varargs || varkwargs) {
-            int i;
+    /**
+     * Create a frame from arguments and closure
+     * @param args
+     * @param kws
+     * @param globals
+     * @param defs
+     * @param kwDefaults
+     * @param closure
+     * @return
+     */
+    public static PyFrame createFrame(PyBaseCode code, PyObject[] args, String kws[], PyObject globals, PyObject[] defs,
+                                      PyDictionary kwDefaults, PyObject closure) {
+        final PyFrame frame = new PyFrame(code, globals);
+        final int argcount = args.length - kws.length;
+        int paramCount = code.paramCount();
+        if ((paramCount > 0) || code.varargs || code.varkwargs) {
+            // n is the position of the last positional parameter
             int n = argcount;
             PyObject kwdict = null;
             final PyObject[] fastlocals = frame.f_fastlocals;
-            if (varkwargs) {
-                kwdict = new PyDictionary();
-                i = co_argcount + co_kwonlyargcount;
-                if (varargs) {
-                    i++;
-                }
 
-                fastlocals[i] = kwdict;
+            if (code.varkwargs) {
+                kwdict = new PyDictionary();
+                fastlocals[paramCount - 1] = kwdict;
             }
-            if (argcount > co_argcount) {
-                if (!varargs) {
+
+            if (argcount > code.co_argcount) {
+                // extra positional arguments
+                if (!code.varargs) {
                     int defcount = defs != null ? defs.length : 0;
                     String msg;
                     if (defcount > 0) {
-                        msg = positionalArgErrorMessage(defcount, args.length);
+                        msg = positionalArgErrorMessage(code.co_name, code.co_argcount - defcount,
+                                code.co_argcount, argcount);
                     } else {
-                        msg = String.format("%.200s() takes %d positional argument but %d were given",
-                                co_name, co_argcount, args.length);
+                        msg = positionalArgErrorMessage(code.co_name, code.co_argcount, argcount);
                     }
                     throw Py.TypeError(msg);
                 }
-                n = co_argcount;
+                n = code.co_argcount;
             }
 
             if (args.length > 0) {
                 System.arraycopy(args, 0, fastlocals, 0, n);
             }
 
-            if (varargs) {
+            // insert the extra parameter to the vararg slot
+            if (code.varargs) {
                 PyObject[] u = new PyObject[argcount - n];
-                if (args.length > 0)
+                if (u.length > 0)
                     System.arraycopy(args, n, u, 0, u.length);
-                PyObject uTuple = new PyTuple(u);
-                fastlocals[co_argcount] = uTuple;
+                fastlocals[n] = new PyTuple(u);
             }
-            for (i = 0; i < kws.length; i++) {
+            for (int i = 0; i < kws.length; i++) {
                 String keyword = kws[i];
                 PyObject value = args[i + argcount];
                 int j;
+                // look for the position of the keyword argument
                 for (j = 0; j < paramCount; j++) {
-                    if (varargs && j == co_argcount) // skip the vararg parameter
+                    // skip the vararg parameter, it cannot be assigned as a keyword
+                    if (code.varargs && j == code.co_argcount)
                         continue;
-                    if (co_varnames[j].equals(keyword)) {
+                    if (code.co_varnames[j].equals(keyword)) {
                         break;
                     }
                 }
-                if (j == paramCount) { // not in varnames
-                    if (kwdict == null) {
+                // not in varnames
+                if (j == paramCount) {
+                    if (code.varkwargs) {
+                        if (keyword.chars().allMatch(c -> c < 127)) {
+                            kwdict.__setitem__(keyword, value);
+                        } else {
+                            kwdict.__setitem__(Py.newUnicode(keyword), value);
+                        }
+                    } else {
+                        // unexpected keyword argument
                         throw Py.TypeError(String.format(
                                 "%.200s() got an unexpected keyword argument '%.400s'",
-                                co_name,
+                                code.co_name,
                                 Py.newUnicode(keyword).encode("ascii", "replace")));
-                    }
-                    if (keyword.chars().allMatch(c -> c < 127)) {
-                        kwdict.__setitem__(keyword, value);
-                    } else {
-                        kwdict.__setitem__(Py.newUnicode(keyword), value);
                     }
                 } else {
                     if (fastlocals[j] != null) {
-                        throw Py.TypeError(String.format("%.200s() got multiple values for "
-                                                         + "keyword argument '%.400s'",
-                                                         co_name, keyword));
+                        // keyword param got multiple assignment
+                        throw Py.TypeError(String.format("%.200s() got multiple values for keyword argument '%.400s'",
+                                code.co_name, keyword));
                     }
                     fastlocals[j] = value;
                 }
             }
-            java.util.List<String> missingKwArg = new ArrayList<>();
 
-            int kwonlyargZeroIndex = co_argcount;
-            if (varargs) kwonlyargZeroIndex++;
-            for (int j = 0; j < co_kwonlyargcount; j++) {
-                int kwonlyargIdx = kwonlyargZeroIndex + j;
-                String name = co_varnames[kwonlyargIdx];
-                PyUnicode key = Py.newUnicode(name);
-                if (fastlocals[kwonlyargIdx] == null) {
-                    if (kw_defaults.__contains__(key)) {
-                        fastlocals[kwonlyargIdx] = kw_defaults.__getitem__(key);
-                    } else {
-                        missingKwArg.add(name);
+            // check for missing keyword only parameter
+            boolean missingArg = Stream.of(fastlocals).anyMatch(Objects::isNull);
+            if (missingArg && code.co_kwonlyargcount > 0) {
+                java.util.List<String> missingKwArg = new ArrayList<>();
+                int kwonlyargZeroIndex = code.co_argcount;
+                if (code.varargs) kwonlyargZeroIndex++;
+                for (int j = 0; j < code.co_kwonlyargcount; j++) {
+                    int kwonlyargIdx = kwonlyargZeroIndex + j;
+                    String name = code.co_varnames[kwonlyargIdx];
+                    PyUnicode key = Py.newUnicode(name);
+                    if (fastlocals[kwonlyargIdx] == null) {
+                        if (kwDefaults.__contains__(key)) {
+                            fastlocals[kwonlyargIdx] = kwDefaults.__getitem__(key);
+                        } else {
+                            missingKwArg.add(name);
+                        }
                     }
                 }
-            }
-            if (!missingKwArg.isEmpty()) {
-                throw Py.TypeError(String.format("%.200s() missing %d keyword-only %s: '%s'", co_name, missingKwArg.size(),
-                        missingKwArg.size() > 1 ? "arguments" : "argument", String.join(",", missingKwArg)));
+                if (!missingKwArg.isEmpty()) {
+                    throw Py.TypeError(String.format("%.200s() missing %d keyword-only %s: '%s'", code.co_name, missingKwArg.size(),
+                            missingKwArg.size() > 1 ? "arguments" : "argument", String.join(",", missingKwArg)));
+                }
             }
 
-            if (argcount < co_argcount) {
+            // filling missing parameter with default value
+            if (missingArg && argcount < code.co_argcount) {
                 final int defcount = defs != null ? defs.length : 0;
-                final int m = co_argcount - defcount;
-                for (i = argcount; i < m; i++) {
+                final int m = code.co_argcount - defcount;
+                for (int i = argcount; i < m; i++) {
                     if (fastlocals[i] == null) {
                         String msg =
                                 String.format("%.200s() takes %s %d %sargument%s (%d given)",
-                                              co_name,
-                                              (varargs || defcount > 0) ? "at least" : "exactly",
+                                              code.co_name,
+                                              (code.varargs || defcount > 0) ? "at least" : "exactly",
                                               m,
                                               kws.length > 0 ? "" : "",
                                               m == 1 ? "" : "s",
-                                              args.length);
+                                              argcount);
                         throw Py.TypeError(msg);
                     }
                 }
+                int i = 0;
                 if (n > m) {
                     i = n - m;
-                } else {
-                    i = 0;
                 }
                 for (; i < defcount; i++) {
                     if (fastlocals[m + i] == null) {
@@ -343,11 +369,17 @@ public abstract class PyBaseCode extends PyCode {
                     }
                 }
             }
-        } else if ((argcount > 0) || (args.length > 0 && (paramCount == 0 && !varargs && !varkwargs))) {
+        } else if ((argcount > 0) || (args.length > 0 && (paramCount == 0 && !code.varargs && !code.varkwargs))) {
             throw Py.TypeError(String.format("%.200s() takes no arguments (%d given)",
-                                             co_name, args.length));
+                                             code.co_name, args.length));
         }
+        return frame;
+    }
 
+    @Override
+    public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals,
+                         PyObject[] defs, PyDictionary kw_defaults, PyObject closure) {
+        PyFrame frame = createFrame(this, args, kws, globals, defs, kw_defaults, closure);
         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
@@ -374,8 +406,12 @@ public abstract class PyBaseCode extends PyCode {
         return co_flags;
     }
 
-    private String positionalArgErrorMessage(int defcount, int argLength) {
+    private static String positionalArgErrorMessage(String name, int min, int max, int argLength) {
         return String.format("%.200s() takes from %d to %d positional arguments but %d were given",
-                co_name, co_argcount - defcount, co_argcount, argLength);
+                name, min, max, argLength);
+    }
+
+    private static String positionalArgErrorMessage(String name, int paramLength, int argLength) {
+        return String.format("%.200s() takes %d positional argument but %d were given", name, paramLength, argLength);
     }
 }
