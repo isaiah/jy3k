@@ -225,22 +225,13 @@ public class Import {
         if (!(code instanceof PyTableCode)) {
             throw Py.TypeError(String.format("expected TableCode, got %s", code.getType().fastGetName()));
         }
-        ThreadState ts = Py.getThreadState();
-        PyFrame f = new PyFrame(code, module.__dict__, module.__dict__);
         try {
-            MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
-                    MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
-            f.f_back = ts.frame;
-            ts.frame = f;
-            main.invoke(code.funcs, f, ts);
-//            code.call(Py.getThreadState(), f);
-            return true;
-        } catch (Throwable t) {
+            Py.runCode(code, module.__dict__, module.__dict__);
+        } catch (PyException e) {
             removeModule(name);
-            throw Py.JavaError(t);
-        } finally {
-            ts.frame = f.f_back;
+            throw e;
         }
+        return true;
     }
 
     /**

@@ -17,17 +17,22 @@ import org.python.modules._systemrestart;
 @ExposedType(name = "code", base = PyObject.class, doc = BuiltinDocs.code_doc)
 public class PyTableCode extends PyCode {
 
+    @ExposedGet
     public int co_argcount;
+    @ExposedGet
     public int co_kwonlyargcount;
+    @ExposedGet
     public int co_firstlineno = -1;
     public String[] co_varnames;
     public String[] co_names;
     public String[] co_cellvars;
     public String[] co_freevars;
     public PyObject[] co_consts;
+    @ExposedGet
     public String co_filename;
     public int jy_npurecell; // internal: jython specific
     public CompilerFlags co_flags = new CompilerFlags();
+    @ExposedGet
     public int co_nlocals;
     public boolean varargs, varkwargs;
     public PyFunctionTable funcs;
@@ -127,11 +132,6 @@ public class PyTableCode extends PyCode {
     }
 
     @ExposedGet
-    final PyObject co_argcount() {
-        return new PyLong(co_argcount);
-    }
-
-    @ExposedGet
     final PyObject co_varnames() {
         return toPyStringTuple(co_varnames);
     }
@@ -155,34 +155,15 @@ public class PyTableCode extends PyCode {
     final PyObject co_consts() {
         return new PyTuple(co_consts);
     }
-    @ExposedGet
-    final PyObject co_filename() {
-        return new PyUnicode(co_filename);
-    }
 
     @ExposedGet
-    final PyObject co_nlocals() {
-        return new PyLong(co_nlocals);
-    }
-
-    @ExposedGet
-    final PyObject co_name() {
+    public final PyObject co_name() {
         return new PyUnicode(co_name);
     }
 
     @ExposedGet
-    final PyObject co_flags() {
-        return Py.newLong(co_flags.toBits());
-    }
-
-    @ExposedGet
-    final PyObject co_kwonlyargcount() {
-        return Py.newLong(co_kwonlyargcount);
-    }
-
-    @ExposedGet
-    final PyObject co_firstlineno() {
-        return new PyLong(co_firstlineno);
+    public final int co_flags() {
+        return co_flags.toBits();
     }
 
     @Override
@@ -298,7 +279,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
+//        return call(state, frame, closure);
     }
 
     @Override
@@ -317,7 +299,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
+//        return call(state, frame, closure);
     }
 
     @Override
@@ -337,7 +320,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
+//        return call(state, frame, closure);
     }
 
     @Override
@@ -359,7 +343,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
+//        return call(state, frame, closure);
     }
 
     @Override
@@ -382,7 +367,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
+//        return call(state, frame, closure);
     }
 
     @Override
@@ -414,7 +400,8 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return call(state, frame, closure);
+//        return call(state, frame, closure);
+        return Py.runCode(state, this, frame, (PyTuple) closure);
     }
 
     public String toString() {

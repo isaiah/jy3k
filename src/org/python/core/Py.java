@@ -28,6 +28,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -1613,9 +1616,11 @@ public final class Py {
         return pye.match(exc);
     }
 
-    public static PyObject runCode(PyCode code, PyObject locals, PyObject globals) {
-        PyFrame f;
+    public static PyObject runCode(PyCode codeObj, PyObject locals, PyObject globals) {
         ThreadState ts = getThreadState();
+        return runCode(ts, codeObj, locals, globals, null);
+    }
+    public static PyObject runCode(ThreadState ts, PyCode codeObj, PyObject locals, PyObject globals, PyTuple closure) {
         if (locals == null || locals == Py.None) {
             if (globals != null && globals != Py.None) {
                 locals = globals;
@@ -1631,14 +1636,24 @@ public final class Py {
             // per documentation of eval and observed behavior of exec
             globals.__setitem__("__builtins__", ts.systemState.builtins);
         }
+        PyTableCode  code = (PyTableCode) codeObj;
+        PyFrame f = new PyFrame(code, locals, globals);
+        return runCode(ts, code, f, closure);
+    }
 
-        PyTableCode baseCode = null;
-        if (code instanceof PyTableCode) {
-            baseCode = (PyTableCode) code;
+    public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f, PyTuple closure) {
+         try {
+            MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
+                    MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+            f.f_back = ts.frame;
+            ts.frame = f;
+            f.setupEnv(closure);
+            return (PyObject) main.invoke(code.funcs, f, ts);
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        } finally {
+            ts.frame = f.f_back;
         }
-
-        f = new PyFrame(baseCode, locals, globals);
-        return code.call(ts, f);
     }
 
     public static void exec(PyObject o, PyObject globals, PyObject locals) {
@@ -2146,8 +2161,9 @@ public final class Py {
             dict.__setitem__("__doc__", classDoc);
         }
 
-        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals);
-        code.call(state, f, new PyTuple(closure_cells));
+//        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals);
+        Py.runCode(state, code, dict, state.frame.f_globals, new PyTuple(closure_cells));
+//        code.call(state, f, new PyTuple(closure_cells));
 
         try {
             if (isWide) {

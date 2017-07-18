@@ -298,6 +298,9 @@ public class BuiltinModule {
     }
 
     public static PyObject exec3(PyObject o, PyObject globals, PyObject locals) {
+        if (o instanceof PyTableCode) {
+            Py.runCode((PyTableCode) o, globals, locals);
+        }
         Py.exec(o, globals, locals);
         return Py.None;
     }

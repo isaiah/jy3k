@@ -44,5 +44,14 @@ public class MethodHandleFactory {
                 throw new LookupException(e);
             }
         }
+
+        @Override
+        public MethodHandle findConstructor(MethodHandles.Lookup explicitLookup, Class<?> clazz, MethodType type) {
+            try {
+                return explicitLookup.findConstructor(clazz, type);
+            } catch (NoSuchMethodException | IllegalAccessException e) {
+                throw new LookupException(e);
+            }
+        }
     }
 }

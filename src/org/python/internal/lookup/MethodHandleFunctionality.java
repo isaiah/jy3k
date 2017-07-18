@@ -6,4 +6,5 @@ import java.lang.invoke.MethodType;
 
 public interface MethodHandleFunctionality {
     public MethodHandle findStatic(MethodHandles.Lookup explicitLookup, Class<?> clazz, String name, MethodType type);
+    public MethodHandle findConstructor(MethodHandles.Lookup explicitLookup, Class<?> clazz, MethodType type);
 }

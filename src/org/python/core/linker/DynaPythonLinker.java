@@ -9,6 +9,7 @@ import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
+import org.python.core.CodeFlag;
 import org.python.core.Py;
 import org.python.core.BaseCode;
 import org.python.core.PyBoolean;
@@ -22,6 +23,9 @@ import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
+import org.python.core.generator.PyAsyncGenerator;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -49,6 +53,11 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandle W_BOOLEAN = MH.findStatic(LOOKUP, Py.class, "newBoolean", MethodType.methodType(PyBoolean.class, boolean.class));
     static final MethodHandle W_VOID = MethodHandles.constant(PyObject.class, Py.None);
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
+
+    static final MethodType GEN_SIG = MethodType.methodType(void.class, PyFrame.class, PyObject.class);
+    static final MethodHandle NEW_GENERATOR = MH.findConstructor(LOOKUP, PyGenerator.class, GEN_SIG);
+    static final MethodHandle NEW_COROUTINE = MH.findConstructor(LOOKUP, PyCoroutine.class, GEN_SIG);
+    static final MethodHandle NEW_ASYNC_GENERATOR = MH.findConstructor(LOOKUP, PyAsyncGenerator.class, GEN_SIG);
 
     @Override
     public GuardedInvocation getGuardedInvocation(LinkRequest linkRequest, LinkerServices linkerServices) throws Exception {
@@ -127,17 +136,29 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                         return new GuardedInvocation(mh, null,
                                 new SwitchPoint[0], ClassCastException.class);
                     }
-                } else if (self instanceof PyFunction) {
-                    PyFunction func = (PyFunction) self;
-                    PyTableCode code = (PyTableCode) func.__code__;
-                    Class<?> klazz = code.funcs.getClass();
-                    String funcName = code.funcname;
-                    mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
-                    mh = MethodHandles.insertArguments(mh, 0, code.funcs);
-                    mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
-                    MethodHandle frameFactory = MethodHandles.insertArguments(CREATE_FRAME, 1, func);
-                    mh = MethodHandles.filterArguments(mh, 1, frameFactory);
-                    mh = MethodHandles.insertArguments(mh, 2, Py.getThreadState());
+//                } else if (self instanceof PyFunction) {
+//                    PyFunction func = (PyFunction) self;
+//                    PyTableCode code = (PyTableCode) func.__code__;
+//                    Class<?> klazz = code.funcs.getClass();
+//                    String funcName = code.funcname;
+//                    MethodHandle frameFactory = MethodHandles.insertArguments(CREATE_FRAME, 1, func);
+//
+//                    if (code.co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+//                        mh = MethodHandles.insertArguments(NEW_GENERATOR, 1, func.__closure__);
+//                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+//                        mh = MethodHandles.insertArguments(NEW_COROUTINE, 1, func.__closure__);
+//                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+//                        mh = MethodHandles.insertArguments(NEW_ASYNC_GENERATOR, 1, func.__closure__);
+//                    } else {
+//                        mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+//                        mh = MethodHandles.insertArguments(mh, 0, code.funcs);
+//                        mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
+//                        mh = MethodHandles.filterArguments(mh, 1, frameFactory);
+//                        mh = MethodHandles.insertArguments(mh, 2, Py.getThreadState());
+//                        break;
+//                    }
+//                    mh = MethodHandles.filterArguments(mh, 0, frameFactory);
+//                    mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
                     // TODO start from here, check if can create a frame successfully, and if the closure if correctly injected
                 } else {
                     mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, ThreadState.class));
