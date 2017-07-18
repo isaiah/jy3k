@@ -141,7 +141,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         PyObject kw_defaults = ap.getPyObject(4, Py.None);
         PyObject closure = ap.getPyObject(5, Py.None);
 
-        if (!(code instanceof PyBaseCode)) {
+        if (!(code instanceof PyTableCode)) {
             throw Py.TypeError("function() argument 1 must be code, not " +
                                code.getType().fastGetName());
         }
@@ -156,7 +156,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         }
 
 
-        PyBaseCode tcode = (PyBaseCode)code;
+        PyTableCode tcode = (PyTableCode)code;
         int nfree = tcode.co_freevars == null ? 0 : tcode.co_freevars.length;
         if (!(closure instanceof PyTuple)) {
             if (nfree > 0 && closure == Py.None) {
@@ -233,10 +233,10 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
 
     @ExposedSet(name = "__code__")
     public void setCode(PyCode code) {
-        if (__code__ == null || !(code instanceof PyBaseCode)) {
+        if (__code__ == null || !(code instanceof PyTableCode)) {
             throw Py.TypeError("__code__ must be set to a code object");
         }
-        PyBaseCode tcode = (PyBaseCode)code;
+        PyTableCode tcode = (PyTableCode) code;
         int nfree = tcode.co_freevars == null ? 0 : tcode.co_freevars.length;
         int nclosure = __closure__ != null ? __closure__.__len__() : 0;
         if (nclosure != nfree) {
@@ -359,20 +359,17 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     }
 
     @Override
-    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
-            PyObject arg2) {
+    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2) {
         return __code__.call(state, arg0, arg1, arg2, __globals__, __defaults__, __kwdefaults__, __closure__);
     }
 
     @Override
-    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2,
-            PyObject arg3) {
+    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
         return __call__(Py.getThreadState(), arg0, arg1, arg2, arg3);
     }
 
     @Override
-    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
-            PyObject arg2, PyObject arg3) {
+    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
         return __code__.call(state, arg0, arg1, arg2, arg3, __globals__, __defaults__, __kwdefaults__, __closure__);
     }
 

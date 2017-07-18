@@ -385,6 +385,7 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
         c.iconst(jy_npurecell);
         c.iconst(kwonlyargcount);
         c.iconst(moreflags);
+        c.ldc(name);
 
         c.invokestatic(
                 p(Py.class),
@@ -392,7 +393,7 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
                 sig(PyCode.class, Integer.TYPE, String[].class, String.class, String.class,
                         Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
                         Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,
-                        Integer.TYPE, Integer.TYPE, Integer.TYPE));
+                        Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class));
         c.putstatic(module.classfile.name, name, ci(PyCode.class));
     }
 }

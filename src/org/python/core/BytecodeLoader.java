@@ -65,12 +65,12 @@ public class BytecodeLoader {
      * @param data
      *            the java byte code.
      */
-    public static PyCode makeCode(String name, byte[] data, String filename) {
+    public static PyTableCode makeCode(String name, byte[] data, String filename) {
         try {
             Class<?> c = makeClass(name, data);
             Object o = c.getConstructor(new Class[] {String.class})
                     .newInstance(new Object[] {filename});
-            return ((PyRunnable)o).getMain();
+            return (PyTableCode) ((PyRunnable)o).getMain();
         } catch (Exception e) {
             throw Py.JavaError(e);
         }

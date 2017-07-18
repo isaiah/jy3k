@@ -6,19 +6,22 @@ import jdk.dynalink.NamespaceOperation;
 import jdk.dynalink.StandardNamespace;
 import jdk.dynalink.StandardOperation;
 import jdk.dynalink.linker.GuardedInvocation;
-import jdk.dynalink.linker.GuardingDynamicLinker;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
-import jdk.dynalink.linker.support.Guards;
 import org.python.core.Py;
+import org.python.core.BaseCode;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFloat;
+import org.python.core.PyFrame;
+import org.python.core.PyFunction;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyTableCode;
 import org.python.core.PyUnicode;
+import org.python.core.ThreadState;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -33,6 +36,11 @@ import java.lang.invoke.SwitchPoint;
 public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
+    static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
+            MethodType.methodType(PyFrame.class, ThreadState.class, PyFunction.class));
+//            MethodType.methodType(PyFrame.class, PyObject[].class, String[].class, PyObject.class, PyObject[].class,
+//                    PyDictionary.class, PyObject.class));
+
     static final MethodHandle W_INTEGER = MH.findStatic(LOOKUP, Py.class, "newInteger", MethodType.methodType(PyLong.class, int.class));
     static final MethodHandle W_LONG = MH.findStatic(LOOKUP, Py.class, "newLong", MethodType.methodType(PyLong.class, long.class));
     static final MethodHandle W_UNICODE = MH.findStatic(LOOKUP, Py.class, "newUnicode", MethodType.methodType(PyUnicode.class, String.class));
@@ -89,18 +97,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                             }
                         }
                         /** Drop receiver for static method */
-                        mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
-                        if (returnType == int.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
-                        } else if (returnType == long.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_LONG);
-                        } else if (returnType == String.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_UNICODE);
-                        } else if (returnType == double.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_DOUBLE);
-                        } else if (returnType == float.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
-                        }
+                        mh = MethodHandles.dropArguments(mh, 0, PyObject.class, ThreadState.class);
+                        mh = asTypesafeReturn(mh, methodType);
                     } else {
                         mh = LOOKUP.findVirtual(klazz, funcname, methodType);
                         if (methodType.parameterCount() > 0) {
@@ -123,27 +121,27 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                         }
                         MethodHandle filter = MethodHandles.explicitCastArguments(GET_REAL_SELF, MethodType.methodType(klazz, PyObject.class));
                         mh = MethodHandles.filterArguments(mh, 0, filter);
-                        if (returnType == int.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
-                        } else if (returnType == long.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_LONG);
-                        } else if (returnType == String.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_UNICODE);
-                        } else if (returnType == double.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_DOUBLE);
-                        } else if (returnType == float.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
-                        } else if (returnType == boolean.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_BOOLEAN);
-                        } else if (returnType == void.class) {
-                            mh = MethodHandles.filterReturnValue(mh, W_VOID);
-                        }
+
+                        mh = asTypesafeReturn(mh, methodType);
+                        mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
                         return new GuardedInvocation(mh, null,
                                 new SwitchPoint[0], ClassCastException.class);
                     }
-                    break;
+                } else if (self instanceof PyFunction) {
+                    PyFunction func = (PyFunction) self;
+                    PyTableCode code = (PyTableCode) func.__code__;
+                    Class<?> klazz = code.funcs.getClass();
+                    String funcName = code.funcname;
+                    mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+                    mh = MethodHandles.insertArguments(mh, 0, code.funcs);
+                    mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
+                    MethodHandle frameFactory = MethodHandles.insertArguments(CREATE_FRAME, 1, func);
+                    mh = MethodHandles.filterArguments(mh, 1, frameFactory);
+                    mh = MethodHandles.insertArguments(mh, 2, Py.getThreadState());
+                    // TODO start from here, check if can create a frame successfully, and if the closure if correctly injected
+                } else {
+                    mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, ThreadState.class));
                 }
-                mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class));
                 break;
             default:
                 mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, PyObject[].class, String[].class));
@@ -152,11 +150,31 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
         return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
     }
 
+    private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {
+        Class<?> returnType = methodType.returnType();
+        if (returnType == int.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_INTEGER);
+        } else if (returnType == long.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_LONG);
+        } else if (returnType == String.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_UNICODE);
+        } else if (returnType == double.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_DOUBLE);
+        } else if (returnType == float.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_FLOAT);
+        } else if (returnType == boolean.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_BOOLEAN);
+        } else if (returnType == void.class) {
+            mh = MethodHandles.filterReturnValue(mh, W_VOID);
+        }
+        return mh;
+    }
+
     private static Object getDefaultValue(String def, Class<?> arg) {
         if (def.equals("null")) {
             return Py.None;
         } else if (arg == int.class) {
-            return Integer.valueOf(def).intValue();
+            return Integer.valueOf(def);
         } else if (arg == long.class) {
             return Long.valueOf(def);
         } else if (arg == String.class) {

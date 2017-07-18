@@ -714,7 +714,21 @@ public final class Py {
         PyTableCode code = new PyTableCode(argcount, varnames,
                 filename, name, firstlineno, args, keywords,
                 funcs, func_id, cellvars, freevars, names, consts, npurecell,
-                kwonlyargcount, moreflags);
+                kwonlyargcount, moreflags, null);
+        return code;
+    }
+
+    public static PyCode newCode(int argcount, String varnames[],
+                                 String filename, String name,
+                                 int firstlineno,
+                                 boolean args, boolean keywords,
+                                 PyFunctionTable funcs, int func_id,
+                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
+                                 int npurecell, int kwonlyargcount, int moreflags, String fname) {
+        PyTableCode code = new PyTableCode(argcount, varnames,
+                filename, name, firstlineno, args, keywords,
+                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                kwonlyargcount, moreflags, fname);
         return code;
     }
 
@@ -728,9 +742,8 @@ public final class Py {
         PyTableCode code = new PyTableCode(argcount, varnames,
                 filename, name, firstlineno, args, keywords,
                 funcs, func_id, cellvars, freevars, names, consts, npurecell,
-                kwonlyargcount, moreflags);
+                kwonlyargcount, moreflags, funcname);
         code.klazz = klazz;
-        code.funcname = funcname;
         return code;
     }
 
@@ -1619,9 +1632,9 @@ public final class Py {
             globals.__setitem__("__builtins__", ts.systemState.builtins);
         }
 
-        PyBaseCode baseCode = null;
-        if (code instanceof PyBaseCode) {
-            baseCode = (PyBaseCode) code;
+        PyTableCode baseCode = null;
+        if (code instanceof PyTableCode) {
+            baseCode = (PyTableCode) code;
         }
 
         f = new PyFrame(baseCode, locals, globals);
@@ -1646,7 +1659,7 @@ public final class Py {
         }
         if (o instanceof PyCode) {
             code = (PyCode) o;
-            if (locals == null && o instanceof PyBaseCode && ((PyBaseCode) o).hasFreevars()) {
+            if (locals == null && o instanceof PyTableCode && ((PyTableCode) o).hasFreevars()) {
                 throw Py.TypeError("code object passed to exec may not contain free variables");
             }
         } else {

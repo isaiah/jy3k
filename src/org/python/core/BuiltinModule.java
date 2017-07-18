@@ -330,7 +330,7 @@ public class BuiltinModule {
     }
 
     public static PyObject eval1(PyObject o) {
-        if (o instanceof PyBaseCode && ((PyBaseCode) o).hasFreevars()) {
+        if (o instanceof PyTableCode && ((PyTableCode) o).hasFreevars()) {
             throw Py.TypeError("code object passed to eval() may not contain free variables");
         }
         return eval3(o, null, null);

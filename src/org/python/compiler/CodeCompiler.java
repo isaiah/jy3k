@@ -453,16 +453,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.ldc(scope.qualname);
 
         if (!makeClosure(scope)) {
-            code.invokespecial(p(PyFunction.class), "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
-                            PyCode.class, PyObject.class, String.class));
-        } else {
-            code.invokespecial(
-                    p(PyFunction.class),
-                    "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
-                            PyCode.class, PyObject.class, String.class, PyObject[].class));
+            code.aconst_null();
         }
+        code.invokespecial(
+                p(PyFunction.class),
+                "<init>",
+                sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
+                        PyCode.class, PyObject.class, String.class, PyObject[].class));
 
         applyDecorators(decs);
 
@@ -1452,11 +1449,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.invokevirtual(p(PyObject.class), "__call__",
                     sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
         } else {
-            if (values.size() != 0)
-                loadThreadState();
+            loadThreadState();
+//            if (values.size() == 0)
+//                loadThreadState();
             switch (values.size()) {
                 case 0:
-                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class), LINKERBOOTSTRAP, Bootstrap.CALL);
 //                    code.invokevirtual(p(PyObject.class), "__call__",
 //                            sig(PyObject.class, ThreadState.class));
                     break;
@@ -1783,14 +1781,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         module.codeConstant(new Suite(node, node.getInternalBody()), name, true, className, node.getLine(), scope, cflags).get(code);
 
         if (!makeClosure(scope)) {
-            code.invokespecial(p(PyFunction.class), "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class));
-        } else {
-            code.invokespecial(
-                    p(PyFunction.class),
-                    "<init>",
-                    sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject[].class));
+            code.aconst_null();
+
         }
+        code.invokespecial(
+                p(PyFunction.class),
+                "<init>",
+                sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject[].class));
         code.dup();
         code.ldc(scope.qualname);
         code.putfield(p(PyFunction.class), "__qualname__", ci(String.class));

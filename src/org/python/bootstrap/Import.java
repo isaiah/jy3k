@@ -7,7 +7,7 @@ import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
-import org.python.core.PyBaseCode;
+import org.python.core.BaseCode;
 import org.python.core.PyCode;
 import org.python.core.PyDict;
 import org.python.core.PyDictionary;
@@ -28,6 +28,9 @@ import org.python.core.ThreadState;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -216,19 +219,27 @@ public class Import {
         } catch (IOException e) {
             throw Py.ImportError("frozen module not found " + name);
         }
-        PyCode code = BytecodeLoader.makeCode(name + Version.PY_CACHE_TAG, bytes, filename);
+        PyTableCode code = BytecodeLoader.makeCode(name + Version.PY_CACHE_TAG, bytes, filename);
         PyModule module = addModule(name);
 
         if (!(code instanceof PyTableCode)) {
             throw Py.TypeError(String.format("expected TableCode, got %s", code.getType().fastGetName()));
         }
+        ThreadState ts = Py.getThreadState();
+        PyFrame f = new PyFrame(code, module.__dict__, module.__dict__);
         try {
-            PyFrame f = new PyFrame((PyTableCode) code, module.__dict__, module.__dict__);
-            code.call(Py.getThreadState(), f);
+            MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
+                    MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+            f.f_back = ts.frame;
+            ts.frame = f;
+            main.invoke(code.funcs, f, ts);
+//            code.call(Py.getThreadState(), f);
             return true;
         } catch (Throwable t) {
             removeModule(name);
-            throw t;
+            throw Py.JavaError(t);
+        } finally {
+            ts.frame = f.f_back;
         }
     }
 
@@ -470,7 +481,7 @@ public class Import {
         boolean always_trim = pye.match(Py.ImportError);
         while (tb != null) {
             PyTraceback next = (PyTraceback) tb.tb_next;
-            PyBaseCode code = tb.tb_frame.f_code;
+            PyTableCode code = tb.tb_frame.f_code;
             boolean now_in_importlib = code.co_filename.equals(importlib_filename)
                     || code.co_filename.equals(external_filename);
             if (now_in_importlib && !in_importlib) {

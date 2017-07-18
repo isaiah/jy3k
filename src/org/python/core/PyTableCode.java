@@ -6,20 +6,36 @@ package org.python.core;
  * is stored as a PyFunctionTable instance and an integer index.
  */
 
+import org.python.core.generator.PyAsyncGenerator;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedType;
 import org.python.modules._systemrestart;
 
 @Untraversable
 @ExposedType(name = "code", base = PyObject.class, doc = BuiltinDocs.code_doc)
-public class PyTableCode extends PyBaseCode
-{
+public class PyTableCode extends PyCode {
 
-    PyFunctionTable funcs;
+    public int co_argcount;
+    public int co_kwonlyargcount;
+    public int co_firstlineno = -1;
+    public String[] co_varnames;
+    public String[] co_names;
+    public String[] co_cellvars;
+    public String[] co_freevars;
+    public PyObject[] co_consts;
+    public String co_filename;
+    public int jy_npurecell; // internal: jython specific
+    public CompilerFlags co_flags = new CompilerFlags();
+    public int co_nlocals;
+    public boolean varargs, varkwargs;
+    public PyFunctionTable funcs;
     int func_id;
     public String co_code = ""; // only used by inspect
     public Class<?> klazz;
     public String funcname;
+    int nargs;
 
     public PyTableCode(int argcount, String varnames[],
                        String filename, String name,
@@ -28,7 +44,7 @@ public class PyTableCode extends PyBaseCode
                        PyFunctionTable funcs, int func_id)
     {
         this(argcount, varnames, filename, name, firstlineno, varargs,
-             varkwargs, funcs, func_id, null, null, null, null, 0, 0, 0);
+             varkwargs, funcs, func_id, null, null, null, null, 0, 0, 0, null);
     }
 
     public PyTableCode(int argcount, String[] varnames,
@@ -38,7 +54,7 @@ public class PyTableCode extends PyBaseCode
                        PyFunctionTable funcs, int func_id,
                        String[] cellvars, String[] freevars, String[] names,
                        PyObject[] consts, int npurecell,
-                       int kwonlyargcount, int moreflags) // may change
+                       int kwonlyargcount, int moreflags, String funcname) // may change
     {
         co_argcount = nargs = argcount;
         co_varnames = varnames;
@@ -64,6 +80,7 @@ public class PyTableCode extends PyBaseCode
         co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
         this.funcs = funcs;
         this.func_id = func_id;
+        this.funcname = funcname;
         co_kwonlyargcount = kwonlyargcount;
     }
 
@@ -180,13 +197,6 @@ public class PyTableCode extends PyBaseCode
 
         // Push frame
         frame.f_back = ts.frame;
-//        if (frame.f_builtins == null) {
-//            if (frame.f_back != null) {
-//                frame.f_builtins = frame.f_back.f_builtins;
-//            } else {
-//                frame.f_builtins = ts.systemState.builtins;
-//            }
-//        }
         // nested scopes: setup env with closure
         // this should only be done once, so let the frame take care of it
         frame.setupEnv((PyTuple)closure);
@@ -265,8 +275,159 @@ public class PyTableCode extends PyBaseCode
         return ret;
     }
 
+    public boolean hasFreevars() {
+        return co_freevars != null && co_freevars.length > 0;
+    }
+
+    private boolean extractArg(int arg) {
+        return co_argcount == arg && co_kwonlyargcount == 0 && !varargs && !varkwargs;
+    }
+
     @Override
-    protected PyObject interpret(PyFrame f, ThreadState ts) {
-        throw new UnsupportedOperationException("Inlined interpret to improve call performance (may want to reconsider in the future).");
+    public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
+                         PyDictionary kw_defaults, PyObject closure)
+    {
+        if (!extractArg(0))
+            return call(state, Py.EmptyObjects, Py.NoKeywords, globals, defaults,
+                        kw_defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject globals, PyObject[] defaults,
+                         PyDictionary kw_defaults, PyObject closure)
+    {
+        if (!extractArg(1))
+            return call(state, new PyObject[] {arg1},
+                        Py.NoKeywords, globals, defaults, kw_defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        frame.f_fastlocals[0] = arg1;
+        if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
+                         PyObject[] defaults, PyDictionary kw_defaults, PyObject closure)
+    {
+        if (!extractArg(2))
+            return call(state, new PyObject[] {arg1, arg2},
+                        Py.NoKeywords, globals, defaults, kw_defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        frame.f_fastlocals[0] = arg1;
+        frame.f_fastlocals[1] = arg2;
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject arg3,
+                         PyObject globals, PyObject[] defaults, PyDictionary kw_defaults,
+                         PyObject closure)
+    {
+        if (!extractArg(3))
+            return call(state, new PyObject[] {arg1, arg2, arg3},
+                        Py.NoKeywords, globals, defaults, kw_defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        frame.f_fastlocals[0] = arg1;
+        frame.f_fastlocals[1] = arg2;
+        frame.f_fastlocals[2] = arg3;
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
+                         PyObject arg3, PyObject arg4, PyObject globals,
+                         PyObject[] defaults, PyDictionary kw_defaults, PyObject closure) {
+        if (!extractArg(4))
+            return call(state, new PyObject[]{arg1, arg2, arg3, arg4},
+                        Py.NoKeywords, globals, defaults, kw_defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        frame.f_fastlocals[0] = arg1;
+        frame.f_fastlocals[1] = arg2;
+        frame.f_fastlocals[2] = arg3;
+        frame.f_fastlocals[3] = arg4;
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject self, PyObject args[],
+                         String keywords[], PyObject globals,
+                         PyObject[] defaults, PyDictionary kw_defaults, PyObject closure)
+    {
+        PyObject[] os = new PyObject[args.length+1];
+        os[0] = self;
+        System.arraycopy(args, 0, os, 1, args.length);
+        return call(state, os, keywords, globals, defaults, kw_defaults, closure);
+    }
+
+    public int paramCount() {
+        int paramCount = co_argcount + co_kwonlyargcount;
+        if (varargs) paramCount++;
+        if (varkwargs) paramCount++;
+        return paramCount;
+    }
+
+    @Override
+    public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals,
+                         PyObject[] defs, PyDictionary kw_defaults, PyObject closure) {
+        PyFrame frame = BaseCode.createFrame(this, args, kws, globals, defs, kw_defaults);
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            return new PyCoroutine(frame, closure);
+        } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            return new PyAsyncGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
+    }
+
+    public String toString() {
+        return String.format("<code object %.100s at %s, file \"%.300s\", line %d>",
+                             co_name, Py.idstr(this), co_filename, co_firstlineno);
+    }
+
+    protected int getline(PyFrame f) {
+         return f.f_lineno;
+    }
+
+    // returns the augmented version of CompilerFlags (instead of just as a bit vector int)
+    public CompilerFlags getCompilerFlags() {
+        return co_flags;
     }
 }

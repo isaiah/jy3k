@@ -41,7 +41,7 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     /** The underyling code object. */
     @ExposedGet
-    public PyBaseCode f_code;
+    public PyTableCode f_code;
 
     /** builtin symbol table. */
     @ExposedGet
@@ -90,7 +90,18 @@ public class PyFrame extends PyObject implements Traverseproc {
     private static final String FREEVAR_ERROR_MSG =
             "free variable '%.200s' referenced before assignment";
 
-    public PyFrame(PyBaseCode code, PyObject locals, PyObject globals) {
+    /**
+     * Construct a frame from a function object
+     *
+     * The function object includes everything needed to create a frame
+     * __code__, __globals__, __defaults__, __kwdefaults__, __closure__
+     *
+     * @param func
+     */
+    public PyFrame(PyFunction func) {
+    }
+
+    public PyFrame(PyTableCode code, PyObject locals, PyObject globals) {
         super(TYPE);
         f_code = code;
         f_locals = locals;
@@ -133,7 +144,7 @@ public class PyFrame extends PyObject implements Traverseproc {
         }
     }
 
-    public PyFrame(PyBaseCode code, PyObject globals) {
+    public PyFrame(PyTableCode code, PyObject globals) {
         this(code, null, globals);
     }
 
@@ -403,6 +414,9 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public void setderef(int index, PyObject value) {
+        if (f_env[index] == null) {
+            f_env[index] = new PyCell();
+        }
         f_env[index].ob_ref = value;
     }
 

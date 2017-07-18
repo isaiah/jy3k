@@ -4,12 +4,13 @@ package org.python.core.generator;
 import org.python.core.BuiltinDocs;
 import org.python.core.CodeFlag;
 import org.python.core.Py;
-import org.python.core.PyBaseCode;
+import org.python.core.BaseCode;
 import org.python.core.PyCode;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
+import org.python.core.PyTableCode;
 import org.python.core.PyTraceback;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
@@ -368,6 +369,6 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     }
 
     public boolean isFlagSet(CodeFlag flag) {
-        return ((PyBaseCode) gi_code).co_flags.isFlagSet(flag);
+        return ((PyTableCode) gi_code).co_flags.isFlagSet(flag);
     }
 }

@@ -102,7 +102,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = "Internal: raise an exception for unsupported operations.")
-    final void _IOBase__unsupported(String name) {
+    public final void _IOBase__unsupported(String name) {
         throw unsupported(name);
     }
 
@@ -137,7 +137,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "0", doc = seek_doc)
-    final long _IOBase_seek(long pos, int whence) {
+    public final long _IOBase_seek(long pos, int whence) {
         throw unsupported("seek");
     }
 
@@ -151,7 +151,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = tell_doc)
-    final long _IOBase_tell() {
+    public final long _IOBase_tell() {
         return seek(0, 1);
     }
 
@@ -176,7 +176,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null", doc = truncate_doc)
-    final long _IOBase_truncate(PyObject size) {
+    public final long _IOBase_truncate(PyObject size) {
         throw unsupported("truncate");
     }
 
@@ -190,7 +190,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = flush_doc)
-    final void _IOBase_flush() {
+    public final void _IOBase_flush() {
         // Even types for which this remains a no-op must complain if closed (e.g. BytesIO)
         _checkClosed();
     }
@@ -223,7 +223,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = close_doc)
-    final void _IOBase_close() {
+    public final void _IOBase_close() {
         if (!__closed) {
             /*
              * The downstream file (file descriptor) will sometimes have been closed by another
@@ -254,7 +254,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = seekable_doc)
-    final boolean _IOBase_seekable() throws PyException {
+    public final boolean _IOBase_seekable() throws PyException {
         return false;
     }
 
@@ -282,7 +282,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null")
-    final void _IOBase__checkSeekable(String msg) {
+    public final void _IOBase__checkSeekable(String msg) {
         if (!invoke("seekable").__bool__()) {
             throw tailoredIOError(msg, "seek");
         }
@@ -299,7 +299,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = readable_doc)
-    final boolean _IOBase_readable() throws PyException {
+    public final boolean _IOBase_readable() throws PyException {
         return false;
     }
 
@@ -325,7 +325,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null")
-    final void _IOBase__checkReadable(String msg) {
+    public final void _IOBase__checkReadable(String msg) {
         if (!invoke("readable").__bool__()) {
             throw tailoredIOError(msg, "read");
         }
@@ -342,7 +342,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = writable_doc)
-    final boolean _IOBase_writable() throws PyException {
+    public final boolean _IOBase_writable() throws PyException {
         return false;
     }
 
@@ -368,7 +368,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null")
-    final void _IOBase__checkWritable(String msg) throws PyException {
+    public final void _IOBase__checkWritable(String msg) throws PyException {
         if (!invoke("writable").__bool__()) {
             throw tailoredIOError(msg, "writ");
         }
@@ -415,7 +415,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(names = {"__enter__", "__iter__"})
-    final PyObject _IOBase___enter__() {
+    public final PyObject _IOBase___enter__() {
         _checkClosed();
         return this;
     }
@@ -431,7 +431,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod
-    final boolean _IOBase___exit__(PyObject type, PyObject value, PyObject traceback) {
+    public final boolean _IOBase___exit__(PyObject type, PyObject value, PyObject traceback) {
         invoke("close");
         return false;
     }
@@ -450,7 +450,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = fileno_doc)
-    final PyObject _IOBase_fileno() {
+    public final PyObject _IOBase_fileno() {
         throw unsupported("fileno");
     }
 
@@ -492,7 +492,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null", doc = readline_doc)
-    final PyObject _IOBase_readline(PyObject limit) {
+    public final PyObject _IOBase_readline(PyObject limit) {
         if (limit == null || limit == Py.None) {
             return _readline(-1);
         } else if (limit.isIndex()) {
@@ -669,7 +669,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(doc = "x.__next__() <==> next(x)")
-    final PyObject _IOBase_next() throws PyException {
+    public final PyObject _IOBase_next() throws PyException {
         // Implement directly. Calling __next__() fails when PyIOBaseDerived is considered.
         PyObject line = invoke("readline");
         if (!line.__bool__()) {
@@ -689,7 +689,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "null", doc = readlines_doc)
-    final PyObject _IOBase_readlines(PyObject hint) {
+    public final PyObject _IOBase_readlines(PyObject hint) {
 
         int h = 0;
 
@@ -743,7 +743,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod
-    final PyObject _IOBase___lt__(PyObject other) {
+    public final PyObject _IOBase___lt__(PyObject other) {
         if (other instanceof PyLong) {
             PyObject fdObj = fileno();
             Object io = fdObj.__tojava__(RawIOBase.class);

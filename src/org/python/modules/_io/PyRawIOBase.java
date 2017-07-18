@@ -63,7 +63,7 @@ public class PyRawIOBase extends PyIOBase {
      * lead to nasty recursion in case a subclass doesn't implement either.)
      */
     @ExposedMethod(defaults = "null", doc = read_doc)
-    final PyObject _RawIOBase_read(PyObject n) {
+    public final PyObject _RawIOBase_read(PyObject n) {
         if (n == null || n == Py.None) {
             return _read(-1);
         } else if (n.isIndex()) {
@@ -128,7 +128,7 @@ public class PyRawIOBase extends PyIOBase {
     }
 
     @ExposedMethod(doc = readall_doc)
-    final synchronized PyObject _RawIOBase_readall() {
+    public final synchronized PyObject _RawIOBase_readall() {
 
         // Get reference to the (possibly overridden) read() method
         PyObject readMethod = __getattr__("read");
@@ -178,7 +178,7 @@ public class PyRawIOBase extends PyIOBase {
     }
 
     @ExposedMethod(doc = readinto_doc)
-    final synchronized PyLong _RawIOBase_readinto(PyObject b) {
+    public final synchronized PyLong _RawIOBase_readinto(PyObject b) {
         throw unsupported("readinto");
     }
 
@@ -194,7 +194,7 @@ public class PyRawIOBase extends PyIOBase {
     }
 
     @ExposedMethod(doc = write_doc)
-    final PyLong _RawIOBase_write(PyObject b) {
+    public final PyLong _RawIOBase_write(PyObject b) {
         throw unsupported("write");
     }
 
