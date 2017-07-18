@@ -200,6 +200,7 @@ user.py
 uu.py
 uuid.py
 warnings.py
+weakref.py
 whichdb.py
 whrandom.py
 wsgiref.egg-info
