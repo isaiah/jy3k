@@ -247,7 +247,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      */
     public PyObject eval(PyObject code) {
         setSystemState();
-        return Py.runCode((PyCode) code, getLocals(), null);
+        return Py.runCode((PyCode) code, null, getLocals());
     }
 
     /**
@@ -270,7 +270,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
 
     public void execfile(java.io.InputStream s, String name) {
         setSystemState();
-        Py.runCode(Py.compile_flags(s, name, CompileMode.exec, cflags), null, getLocals());
+        Py.runCode(Py.compile_flags(s, name, CompileMode.exec, cflags), getLocals(), null);
         Py.flushLine();
     }
 

@@ -90,7 +90,16 @@ public class PyFrame extends PyObject implements Traverseproc {
     private static final String FREEVAR_ERROR_MSG =
             "free variable '%.200s' referenced before assignment";
 
-    public PyFrame(PyTableCode code, PyObject locals, PyObject globals) {
+    /**
+     * Create a frame from code and context
+     *
+     * note: the globals should always come before locals, that's the order defined in `exec`
+     *
+     * @param code
+     * @param globals
+     * @param locals
+     */
+    public PyFrame(PyTableCode code, PyObject globals, PyObject locals) {
         super(TYPE);
         f_code = code;
         f_locals = locals;
@@ -134,7 +143,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public PyFrame(PyTableCode code, PyObject globals) {
-        this(code, null, globals);
+        this(code, globals, null);
     }
 
     /**

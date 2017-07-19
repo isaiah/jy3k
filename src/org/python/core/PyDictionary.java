@@ -161,7 +161,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict___len___doc)
-    final int dict___len__() {
+    public final int dict___len__() {
         return getMap().size();
     }
 
@@ -529,7 +529,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedMethod(doc = BuiltinDocs.dict_popitem_doc)
-    final PyObject dict_popitem() {
+    public final PyObject dict_popitem() {
         Iterator<Entry<PyObject, PyObject>> it = getMap().entrySet().iterator();
         if (!it.hasNext()) {
             throw Py.KeyError("popitem(): dictionary is empty");

@@ -1616,11 +1616,22 @@ public final class Py {
         return pye.match(exc);
     }
 
-    public static PyObject runCode(PyCode codeObj, PyObject locals, PyObject globals) {
+    /**
+     * Run a Codeobject with the provided context
+     *
+     * note: the globals should always come before locals, that's the order defined in `exec`
+     *
+     * @param codeObj
+     * @param locals
+     * @param globals
+     * @return
+     */
+    public static PyObject runCode(PyCode codeObj, PyObject globals, PyObject locals) {
         ThreadState ts = getThreadState();
-        return runCode(ts, codeObj, locals, globals, null);
+        return runCode(ts, codeObj, globals, locals, null);
     }
-    public static PyObject runCode(ThreadState ts, PyCode codeObj, PyObject locals, PyObject globals, PyTuple closure) {
+
+    public static PyObject runCode(ThreadState ts, PyCode codeObj, PyObject globals, PyObject locals, PyTuple closure) {
         if (locals == null || locals == Py.None) {
             if (globals != null && globals != Py.None) {
                 locals = globals;
@@ -1637,7 +1648,7 @@ public final class Py {
             globals.__setitem__("__builtins__", ts.systemState.builtins);
         }
         PyTableCode  code = (PyTableCode) codeObj;
-        PyFrame f = new PyFrame(code, locals, globals);
+        PyFrame f = new PyFrame(code, globals, locals);
         return runCode(ts, code, f, closure);
     }
 
@@ -1697,7 +1708,7 @@ public final class Py {
             code = Py.compile_flags(contents, "<string>", CompileMode.exec,
                     getCompilerFlags(flags, false));
         }
-        Py.runCode(code, locals, globals);
+        Py.runCode(code, globals, locals);
     }
 
     private final static ThreadStateMapping threadStateMapping = new ThreadStateMapping();
@@ -2162,7 +2173,7 @@ public final class Py {
         }
 
 //        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals);
-        Py.runCode(state, code, dict, state.frame.f_globals, new PyTuple(closure_cells));
+        Py.runCode(state, code, state.frame.f_globals, dict, new PyTuple(closure_cells));
 //        code.call(state, f, new PyTuple(closure_cells));
 
         try {

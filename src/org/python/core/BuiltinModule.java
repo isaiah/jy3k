@@ -325,7 +325,7 @@ public class BuiltinModule {
                 throw Py.TypeError("eval: argument 1 must be string or code object");
             }
         }
-        return Py.runCode(code, locals, globals);
+        return Py.runCode(code, globals, locals);
     }
 
     public static PyObject eval2(PyObject o, PyObject globals) {
