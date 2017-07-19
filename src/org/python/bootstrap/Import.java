@@ -226,12 +226,13 @@ public class Import {
             throw Py.TypeError(String.format("expected TableCode, got %s", code.getType().fastGetName()));
         }
         try {
-            Py.runCode(code, module.__dict__, module.__dict__);
-        } catch (PyException e) {
+            PyFrame f = new PyFrame(code, module.__dict__, module.__dict__);
+            Py.runCode(Py.getThreadState(), code, f, new PyTuple());
+            return true;
+        } catch (Throwable t) {
             removeModule(name);
-            throw e;
+            throw t;
         }
-        return true;
     }
 
     /**

@@ -1469,7 +1469,7 @@ public final class Py {
             Object javaError = value.__tojava__(Throwable.class);
 
             if (javaError != null && javaError != Py.NoConversion) {
-                stderr.println(getStackTrace((Throwable) javaError));
+                System.err.println(getStackTrace((Throwable) javaError));
             }
         }
         try {

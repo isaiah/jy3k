@@ -10,5 +10,5 @@ public interface PyRunnable {
     /**
      * Return the modules code object.
      */
-    abstract public PyCode getMain();
+    public PyCode getMain();
 }

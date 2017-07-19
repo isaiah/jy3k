@@ -90,17 +90,6 @@ public class PyFrame extends PyObject implements Traverseproc {
     private static final String FREEVAR_ERROR_MSG =
             "free variable '%.200s' referenced before assignment";
 
-    /**
-     * Construct a frame from a function object
-     *
-     * The function object includes everything needed to create a frame
-     * __code__, __globals__, __defaults__, __kwdefaults__, __closure__
-     *
-     * @param func
-     */
-    public PyFrame(PyFunction func) {
-    }
-
     public PyFrame(PyTableCode code, PyObject locals, PyObject globals) {
         super(TYPE);
         f_code = code;

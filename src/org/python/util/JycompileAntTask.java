@@ -64,9 +64,9 @@ public class JycompileAntTask extends GlobMatchingTask {
         } else if (toCompile.size() == 1) {
             log("Compiling 1 file");
         }
-        Properties props = new Properties();
-        props.setProperty(PySystemState.PYTHON_CACHEDIR_SKIP, "true");
-        PySystemState.initialize(System.getProperties(), props);
+//        Properties props = new Properties();
+//        props.setProperty(PySystemState.PYTHON_CACHEDIR_SKIP, "true");
+//        PySystemState.initialize(System.getProperties(), props);
         for (File src : toCompile) {
             try {
                 String name = getModuleName(src);
