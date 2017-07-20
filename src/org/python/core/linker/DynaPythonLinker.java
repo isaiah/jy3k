@@ -18,6 +18,7 @@ import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFloat;
 import org.python.core.PyFrame;
 import org.python.core.PyFunction;
+import org.python.core.PyFunctionTable;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
@@ -33,6 +34,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SwitchPoint;
+import java.lang.reflect.Method;
 
 /**
  * The dynamic linker implementation for Python objects
@@ -41,7 +43,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, ThreadState.class, PyFunction.class));
+            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class));
 //            MethodType.methodType(PyFrame.class, PyObject[].class, String[].class, PyObject.class, PyObject[].class,
 //                    PyDictionary.class, PyObject.class));
 
@@ -53,6 +55,10 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandle W_BOOLEAN = MH.findStatic(LOOKUP, Py.class, "newBoolean", MethodType.methodType(PyBoolean.class, boolean.class));
     static final MethodHandle W_VOID = MethodHandles.constant(PyObject.class, Py.None);
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
+    static final MethodHandle GET_FUNC_TBL = findOwnMH("getFuncTable", PyFunctionTable.class, PyObject.class);
+    static final MethodHandle GET_CLOSURE = findOwnMH("getClosure", PyObject.class, PyObject.class);
+    static final MethodHandle RESTORE_FRAME = findOwnMH("restoreFrame", PyObject.class, Throwable.class,
+            PyObject.class, PyObject.class, ThreadState.class);
 
     static final MethodType GEN_SIG = MethodType.methodType(void.class, PyFrame.class, PyObject.class);
     static final MethodHandle NEW_GENERATOR = MH.findConstructor(LOOKUP, PyGenerator.class, GEN_SIG);
@@ -136,30 +142,39 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                         return new GuardedInvocation(mh, null,
                                 new SwitchPoint[0], ClassCastException.class);
                     }
-//                } else if (self instanceof PyFunction) {
-//                    PyFunction func = (PyFunction) self;
-//                    PyTableCode code = (PyTableCode) func.__code__;
-//                    Class<?> klazz = code.funcs.getClass();
-//                    String funcName = code.funcname;
-//                    MethodHandle frameFactory = MethodHandles.insertArguments(CREATE_FRAME, 1, func);
-//
-//                    if (code.co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
-//                        mh = MethodHandles.insertArguments(NEW_GENERATOR, 1, func.__closure__);
-//                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
-//                        mh = MethodHandles.insertArguments(NEW_COROUTINE, 1, func.__closure__);
-//                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
-//                        mh = MethodHandles.insertArguments(NEW_ASYNC_GENERATOR, 1, func.__closure__);
-//                    } else {
-//                        mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
-//                        mh = MethodHandles.insertArguments(mh, 0, code.funcs);
-//                        mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
-//                        mh = MethodHandles.filterArguments(mh, 1, frameFactory);
-//                        mh = MethodHandles.insertArguments(mh, 2, Py.getThreadState());
-//                        break;
-//                    }
-//                    mh = MethodHandles.filterArguments(mh, 0, frameFactory);
-//                    mh = MethodHandles.dropArguments(mh, 0, PyObject.class); // drop receiver
-                    // TODO start from here, check if can create a frame successfully, and if the closure if correctly injected
+                } else if (self instanceof PyFunction) {
+                    PyFunction func = (PyFunction) self;
+                    PyTableCode code = (PyTableCode) func.__code__;
+                    Class<?> klazz = code.funcs.getClass();
+                    String funcName = code.funcname;
+
+                    Class<?> genCls;
+                    if (code.co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+                        mh = NEW_GENERATOR;
+                        genCls = PyGenerator.class;
+                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+                        mh = NEW_COROUTINE;
+                        genCls = PyCoroutine.class;
+                    } else if (code.co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+                        mh = NEW_ASYNC_GENERATOR;
+                        genCls = PyAsyncGenerator.class;
+                    } else {
+                        mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+                        mh = MethodHandles.dropArguments(mh, 2, PyObject.class, ThreadState.class);
+                        mh = MethodHandles.foldArguments(mh, 1, CREATE_FRAME);
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 1, 2, 2);
+                        mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class), 0, 0, 1);
+                        mh = MethodHandles.tryFinally(mh, RESTORE_FRAME);
+                        break;
+                    }
+                    mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
+                    mh = MethodHandles.dropArguments(mh, 1, PyObject.class, ThreadState.class);
+                    mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME);
+                    mh = MethodHandles.permuteArguments(mh,
+                            MethodType.methodType(genCls, PyObject.class, ThreadState.class), 0, 1, 0);
+//                    mh = mh.asType(MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class));
                 } else {
                     mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, ThreadState.class));
                 }
@@ -169,6 +184,24 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
         }
 
         return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+    }
+
+    /**
+     * Get the real java object that hosts the linked method handle from the function object
+     *
+     * it's func.__code__.funcs
+     */
+    private static PyFunctionTable getFuncTable(PyObject funcObj) {
+        return ((PyTableCode) ((PyFunction) funcObj).__code__).funcs;
+    }
+
+    private static PyObject getClosure(PyObject funcObj) {
+        return ((PyFunction) funcObj).__closure__;
+    }
+
+    private static PyObject restoreFrame(Throwable t, PyObject v, PyObject arg, ThreadState ts) {
+        ts.frame = ts.frame.f_back;
+        return v;
     }
 
     private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {

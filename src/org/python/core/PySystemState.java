@@ -881,15 +881,16 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
      * @return the console encoding; can be <code>null</code>
      */
     private static String getConsoleEncoding() {
-        String encoding = null;
-        try {
-            Method encodingMethod = java.io.Console.class.getDeclaredMethod("encoding");
-            encodingMethod.setAccessible(true); // private static method
-            encoding = (String)encodingMethod.invoke(Console.class);
-        } catch (Exception e) {
-            // ignore any exception
-        }
-        return encoding;
+        return Charset.defaultCharset().name();
+//        String encoding = null;
+//        try {
+//            Method encodingMethod = java.io.Console.class.getDeclaredMethod("encoding");
+//            encodingMethod.setAccessible(true); // private static method
+//            encoding = (String)encodingMethod.invoke(Console.class);
+//        } catch (Exception e) {
+//            // ignore any exception
+//        }
+//        return encoding;
     }
 
     /**
