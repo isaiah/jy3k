@@ -707,7 +707,7 @@ public final class Py {
         return mod;
     }
 
-    public static PyCode newCode(int argcount, String varnames[],
+    public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
                                  boolean args, boolean keywords,
@@ -721,7 +721,7 @@ public final class Py {
         return code;
     }
 
-    public static PyCode newCode(int argcount, String varnames[],
+    public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
                                  boolean args, boolean keywords,
@@ -735,7 +735,7 @@ public final class Py {
         return code;
     }
 
-    public static PyCode newCode(int argcount, String varnames[],
+    public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
                                  boolean args, boolean keywords,
@@ -1655,11 +1655,11 @@ public final class Py {
     public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f, PyTuple closure) {
          try {
             MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
-                    MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
+                    MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
             f.f_back = ts.frame;
             ts.frame = f;
             f.setupEnv(closure);
-            return (PyObject) main.invoke(code.funcs, f, ts);
+            return (PyObject) main.invokeExact(ts, f);
         } catch (Throwable t) {
             throw Py.JavaError(t);
         } finally {

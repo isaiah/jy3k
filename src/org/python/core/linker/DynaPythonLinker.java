@@ -44,8 +44,6 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
             MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class));
-//            MethodType.methodType(PyFrame.class, PyObject[].class, String[].class, PyObject.class, PyObject[].class,
-//                    PyDictionary.class, PyObject.class));
 
     static final MethodHandle W_INTEGER = MH.findStatic(LOOKUP, Py.class, "newInteger", MethodType.methodType(PyLong.class, int.class));
     static final MethodHandle W_LONG = MH.findStatic(LOOKUP, Py.class, "newLong", MethodType.methodType(PyLong.class, long.class));
@@ -96,19 +94,23 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 }
                 break;
             case CALL:
+                int argCount = linkRequest.getCallSiteDescriptor().getMethodType().parameterCount() - 2;
                 if (self instanceof PyBuiltinMethod) {
                     String funcname = ((PyBuiltinMethod) self).methodName;
                     Class<?> klazz = ((PyBuiltinMethod) self).klazz;
                     String descriptor = ((PyBuiltinMethod) self).methodDescriptor;
                     MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
-                    Class<?> returnType = methodType.returnType();
+                    String defaultVals = ((PyBuiltinMethod) self).defaultVals;
+                    String[] defaults = defaultVals.split(",");
+                    Class<?>[] paramArray = methodType.parameterArray();
+                    int defaultLength = defaults.length;
+                    int missingArg = methodType.parameterCount() - argCount;
+                    int startIndex = defaultLength - missingArg;
                     if (((PyBuiltinMethod) self).isStatic) {
                         mh = LOOKUP.findStatic(klazz, funcname, methodType);
-                        if (methodType.parameterCount() > 0) {
-                            int i = 0;
-                            String[] defaults = ((PyBuiltinMethod) self).defaultVals.split(",");
-                            for (Class<?> paramType : methodType.parameterArray()) {
-                                mh = MethodHandles.insertArguments(mh, i, getDefaultValue(defaults[i++], paramType));
+                        if (missingArg > 0) {
+                            for (int i = argCount; i < methodType.parameterCount(); i++) {
+                                mh = MethodHandles.insertArguments(mh, argCount + 1, getDefaultValue(defaults[startIndex++], paramArray[i]));
                             }
                         }
                         /** Drop receiver for static method */
@@ -117,7 +119,6 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     } else {
                         mh = LOOKUP.findVirtual(klazz, funcname, methodType);
                         if (methodType.parameterCount() > 0) {
-                            String defaultVals = ((PyBuiltinMethod) self).defaultVals;
                             if (defaultVals.equals("")) {
                                 // wide call
                                 if (methodType.parameterCount() == 2
@@ -126,11 +127,10 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                                     mh = MethodHandles.insertArguments(mh, 1, Py.EmptyObjects, Py.NoKeywords);
                                 }
                             } else {
-                                int i = 0;
-                                String[] defaults = defaultVals.split(",");
-                                for (Class<?> paramType : methodType.parameterArray()) {
-                                    // position 1 because the next argument is always at position 1
-                                    mh = MethodHandles.insertArguments(mh, 1, getDefaultValue(defaults[i++], paramType));
+                                if (missingArg > 0) {
+                                    for (int i = argCount; i < methodType.parameterCount(); i++) {
+                                        mh = MethodHandles.insertArguments(mh, argCount + 1, getDefaultValue(defaults[startIndex++], paramArray[i]));
+                                    }
                                 }
                             }
                         }
@@ -159,11 +159,12 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                         mh = NEW_ASYNC_GENERATOR;
                         genCls = PyAsyncGenerator.class;
                     } else {
-                        mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, PyFrame.class, ThreadState.class));
-                        mh = MethodHandles.dropArguments(mh, 2, PyObject.class, ThreadState.class);
-                        mh = MethodHandles.foldArguments(mh, 1, CREATE_FRAME);
+                        mh = LOOKUP.findVirtual(klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class);
+                        mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
                         mh = MethodHandles.permuteArguments(mh,
-                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 1, 2, 2);
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 2, 1, 2);
+//                        mh = mh.asCollector(PyObject[].class, argCount);
                         mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
                         mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class), 0, 0, 1);
                         mh = MethodHandles.tryFinally(mh, RESTORE_FRAME);
@@ -174,9 +175,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME);
                     mh = MethodHandles.permuteArguments(mh,
                             MethodType.methodType(genCls, PyObject.class, ThreadState.class), 0, 1, 0);
-//                    mh = mh.asType(MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class));
                 } else {
-                    mh = LOOKUP.findVirtual(self.getClass(), "__call__", MethodType.methodType(PyObject.class, ThreadState.class));
+                    mh = LOOKUP.findVirtual(self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));
                 }
                 break;
             default:

@@ -70,7 +70,7 @@ public class BytecodeLoader {
             Class<?> c = makeClass(name, data);
             Object o = c.getConstructor(new Class[] {String.class})
                     .newInstance(new Object[] {filename});
-            return (PyTableCode) ((PyRunnable)o).getMain();
+            return ((PyRunnable)o).getMain();
         } catch (Exception e) {
             throw Py.JavaError(e);
         }

@@ -171,11 +171,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public void loadFrame() throws Exception {
-        code.aload(1);
+        code.aload(2);
     }
 
     public void loadThreadState() throws Exception {
-        code.aload(2);
+        code.aload(1);
     }
 
     public void setLastI(int idx) throws Exception {
@@ -249,7 +249,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (nparamcell > 0) {
             java.util.List<String> paramcells = my_scope.jy_paramcells;
             for (int i = 0; i < nparamcell; i++) {
-                code.aload(1);
+                code.aload(2);
                 SymInfo syminf = tbl.get(paramcells.get(i));
                 code.iconst(syminf.locals_index);
                 code.iconst(syminf.env_index);
@@ -275,7 +275,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (my_scope.generator) {
             code.mark(genswitch);
 
-            code.aload(1);
+            code.aload(2);
             getLastI();
             Label[] y = {start};
             code.tableswitch(0, y.length - 1, start, y);
@@ -1450,8 +1450,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
         } else {
             loadThreadState();
-//            if (values.size() == 0)
-//                loadThreadState();
             switch (values.size()) {
                 case 0:
                     code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class), LINKERBOOTSTRAP, Bootstrap.CALL);
@@ -1466,6 +1464,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
                     } else {
+//                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class));
                     }

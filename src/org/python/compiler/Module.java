@@ -27,6 +27,7 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyRunnable;
 import org.python.core.PyRunnableBootstrap;
+import org.python.core.PyTableCode;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
 
@@ -339,12 +340,12 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
 
     @Override
     void get(Code c) throws IOException {
-        c.getstatic(module.classfile.name, name, ci(PyCode.class));
+        c.getstatic(module.classfile.name, name, ci(PyTableCode.class));
     }
 
     @Override
     void put(Code c) throws IOException {
-        module.classfile.addField(name, ci(PyCode.class), access);
+        module.classfile.addField(name, ci(PyTableCode.class), access);
         c.iconst(argcount);
 
         // Make all var names
@@ -390,11 +391,11 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
         c.invokestatic(
                 p(Py.class),
                 "newCode",
-                sig(PyCode.class, Integer.TYPE, String[].class, String.class, String.class,
+                sig(PyTableCode.class, Integer.TYPE, String[].class, String.class, String.class,
                         Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
                         Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,
                         Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class));
-        c.putstatic(module.classfile.name, name, ci(PyCode.class));
+        c.putstatic(module.classfile.name, name, ci(PyTableCode.class));
     }
 }
 
@@ -498,14 +499,13 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
                                 int firstlineno, ScopeInfo scope, CompilerFlags cflags) throws Exception {
-        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals,
-                firstlineno, scope, cflags, this);
+        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, firstlineno, scope, cflags, this);
         codes.add(code);
 
         CodeCompiler compiler = new CodeCompiler(this);
 
         Code c = classfile.addMethod(code.fname, //
-                sig(PyObject.class, PyFrame.class, ThreadState.class), ACC_PUBLIC);
+                sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
         compiler.parse(tree, c, fast_locals, className, scope, cflags);
         return code;
@@ -522,7 +522,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     public void addRunnable() throws IOException {
-        Code c = classfile.addMethod("getMain", sig(PyCode.class), ACC_PUBLIC);
+        Code c = classfile.addMethod("getMain", sig(PyTableCode.class), ACC_PUBLIC);
         mainCode.get(c);
         c.areturn();
     }
@@ -580,11 +580,11 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     public void addFunctions() throws IOException {
         Code code = classfile.addMethod("call_function", //
-                sig(PyObject.class, Integer.TYPE, PyFrame.class, ThreadState.class), ACC_PUBLIC);
+                sig(PyObject.class, Integer.TYPE, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
         code.aload(0); // this
-        code.aload(2); // frame
-        code.aload(3); // thread state
+        code.aload(2); // thread state
+        code.aload(3); // frame
         Label def = new Label();
         Label[] labels = new Label[codes.size()];
         int i;
@@ -598,7 +598,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         for (i = 0; i < labels.length; i++) {
             code.label(labels[i]);
             code.invokevirtual(classfile.name, (codes.get(i)).fname,
-                    sig(PyObject.class, PyFrame.class, ThreadState.class));
+                    sig(PyObject.class, ThreadState.class, PyFrame.class));
             code.areturn();
         }
         code.label(def);

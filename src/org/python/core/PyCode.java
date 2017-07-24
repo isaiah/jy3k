@@ -4,8 +4,7 @@ package org.python.core;
 /**
  * A super class for all python code implementations.
  */
-public abstract class PyCode extends PyObject
-{
+public abstract class PyCode extends PyObject {
     public String co_name;
 
     abstract public PyObject call(ThreadState state, PyFrame frame, PyObject closure);

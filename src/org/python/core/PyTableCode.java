@@ -198,7 +198,7 @@ public class PyTableCode extends PyCode {
         PyObject ret;
         ThreadStateMapping.enterCall(ts);
         try {
-            ret = funcs.call_function(func_id, frame, ts);
+            ret = funcs.call_function(func_id, ts, frame);
         } catch (Throwable t) {
             // Convert Exceptions that occurred in Java code to PyExceptions
             PyException pye = Py.JavaError(t);
