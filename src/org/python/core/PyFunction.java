@@ -1,22 +1,49 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.SwitchPoint;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
+import org.python.core.generator.PyAsyncGenerator;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
+import org.python.core.linker.DynaPythonLinker;
 import org.python.expose.ExposedDelete;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
+import org.python.internal.lookup.MethodHandleFactory;
+import org.python.internal.lookup.MethodHandleFunctionality;
 
 /**
  * A Python function.
  */
 @ExposedType(name = "function", isBaseType = false, doc = BuiltinDocs.function_doc)
 public class PyFunction extends PyObject implements InvocationHandler, Traverseproc {
+    static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+    static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
+    static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
+            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class));
+
+    static final MethodHandle GET_FUNC_TBL = findOwnMH("getFuncTable", PyFunctionTable.class, PyObject.class);
+    static final MethodHandle GET_CLOSURE = findOwnMH("getClosure", PyObject.class, PyObject.class);
+    static final MethodHandle RESTORE_FRAME = findOwnMH("restoreFrame", PyObject.class, Throwable.class,
+            PyObject.class, PyObject.class, ThreadState.class);
+
+    static final MethodType GEN_SIG = MethodType.methodType(void.class, PyFrame.class, PyObject.class);
+    static final MethodHandle NEW_GENERATOR = MH.findConstructor(LOOKUP, PyGenerator.class, GEN_SIG);
+    static final MethodHandle NEW_COROUTINE = MH.findConstructor(LOOKUP, PyCoroutine.class, GEN_SIG);
+    static final MethodHandle NEW_ASYNC_GENERATOR = MH.findConstructor(LOOKUP, PyAsyncGenerator.class, GEN_SIG);
 
     public static final PyType TYPE = PyType.fromClass(PyFunction.class);
 
@@ -477,6 +504,67 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     @Override
     public boolean isSequenceType() { return false; }
 
+    public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request) {
+        Object self = request.getReceiver();
+        PyFunction func = (PyFunction) self;
+        PyTableCode code = (PyTableCode) func.__code__;
+        Class<?> klazz = code.funcs.getClass();
+        String funcName = code.funcname;
+        MethodHandle mh;
+
+        Class<?> genCls;
+        if (code.co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            mh = NEW_GENERATOR;
+            genCls = PyGenerator.class;
+        } else if (code.co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
+            mh = NEW_COROUTINE;
+            genCls = PyCoroutine.class;
+        } else if (code.co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
+            mh = NEW_ASYNC_GENERATOR;
+            genCls = PyAsyncGenerator.class;
+        } else {
+            mh = MH.findVirtual(LOOKUP, klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
+            mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class);
+            mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
+            mh = MethodHandles.permuteArguments(mh,
+                    MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 2, 1, 2);
+//                        mh = mh.asCollector(PyObject[].class, argCount);
+            mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
+            mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class), 0, 0, 1);
+            mh = MethodHandles.tryFinally(mh, RESTORE_FRAME);
+            return new GuardedInvocation(mh, null,
+                    new SwitchPoint[0], ClassCastException.class);
+        }
+        mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
+        mh = MethodHandles.dropArguments(mh, 1, PyObject.class, ThreadState.class);
+        mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME);
+        mh = MethodHandles.permuteArguments(mh,
+                MethodType.methodType(genCls, PyObject.class, ThreadState.class), 0, 1, 0);
+        return new GuardedInvocation(mh, null,
+                new SwitchPoint[0], ClassCastException.class);
+    }
+
+    /**
+     * Get the real java object that hosts the linked method handle from the function object
+     *
+     * it's func.__code__.funcs
+     */
+    private static PyFunctionTable getFuncTable(PyObject funcObj) {
+        return ((PyTableCode) ((PyFunction) funcObj).__code__).funcs;
+    }
+
+    private static PyObject getClosure(PyObject funcObj) {
+        return ((PyFunction) funcObj).__closure__;
+    }
+
+    private static PyObject restoreFrame(Throwable t, PyObject v, PyObject arg, ThreadState ts) {
+        ts.frame = ts.frame.f_back;
+        return v;
+    }
+
+    private static MethodHandle findOwnMH(final String name, final Class<?> rtype, final Class<?>... types) {
+        return MH.findStatic(MethodHandles.lookup(), PyFunction.class, name, MethodType.methodType(rtype, types));
+    }
 
     /* Traverseproc implementation */
     @Override

@@ -46,6 +46,15 @@ public class MethodHandleFactory {
         }
 
         @Override
+        public MethodHandle findVirtual(MethodHandles.Lookup explicitLookup, Class<?> clazz, String name, MethodType type) {
+            try {
+                return explicitLookup.findVirtual(clazz, name, type);
+            } catch (NoSuchMethodException | IllegalAccessException e) {
+                throw new LookupException(e);
+            }
+        }
+
+        @Override
         public MethodHandle findConstructor(MethodHandles.Lookup explicitLookup, Class<?> clazz, MethodType type) {
             try {
                 return explicitLookup.findConstructor(clazz, type);
