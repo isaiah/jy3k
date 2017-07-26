@@ -78,7 +78,7 @@ public class PyFrozenSet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.frozenset___contains___doc)
-    final boolean frozenset___contains__(PyObject item) {
+    public final boolean frozenset___contains__(PyObject item) {
         return baseset___contains__(item);
     }
 
@@ -136,7 +136,7 @@ public class PyFrozenSet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.frozenset___len___doc)
-    final int frozenset___len__() {
+    public final int frozenset___len__() {
         return baseset___len__();
     }
 
@@ -146,12 +146,12 @@ public class PyFrozenSet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.frozenset___hash___doc)
-    final int frozenset___hash__() {
+    public final int frozenset___hash__() {
         return _set.hashCode();
     }
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.frozenset___repr___doc)
-    final String frozenset_toString() {
+    public final String frozenset_toString() {
         return baseset_toString();
     }
 

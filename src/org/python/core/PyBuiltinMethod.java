@@ -3,7 +3,6 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
-import org.python.core.linker.DynaPythonLinker;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
@@ -23,6 +22,11 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     static final MethodHandle W_FLOAT = MH.findStatic(LOOKUP, Py.class, "newFloat", MethodType.methodType(PyFloat.class, float.class));
     static final MethodHandle W_BOOLEAN = MH.findStatic(LOOKUP, Py.class, "newBoolean", MethodType.methodType(PyBoolean.class, boolean.class));
     static final MethodHandle W_VOID = MethodHandles.constant(PyObject.class, Py.None);
+
+    static final MethodHandle U_INTEGER = MH.findVirtual(LOOKUP, PyObject.class, "asInt", MethodType.methodType(int.class));
+    static final MethodHandle U_BOOLEAN = MH.findVirtual(LOOKUP, PyObject.class, "__bool__", MethodType.methodType(boolean.class));
+    static final MethodHandle IDENTITY = MethodHandles.identity(PyObject.class);
+
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
     static final MethodHandle IS_BUILTIN_METHOD_MH = findOwnMH("isBuiltinMethodMH", boolean.class, Object.class);
 
@@ -88,46 +92,65 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         int defaultLength = defaults.length;
         int missingArg = methodType.parameterCount() - argCount;
         int startIndex = defaultLength - missingArg;
+        boolean isWide = methodType.parameterCount() == 2
+                && methodType.parameterType(0) == PyObject[].class
+                && methodType.parameterType(1) == String[].class;
+        int argOffset = 0;
+        Class<?> selfType = klazz;
         if (((PyBuiltinMethod) receiver).isStatic) {
+            if (receiver instanceof PyBuiltinClassMethodNarrow) {
+                methodType = methodType.insertParameterTypes(0, PyType.class);
+                selfType = PyType.class;
+                argOffset = 1;
+            }
             mh = MH.findStatic(LOOKUP, klazz, funcname, methodType);
+        } else {
+            mh = MH.findVirtual(LOOKUP, klazz, funcname, methodType);
+            argOffset = 1;
+        }
+        // wide call
+        if (defaultVals.equals("") && isWide) {
+            if (argCount == 0) {
+                mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
+            } else {
+                mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
+                mh = mh.asCollector(argOffset, PyObject[].class, 1);
+            }
+        } else {
             if (missingArg > 0) {
                 for (int i = argCount; i < methodType.parameterCount(); i++) {
                     mh = MethodHandles.insertArguments(mh, argCount + 1, getDefaultValue(defaults[startIndex++], paramArray[i]));
                 }
             }
-            /** Drop receiver for static method */
-            mh = MethodHandles.dropArguments(mh, 0, PyObject.class, ThreadState.class);
-            mh = asTypesafeReturn(mh, methodType);
-        } else {
-            mh = MH.findVirtual(LOOKUP, klazz, funcname, methodType);
-            if (methodType.parameterCount() > 0) {
-                if (defaultVals.equals("")) {
-                    // wide call
-                    if (methodType.parameterCount() == 2
-                            && methodType.parameterType(0) == PyObject[].class
-                            && methodType.parameterType(1) == String[].class) {
-                        mh = MethodHandles.insertArguments(mh, 1, Py.EmptyObjects, Py.NoKeywords);
-                    }
-                } else {
-                    if (missingArg > 0) {
-                        for (int i = argCount; i < methodType.parameterCount(); i++) {
-                            mh = MethodHandles.insertArguments(mh, argCount + 1, getDefaultValue(defaults[startIndex++], paramArray[i]));
-                        }
-                    }
-                }
+            for (int i = 0; i < argCount; i++) {
+                mh = MethodHandles.filterArguments(mh, argOffset + i, convert(paramArray[i]));
             }
-            MethodHandle filter = MethodHandles.explicitCastArguments(GET_REAL_SELF, MethodType.methodType(klazz, PyObject.class));
-            mh = MethodHandles.filterArguments(mh, 0, filter);
-
-            mh = asTypesafeReturn(mh, methodType);
-            mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         }
+
+        if (argOffset > 0) {
+            MethodHandle filter = MethodHandles.explicitCastArguments(GET_REAL_SELF, MethodType.methodType(selfType, PyObject.class));
+            mh = MethodHandles.filterArguments(mh, 0, filter);
+        } else {
+            /** Drop receiver for static method */
+            mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
+        }
+        mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+        mh = asTypesafeReturn(mh, methodType);
         return new GuardedInvocation(mh, IS_BUILTIN_METHOD_MH, new SwitchPoint[0], ClassCastException.class);
     }
 
     @SuppressWarnings("unused")
     private static boolean isBuiltinMethodMH(final Object self) {
         return self instanceof PyBuiltinMethod;
+    }
+
+    private MethodHandle convert(Class<?> argType) {
+        if (argType == int.class) {
+            return U_INTEGER;
+        } else if (argType == boolean.class) {
+            return U_BOOLEAN;
+        }
+        return IDENTITY;
     }
 
     private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {

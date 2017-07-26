@@ -12,15 +12,15 @@ import org.python.expose.ExposedType;
  * A weak reference proxy object.
  */
 @ExposedType(name = "weakproxy", isBaseType = false)
-public class ProxyType extends AbstractReference {
+public class PyWeakProxy extends AbstractReference {
 
-    public static final PyType TYPE = PyType.fromClass(ProxyType.class);
+    public static final PyType TYPE = PyType.fromClass(PyWeakProxy.class);
 
-    public ProxyType(PyType subType, GlobalRef ref, PyObject callback) {
+    public PyWeakProxy(PyType subType, GlobalRef ref, PyObject callback) {
         super(subType, ref, callback);
     }
 
-    public ProxyType(GlobalRef ref, PyObject callback) {
+    public PyWeakProxy(GlobalRef ref, PyObject callback) {
         this(TYPE, ref, callback);
     }
 

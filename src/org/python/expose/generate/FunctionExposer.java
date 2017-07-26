@@ -1,8 +1,8 @@
 package org.python.expose.generate;
 
 import org.objectweb.asm.Type;
-import org.python.core.PyBuiltinClassMethodNarrow;
 import org.python.core.PyBuiltinMethod;
+import org.python.core.PyBuiltinMethodNarrow;
 
 public class FunctionExposer extends MethodExposer {
         public FunctionExposer(Type onType,
@@ -20,7 +20,7 @@ public class FunctionExposer extends MethodExposer {
               typeName,
               asNames,
               defaults,
-              isWide(desc) ? PyBuiltinMethod.class : PyBuiltinClassMethodNarrow.class,
+              isWide(desc) ? PyBuiltinMethod.class : PyBuiltinMethodNarrow.class,
               doc,
               true);
         if ((access & ACC_STATIC) == 0) {

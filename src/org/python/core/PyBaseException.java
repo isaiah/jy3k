@@ -56,7 +56,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
 
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.BaseException___init___doc)
-    final void BaseException___init__(PyObject[] args, String[] keywords) {
+    public final void BaseException___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser(getType().getName(), args, keywords, "args");
         ap.noKeywords();
         this.args = ap.getList(0);
@@ -77,7 +77,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException_with_traceback_doc)
-    final PyObject BaseException_with_traceback(PyObject tb) {
+    public final PyObject BaseException_with_traceback(PyObject tb) {
         __traceback__ = tb;
         return this;
     }
@@ -88,7 +88,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException___reduce___doc)
-    final PyObject BaseException___reduce__() {
+    public final PyObject BaseException___reduce__() {
         if (__dict__ != null) {
             return new PyTuple(getType(), args, __dict__);
         } else {
@@ -101,7 +101,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException___setstate___doc)
-    final PyObject BaseException___setstate__(PyObject state) {
+    public final PyObject BaseException___setstate__(PyObject state) {
         if (state != Py.None) {
             if (!(state instanceof PyStringMap) && !(state instanceof PyDictionary)) {
                 throw Py.TypeError("state is not a dictionary");
@@ -135,7 +135,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException___setattr___doc)
-    final void BaseException___setattr__(String name, PyObject value) {
+    public final void BaseException___setattr__(String name, PyObject value) {
         ensureDict();
         super.__setattr__(name, value);
     }
@@ -207,7 +207,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException___str___doc)
-    final PyUnicode BaseException___str__() {
+    public final PyUnicode BaseException___str__() {
         // CPython issue6108: if __str__ has been overridden in the subclass, unicode()
         // should return the message returned by __str__ as used to happen before this
         // method was implemented
@@ -236,7 +236,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.BaseException___repr___doc)
-    final PyUnicode BaseException_toString() {
+    public final PyUnicode BaseException_toString() {
         PyObject reprSuffix = args.__repr__();
         String name = getType().fastGetName();
         int lastDot = name.lastIndexOf('.');

@@ -46,7 +46,7 @@ public class PySet extends BaseSet {
 
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.set___init___doc)
-    final void set___init__(PyObject[] args, String[] kwds) {
+    public final void set___init__(PyObject[] args, String[] kwds) {
         if (args.length > 1 || kwds.length != 0) {
             throw PyBuiltinCallable.DefaultInfo.unexpectedCall(args.length, false, "Set", 0, 1);
         }
@@ -84,17 +84,17 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___contains___doc)
-    final boolean set___contains__(PyObject item) {
+    public final boolean set___contains__(PyObject item) {
         return baseset___contains__(item);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_copy_doc)
-    final PyObject set_copy() {
+    public final PyObject set_copy() {
         return baseset_copy();
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_union_doc)
-    final PyObject set_union(PyObject[] args, String [] kws) {
+    public final PyObject set_union(PyObject[] args, String [] kws) {
         if (kws.length > 0) {
             throw Py.TypeError("union() takes no keyword arguments");
         }
@@ -102,7 +102,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_difference_doc)
-    final PyObject set_difference(PyObject[] args, String [] kws) {
+    public final PyObject set_difference(PyObject[] args, String [] kws) {
         if (kws.length > 0) {
             throw Py.TypeError("difference() takes no keyword arguments");
         }
@@ -110,12 +110,12 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_symmetric_difference_doc)
-    final PyObject set_symmetric_difference(PyObject set) {
+    public final PyObject set_symmetric_difference(PyObject set) {
         return baseset_symmetric_difference(set);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_intersection_doc)
-    final PyObject set_intersection(PyObject[] args, String [] kws) {
+    public final PyObject set_intersection(PyObject[] args, String [] kws) {
         if (kws.length > 0) {
             throw Py.TypeError("intersection() takes no keyword arguments");
         }
@@ -123,27 +123,27 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_issubset_doc)
-    final PyObject set_issubset(PyObject set) {
+    public final PyObject set_issubset(PyObject set) {
         return baseset_issubset(set);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_issuperset_doc)
-    final PyObject set_issuperset(PyObject set) {
+    public final PyObject set_issuperset(PyObject set) {
         return baseset_issuperset(set);
     }
     
     @ExposedMethod(doc = BuiltinDocs.set_isdisjoint_doc)
-    final PyObject set_isdisjoint(PyObject set) {
+    public final PyObject set_isdisjoint(PyObject set) {
         return baseset_isdisjoint(set);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___len___doc)
-    final int set___len__() {
+    public final int set___len__() {
         return baseset___len__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___reduce___doc)
-    final PyObject set___reduce__() {
+    public final PyObject set___reduce__() {
         return baseset___reduce__();
     }
 
@@ -152,7 +152,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ior___doc)
-    final PyObject set___ior__(PyObject other) {
+    public final PyObject set___ior__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
         }
@@ -165,7 +165,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ixor___doc)
-    final PyObject set___ixor__(PyObject other) {
+    public final PyObject set___ixor__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
         }
@@ -178,7 +178,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___iand___doc)
-    final PyObject set___iand__(PyObject other) {
+    public final PyObject set___iand__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
         }
@@ -191,7 +191,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___isub___doc)
-    final PyObject set___isub__(PyObject other) {
+    public final PyObject set___isub__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
         }
@@ -204,17 +204,17 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___hash___doc)
-    final int set___hash__() {
+    public final int set___hash__() {
         throw Py.TypeError("set objects are unhashable");
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_add_doc)
-    final void set_add(PyObject o) {
+    public final void set_add(PyObject o) {
         _set.add(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_remove_doc)
-    final void set_remove(PyObject o) {
+    public final void set_remove(PyObject o) {
         boolean b = false;
         try {
             b = _set.remove(o);
@@ -228,7 +228,7 @@ public class PySet extends BaseSet {
     }
 
     @ExposedMethod(doc = BuiltinDocs.set_discard_doc)
-    final void set_discard(PyObject o) {
+    public final void set_discard(PyObject o) {
         try {
             _set.remove(o);
         } catch (PyException e) {

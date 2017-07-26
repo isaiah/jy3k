@@ -1464,9 +1464,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
                     } else {
-//                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
-                        code.invokevirtual(p(PyObject.class), "__call__",
-                                sig(PyObject.class, ThreadState.class, PyObject.class));
+                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//                        code.invokevirtual(p(PyObject.class), "__call__",
+//                                sig(PyObject.class, ThreadState.class, PyObject.class));
                     }
                     break;
                 case 2:
