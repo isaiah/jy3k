@@ -20,6 +20,7 @@ import org.python.core.PyFrame;
 import org.python.core.PyFunction;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 import org.python.core.PyUnicode;
@@ -74,7 +75,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 }
                 break;
             case CALL:
-                if (self instanceof PyBuiltinMethod) {
+                if (self instanceof PyBuiltinMethod && !(self instanceof PyNewWrapper)) {
                     return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyFunction) {
                     return ((PyFunction) self).findCallMethod(desc, linkRequest);

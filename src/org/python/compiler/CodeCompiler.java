@@ -1464,7 +1464,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
                     } else {
-                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                                PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
 //                        code.invokevirtual(p(PyObject.class), "__call__",
 //                                sig(PyObject.class, ThreadState.class, PyObject.class));
                     }
@@ -1472,29 +1473,35 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 case 2:
                     visit(values.get(0));
                     visit(values.get(1));
-                    code.invokevirtual(p(PyObject.class), "__call__",
-                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class));
+                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                            PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//                    code.invokevirtual(p(PyObject.class), "__call__",
+//                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class));
                     break;
                 case 3:
                     visit(values.get(0));
                     visit(values.get(1));
                     visit(values.get(2));
-                    code.invokevirtual(
-                            p(PyObject.class),
-                            "__call__",
-                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class,
-                                    PyObject.class));
+                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                            PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//                    code.invokevirtual(
+//                            p(PyObject.class),
+//                            "__call__",
+//                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class,
+//                                    PyObject.class));
                     break;
                 case 4:
                     visit(values.get(0));
                     visit(values.get(1));
                     visit(values.get(2));
                     visit(values.get(3));
-                    code.invokevirtual(
-                            p(PyObject.class),
-                            "__call__",
-                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class,
-                                    PyObject.class, PyObject.class));
+                    code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                            PyObject.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//                    code.invokevirtual(
+//                            p(PyObject.class),
+//                            "__call__",
+//                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class,
+//                                    PyObject.class, PyObject.class));
                     break;
                 default:
                     loadArray(code, values);

@@ -12,6 +12,14 @@ public class BaseCode {
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts) {
         return createFrame(funcObj, ts, Py.EmptyObjects);
     }
+    // create a frame with arguments and without ThreadState
+    public static PyFrame createFrame(PyObject funcObj, PyObject[] args) {
+        PyFunction function = (PyFunction) funcObj;
+        PyFrame frame = createFrame((PyTableCode) function.__code__, args, Py.NoKeywords, function.__globals__,
+                function.__defaults__, function.__kwdefaults__);
+        frame.setupEnv((PyTuple) function.__closure__);
+        return frame;
+    }
 
     // create a frame with arguments
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args) {

@@ -25,7 +25,10 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
 
     static final MethodHandle U_INTEGER = MH.findVirtual(LOOKUP, PyObject.class, "asInt", MethodType.methodType(int.class));
     static final MethodHandle U_BOOLEAN = MH.findVirtual(LOOKUP, PyObject.class, "__bool__", MethodType.methodType(boolean.class));
-    static final MethodHandle IDENTITY = MethodHandles.identity(PyObject.class);
+    static final MethodHandle U_STRING = MH.findVirtual(LOOKUP, PyBytes.class, "getString", MethodType.methodType(String.class));
+    static final MethodHandle CAST_UNICODE = MethodHandles.explicitCastArguments(U_STRING, MethodType.methodType(String.class, PyObject.class));
+    static final MethodHandle U_DOUBLE = MH.findVirtual(LOOKUP, PyObject.class, "asDouble", MethodType.methodType(double.class));
+    static final MethodHandle U_LONG = MH.findVirtual(LOOKUP, PyObject.class, "asLong", MethodType.methodType(long.class));
 
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
     static final MethodHandle IS_BUILTIN_METHOD_MH = findOwnMH("isBuiltinMethodMH", boolean.class, Object.class);
@@ -123,7 +126,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 }
             }
             for (int i = 0; i < argCount; i++) {
-                mh = MethodHandles.filterArguments(mh, argOffset + i, convert(paramArray[i]));
+                mh = convert(mh, argOffset + i, paramArray[i]);
             }
         }
 
@@ -144,13 +147,24 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         return self instanceof PyBuiltinMethod;
     }
 
-    private MethodHandle convert(Class<?> argType) {
+    private MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {
+        MethodHandle filter = null;
         if (argType == int.class) {
-            return U_INTEGER;
+            filter = U_INTEGER;
         } else if (argType == boolean.class) {
-            return U_BOOLEAN;
+            filter = U_BOOLEAN;
+        } else if (argType == String.class) {
+            filter = CAST_UNICODE;
+        } else if (argType == double.class) {
+            filter = U_DOUBLE;
+        } else if (argType == long.class) {
+            filter = U_LONG;
         }
-        return IDENTITY;
+        if (filter != null) {
+            return MethodHandles.filterArguments(mh, idx, filter);
+        } else {
+            return mh;
+        }
     }
 
     private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {

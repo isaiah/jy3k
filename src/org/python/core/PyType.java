@@ -156,7 +156,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___init___doc)
-    final void type___init__(PyObject[] args, String[] kwds) {
+    public final void type___init__(PyObject[] args, String[] kwds) {
         if (kwds.length > 0) {
             throw Py.TypeError("type.__init__() takes no keyword arguments");
         }
@@ -1496,7 +1496,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___setattr___doc)
-    final void type___setattr__(PyObject name, PyObject value) {
+    public final void type___setattr__(PyObject name, PyObject value) {
         type___setattr__(asName(name), value);
     }
 

@@ -292,7 +292,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___str___doc)
-    final PyUnicode bytes___str__() {
+    public final PyUnicode bytes___str__() {
         return new PyUnicode("b" + Encoding.encode_UnicodeEscape(getString(), true));
     }
 
@@ -308,7 +308,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___len___doc)
-    final int bytes___len__() {
+    public final int bytes___len__() {
         return getString().length();
     }
 
@@ -323,12 +323,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___repr___doc)
-    final PyUnicode bytes___repr__() {
+    public final PyUnicode bytes___repr__() {
         return new PyUnicode("b" + Encoding.encode_UnicodeEscapeAsASCII(getString(), true));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___getitem___doc)
-    final PyObject bytes___getitem__(PyObject index) {
+    public final PyObject bytes___getitem__(PyObject index) {
         PyObject ret = seq___finditem__(index);
         if (ret == null) {
             throw Py.IndexError("string index out of range");
@@ -366,7 +366,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___hash___doc)
-    final int bytes___hash__() {
+    public final int bytes___hash__() {
         return getString().hashCode();
     }
 
@@ -435,7 +435,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___contains___doc)
-    final boolean bytes___contains__(PyObject o) {
+    public final boolean bytes___contains__(PyObject o) {
         if (o instanceof PyLong) {
             return getString().contains(String.valueOf(Character.toChars(o.asInt())));
         }
@@ -469,7 +469,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___mul___doc)
-    final PyObject bytes___mul__(PyObject o) {
+    public final PyObject bytes___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -482,7 +482,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___rmul___doc)
-    final PyObject bytes___rmul__(PyObject o) {
+    public final PyObject bytes___rmul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -500,7 +500,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___add___doc)
-    final PyObject bytes___add__(PyObject other) {
+    public final PyObject bytes___add__(PyObject other) {
         // Expect other to be some kind of byte-like object.
         String otherStr = Encoding.asStringOrNull(other);
         if (otherStr != null) {
@@ -574,27 +574,27 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_lower_doc)
-    final String bytes_lower() {
+    public final String bytes_lower() {
         return getString().toLowerCase(Locale.ROOT);
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_upper_doc)
-    final String bytes_uuper() {
+    public final String bytes_uuper() {
         return getString().toUpperCase(Locale.ROOT);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_title_doc)
-    final String bytes_title() {
+    public final String bytes_title() {
         return Encoding.title(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_swapcase_doc)
-    final String bytes_swapcase() {
+    public final String bytes_swapcase() {
         return Encoding.swapcase(getString());
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_strip_doc)
-    final PyObject bytes_strip(PyObject chars) {
+    public final PyObject bytes_strip(PyObject chars) {
         if (chars instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -606,7 +606,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_lstrip_doc)
-    final PyObject bytes_lstrip(PyObject chars) {
+    public final PyObject bytes_lstrip(PyObject chars) {
         if (chars instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -618,7 +618,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_rstrip_doc)
-    final PyObject bytes_rstrip(PyObject chars) {
+    public final PyObject bytes_rstrip(PyObject chars) {
         if (chars instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -630,7 +630,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_split_doc)
-    final PyList bytes_split(PyObject[] args, String[] keywords) {
+    public final PyList bytes_split(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("split", args, keywords, "sep", "maxsplit");
         PyObject sep = ap.getPyObject(0, Py.None);
         int maxsplit = ap.getInt(1, -1);
@@ -643,7 +643,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_split_doc)
-    final PyList bytes_rsplit(PyObject[] args, String[] keywords) {
+    public final PyList bytes_rsplit(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("rsplit", args, keywords, "sep", "maxsplit");
         PyObject sep = ap.getPyObject(0, Py.None);
         int maxsplit = ap.getInt(1, -1);
@@ -653,7 +653,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_partition_doc)
-    final PyTuple bytes_partition(PyObject sepObj) {
+    public final PyTuple bytes_partition(PyObject sepObj) {
 
         if (sepObj instanceof PyUnicode) {
             // Deal with Unicode separately
@@ -678,7 +678,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_rpartition_doc)
-    final PyTuple bytes_rpartition(PyObject sepObj) {
+    public final PyTuple bytes_rpartition(PyObject sepObj) {
 
         if (sepObj instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
@@ -701,7 +701,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_splitlines_doc)
-    final PyList bytes_splitlines(PyObject[] args, String[] keywords) {
+    public final PyList bytes_splitlines(PyObject[] args, String[] keywords) {
         ArgParser arg = new ArgParser("splitlines", args, keywords, "keepends");
         boolean keepends = arg.getPyObject(0, Py.False).__bool__();
 
@@ -723,12 +723,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_index_doc)
-    final int bytes_index(PyObject subObj, PyObject start, PyObject end) {
+    public final int bytes_index(PyObject subObj, PyObject start, PyObject end) {
         return checkIndex(bytes_find(subObj, start, end));
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_rindex_doc)
-    final int bytes_rindex(PyObject subObj, PyObject start, PyObject end) {
+    public final int bytes_rindex(PyObject subObj, PyObject start, PyObject end) {
         return checkIndex(bytes_rfind(subObj, start, end));
     }
 
@@ -750,7 +750,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_count_doc)
-    final int bytes_count(PyObject subObj, PyObject start, PyObject end) {
+    public final int bytes_count(PyObject subObj, PyObject start, PyObject end) {
         if (subObj instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -761,7 +761,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_find_doc)
-    final int bytes_find(PyObject subObj, PyObject start, PyObject end) {
+    public final int bytes_find(PyObject subObj, PyObject start, PyObject end) {
         if (subObj instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -772,7 +772,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytes_rfind_doc)
-    final int bytes_rfind(PyObject subObj, PyObject start, PyObject end) {
+    public final int bytes_rfind(PyObject subObj, PyObject start, PyObject end) {
         if (subObj instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -801,7 +801,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_ljust_doc)
-    final PyBytes bytes_ljust(int width, String fillchar) {
+    public final PyBytes bytes_ljust(int width, String fillchar) {
         char pad = parse_fillchar("ljust", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
@@ -811,7 +811,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_rjust_doc)
-    final PyBytes bytes_rjust(int width, String fillchar) {
+    public final PyBytes bytes_rjust(int width, String fillchar) {
         char pad = parse_fillchar("rjust", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
@@ -821,7 +821,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_center_doc)
-    final PyBytes bytes_center(int width, String fillchar) {
+    public final PyBytes bytes_center(int width, String fillchar) {
         char pad = parse_fillchar("center", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
@@ -836,22 +836,22 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_zfill_doc)
-    final PyBytes bytes_zfill(int width) {
+    public final PyBytes bytes_zfill(int width) {
         return new PyBytes(Encoding.zfill(getString(), width).toString());
     }
 
     @ExposedMethod(defaults = "8", doc = BuiltinDocs.bytes_expandtabs_doc)
-    final PyBytes bytes_expandtabs(int tabsize) {
+    public final PyBytes bytes_expandtabs(int tabsize) {
         return new PyBytes(Encoding.expandtabs(getString(), tabsize));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_capitalize_doc)
-    final PyBytes bytes_capitalize() {
+    public final PyBytes bytes_capitalize() {
         return new PyBytes(Encoding.capitalize(getString()));
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.bytes_replace_doc)
-    final PyBytes bytes_replace(PyObject oldPieceObj, PyObject newPieceObj, int count) {
+    public final PyBytes bytes_replace(PyObject oldPieceObj, PyObject newPieceObj, int count) {
         if (oldPieceObj instanceof PyUnicode || newPieceObj instanceof PyUnicode) {
             throw Py.TypeError(BYTES_REQUIRED_ERROR);
         } else {
@@ -896,7 +896,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_startswith_doc)
-    final boolean bytes_startswith(PyObject prefix, PyObject startObj, PyObject endObj) {
+    public final boolean bytes_startswith(PyObject prefix, PyObject startObj, PyObject endObj) {
         if (prefix instanceof PyUnicode) {
             throw Py.TypeError("startswith first arg must be bytes or a tuple of bytes, not str");
         }
@@ -904,12 +904,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_endswith_doc)
-    final boolean bytes_endswith(PyObject suffix, PyObject startObj, PyObject endObj) {
+    public final boolean bytes_endswith(PyObject suffix, PyObject startObj, PyObject endObj) {
         return Encoding.endswith(getString(), suffix, startObj, endObj, __len__());
     }
 
     @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_translate_doc)
-    final PyBytes bytes_translate(PyObject tableObj, PyObject deletecharsObj) {
+    public final PyBytes bytes_translate(PyObject tableObj, PyObject deletecharsObj) {
         String table = Encoding.asStringOrNull(tableObj);
         String deletechars = null;
         if (deletecharsObj != null) {
@@ -957,7 +957,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_fromhex_doc)
-    static final PyObject bytes_fromhex(PyType type, PyObject obj) {
+    public static final PyObject bytes_fromhex(PyType type, PyObject obj) {
         byte[] argbuf;
         if (obj instanceof PyUnicode) {
             argbuf = ((PyUnicode) obj).getString().getBytes();
@@ -979,7 +979,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_maketrans_doc)
-    static final PyObject bytes_maketrans(PyType type, PyObject fromstr, PyObject tostr, PyObject other) {
+    public static final PyObject bytes_maketrans(PyType type, PyObject fromstr, PyObject tostr, PyObject other) {
         if (fromstr.__len__() != tostr.__len__()) {
             throw Py.ValueError("maketrans arguments must have same length");
         }
@@ -999,47 +999,47 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_islower_doc)
-    final boolean bytes_islower() {
+    public final boolean bytes_islower() {
         return Encoding.isLowercase(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isupper_doc)
-    final boolean bytes_isupper() {
+    public final boolean bytes_isupper() {
         return Encoding.isUppercase(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isalpha_doc)
-    final boolean bytes_isalpha() {
+    public final boolean bytes_isalpha() {
         return Encoding.isAlpha(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isalnum_doc)
-    final boolean bytes_isalnum() {
+    public final boolean bytes_isalnum() {
         return Encoding.isAlnum(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isdecimal_doc)
-    final boolean bytes_isdecimal() {
+    public final boolean bytes_isdecimal() {
         return Encoding.isDecimal(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isdigit_doc)
-    final boolean bytes_isdigit() {
+    public final boolean bytes_isdigit() {
         return Encoding.isDigit(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_isnumeric_doc)
-    final boolean bytes_isnumeric() {
+    public final boolean bytes_isnumeric() {
         return Encoding.isNumeric(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_istitle_doc)
-    final boolean bytes_istitle() {
+    public final boolean bytes_istitle() {
         return Encoding.isTitle(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_isspace_doc)
-    final boolean bytes_isspace() {
+    public final boolean bytes_isspace() {
         return Encoding.isSpace(getString());
     }
 
@@ -1056,7 +1056,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_decode_doc)
-    final PyObject bytes_decode(PyObject[] args, String[] keywords) {
+    public final PyObject bytes_decode(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("decode", args, keywords, "encoding", "errors");
         String encoding = ap.getString(0, "UTF-8");
         String errors = ap.getString(1, "strict");
@@ -1064,12 +1064,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = ""/*BuiltinDocs.str__formatter_parser_doc*/)
-    final PyObject bytes__formatter_parser() {
+    public final PyObject bytes__formatter_parser() {
         return new MarkupIterator(getString());
     }
 
     @ExposedMethod(doc = ""/*BuiltinDocs.str__formatter_field_name_split_doc*/)
-    final PyObject bytes__formatter_field_name_split() {
+    public final PyObject bytes__formatter_field_name_split() {
         FieldNameIterator iterator = new FieldNameIterator(getString(), true);
         return new PyTuple(iterator.pyHead(), iterator);
     }
@@ -1080,7 +1080,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes___format___doc)
-    final PyObject bytes___format__(PyObject formatSpec) {
+    public final PyObject bytes___format__(PyObject formatSpec) {
         return Encoding.format(getString(), formatSpec, true);
     }
 
