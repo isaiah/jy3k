@@ -114,7 +114,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
             } else {
                 mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
-                mh = mh.asCollector(argOffset, PyObject[].class, 1);
+                mh = mh.asCollector(argOffset, PyObject[].class, argCount);
             }
         } else {
             if (missingArg > 0) {

@@ -77,9 +77,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 if (self instanceof PyBuiltinMethod) {
                     return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyFunction) {
-                    if (desc.getMethodType().parameterCount() == 2) {
-                        return ((PyFunction) self).findCallMethod(desc, linkRequest);
-                    }
+                    return ((PyFunction) self).findCallMethod(desc, linkRequest);
                 }
                 /** PyBuiltinFuction from builtins module */
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));

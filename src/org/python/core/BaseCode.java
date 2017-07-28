@@ -16,11 +16,8 @@ public class BaseCode {
     // create a frame with arguments
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args) {
         PyFunction function = (PyFunction) funcObj;
-        PyFrame frame = createFrame((PyTableCode) function.__code__, Py.EmptyObjects, Py.NoKeywords, function.__globals__,
+        PyFrame frame = createFrame((PyTableCode) function.__code__, args, Py.NoKeywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__);
-        if (frame.f_fastlocals != null) {
-            System.arraycopy(args, 0, frame.f_fastlocals, 0, args.length);
-        }
         frame.f_back = ts.frame;
         ts.frame = frame;
         frame.setupEnv((PyTuple) function.__closure__);
