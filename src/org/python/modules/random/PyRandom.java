@@ -41,7 +41,7 @@ public class PyRandom extends PyObject {
      * uses the value, else it uses the hash function of PyObject
      */
     @ExposedMethod(defaults = "null")
-    final void Random_seed(PyObject seed) {
+    public final void Random_seed(PyObject seed) {
         long n;
         if (seed == null) {
             seed = new PyLong(System.currentTimeMillis());
@@ -57,10 +57,10 @@ public class PyRandom extends PyObject {
 
     @ExposedNew
     @ExposedMethod
-    final void Random___init__(PyObject[] args, String[] keywords) {}
+    public final void Random___init__(PyObject[] args, String[] keywords) {}
 
     @ExposedMethod
-    final void Random_jumpahead(PyObject arg0) {
+    public final void Random_jumpahead(PyObject arg0) {
         if (!(arg0 instanceof PyLong)) {
             throw Py.TypeError(String.format("jumpahead requires an integer, not '%s'",
                                              arg0.getType().fastGetName()));
@@ -71,7 +71,7 @@ public class PyRandom extends PyObject {
     }
 
     @ExposedMethod
-    final void Random_setstate(PyObject arg0) {
+    public final void Random_setstate(PyObject arg0) {
         if (!(arg0 instanceof PyTuple)) {
             throw Py.TypeError("state vector must be a tuple");
         }
@@ -98,7 +98,7 @@ public class PyRandom extends PyObject {
     }
 
     @ExposedMethod
-    final PyObject Random_getstate() {
+    public final PyObject Random_getstate() {
         try {
             ByteArrayOutputStream bout=new ByteArrayOutputStream();
             ObjectOutputStream oout=new ObjectOutputStream(bout);
@@ -122,7 +122,7 @@ public class PyRandom extends PyObject {
      * problems.
      */
     @ExposedMethod
-    final PyObject Random_random() {
+    public final PyObject Random_random() {
         long a=this.javaRandom.nextInt()>>>5;
         long b=this.javaRandom.nextInt()>>>6;
         double ret=(a*67108864.0+b)*(1.0/9007199254740992.0);
@@ -130,7 +130,7 @@ public class PyRandom extends PyObject {
     }
     
     @ExposedMethod
-    final PyLong Random_getrandbits(int k) {
+    public final PyLong Random_getrandbits(int k) {
         return new PyLong(new BigInteger(k, javaRandom));
     }
 }

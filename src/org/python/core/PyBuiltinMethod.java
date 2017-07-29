@@ -25,8 +25,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
 
     static final MethodHandle U_INTEGER = MH.findVirtual(LOOKUP, PyObject.class, "asInt", MethodType.methodType(int.class));
     static final MethodHandle U_BOOLEAN = MH.findVirtual(LOOKUP, PyObject.class, "__bool__", MethodType.methodType(boolean.class));
-    static final MethodHandle U_STRING = MH.findVirtual(LOOKUP, PyBytes.class, "getString", MethodType.methodType(String.class));
-    static final MethodHandle CAST_UNICODE = MethodHandles.explicitCastArguments(U_STRING, MethodType.methodType(String.class, PyObject.class));
+    static final MethodHandle U_STRING = MH.findStatic(LOOKUP, Py.class, "getString", MethodType.methodType(String.class, PyObject.class));
     static final MethodHandle U_DOUBLE = MH.findVirtual(LOOKUP, PyObject.class, "asDouble", MethodType.methodType(double.class));
     static final MethodHandle U_LONG = MH.findVirtual(LOOKUP, PyObject.class, "asLong", MethodType.methodType(long.class));
 
@@ -121,8 +120,8 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             }
         } else {
             if (missingArg > 0) {
-                for (int i = argCount; i < methodType.parameterCount(); i++) {
-                    mh = MethodHandles.insertArguments(mh, argCount + 1, getDefaultValue(defaults[startIndex++], paramArray[i]));
+                for (int i = argCount; i < paramArray.length; i++) {
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
                 }
             }
             for (int i = 0; i < argCount; i++) {
@@ -154,7 +153,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         } else if (argType == boolean.class) {
             filter = U_BOOLEAN;
         } else if (argType == String.class) {
-            filter = CAST_UNICODE;
+            filter = U_STRING;
         } else if (argType == double.class) {
             filter = U_DOUBLE;
         } else if (argType == long.class) {

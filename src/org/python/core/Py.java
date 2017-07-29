@@ -2339,6 +2339,11 @@ public final class Py {
         }
     }
 
+    public static String getString(PyObject str) {
+        if (str instanceof PyBytes)
+            return ((PyBytes) str).getString();
+        return ((PyUnicode) str).getString();
+    }
     public static PyObject[] unpackIterator(PyObject obj, int argcount, int argcountAfter) {
         // optimization
         if (obj instanceof PyTuple && obj.__len__() == argcount && argcountAfter == -1) {
