@@ -184,7 +184,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedClassMethod(defaults = {"false"}, doc = BuiltinDocs.int_from_bytes_doc)
-    final static PyObject int_from_bytes(PyType type, PyObject bytes, String byteorder, boolean signed) {
+    public final static PyObject int_from_bytes(PyType type, PyObject bytes, String byteorder, boolean signed) {
         ByteOrder order = getByteOrder(byteorder);
 
         try (PyBuffer view = ((BufferProtocol) bytes).getBuffer(PyBUF.FULL_RO)) {
@@ -447,7 +447,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.int___repr___doc)
-    final String int_toString() {
+    public final String int_toString() {
         return getValue().toString();
     }
 
@@ -457,7 +457,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedMethod(doc = BuiltinDocs.int___hash___doc)
-    final int int___hash__() {
+    public final int int___hash__() {
         return getValue().hashCode();
     }
 
@@ -855,7 +855,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rshift___doc)
-    final PyObject int___rshift__(PyObject right) {
+    public final PyObject int___rshift__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
@@ -867,7 +867,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rrshift___doc)
-    final PyObject int___rrshift__(PyObject left) {
+    public final PyObject int___rrshift__(PyObject left) {
         if (!canCoerce(left)) {
             return null;
         }
@@ -1085,7 +1085,7 @@ public class PyLong extends PyObject {
     }
 
     @ExposedMethod(doc = BuiltinDocs.int___getnewargs___doc)
-    final PyTuple int___getnewargs__() {
+    public final PyTuple int___getnewargs__() {
         return new PyTuple(new PyLong(this.getValue()));
     }
 

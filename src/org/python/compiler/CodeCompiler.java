@@ -1442,12 +1442,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     p(PyObject.class),
                     "_callextra",
                     sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class));
-        } else if (keys.size() > 0) {
+        } else if (keys.size() > 0 || values.size() > 4) {
             loadThreadState();
             loadArray(code, values);
             loadStrings(code, keys);
-            code.invokevirtual(p(PyObject.class), "__call__",
-                    sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//            code.invokevirtual(p(PyObject.class), "__call__",
+//                    sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
         } else {
             loadThreadState();
             switch (values.size()) {
@@ -1503,11 +1504,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //                            sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class,
 //                                    PyObject.class, PyObject.class));
                     break;
-                default:
-                    loadArray(code, values);
-                    code.invokevirtual(p(PyObject.class), "__call__",
-                            sig(PyObject.class, ThreadState.class, PyObject[].class));
-                    break;
+//                default:
+//                    loadArray(code, values);
+//                    code.invokevirtual(p(PyObject.class), "__call__",
+//                            sig(PyObject.class, ThreadState.class, PyObject[].class));
+//                    break;
             }
         }
         return null;

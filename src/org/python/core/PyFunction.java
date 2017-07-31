@@ -33,7 +33,9 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject[].class));
+            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class));
+
+    static final MethodHandle CREATE_FRAME_NO_KEYWORDS = MethodHandles.insertArguments(CREATE_FRAME, 3, (Object) Py.NoKeywords);
 
     static final MethodHandle CREATE_FRAME_WITHOUT_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
             MethodType.methodType(PyFrame.class, PyObject.class, PyObject[].class));
@@ -509,7 +511,8 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
 
     public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request) {
         Object self = request.getReceiver();
-        int argCount = desc.getMethodType().parameterCount() - 2;
+        MethodType argType = desc.getMethodType();
+        int argCount = argType.parameterCount() - 2;
         PyFunction func = (PyFunction) self;
         PyTableCode code = (PyTableCode) func.__code__;
         Class<?> klazz = code.funcs.getClass();
@@ -528,70 +531,87 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
             genCls = PyAsyncGenerator.class;
         } else {
             mh = MH.findVirtual(LOOKUP, klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
-            switch(argCount) {
-                case 0:
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class);
-                    break;
-                case 1:
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class);
-                    break;
-                case 2:
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
-                    break;
-                case 3:
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
-                    break;
-                case 4:
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
-                    break;
-            }
+            if (BaseCode.isWideMethod(argType)){
+                mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
+                mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
+                mh = MethodHandles.permuteArguments(mh,
+                        MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class,
+                                PyObject[].class, String[].class), 0, 2, 1, 2, 3, 4);
+            } else {
+                switch (argCount) {
+                    case 0:
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class);
+                        break;
+                    case 1:
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class);
+                        break;
+                    case 2:
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+                        break;
+                    case 3:
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
+                        break;
+                    case 4:
+                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
+                        break;
+                }
 
-            mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME.asCollector(2, PyObject[].class, argCount));
-            switch(argCount) {
-                case 0:
-                    mh = MethodHandles.permuteArguments(mh,
-                            MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 2, 1, 2);
-                    break;
-                case 1:
-                    mh = MethodHandles.permuteArguments(mh,
-                            MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class), 0, 2, 1, 2, 3);
-                    break;
-                case 2:
-                    mh = MethodHandles.permuteArguments(mh,
-                            MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4);
-                    break;
-                case 3:
-                    mh = MethodHandles.permuteArguments(mh,
-                            MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4, 5);
-                    break;
-                case 4:
-                    mh = MethodHandles.permuteArguments(mh,
-                            MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4, 5, 6);
-                    break;
+                mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_NO_KEYWORDS.asCollector(2, PyObject[].class, argCount));
+                switch(argCount) {
+                    case 0:
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class), 0, 2, 1, 2);
+                        break;
+                    case 1:
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class), 0, 2, 1, 2, 3);
+                        break;
+                    case 2:
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4);
+                        break;
+                    case 3:
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4, 5);
+                        break;
+                    case 4:
+                        mh = MethodHandles.permuteArguments(mh,
+                                MethodType.methodType(PyObject.class, klazz, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 2, 1, 2, 3, 4, 5, 6);
+                        break;
+                }
             }
 
             mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
-            switch(argCount) {
-                case 0:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class), 0, 0, 1);
-                    mh = MethodHandles.tryFinally(mh, RESTORE_FRAME);
-                    break;
-                case 1:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), 0, 0, 1, 2);
-                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class));
-                    break;
-                case 2:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3);
-                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class));
-                    break;
-                case 3:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3, 4);
-                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class));
-                    break;
-                case 4:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3, 4, 5);
-                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class, PyObject.class));
-                    break;
+            if (BaseCode.isWideMethod(argType)) {
+                mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
+                        ThreadState.class, PyObject[].class, String[].class), 0, 0, 1, 2, 3);
+                mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject[].class, String[].class));
+            } else {
+                switch (argCount) {
+                    case 0:
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class), 0, 0, 1);
+                        mh = MethodHandles.tryFinally(mh, RESTORE_FRAME);
+                        break;
+                    case 1:
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class), 0, 0, 1, 2);
+                        mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class));
+                        break;
+                    case 2:
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
+                                ThreadState.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3);
+                        mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class));
+                        break;
+                    case 3:
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
+                                ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3, 4);
+                        mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class));
+                        break;
+                    case 4:
+                        mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
+                                ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 0, 1, 2, 3, 4, 5);
+                        mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class, PyObject.class));
+                        break;
+                }
             }
 
             return new GuardedInvocation(mh, null,

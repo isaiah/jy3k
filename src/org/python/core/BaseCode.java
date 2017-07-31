@@ -4,13 +4,19 @@
  */
 package org.python.core;
 
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class BaseCode {
+    public static boolean isWideMethod(MethodType argType) {
+        // ThreadState;PyFrame;PyObject[];String[];
+        return argType.parameterCount() == 4 && argType.parameterType(2) == PyObject[].class && argType.parameterType(3) == String[].class;
+    }
+
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts) {
-        return createFrame(funcObj, ts, Py.EmptyObjects);
+        return createFrame(funcObj, ts, Py.EmptyObjects, Py.NoKeywords);
     }
     // create a frame with arguments and without ThreadState
     public static PyFrame createFrame(PyObject funcObj, PyObject[] args) {
@@ -22,9 +28,9 @@ public class BaseCode {
     }
 
     // create a frame with arguments
-    public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args) {
+    public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args, String[] keywords) {
         PyFunction function = (PyFunction) funcObj;
-        PyFrame frame = createFrame((PyTableCode) function.__code__, args, Py.NoKeywords, function.__globals__,
+        PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__);
         frame.f_back = ts.frame;
         frame.fBackExecSize = ts.exceptions.size();

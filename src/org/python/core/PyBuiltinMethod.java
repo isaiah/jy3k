@@ -83,7 +83,8 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
         MethodHandle mh;
         Object receiver = request.getReceiver();
-        int argCount = desc.getMethodType().parameterCount() - 2;
+        MethodType argType = desc.getMethodType();
+        int argCount = argType.parameterCount() - 2;
         String funcname = ((PyBuiltinMethod) receiver).methodName;
         Class<?> klazz = ((PyBuiltinMethod) receiver).klazz;
         String descriptor = ((PyBuiltinMethod) receiver).methodDescriptor;
@@ -114,11 +115,11 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         if (defaultVals.equals("") && isWide) {
             if (argCount == 0) {
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
-            } else {
+            } else if (!BaseCode.isWideMethod(argType)) {
                 mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
                 mh = mh.asCollector(argOffset, PyObject[].class, argCount);
             }
-        } else {
+        } else if(!BaseCode.isWideMethod(argType)) {
             if (missingArg > 0) {
                 for (int i = argCount; i < paramArray.length; i++) {
                     mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
@@ -127,6 +128,8 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             for (int i = 0; i < argCount; i++) {
                 mh = convert(mh, argOffset + i, paramArray[i]);
             }
+        } else {
+            throw Py.TypeError(String.format("%s() takes no keyword arguments", funcname));
         }
 
         if (argOffset > 0) {
