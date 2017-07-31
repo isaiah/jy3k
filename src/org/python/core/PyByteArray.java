@@ -770,7 +770,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      */
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.bytearray___init___doc)
-    final synchronized void bytearray___init__(PyObject[] args, String[] kwds) {
+    public final synchronized void bytearray___init__(PyObject[] args, String[] kwds) {
 
         ArgParser ap = new ArgParser("bytearray", args, kwds, "source", "encoding", "errors");
         PyObject arg = ap.getPyObject(0, null);
@@ -839,7 +839,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___add___doc)
-    final synchronized PyObject bytearray___add__(PyObject o) {
+    public final synchronized PyObject bytearray___add__(PyObject o) {
         PyByteArray sum = null;
 
         // XXX re-write using buffer API
@@ -879,7 +879,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      * @return length
      */
     @ExposedMethod(doc = BuiltinDocs.bytearray___alloc___doc)
-    final int bytearray___alloc__() {
+    public final int bytearray___alloc__() {
         return storage.length + 1;
     }
 
@@ -893,7 +893,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___imul___doc)
-    final PyObject bytearray___imul__(PyObject n) {
+    public final PyObject bytearray___imul__(PyObject n) {
         if (!n.isIndex()) {
             return null;
         }
@@ -911,7 +911,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___mul___doc)
-    final PyObject bytearray___mul__(PyObject n) {
+    public final PyObject bytearray___mul__(PyObject n) {
         if (!n.isIndex()) {
             return null;
         }
@@ -928,7 +928,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___rmul___doc)
-    final PyObject bytearray___rmul__(PyObject n) {
+    public final PyObject bytearray___rmul__(PyObject n) {
         if (!n.isIndex()) {
             return null;
         }
@@ -941,13 +941,13 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___mod___doc)
-    final PyObject bytearray___mod__(PyObject other) {
+    public final PyObject bytearray___mod__(PyObject other) {
         StringFormatter fmt = new StringFormatter(asString(), false);
         return new PyByteArray(fmt.format(other));
     }
 
     @ExposedClassMethod(doc = BuiltinDocs.bytearray_maketrans_doc)
-    final static PyObject bytearray_maketrans(PyType type, PyObject from, PyObject to) {
+    public final static PyObject bytearray_maketrans(PyType type, PyObject from, PyObject to) {
         return PyBytes.bytes_maketrans(type, from, to, null);
     }
 
@@ -975,7 +975,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_append_doc)
-    final synchronized void bytearray_append(PyObject element) {
+    public final synchronized void bytearray_append(PyObject element) {
         // Insert at the end, checked for type and range
         storageExtend(1);
         storage[offset + size - 1] = byteCheck(element);
@@ -994,12 +994,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___contains___doc)
-    final boolean bytearray___contains__(PyObject o) {
+    public final boolean bytearray___contains__(PyObject o) {
         return basebytes___contains__(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_decode_doc)
-    final PyObject bytearray_decode(PyObject[] args, String[] keywords) {
+    public final PyObject bytearray_decode(PyObject[] args, String[] keywords) {
         return basebytes_decode(args, keywords);
     }
 
@@ -1030,12 +1030,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_center_doc)
-    final PyByteArray bytearray_center(int width, String fillchar) {
+    public final PyByteArray bytearray_center(int width, String fillchar) {
         return (PyByteArray)basebytes_center(width, fillchar);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_copy_doc)
-    final PyByteArray bytearray_copy() {
+    public final PyByteArray bytearray_copy() {
         PyByteArray copy = new PyByteArray();
         copy.init((BufferProtocol) this);
         return copy;
@@ -1080,7 +1080,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_count_doc)
-    final int bytearray_count(PyObject sub, PyObject start, PyObject end) {
+    public final int bytearray_count(PyObject sub, PyObject start, PyObject end) {
         return basebytes_count(sub, start, end);
     }
 
@@ -1136,7 +1136,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_endswith_doc)
-    final boolean bytearray_endswith(PyObject suffix, PyObject start, PyObject end) {
+    public final boolean bytearray_endswith(PyObject suffix, PyObject start, PyObject end) {
         return basebytes_starts_or_endswith(suffix, start, end, true);
     }
 
@@ -1166,7 +1166,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_expandtabs_doc)
-    final PyByteArray bytearray_expandtabs(PyObject[] args, String[] keywords) {
+    public final PyByteArray bytearray_expandtabs(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("expandtabs", args, keywords, 0, "tabsize");
         int tabsize = ap.getInt(0, 8);
         return (PyByteArray)basebytes_expandtabs(tabsize);
@@ -1184,7 +1184,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_extend_doc)
-    final synchronized void bytearray_extend(PyObject o) {
+    public final synchronized void bytearray_extend(PyObject o) {
         // Raise TypeError if the argument is not iterable
         o.__iter__();
         // Use the general method, assigning to the crack at the end of the array.
@@ -1233,7 +1233,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_find_doc)
-    final int bytearray_find(PyObject sub, PyObject start, PyObject end) {
+    public final int bytearray_find(PyObject sub, PyObject start, PyObject end) {
         return basebytes_find(sub, start, end);
     }
 
@@ -1256,7 +1256,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedClassMethod(doc = BuiltinDocs.bytearray_fromhex_doc)
-    static PyByteArray bytearray_fromhex(PyType type, PyObject hex) {
+    public static PyByteArray bytearray_fromhex(PyType type, PyObject hex) {
         // I think type tells us the actual class but we always return exactly a bytearray
         // PyObject ba = type.__call__();
         if (!(hex instanceof PyUnicode)) {
@@ -1268,7 +1268,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_hex_doc)
-    final PyObject bytearray_hex() {
+    public final PyObject bytearray_hex() {
         StringBuilder sb = new StringBuilder();
         for (int i = offset; i < offset + size; i++) {
             sb.append(String.format("%02x", storage[i]));
@@ -1277,7 +1277,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___getitem___doc)
-    final synchronized PyObject bytearray___getitem__(PyObject index) {
+    public final synchronized PyObject bytearray___getitem__(PyObject index) {
         // Let the SequenceIndexDelegate take care of it
         return delegator.checkIdxAndGetItem(index);
     }
@@ -1288,7 +1288,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___iadd___doc)
-    final synchronized PyObject bytearray___iadd__(PyObject o) {
+    public final synchronized PyObject bytearray___iadd__(PyObject o) {
         PyType oType = o.getType();
         if (oType == TYPE) {
             // Use the general method, specifying the crack at the end of the array.
@@ -1339,7 +1339,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___hash___doc)
-    final int bytearray___hash__() {
+    public final int bytearray___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }
 
@@ -1359,7 +1359,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_index_doc)
-    final int bytearray_index(PyObject sub, PyObject start, PyObject end) {
+    public final int bytearray_index(PyObject sub, PyObject start, PyObject end) {
         // Like find but raise a ValueError if not found
         int pos = basebytes_find(sub, start, end);
         if (pos < 0) {
@@ -1380,7 +1380,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_insert_doc)
-    final synchronized void bytearray_insert(PyObject index, PyObject value) {
+    public final synchronized void bytearray_insert(PyObject index, PyObject value) {
         // XXX: do something with delegator instead?
         pyinsert(boundToSequence(index.asIndex()), value);
     }
@@ -1390,37 +1390,37 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     //
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_isalnum_doc)
-    final boolean bytearray_isalnum() {
+    public final boolean bytearray_isalnum() {
         return basebytes_isalnum();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_isalpha_doc)
-    final boolean bytearray_isalpha() {
+    public final boolean bytearray_isalpha() {
         return basebytes_isalpha();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_isdigit_doc)
-    final boolean bytearray_isdigit() {
+    public final boolean bytearray_isdigit() {
         return basebytes_isdigit();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_islower_doc)
-    final boolean bytearray_islower() {
+    public final boolean bytearray_islower() {
         return basebytes_islower();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_isspace_doc)
-    final boolean bytearray_isspace() {
+    public final boolean bytearray_isspace() {
         return basebytes_isspace();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_istitle_doc)
-    final boolean bytearray_istitle() {
+    public final boolean bytearray_istitle() {
         return basebytes_istitle();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_isupper_doc)
-    final boolean bytearray_isupper() {
+    public final boolean bytearray_isupper() {
         return basebytes_isupper();
     }
 
@@ -1429,27 +1429,27 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     //
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_capitalize_doc)
-    final PyByteArray bytearray_capitalize() {
+    public final PyByteArray bytearray_capitalize() {
         return (PyByteArray)basebytes_capitalize();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_lower_doc)
-    final PyByteArray bytearray_lower() {
+    public final PyByteArray bytearray_lower() {
         return (PyByteArray)basebytes_lower();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_swapcase_doc)
-    final PyByteArray bytearray_swapcase() {
+    public final PyByteArray bytearray_swapcase() {
         return (PyByteArray)basebytes_swapcase();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_title_doc)
-    final PyByteArray bytearray_title() {
+    public final PyByteArray bytearray_title() {
         return (PyByteArray)basebytes_title();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_upper_doc)
-    final PyByteArray bytearray_upper() {
+    public final PyByteArray bytearray_upper() {
         return (PyByteArray)basebytes_upper();
     }
 
@@ -1466,12 +1466,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_join_doc)
-    final PyByteArray bytearray_join(PyObject iterable) {
+    public final PyByteArray bytearray_join(PyObject iterable) {
         return basebytes_join(iterable.asIterable());
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___len___doc)
-    final int bytearray___len__() {
+    public final int bytearray___len__() {
         return super.__len__();
     }
 
@@ -1502,7 +1502,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_ljust_doc)
-    final PyByteArray bytearray_ljust(int width, String fillchar) {
+    public final PyByteArray bytearray_ljust(int width, String fillchar) {
         // If this was immutable and width<=this.size we could return (this).
         return (PyByteArray)basebytes_ljust(width, fillchar);
     }
@@ -1533,7 +1533,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_lstrip_doc)
-    final synchronized PyByteArray bytearray_lstrip(PyObject bytes) {
+    public final synchronized PyByteArray bytearray_lstrip(PyObject bytes) {
         int left;
         if (bytes == null || bytes == Py.None) {
             // Find left bound of the slice that results from the stripping of whitespace
@@ -1547,7 +1547,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_partition_doc)
-    final PyTuple bytearray_partition(PyObject sep) {
+    public final PyTuple bytearray_partition(PyObject sep) {
         return basebytes_partition(sep);
     }
 
@@ -1571,7 +1571,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.bytearray_pop_doc)
-    final synchronized PyLong bytearray_pop(int i) {
+    public final synchronized PyLong bytearray_pop(int i) {
         if (size == 0) {
             throw Py.IndexError("pop from empty list");
         } else {
@@ -1585,7 +1585,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___reduce___doc)
-    final PyObject bytearray___reduce__() {
+    public final PyObject bytearray___reduce__() {
         return basebytes___reduce__();
     }
 
@@ -1602,7 +1602,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_remove_doc)
-    final synchronized void bytearray_remove(PyObject o) {
+    public final synchronized void bytearray_remove(PyObject o) {
         // Check and extract the value, and search for it.
         byte b = byteCheck(o);
         int pos = index(b);
@@ -1643,7 +1643,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_replace_doc)
-    final PyByteArray bytearray_replace(PyObject oldB, PyObject newB, PyObject count) {
+    public final PyByteArray bytearray_replace(PyObject oldB, PyObject newB, PyObject count) {
         int maxcount = (count == null) ? -1 : count.asInt(); // or count.asIndex() ?
         return basebytes_replace(oldB, newB, maxcount);
     }
@@ -1658,7 +1658,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_reverse_doc)
-    final synchronized void bytearray_reverse() {
+    public final synchronized void bytearray_reverse() {
         // In place reverse
         int a = offset, b = offset + size;
         while (--b > a) {
@@ -1710,7 +1710,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_rfind_doc)
-    final int bytearray_rfind(PyObject sub, PyObject start, PyObject end) {
+    public final int bytearray_rfind(PyObject sub, PyObject start, PyObject end) {
         return basebytes_rfind(sub, start, end);
     }
 
@@ -1765,7 +1765,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_rjust_doc)
-    final PyByteArray bytearray_rjust(int width, String fillchar) {
+    public final PyByteArray bytearray_rjust(int width, String fillchar) {
         return (PyByteArray)basebytes_rjust(width, fillchar);
     }
 
@@ -1784,7 +1784,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_rindex_doc)
-    final int bytearray_rindex(PyObject sub, PyObject start, PyObject end) {
+    public final int bytearray_rindex(PyObject sub, PyObject start, PyObject end) {
         // Like rfind but raise a ValueError if not found
         int pos = basebytes_rfind(sub, start, end);
         if (pos < 0) {
@@ -1794,12 +1794,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_rpartition_doc)
-    final PyTuple bytearray_rpartition(PyObject sep) {
+    public final PyTuple bytearray_rpartition(PyObject sep) {
         return basebytes_rpartition(sep);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_rsplit_doc)
-    final PyList bytearray_rsplit(PyObject[] args, String[] keywords) {
+    public final PyList bytearray_rsplit(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("rsplit", args, keywords, "sep", "maxsplit");
         PyObject sep = ap.getPyObject(0, null);
         int maxsplit = ap.getInt(1, -1);
@@ -1832,7 +1832,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_rstrip_doc)
-    final synchronized PyByteArray bytearray_rstrip(PyObject bytes) {
+    public final synchronized PyByteArray bytearray_rstrip(PyObject bytes) {
         int right;
         if (bytes == null || bytes == Py.None) {
             // Find right bound of the slice that results from the stripping of whitespace
@@ -1846,7 +1846,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_split_doc)
-    final PyList bytearray_split(PyObject[] args, String[] keywords) {
+    public final PyList bytearray_split(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("split", args, keywords, "sep", "maxsplit");
         PyObject sep = ap.getPyObject(0, null);
         int maxsplit = ap.getInt(1, -1);
@@ -1854,7 +1854,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_splitlines_doc)
-    final PyList bytearray_splitlines(PyObject[] args, String[] keywords) {
+    public final PyList bytearray_splitlines(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("splitlines", args, keywords, 0, "keepends");
         boolean keepends = ap.getPyObject(0, Py.False).__bool__();
         return basebytes_splitlines(keepends);
@@ -1913,7 +1913,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.bytearray_startswith_doc)
-    final boolean bytearray_startswith(PyObject prefix, PyObject start, PyObject end) {
+    public final boolean bytearray_startswith(PyObject prefix, PyObject start, PyObject end) {
         return basebytes_starts_or_endswith(prefix, start, end, false);
     }
 
@@ -1944,7 +1944,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_strip_doc)
-    final synchronized PyByteArray bytearray_strip(PyObject bytes) {
+    public final synchronized PyByteArray bytearray_strip(PyObject bytes) {
         int left, right;
         if (bytes == null || bytes == Py.None) {
             // Find bounds of the slice that results from the stripping of whitespace
@@ -1962,13 +1962,13 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray___setitem___doc)
-    final synchronized void bytearray___setitem__(PyObject index, PyObject value) {
+    public final synchronized void bytearray___setitem__(PyObject index, PyObject value) {
         // Let the SequenceIndexDelegate take care of it
         delegator.checkIdxAndSetItem(index, value);
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_clear_doc)
-    final synchronized void bytearray_clear() {
+    public final synchronized void bytearray_clear() {
         clear();
     }
 
@@ -1985,7 +1985,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(names = {"__repr__"}, doc = BuiltinDocs.bytearray___repr___doc)
-    final synchronized String bytearray_repr() {
+    public final synchronized String bytearray_repr() {
         return basebytes_repr("bytearray(b", ")");
     }
 
@@ -2000,7 +2000,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(names = {"__str__"}, doc = BuiltinDocs.bytearray___str___doc)
-    final PyUnicode bytearray_str() {
+    public final PyUnicode bytearray_str() {
         return new PyUnicode(toString());
     }
 
@@ -2038,7 +2038,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_translate_doc)
-    final PyByteArray bytearray_translate(PyObject table, PyObject deletechars) {
+    public final PyByteArray bytearray_translate(PyObject table, PyObject deletechars) {
 
         // Work with the translation table (if there is one) as a PyBuffer view.
         try (PyBuffer tab = getTranslationTable(table)) {
@@ -2128,7 +2128,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_zfill_doc)
-    final PyByteArray bytearray_zfill(int width) {
+    public final PyByteArray bytearray_zfill(int width) {
         return (PyByteArray)basebytes_zfill(width);
     }
 

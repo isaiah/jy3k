@@ -316,7 +316,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         return dict_get(key, defaultObj);
     }
 
-    @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_get_doc)
+    @ExposedMethod(defaults = "null", doc = BuiltinDocs.dict_get_doc)
     public final PyObject dict_get(PyObject key, PyObject defaultObj) {
         PyObject o = getMap().get(key);
         return o == null ? defaultObj : o;

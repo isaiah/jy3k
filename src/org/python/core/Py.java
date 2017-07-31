@@ -1653,16 +1653,24 @@ public final class Py {
     }
 
     public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f, PyTuple closure) {
-         try {
+        try {
             MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
-                    MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
+                     MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
             f.f_back = ts.frame;
+            f.fBackExecSize = ts.exceptions.size();
             ts.frame = f;
             f.setupEnv(closure);
             return (PyObject) main.invokeExact(ts, f);
-        } catch (Throwable t) {
+         } catch (Throwable t) {
             throw Py.JavaError(t);
-        } finally {
+         } finally {
+            if (f.fBackExecSize == 0) {
+                ts.exceptions.clear();
+            } else {
+                while(ts.exceptions.size() > f.fBackExecSize) {
+                    ts.exceptions.pop();
+                }
+            }
             ts.frame = f.f_back;
         }
     }
@@ -1745,10 +1753,6 @@ public final class Py {
             return null;
         }
         return ts.frame;
-    }
-
-    public static void setFrame(PyFrame f) {
-        getThreadState().frame = f;
     }
 
     /**

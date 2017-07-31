@@ -20,6 +20,9 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyFrame.class);
 
+    /** the size of the previous frame's exception stack */
+    public int fBackExecSize = 0;
+
     /** yield from generator */
     public PyObject f_yieldfrom;
 
