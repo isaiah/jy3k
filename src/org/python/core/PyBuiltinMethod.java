@@ -31,6 +31,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
 
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
     static final MethodHandle IS_BUILTIN_METHOD_MH = findOwnMH("isBuiltinMethodMH", boolean.class, Object.class);
+    static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class, int.class);
 
     protected PyObject self;
     public String methodName;
@@ -80,6 +81,15 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         return hashCode ^ getClass().hashCode();
     }
 
+    private static boolean varargLen(PyObject obj, ThreadState ts, PyObject[] args, String[] keywords, int len) {
+        return obj instanceof PyBuiltinMethod && args.length == len;
+    }
+
+    @SuppressWarnings("unused")
+    private static boolean isBuiltinMethodMH(final Object self) {
+        return self instanceof PyBuiltinMethod;
+    }
+
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
         MethodHandle mh;
         Object receiver = request.getReceiver();
@@ -90,7 +100,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         String descriptor = ((PyBuiltinMethod) receiver).methodDescriptor;
         MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
         String defaultVals = ((PyBuiltinMethod) receiver).defaultVals;
-        String[] defaults = defaultVals.split(",");
+        String[] defaults = defaultVals.equals("") ? Py.NoKeywords : defaultVals.split(",");
         Class<?>[] paramArray = methodType.parameterArray();
         int defaultLength = defaults.length;
         int missingArg = methodType.parameterCount() - argCount;
@@ -111,8 +121,9 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             mh = MH.findVirtual(LOOKUP, klazz, funcname, methodType);
             argOffset = 1;
         }
+        MethodHandle guard = IS_BUILTIN_METHOD_MH;
         // wide call
-        if (defaultVals.equals("") && isWide) {
+        if (defaults.length == 0 && isWide) {
             if (argCount == 0) {
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
             } else if (!BaseCode.isWideCall(argType)) {
@@ -126,24 +137,41 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             if (keywords.length == 0) {
                 PyObject[] args = (PyObject[]) request.getArguments()[2];
                 argCount = args.length;
+                if (paramArray.length < argCount) {
+                    if (paramArray.length == 0) {
+                        throw Py.TypeError(String.format("%s() takes no arguments, (%d given)", info.getName(), args.length));
+                    } else {
+                        throw Py.TypeError(String.format("%s() takes at most %d arguments, (%d given)",
+                                info.getName(), methodType.parameterCount() - argCount, args.length));
+                    }
+                }
+
                 for (int i = 0; i < argCount; i++) {
                     mh = convert(mh, argOffset + i, paramArray[i]);
                 }
-                mh = mh.asSpreader(argOffset, PyObject[].class, args.length);
+
                 missingArg = methodType.parameterCount() - argCount;
                 startIndex = defaultLength - missingArg;
+                if (startIndex < 0) {
+                    throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
+                }
                 if (missingArg > 0) {
                     for (int i = argCount; i < paramArray.length; i++) {
                         mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
                     }
                 }
+                mh = mh.asSpreader(argOffset, PyObject[].class, argCount);
 
                 mh = MethodHandles.dropArguments(mh, argOffset + 1, String[].class);
+                guard = MethodHandles.insertArguments(VARARG_LEN, 4, argCount);
             } else {
-                throw Py.TypeError(String.format("%s() takes no keyword arguments", funcname));
+                throw Py.TypeError(String.format("%s() takes no keyword arguments", info.getName()));
             }
         } else {
             if (missingArg > 0) {
+                if (startIndex < 0) {
+                    throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
+                }
                 for (int i = argCount; i < paramArray.length; i++) {
                     mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
                 }
@@ -162,12 +190,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         }
         mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         mh = asTypesafeReturn(mh, methodType);
-        return new GuardedInvocation(mh, IS_BUILTIN_METHOD_MH, new SwitchPoint[0], ClassCastException.class);
-    }
-
-    @SuppressWarnings("unused")
-    private static boolean isBuiltinMethodMH(final Object self) {
-        return self instanceof PyBuiltinMethod;
+        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
 
     private MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {

@@ -46,6 +46,9 @@ public class BaseCode {
             String[] newkeywords = new String[keywords.length + kwargs.__len__()];
             System.arraycopy(keywords, 0, newkeywords, 0, keywords.length);
 
+            if (kwargs.__len__() == 0) {
+                continue;
+            }
             PyObject keys = kwargs.invoke("keys");
             int i = 0;
             Iterator<PyObject> keysIter = keys.asIterable().iterator();
@@ -61,7 +64,6 @@ public class BaseCode {
         }
         if (newargs.length > args.length)
             args = newargs;
-//        return new WideMethodArgs(args, keywords);
         return new Object[]{args, keywords};
     }
 
@@ -74,6 +76,13 @@ public class BaseCode {
         return frame;
     }
 
+    public static PyFrame createFrame(PyObject funcObj, PyObject[] args, String[] keywords) {
+        PyFunction function = (PyFunction) funcObj;
+        PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
+                function.__defaults__, function.__kwdefaults__);
+        frame.setupEnv((PyTuple) function.__closure__);
+        return frame;
+    }
     // create a frame with arguments
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args, String[] keywords) {
         PyFunction function = (PyFunction) funcObj;
