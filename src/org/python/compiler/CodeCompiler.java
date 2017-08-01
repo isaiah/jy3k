@@ -67,6 +67,7 @@ import org.python.antlr.ast.keyword;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.antlr.base.stmt;
+import org.python.core.BaseCode;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
@@ -305,9 +306,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitExpression(Expression node) throws Exception {
-//        if (my_scope.generator && node.getInternalBody() != null) {
-//            module.error("'return' with argument inside generator", true, node);
-//        }
         return visitReturn(new Return(node, node.getInternalBody()), true);
     }
 
@@ -1435,18 +1433,34 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         visit(node.getInternalFunc());
 
         if (stararg || !kwargs.isEmpty()) {
+            code.dup();
             loadList(code, values);
             loadStrings(code, keys);
             loadArray(code, kwargs);
-            code.invokevirtual(
-                    p(PyObject.class),
-                    "_callextra",
-                    sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class));
+            code.invokestatic(p(BaseCode.class), "destructArguments", sig(Object[].class, PyObject.class, java.util.List.class, String[].class, PyObject[].class));
+            loadThreadState();
+            code.swap();
+            code.dup();
+            code.iconst(0);
+            code.aaload();
+            code.checkcast(p(PyObject[].class));
+            code.swap();
+            code.iconst(1);
+            code.aaload();
+            code.checkcast(p(String[].class));
+
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                    PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+//            code.invokevirtual(
+//                    p(PyObject.class),
+//                    "_callextra",
+//                    sig(PyObject.class, java.util.List.class, String[].class, PyObject[].class));
         } else if (keys.size() > 0 || values.size() > 4) {
             loadThreadState();
             loadArray(code, values);
             loadStrings(code, keys);
-            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                    PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
 //            code.invokevirtual(p(PyObject.class), "__call__",
 //                    sig(PyObject.class, ThreadState.class, PyObject[].class, String[].class));
         } else {
@@ -1464,6 +1478,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         // special case for sys.excinfo hack, used by desugared "With" stmt
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
+//                        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+//                                PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
                     } else {
                         code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
                                 PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);

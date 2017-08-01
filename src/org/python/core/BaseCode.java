@@ -6,18 +6,65 @@ package org.python.core;
 
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class BaseCode {
-    public static boolean isWideMethod(MethodType argType) {
+    public static boolean isWideCall(MethodType argType) {
         // ThreadState;PyFrame;PyObject[];String[];
-        return argType.parameterCount() == 4 && argType.parameterType(2) == PyObject[].class && argType.parameterType(3) == String[].class;
+        return argType.parameterCount() == 4 && argType.parameterType(2) == PyObject[].class
+                && argType.parameterType(3) == String[].class;
     }
 
     public static PyFrame createFrame(PyObject funcObj, ThreadState ts) {
         return createFrame(funcObj, ts, Py.EmptyObjects, Py.NoKeywords);
     }
+
+    /**
+     *  Destruct vararg and kwarg
+     *  @returns a (PyObject[], String[]) pair
+     */
+    public static Object[] destructArguments(PyObject funcObj, List<PyObject> arglist, String[] keywords,
+                                      PyObject[] kwargsArray) {
+
+        PyObject[] args = arglist.toArray(new PyObject[0]);
+        int argslen = args.length;
+
+        for (PyObject kwargs : kwargsArray) {
+            argslen += kwargs.__len__();
+        }
+
+        PyObject[] newargs = new PyObject[argslen];
+        int argidx = args.length;
+        if (argslen > args.length) {
+            System.arraycopy(args, 0, newargs, 0, argidx);
+        }
+
+        for (PyObject kwargs : kwargsArray) {
+            String[] newkeywords = new String[keywords.length + kwargs.__len__()];
+            System.arraycopy(keywords, 0, newkeywords, 0, keywords.length);
+
+            PyObject keys = kwargs.invoke("keys");
+            int i = 0;
+            Iterator<PyObject> keysIter = keys.asIterable().iterator();
+            for (PyObject key; keysIter.hasNext();) {
+                key = keysIter.next();
+                if (!(key instanceof PyUnicode))
+                    throw Py.TypeError(getFuncName(funcObj) + "keywords must be strings");
+                newkeywords[keywords.length + i++] =
+                    ((PyUnicode) key).internedString();
+                newargs[argidx++] = kwargs.__finditem__(key);
+            }
+            keywords = newkeywords;
+        }
+        if (newargs.length > args.length)
+            args = newargs;
+//        return new WideMethodArgs(args, keywords);
+        return new Object[]{args, keywords};
+    }
+
     // create a frame with arguments and without ThreadState
     public static PyFrame createFrame(PyObject funcObj, PyObject[] args) {
         PyFunction function = (PyFunction) funcObj;
@@ -194,5 +241,17 @@ public class BaseCode {
 
     private static String positionalArgErrorMessage(String name, int paramLength, int argLength) {
         return String.format("%.200s() takes %d positional argument but %d were given", name, paramLength, argLength);
+    }
+
+    private static String getFuncName(PyObject funcObj) {
+        String name;
+        if (funcObj instanceof PyFunction) {
+            name = ((PyFunction) funcObj).__name__ + "() ";
+        } else if (funcObj instanceof PyBuiltinCallable) {
+            name = ((PyBuiltinCallable)funcObj).fastGetName().toString() + "() ";
+        } else {
+            name = funcObj.getType().fastGetName() + " ";
+        }
+        return name;
     }
 }

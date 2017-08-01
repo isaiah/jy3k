@@ -115,11 +115,34 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         if (defaultVals.equals("") && isWide) {
             if (argCount == 0) {
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
-            } else if (!BaseCode.isWideMethod(argType)) {
+            } else if (!BaseCode.isWideCall(argType)) {
                 mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
                 mh = mh.asCollector(argOffset, PyObject[].class, argCount);
             }
-        } else if(!BaseCode.isWideMethod(argType)) {
+        } else if(BaseCode.isWideCall(argType)) {
+            /** it's a wide call, but not a wide method */
+            String[] keywords = (String[]) request.getArguments()[3];
+            // if there is no keywords, means it's a stararg call, spread the args
+            if (keywords.length == 0) {
+                PyObject[] args = (PyObject[]) request.getArguments()[2];
+                argCount = args.length;
+                for (int i = 0; i < argCount; i++) {
+                    mh = convert(mh, argOffset + i, paramArray[i]);
+                }
+                mh = mh.asSpreader(argOffset, PyObject[].class, args.length);
+                missingArg = methodType.parameterCount() - argCount;
+                startIndex = defaultLength - missingArg;
+                if (missingArg > 0) {
+                    for (int i = argCount; i < paramArray.length; i++) {
+                        mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
+                    }
+                }
+
+                mh = MethodHandles.dropArguments(mh, argOffset + 1, String[].class);
+            } else {
+                throw Py.TypeError(String.format("%s() takes no keyword arguments", funcname));
+            }
+        } else {
             if (missingArg > 0) {
                 for (int i = argCount; i < paramArray.length; i++) {
                     mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
@@ -128,8 +151,6 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             for (int i = 0; i < argCount; i++) {
                 mh = convert(mh, argOffset + i, paramArray[i]);
             }
-        } else {
-            throw Py.TypeError(String.format("%s() takes no keyword arguments", funcname));
         }
 
         if (argOffset > 0) {
