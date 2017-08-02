@@ -7255,6 +7255,104 @@ public class BuiltinDocs {
         "overrides the normal algorithm (and the outcome is cached).\n" + 
         "";
 
+    // Docs for <class 'method'>
+    public final static String method___call___doc = 
+        "Call self as a function.";
+
+    public final static String method___class___doc = 
+        "type(object_or_name, bases, dict)\n" + 
+        "type(object) -> the object's type\n" + 
+        "type(name, bases, dict) -> a new type";
+
+    public final static String method___delattr___doc = 
+        "Implement delattr(self, name).";
+
+    public final static String method___dir___doc = 
+        "__dir__() -> list\n" + 
+        "default dir() implementation";
+
+    public final static String method_doc = 
+        "method(function, instance)\n" + 
+        "\n" + 
+        "Create a bound instance method object.";
+
+    public final static String method___eq___doc = 
+        "Return self==value.";
+
+    public final static String method___format___doc = 
+        "default object formatter";
+
+    public final static String method___func___doc = 
+        "the function (or other callable) implementing a method";
+
+    public final static String method___ge___doc = 
+        "Return self>=value.";
+
+    public final static String method___get___doc = 
+        "Return an attribute of instance, which is of type owner.";
+
+    public final static String method___getattribute___doc = 
+        "Return getattr(self, name).";
+
+    public final static String method___gt___doc = 
+        "Return self>value.";
+
+    public final static String method___hash___doc = 
+        "Return hash(self).";
+
+    public final static String method___init___doc = 
+        "Initialize self.  See help(type(self)) for accurate signature.";
+
+    public final static String method___init_subclass___doc = 
+        "This method is called when a class is subclassed.\n" + 
+        "\n" + 
+        "The default implementation does nothing. It may be\n" + 
+        "overridden to extend subclasses.\n" + 
+        "";
+
+    public final static String method___le___doc = 
+        "Return self<=value.";
+
+    public final static String method___lt___doc = 
+        "Return self<value.";
+
+    public final static String method___ne___doc = 
+        "Return self!=value.";
+
+    public final static String method___new___doc = 
+        "Create and return a new object.  See help(type) for accurate signature.";
+
+    public final static String method___reduce___doc = 
+        "";
+
+    public final static String method___reduce_ex___doc = 
+        "helper for pickle";
+
+    public final static String method___repr___doc = 
+        "Return repr(self).";
+
+    public final static String method___self___doc = 
+        "the instance to which a method is bound";
+
+    public final static String method___setattr___doc = 
+        "Implement setattr(self, name, value).";
+
+    public final static String method___sizeof___doc = 
+        "__sizeof__() -> int\n" + 
+        "size of object in memory, in bytes";
+
+    public final static String method___str___doc = 
+        "Return str(self).";
+
+    public final static String method___subclasshook___doc = 
+        "Abstract classes can override this to customize issubclass().\n" + 
+        "\n" + 
+        "This is invoked early on by abc.ABCMeta.__subclasscheck__().\n" + 
+        "It should return True, False or NotImplemented.  If it returns\n" + 
+        "NotImplemented, the normal algorithm is used.  Otherwise, it\n" + 
+        "overrides the normal algorithm (and the outcome is cached).\n" + 
+        "";
+
     // Docs for <class '_multiprocessing.SemLock'>
     public final static String SemLock_SEM_VALUE_MAX_doc = 
         "int(x=0) -> integer\n" + 
