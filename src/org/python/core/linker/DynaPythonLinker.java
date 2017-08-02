@@ -9,26 +9,12 @@ import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
-import org.python.core.CodeFlag;
-import org.python.core.Py;
-import org.python.core.BaseCode;
-import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
-import org.python.core.PyFloat;
-import org.python.core.PyFrame;
 import org.python.core.PyFunction;
-import org.python.core.PyFunctionTable;
-import org.python.core.PyLong;
 import org.python.core.PyMethod;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
-import org.python.core.PyTableCode;
-import org.python.core.PyUnicode;
-import org.python.core.ThreadState;
-import org.python.core.generator.PyAsyncGenerator;
-import org.python.core.generator.PyCoroutine;
-import org.python.core.generator.PyGenerator;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -36,7 +22,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SwitchPoint;
-import java.lang.reflect.Method;
 
 /**
  * The dynamic linker implementation for Python objects

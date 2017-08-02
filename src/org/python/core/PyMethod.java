@@ -8,7 +8,11 @@ import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
+import org.python.internal.lookup.MethodHandleFactory;
+import org.python.internal.lookup.MethodHandleFunctionality;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -18,6 +22,8 @@ import java.lang.reflect.Proxy;
  */
 @ExposedType(name = "method", isBaseType = false, doc = BuiltinDocs.method_doc)
 public class PyMethod extends PyObject implements InvocationHandler, Traverseproc {
+    static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+    static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
 
     public static final PyType TYPE = PyType.fromClass(PyMethod.class);
 
@@ -227,8 +233,13 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
     }
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
-        assert __func__ instanceof PyFunction;
-        return ((PyFunction) __func__).findCallMethod(desc, request, __self__);
+        if (__func__ instanceof PyFunction) {
+            return ((PyFunction) __func__).findCallMethod(desc, request, __self__);
+        }
+
+        // FIXME fix dynamically linking reflected Java method
+        MethodHandle mh = MH.findVirtual(LOOKUP, getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));
+        return new GuardedInvocation(mh);
     }
 
     private PyObject checkSelf(PyObject arg, PyObject[] args) {
