@@ -67,6 +67,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         return this;
     }
 
+    @Override
     public PyObject getSelf(){
         return self;
     }

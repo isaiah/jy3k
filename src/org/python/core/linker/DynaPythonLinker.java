@@ -61,7 +61,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 }
                 break;
             case CALL:
-                if (self instanceof PyBuiltinMethod && !(self instanceof PyNewWrapper)) {
+                if (self instanceof PyNewWrapper) {
+                } else if (self instanceof PyBuiltinMethod) {
                     return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyFunction) {
                     return ((PyFunction) self).findCallMethod(desc, linkRequest);

@@ -80,7 +80,7 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     @Override
     public String toString() {
-        return String.format("<function %s>", getQualname());
+        return String.format("<built-in method %s of %s object at %s>", fastGetName(), getSelf().getType().fastGetName(), Py.idstr(getSelf()));
     }
 
     public interface Info extends Serializable {
