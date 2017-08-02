@@ -92,14 +92,9 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
         MethodHandle mh;
-        Object receiver = request.getReceiver();
         MethodType argType = desc.getMethodType();
         int argCount = argType.parameterCount() - 2;
-        String funcname = ((PyBuiltinMethod) receiver).methodName;
-        Class<?> klazz = ((PyBuiltinMethod) receiver).klazz;
-        String descriptor = ((PyBuiltinMethod) receiver).methodDescriptor;
-        MethodType methodType = MethodType.fromMethodDescriptorString(descriptor, null);
-        String defaultVals = ((PyBuiltinMethod) receiver).defaultVals;
+        MethodType methodType = MethodType.fromMethodDescriptorString(methodDescriptor, null);
         String[] defaults = defaultVals.equals("") ? Py.NoKeywords : defaultVals.split(",");
         Class<?>[] paramArray = methodType.parameterArray();
         int defaultLength = defaults.length;
@@ -110,15 +105,15 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 && methodType.parameterType(1) == String[].class;
         int argOffset = 0;
         Class<?> selfType = klazz;
-        if (((PyBuiltinMethod) receiver).isStatic) {
-            if (receiver instanceof PyBuiltinClassMethodNarrow) {
+        if (isStatic) {
+            if (this instanceof PyBuiltinClassMethodNarrow) {
                 methodType = methodType.insertParameterTypes(0, PyType.class);
                 selfType = PyType.class;
                 argOffset = 1;
             }
-            mh = MH.findStatic(LOOKUP, klazz, funcname, methodType);
+            mh = MH.findStatic(LOOKUP, klazz, methodName, methodType);
         } else {
-            mh = MH.findVirtual(LOOKUP, klazz, funcname, methodType);
+            mh = MH.findVirtual(LOOKUP, klazz, methodName, methodType);
             argOffset = 1;
         }
         MethodHandle guard = IS_BUILTIN_METHOD_MH;
