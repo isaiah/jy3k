@@ -4,6 +4,7 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
+import jdk.dynalink.linker.support.Guards;
 import org.python.core.generator.PyAsyncGenerator;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
@@ -34,6 +35,9 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
             MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class));
 
+    static final MethodHandle CREATE_FRAME_WITH_SELF = MH.findStatic(LOOKUP, BaseCode.class, "createFrameWithSelf",
+            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class));
+
     static final MethodHandle CREATE_FRAME_NO_KEYWORDS = MethodHandles.insertArguments(CREATE_FRAME, 3, (Object) Py.NoKeywords);
 
     static final MethodHandle CREATE_FRAME_WITHOUT_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
@@ -42,10 +46,14 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     static final MethodHandle CREATE_FRAME_WITH_KW_NO_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
             MethodType.methodType(PyFrame.class, PyObject.class, PyObject[].class, String[].class));
 
+    static final MethodHandle CREATE_FRAME_WITH_KW_SELF_NO_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
+            MethodType.methodType(PyFrame.class, PyObject.class, PyObject.class, PyObject[].class, String[].class));
+
     static final MethodHandle GET_FUNC_TBL = findOwnMH("getFuncTable", PyFunctionTable.class, PyObject.class);
     static final MethodHandle GET_CLOSURE = findOwnMH("getClosure", PyObject.class, PyObject.class);
     static final MethodHandle RESTORE_FRAME = findOwnMH("restoreFrame", PyObject.class, Throwable.class,
             PyObject.class, PyObject.class, ThreadState.class);
+    static final MethodHandle IS_SAME_RECEIVER = findOwnMH("isSameReceiver", boolean.class, PyObject.class, PyObject.class);
 
     static final MethodType GEN_SIG = MethodType.methodType(void.class, PyFrame.class, PyObject.class);
     static final MethodHandle NEW_GENERATOR = MH.findConstructor(LOOKUP, PyGenerator.class, GEN_SIG);
@@ -512,11 +520,20 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     public boolean isSequenceType() { return false; }
 
     public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request) {
-        Object self = request.getReceiver();
+        return findCallMethod(desc, request, null);
+    }
+
+    /**
+     * Create GuardedInvocation for link request
+     * @param desc
+     * @param request
+     * @param self the bounded receiver, when not null, it should be append to the arguments
+     * @return
+     */
+    public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request, PyObject self) {
         MethodType argType = desc.getMethodType();
         int argCount = argType.parameterCount() - 2;
-        PyFunction func = (PyFunction) self;
-        PyTableCode code = (PyTableCode) func.__code__;
+        PyTableCode code = (PyTableCode) __code__;
         Class<?> klazz = code.funcs.getClass();
         String funcName = code.funcname;
         MethodHandle mh;
@@ -534,8 +551,14 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         } else {
             mh = MH.findVirtual(LOOKUP, klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
             if (BaseCode.isWideCall(argType)){
-                mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
-                mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
+                if (self == null) {
+                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
+                } else {
+                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_WITH_SELF);
+                    mh = MethodHandles.insertArguments(mh, 4, self);
+                }
             } else {
                 switch (argCount) {
                     case 0:
@@ -555,7 +578,13 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
                         break;
                 }
 
-                mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_NO_KEYWORDS.asCollector(2, PyObject[].class, argCount));
+                if (self == null) {
+                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_NO_KEYWORDS.asCollector(2, PyObject[].class, argCount));
+                } else {
+                    mh = MethodHandles.dropArguments(mh, 5, PyObject.class);
+                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_NO_KEYWORDS.asCollector(2, PyObject[].class, argCount + 1));
+                    mh = MethodHandles.insertArguments(mh, 4, self);
+                }
             }
 
             mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
@@ -595,8 +624,11 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
                     mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class, PyObject.class));
                     break;
             }
-
-            return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+            MethodHandle guard = null;
+            if (self != null) {
+                guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
+            }
+            return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
 
         mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
@@ -624,9 +656,21 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         }
 
         if (BaseCode.isWideCall(argType)) {
-            mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITH_KW_NO_TS);
+            if (self == null) {
+                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITH_KW_NO_TS);
+            } else {
+                mh = MethodHandles.dropArguments(mh, 1, PyObject.class);
+                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITH_KW_SELF_NO_TS);
+                mh = MethodHandles.insertArguments(mh, 1, self);
+            }
         } else {
-            mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount));
+            if (self == null) {
+                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount));
+            } else {
+                mh = MethodHandles.dropArguments(mh, 1, PyObject.class);
+                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount + 1));
+                mh = MethodHandles.insertArguments(mh, 1, self);
+            }
         }
 
         switch (argCount) {
@@ -658,7 +702,15 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
                 break;
         }
         mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
-        return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+        MethodHandle guard = null;
+        if (self != null) {
+            guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
+        }
+        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
+    }
+
+    private static boolean isSameReceiver(PyObject boundMethod, PyObject self) {
+        return boundMethod instanceof PyMethod && ((PyMethod) boundMethod).__self__ == self;
     }
 
     /**
@@ -667,11 +719,22 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
      * it's func.__code__.funcs
      */
     private static PyFunctionTable getFuncTable(PyObject funcObj) {
-        return ((PyTableCode) ((PyFunction) funcObj).__code__).funcs;
+        PyTableCode code;
+        if (funcObj instanceof PyFunction) {
+            code = (PyTableCode) ((PyFunction) funcObj).__code__;
+        } else {
+            PyFunction func = (PyFunction) ((PyMethod) funcObj).__func__;
+            code = (PyTableCode) func.__code__;
+        }
+        return code.funcs;
     }
 
     private static PyObject getClosure(PyObject funcObj) {
-        return ((PyFunction) funcObj).__closure__;
+        if (funcObj instanceof PyFunction) {
+            return ((PyFunction) funcObj).__closure__;
+        }
+        PyFunction func = (PyFunction) ((PyMethod) funcObj).__func__;
+        return func.__closure__;
     }
 
     public static PyObject restoreFrame(Throwable t, PyObject v, PyObject arg, ThreadState ts) {

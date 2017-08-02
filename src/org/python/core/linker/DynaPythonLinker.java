@@ -20,6 +20,7 @@ import org.python.core.PyFrame;
 import org.python.core.PyFunction;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyLong;
+import org.python.core.PyMethod;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
@@ -79,6 +80,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyFunction) {
                     return ((PyFunction) self).findCallMethod(desc, linkRequest);
+                } else if (self instanceof PyMethod) {
+                    return ((PyMethod) self).findCallMethod(desc, linkRequest);
                 }
                 /** PyBuiltinFuction from builtins module */
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));

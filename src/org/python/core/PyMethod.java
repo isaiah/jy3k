@@ -1,12 +1,13 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
 import org.python.expose.ExposedType;
-import org.python.expose.MethodType;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,34 +16,21 @@ import java.lang.reflect.Proxy;
 /**
  * A Python method.
  */
-@ExposedType(name = "instancemethod", isBaseType = false, doc = "") // BuiltinDocs.instancemethod_doc)
+@ExposedType(name = "method", isBaseType = false, doc = BuiltinDocs.method_doc)
 public class PyMethod extends PyObject implements InvocationHandler, Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyMethod.class);
 
     /** The class associated with a method. */
-    @ExposedGet(doc = "") // BuiltinDocs.instancemethod_im_class_doc)
     public PyObject im_class;
 
-    /** The function (or other callable) implementing a method, also available via im_func */
-    @ExposedGet(doc = "") // BuiltinDocs.instancemethod___func___doc)
+    /** The function (or other callable) implementing a method */
+    @ExposedGet(doc = BuiltinDocs.method___func___doc)
     public PyObject __func__;
 
-    /** The instance to which a method is bound; None for unbound methods also available via im_self  */
-    @ExposedGet(doc = "") // BuiltinDocs.instancemethod___self___doc)
+    /** The instance to which a method is bound; None for unbound methods */
+    @ExposedGet(doc = BuiltinDocs.method___self___doc)
     public PyObject __self__;
-
-    @Deprecated
-    @ExposedGet(name = "im_func")
-    public PyObject getFunc() {
-        return __func__;
-    }
-
-    @Deprecated
-    @ExposedGet(name = "im_self")
-    public PyObject getSelf() {
-        return __self__;
-    }
 
     public PyMethod(PyObject function, PyObject self, PyObject type) {
         super(TYPE);
@@ -55,9 +43,9 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
     }
 
     @ExposedNew
-    static final PyObject instancemethod___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    static final PyObject method___new__(PyNewWrapper new_, boolean init, PyType subtype,
                                                 PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("instancemethod", args, keywords, "func");
+        ArgParser ap = new ArgParser("method", args, keywords, "func");
         ap.noKeywords();
         PyObject func = ap.getPyObject(0);
         PyObject self = ap.getPyObject(1);
@@ -74,10 +62,10 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
 
     @Override
     public PyObject __findattr_ex__(String name) {
-        return instancemethod___findattr_ex__(name);
+        return method___findattr_ex__(name);
     }
  
-    final PyObject instancemethod___findattr_ex__(String name) {
+    final PyObject method___findattr_ex__(String name) {
         PyObject ret = super.__findattr_ex__(name);
         if (ret != null) {
             return ret;
@@ -85,10 +73,10 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
         return __func__.__findattr_ex__(name);
     }
     
-    @ExposedMethod(doc = "") // BuiltinDocs.instancemethod___getattribute___doc)
-    final PyObject instancemethod___getattribute__(PyObject arg0) {
+    @ExposedMethod(doc = BuiltinDocs.method___getattribute___doc)
+    final PyObject method___getattribute__(PyObject arg0) {
         String name = asName(arg0);
-        PyObject ret = instancemethod___findattr_ex__(name);
+        PyObject ret = method___findattr_ex__(name);
         if (ret == null) {
             noAttributeError(name);
         }
@@ -97,11 +85,11 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
 
     @Override
     public PyObject __get__(PyObject obj, PyObject type) {
-        return instancemethod___get__(obj, type);
+        return method___get__(obj, type);
     }
 
-    @ExposedMethod(defaults = "null", doc = "") // BuiltinDocs.instancemethod___get___doc)
-    final PyObject instancemethod___get__(PyObject obj, PyObject type) {
+    @ExposedMethod(defaults = "null", doc = BuiltinDocs.method___get___doc)
+    final PyObject method___get__(PyObject obj, PyObject type) {
         // Only if classes are compatible
         if (obj == null || __self__ != null) {
             return this;
@@ -225,11 +213,11 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
     
     @Override
     public PyObject __call__(ThreadState state, PyObject[] args, String[] keywords) {
-        return instancemethod___call__(state, args, keywords);
+        return method___call__(state, args, keywords);
     }
 
-    @ExposedMethod(doc = "") // BuiltinDocs.instancemethod___call___doc)
-    final PyObject instancemethod___call__(ThreadState state, PyObject[] args, String[] keywords) {
+    @ExposedMethod(doc = BuiltinDocs.method___call___doc)
+    final PyObject method___call__(ThreadState state, PyObject[] args, String[] keywords) {
         PyObject self = checkSelf(null, args);
         if (self == null) {
             return __func__.__call__(state, args, keywords);
@@ -238,36 +226,36 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
         }
     }
 
+    public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
+        assert __func__ instanceof PyFunction;
+        return ((PyFunction) __func__).findCallMethod(desc, request, __self__);
+    }
+
     private PyObject checkSelf(PyObject arg, PyObject[] args) {
         PyObject self = __self__;
-        if (self == null) {
-            // Unbound methods must be called with an instance of the
-            // class (or a derived class) as first argument
-            boolean ok;
-            if (arg != null) {
-                self = arg;
-            } else if (args != null && args.length >= 1) {
-                self = args[0];
-            }
-            if (self == null) {
-                ok = false;
-            } else {
-                ok = Py.isInstance(self, im_class);
-            }
-            if (!ok) {
-                // XXX: Need equiv. of PyEval_GetFuncDesc instead of
-                // hardcoding "()"
-                String msg = String.format("unbound method %s%s must be called with %s instance as "
-                                           + "first argument (got %s%s instead)",
-                                           getFuncName(), "()",
-                                           getClassName(im_class), getInstClassName(self),
-                                           self == null ? "" : " instance");
-                throw Py.TypeError(msg);
-            }
-            return null;
-        } else {
+        if (self != null) {
             return self;
         }
+        // Unbound methods must be called with an instance of the
+        // class (or a derived class) as first argument
+        if (arg != null) {
+            self = arg;
+        } else if (args != null && args.length >= 1) {
+            self = args[0];
+        }
+
+        boolean ok = self != null && Py.isInstance(self, im_class);
+        if (!ok) {
+            // XXX: Need equiv. of PyEval_GetFuncDesc instead of
+            // hardcoding "()"
+            String msg = String.format("unbound method %s%s must be called with %s instance as "
+                            + "first argument (got %s%s instead)",
+                    getFuncName(), "()",
+                    getClassName(im_class), getInstClassName(self),
+                    self == null ? "" : " instance");
+            throw Py.TypeError(msg);
+        }
+        return null;
     }
 
     @Override
@@ -284,7 +272,7 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
     // FIXME this should work, but it has a dependency on our descriptor mechanism!
 //    @ExposedSet(name = "__doc__")
 //    public void setDoc() {
-//        throw Py.AttributeError("attribute '__doc__' of 'instancemethod' objects is not writable");
+//        throw Py.AttributeError("attribute '__doc__' of 'method' objects is not writable");
 //    }
 
     @Override
@@ -309,7 +297,7 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
         if (inst == null) {
             return "nothing";
         }
-        PyObject classObj = inst.__findattr__("__class__");
+        PyObject classObj = inst.__findattr__("im_class");
         if (classObj == null) {
             classObj = inst.getType();
         }
