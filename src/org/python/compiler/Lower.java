@@ -27,6 +27,7 @@ import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Num;
+import org.python.antlr.ast.PopExcept;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.SetComp;
@@ -450,10 +451,12 @@ public class Lower extends Visitor {
         // apply other lowers in this visitor first
         traverse(node);
         final List<stmt> finalBody = node.getInternalFinalbody();
+        final stmt finalBlock;
         if (finalBody == null || finalBody.isEmpty()) {
-            return super.visitTry(node);
+            finalBlock = new PopExcept(node);
+        } else {
+            finalBlock = new Block(node.getToken(), finalBody);
         }
-        final Block finalBlock = new Block(node.getToken(), finalBody);
         node.setInternalFinalbody(null);
 
         Visitor tryVisitor = new Visitor() {
@@ -499,7 +502,7 @@ public class Lower extends Visitor {
         traverse(finalBlock);
         tryVisitor.traverse(node);
 
-        excepthandler catchAll = catchAllBlock(finalBody.get(0), finalBlock);
+        excepthandler catchAll = catchAllBlock(node, finalBlock);
         List<excepthandler> excepthandlers = node.getInternalHandlers();
         Try newTryNode;
         // when there is no except clause
@@ -513,7 +516,7 @@ public class Lower extends Visitor {
         return null;
     }
 
-    private excepthandler catchAllBlock(stmt node, Block body) {
+    private excepthandler catchAllBlock(stmt node, stmt body) {
         Raise raiseNode = new Raise(node.getToken(), null, null);
         return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
     }

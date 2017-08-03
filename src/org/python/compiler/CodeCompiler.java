@@ -46,6 +46,7 @@ import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Nonlocal;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Pass;
+import org.python.antlr.ast.PopExcept;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Set;
@@ -529,6 +530,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitExitFor(ExitFor node) throws Exception {
         popException();
         code.goto_(exitLabels.peek());
+        return null;
+    }
+
+    @Override
+    public Object visitPopExcept(PopExcept node) throws Exception {
+        popException();
         return null;
     }
 
