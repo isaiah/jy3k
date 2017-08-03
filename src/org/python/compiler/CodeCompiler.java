@@ -527,6 +527,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitExitFor(ExitFor node) throws Exception {
+        popException();
         code.goto_(exitLabels.peek());
         return null;
     }
@@ -1037,7 +1038,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
 
-    public void exceptionTest(int exc, Label end_of_exceptions, Try node, int index)
+    public void exceptionTest(int exc, Label end_of_exceptions, Try node)
             throws Exception {
         for (int i = 0; i < node.getInternalHandlers().size(); i++) {
             ExceptHandler handler = (ExceptHandler) node.getInternalHandlers().get(i);
@@ -1106,12 +1107,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         if (node.getInternalOrelse() == null) {
             // No else clause to worry about
-            exceptionTest(exc, handler_end, node, 1);
+            exceptionTest(exc, handler_end, node);
             code.mark(handler_end);
         } else {
             // Have else clause
             Label else_end = new Label();
-            exceptionTest(exc, else_end, node, 1);
+            exceptionTest(exc, else_end, node);
             code.mark(handler_end);
 
             // do else clause
