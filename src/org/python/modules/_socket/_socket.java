@@ -1,6 +1,5 @@
 package org.python.modules._socket;
 
-import org.python.core.ClassDictInit;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.expose.ExposedModule;

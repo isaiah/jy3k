@@ -2,12 +2,10 @@
 package org.python.modules.zipimport;
 
 import org.python.core.BuiltinDocs;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyObject;
-import org.python.core.PyBytes;
 import org.python.core.PyStringMap;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;

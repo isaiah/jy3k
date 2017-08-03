@@ -1,19 +1,13 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.python.core.BuiltinDocs;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyArray;
+import org.python.core.PyBytes;
 import org.python.core.PyFrozenSet;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyBytes;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
@@ -22,9 +16,13 @@ import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedModule;
-import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.ModuleInit;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The Python _hashlib module: provides hashing algorithms via

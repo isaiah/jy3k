@@ -2,7 +2,6 @@
 package org.python.modules.jffi;
 
 import com.kenai.jffi.Library;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;

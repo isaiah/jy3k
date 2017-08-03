@@ -1,16 +1,11 @@
 package org.python.modules;
 
-import org.python.core.ClassDictInit;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
-import org.python.core.PyBuiltinCallable;
-import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFunction;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 import org.python.core.PyType;
-import org.python.core.PyUnicode;
-import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 

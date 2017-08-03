@@ -1,18 +1,17 @@
 package org.python.modules.bz2;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
-import org.python.core.ClassDictInit;
 import org.python.core.Py;
-import org.python.core.PyObject;
 import org.python.core.PyBytes;
+import org.python.core.PyObject;
 import org.python.expose.ExposedFunction;
 import org.python.expose.ExposedModule;
 import org.python.expose.ModuleInit;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Python _bz2 module
