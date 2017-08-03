@@ -453,7 +453,43 @@ public class Lower extends Visitor {
         final List<stmt> finalBody = node.getInternalFinalbody();
         final stmt finalBlock;
         if (finalBody == null || finalBody.isEmpty()) {
-            finalBlock = new PopExcept(node);
+            finalBlock = new PopExcept(node.getToken());
+            // where the final block is non, only have to inline a PopExcept instruction on each exit point in
+            // excepthandler
+            Visitor handlersVisitor = new Visitor() {
+                @Override
+                public Object visitBreak(Break node) {
+                    node.replaceSelf(finalBlock, node.copy());
+                    return node;
+                }
+
+                @Override
+                public Object visitContinue(Continue node) {
+                    node.replaceSelf(finalBlock, node.copy());
+                    return node;
+                }
+
+                @Override
+                public Object visitReturn(Return node) {
+                    expr value = node.getInternalValue();
+                    // no return expression, or returns a primitive literal
+                    if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
+                        node.replaceSelf(finalBlock, node.copy());
+                    } else {
+                        Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
+                        Assign assign = new Assign(value.getToken(), asList(resultNode), value);
+                        resultNode = resultNode.copy();
+                        resultNode.setContext(expr_contextType.Load);
+                        node.replaceSelf(assign, finalBlock, new Return(node.getToken(), resultNode));
+                    }
+                    return node;
+                }
+            };
+
+            for (excepthandler handler : node.getInternalHandlers()) {
+                handler.accept(handlersVisitor);
+            }
+            return super.visitTry(node);
         } else {
             finalBlock = new Block(node.getToken(), finalBody);
         }
@@ -473,13 +509,13 @@ public class Lower extends Visitor {
 
             @Override
             public Object visitBreak(Break node) {
-                node.replaceSelf(asList(finalBlock, node.copy()));
+                node.replaceSelf(finalBlock, node.copy());
                 return node;
             }
 
             @Override
             public Object visitContinue(Continue node) {
-                node.replaceSelf(asList(finalBlock, node.copy()));
+                node.replaceSelf(finalBlock, node.copy());
                 return node;
             }
 
@@ -488,7 +524,7 @@ public class Lower extends Visitor {
                 expr value = node.getInternalValue();
                 // no return expression, or returns a primitive literal
                 if (value == null || value instanceof Num || value instanceof Str || value instanceof NameConstant) {
-                    node.replaceSelf(asList(finalBlock, node.copy()));
+                    node.replaceSelf(finalBlock, node.copy());
                 } else {
                     Name resultNode = new Name(node.getToken(), RETURN.symbolName(), expr_contextType.Store);
                     Assign assign = new Assign(value.getToken(), asList(resultNode), value);
