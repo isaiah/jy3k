@@ -1,0 +1,3 @@
+codegen is a tool to parse org.python.expose.annotation annotations and generate PropertyMap for native classes.
+It was original the org.python.core.expose package and then moved into it's own folder, as part of the effort
+to adopt the nashorn approach of generating wraps for native implemented classes.

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="codegen" default="jar">
+  <target name="init">
+    <loadproperties srcFile="project.properties" />
+  </target>
+</project>
