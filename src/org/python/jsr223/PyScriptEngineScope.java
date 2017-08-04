@@ -16,9 +16,9 @@ import org.python.core.PyBytes;
 import org.python.core.PyType;
 import org.python.core.Visitproc;
 import org.python.core.Untraversable;
-import org.python.expose.ExposedType;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
+import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
 
 /**
  * JSR 223 does not map well to Jython's concept of "locals" and "globals".

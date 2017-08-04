@@ -1,32 +1,20 @@
 package org.python.modules;
 
-import jnr.constants.platform.Fcntl;
 import jnr.posix.POSIX;
-import jnr.posix.SpawnAttribute;
-import jnr.posix.SpawnFileAction;
-import jnr.posix.util.Platform;
 import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
-import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.core.PySequence;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 import org.python.modules._io.PyFileIO;
 import org.python.modules.posix.PosixModule;
-import org.python.util.FilenoUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
-import java.nio.channels.Pipe;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ExposedModule(doc = "A POSIX helper for the subprocess module.")

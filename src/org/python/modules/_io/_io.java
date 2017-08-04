@@ -12,10 +12,10 @@ import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.io.IOBase;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * The Python _io module implemented in Java.

@@ -4,7 +4,6 @@
 package org.python.core;
 
 import org.python.core.packagecache.PackageManager;
-import org.python.expose.ExposedType;
 
 import java.util.StringTokenizer;
 

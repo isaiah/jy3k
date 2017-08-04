@@ -11,9 +11,9 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.repeat", base = PyObject.class, doc = BuiltinDocs.itertools_repeat_doc)
 public class repeat extends PyIterator {

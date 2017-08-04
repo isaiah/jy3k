@@ -3,11 +3,10 @@ package org.python.modules._functools;
 
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * The Python _functools module.

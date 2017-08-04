@@ -37,11 +37,11 @@ import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.codecs;
 import org.python.core.stringlib.Encoding;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
+import org.python.annotations.ModuleInit;
 
 import java.math.BigInteger;
 import java.util.HashMap;

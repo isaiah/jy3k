@@ -6,8 +6,8 @@ import org.python.antlr.AST;
 import org.python.antlr.PythonTree;
 import org.python.core.PyBytes;
 import org.python.core.PyType;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "_ast.operator", base = AST.class)
 public abstract class operator extends PythonTree {

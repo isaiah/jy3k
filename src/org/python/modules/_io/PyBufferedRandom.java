@@ -2,7 +2,7 @@ package org.python.modules._io;
 
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "_io.BufferedRandom")
 public class PyBufferedRandom extends PyObject {

@@ -1,8 +1,8 @@
 package org.python.modules._collections;
 
 import org.python.core.PyObject;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * Collections - This module adds the ability to use high performance data 

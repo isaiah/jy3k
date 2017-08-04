@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.python.antlr.adapter.AstAdapter;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
 
 @ExposedType(name = "_ast.astlist", base = PyList.class)

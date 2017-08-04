@@ -3,7 +3,7 @@ package org.python.expose.generate;
 import org.objectweb.asm.Type;
 import org.python.core.BytecodeLoader;
 import org.python.expose.BaseTypeBuilder;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedType;
 import org.python.expose.TypeBuilder;
 
 import java.util.Collection;

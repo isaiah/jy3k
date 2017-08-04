@@ -4,10 +4,10 @@ import com.ibm.icu.lang.UCharacter;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FieldNameIterator;
 import org.python.core.stringlib.MarkupIterator;
-import org.python.expose.ExposedClassMethod;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedClassMethod;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
 import org.python.modules._codecs;
 

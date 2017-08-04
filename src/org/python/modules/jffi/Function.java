@@ -9,10 +9,10 @@ import org.python.core.PyObject;
 import org.python.core.PySequenceList;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "jffi.Function", base = PyObject.class)
 public class Function extends BasePointer implements Pointer {

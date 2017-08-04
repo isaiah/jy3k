@@ -1,7 +1,7 @@
 package org.python.core;
 
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 /**
  * An iterator that yields the objects from a sequence-like object in reverse

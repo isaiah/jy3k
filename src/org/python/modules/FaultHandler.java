@@ -2,8 +2,8 @@ package org.python.modules;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 /**
  * Created by isaiah on 7/15/16.

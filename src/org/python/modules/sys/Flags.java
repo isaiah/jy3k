@@ -1,8 +1,8 @@
 package org.python.modules.sys;
 
 import org.python.core.PyObject;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "sys.flags")
 public class Flags extends PyObject {

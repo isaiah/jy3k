@@ -9,8 +9,8 @@ package org.python.core;
 import org.python.core.generator.PyAsyncGenerator;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 import org.python.modules._systemrestart;
 
 @Untraversable

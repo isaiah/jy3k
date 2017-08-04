@@ -1,8 +1,5 @@
 package org.python.core;
 
-import org.python.expose.ExposedType;
-import org.python.modules.gc;
-
 /**
  * <p>
  * This interface defines a

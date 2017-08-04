@@ -5,8 +5,8 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 import java.io.BufferedInputStream;
 import java.io.File;

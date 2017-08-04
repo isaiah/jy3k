@@ -1,10 +1,9 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.modules;
 import org.python.core.PyArray;
-import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 import static org.python.core.PyArray.char2class;
 

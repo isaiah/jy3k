@@ -9,11 +9,11 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Untraversable;
-import org.python.expose.ExposedDelete;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedDelete;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 
 /**
  * The Python CSV Dialect type.

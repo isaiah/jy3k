@@ -1,9 +1,9 @@
 package org.python.modules.unicodedata;
 
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 import static org.python.modules.unicodedata.UCD.UNICODEDATA;
 

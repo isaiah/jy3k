@@ -7,10 +7,10 @@ import org.python.core.PyException;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

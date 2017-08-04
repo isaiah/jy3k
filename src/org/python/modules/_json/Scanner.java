@@ -10,9 +10,8 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "_json.Scanner", base = PyObject.class)
 public class Scanner extends PyObject implements Traverseproc {

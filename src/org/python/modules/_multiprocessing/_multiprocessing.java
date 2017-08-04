@@ -2,8 +2,8 @@ package org.python.modules._multiprocessing;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 @ExposedModule
 public class _multiprocessing {

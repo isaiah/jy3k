@@ -35,10 +35,10 @@ import org.python.core.io.IOBase;
 import org.python.core.io.StreamIO;
 import org.python.core.io.TextIOBase;
 import org.python.core.io.UniversalIOWrapper;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 @Untraversable
 @ExposedType(name = "bz2.BZ2File")

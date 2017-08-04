@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
 
 @ExposedType(name = "frozenset", base = PyObject.class, doc = BuiltinDocs.frozenset_doc)

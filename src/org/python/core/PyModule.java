@@ -1,12 +1,12 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import org.python.expose.ExposedDelete;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedDelete;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 
 /**
  * The Python Module object.

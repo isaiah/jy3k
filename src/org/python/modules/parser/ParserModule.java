@@ -2,13 +2,12 @@ package org.python.modules.parser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.python.antlr.BuildAstVisitor;
 import org.python.antlr.PythonLexer;
 import org.python.antlr.PythonParser;
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 /**
  * Created by isaiah on 3/22/17.

@@ -1,9 +1,9 @@
 package org.python.modules._blake2;
 
 import org.python.core.PyObject;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.internal.blake2.Blake2b;
 import org.python.internal.blake2.Blake2s;
 

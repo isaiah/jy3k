@@ -3,8 +3,8 @@ package org.python.core;
 
 import java.io.Serializable;
 
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 /**
  * A class representing the singleton Ellipsis <code>...</code> object.

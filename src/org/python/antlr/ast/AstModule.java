@@ -9,8 +9,8 @@ import org.python.core.PyObject;
 
 import org.python.antlr.AST;
 import org.python.core.PyUnicode;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 @ExposedModule(name = "_ast")
 public class AstModule {

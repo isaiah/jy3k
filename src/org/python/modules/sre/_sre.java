@@ -3,9 +3,9 @@ package org.python.modules.sre;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 @ExposedModule(name="_sre", doc="Native implementation of sre_compile")
 public class _sre {

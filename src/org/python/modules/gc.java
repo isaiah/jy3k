@@ -9,10 +9,10 @@ import org.python.core.TraverseprocDerived;
 import org.python.core.Untraversable;
 import org.python.core.Visitproc;
 import org.python.core.finalization.FinalizeTrigger;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.modules._weakref.GlobalRef;
 
 import java.lang.ref.Reference;

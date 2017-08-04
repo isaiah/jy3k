@@ -4,8 +4,8 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.stringlib.FieldNameIterator;
 import org.python.core.stringlib.MarkupIterator;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 @ExposedModule(doc = "string helper module")
 public class _string {

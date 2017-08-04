@@ -5,10 +5,10 @@ import org.python.core.BuiltinDocs;
 import org.python.core.PyArray;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * The python array module, plus jython extensions from jarray.

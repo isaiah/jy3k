@@ -1,15 +1,14 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._csv;
 
-import org.python.core.PyBytes;
 import org.python.core.PyIterator;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 
 /**
  * CSV file reader.

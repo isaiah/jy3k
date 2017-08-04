@@ -6,9 +6,9 @@ package org.python.core;
 
 import java.io.Serializable;
 
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 /**
  * The singleton None object.

@@ -3,17 +3,15 @@ package org.python.modules.jffi;
 
 import org.python.core.Py;
 import org.python.core.PyFloat;
-import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
-import org.python.core.PyObject.ConversionException;
 import org.python.core.PyType;
-import org.python.expose.ExposedClassMethod;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedClassMethod;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "jffi.ScalarCData", base = CData.class)
 public class ScalarCData extends CData {

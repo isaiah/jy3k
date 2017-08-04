@@ -1,4 +1,4 @@
-package org.python.expose;
+package org.python.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target( {ElementType.METHOD, ElementType.FIELD})
-public @interface ExposedSet {
+@Target( {ElementType.METHOD})
+public @interface ExposedDelete {
 
     String name() default "";
 }

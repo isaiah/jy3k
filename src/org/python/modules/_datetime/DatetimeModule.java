@@ -2,9 +2,9 @@ package org.python.modules._datetime;
 
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.modules.time.PyTimeTuple;
 import org.python.modules.time.TimeModule;
 

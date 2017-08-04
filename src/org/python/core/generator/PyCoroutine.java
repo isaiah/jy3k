@@ -7,9 +7,9 @@ import org.python.core.PyFrame;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.finalization.FinalizeTrigger;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "coroutine", base = PyObject.class, isBaseType = false, doc = BuiltinDocs.coroutine_doc)
 public class PyCoroutine extends PyGenerator {

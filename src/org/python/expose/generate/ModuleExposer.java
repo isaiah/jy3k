@@ -2,6 +2,7 @@ package org.python.expose.generate;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
+import org.python.annotations.ExposedModule;
 import org.python.expose.BaseModuleBuilder;
 
 import java.util.Collection;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Expose a class with the {@link org.python.expose.ExposedModule} annotation as a builtin Python module.
+ * Expose a class with the {@link ExposedModule} annotation as a builtin Python module.
  */
 public class ModuleExposer extends Exposer {
     private String doc;

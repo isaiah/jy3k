@@ -2,7 +2,6 @@ package org.python.modules._collections;
 
 import org.python.core.ArgParser;
 import org.python.core.CompareOp;
-import org.python.core.PyIterator;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -12,11 +11,11 @@ import org.python.core.PyException;
 import org.python.core.ThreadState;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
 
 /**

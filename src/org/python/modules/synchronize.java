@@ -9,8 +9,8 @@ import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 
 @ExposedModule

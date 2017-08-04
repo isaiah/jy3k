@@ -3,7 +3,7 @@ package org.python.modules.jffi;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.expose.ExposedGet;
+import org.python.annotations.ExposedGet;
 
 public abstract class BasePointer extends PyObject implements Pointer {
 

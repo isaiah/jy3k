@@ -3,9 +3,8 @@ package org.python.modules;
 import org.python.core.BytecodeNotification;
 import org.python.core.PyObject;
 import org.python.core.Py;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 /**
  * BytecodeTools provides tools for generated JVM bytecode.

@@ -5,8 +5,8 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Untraversable;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 @Untraversable
 @ExposedType(name = "_thread.lock")

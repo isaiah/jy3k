@@ -6,8 +6,8 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 import org.python.modules.gc;
 
 import java.util.regex.Pattern;

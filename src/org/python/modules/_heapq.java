@@ -1,8 +1,8 @@
 package org.python.modules;
 
 import org.python.core.PyObject;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * Native implementation of heapq

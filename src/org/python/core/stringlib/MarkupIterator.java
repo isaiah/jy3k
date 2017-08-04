@@ -6,8 +6,8 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 /**
  * Provides an implementation of the object that <code>str._formatter_parser()</code> returns, which

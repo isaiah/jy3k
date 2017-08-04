@@ -1,4 +1,4 @@
-package org.python.expose;
+package org.python.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,12 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target( {ElementType.METHOD, ElementType.FIELD})
-public @interface ExposedGet {
+public @interface ExposedSet {
 
     String name() default "";
-
-    /**
-     * Returns the __doc__ String for this descriptor.
-     */
-    String doc() default "";
 }

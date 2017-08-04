@@ -1,6 +1,5 @@
 package org.python.modules._struct;
 
-import org.python.antlr.ast.For;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyArray;
@@ -12,10 +11,10 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

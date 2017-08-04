@@ -1,7 +1,7 @@
 package org.python.core;
 
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 import java.io.Serializable;
 

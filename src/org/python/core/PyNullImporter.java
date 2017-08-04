@@ -6,8 +6,8 @@ package org.python.core;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 @Untraversable
 @ExposedType(name = "NullImporter", isBaseType = false)

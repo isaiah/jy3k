@@ -9,9 +9,9 @@ import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.Visitproc;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 /**
  * Functional tools for creating and using iterators. Java implementation of the CPython module

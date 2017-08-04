@@ -6,7 +6,7 @@ import org.python.core.PyFloat;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedType;
 
 /**
  * A weak reference proxy object.

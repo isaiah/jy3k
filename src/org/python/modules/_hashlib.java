@@ -12,12 +12,12 @@ import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
 import org.python.core.util.StringUtil;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedModule;
-import org.python.expose.ExposedType;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ExposedType;
+import org.python.annotations.ModuleInit;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

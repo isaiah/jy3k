@@ -1,4 +1,6 @@
-package org.python.expose;
+package org.python.annotations;
+
+import org.python.expose.MethodType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

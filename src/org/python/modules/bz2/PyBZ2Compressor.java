@@ -12,9 +12,9 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Untraversable;
 import org.python.core.util.StringUtil;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 @Untraversable
 @ExposedType(name = "bz2.BZ2Compressor")

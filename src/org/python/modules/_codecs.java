@@ -15,19 +15,16 @@ import org.python.core.PyDictionary;
 import org.python.core.PyLong;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
-import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.Untraversable;
 import org.python.core.codecs;
 import org.python.core.stringlib.Encoding;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ExposedType;
 import org.python.modules.sys.SysModule;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 
 /**

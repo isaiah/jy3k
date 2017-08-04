@@ -23,11 +23,11 @@ import org.python.core.io.FileIO;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.core.io.RawIOBase;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 import org.python.util.FilenoUtil;
 
 /**

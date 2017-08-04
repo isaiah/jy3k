@@ -4,7 +4,6 @@ package org.python.core.generator;
 import org.python.core.BuiltinDocs;
 import org.python.core.CodeFlag;
 import org.python.core.Py;
-import org.python.core.BaseCode;
 import org.python.core.PyCode;
 import org.python.core.PyException;
 import org.python.core.PyFrame;
@@ -18,9 +17,9 @@ import org.python.core.ThreadState;
 import org.python.core.Visitproc;
 import org.python.core.finalization.FinalizableBuiltin;
 import org.python.core.finalization.FinalizeTrigger;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "generator", base = PyObject.class, isBaseType = false, doc = BuiltinDocs.generator_doc)
 public class PyGenerator extends PyIterator implements FinalizableBuiltin {

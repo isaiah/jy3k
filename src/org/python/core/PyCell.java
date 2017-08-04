@@ -1,8 +1,8 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 
 /**
  * The Python cell type.

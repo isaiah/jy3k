@@ -3,8 +3,8 @@ package org.python.modules._jythonlib;
 
 import org.python.core.PyBytes;
 import org.python.core.PyObject;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 
 @ExposedModule

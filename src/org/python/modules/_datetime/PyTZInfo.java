@@ -3,8 +3,8 @@ package org.python.modules._datetime;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "datetime.tzinfo")
 public class PyTZInfo extends PyObject {

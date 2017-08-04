@@ -4,7 +4,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyBuiltinMethodNarrow;
-import org.python.expose.ExposedMethod;
+import org.python.annotations.ExposedMethod;
 import org.python.expose.MethodType;
 
 /**

@@ -1,18 +1,15 @@
 package org.python.modules.zlib;
 
 import org.python.core.ArgParser;
-import org.python.core.BufferProtocol;
 import org.python.core.Py;
-import org.python.core.PyBUF;
-import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 
 import java.util.zip.Deflater;
 

@@ -8,7 +8,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedType;
 
 import java.io.IOException;
 import java.io.InputStream;

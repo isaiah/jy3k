@@ -3,8 +3,8 @@ package org.python.modules;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 
 @ExposedModule
 public class _systemrestart {

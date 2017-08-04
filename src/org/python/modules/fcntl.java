@@ -5,9 +5,9 @@ import jnr.posix.POSIX;
 import org.python.core.ArgParser;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.modules.posix.PosixModule;
 
 @ExposedModule

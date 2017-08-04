@@ -3,8 +3,8 @@ package org.python.core;
 
 import java.io.Serializable;
 
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedType;
 
 @Untraversable
 @ExposedType(name = "builtin_function_or_method", isBaseType = false)

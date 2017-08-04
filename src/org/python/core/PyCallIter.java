@@ -1,6 +1,6 @@
 package org.python.core;
 
-import org.python.expose.ExposedType;
+import org.python.annotations.ExposedType;
 
 @ExposedType(name = "callable_iterator")
 public class PyCallIter extends PyIterator {

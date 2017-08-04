@@ -2,7 +2,6 @@ package org.python.expose.generate;
 
 import org.objectweb.asm.Type;
 import org.python.compiler.ClassConstants;
-import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
@@ -19,17 +18,17 @@ import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
 import org.python.expose.ExposeAsSuperclass;
-import org.python.expose.ExposedClassMethod;
-import org.python.expose.ExposedConst;
-import org.python.expose.ExposedDelete;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedGet;
-import org.python.expose.ExposedMethod;
-import org.python.expose.ExposedModule;
-import org.python.expose.ExposedNew;
-import org.python.expose.ExposedSet;
-import org.python.expose.ExposedType;
-import org.python.expose.ModuleInit;
+import org.python.annotations.ExposedClassMethod;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedDelete;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
+import org.python.annotations.ModuleInit;
 import org.python.expose.TypeBuilder;
 
 /**

@@ -2,8 +2,8 @@ package org.python.modules.cjkcodecs;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.expose.ExposedFunction;
-import org.python.expose.ExposedModule;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
 
 import java.nio.charset.Charset;
 
