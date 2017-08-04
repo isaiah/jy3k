@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-  <info organisation="org.apache" module="jython"/>
+  <info organisation="org.python" module="jylang"/>
   <configurations>
     <conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime"/>
     <conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>

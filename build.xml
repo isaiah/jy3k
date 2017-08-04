@@ -1,7 +1,8 @@
 <!-- Copyright 2000 Dj Walker-Morgan -->
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="jython" default="developer-build" basedir=".">
+  <import file="build-codegen.xml"/>
   <target name="deps">
-    <ivy:retrieve sync="true" type="jar,bundle"/>
+    <ivy:retrieve type="jar,bundle"/>
   </target>
   <target name="resolve">
     <ivy:cachepath pathid="main.classpath" conf="compile"/>
@@ -490,27 +491,6 @@
     <cc outtype="shared" subsystem="console" outfile="ctypes_test" objdir="${compile.dir}">
       <fileset dir="tests/c" includes="*.c"/>
     </cc>
-  </target>
-
-
-  <target name="expose" depends="compile">
-    <taskdef name="expose" classname="org.python.tools.codegen.ExposeTask">
-      <classpath>
-        <path refid="main.classpath" />
-        <pathelement path="${compile.dir}" />
-      </classpath>
-    </taskdef>
-    <taskdef name="expose_module" classname="org.python.tools.codegen.ModuleExposeTask">
-      <classpath>
-        <path refid="main.classpath" />
-        <pathelement path="${compile.dir}" />
-      </classpath>
-    </taskdef>
-
-    <expose srcdir="${compile.dir}"
-      destdir="${exposed.dir}"
-      includesfile="${jython.base.dir}/CoreExposed.includes"/>
-    <expose_module destdir="${exposed.dir}"/>
   </target>
 
   <target name="jar-complete" depends="jar, pycompile">

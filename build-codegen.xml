@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build-codegen" default="expose" basedir=".">
+  <target name="build-codegen" depends="compile">
+    <ant antfile="build.xml" inheritAll="false"
+      dir="${basedir}/buildtools/codegen" target="jar">
+      <reference refid="main.classpath"/>
+      <property name="jylang.compile.dir" value="${compile.dir}"/>
+    </ant>
+  </target>
+
+  <target name="expose" depends="build-codegen">
+    <taskdef name="expose" classname="org.python.tools.codegen.ExposeTask">
+      <classpath>
+        <path refid="main.classpath" />
+        <pathelement path="${compile.dir}" />
+        <pathelement location="${basedir}/buildtools/codegen/dist/codegen.jar"/>
+      </classpath>
+    </taskdef>
+    <taskdef name="expose_module" classname="org.python.tools.codegen.ModuleExposeTask">
+      <classpath>
+        <path refid="main.classpath" />
+        <pathelement path="${compile.dir}" />
+        <pathelement location="${basedir}/buildtools/codegen/dist/codegen.jar"/>
+      </classpath>
+    </taskdef>
+
+    <expose srcdir="${compile.dir}"
+      destdir="${exposed.dir}"
+      includesfile="${jython.base.dir}/CoreExposed.includes"/>
+    <expose_module destdir="${exposed.dir}"/>
+  </target>
+</project>

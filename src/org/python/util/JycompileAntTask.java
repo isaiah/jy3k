@@ -3,7 +3,6 @@ package org.python.util;
 import org.apache.tools.ant.BuildException;
 import org.python.Version;
 import org.python.bootstrap.Import;
-import org.python.core.PySystemState;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
 import java.util.Set;
 
 /**

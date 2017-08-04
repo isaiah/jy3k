@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="codegen" default="jar">
+<project name="codegen" default="jar" basedir=".">
   <target name="init">
     <loadproperties srcFile="project.properties" />
+  </target>
+
+  <target name="prepare" depends="init">
+    <mkdir dir="${build.class.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}/lib"/>
+  </target>
+
+  <target name="compile" depends="prepare" description="compile codegen source">
+    <javac srcdir="${src.dir}"
+      destdir="${build.class.dir}"
+      includeantruntime="true" fork="true">
+      <classpath>
+        <path refid="main.classpath"/>
+        <pathelement path="${jylang.compile.dir}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile" description="create codegen.jar">
+    <jar jarfile="${dist.jar}" basedir="${build.class.dir}"/>
   </target>
 </project>
