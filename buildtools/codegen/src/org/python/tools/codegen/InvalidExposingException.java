@@ -1,4 +1,4 @@
-package org.python.expose.generate;
+package org.python.tools.codegen;
 
 /**
  * Indicates that something is invalid in an exposed type be it a conflict of names, a missing

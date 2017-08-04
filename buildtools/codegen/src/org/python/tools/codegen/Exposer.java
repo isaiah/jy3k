@@ -1,4 +1,4 @@
-package org.python.expose.generate;
+package org.python.tools.codegen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.python.core.BytecodeLoader;
-import org.python.core.PyUnicode;
 
 /**
  * Base class that handles the basics of generating a single class with asm. Subclass to supply the

@@ -494,13 +494,13 @@
 
 
   <target name="expose" depends="compile">
-    <taskdef name="expose" classname="org.python.expose.generate.ExposeTask">
+    <taskdef name="expose" classname="org.python.tools.codegen.ExposeTask">
       <classpath>
         <path refid="main.classpath" />
         <pathelement path="${compile.dir}" />
       </classpath>
     </taskdef>
-    <taskdef name="expose_module" classname="org.python.expose.generate.ModuleExposeTask">
+    <taskdef name="expose_module" classname="org.python.tools.codegen.ModuleExposeTask">
       <classpath>
         <path refid="main.classpath" />
         <pathelement path="${compile.dir}" />
