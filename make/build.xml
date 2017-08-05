@@ -79,7 +79,7 @@
   </target>
 
   <target name="devclean" depends="init"
-    description="clean up build working directories without deleting antlr files, cachedir, or Lib">
+          description="clean up build working directories without deleting antlr files, cachedir, or Lib">
 
     <delete includeemptydirs="true" failonerror="false">
       <fileset dir="${output.dir}" includes="**/*" excludes="gensrc/**"/>
@@ -143,7 +143,7 @@
   </target>
 
   <target name="asdl_antlr" depends="prepare-output"
-    description="Generates ast node files from ast/Python.asdl">
+          description="Generates ast node files from ast/Python.asdl">
     <exec executable="python" failifexecutionfails="true">
       <arg value="${asdl.dir}/asdl_antlr.py"/>
       <arg value="${asdl.dir}/Python.asdl"/>
@@ -151,7 +151,7 @@
   </target>
 
   <target name="template" depends="prepare-output"
-    description="Generates *Derived.java files with src/templates/gderived.py">
+          description="Generates *Derived.java files with src/templates/gderived.py">
     <exec executable="python" failifexecutionfails="true">
       <arg value="${templates.dir}/gderived.py"/>
       <arg value="--lazy"/>
@@ -171,15 +171,15 @@
 
   <target name="compile" depends="init,antlr_gen,brand-version">
     <javac destdir="${compile.dir}"
-      target="${jdk.target.version}"
-      source="${jdk.source.version}"
-      debug="${debug}"
-      deprecation="${deprecation}"
-      nowarn="${nowarn}"
-      memoryMaximumSize="1024m"
-      fork="true"
-      includeantruntime="true"
-      encoding="UTF-8">
+           target="${jdk.target.version}"
+           source="${jdk.source.version}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           nowarn="${nowarn}"
+           memoryMaximumSize="1024m"
+           fork="true"
+           includeantruntime="true"
+           encoding="UTF-8">
       <compilerarg line="${javac.Xlint}"/>
       <src path="${source.dir}"/>
       <src path="${gensrc.dir}"/>
@@ -189,14 +189,14 @@
     </javac>
 
     <javac srcdir="${jython.base.dir}/Lib"
-      includes="jxxload_help/**"
-      destdir="${compile.dir}"
-      target="${jdk.target.version}"
-      source="${jdk.source.version}"
-      debug="${debug}"
-      deprecation="${deprecation}"
-      includeantruntime="true"
-      nowarn="${nowarn}">
+           includes="jxxload_help/**"
+           destdir="${compile.dir}"
+           target="${jdk.target.version}"
+           source="${jdk.source.version}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           includeantruntime="true"
+           nowarn="${nowarn}">
       <compilerarg line="${javac.Xlint}"/>
     </javac>
 
@@ -274,19 +274,19 @@
     </jarjar>
   </target>
 
-    <target name="create-manifest" depends="compile, expose">
-      <manifest file="${meta.inf.dir}/MANIFEST.MF">
-        <attribute name="Main-Class" value="org.python.util.jython" />
-        <attribute name="Built-By" value="n\a" />
-        <!-- info section. ATTN: no blanks, no '.' in the names -->
-        <section name="Build-Info">
-          <attribute name="version" value="${jython.version}" />
-          <attribute name="build-compiler" value="${build.compiler}" />
-          <attribute name="jdk-target-version" value="${jdk.target.version}" />
-          <attribute name="debug" value="${debug}" />
-        </section>
-      </manifest>
-    </target>
+  <target name="create-manifest" depends="compile, expose">
+    <manifest file="${meta.inf.dir}/MANIFEST.MF">
+      <attribute name="Main-Class" value="org.python.util.jython" />
+      <attribute name="Built-By" value="n\a" />
+      <!-- info section. ATTN: no blanks, no '.' in the names -->
+      <section name="Build-Info">
+        <attribute name="version" value="${jython.version}" />
+        <attribute name="build-compiler" value="${build.compiler}" />
+        <attribute name="jdk-target-version" value="${jdk.target.version}" />
+        <attribute name="debug" value="${debug}" />
+      </section>
+    </manifest>
+  </target>
   <target name="jar-standalone" depends="jar-complete">
     <jar destfile="${dist.dir}/${jython.standalone.jar}" filesetmanifest="merge">
       <zipfileset src="${dist.dir}/${jython.deploy.jar}"/>
@@ -311,7 +311,7 @@
       <nameunion>
         <fileset dir="${exposed.dir}"/>
         <fileset dir="${compile.dir}"
-          excludes="org/python/expose/generate/**,org/python/version.properties"/>
+                 excludes="org/python/expose/generate/**,org/python/version.properties"/>
       </nameunion>
     </jar>
   </target>
@@ -323,15 +323,15 @@
       <path refid="main.classpath" />
     </path>
     <javadoc sourcepath="${source.dir}"
-      destdir="${apidoc.dir}"
-      source="${jdk.source.version}"
-      maxmemory="1024m"
-      public="true"
-      breakiterator="yes"
-      packagenames="org.python.core.*, org.python.util.*, org.python.modules.*, com.ziclix.python.sql, com.xhaus.modjy"
-      windowtitle="Jython API documentation"
-      bottom="&lt;a href='http://www.jython.org' target='_top'>Jython homepage&lt;/a>"
-      >
+             destdir="${apidoc.dir}"
+             source="${jdk.source.version}"
+             maxmemory="1024m"
+             public="true"
+             breakiterator="yes"
+             packagenames="org.python.core.*, org.python.util.*, org.python.modules.*, com.ziclix.python.sql, com.xhaus.modjy"
+             windowtitle="Jython API documentation"
+             bottom="&lt;a href='http://www.jython.org' target='_top'>Jython homepage&lt;/a>"
+    >
       <link href="http://docs.oracle.com/javase/7/docs/api/" />
       <classpath refid="javadoc.classpath" />
     </javadoc>
@@ -355,8 +355,8 @@
     <echo>copy misc files from ${jython.base.dir}</echo>
     <copy todir="${dist.dir}" preservelastmodified="true" overwrite="true">
       <fileset dir="${jython.base.dir}"
-        includes="ACKNOWLEDGMENTS, build.xml, build.Lib.include.properties, NEWS, LICENSE.txt, README.txt, registry"
-        />
+               includes="ACKNOWLEDGMENTS, build.xml, build.Lib.include.properties, NEWS, LICENSE.txt, README.txt, registry"
+      />
     </copy>
 
     <!-- sources: todir has to correspond with installer/**/JarInstaller.java -->
@@ -452,14 +452,14 @@
     <property name="installer.src.dir" value="${jython.base.dir}/installer/src/java" />
     <echo>compiling installer from ${installer.src.dir}</echo>
     <javac srcdir="${installer.src.dir}"
-      includes="org/**"
-      destdir="${compile.dir}"
-      target="${jdk.target.version}"
-      source="${jdk.source.version}"
-      debug="${debug}"
-      deprecation="${deprecation}"
-      nowarn="${nowarn}"
-      />
+           includes="org/**"
+           destdir="${compile.dir}"
+           target="${jdk.target.version}"
+           source="${jdk.source.version}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           nowarn="${nowarn}"
+    />
     <echo>copy installer classes to ${dist.dir}</echo>
     <copy todir="${dist.dir}" preservelastmodified="true">
       <fileset dir="${compile.dir}">
@@ -530,7 +530,7 @@
     <delete dir="${junit.reports}"/>
   </target>
   <target name="javatest" depends="javatest-basepath,importest"
-    description="run all the JUnit tests">
+          description="run all the JUnit tests">
   </target>
   <target name="javatest-basepath" depends="developer-build">
     <mkdir dir="${junit.reports}"/>

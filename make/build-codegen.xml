@@ -25,8 +25,8 @@
     </taskdef>
 
     <expose srcdir="${compile.dir}"
-      destdir="${exposed.dir}"
-      includesfile="${jython.base.dir}/CoreExposed.includes"/>
+            destdir="${exposed.dir}"
+            includesfile="${jython.base.dir}/CoreExposed.includes"/>
     <expose_module destdir="${exposed.dir}"/>
   </target>
 </project>
