@@ -12,8 +12,8 @@
 
   <target name="compile" depends="prepare" description="compile codegen source">
     <javac srcdir="${src.dir}"
-      destdir="${build.class.dir}"
-      includeantruntime="true" fork="true">
+           destdir="${build.class.dir}"
+           includeantruntime="true" fork="true">
       <classpath>
         <path refid="main.classpath"/>
         <pathelement path="${jylang.compile.dir}" />

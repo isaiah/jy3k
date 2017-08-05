@@ -1,74 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2000 Dj Walker-Morgan -->
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="jython" default="developer-build" basedir=".">
+<project xmlns:ivy="antlib:org.apache.ivy.ant"
+         name="jython" default="developer-build" basedir="..">
   <import file="build-codegen.xml"/>
   <target name="deps">
-    <ivy:retrieve type="jar,bundle"/>
+    <ivy:retrieve type="jar,bundle" file="make/ivy.xml"/>
   </target>
   <target name="resolve">
+    <property name="ivy.dep.file" value="make/ivy.xml"/>
     <ivy:cachepath pathid="main.classpath" conf="compile"/>
     <ivy:cachepath pathid="default.classpath" conf="default"/>
     <ivy:cachepath pathid="test.classpath" conf="test"/>
-  </target>
-
-  <target name="usage" description="print usage hints (-emacs removes [echo] prefix)">
-    <echo>
-      Use case 1: developer build (in your local Jython copy)
-      -------------------------------------------------------
-      - call target 'developer-build' (the default for this build.xml)
-
-      This build will create directories /build and /dist below basedir.
-
-
-      Use case 2: full build for a release (using hg checkout)
-      ---------------------------------------------------------
-      - make sure you have access to the Jython mercurial repository
-      (http://hg.python.org/jython)
-      - override ant.properties (if necessary)
-      - call target 'full-build'
-
-      This build will create a working directory named
-      full_build at the same level as your local directories
-      jython and installer.  It will contain a big
-      jython_installer-${jython.version}.jar file suitable for installation.
-
-      To build older releases, it may be necessary to use an older
-      build.xml, too (with the corresponding tag).  For example it is not
-      possible to build Release_2_2alpha1 with this version of build.xml.
-
-      Note on targets
-      ---------------
-      A subset of the available targets are designed for direct invocation.
-      Following an ant convention, the callable targets have a description
-      attribute.  Use ant -p to display these targets.  All other targets
-      may behave unpredictably if called directly.
-
-
-      Where ant looks for ant.properties 
-      ----------------------------------
-      1. in user.home
-      2. in the same directory as this build.xml file
-      The first setting of a property wins. Further settings are ignored.
-
-
-      Actions for a release
-      ---------------------
-      See http://wiki.python.org/jython/JythonDeveloperGuide/HowToReleaseJython
-
-
-      An example ant.properties file:
-      -------------------------------
-
-      # - zxJDBC
-      oracle.jar=C:/workspace/HEAD/for_development/bisdevsrv28/jboss/server/infra/lib/ojdbc14.jar
-      #informix.jar=${basedir}/../externals/external-jars/ifxjdbc.jar
-
-      # - option for javac (build.compiler=modern is a global option to use standard jdk 1.7/1.8)
-      #build.compiler=modern
-      #jdk.target.version=1.8
-      #debug=false
-      #deprecation=off
-
-    </echo>
   </target>
 
   <target name="jarless" depends="compile, pycompile"/>
@@ -87,30 +29,12 @@
   </target>
 
   <target name="init" depends="resolve">
-    <property file="${user.home}/ant.properties" />
-    <property file="${basedir}/ant.properties" />
-
-    <property name="PY_RELEASE_LEVEL_ALPHA" value="10"/> <!-- 0xA -->
-    <property name="PY_RELEASE_LEVEL_BETA" value="11"/> <!-- 0xB -->
-    <property name="PY_RELEASE_LEVEL_GAMMA" value="12"/> <!-- 0xC -->
-    <property name="PY_RELEASE_LEVEL_FINAL" value="15"/> <!-- 0xF -->
-    <property name="PY_RELEASE_LEVEL_SNAPSHOT" value="170"/> <!-- 0xAA -->
-
-    <!-- The current version info -->
-    <property name="jython.version" value="3.6.0a1+"/>
-    <property name="jython.version.noplus" value="3.6.0a1"/>
-    <property name="jython.major_version" value="3"/>
-    <property name="jython.minor_version" value="6"/>
-    <property name="jython.micro_version" value="0"/>
-    <property name="jython.release_level" value="${PY_RELEASE_LEVEL_ALPHA}"/>
-    <property name="jython.release_serial" value="1"/>
-    <property name="jython.java.version" value="1.8"/>
-
+    <property file="make/build.properties" />
     <condition property="do.snapshot.build">
       <isset property="snapshot.revision" />
     </condition>
     <!-- Switch to a snapshot release_level when appropriate -->
-    <condition property="jython.real_release_level" value="${PY_RELEASE_LEVEL_SNAPSHOT}" else="${jython.release_level}">
+    <condition property="jython.real_release_level" value="${PY_RELEASE_LEVEL_SNAPSHOT}" else="${jython.release.level}">
       <isset property="do.snapshot.build" />
     </condition>
     <condition property="os.family.unix">
@@ -119,111 +43,16 @@
     <condition property="os.family.windows">
       <os family="windows"/>
     </condition>
-    <property name="build.compiler" value="modern" />
-    <property name="jdk.target.version" value="${jython.java.version}" />
-    <property name="jdk.source.version" value="${jython.java.version}" />
-    <property name="deprecation" value="true" />
-    <property name="debug" value="true" />
-    <property name="nowarn" value="true" />
-    <property name="javac.Xlint" value="-Xlint -Xlint:-serial -Xlint:-unchecked -Xlint:-cast"/>
-
-    <!-- properties work.dir and jython.base.dir are also defined in full-preinit -->
-    <property name="work.dir" value="${basedir}" />
-    <property name="jython.base.dir" value="${work.dir}" />
-
-    <property name="source.dir" value="${jython.base.dir}/src" />
-    <property name="test.source.dir" value="${jython.base.dir}/tests/java" />
-    <property name="test.shell.dir" value="${jython.base.dir}/tests/shell" />
-    <property name="templates.dir" value="${source.dir}/templates" />
-    <property name="asdl.dir" value="${basedir}/ast" />
-    <property name="python.lib" value="${jython.base.dir}/lib-python/3.6.0" />
-    <property name="bugtests.dir" value="${jython.base.dir}/bugtests" />
-    <property name="templates.lazy" value="true" />
-    <property name="extlibs.dir" value="${jython.base.dir}/lib" />
-    <property name="output.dir" value="${work.dir}/build" />
-    <property name="compile.dir" value="${output.dir}/classes" />
-    <property name="exposed.dir" value="${output.dir}/exposed" />
-    <property name="gensrc.dir" value="${output.dir}/gensrc" />
-    <property name="dist.dir" value="${work.dir}/dist" />
-    <property name="apidoc.dir" value="${dist.dir}/Doc/javadoc" />
-    <property name="junit.reports" value="${dist.dir}/testreports" />
-    <property name="junit.htmlreports" value="${dist.dir}/test-html-reports" />
-
 
     <!-- classpaths -->
     <available property="informix.present" classname="com.informix.jdbc.IfxDriver" classpath="${informix.jar}" />
     <available property="oracle.present" classname="oracle.jdbc.driver.OracleDriver" classpath="${oracle.jar}" />
-
-    <property name="jython.dev.jar" value="jython-dev.jar" />
-    <property name="jython.deploy.jar" value="jython.jar" />
-    <property name="jython.standalone.jar" value="jython-standalone.jar" />
-    <property name="jython.javadoc.jar" value="javadoc.jar" />
-    <property name="jython.sources.jar" value="sources.jar" />
   </target>
 
-  <target name="full-preinit">
-    <property file="${user.home}/ant.properties" />
-    <property file="${basedir}/ant.properties" />
-
-    <property name="cpptasks.jar.dir" value="${basedir}/extlibs/cpptasks/cpptasks.jar" />
-
-    <!-- use this property to distinguish a full-build from a developer-build -->
-    <property name="full-build" value="true" />
-
-    <!-- predefined main directory for checkout -->
-    <property name="hg.code.dir" value="jython" />
-    <!-- predefined revision for checkout (this works for both trunk and release branches -->
-
-    <property name="work.dir" value="${basedir}/../full_build/work" />
-    <property name="checkout.dir" value="${work.dir}/checkout" />
-    <property name="jython.base.dir" value="${checkout.dir}/${hg.code.dir}" />
-    <!-- set has.repositories.connection to false in ant.properties if you want to skip checkout -->
-    <property name="has.repositories.connection" value="true" />
-    <condition property="do.checkout" value="true">
-      <istrue value="${has.repositories.connection}" />
-    </condition>
-
-  </target>
-  <target name="full-check" depends="full-preinit, init, dump-env">
+  <target name="full-check" depends="init">
     <!-- Require all of the optional jars for a full build -->
     <fail unless="informix.present" message="informix jar not present" />
     <fail unless="oracle.present" message="oracle jar not present" />
-  </target>
-  <target name="dump-env" depends="init">
-    <echo>.</echo>
-    <echo>Build environment for ${ant.project.name}</echo>
-    <echo>(Note: if ${propertyname} is displayed, then the property is not set)</echo>
-    <echo>--- optional libraries ---</echo>
-    <echo>oracle location    = '${oracle.jar}'</echo>
-    <echo>informix location  = '${informix.jar}'</echo>
-    <echo>oracle             = '${oracle.present}'</echo>
-    <echo>informix           = '${informix.present}'</echo>
-    <echo>--- properties ---</echo>
-    <echo>work.dir           = '${work.dir}'</echo>
-    <echo>jython.base.dir    = '${jython.base.dir}'</echo>
-    <echo>source.dir         = '${source.dir}'</echo>
-    <echo>output.dir         = '${output.dir}'</echo>
-    <echo>compile.dir        = '${compile.dir}'</echo>
-    <echo>exposed.dir        = '${exposed.dir}'</echo>
-    <echo>dist.dir           = '${dist.dir}'</echo>
-    <echo>apidoc.dir         = '${apidoc.dir}'</echo>
-    <echo>templates.dir      = '${templates.dir}'</echo>
-    <echo>templates.lazy     = '${templates.lazy}'</echo>
-    <echo>python.lib         = '${python.lib}'</echo>
-    <echo>build.compiler     = '${build.compiler}'</echo>
-    <echo>jdk.target.version = '${jdk.target.version}'</echo>
-    <echo>jdk.source.version = '${jdk.source.version}'</echo>
-    <echo>deprecation        = '${deprecation}'</echo>
-    <echo>debug              = '${debug}'</echo>
-    <echo>nowarn             = '${nowarn}'</echo>
-    <echo>test               = '${test}'</echo>
-    <echo>test.source.dir    = '${test.source.dir}'</echo>
-    <echo>--- properties (used for full-build only) ---</echo>
-    <echo>checkout.dir   = '${checkout.dir}'</echo>
-    <echo>javahl.dir         = '${javahl.dir}'</echo>
-    <echo>do.snapshot.build  = '${do.snapshot.build}'</echo>
-    <echo>snapshot.revision  = '${snapshot.revision}'</echo>
-    <echo>do.checkout        = '${do.checkout}'</echo>
   </target>
 
   <!-- delete what's necessary. should correspond to the directories created in prepare  -->
@@ -286,7 +115,7 @@
   </target>
 
   <!-- create necessary directories -->
-  <target name="prepare" depends="prepare-full, prepare-checkout, prepare-output"/>
+  <target name="prepare" depends="prepare-full, prepare-output"/>
 
   <!-- create directories needed only in full-build -->
   <target name="prepare-full" depends="clean" if="full-build">
@@ -295,51 +124,7 @@
     <mkdir dir="${apidoc.dir}" />
   </target>
 
-  <!-- create checkout directory if necessary -->
-  <target name="prepare-checkout" if="do.checkout">
-    <mkdir dir="${checkout.dir}" />
-  </target>
-
-  <target name="checkout" depends="prepare" if="do.checkout">
-    <exec executable="hg">
-      <arg line="clone http://hg.python.org/jython ${checkout.dir}/${hg.code.dir}"/>
-    </exec>
-  </target>
-
-  <target name="check-hg">
-    <available file=".hg" type="dir" property="hg.present"/>
-    <condition property="hg-run">
-      <and>
-        <isset property="hg.present"/>
-        <or>
-          <isset property="os.family.unix"/>
-          <isset property="os.family.windows"/>
-        </or>
-      </and>
-    </condition>
-  </target>
-  <target name="hg-id" depends="check-hg, hg-branch, hg-tag, hg-version"/>
-
-  <target name="hg-branch" if="hg-run">
-    <exec executable="hg" failifexecutionfails="false" outputproperty="build.hg.branch">
-      <arg line="id -b"/>
-    </exec>
-  </target>
-  <target name="hg-tag" if="hg-run">
-    <exec executable="hg" failifexecutionfails="false" outputproperty="build.hg.tag">
-      <arg line="id -t"/>
-    </exec>
-  </target>
-  <target name="hg-version" if="hg-run">
-    <exec executable="hg" failifexecutionfails="false" outputproperty="build.hg.version">
-      <arg line="id -i"/>
-    </exec>
-  </target>
-
-  <target name="brand-version" depends="init, hg-id" unless="skip-brand">
-    <property name="build.hg.branch" value=""/>
-    <property name="build.hg.tag" value=""/>
-    <property name="build.hg.version" value=""/>
+  <target name="brand-version" depends="init" unless="skip-brand">
     <tstamp>
       <format property="build.date" pattern="MMM d yyyy" offset="0"/>
       <format property="build.time" pattern="HH:mm:ss" offset="0"/>
@@ -347,32 +132,14 @@
     <mkdir dir="${compile.dir}/org/python"/>
     <echo file="${compile.dir}/org/python/version.properties"># Jython version information
       jython.version=${jython.version}
-      jython.major_version=${jython.major_version}
-      jython.minor_version=${jython.minor_version}
-      jython.micro_version=${jython.micro_version}
-      jython.release_level=${jython.release_level}
-      jython.release_serial=${jython.release_serial}
+      jython.major_version=${jython.version.major}
+      jython.minor_version=${jython.version.minor}
+      jython.micro_version=${jython.version.micro}
+      jython.release_level=${jython.release.level}
+      jython.release_serial=${jython.release.serial}
       jython.build.date=${build.date}
       jython.build.time=${build.time}
-      jython.build.hg_branch=${build.hg.branch}
-      jython.build.hg_tag=${build.hg.tag}
-      jython.build.hg_version=${build.hg.version}</echo>
-  </target>
-
-  <target name="brand-readme-version" depends="checkout" if="do.snapshot.build">
-    <replace file="${jython.base.dir}/README.txt" token='2.7b3+'
-      value='2.7b${xxx.revision}' />
-    <replace file="${jython.base.dir}/README.txt">
-      <replacetoken>=======================</replacetoken>
-      <replacevalue>--------------------------
-
-        This is a snapshot build.
-        It reflects the current development status.
-
-        The readme text for the next release will be like:
-
-      </replacevalue>
-    </replace>
+    </echo>
   </target>
 
   <target name="asdl_antlr" depends="prepare-output"
@@ -504,45 +271,30 @@
       <rule pattern="org.apache.xerces.**" result="org.python.apache.xerces.@1"/>
       <rule pattern="org.apache.wml.**" result="org.python.apache.wml.@1"/>
       <rule pattern="org.apache.html.**" result="org.python.apache.html.@1"/>
-      <manifest>
-        <attribute name="Main-Class" value="org.python.util.jython" />
-        <attribute name="Built-By" value="${user.name}" />
-        <!-- info section. ATTN: no blanks, no '.' in the names -->
-        <section name="Build-Info">
-          <attribute name="version" value="${jython.version}" />
-          <attribute name="oracle" value="${oracle.present}" />
-          <attribute name="informix" value="${informix.present}" />
-          <attribute name="build-compiler" value="${build.compiler}" />
-          <attribute name="jdk-target-version" value="${jdk.target.version}" />
-          <attribute name="debug" value="${debug}" />
-        </section>
-      </manifest>
     </jarjar>
   </target>
 
-  <target name="jar-standalone" depends="jar-complete">
-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
-    <jar destfile="${dist.dir}/${jython.standalone.jar}">
-      <zipfileset src="${dist.dir}/${jython.deploy.jar}"/>
-      <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**" />
-      <manifest>
+    <target name="create-manifest" depends="compile, expose">
+      <manifest file="${meta.inf.dir}/MANIFEST.MF">
         <attribute name="Main-Class" value="org.python.util.jython" />
-        <attribute name="Built-By" value="${user.name}" />
+        <attribute name="Built-By" value="n\a" />
         <!-- info section. ATTN: no blanks, no '.' in the names -->
         <section name="Build-Info">
           <attribute name="version" value="${jython.version}" />
-          <attribute name="hg-build" value="${do.checkout}" />
-          <attribute name="oracle" value="${oracle.present}" />
-          <attribute name="informix" value="${informix.present}" />
           <attribute name="build-compiler" value="${build.compiler}" />
           <attribute name="jdk-target-version" value="${jdk.target.version}" />
           <attribute name="debug" value="${debug}" />
         </section>
       </manifest>
+    </target>
+  <target name="jar-standalone" depends="jar-complete">
+    <jar destfile="${dist.dir}/${jython.standalone.jar}" filesetmanifest="merge">
+      <zipfileset src="${dist.dir}/${jython.deploy.jar}"/>
+      <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**" />
     </jar>
   </target>
 
-  <target name="jar" depends="compile,expose">
+  <target name="jar" depends="compile,expose,create-manifest">
     <typedef name="nameunion" classname="org.python.util.NameUnionAntType">
       <classpath>
         <path refid="main.classpath" />
@@ -552,29 +304,15 @@
     <jar destfile="${dist.dir}/callbacker_test.jar">
       <fileset dir="${compile.dir}" includes="org/python/tests/Callbacker*"/>
     </jar>
-    <jar destfile="${dist.dir}/${jython.dev.jar}" duplicate="fail">
+    <jar destfile="${dist.dir}/${jython.dev.jar}" duplicate="fail" manifest="${meta.inf.dir}/MANIFEST.MF">
       <!-- If only nameunion is used, ant issues a spurious warning about no files being
                included.  Use a fileset for version.properties just to shut that up. -->
       <fileset dir="${compile.dir}" includes="org/python/version.properties"/>
       <nameunion>
         <fileset dir="${exposed.dir}"/>
         <fileset dir="${compile.dir}"
-          excludes="org/python/expose/generate/**,org/python/version.properties"/>   
+          excludes="org/python/expose/generate/**,org/python/version.properties"/>
       </nameunion>
-      <manifest>
-        <attribute name="Main-Class" value="org.python.util.jython" />
-        <attribute name="Built-By" value="${user.name}" />
-        <!-- info section. ATTN: no blanks, no '.' in the names -->
-        <section name="Build-Info">
-          <attribute name="version" value="${jython.version}" />
-          <attribute name="hg-build" value="${do.checkout}" />
-          <attribute name="oracle" value="${oracle.present}" />
-          <attribute name="informix" value="${informix.present}" />
-          <attribute name="build-compiler" value="${build.compiler}" />
-          <attribute name="jdk-target-version" value="${jdk.target.version}" />
-          <attribute name="debug" value="${debug}" />
-        </section>
-      </manifest>
     </jar>
   </target>
 
@@ -583,8 +321,8 @@
       <pathelement path="${java.class.path}" />
       <pathelement path="${compile.dir}" />
       <path refid="main.classpath" />
-    </path> 
-    <javadoc sourcepath="${source.dir}" 
+    </path>
+    <javadoc sourcepath="${source.dir}"
       destdir="${apidoc.dir}"
       source="${jdk.source.version}"
       maxmemory="1024m"
@@ -613,12 +351,7 @@
     </jar>
   </target>
 
-  <target name="copy-license" if="do.checkout">
-    <echo>copy CPython LICENSE from ${checkout.dir}/python</echo>
-    <copy file="${checkout.dir}/python/LICENSE" tofile="${dist.dir}/LICENSE_CPython.txt" preservelastmodified="true" />
-  </target>
-
-  <target name="copy-full" depends="copy-lib, copy-license" if="full-build">
+  <target name="copy-full" depends="copy-lib" if="full-build">
     <echo>copy misc files from ${jython.base.dir}</echo>
     <copy todir="${dist.dir}" preservelastmodified="true" overwrite="true">
       <fileset dir="${jython.base.dir}"
@@ -670,7 +403,7 @@
   <target name="copy-lib" depends="init, copy-javalib, copy-cpythonlib">
     <copy todir="${dist.dir}/Lib">
       <fileset dir="${jython.base.dir}/Lib">
-        <exclude name="**/*.class"/>   
+        <exclude name="**/*.class"/>
       </fileset>
     </copy>
 
@@ -715,7 +448,7 @@
   </target>
 
   <!-- wrap the build into the installer -->
-  <target name="installer" depends="brand-readme-version, installer-init, jar-standalone, javadoc, copy-full">
+  <target name="installer" depends="installer-init, jar-standalone, javadoc, copy-full">
     <property name="installer.src.dir" value="${jython.base.dir}/installer/src/java" />
     <echo>compiling installer from ${installer.src.dir}</echo>
     <javac srcdir="${installer.src.dir}"
@@ -770,7 +503,6 @@
         </section>
         <!-- info section. ATTN: no blanks, no '.' in the names -->
         <section name="Build-Info">
-          <attribute name="hg-build" value="${do.checkout}" />
           <attribute name="oracle" value="${oracle.present}" />
           <attribute name="informix" value="${informix.present}" />
           <attribute name="build-compiler" value="${build.compiler}" />
@@ -954,7 +686,7 @@
       # this configuration was auto-generated by ant build script,
       # safe to edit by hand (won't be overwritten)
       java_home="${jdk.home}"
-      jython_home="${dist.dir}" 
+      jython_home="${dist.dir}"
       classpath="${dist.dir}/${jython.dev.jar}${path.separator}classes"
     </echo>
   </target>
