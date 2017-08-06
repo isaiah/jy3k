@@ -121,6 +121,8 @@ public class TypeExposer extends Exposer {
         mv.visitTypeInsn(ANEWARRAY, BUILTIN_METHOD.getInternalName());
         mv.visitVarInsn(ASTORE, 1);
         int i = 0;
+        // FIXME
+        // instead of generating the instance of anonymous class, generate PyBuiltinMethod directly
         for(MethodExposer exposer : methods) {
             for(final String name : exposer.getNames()) {
                 mv.visitVarInsn(ALOAD, 1);

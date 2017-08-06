@@ -36,6 +36,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     protected PyObject self;
     public String methodName;
     public String defaultVals;
+    public MethodHandle target;
 
     protected PyBuiltinMethod(PyType type, PyObject self, Info info) {
         super(type, info);
@@ -82,6 +83,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         return hashCode ^ getClass().hashCode();
     }
 
+    @SuppressWarnings("unused")
     private static boolean varargLen(PyObject obj, ThreadState ts, PyObject[] args, String[] keywords, int len) {
         return obj instanceof PyBuiltinMethod && args.length == len;
     }
@@ -92,7 +94,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     }
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
-        MethodHandle mh;
+        MethodHandle mh = target;
         MethodType argType = desc.getMethodType();
         int argCount = argType.parameterCount() - 2;
         MethodType methodType = MethodType.fromMethodDescriptorString(methodDescriptor, null);
@@ -112,9 +114,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 selfType = PyType.class;
                 argOffset = 1;
             }
-            mh = MH.findStatic(LOOKUP, klazz, methodName, methodType);
         } else {
-            mh = MH.findVirtual(LOOKUP, klazz, methodName, methodType);
             argOffset = 1;
         }
         MethodHandle guard = IS_BUILTIN_METHOD_MH;

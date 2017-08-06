@@ -1,5 +1,6 @@
 package org.python.tools.codegen;
 
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 
 public abstract class MethodExposer extends Exposer {
@@ -149,6 +150,18 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_METHOD.getInternalName(),
                 "methodName",
                 STRING.getDescriptor());
+
+        String desc = Type.getMethodDescriptor(returnType, args);
+        if (this instanceof ClassMethodExposer) {
+            desc = Type.getMethodDescriptor(returnType, ((ClassMethodExposer) this).actualArgs);
+        }
+        int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(new Handle(tag, onType.getInternalName(), methodName, desc, false));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "target",
+                METHOD_HANDLE.getDescriptor());
         endConstructor();
     }
 
@@ -204,6 +217,18 @@ public abstract class MethodExposer extends Exposer {
                 BUILTIN_METHOD.getInternalName(),
                 "methodName",
                 STRING.getDescriptor());
+        /** Set target method handle */
+        int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
+        mv.visitVarInsn(ALOAD, 0);
+        String desc = Type.getMethodDescriptor(returnType, args);
+        if (this instanceof ClassMethodExposer) {
+            desc = Type.getMethodDescriptor(returnType, ((ClassMethodExposer) this).actualArgs);
+        }
+        mv.visitLdcInsn(new Handle(tag, onType.getInternalName(), methodName, desc, false));
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "target",
+                METHOD_HANDLE.getDescriptor());
         endConstructor();
     }
 

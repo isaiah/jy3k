@@ -31,6 +31,8 @@ import org.python.annotations.ExposedType;
 import org.python.annotations.ModuleInit;
 import org.python.expose.TypeBuilder;
 
+import java.lang.invoke.MethodHandle;
+
 /**
  * Type objects used by exposed generation.
  */
@@ -106,6 +108,8 @@ public interface PyTypes extends ClassConstants {
     public static final Type OBJECT = Type.getType(Object.class);
 
     public static final Type STRING = Type.getType(String.class);
+
+    public static final Type METHOD_HANDLE = Type.getType(MethodHandle.class);
 
     public static final Type ASTRING = Type.getType(String[].class);
 

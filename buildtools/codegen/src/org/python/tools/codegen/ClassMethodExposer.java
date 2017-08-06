@@ -5,7 +5,7 @@ import org.python.core.PyBuiltinClassMethodNarrow;
 
 public class ClassMethodExposer extends MethodExposer {
 
-    private final Type[] actualArgs;
+    protected final Type[] actualArgs;
 
     public ClassMethodExposer(Type onType,
                               int access,
