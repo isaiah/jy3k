@@ -16,9 +16,6 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     public boolean isStatic;
 
-    public Class<?> klazz;
-    public String methodDescriptor;
-
     protected PyBuiltinCallable(PyType type, Info info) {
         super(type);
         this.info = info;

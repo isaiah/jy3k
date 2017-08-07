@@ -12,6 +12,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SwitchPoint;
 
+/**
+ * PyBuiltinMethod is native implemented methods
+ * i.e. str.split
+ */
 public abstract class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperclass, Cloneable, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
@@ -34,7 +38,6 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class, int.class);
 
     protected PyObject self;
-    public String methodName;
     public String defaultVals;
     public MethodHandle target;
 

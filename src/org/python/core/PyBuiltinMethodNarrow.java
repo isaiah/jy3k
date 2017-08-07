@@ -1,5 +1,9 @@
 package org.python.core;
 
+/**
+ *  PyBuiltinMethodNarrow represents a native class method
+ *  type.__prepare__
+ */
 public abstract class PyBuiltinMethodNarrow extends PyBuiltinMethod {
     protected boolean isWide;
     /**

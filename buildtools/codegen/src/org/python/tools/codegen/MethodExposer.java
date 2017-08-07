@@ -122,33 +122,12 @@ public abstract class MethodExposer extends Exposer {
                 "isStatic",
                 BOOLEAN.getDescriptor());
 
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(onType);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "klazz",
-                CLASS.getDescriptor());
-        /** Set original method signature */
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(Type.getMethodDescriptor(returnType, args));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "methodDescriptor",
-                STRING.getDescriptor());
         /** Set default values */
         mv.visitVarInsn(ALOAD, 0);
         mv.visitLdcInsn(String.join(",", defaults));
         mv.visitFieldInsn(PUTFIELD,
                 BUILTIN_METHOD.getInternalName(),
                 "defaultVals",
-                STRING.getDescriptor());
-
-        /** Set the original method name */
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(methodName);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "methodName",
                 STRING.getDescriptor());
 
         String desc = Type.getMethodDescriptor(returnType, args);
@@ -189,19 +168,6 @@ public abstract class MethodExposer extends Exposer {
                 "isStatic",
                 BOOLEAN.getDescriptor());
 
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(onType);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "klazz",
-                CLASS.getDescriptor());
-        /** Set original method signature */
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(Type.getMethodDescriptor(returnType, args));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "methodDescriptor",
-                STRING.getDescriptor());
         /** Set default values */
         mv.visitVarInsn(ALOAD, 0);
         mv.visitLdcInsn(String.join(",", defaults));
@@ -210,13 +176,6 @@ public abstract class MethodExposer extends Exposer {
                 "defaultVals",
                 STRING.getDescriptor());
 
-        /** Set the original method name */
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(methodName);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "methodName",
-                STRING.getDescriptor());
         /** Set target method handle */
         int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
         mv.visitVarInsn(ALOAD, 0);
