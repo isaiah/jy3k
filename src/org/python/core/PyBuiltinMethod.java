@@ -97,26 +97,22 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         MethodHandle mh = target;
         MethodType argType = desc.getMethodType();
         int argCount = argType.parameterCount() - 2;
-        MethodType methodType = MethodType.fromMethodDescriptorString(methodDescriptor, null);
+        MethodType methodType = target.type();
+        int argOffset = 0;
+        Class<?> selfType = null;
+        if (this instanceof PyBuiltinClassMethodNarrow || !isStatic) {
+            selfType = methodType.parameterType(0);
+            argOffset = 1;
+        }
+        int paramCount = methodType.parameterCount() - argOffset;
         String[] defaults = defaultVals.equals("") ? Py.NoKeywords : defaultVals.split(",");
         Class<?>[] paramArray = methodType.parameterArray();
         int defaultLength = defaults.length;
-        int missingArg = methodType.parameterCount() - argCount;
+        int missingArg = paramCount - argCount;
         int startIndex = defaultLength - missingArg;
-        boolean isWide = methodType.parameterCount() == 2
-                && methodType.parameterType(0) == PyObject[].class
-                && methodType.parameterType(1) == String[].class;
-        int argOffset = 0;
-        Class<?> selfType = klazz;
-        if (isStatic) {
-            if (this instanceof PyBuiltinClassMethodNarrow) {
-                methodType = methodType.insertParameterTypes(0, PyType.class);
-                selfType = PyType.class;
-                argOffset = 1;
-            }
-        } else {
-            argOffset = 1;
-        }
+        boolean isWide = paramCount == 2
+                && methodType.parameterType(argOffset) == PyObject[].class
+                && methodType.parameterType(argOffset + 1) == String[].class;
         MethodHandle guard = IS_BUILTIN_METHOD_MH;
         // wide call
         if (defaults.length == 0 && isWide) {
@@ -133,12 +129,12 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             if (keywords.length == 0) {
                 PyObject[] args = (PyObject[]) request.getArguments()[2];
                 argCount = args.length;
-                if (paramArray.length < argCount) {
-                    if (paramArray.length == 0) {
+                if (paramCount < argCount) {
+                    if (paramCount == 0) {
                         throw Py.TypeError(String.format("%s() takes no arguments, (%d given)", info.getName(), args.length));
                     } else {
                         throw Py.TypeError(String.format("%s() takes at most %d arguments, (%d given)",
-                                info.getName(), methodType.parameterCount() - argCount, args.length));
+                                info.getName(), paramCount - defaultLength, args.length));
                     }
                 }
 
@@ -146,13 +142,13 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                     mh = convert(mh, argOffset + i, paramArray[i]);
                 }
 
-                missingArg = methodType.parameterCount() - argCount;
+                missingArg = paramCount - argCount;
                 startIndex = defaultLength - missingArg;
                 if (startIndex < 0) {
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
                 }
                 if (missingArg > 0) {
-                    for (int i = argCount; i < paramArray.length; i++) {
+                    for (int i = argCount; i < paramCount; i++) {
                         mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
                     }
                 }
@@ -168,12 +164,12 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 if (startIndex < 0) {
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
                 }
-                for (int i = argCount; i < paramArray.length; i++) {
-                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
+                for (int i = argCount; i < paramCount; i++) {
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i + argOffset]));
                 }
             }
-            for (int i = 0; i < argCount; i++) {
-                mh = convert(mh, argOffset + i, paramArray[i]);
+            for (int i = argOffset; i < argCount + argOffset; i++) {
+                mh = convert(mh, i, paramArray[i]);
             }
         }
 
