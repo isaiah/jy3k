@@ -2,7 +2,6 @@ package org.python.tools.codegen;
 
 import org.objectweb.asm.Type;
 import org.python.core.PyBuiltinMethod;
-import org.python.core.PyBuiltinMethodNarrow;
 
 public class FunctionExposer extends MethodExposer {
         public FunctionExposer(Type onType,
@@ -20,9 +19,10 @@ public class FunctionExposer extends MethodExposer {
               typeName,
               asNames,
               defaults,
-              isWide(desc) ? PyBuiltinMethod.class : PyBuiltinMethodNarrow.class,
+              PyBuiltinMethod.class,
               doc,
-              true);
+              true,
+                isWide(desc));
         if ((access & ACC_STATIC) == 0) {
             throwInvalid("@ExposedFunction can't be applied to non-static methods");
         }
@@ -46,9 +46,5 @@ public class FunctionExposer extends MethodExposer {
     @Override
     protected void loadSelfAndThreadState() {
         // noop
-    }
-
-    private static boolean isWide(String methDescriptor) {
-        return isWide(Type.getArgumentTypes(methDescriptor));
     }
 }

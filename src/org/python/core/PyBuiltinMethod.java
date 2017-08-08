@@ -38,21 +38,19 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class, int.class);
 
     protected PyObject self;
-    public String defaultVals;
-    public MethodHandle target;
 
-    protected PyBuiltinMethod(PyType type, PyObject self, Info info) {
+    protected PyBuiltinMethod(PyType type, PyObject self, PyBuiltinMethodData info) {
         super(type, info);
         this.self = self;
     }
 
-    protected PyBuiltinMethod(PyObject self, Info info) {
+    protected PyBuiltinMethod(PyObject self, PyBuiltinMethodData info) {
         super(info);
         this.self = self;
     }
 
-    protected PyBuiltinMethod(String name) {
-        this(null, new DefaultInfo(name));
+    protected PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
+        super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide));
     }
 
     @Override
@@ -97,28 +95,24 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     }
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
-        MethodHandle mh = target;
+        MethodHandle mh = info.target;
         MethodType argType = desc.getMethodType();
         int argCount = argType.parameterCount() - 2;
-        MethodType methodType = target.type();
+        MethodType methodType = info.target.type();
         int argOffset = 0;
         Class<?> selfType = null;
-        if (this instanceof PyBuiltinClassMethodNarrow || !isStatic) {
+        if (this instanceof PyBuiltinClassMethod || !info.isStatic) {
             selfType = methodType.parameterType(0);
             argOffset = 1;
         }
         int paramCount = methodType.parameterCount() - argOffset;
-        String[] defaults = defaultVals.equals("") ? Py.NoKeywords : defaultVals.split(",");
         Class<?>[] paramArray = methodType.parameterArray();
-        int defaultLength = defaults.length;
+        int defaultLength = info.defaults.length;
         int missingArg = paramCount - argCount;
         int startIndex = defaultLength - missingArg;
-        boolean isWide = paramCount == 2
-                && methodType.parameterType(argOffset) == PyObject[].class
-                && methodType.parameterType(argOffset + 1) == String[].class;
         MethodHandle guard = IS_BUILTIN_METHOD_MH;
         // wide call
-        if (defaults.length == 0 && isWide) {
+        if (defaultLength == 0 && info.isWide) {
             if (argCount == 0) {
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
             } else if (!BaseCode.isWideCall(argType)) {
@@ -152,7 +146,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                 }
                 if (missingArg > 0) {
                     for (int i = argCount; i < paramCount; i++) {
-                        mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i]));
+                        mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults);
                     }
                 }
                 mh = mh.asSpreader(argOffset, PyObject[].class, argCount);
@@ -168,7 +162,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
                 }
                 for (int i = argCount; i < paramCount; i++) {
-                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, getDefaultValue(defaults[startIndex++], paramArray[i + argOffset]));
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults);
                 }
             }
             for (int i = argOffset; i < argCount + argOffset; i++) {
@@ -203,9 +197,8 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         }
         if (filter != null) {
             return MethodHandles.filterArguments(mh, idx, filter);
-        } else {
-            return mh;
         }
+        return mh;
     }
 
     private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {
@@ -226,27 +219,6 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
             mh = MethodHandles.filterReturnValue(mh, W_VOID);
         }
         return mh;
-    }
-
-    private static Object getDefaultValue(String def, Class<?> arg) {
-        if (def.equals("null")) {
-            return Py.None;
-        } else if (arg == int.class) {
-            return Integer.valueOf(def);
-        } else if (arg == long.class) {
-            return Long.valueOf(def);
-        } else if (arg == String.class) {
-            return def;
-        } else if (arg == double.class) {
-            return Double.valueOf(def);
-        } else if (arg == float.class) {
-            return Float.valueOf(def);
-        } else if (arg == PyUnicode.class || arg == PyObject.class) {
-            return new PyUnicode(def);
-        } else if (arg == boolean.class) {
-            return Boolean.valueOf(def);
-        }
-        return def;
     }
 
     private static MethodHandle findOwnMH(final String name, final Class<?> rtype, final Class<?>... types) {
@@ -271,4 +243,35 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && ob == self;
     }
+
+    public PyObject invoke(PyObject[] args, String[] keywords) {
+        return info.invoke(args, keywords);
+    }
+
+    public PyObject invoke(PyObject... args) {
+        return info.invoke(args);
+    }
+
+//    public PyObject __call__() {
+//        throw info.unexpectedCall(0, false);
+//    }
+//
+//    public PyObject __call__(PyObject arg0) {
+//        throw info.unexpectedCall(1, false);
+//    }
+//
+//    public PyObject __call__(PyObject arg0, PyObject arg1) {
+//        throw info.unexpectedCall(2, false);
+//    }
+//
+//    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
+//        throw info.unexpectedCall(3, false);
+//    }
+//
+//    public PyObject __call__(PyObject arg0,
+//                             PyObject arg1,
+//                             PyObject arg2,
+//                             PyObject arg3) {
+//        throw info.unexpectedCall(4, false);
+//    }
 }

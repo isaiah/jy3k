@@ -19,7 +19,7 @@ import java.util.ListIterator;
 class JavaProxyList {
 
     @Untraversable
-    private static class ListMethod extends PyBuiltinMethodNarrow {
+    private static class ListMethod extends PyBuiltinMethod {
         protected ListMethod(String name, int numArgs) {
             super(name, numArgs);
         }
@@ -319,27 +319,27 @@ class JavaProxyList {
         }
     }
 
-    private static final PyBuiltinMethodNarrow listGetProxy = new ListMethod("__getitem__", 1) {
+    private static final PyBuiltinMethod listGetProxy = new ListMethod("__getitem__", 1) {
         @Override
         public PyObject __call__(PyObject key) {
             return new ListIndexDelegate(asList()).checkIdxAndGetItem(key);
         }
     };
-    private static final PyBuiltinMethodNarrow listSetProxy = new ListMethod("__setitem__", 2) {
+    private static final PyBuiltinMethod listSetProxy = new ListMethod("__setitem__", 2) {
         @Override
         public PyObject __call__(PyObject key, PyObject value) {
             new ListIndexDelegate(asList()).checkIdxAndSetItem(key, value);
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listRemoveProxy = new ListMethod("__delitem__", 1) {
+    private static final PyBuiltinMethod listRemoveProxy = new ListMethod("__delitem__", 1) {
         @Override
         public PyObject __call__(PyObject key) {
             new ListIndexDelegate(asList()).checkIdxAndDelItem(key);
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listEqProxy = new ListMethod("__eq__", 1) {
+    private static final PyBuiltinMethod listEqProxy = new ListMethod("__eq__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             List jList = asList();
@@ -374,14 +374,14 @@ class JavaProxyList {
             }
         }
     };
-    private static final PyBuiltinMethodNarrow listAppendProxy = new ListMethod("append", 1) {
+    private static final PyBuiltinMethod listAppendProxy = new ListMethod("append", 1) {
         @Override
         public PyObject __call__(PyObject value) {
             asList().add(value);
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listExtendProxy = new ListMethod("extend", 1) {
+    private static final PyBuiltinMethod listExtendProxy = new ListMethod("extend", 1) {
         @Override
         public PyObject __call__(PyObject obj) {
             List jList = asList();
@@ -396,7 +396,7 @@ class JavaProxyList {
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listInsertProxy = new ListMethod("insert", 2) {
+    private static final PyBuiltinMethod listInsertProxy = new ListMethod("insert", 2) {
         @Override
         public PyObject __call__(PyObject index, PyObject object) {
             List jlist = asList();
@@ -406,7 +406,7 @@ class JavaProxyList {
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listPopProxy = new ListMethod("pop", 0, 1) {
+    private static final PyBuiltinMethod listPopProxy = new ListMethod("pop", 0, 1) {
         @Override
         public PyObject __call__() {
             return __call__(Py.newInteger(-1));
@@ -428,7 +428,7 @@ class JavaProxyList {
             }
         }
     };
-    private static final PyBuiltinMethodNarrow listIndexProxy = new ListMethod("index", 1, 3) {
+    private static final PyBuiltinMethod listIndexProxy = new ListMethod("index", 1, 3) {
         @Override
         public PyObject __call__(PyObject object) {
             return __call__(object, Py.newInteger(0), Py.newInteger(asList().size()));
@@ -462,7 +462,7 @@ class JavaProxyList {
             throw Py.ValueError(object.toString() + " is not in list");
         }
     };
-    private static final PyBuiltinMethodNarrow listCountProxy = new ListMethod("count", 1) {
+    private static final PyBuiltinMethod listCountProxy = new ListMethod("count", 1) {
         @Override
         public PyObject __call__(PyObject object) {
             int count = 0;
@@ -476,7 +476,7 @@ class JavaProxyList {
             return Py.newInteger(count);
         }
     };
-    private static final PyBuiltinMethodNarrow listReverseProxy = new ListMethod("reverse", 0) {
+    private static final PyBuiltinMethod listReverseProxy = new ListMethod("reverse", 0) {
         @Override
         public PyObject __call__() {
             List jlist = asList();
@@ -484,7 +484,7 @@ class JavaProxyList {
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow listRemoveOverrideProxy = new ListMethod("remove", 1) {
+    private static final PyBuiltinMethod listRemoveOverrideProxy = new ListMethod("remove", 1) {
         @Override
         public PyObject __call__(PyObject object) {
             List jlist = asList();
@@ -498,7 +498,7 @@ class JavaProxyList {
             throw Py.ValueError(object.toString() + " is not in list");
         }
     };
-    private static final PyBuiltinMethodNarrow listRAddProxy = new ListMethod("__radd__", 1) {
+    private static final PyBuiltinMethod listRAddProxy = new ListMethod("__radd__", 1) {
         @Override
         public PyObject __call__(PyObject obj) {
             // first, clone the self list
@@ -531,7 +531,7 @@ class JavaProxyList {
             return Py.java2py(jClone);
         }
     };
-    private static final PyBuiltinMethodNarrow listIAddProxy = new ListMethod("__iadd__", 1) {
+    private static final PyBuiltinMethod listIAddProxy = new ListMethod("__iadd__", 1) {
         @Override
         public PyObject __call__(PyObject obj) {
             List jList = asList();
@@ -545,7 +545,7 @@ class JavaProxyList {
             return self;
         }
     };
-    private static final PyBuiltinMethodNarrow listIMulProxy = new ListMethod("__imul__", 1) {
+    private static final PyBuiltinMethod listIMulProxy = new ListMethod("__imul__", 1) {
         @Override
         public PyObject __call__(PyObject obj) {
             List jList = asList();
@@ -573,7 +573,7 @@ class JavaProxyList {
             return self;
         }
     };
-    private static final PyBuiltinMethodNarrow listSortProxy = new ListMethod("sort", 0, 3) {
+    private static final PyBuiltinMethod listSortProxy = new ListMethod("sort", 0, 3) {
         @Override
         public PyObject __call__() {
             list_sort(asList(), Py.None, Py.None, false);

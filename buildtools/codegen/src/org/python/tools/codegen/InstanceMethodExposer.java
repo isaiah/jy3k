@@ -3,7 +3,6 @@ package org.python.tools.codegen;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.python.core.PyBuiltinMethod;
-import org.python.core.PyBuiltinMethodNarrow;
 import org.python.annotations.ExposedMethod;
 import org.python.expose.MethodType;
 
@@ -47,8 +46,8 @@ public class InstanceMethodExposer extends MethodExposer {
               typeName,
               asNames,
               defaults,
-              isWide(desc) ? PyBuiltinMethod.class : PyBuiltinMethodNarrow.class,
-              doc);
+              PyBuiltinMethod.class,
+              doc, isWide(desc));
         if ((access & ACC_STATIC) != 0) {
             throwInvalid("@ExposedMethod can't be applied to static methods");
         }
@@ -79,9 +78,5 @@ public class InstanceMethodExposer extends MethodExposer {
         getStatic(PY, "NotImplemented", PYOBJ);
         mv.visitInsn(ARETURN);
         mv.visitLabel(regularReturn);
-    }
-
-    private static boolean isWide(String methDescriptor) {
-        return isWide(Type.getArgumentTypes(methDescriptor));
     }
 }

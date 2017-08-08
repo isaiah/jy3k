@@ -21,6 +21,7 @@ public abstract class MethodExposer extends Exposer {
 
     // whether it's a function or method
     protected boolean isStatic;
+    protected boolean isWide;
     public MethodExposer(Type onType,
                          String methodName,
                          Type[] args,
@@ -30,8 +31,10 @@ public abstract class MethodExposer extends Exposer {
                          String[] defaults,
                          Class superClass,
                          String doc,
-                         boolean isStatic) {
-        this(onType, methodName, args, returnType, typeName, asNames, defaults, superClass, doc);
+                         boolean isStatic,
+                         boolean isWide
+    ) {
+        this(onType, methodName, args, returnType, typeName, asNames, defaults, superClass, doc, isWide);
         this.isStatic = isStatic;
     }
 
@@ -43,7 +46,8 @@ public abstract class MethodExposer extends Exposer {
                          String[] asNames,
                          String[] defaults,
                          Class superClass,
-                         String doc) {
+                         String doc,
+                         boolean isWide) {
         super(superClass, onType.getClassName() + "$" + methodName + "_exposer");
         this.onType = onType;
         this.methodName = methodName;
@@ -63,6 +67,7 @@ public abstract class MethodExposer extends Exposer {
         this.returnType = returnType;
         this.defaults = defaults;
         this.isStatic = false;
+        this.isWide = isWide;
         for(String name : getNames()) {
             if(name.equals("__new__")) {
                 throwInvalid("@ExposedNew must be used to create __new__, not @ExposedMethod");
@@ -122,6 +127,14 @@ public abstract class MethodExposer extends Exposer {
                 "isStatic",
                 BOOLEAN.getDescriptor());
 
+        // set isWide flag
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitLdcInsn(isWide);
+        mv.visitFieldInsn(PUTFIELD,
+                BUILTIN_METHOD.getInternalName(),
+                "isWide",
+                BOOLEAN.getDescriptor());
+
         /** Set default values */
         mv.visitVarInsn(ALOAD, 0);
         mv.visitLdcInsn(String.join(",", defaults));
@@ -147,36 +160,11 @@ public abstract class MethodExposer extends Exposer {
     private void generateNamedConstructor() {
         startConstructor(STRING);
         mv.visitVarInsn(ALOAD, 0);
+        // name
         mv.visitVarInsn(ALOAD, 1);
-        if(isWide(args)) {
-            superConstructor(STRING);
-        } else {
-            mv.visitLdcInsn(args.length + 1 - defaults.length);
-            mv.visitLdcInsn(args.length + 1);
-            superConstructor(STRING, INT, INT);
-        }
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(doc);
-        mv.visitFieldInsn(PUTFIELD,
-                          BUILTIN_FUNCTION.getInternalName(),
-                          "doc",
-                          STRING.getDescriptor());
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(isStatic);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "isStatic",
-                BOOLEAN.getDescriptor());
-
-        /** Set default values */
-        mv.visitVarInsn(ALOAD, 0);
+        // defaultVals
         mv.visitLdcInsn(String.join(",", defaults));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "defaultVals",
-                STRING.getDescriptor());
-
-        /** Set target method handle */
+        // target
         int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
         mv.visitVarInsn(ALOAD, 0);
         String desc = Type.getMethodDescriptor(returnType, args);
@@ -184,11 +172,13 @@ public abstract class MethodExposer extends Exposer {
             desc = Type.getMethodDescriptor(returnType, ((ClassMethodExposer) this).actualArgs);
         }
         mv.visitLdcInsn(new Handle(tag, onType.getInternalName(), methodName, desc, false));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "target",
-                METHOD_HANDLE.getDescriptor());
-        endConstructor();
+        // doc
+        mv.visitLdcInsn(doc);
+        // static
+        mv.visitLdcInsn(isStatic);
+        // wide
+        mv.visitLdcInsn(isWide(args));
+        superConstructor(STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
     }
 
     private void generateBind() {
@@ -356,4 +346,7 @@ public abstract class MethodExposer extends Exposer {
                 && args[offset].equals(APYOBJ) && args[offset + 1].equals(ASTRING);
     }
 
+    protected static boolean isWide(String methDescriptor) {
+        return isWide(Type.getArgumentTypes(methDescriptor));
+    }
 }

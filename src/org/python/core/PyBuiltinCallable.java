@@ -10,18 +10,14 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "builtin_function_or_method", isBaseType = false)
 public abstract class PyBuiltinCallable extends PyObject {
 
-    public Info info;
+    public PyBuiltinMethodData info;
 
-    protected String doc;
-
-    public boolean isStatic;
-
-    protected PyBuiltinCallable(PyType type, Info info) {
+    protected PyBuiltinCallable(PyType type, PyBuiltinMethodData info) {
         super(type);
         this.info = info;
     }
 
-    protected PyBuiltinCallable(Info info) {
+    protected PyBuiltinCallable(PyBuiltinMethodData info) {
         this.info = info;
     }
 
@@ -40,7 +36,7 @@ public abstract class PyBuiltinCallable extends PyObject {
         PyObject self = getSelf();
         String qualname = info.getName();
         if (self != null && self != Py.None) {
-            if (!isStatic) {
+            if (!info.isStatic) {
                 self = self.getType();
             }
             PyObject name = self.__getattr__("__name__");
@@ -53,7 +49,7 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     @ExposedGet(name = "__doc__")
     public String getDoc() {
-        return doc;
+        return info.doc;
     }
 
     @ExposedGet(name = "__module__")
@@ -71,7 +67,7 @@ public abstract class PyBuiltinCallable extends PyObject {
         return Py.None;
     }
 
-    public void setInfo(Info info) {
+    public void setInfo(PyBuiltinMethodData info) {
         this.info = info;
     }
 
@@ -93,84 +89,5 @@ public abstract class PyBuiltinCallable extends PyObject {
         void setMinargs(int minArgs);
 
         PyException unexpectedCall(int nargs, boolean keywords);
-    }
-
-    public static class DefaultInfo implements Info {
-
-        private String name;
-
-        private int maxargs, minargs;
-
-        public DefaultInfo(String name, int minargs, int maxargs) {
-            this.name = name;
-            this.minargs = minargs;
-            this.maxargs = maxargs;
-        }
-
-        public DefaultInfo(String name) {
-            this(name, -1, -1);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getMaxargs() {
-            return maxargs;
-        }
-
-        @Override
-        public void setMaxargs(int maxArgs) {
-            maxargs = maxArgs;
-        }
-
-        public int getMinargs() {
-            return minargs;
-        }
-
-        @Override
-        public void setMinargs(int minArgs) {
-            minargs = minArgs;
-        }
-
-        public static boolean check(int nargs, int minargs, int maxargs) {
-            if (nargs < minargs) {
-                return false;
-            }
-            if (maxargs != -1 && nargs > maxargs) {
-                return false;
-            }
-            return true;
-        }
-
-        public static PyException unexpectedCall(int nargs, boolean keywords, String name,
-                                                 int minargs, int maxargs) {
-            if (keywords) {
-                return Py.TypeError(name + "() takes no keyword arguments");
-            }
-
-            String argsblurb;
-            if (minargs == maxargs) {
-                if (minargs == 0) {
-                    argsblurb = "no arguments";
-                } else if (minargs == 1) {
-                    argsblurb = "exactly one argument";
-                } else {
-                    argsblurb = minargs + " arguments";
-                }
-            } else if (maxargs == -1) {
-                return Py.TypeError(String.format("%s() requires at least %d arguments (%d) given",
-                                                  name, minargs, nargs));
-            } else if (minargs <= 0) {
-                argsblurb = "at most " + maxargs + " arguments";
-            } else {
-                argsblurb = minargs + "-" + maxargs + " arguments";
-            }
-            return Py.TypeError(String.format("%s() takes %s (%d given)", name, argsblurb, nargs));
-        }
-
-        public PyException unexpectedCall(int nargs, boolean keywords) {
-            return unexpectedCall(nargs, keywords, name, minargs, maxargs);
-        }
     }
 }

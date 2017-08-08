@@ -1,7 +1,7 @@
 package org.python.tools.codegen;
 
 import org.objectweb.asm.Type;
-import org.python.core.PyBuiltinClassMethodNarrow;
+import org.python.core.PyBuiltinClassMethod;
 
 public class ClassMethodExposer extends MethodExposer {
 
@@ -22,9 +22,10 @@ public class ClassMethodExposer extends MethodExposer {
               typeName,
               asNames,
               defaults,
-              PyBuiltinClassMethodNarrow.class,
+              PyBuiltinClassMethod.class,
               doc,
-              true);
+              true,
+                isWide(desc));
         actualArgs = Type.getArgumentTypes(desc);
     }
 

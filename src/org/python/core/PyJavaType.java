@@ -580,21 +580,21 @@ public class PyJavaType extends PyType {
         }
 
         if (forClass == Object.class) {
-            addMethod(new PyBuiltinMethodNarrow("__copy__") {
+            addMethod(new PyBuiltinMethod("__copy__") {
                 @Override
                 public PyObject __call__() {
                     throw Py.TypeError("Could not copy Java object because it is not Cloneable or known to be immutable. "
                             + "Consider monkeypatching __copy__ for " + self.getType().fastGetName());
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__deepcopy__") {
+            addMethod(new PyBuiltinMethod("__deepcopy__") {
                 @Override
                 public PyObject __call__(PyObject memo) {
                     throw Py.TypeError("Could not deepcopy Java object because it is not Serializable. "
                             + "Consider monkeypatching __deepcopy__ for " + self.getType().fastGetName());
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__eq__", 1) {
+            addMethod(new PyBuiltinMethod("__eq__", 1) {
                 @Override
                 public PyObject __call__(PyObject o) {
                     Object proxy = self.getJavaProxy();
@@ -602,7 +602,7 @@ public class PyJavaType extends PyType {
                     return proxy.equals(oProxy) ? Py.True : Py.False;
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__ne__", 1) {
+            addMethod(new PyBuiltinMethod("__ne__", 1) {
                 @Override
                 public PyObject __call__(PyObject o) {
                     Object proxy = self.getJavaProxy();
@@ -610,13 +610,13 @@ public class PyJavaType extends PyType {
                     return !proxy.equals(oProxy) ? Py.True : Py.False;
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__hash__") {
+            addMethod(new PyBuiltinMethod("__hash__") {
                 @Override
                 public PyObject __call__() {
                     return Py.newInteger(self.getJavaProxy().hashCode());
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__repr__") {
+            addMethod(new PyBuiltinMethod("__repr__") {
                 @Override
                 public PyObject __call__() {
                     /*
@@ -627,7 +627,7 @@ public class PyJavaType extends PyType {
                     return toString == null ? Py.EmptyUnicode : Py.newUnicode(toString);
                 }
             });
-            addMethod(new PyBuiltinMethodNarrow("__unicode__") {
+            addMethod(new PyBuiltinMethod("__unicode__") {
                 @Override
                 public PyObject __call__() {
                     return new PyUnicode(self.toString());
@@ -664,7 +664,7 @@ public class PyJavaType extends PyType {
 
         if (immutableClasses.contains(forClass)) {
             // __deepcopy__ just works for these objects since it uses serialization instead
-            addMethod(new PyBuiltinMethodNarrow("__copy__") {
+            addMethod(new PyBuiltinMethod("__copy__") {
                 @Override
                 public PyObject __call__() {
                     return self;
@@ -673,7 +673,7 @@ public class PyJavaType extends PyType {
         }
 
         if(forClass == Cloneable.class) {
-            addMethod(new PyBuiltinMethodNarrow("__copy__") {
+            addMethod(new PyBuiltinMethod("__copy__") {
                 @Override
                 public PyObject __call__() {
                     Object obj = self.getJavaProxy();
@@ -695,7 +695,7 @@ public class PyJavaType extends PyType {
         }
 
         if(forClass == Serializable.class) {
-            addMethod(new PyBuiltinMethodNarrow("__deepcopy__") {
+            addMethod(new PyBuiltinMethod("__deepcopy__") {
                 @Override
                 public PyObject __call__(PyObject memo) {
                     Object obj = self.getJavaProxy();
@@ -880,7 +880,7 @@ public class PyJavaType extends PyType {
         }
     }
 
-    private static abstract class ComparableMethod extends PyBuiltinMethodNarrow {
+    private static abstract class ComparableMethod extends PyBuiltinMethod {
 
         protected ComparableMethod(String name, int numArgs) {
             super(name, numArgs);
@@ -936,7 +936,7 @@ public class PyJavaType extends PyType {
     private static Map<Class<?>, PyBuiltinMethod[]> buildCollectionProxies() {
         final Map<Class<?>, PyBuiltinMethod[]> proxies = new HashMap<>();
 
-        PyBuiltinMethodNarrow iterableProxy = new PyBuiltinMethodNarrow("__iter__") {
+        PyBuiltinMethod iterableProxy = new PyBuiltinMethod("__iter__") {
             @Override
             public PyObject __call__() {
                 return new JavaIterator(((Iterable) self.getJavaProxy()));
@@ -944,13 +944,14 @@ public class PyJavaType extends PyType {
         };
         proxies.put(Iterable.class, new PyBuiltinMethod[]{iterableProxy});
 
-        PyBuiltinMethodNarrow lenProxy = new PyBuiltinMethodNarrow("__len__") {
+        PyBuiltinMethod lenProxy = new PyBuiltinMethod("__len__") {
             @Override
             public PyObject __call__() {
                 return Py.newInteger(((Collection<?>) self.getJavaProxy()).size());
             }
         };
-        PyBuiltinMethodNarrow containsProxy = new PyBuiltinMethodNarrow("__contains__", 1) {
+
+        PyBuiltinMethod containsProxy = new PyBuiltinMethod("__contains__", 1) {
             @Override
             public PyObject __call__(PyObject obj) {
                 boolean contained = false;
@@ -972,7 +973,7 @@ public class PyJavaType extends PyType {
         };
         proxies.put(Collection.class, new PyBuiltinMethod[]{lenProxy, containsProxy});
 
-        PyBuiltinMethodNarrow iteratorProxy = new PyBuiltinMethodNarrow("__iter__") {
+        PyBuiltinMethod iteratorProxy = new PyBuiltinMethod("__iter__") {
             @Override
             public PyObject __call__() {
                 return new JavaIterator(((Iterator) self.getJavaProxy()));
@@ -980,7 +981,7 @@ public class PyJavaType extends PyType {
         };
         proxies.put(Iterator.class, new PyBuiltinMethod[]{iteratorProxy});
 
-        PyBuiltinMethodNarrow enumerationProxy = new PyBuiltinMethodNarrow("__iter__") {
+        PyBuiltinMethod enumerationProxy = new PyBuiltinMethod("__iter__") {
             @Override
             public PyObject __call__() {
                 return new EnumerationIter(((Enumeration) self.getJavaProxy()));

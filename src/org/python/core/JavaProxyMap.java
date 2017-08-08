@@ -11,7 +11,7 @@ import java.util.Set;
 class JavaProxyMap {
 
     @Untraversable
-    private static class MapMethod extends PyBuiltinMethodNarrow {
+    private static class MapMethod extends PyBuiltinMethod {
         protected MapMethod(String name, int numArgs) {
             super(name, numArgs);
         }
@@ -26,7 +26,7 @@ class JavaProxyMap {
     }
 
     @Untraversable
-    private static class MapClassMethod extends PyBuiltinClassMethodNarrow {
+    private static class MapClassMethod extends PyBuiltinClassMethod {
         protected MapClassMethod(String name, int minArgs, int maxArgs) {
             super(name, minArgs, maxArgs);
         }
@@ -89,13 +89,13 @@ class JavaProxyMap {
     }
 
     // Map doesn't extend Collection, so it needs its own version of len, iter and contains
-    private static final PyBuiltinMethodNarrow mapLenProxy = new MapMethod("__len__", 0) {
+    private static final PyBuiltinMethod mapLenProxy = new MapMethod("__len__", 0) {
         @Override
         public PyObject __call__() {
             return Py.java2py(asMap().size());
         }
     };
-    private static final PyBuiltinMethodNarrow mapReprProxy = new MapMethod("__repr__", 0) {
+    private static final PyBuiltinMethod mapReprProxy = new MapMethod("__repr__", 0) {
         @Override
         public PyObject __call__() {
             StringBuilder repr = new StringBuilder("{");
@@ -115,43 +115,43 @@ class JavaProxyMap {
             return new PyBytes(repr.toString());
         }
     };
-    private static final PyBuiltinMethodNarrow mapEqProxy = new MapMethod("__eq__", 1) {
+    private static final PyBuiltinMethod mapEqProxy = new MapMethod("__eq__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             return mapEq(self, other);
         }
     };
-    private static final PyBuiltinMethodNarrow mapLeProxy = new MapMethod("__le__", 1) {
+    private static final PyBuiltinMethod mapLeProxy = new MapMethod("__le__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             return mapLe(self, other);
         }
     };
-    private static final PyBuiltinMethodNarrow mapGeProxy = new MapMethod("__ge__", 1) {
+    private static final PyBuiltinMethod mapGeProxy = new MapMethod("__ge__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             return (mapLe(self, other).__not__()).__or__(mapEq(self, other));
         }
     };
-    private static final PyBuiltinMethodNarrow mapLtProxy = new MapMethod("__lt__", 1) {
+    private static final PyBuiltinMethod mapLtProxy = new MapMethod("__lt__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             return mapLe(self, other).__and__(mapEq(self, other).__not__());
         }
     };
-    private static final PyBuiltinMethodNarrow mapGtProxy = new MapMethod("__gt__", 1) {
+    private static final PyBuiltinMethod mapGtProxy = new MapMethod("__gt__", 1) {
         @Override
         public PyObject __call__(PyObject other) {
             return mapLe(self, other).__not__();
         }
     };
-    private static final PyBuiltinMethodNarrow mapIterProxy = new MapMethod("__iter__", 0) {
+    private static final PyBuiltinMethod mapIterProxy = new MapMethod("__iter__", 0) {
         @Override
         public PyObject __call__() {
             return new JavaIterator(asMap().keySet());
         }
     };
-    private static final PyBuiltinMethodNarrow mapContainsProxy = new MapMethod("__contains__", 1) {
+    private static final PyBuiltinMethod mapContainsProxy = new MapMethod("__contains__", 1) {
         @Override
         public PyObject __call__(PyObject obj) {
             Object other = obj.__tojava__(Object.class);
@@ -160,7 +160,7 @@ class JavaProxyMap {
     };
     // "get" needs to override java.util.Map#get() in its subclasses, too, so this needs to be injected last
     // (i.e. when HashMap is loaded not when it is recursively loading its super-type Map)
-    private static final PyBuiltinMethodNarrow mapGetProxy = new MapMethod("get", 1, 2) {
+    private static final PyBuiltinMethod mapGetProxy = new MapMethod("get", 1, 2) {
         @Override
         public PyObject __call__(PyObject key) {
             return __call__(key, Py.None);
@@ -176,7 +176,7 @@ class JavaProxyMap {
             }
         }
     };
-    private static final PyBuiltinMethodNarrow mapGetItemProxy = new MapMethod("__getitem__", 1) {
+    private static final PyBuiltinMethod mapGetItemProxy = new MapMethod("__getitem__", 1) {
         @Override
         public PyObject __call__(PyObject key) {
             Object jkey = Py.tojava(key, Object.class);
@@ -187,7 +187,7 @@ class JavaProxyMap {
             }
         }
     };
-    private static final PyBuiltinMethodNarrow mapPutProxy = new MapMethod("__setitem__", 2) {
+    private static final PyBuiltinMethod mapPutProxy = new MapMethod("__setitem__", 2) {
         @Override
         public PyObject __call__(PyObject key, PyObject value) {
             asMap().put(Py.tojava(key, Object.class),
@@ -195,7 +195,7 @@ class JavaProxyMap {
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow mapRemoveProxy = new MapMethod("__delitem__", 1) {
+    private static final PyBuiltinMethod mapRemoveProxy = new MapMethod("__delitem__", 1) {
         @Override
         public PyObject __call__(PyObject key) {
             Object jkey = Py.tojava(key, Object.class);
@@ -205,7 +205,7 @@ class JavaProxyMap {
             return Py.None;
         }
     };
-    private static final PyBuiltinMethodNarrow mapIterItemsProxy = new MapMethod("iteritems", 0) {
+    private static final PyBuiltinMethod mapIterItemsProxy = new MapMethod("iteritems", 0) {
         @Override
         public PyObject __call__() {
             final Iterator<Map.Entry<Object, Object>> entrySetIterator = asMap().entrySet().iterator();
@@ -223,13 +223,13 @@ class JavaProxyMap {
             };
         }
     };
-    private static final PyBuiltinMethodNarrow mapHasKeyProxy = new MapMethod("has_key", 1) {
+    private static final PyBuiltinMethod mapHasKeyProxy = new MapMethod("has_key", 1) {
         @Override
         public PyObject __call__(PyObject key) {
             return asMap().containsKey(Py.tojava(key, Object.class)) ? Py.True : Py.False;
         }
     };
-    private static final PyBuiltinMethodNarrow mapKeysProxy = new MapMethod("keys", 0) {
+    private static final PyBuiltinMethod mapKeysProxy = new MapMethod("keys", 0) {
         @Override
         public PyObject __call__() {
             PyList keys = new PyList();
@@ -249,7 +249,7 @@ class JavaProxyMap {
             return values;
         }
     };
-    private static final PyBuiltinMethodNarrow mapSetDefaultProxy = new MapMethod("setdefault", 1, 2) {
+    private static final PyBuiltinMethod mapSetDefaultProxy = new MapMethod("setdefault", 1, 2) {
         @Override
         public PyObject __call__(PyObject key) {
             return __call__(key, Py.None);
@@ -266,7 +266,7 @@ class JavaProxyMap {
             return Py.java2py(jval);
         }
     };
-    private static final PyBuiltinMethodNarrow mapPopProxy = new MapMethod("pop", 1, 2) {
+    private static final PyBuiltinMethod mapPopProxy = new MapMethod("pop", 1, 2) {
         @Override
         public PyObject __call__(PyObject key) {
             return __call__(key, null);
@@ -287,7 +287,7 @@ class JavaProxyMap {
             }
         }
     };
-    private static final PyBuiltinMethodNarrow mapPopItemProxy = new MapMethod("popitem", 0) {
+    private static final PyBuiltinMethod mapPopItemProxy = new MapMethod("popitem", 0) {
         @Override
         public PyObject __call__() {
             if (asMap().size() == 0) {
@@ -298,7 +298,7 @@ class JavaProxyMap {
             return Py.java2py(val);
         }
     };
-    private static final PyBuiltinMethodNarrow mapItemsProxy = new MapMethod("items", 0) {
+    private static final PyBuiltinMethod mapItemsProxy = new MapMethod("items", 0) {
         @Override
         public PyObject __call__() {
             PyList items = new PyList();
@@ -309,7 +309,7 @@ class JavaProxyMap {
             return items;
         }
     };
-    private static final PyBuiltinMethodNarrow mapCopyProxy = new MapMethod("copy", 0) {
+    private static final PyBuiltinMethod mapCopyProxy = new MapMethod("copy", 0) {
         @Override
         public PyObject __call__() {
             Map<Object, Object> jmap = asMap();
@@ -327,7 +327,7 @@ class JavaProxyMap {
             return Py.java2py(jclone);
         }
     };
-    private static final PyBuiltinMethodNarrow mapUpdateProxy = new MapMethod("update", 0, 1) {
+    private static final PyBuiltinMethod mapUpdateProxy = new MapMethod("update", 0, 1) {
         private Map<Object, Object> jmap;
 
         @Override
@@ -414,7 +414,7 @@ class JavaProxyMap {
             }
         }
     };
-    private static final PyBuiltinClassMethodNarrow mapFromKeysProxy = new MapClassMethod("fromkeys", 1, 2) {
+    private static final PyBuiltinClassMethod mapFromKeysProxy = new MapClassMethod("fromkeys", 1, 2) {
         @Override
         public PyObject __call__(PyObject keys) {
             return __call__(keys, null);

@@ -5,7 +5,7 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "method_descriptor", base = PyObject.class, isBaseType = false)
-public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Info, Traverseproc {
+public class PyMethodDescr extends PyDescriptor implements Traverseproc {
 
     protected int minargs, maxargs;
 
@@ -17,7 +17,7 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
         minargs = func.info.getMinargs();
         maxargs = func.info.getMaxargs();
         meth = func;
-        meth.setInfo(this);
+//        meth.setInfo(this);
     }
 
     @ExposedGet(name = "__doc__")
@@ -29,7 +29,6 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
         return maxargs;
     }
 
-    @Override
     public void setMaxargs(int maxArgs) {
         maxargs = maxArgs;
     }
@@ -38,7 +37,6 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
         return minargs;
     }
 
-    @Override
     public void setMinargs(int minArgs) {
         minargs = minArgs;
     }
@@ -62,7 +60,7 @@ public class PyMethodDescr extends PyDescriptor implements PyBuiltinCallable.Inf
     }
 
     public PyException unexpectedCall(int nargs, boolean keywords) {
-        return PyBuiltinCallable.DefaultInfo.unexpectedCall(nargs, keywords, name, minargs,
+        return PyBuiltinMethodData.unexpectedCall(nargs, keywords, name, minargs,
                                                             maxargs);
     }
 

@@ -5,7 +5,6 @@ import org.python.compiler.ClassConstants;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
-import org.python.core.PyBuiltinMethodNarrow;
 import org.python.core.PyDataDescr;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -64,8 +63,6 @@ public interface PyTypes extends ClassConstants {
     public static final Type BUILTIN_METHOD = Type.getType(PyBuiltinMethod.class);
 
     public static final Type ABUILTIN_METHOD = Type.getType(PyBuiltinMethod[].class);
-
-    public static final Type BUILTIN_METHOD_NARROW = Type.getType(PyBuiltinMethodNarrow.class);
 
     public static final Type BUILTIN_FUNCTION = Type.getType(PyBuiltinCallable.class);
 

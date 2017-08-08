@@ -15,7 +15,7 @@ import java.util.Set;
 class JavaProxySet {
 
     @Untraversable
-    private static class SetMethod extends PyBuiltinMethodNarrow {
+    private static class SetMethod extends PyBuiltinMethod {
 
         protected SetMethod(String name, int numArgs) {
             super(name, numArgs);
