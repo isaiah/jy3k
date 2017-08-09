@@ -3,16 +3,18 @@
 
 package org.python.core;
 
+import org.python.annotations.ExposedType;
 import org.python.core.packagecache.PackageManager;
 
 import java.util.StringTokenizer;
 
 /**
  * A representation of java package.
- * FIXME annotate with ExposedType
  */
+@ExposedType(name = "java_package")
 public class PyJavaPackage extends PyObject implements Traverseproc {
     private static final PyObject JAVAPKG_PATH = new PyList(new PyObject[] {new PyUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY)});
+    public static final PyType TYPE = PyType.fromClass(PyJavaPackage.class);
     public String __name__;
 
     public PyStringMap __dict__;
@@ -40,7 +42,6 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
     public PyJavaPackage(String name,PackageManager mgr) {
         this(name, mgr, null);
     }
-
 
     public PyJavaPackage(String name,PackageManager mgr,String jarfile) {
         __file__ = jarfile;
