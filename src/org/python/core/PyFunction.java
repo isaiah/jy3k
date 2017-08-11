@@ -4,6 +4,7 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
+import jdk.dynalink.linker.support.Guards;
 import org.python.core.generator.PyAsyncGenerator;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
@@ -626,6 +627,8 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
             MethodHandle guard = null;
             if (self != null) {
                 guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
+            } else {
+                guard = Guards.getIdentityGuard(this);
             }
             return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
@@ -704,6 +707,8 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         MethodHandle guard = null;
         if (self != null) {
             guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
+        } else {
+            guard = Guards.getIdentityGuard(this);
         }
         return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
