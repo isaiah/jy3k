@@ -141,7 +141,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         }
         // If that didn't trigger, we need 3 arguments. but ArgParser below may give a msg
         // saying type() needs exactly 3.
-        if (args.length + keywords.length != 3) {
+        if (args.length != 3) {
             throw Py.TypeError("type() takes 1 or 3 arguments");
         }
 
@@ -149,7 +149,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         String name = ap.getString(0);
         PyTuple bases = (PyTuple)ap.getPyObjectByType(1, PyTuple.TYPE);
         PyObject dict = ap.getPyObject(2);
-        if (!(dict instanceof PyDictionary || dict instanceof PyStringMap)) {
+        if (!(dict instanceof PyDict)) {
             throw Py.TypeError("type(): argument 3 must be dict, not " + dict.getType());
         }
         return newType(new_, subtype, name, bases, dict);

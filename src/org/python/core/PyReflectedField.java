@@ -4,18 +4,24 @@
  */
 package org.python.core;
 
+import org.python.annotations.ExposedType;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 @Untraversable
+@ExposedType(name = "java_field")
 public class PyReflectedField extends PyObject {
+    public static final PyType TYPE = PyType.fromClass(PyReflectedField.class);
 
     public Field field;
 
     public PyReflectedField() {
+            super(TYPE);
     }
 
     public PyReflectedField(Field field) {
+        super(TYPE);
         this.field = field;
     }
 

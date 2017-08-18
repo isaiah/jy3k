@@ -1,13 +1,17 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import org.python.annotations.ExposedType;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
+@ExposedType(name = "java_function")
 public class PyReflectedFunction extends PyObject implements Traverseproc {
+    public static final PyType TYPE = PyType.fromClass(PyReflectedFunction.class);
 
     public String __name__;
 
@@ -21,6 +25,7 @@ public class PyReflectedFunction extends PyObject implements Traverseproc {
     private boolean calledStatically;
 
     protected PyReflectedFunction(String name) {
+        super(TYPE);
         __name__ = name;
     }
 

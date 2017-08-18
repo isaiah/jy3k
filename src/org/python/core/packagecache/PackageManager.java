@@ -19,7 +19,7 @@ import java.io.InputStream;
 /**
  * Abstract package manager.
  */
-public abstract class PackageManager extends Object {
+public abstract class PackageManager {
 
     public PyJavaPackage topLevelPackage;
 

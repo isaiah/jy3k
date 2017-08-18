@@ -2,7 +2,7 @@ package org.python.core;
 
 /**
  * A __new__ function that tells its subclasses to just init if __new__ is being called on the type
- * the function was defined on. Otherwise, it just leaves initting up to the subtype otherwise.
+ * the function was defined on. Otherwise, it just leaves initialization up to the subtype otherwise.
  */
 public abstract class PyOverridableNew extends PyNewWrapper {
 

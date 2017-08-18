@@ -5,6 +5,7 @@ package org.python.core;
  * corresponding to the standard list type
  */
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,10 +34,14 @@ class JavaProxyList {
 
         protected List newList() {
             try {
-                return (List) asList().getClass().newInstance();
+                return asList().getClass().getDeclaredConstructor().newInstance();
             } catch (IllegalAccessException e) {
                 throw Py.JavaError(e);
             } catch (InstantiationException e) {
+                throw Py.JavaError(e);
+            } catch (NoSuchMethodException e) {
+                throw Py.JavaError(e);
+            } catch (InvocationTargetException e) {
                 throw Py.JavaError(e);
             }
         }
