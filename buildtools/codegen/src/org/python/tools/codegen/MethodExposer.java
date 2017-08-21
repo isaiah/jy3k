@@ -96,8 +96,8 @@ public abstract class MethodExposer extends Exposer {
 
     protected void generate() {
         generateNamedConstructor();
-        generateFullConstructor();
-        generateBind();
+//        generateFullConstructor();
+//        generateBind();
         if(isWide(args)) {
             generateWideCall();
         } else {
@@ -105,56 +105,6 @@ public abstract class MethodExposer extends Exposer {
                 generateCall(i);
             }
         }
-    }
-
-    private void generateFullConstructor() {
-        startConstructor(PYTYPE, PYOBJ, BUILTIN_INFO);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitVarInsn(ALOAD, 1);
-        mv.visitVarInsn(ALOAD, 2);
-        mv.visitVarInsn(ALOAD, 3);
-        superConstructor(PYTYPE, PYOBJ, BUILTIN_INFO);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(doc);
-        mv.visitFieldInsn(PUTFIELD,
-                          BUILTIN_FUNCTION.getInternalName(),
-                          "doc",
-                          STRING.getDescriptor());
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(isStatic);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_FUNCTION.getInternalName(),
-                "isStatic",
-                BOOLEAN.getDescriptor());
-
-        // set isWide flag
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(isWide);
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "isWide",
-                BOOLEAN.getDescriptor());
-
-        /** Set default values */
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(String.join(",", defaults));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "defaultVals",
-                STRING.getDescriptor());
-
-        String desc = Type.getMethodDescriptor(returnType, args);
-        if (this instanceof ClassMethodExposer) {
-            desc = Type.getMethodDescriptor(returnType, ((ClassMethodExposer) this).actualArgs);
-        }
-        int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitLdcInsn(new Handle(tag, onType.getInternalName(), methodName, desc, false));
-        mv.visitFieldInsn(PUTFIELD,
-                BUILTIN_METHOD.getInternalName(),
-                "target",
-                METHOD_HANDLE.getDescriptor());
-        endConstructor();
     }
 
     private void generateNamedConstructor() {
@@ -166,7 +116,6 @@ public abstract class MethodExposer extends Exposer {
         mv.visitLdcInsn(String.join(",", defaults));
         // target
         int tag = isStatic ? H_INVOKESTATIC : H_INVOKEVIRTUAL;
-        mv.visitVarInsn(ALOAD, 0);
         String desc = Type.getMethodDescriptor(returnType, args);
         if (this instanceof ClassMethodExposer) {
             desc = Type.getMethodDescriptor(returnType, ((ClassMethodExposer) this).actualArgs);
@@ -181,19 +130,19 @@ public abstract class MethodExposer extends Exposer {
         superConstructor(STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
     }
 
-    private void generateBind() {
-        startMethod("bind", BUILTIN_FUNCTION, PYOBJ);
-        instantiate(thisType, new Instantiator(PYTYPE, PYOBJ, BUILTIN_INFO) {
-
-            public void pushArgs() {
-                mv.visitVarInsn(ALOAD, 0);
-                call(thisType, "getType", PYTYPE);
-                mv.visitVarInsn(ALOAD, 1);
-                get("info", BUILTIN_INFO);
-            }
-        });
-        endMethod(ARETURN);
-    }
+//    private void generateBind() {
+//        startMethod("bind", BUILTIN_FUNCTION, PYOBJ);
+//        instantiate(thisType, new Instantiator(PYTYPE, PYOBJ, BUILTIN_METHOD_DATA) {
+//
+//            public void pushArgs() {
+//                mv.visitVarInsn(ALOAD, 0);
+//                call(thisType, "getType", PYTYPE);
+//                mv.visitVarInsn(ALOAD, 1);
+//                get("info", BUILTIN_METHOD_DATA);
+//            }
+//        });
+//        endMethod(ARETURN);
+//    }
 
     private void generateWideCall() {
         boolean needsThreadState = needsThreadState(args);

@@ -19,6 +19,28 @@ public class PyBuiltinMethodData {
         this.maxargs = maxargs;
     }
 
+    /**
+     * Create from wide static methods for Exceptions.class
+     * @param name
+     * @param mh
+     */
+    public PyBuiltinMethodData(String name, MethodHandle mh) {
+        this.name = name;
+        this.target = mh;
+        this.doc = "";
+        this.isWide = true;
+        this.isStatic = true;
+    }
+
+    /**
+     * Information for native implemented methods
+     * @param name
+     * @param defaultVals
+     * @param mh
+     * @param doc
+     * @param isStatic
+     * @param isWide
+     */
     public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
         this.name = name;
         this.defaultVals = defaultVals;

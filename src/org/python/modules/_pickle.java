@@ -12,11 +12,14 @@
 
 package org.python.modules;
 
+import jdk.dynalink.linker.support.Lookup;
 import org.python.bootstrap.Import;
 import org.python.core.Exceptions;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
+import org.python.core.PyBuiltinMethod;
+import org.python.core.PyBuiltinMethodData;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -43,6 +46,8 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ModuleInit;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -349,6 +354,7 @@ import java.util.Map;
  */
 @ExposedModule
 public class _pickle {
+    private static final Lookup LOOKUP = new Lookup(MethodHandles.lookup());
     /**
      * The program version.
      */
@@ -2152,6 +2158,8 @@ public class _pickle {
     }
 
     private static PyObject getJavaFunc(String name, String methodName) {
-        return Exceptions.bindStaticJavaMethod(name, _pickle.class, methodName);
+        MethodHandle mh = LOOKUP.findOwnStatic(methodName, PyObject.class, PyObject[].class, String[].class);
+        PyBuiltinMethodData info = new PyBuiltinMethodData(name, mh);
+        return new PyBuiltinMethod(null, info);
     }
 }

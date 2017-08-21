@@ -331,9 +331,6 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     @ExposedMethod(doc = BuiltinDocs.dict_update_doc)
     public final void stringmap_update(PyObject[] args, String[] keywords) {
         int nargs = args.length - keywords.length;
-        if (nargs > 1) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(nargs, false, "update", 0, 1);
-        }
         if (nargs == 1) {
             PyObject arg = args[0];
             if (arg.__findattr__("keys") != null) {

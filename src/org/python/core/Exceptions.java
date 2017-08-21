@@ -1,9 +1,13 @@
 // Copyright 2001 Finn Bock
 package org.python.core;
 
+import jdk.dynalink.linker.support.Lookup;
 import org.python.modules.zipimport.ZipImportModule;
 
 import java.io.File;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 
 /**
@@ -12,6 +16,7 @@ import java.lang.reflect.Method;
  */
 @Untraversable
 public class Exceptions {
+    private static final Lookup LOOKUP = new Lookup(MethodHandles.lookup());
 
     /**
      * <i>Internal use only. Do not call this method explicit.</i>
@@ -721,58 +726,8 @@ public class Exceptions {
     }
 
     public static PyObject bindStaticJavaMethod(String name, String methodName) {
-        return bindStaticJavaMethod(name, Exceptions.class, methodName);
-    }
-
-    public static PyObject bindStaticJavaMethod(String name, Class<?> cls, String methodName) {
-        Method javaMethod;
-        try {
-            javaMethod = cls.getMethod(methodName,
-                                       new Class<?>[] {PyObject.class, PyObject[].class,
-                                                       String[].class});
-        } catch (Exception e) {
-            throw Py.JavaError(e);
-        }
-        return new BoundStaticJavaMethod(name, javaMethod);
-    }
-
-    @Untraversable
-    public static class BoundStaticJavaMethod extends PyBuiltinMethod {
-
-        /** The Java Method to be bound. Its signature must be:
-         * (PyObject, PyObject[], String[])PyObject. */
-        private Method javaMethod;
-
-        public BoundStaticJavaMethod(String name, Method javaMethod) {
-            super(name);
-            this.javaMethod = javaMethod;
-        }
-
-        protected BoundStaticJavaMethod(PyType type, PyObject self, Info info, Method javaMethod) {
-            super(type, self, info);
-            this.javaMethod = javaMethod;
-        }
-
-        @Override
-        public PyBuiltinCallable bind(PyObject self) {
-            return new BoundStaticJavaMethod(getType(), self, info, javaMethod);
-        }
-
-        @Override
-        public PyObject __get__(PyObject obj, PyObject type) {
-            if (obj != null) {
-                return bind(obj);
-            }
-            return makeDescriptor((PyType)type);
-        }
-
-        @Override
-        public PyObject __call__(PyObject[] args, String kwargs[]) {
-            try {
-                return Py.java2py(javaMethod.invoke(null, self, args, kwargs));
-            } catch (Throwable t) {
-                throw Py.JavaError(t);
-            }
-        }
+        MethodHandle mh = LOOKUP.findOwnStatic(methodName, PyObject.class, PyObject[].class, String[].class);
+        PyBuiltinMethodData info = new PyBuiltinMethodData(name, mh);
+        return new PyBuiltinMethod(null, info);
     }
 }

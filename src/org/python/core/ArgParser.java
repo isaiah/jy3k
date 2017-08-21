@@ -73,11 +73,6 @@ public class ArgParser {
         this(funcname, args, kws);
         splitParams(paramnames);
         check();
-        if (!PyBuiltinCallable.DefaultInfo.check(args.length, minargs,
-                paramnames.length)) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(args.length,
-                    false, funcname, minargs, paramnames.length);
-        }
     }
 
     public ArgParser(String funcname, PyObject[] args, String[] kws,
@@ -85,11 +80,6 @@ public class ArgParser {
         this(funcname, args, kws);
         splitParams(paramnames);
         check();
-        if (!PyBuiltinCallable.DefaultInfo.check(args.length, minargs,
-                this.params.length)) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(args.length,
-                    false, funcname, minargs, this.params.length);
-        }
     }
 
     public ArgParser(String funcname, PyObject[] args, String[] kws,

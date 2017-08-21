@@ -5,6 +5,7 @@ import org.python.compiler.ClassConstants;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
+import org.python.core.PyBuiltinMethodData;
 import org.python.core.PyDataDescr;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -72,7 +73,7 @@ public interface PyTypes extends ClassConstants {
 
     public static final Type ADATA_DESCR = Type.getType(PyDataDescr[].class);
 
-    public static final Type BUILTIN_INFO = Type.getType(PyBuiltinCallable.Info.class);
+    public static final Type BUILTIN_METHOD_DATA = Type.getType(PyBuiltinMethodData.class);
 
     public static final Type THREAD_STATE = Type.getType(ThreadState.class);
 

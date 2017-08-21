@@ -11,12 +11,14 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SwitchPoint;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * PyBuiltinMethod is native implemented methods
  * i.e. str.split
  */
-public abstract class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperclass, Cloneable, Traverseproc {
+public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperclass, Cloneable, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle W_INTEGER = MH.findStatic(LOOKUP, Py.class, "newInteger", MethodType.methodType(PyLong.class, int.class));
@@ -44,7 +46,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
         this.self = self;
     }
 
-    protected PyBuiltinMethod(PyObject self, PyBuiltinMethodData info) {
+    public PyBuiltinMethod(PyObject self, PyBuiltinMethodData info) {
         super(info);
         this.self = self;
     }
@@ -55,18 +57,7 @@ public abstract class PyBuiltinMethod extends PyBuiltinCallable implements Expos
 
     @Override
     public PyBuiltinCallable bind(PyObject bindTo) {
-        if(self == null) {
-            PyBuiltinMethod bindable;
-            try {
-                bindable = (PyBuiltinMethod)clone();
-            } catch(CloneNotSupportedException e) {
-                throw new RuntimeException("Didn't expect PyBuiltinMethod to throw " +
-                                           "CloneNotSupported since it implements Cloneable", e);
-            }
-            bindable.self = bindTo;
-            return bindable;
-        }
-        return this;
+        return new PyBuiltinMethod(bindTo, info);
     }
 
     @Override

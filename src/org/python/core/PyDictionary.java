@@ -372,9 +372,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
     public void updateCommon(PyObject[] args, String[] keywords, String methName) {
         int nargs = args.length - keywords.length;
-        if (nargs > 1) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(nargs, false, methName, 0, 1);
-        }
         if (nargs == 1) {
             PyObject arg = args[0];
 

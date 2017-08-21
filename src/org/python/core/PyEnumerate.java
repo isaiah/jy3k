@@ -42,10 +42,6 @@ public class PyEnumerate extends PyIterator {
     @ExposedNew
     public final static PyObject enumerate_new(PyNewWrapper new_, boolean init, PyType subtype,
                                                PyObject[] args, String[] keywords) {
-        if (args.length > 2 || args.length <= 0) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(args.length, true, "enumerate", 1, 2);
-        }
-
         ArgParser ap = new ArgParser("enumerate", args, keywords, new String[] {"sequence", "start"});
         PyObject seq = ap.getPyObject(0);
         PyObject start = ap.getPyObject(1, Py.newInteger(0));

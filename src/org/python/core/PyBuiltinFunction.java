@@ -17,13 +17,12 @@ public class PyBuiltinFunction extends PyBuiltinCallable {
     private Function<PyObject[], PyObject> varargFunc;
     private BiFunction<PyObject[], String[], PyObject> wideFunc;
 
-    public static PyBuiltinFunction named(String name, String doc) {
-        return new PyBuiltinFunction(name, 0,0, doc);
+    protected PyBuiltinFunction(PyBuiltinMethodData info) {
+        super(info);
     }
 
-    protected PyBuiltinFunction(String name, int minargs, int maxargs, String doc) {
-        super(new DefaultInfo(name, minargs, maxargs));
-        this.doc = doc == null ? null : doc;
+    public static PyBuiltinFunction named(String name, String doc) {
+        return new PyBuiltinFunction(new PyBuiltinMethodData(name, 0, 0));
     }
 
     public boolean isMappingType() {

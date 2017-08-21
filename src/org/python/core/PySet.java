@@ -47,9 +47,6 @@ public class PySet extends BaseSet {
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.set___init___doc)
     public final void set___init__(PyObject[] args, String[] kwds) {
-        if (args.length > 1 || kwds.length != 0) {
-            throw PyBuiltinCallable.DefaultInfo.unexpectedCall(args.length, false, "Set", 0, 1);
-        }
         if (args.length == 0) {
             return;
         }
