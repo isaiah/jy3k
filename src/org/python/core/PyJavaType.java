@@ -263,9 +263,9 @@ public class PyJavaType extends PyType {
             }
             if (JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR) == Object.class) {
                 base = PyType.fromClassSkippingInners(PyObject.class, needsInners);
-            } else if(baseClass == null) {
+            } else if (baseClass == null) {
                 base = PyType.fromClassSkippingInners(Object.class, needsInners);
-            }else if (JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR) == Class.class) {
+            } else if (JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR) == Class.class) {
                 base = PyType.fromClassSkippingInners(PyType.class, needsInners);
             } else {
                 base = PyType.fromClassSkippingInners(baseClass, needsInners);
@@ -293,7 +293,7 @@ public class PyJavaType extends PyType {
         } else {
             // Grab all methods on this class and all of its superclasses and make them accessible
             List<Method> allMethods = new ArrayList<>();
-            for(Class<?> c = forClass; c != null; c = c.getSuperclass()) {
+            for (Class<?> c = forClass; c != null; c = c.getSuperclass()) {
                 for (Method meth : c.getDeclaredMethods()) {
                     allMethods.add(meth);
                     meth.setAccessible(true);
@@ -318,7 +318,7 @@ public class PyJavaType extends PyType {
             }
 
             String nmethname = normalize(methname);
-            PyReflectedFunction reflfunc = (PyReflectedFunction)dict.__finditem__(nmethname);
+            PyReflectedFunction reflfunc = (PyReflectedFunction) dict.__finditem__(nmethname);
             if (reflfunc == null) {
                 dict.__setitem__(nmethname, new PyReflectedFunction(meth));
             } else {
@@ -389,7 +389,7 @@ public class PyJavaType extends PyType {
         // Add superclass methods
         for (Method meth : methods) {
             String nmethname = normalize(meth.getName());
-            PyReflectedFunction reflfunc = (PyReflectedFunction)dict.__finditem__(nmethname);
+            PyReflectedFunction reflfunc = (PyReflectedFunction) dict.__finditem__(nmethname);
             if (reflfunc != null) {
                 // The superclass method has the same name as one declared on this class, so add
                 // the superclass version's arguments
@@ -428,11 +428,11 @@ public class PyJavaType extends PyType {
                     if (memb != null && memb instanceof PyReflectedFunction) {
                         PyBytes doc = null;
                         try {
-                            doc = (PyBytes)field.get(null);
+                            doc = (PyBytes) field.get(null);
                         } catch (IllegalAccessException e) {
                             throw Py.JavaError(e);
                         }
-                        ((PyReflectedFunction)memb).__doc__ = doc;
+                        ((PyReflectedFunction) memb).__doc__ = doc;
                     }
                 }
             }
@@ -452,9 +452,9 @@ public class PyJavaType extends PyType {
                     continue;
                 }
                 dict.__setitem__(methodName, new PyBeanEventProperty(methodName,
-                                                               ev.eventClass,
-                                                               ev.addMethod,
-                                                               meth));
+                        ev.eventClass,
+                        ev.addMethod,
+                        meth));
             }
         }
 
@@ -463,27 +463,27 @@ public class PyJavaType extends PyType {
             PyObject prev = dict.__finditem__(prop.__name__);
             if (prev != null) {
                 if (!(prev instanceof PyReflectedField)
-                        || !Modifier.isStatic(((PyReflectedField)prev).field.getModifiers())) {
+                        || !Modifier.isStatic(((PyReflectedField) prev).field.getModifiers())) {
                     // Any methods or non-static fields take precedence over the bean property
                     continue;
                 } else {
                     // Must've been a static field, so add it to the property
-                    prop.field = ((PyReflectedField)prev).field;
+                    prop.field = ((PyReflectedField) prev).field;
                 }
             }
 
             // If one of our superclasses  has something defined for this name, check if its a bean
             // property, and if so, try to fill in any gaps in our property from there
-            PyObject fromType[] = new PyObject[] { null };
+            PyObject fromType[] = new PyObject[]{null};
             PyObject superForName = lookup_where_mro(prop.__name__, fromType);
             if (superForName instanceof PyBeanProperty) {
-                PyBeanProperty superProp = ((PyBeanProperty)superForName);
+                PyBeanProperty superProp = ((PyBeanProperty) superForName);
                 // If it has a set method and we don't, take it regardless.  If the types don't line
                 // up, it'll be rejected below
                 if (prop.setMethod == null) {
                     prop.setMethod = superProp.setMethod;
                 } else if (prop.getMethod == null
-                           && superProp.myType == prop.setMethod.getParameterTypes()[0]) {
+                        && superProp.myType == prop.setMethod.getParameterTypes()[0]) {
                     // Only take a get method if the type on it agrees with the set method
                     // we already have. The bean on this type overrides a conflicting one
                     // of the parent
@@ -495,7 +495,7 @@ public class PyJavaType extends PyType {
                     // If the parent bean is hiding a static field, we need it as well.
                     prop.field = superProp.field;
                 }
-            } else if (superForName != null  &&  fromType[0] != this  &&  !(superForName instanceof PyBeanEvent)) {
+            } else if (superForName != null && fromType[0] != this && !(superForName instanceof PyBeanEvent)) {
                 // There is already an entry for this name
                 // It came from a type which is not @this; it came from a superclass
                 // It is not a bean event
@@ -529,7 +529,8 @@ public class PyJavaType extends PyType {
         }
         if (PyObject.class.isAssignableFrom(forClass)) {
             PyObject new_ = new PyNewWrapper(forClass, "__new__", -1, -1) {
-                @Override public PyObject new_impl(boolean init,
+                @Override
+                public PyObject new_impl(boolean init,
                                          PyType subtype,
                                          PyObject[] args,
                                          String[] keywords) {
@@ -539,20 +540,6 @@ public class PyJavaType extends PyType {
             dict.__setitem__("__new__", new_);
         } else {
             dict.__setitem__("__init__", reflctr);
-        }
-        PyBuiltinMethod[] collectionProxyMethods = getCollectionProxies().get(forClass);
-        if (collectionProxyMethods != null) {
-            for (PyBuiltinMethod meth : collectionProxyMethods) {
-                addMethod(meth);
-            }
-        }
-        // allow for some methods to override the Java type's methods as a late injection
-        for (Class<?> type : getPostCollectionProxies().keySet()) {
-            if (type.isAssignableFrom(forClass)) {
-                for (PyBuiltinMethod meth : getPostCollectionProxies().get(type)) {
-                    addMethod(meth);
-                }
-            }
         }
 
         if (ClassDictInit.class.isAssignableFrom(forClass) && forClass != ClassDictInit.class) {
@@ -578,137 +565,8 @@ public class PyJavaType extends PyType {
             hasDelete = getDescrMethod(forClass, "__delete__", PyObject.class) != null
                     || getDescrMethod(forClass, "_dodel", PyObject.class) != null;
         }
-
-        if (forClass == Object.class) {
-            addMethod(new PyBuiltinMethod("__copy__") {
-                @Override
-                public PyObject __call__() {
-                    throw Py.TypeError("Could not copy Java object because it is not Cloneable or known to be immutable. "
-                            + "Consider monkeypatching __copy__ for " + self.getType().fastGetName());
-                }
-            });
-            addMethod(new PyBuiltinMethod("__deepcopy__") {
-                @Override
-                public PyObject __call__(PyObject memo) {
-                    throw Py.TypeError("Could not deepcopy Java object because it is not Serializable. "
-                            + "Consider monkeypatching __deepcopy__ for " + self.getType().fastGetName());
-                }
-            });
-            addMethod(new PyBuiltinMethod("__eq__", 1) {
-                @Override
-                public PyObject __call__(PyObject o) {
-                    Object proxy = self.getJavaProxy();
-                    Object oProxy = o.getJavaProxy();
-                    return proxy.equals(oProxy) ? Py.True : Py.False;
-                }
-            });
-            addMethod(new PyBuiltinMethod("__ne__", 1) {
-                @Override
-                public PyObject __call__(PyObject o) {
-                    Object proxy = self.getJavaProxy();
-                    Object oProxy = o.getJavaProxy();
-                    return !proxy.equals(oProxy) ? Py.True : Py.False;
-                }
-            });
-            addMethod(new PyBuiltinMethod("__hash__") {
-                @Override
-                public PyObject __call__() {
-                    return Py.newInteger(self.getJavaProxy().hashCode());
-                }
-            });
-            addMethod(new PyBuiltinMethod("__repr__") {
-                @Override
-                public PyObject __call__() {
-                    /*
-                     * java.lang.Object.toString returns Unicode: preserve as a PyUnicode, then let
-                     * the repr() built-in decide how to handle it. (Also applies to __str__.)
-                     */
-                    String toString = self.getJavaProxy().toString();
-                    return toString == null ? Py.EmptyUnicode : Py.newUnicode(toString);
-                }
-            });
-            addMethod(new PyBuiltinMethod("__unicode__") {
-                @Override
-                public PyObject __call__() {
-                    return new PyUnicode(self.toString());
-                }
-            });
-        }
-
-        if(forClass == Comparable.class) {
-            addMethod(new ComparableMethod("__lt__", 1) {
-                @Override
-                protected boolean getResult(int comparison) {
-                    return comparison < 0;
-                }
-            });
-            addMethod(new ComparableMethod("__le__", 1) {
-                @Override
-                protected boolean getResult(int comparison) {
-                    return comparison <= 0;
-                }
-            });
-            addMethod(new ComparableMethod("__gt__", 1) {
-                @Override
-                protected boolean getResult(int comparison) {
-                    return comparison > 0;
-                }
-            });
-            addMethod(new ComparableMethod("__ge__", 1) {
-                @Override
-                protected boolean getResult(int comparison) {
-                    return comparison >= 0;
-                }
-            });
-        }
-
-        if (immutableClasses.contains(forClass)) {
-            // __deepcopy__ just works for these objects since it uses serialization instead
-            addMethod(new PyBuiltinMethod("__copy__") {
-                @Override
-                public PyObject __call__() {
-                    return self;
-                }
-            });
-        }
-
-        if(forClass == Cloneable.class) {
-            addMethod(new PyBuiltinMethod("__copy__") {
-                @Override
-                public PyObject __call__() {
-                    Object obj = self.getJavaProxy();
-                    Method clone;
-                    // TODO we could specialize so that for well known objects like collections.
-                    // This would avoid needing to use reflection in the general case,
-                    // because Object#clone is protected (but most subclasses are not).
-                    //
-                    // Lastly we can potentially cache the method handle in the proxy instead of looking it up each time
-                    try {
-                        clone = obj.getClass().getMethod("clone");
-                        Object copy = clone.invoke(obj);
-                        return Py.java2py(copy);
-                    } catch (Exception ex) {
-                        throw Py.TypeError("Could not copy Java object");
-                    }
-                }
-            });
-        }
-
-        if(forClass == Serializable.class) {
-            addMethod(new PyBuiltinMethod("__deepcopy__") {
-                @Override
-                public PyObject __call__(PyObject memo) {
-                    Object obj = self.getJavaProxy();
-                    try {
-                        Object copy = cloneX(obj);
-                        return Py.java2py(copy);
-                    } catch (Exception ex) {
-                        throw Py.TypeError("Could not copy Java object");
-                    }
-                }
-            });
-        }
     }
+
 
     // cloneX, CloneOutput, CloneInput are verbatim from Eamonn McManus'
     // http://weblogs.java.net/blog/emcmanus/archive/2007/04/cloning_java_ob.html
@@ -879,129 +737,6 @@ public class PyJavaType extends PyType {
             return proxy.hasMoreElements() ? Py.java2py(proxy.nextElement()) : null;
         }
     }
-
-    private static abstract class ComparableMethod extends PyBuiltinMethod {
-
-        protected ComparableMethod(String name, int numArgs) {
-            super(name, numArgs);
-        }
-
-        @Override
-        public PyObject __call__(PyObject arg) {
-            Object asjava = arg.__tojava__(Object.class);
-            int compare;
-            try {
-                compare = ((Comparable<Object>)self.getJavaProxy()).compareTo(asjava);
-            } catch(ClassCastException classCast) {
-                return Py.NotImplemented;
-            }
-            return getResult(compare) ? Py.True : Py.False;
-        }
-
-        protected abstract boolean getResult(int comparison);
-    }
-
-    // Traverseproc-note: Usually we would have to traverse this class, but we can
-    // leave this out, since CollectionProxies is only used locally in private
-    // static fields.
-    private static class CollectionProxies {
-        final Map<Class<?>, PyBuiltinMethod[]> proxies;
-        final Map<Class<?>, PyBuiltinMethod[]> postProxies;
-
-        CollectionProxies() {
-            proxies = buildCollectionProxies();
-            postProxies = buildPostCollectionProxies();
-        }
-    }
-
-    private static class CollectionsProxiesHolder {
-        static final CollectionProxies proxies = new CollectionProxies();
-    }
-
-    private static Map<Class<?>, PyBuiltinMethod[]> getCollectionProxies() {
-        return CollectionsProxiesHolder.proxies.proxies;
-    }
-
-    private static Map<Class<?>, PyBuiltinMethod[]> getPostCollectionProxies() {
-        return CollectionsProxiesHolder.proxies.postProxies;
-    }
-
-    /**
-     * Build a map of common Java collection base types (Map, Iterable, etc) that need to be
-     * injected with Python's equivalent types' builtin methods (__len__, __iter__, iteritems, etc).
-     *
-     * @return A map whose key is the base Java collection types and whose entry is a list of
-     *         injected methods.
-     */
-    private static Map<Class<?>, PyBuiltinMethod[]> buildCollectionProxies() {
-        final Map<Class<?>, PyBuiltinMethod[]> proxies = new HashMap<>();
-
-        PyBuiltinMethod iterableProxy = new PyBuiltinMethod("__iter__") {
-            @Override
-            public PyObject __call__() {
-                return new JavaIterator(((Iterable) self.getJavaProxy()));
-            }
-        };
-        proxies.put(Iterable.class, new PyBuiltinMethod[]{iterableProxy});
-
-        PyBuiltinMethod lenProxy = new PyBuiltinMethod("__len__") {
-            @Override
-            public PyObject __call__() {
-                return Py.newInteger(((Collection<?>) self.getJavaProxy()).size());
-            }
-        };
-
-        PyBuiltinMethod containsProxy = new PyBuiltinMethod("__contains__", 1) {
-            @Override
-            public PyObject __call__(PyObject obj) {
-                boolean contained = false;
-                Object proxy = obj.getJavaProxy();
-                if (proxy == null) {
-                    for (Object item : (Collection<?>) self.getJavaProxy()) {
-                        if (Py.java2py(item).richCompare(obj, CompareOp.EQ).__bool__()) {
-                            contained = true;
-                            break;
-                        }
-                    }
-                } else {
-                    Object other = obj.__tojava__(Object.class);
-                    contained = ((Collection<?>) self.getJavaProxy()).contains(other);
-
-                }
-                return contained ? Py.True : Py.False;
-            }
-        };
-        proxies.put(Collection.class, new PyBuiltinMethod[]{lenProxy, containsProxy});
-
-        PyBuiltinMethod iteratorProxy = new PyBuiltinMethod("__iter__") {
-            @Override
-            public PyObject __call__() {
-                return new JavaIterator(((Iterator) self.getJavaProxy()));
-            }
-        };
-        proxies.put(Iterator.class, new PyBuiltinMethod[]{iteratorProxy});
-
-        PyBuiltinMethod enumerationProxy = new PyBuiltinMethod("__iter__") {
-            @Override
-            public PyObject __call__() {
-                return new EnumerationIter(((Enumeration) self.getJavaProxy()));
-            }
-        };
-        proxies.put(Enumeration.class, new PyBuiltinMethod[]{enumerationProxy});
-        proxies.put(List.class, JavaProxyList.getProxyMethods());
-        proxies.put(Map.class, JavaProxyMap.getProxyMethods());
-        proxies.put(Set.class, JavaProxySet.getProxyMethods());
-        return Collections.unmodifiableMap(proxies);
-    }
-
-    private static Map<Class<?>, PyBuiltinMethod[]> buildPostCollectionProxies() {
-        final Map<Class<?>, PyBuiltinMethod[]> postProxies = new HashMap<>();
-        postProxies.put(List.class, JavaProxyList.getPostProxyMethods());
-        postProxies.put(Map.class, JavaProxyMap.getPostProxyMethods());
-        postProxies.put(Set.class, JavaProxySet.getPostProxyMethods());
-        return Collections.unmodifiableMap(postProxies);
-    }
-
 
     /* Traverseproc implementation */
     @Override
