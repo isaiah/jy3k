@@ -529,6 +529,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitExitFor(ExitFor node) throws Exception {
         popException();
+
         code.goto_(exitLabels.peek());
         return null;
     }

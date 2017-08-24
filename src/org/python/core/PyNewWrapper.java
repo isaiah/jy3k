@@ -29,10 +29,6 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
                                       PyObject[] args,
                                       String[] keywords);
 
-    public PyBuiltinCallable bind(PyObject self) {
-        throw Py.SystemError("__new__ wrappers are already bound");
-    }
-
     public PyType getWrappedType() {
         return for_type;
     }

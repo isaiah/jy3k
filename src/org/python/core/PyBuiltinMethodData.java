@@ -48,6 +48,7 @@ public class PyBuiltinMethodData {
         this.doc = doc;
         this.isStatic = isStatic;
         this.isWide = isWide;
+        getDefaults();
     }
 
     public String getName() {
@@ -96,6 +97,26 @@ public class PyBuiltinMethodData {
         }
     }
 
+    public PyObject invoke(PyObject arg) {
+        try {
+            int i = 0, j = 0;
+            MethodType type = target.type();
+            int paramCount = type.parameterCount();
+            if (paramCount > 1) {
+                if (paramCount == 2) {
+                    return wrap(target.invokeExact(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1]));
+                } else {
+                    return wrap(target.invokeExact(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1], defaults[defaults.length - 2]));
+                }
+            } else {
+                return wrap(target.invokeExact(unwrap(arg, type.parameterType(i))));
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
     public PyObject invoke(PyObject... args) {
         try {
             if (isWide) {
@@ -104,11 +125,13 @@ public class PyBuiltinMethodData {
             MethodType type = target.type();
             int paramCount = type.parameterCount();
             Object[] callArgs = new Object[paramCount];
-            System.arraycopy(defaults, 0, callArgs, paramCount - defaults.length, defaults.length);
+            if (defaults != null) {
+                System.arraycopy(defaults, 0, callArgs, paramCount - defaults.length, defaults.length);
+            }
             for (int i = 0; i < args.length; i++) {
                 callArgs[i] = unwrap(args[i], type.parameterType(i));
             }
-            return wrap(target.invokeExact(callArgs));
+            return wrap(target.asSpreader(Object[].class, paramCount).invoke(callArgs));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return null;
@@ -159,6 +182,7 @@ public class PyBuiltinMethodData {
         Class<?>[] paramTypes = type.parameterArray();
         String[] values = defaultVals.split(",");
         int startIndex = type.parameterCount() - values.length;
+        defaults = new Object[values.length];
         for (int i = 0; i < values.length; i++) {
             defaults[i] = getDefaultValue(values[i], paramTypes[startIndex + i]);
         }

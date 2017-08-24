@@ -350,7 +350,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
      *
      * @param other a PyObject with a keys() method
      */
-    private void merge(PyObject other) {
+    protected void merge(PyObject other) {
         if (other instanceof PyStringMap) {
             table.putAll(((PyStringMap)other).table);
         } else if (other instanceof PyDictionary) {

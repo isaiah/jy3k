@@ -25,6 +25,4 @@ public abstract class BaseModuleBuilder {
     public void setName(String name) {
         this.name = name;
     }
-
-    public abstract void classDictInit(PyObject module);
 }

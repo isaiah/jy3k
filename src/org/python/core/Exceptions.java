@@ -726,7 +726,15 @@ public class Exceptions {
     }
 
     public static PyObject bindStaticJavaMethod(String name, String methodName) {
-        MethodHandle mh = LOOKUP.findOwnStatic(methodName, PyObject.class, PyObject[].class, String[].class);
+        Class returnType;
+        if (name.equals("__init__")) {
+            returnType = void.class;
+        } else if (name.equals("__str__")) {
+            returnType = PyUnicode.class;
+        } else {
+            returnType = PyObject.class;
+        }
+        MethodHandle mh = LOOKUP.findOwnStatic(methodName, returnType, PyObject.class, PyObject[].class, String[].class);
         PyBuiltinMethodData info = new PyBuiltinMethodData(name, mh);
         return new PyBuiltinMethod(null, info);
     }

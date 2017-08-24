@@ -949,8 +949,18 @@ public class PyObject implements Serializable {
      **/
     public final PyObject __getattr__(String name) {
         PyType selfType = getType();
+        if (selfType == TYPE) {
+            return object___getattribute__(new PyUnicode(name));
+        }
         PyObject getattr = selfType.lookup("__getattribute__");
-        return getattr.__get__(this, selfType).__call__(new PyUnicode(name));
+        if (getattr instanceof PyBuiltinMethod) {
+            return ((PyBuiltinMethod) getattr).invoke(new PyUnicode(name));
+        }
+        PyObject func = getattr.__get__(this, selfType);
+        if (func instanceof PyBuiltinMethod) {
+            return ((PyBuiltinMethod) func).invoke(new PyUnicode(name));
+        }
+        return func.__call__(new PyUnicode(name));
     }
 
     public void noAttributeError(String name) {

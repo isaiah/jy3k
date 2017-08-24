@@ -1,6 +1,7 @@
 package org.python.tools.codegen;
 
 import org.objectweb.asm.Handle;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 public abstract class MethodExposer extends Exposer {
@@ -95,7 +96,7 @@ public abstract class MethodExposer extends Exposer {
     }
 
     protected void generate() {
-        generateNamedConstructor();
+//        generateNamedConstructor();
 //        generateFullConstructor();
 //        generateBind();
         if(isWide(args)) {
@@ -107,11 +108,9 @@ public abstract class MethodExposer extends Exposer {
         }
     }
 
-    private void generateNamedConstructor() {
-        startConstructor(STRING);
-        mv.visitVarInsn(ALOAD, 0);
+    public void generateNamedConstructor(MethodVisitor mv) {
         // name
-        mv.visitVarInsn(ALOAD, 1);
+//        mv.visitVarInsn(ALOAD, 1);
         // defaultVals
         mv.visitLdcInsn(String.join(",", defaults));
         // target
@@ -127,7 +126,6 @@ public abstract class MethodExposer extends Exposer {
         mv.visitLdcInsn(isStatic);
         // wide
         mv.visitLdcInsn(isWide(args));
-        superConstructor(STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
     }
 
 //    private void generateBind() {

@@ -9,9 +9,9 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
 
     protected int minargs, maxargs;
 
-    protected PyBuiltinCallable meth;
+    protected PyBuiltinMethod meth;
 
-    public PyMethodDescr(PyType t, PyBuiltinCallable func) {
+    public PyMethodDescr(PyType t, PyBuiltinMethod func) {
         name = func.info.getName();
         dtype = t;
         minargs = func.info.getMinargs();
@@ -56,7 +56,7 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
         checkCallerType(args[0].getType());
         PyObject[] actualArgs = new PyObject[args.length - 1];
         System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
-        return meth.bind(args[0]).__call__(actualArgs, kwargs);
+        return meth.bind(args[0]).invoke(actualArgs, kwargs);
     }
 
     public PyException unexpectedCall(int nargs, boolean keywords) {
@@ -65,12 +65,8 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
     }
 
     @Override
-    public PyObject __get__(PyObject obj, PyObject type) {
-        return method_descriptor___get__(obj, type);
-    }
-
     @ExposedMethod(defaults = "null")
-    final PyObject method_descriptor___get__(PyObject obj, PyObject type) {
+    public PyObject __get__(PyObject obj, PyObject type) {
         if(obj != null) {
             checkGetterType(obj.getType());
             return meth.bind(obj);

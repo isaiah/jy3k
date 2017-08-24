@@ -120,22 +120,42 @@ public class TypeExposer extends Exposer {
         mv.visitLdcInsn(numNames);
         mv.visitTypeInsn(ANEWARRAY, BUILTIN_METHOD.getInternalName());
         mv.visitVarInsn(ASTORE, 1);
+        getStatic(onType, "TYPE", PYTYPE);
+        mv.visitVarInsn(ASTORE, 2);
         int i = 0;
+
         // FIXME
         // instead of generating the instance of anonymous class, generate PyBuiltinMethod directly
         for(MethodExposer exposer : methods) {
-            for(final String name : exposer.getNames()) {
-                mv.visitVarInsn(ALOAD, 1);
-                mv.visitLdcInsn(i++);
-                instantiate(exposer.getGeneratedType(), new Instantiator(STRING) {
-
-                    public void pushArgs() {
-                        mv.visitLdcInsn(name);
-                    }
-                });
-                mv.visitInsn(AASTORE);
+            if (exposer instanceof ClassMethodExposer) {
+                for(final String name : exposer.getNames()) {
+                    mv.visitVarInsn(ALOAD, 1);
+                    mv.visitLdcInsn(i++);
+                    mv.visitTypeInsn(NEW, BUILTIN_METHOD.getInternalName());
+                    mv.visitInsn(DUP);
+                    mv.visitVarInsn(ALOAD, 2);
+                    mv.visitTypeInsn(NEW, BUILTIN_METHOD_DATA.getInternalName());
+                    mv.visitInsn(DUP);
+                    mv.visitLdcInsn(name);
+                    exposer.generateNamedConstructor(mv);
+                    callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                    callConstructor(BUILTIN_METHOD, PYOBJ, BUILTIN_METHOD_DATA);
+                    mv.visitInsn(AASTORE);
+                }
+            } else {
+                for (final String name : exposer.getNames()) {
+                    mv.visitVarInsn(ALOAD, 1);
+                    mv.visitLdcInsn(i++);
+                    mv.visitTypeInsn(NEW, BUILTIN_METHOD.getInternalName());
+                    mv.visitInsn(DUP);
+                    mv.visitLdcInsn(name);
+                    exposer.generateNamedConstructor(mv);
+                    callConstructor(BUILTIN_METHOD, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                    mv.visitInsn(AASTORE);
+                }
             }
         }
+
         mv.visitVarInsn(ALOAD, 1);
         mv.visitLdcInsn(descriptors.size());
         mv.visitTypeInsn(ANEWARRAY, DATA_DESCR.getInternalName());

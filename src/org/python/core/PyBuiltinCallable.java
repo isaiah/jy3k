@@ -12,19 +12,9 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     public PyBuiltinMethodData info;
 
-    protected PyBuiltinCallable(PyType type, PyBuiltinMethodData info) {
-        super(type);
-        this.info = info;
-    }
-
     protected PyBuiltinCallable(PyBuiltinMethodData info) {
         this.info = info;
     }
-
-    /**
-     * Returns a new instance of this type of PyBuiltinFunction bound to self
-     */
-    abstract public PyBuiltinCallable bind(PyObject self);
 
     @ExposedGet(name = "__name__")
     public PyObject fastGetName() {

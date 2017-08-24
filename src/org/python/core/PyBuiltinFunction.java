@@ -37,10 +37,6 @@ public class PyBuiltinFunction extends PyBuiltinCallable {
         return false;
     }
 
-    public PyBuiltinCallable bind(PyObject self) {
-        throw Py.TypeError("Can't bind a builtin function");
-    }
-
     public String toString() {
         return "<built-in function " + info.getName() + ">";
     }

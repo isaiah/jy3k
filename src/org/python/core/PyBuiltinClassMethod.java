@@ -9,10 +9,6 @@ public abstract class PyBuiltinClassMethod extends PyBuiltinMethod {
         super(self, info);
     }
 
-    protected PyBuiltinClassMethod(PyType type, PyObject self, PyBuiltinMethodData info) {
-        super(type, self, info);
-    }
-    
     public PyMethodDescr makeDescriptor(PyType t) {
         return new PyClassMethodDescr(t, this);
     }

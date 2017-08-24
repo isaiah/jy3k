@@ -41,22 +41,16 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     protected PyObject self;
 
-    protected PyBuiltinMethod(PyType type, PyObject self, PyBuiltinMethodData info) {
-        super(type, info);
-        this.self = self;
-    }
-
     public PyBuiltinMethod(PyObject self, PyBuiltinMethodData info) {
         super(info);
         this.self = self;
     }
 
-    protected PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
+    public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
         super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide));
     }
 
-    @Override
-    public PyBuiltinCallable bind(PyObject bindTo) {
+    public PyBuiltinMethod bind(PyObject bindTo) {
         return new PyBuiltinMethod(bindTo, info);
     }
 
@@ -236,11 +230,41 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyObject invoke(PyObject[] args, String[] keywords) {
+        if (self != null) {
+           PyObject[] newArgs = new PyObject[args.length + 1];
+           newArgs[0] = self;
+           System.arraycopy(args, 0, newArgs, 1, args.length);
+           args = newArgs;
+        }
         return info.invoke(args, keywords);
     }
 
-    public PyObject invoke(PyObject... args) {
-        return info.invoke(args);
+    public PyObject invoke(PyObject arg) {
+        if (self != null) {
+            return info.invoke(self, arg);
+        }
+        return info.invoke(arg);
+    }
+
+    public PyObject invoke(PyObject arg1, PyObject arg2) {
+        if (self != null) {
+            return info.invoke(self, arg1, arg2);
+        }
+        return info.invoke(arg1, arg2);
+    }
+
+    public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3) {
+        if (self != null) {
+            return info.invoke(self, arg1, arg2, arg3);
+        }
+        return info.invoke(arg1, arg2, arg3);
+    }
+
+    public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3, PyObject arg4) {
+        if (self != null) {
+            return info.invoke(self, arg1, arg2, arg3, arg4);
+        }
+        return info.invoke(arg1, arg2, arg3, arg4);
     }
 
 //    public PyObject __call__() {

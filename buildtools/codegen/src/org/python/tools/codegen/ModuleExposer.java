@@ -3,6 +3,8 @@ package org.python.tools.codegen;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
 import org.python.annotations.ExposedModule;
+import org.python.core.PyModule;
+import org.python.core.PyType;
 import org.python.expose.BaseModuleBuilder;
 
 import java.util.Collection;
@@ -64,16 +66,22 @@ public class ModuleExposer extends Exposer {
         mv.visitLdcInsn(name);
         callStatic(PY, "newUnicode", PYSTR, STRING);
         call(PYOBJ, "__setitem__", VOID, STRING, PYOBJ);
+        mv.visitVarInsn(ALOAD, 0);
+        call(PYMODULE, "getType", PYTYPE);
+        mv.visitVarInsn(ASTORE, 1);
         for(MethodExposer exposer : methods) {
             for(final String name : exposer.getNames()) {
                 mv.visitInsn(DUP);
                 mv.visitLdcInsn(name);
-                instantiate(exposer.getGeneratedType(), new Instantiator(STRING) {
-                    @Override
-                    public void pushArgs() {
-                        mv.visitLdcInsn(name);
-                    }
-                });
+                mv.visitTypeInsn(NEW, BUILTIN_METHOD.getInternalName());
+                mv.visitInsn(DUP);
+                mv.visitVarInsn(ALOAD, 1);
+                mv.visitTypeInsn(NEW, BUILTIN_METHOD_DATA.getInternalName());
+                mv.visitInsn(DUP);
+                mv.visitLdcInsn(name);
+                exposer.generateNamedConstructor(mv);
+                callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                callConstructor(BUILTIN_METHOD, PYOBJ, BUILTIN_METHOD_DATA);
                 call(PYOBJ, "__setitem__", VOID, STRING, PYOBJ);
             }
         }
