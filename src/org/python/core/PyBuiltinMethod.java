@@ -37,7 +37,8 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     static final MethodHandle GET_REAL_SELF = findOwnMH("getRealSelf", PyObject.class, PyObject.class);
     static final MethodHandle IS_BUILTIN_METHOD_MH = findOwnMH("isBuiltinMethodMH", boolean.class, Object.class);
-    static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class, int.class);
+    static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class,
+            PyObject[].class, String[].class, int.class, PyObject.class);
 
     protected PyObject self;
 
@@ -48,6 +49,11 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
         super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide));
+    }
+
+    @Override
+    public PyObject _doget(PyObject container) {
+        return bind(container);
     }
 
     public PyBuiltinMethod bind(PyObject bindTo) {
@@ -70,8 +76,8 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     @SuppressWarnings("unused")
-    private static boolean varargLen(PyObject obj, ThreadState ts, PyObject[] args, String[] keywords, int len) {
-        return obj instanceof PyBuiltinMethod && args.length == len;
+    private static boolean varargLen(PyObject obj, ThreadState ts, PyObject[] args, String[] keywords, int len, PyObject self) {
+        return obj == self && args.length == len;
     }
 
     @SuppressWarnings("unused")
@@ -131,13 +137,13 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
                 }
                 if (missingArg > 0) {
                     for (int i = argCount; i < paramCount; i++) {
-                        mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults);
+                        mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults[defaultLength + i - paramCount]);
                     }
                 }
                 mh = mh.asSpreader(argOffset, PyObject[].class, argCount);
 
                 mh = MethodHandles.dropArguments(mh, argOffset + 1, String[].class);
-                guard = MethodHandles.insertArguments(VARARG_LEN, 4, argCount);
+                guard = MethodHandles.insertArguments(VARARG_LEN, 4, argCount, self);
             } else {
                 throw Py.TypeError(String.format("%s() takes no keyword arguments", info.getName()));
             }
@@ -147,7 +153,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
                 }
                 for (int i = argCount; i < paramCount; i++) {
-                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults);
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults[defaultLength + i - paramCount]);
                 }
             }
             for (int i = argOffset; i < argCount + argOffset; i++) {
@@ -231,12 +237,19 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     public PyObject invoke(PyObject[] args, String[] keywords) {
         if (self != null) {
-           PyObject[] newArgs = new PyObject[args.length + 1];
-           newArgs[0] = self;
-           System.arraycopy(args, 0, newArgs, 1, args.length);
-           args = newArgs;
+            if (self instanceof PyType) {
+                return info.invoke((PyType) self, args, keywords);
+            }
+            return info.invoke(self, args, keywords);
         }
         return info.invoke(args, keywords);
+    }
+
+    public PyObject invoke() {
+        if (self != null) {
+            return info.invoke(self);
+        }
+        return info.invoke();
     }
 
     public PyObject invoke(PyObject arg) {
@@ -267,26 +280,27 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
         return info.invoke(arg1, arg2, arg3, arg4);
     }
 
-//    public PyObject __call__() {
-//        throw info.unexpectedCall(0, false);
-//    }
-//
-//    public PyObject __call__(PyObject arg0) {
-//        throw info.unexpectedCall(1, false);
-//    }
-//
-//    public PyObject __call__(PyObject arg0, PyObject arg1) {
-//        throw info.unexpectedCall(2, false);
-//    }
-//
-//    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
-//        throw info.unexpectedCall(3, false);
-//    }
-//
-//    public PyObject __call__(PyObject arg0,
-//                             PyObject arg1,
-//                             PyObject arg2,
-//                             PyObject arg3) {
-//        throw info.unexpectedCall(4, false);
-//    }
+    public PyObject __call__() {
+        return invoke();
+    }
+
+    public PyObject __call__(PyObject arg0) {
+        return invoke(arg0);
+    }
+
+    public PyObject __call__(PyObject arg0, PyObject arg1) {
+        return invoke(arg0, arg1);
+    }
+
+    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
+        return invoke(arg0, arg1, arg2);
+    }
+
+    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
+        return invoke(arg0, arg1, arg2, arg3);
+    }
+
+    public PyObject __call__(PyObject[] args, String[] keywords) {
+        return invoke(args, keywords);
+    }
 }

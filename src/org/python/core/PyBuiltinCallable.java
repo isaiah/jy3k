@@ -65,19 +65,4 @@ public abstract class PyBuiltinCallable extends PyObject {
     public String toString() {
         return String.format("<built-in method %s of %s object at %s>", fastGetName(), getSelf().getType().fastGetName(), Py.idstr(getSelf()));
     }
-
-    public interface Info extends Serializable {
-
-        String getName();
-
-        int getMaxargs();
-
-        void setMaxargs(int maxArgs);
-
-        int getMinargs();
-
-        void setMinargs(int minArgs);
-
-        PyException unexpectedCall(int nargs, boolean keywords);
-    }
 }

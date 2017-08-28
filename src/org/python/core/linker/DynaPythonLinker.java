@@ -9,6 +9,7 @@ import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
+import jdk.dynalink.linker.support.Guards;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFunction;
@@ -38,6 +39,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
         StandardOperation baseOperation = (StandardOperation) NamespaceOperation.getBaseOperation(NamedOperation.getBaseOperation(desc.getOperation()));
         StandardNamespace namespace = StandardNamespace.findFirst(desc.getOperation());
         MethodHandle mh = null;
+        MethodHandle guard = null;
         switch (baseOperation) {
             case GET:
                 if (namespace == StandardNamespace.PROPERTY) {
@@ -49,6 +51,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     mh = LOOKUP.findVirtual(self.getClass(), "__getitem__",
                             MethodType.methodType(PyObject.class, PyObject.class));
                 }
+                guard = Guards.getIdentityGuard(self);
                 break;
             case SET:
                 if (namespace == StandardNamespace.PROPERTY) {
@@ -59,6 +62,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                      mh = LOOKUP.findVirtual(self.getClass(), "__setitem__",
                             MethodType.methodType(void.class, PyObject.class, PyObject.class));
                 }
+                guard = Guards.getIdentityGuard(self);
                 break;
             case CALL:
                 if (self instanceof PyNewWrapper) {
@@ -76,7 +80,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", MethodType.methodType(PyObject.class, PyObject[].class, String[].class));
         }
 
-        return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
 
     @Override

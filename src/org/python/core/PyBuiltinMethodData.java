@@ -81,10 +81,36 @@ public class PyBuiltinMethodData {
         return true;
     }
 
+    public PyObject invoke(PyType self, PyObject[] args, String[] keywords) {
+        try {
+            if (target.type().returnType() == void.class) {
+                target.invokeExact(self, args, keywords);
+                return Py.None;
+            }
+            return (PyObject) target.invokeExact(self, args, keywords);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
+    public PyObject invoke(PyObject self, PyObject[] args, String[] keywords) {
+        try {
+            if (target.type().returnType() == void.class) {
+                target.invoke(self, args, keywords);
+                return Py.None;
+            }
+            return (PyObject) target.invokeExact(self, args, keywords);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
     public PyObject invoke(PyObject[] args, String[] keywords) {
         try {
             if (isWide) {
-                return (PyObject) target.invokeExact(args, keywords);
+                return wrap(target.invokeExact(args, keywords));
             } else {
                 if(keywords.length != 0) {
                     throw unexpectedCall(args.length, true);
@@ -104,12 +130,12 @@ public class PyBuiltinMethodData {
             int paramCount = type.parameterCount();
             if (paramCount > 1) {
                 if (paramCount == 2) {
-                    return wrap(target.invokeExact(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1]));
+                    return wrap(target.invoke(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1]));
                 } else {
-                    return wrap(target.invokeExact(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1], defaults[defaults.length - 2]));
+                    return wrap(target.invoke(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1], defaults[defaults.length - 2]));
                 }
             } else {
-                return wrap(target.invokeExact(unwrap(arg, type.parameterType(i))));
+                return wrap(target.invoke(unwrap(arg, type.parameterType(i))));
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -133,7 +159,9 @@ public class PyBuiltinMethodData {
             }
             return wrap(target.asSpreader(Object[].class, paramCount).invoke(callArgs));
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            if (throwable instanceof PyException) {
+                throw Py.JavaError(throwable);
+            }
             return null;
         }
     }

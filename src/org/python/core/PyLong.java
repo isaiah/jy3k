@@ -175,16 +175,12 @@ public class PyLong extends PyObject {
         return new BigDecimal(value).toBigInteger();
     }
 
-    public static PyObject from_bytes(PyObject bytes, String byteorder) {
-        return int_from_bytes(TYPE, bytes, byteorder, false);
-    }
-
-    public static PyObject from_bytes(PyObject bytes, String byteorder, boolean signed) {
-        return int_from_bytes(TYPE, bytes, byteorder, signed);
-    }
-
-    @ExposedClassMethod(defaults = {"false"}, doc = BuiltinDocs.int_from_bytes_doc)
-    public final static PyObject int_from_bytes(PyType type, PyObject bytes, String byteorder, boolean signed) {
+    @ExposedClassMethod(doc = BuiltinDocs.int_from_bytes_doc)
+    public final static PyObject int_from_bytes(PyType type, PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("from_bytes", args, keywords, "bytes", "byteorder", "*", "signed");
+        PyObject bytes = ap.getPyObject(0);
+        String byteorder = ap.getString(1);
+        boolean signed = ap.getBoolean(2, false);
         ByteOrder order = getByteOrder(byteorder);
 
         try (PyBuffer view = ((BufferProtocol) bytes).getBuffer(PyBUF.FULL_RO)) {

@@ -4,6 +4,7 @@ import org.objectweb.asm.Type;
 import org.python.compiler.ClassConstants;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
+import org.python.core.PyBuiltinClassMethod;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyBuiltinMethodData;
 import org.python.core.PyDataDescr;
@@ -62,6 +63,8 @@ public interface PyTypes extends ClassConstants {
     public static final Type PYNEWWRAPPER = Type.getType(PyNewWrapper.class);
 
     public static final Type BUILTIN_METHOD = Type.getType(PyBuiltinMethod.class);
+
+    public static final Type BUILTIN_CLASS_METHOD = Type.getType(PyBuiltinClassMethod.class);
 
     public static final Type ABUILTIN_METHOD = Type.getType(PyBuiltinMethod[].class);
 

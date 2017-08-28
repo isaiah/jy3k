@@ -735,7 +735,8 @@ public class Exceptions {
             returnType = PyObject.class;
         }
         MethodHandle mh = LOOKUP.findOwnStatic(methodName, returnType, PyObject.class, PyObject[].class, String[].class);
-        PyBuiltinMethodData info = new PyBuiltinMethodData(name, mh);
-        return new PyBuiltinMethod(null, info);
+        // isStatic is false because all method accept a first argument self
+        PyBuiltinMethodData info = new PyBuiltinMethodData(name, "", mh, "", false,true);
+        return new PyBuiltinExceptionMethod(null, info);
     }
 }
