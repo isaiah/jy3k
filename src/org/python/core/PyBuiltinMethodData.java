@@ -98,9 +98,10 @@ public class PyBuiltinMethodData {
                 return Py.None;
             }
             return (PyObject) target.invokeExact(self, args, keywords);
+        } catch (PyException e) {
+            throw e;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
+            throw Py.JavaError(throwable);
         }
     }
 
@@ -117,9 +118,10 @@ public class PyBuiltinMethodData {
                 return Py.None;
             }
             return (PyUnicode) target.invokeExact(self, args, keywords);
+        } catch (PyException e) {
+            throw e;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
+            throw Py.JavaError(throwable);
         }
     }
 
@@ -128,14 +130,15 @@ public class PyBuiltinMethodData {
             if (isWide) {
                 return wrap(target.invokeExact(args, keywords));
             } else {
-                if(keywords.length != 0) {
+                if (keywords.length != 0) {
                     throw unexpectedCall(args.length, true);
                 }
                 return invoke(args);
             }
+        } catch (PyException e) {
+            throw e;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
+            throw Py.JavaError(throwable);
         }
     }
 
@@ -156,9 +159,10 @@ public class PyBuiltinMethodData {
             } else {
                 return wrap(target.invoke(unwrap(arg, type.parameterType(i))));
             }
+        } catch (PyException e) {
+            throw e;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
+            throw Py.JavaError(throwable);
         }
     }
 
@@ -177,11 +181,10 @@ public class PyBuiltinMethodData {
                 callArgs[i] = unwrap(args[i], type.parameterType(i));
             }
             return wrap(target.asSpreader(Object[].class, paramCount).invoke(callArgs));
+        } catch (PyException e) {
+            throw e;
         } catch (Throwable throwable) {
-            if (throwable instanceof PyException) {
-                throw Py.JavaError(throwable);
-            }
-            return null;
+            throw Py.JavaError(throwable);
         }
     }
 

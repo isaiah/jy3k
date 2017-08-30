@@ -54,4 +54,13 @@ public class WeakrefModule {
     public static PyList getweakrefs(PyObject object) {
         return GlobalRef.getRefs(object);
     }
+
+    @ExposedFunction
+    public static PyObject _remove_dead_weakref(PyObject dict, PyObject key) {
+        int count = GlobalRef.getCount(key);
+        if (count == 0) {
+            dict.__delete__(key);
+        }
+        return Py.None;
+    }
 }
