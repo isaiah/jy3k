@@ -8,8 +8,12 @@ public class PyBuiltinMethodData {
     String name, defaultVals, doc;
     Object[] defaults;
     MethodHandle target;
+    // if this is implemented as a static method
     boolean isStatic;
+    // if the arguments are (PyObject[] args, String[] keywords)
     boolean isWide;
+    // if this is a module functin
+    boolean isFunction;
 
     private int maxargs, minargs;
 
@@ -82,6 +86,12 @@ public class PyBuiltinMethodData {
     }
 
     public PyObject invoke(PyType self, PyObject[] args, String[] keywords) {
+        if (!isWide) {
+            PyObject[] newArgs = new PyObject[args.length + 1];
+            newArgs[0] = self;
+            System.arraycopy(args, 0, newArgs, 1, args.length);
+            return invoke(newArgs);
+        }
         try {
             if (target.type().returnType() == void.class) {
                 target.invokeExact(self, args, keywords);
@@ -95,12 +105,18 @@ public class PyBuiltinMethodData {
     }
 
     public PyObject invoke(PyObject self, PyObject[] args, String[] keywords) {
+        if (!isWide) {
+            PyObject[] newArgs = new PyObject[args.length + 1];
+            newArgs[0] = self;
+            System.arraycopy(args, 0, newArgs, 1, args.length);
+            return invoke(newArgs);
+        }
         try {
             if (target.type().returnType() == void.class) {
                 target.invoke(self, args, keywords);
                 return Py.None;
             }
-            return (PyObject) target.invokeExact(self, args, keywords);
+            return (PyUnicode) target.invokeExact(self, args, keywords);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return null;
@@ -124,6 +140,9 @@ public class PyBuiltinMethodData {
     }
 
     public PyObject invoke(PyObject arg) {
+        if (isWide) {
+            return invoke(new PyObject[]{arg}, Py.NoKeywords);
+        }
         try {
             int i = 0, j = 0;
             MethodType type = target.type();
@@ -218,7 +237,10 @@ public class PyBuiltinMethodData {
 
     private static Object getDefaultValue(String def, Class<?> arg) {
         if (def.equals("null")) {
-            return Py.None;
+            if (arg == PyObject.class) {
+                return Py.None;
+            }
+            return null;
         } else if (arg == int.class) {
             return Integer.valueOf(def);
         } else if (arg == long.class) {

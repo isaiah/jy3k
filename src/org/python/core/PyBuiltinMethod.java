@@ -236,7 +236,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyObject invoke(PyObject[] args, String[] keywords) {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             if (self instanceof PyType) {
                 return info.invoke((PyType) self, args, keywords);
             }
@@ -246,35 +246,35 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyObject invoke() {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             return info.invoke(self);
         }
         return info.invoke();
     }
 
     public PyObject invoke(PyObject arg) {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             return info.invoke(self, arg);
         }
         return info.invoke(arg);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2) {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             return info.invoke(self, arg1, arg2);
         }
         return info.invoke(arg1, arg2);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3) {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             return info.invoke(self, arg1, arg2, arg3);
         }
         return info.invoke(arg1, arg2, arg3);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3, PyObject arg4) {
-        if (self != null) {
+        if (!isFunction() && self != null) {
             return info.invoke(self, arg1, arg2, arg3, arg4);
         }
         return info.invoke(arg1, arg2, arg3, arg4);
@@ -302,5 +302,9 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     public PyObject __call__(PyObject[] args, String[] keywords) {
         return invoke(args, keywords);
+    }
+
+    private boolean isFunction() {
+        return info.isStatic && !(this instanceof PyBuiltinClassMethod);
     }
 }

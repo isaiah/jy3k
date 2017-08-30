@@ -1,6 +1,23 @@
 package org.python.core;
 
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
+import org.python.internal.lookup.MethodHandleFactory;
+import org.python.internal.lookup.MethodHandleFunctionality;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 public abstract class PyNewWrapper extends PyBuiltinMethod implements Traverseproc {
+    MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
+    MethodHandle NEW_IMPL = MH.findVirtual(MethodHandles.lookup(), PyNewWrapper.class, "new_impl",
+            MethodType.methodType(PyObject.class, boolean.class, PyType.class, PyObject[].class, String[].class));
+
+    MethodHandle WIDE_CALL = MH.findVirtual(MethodHandles.lookup(), PyNewWrapper.class, "__call__",
+            MethodType.methodType(PyObject.class, PyObject[].class, String[].class));
+
 
     public PyType for_type;
 
@@ -31,6 +48,22 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
 
     public PyType getWrappedType() {
         return for_type;
+    }
+
+    public PyNewWrapper bind(PyObject bindTo) {
+        return this;
+    }
+
+    @Override
+    public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request) {
+        MethodType argType = desc.getMethodType();
+        if (BaseCode.isWideCall(argType)) {
+            return new GuardedInvocation(MethodHandles.dropArguments(WIDE_CALL, 1, ThreadState.class));
+        }
+        MethodHandle mh = MethodHandles.insertArguments(WIDE_CALL, 2, (Object) Py.NoKeywords);
+        mh = mh.asCollector(1, PyObject[].class, argType.parameterCount() - 2);
+        mh = MethodHandles.dropArguments(mh,1, ThreadState.class);
+        return new GuardedInvocation(mh);
     }
 
     public void setWrappedType(PyType type) {
@@ -65,7 +98,6 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
         System.arraycopy(args, 1, rest, 0, nargs - 1);
         return new_impl(false, subtype, rest, keywords);
     }
-
 
     /* Traverseproc implementation */
     @Override

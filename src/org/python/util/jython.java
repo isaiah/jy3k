@@ -369,7 +369,8 @@ public class jython {
             // on sys.path. This is here because if there /was/ a filename on the c.l.,
             // and say the -i option was given, sys.path[0] will have gotten filled in
             // with the dir of the argument filename.
-            Py.getSystemState().path.insert(0, Py.EmptyUnicode);
+            // NOTE: don't use Py.EmptyUnicode here, it doesn't have the str type because of bootstrap issues
+            Py.getSystemState().path.insert(0, new PyUnicode(""));
 
             if (opts.command != null) {
                 try {

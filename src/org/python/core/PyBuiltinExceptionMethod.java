@@ -12,6 +12,11 @@ public class PyBuiltinExceptionMethod extends PyBuiltinMethod {
     }
 
     @Override
+    public PyObject invoke() {
+        return invoke(Py.EmptyObjects, Py.NoKeywords);
+    }
+
+    @Override
     public PyObject invoke(PyObject[] args, String[] keywords) {
         if (self != null) {
             return info.invoke(self, args, keywords);

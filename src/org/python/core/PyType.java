@@ -2,6 +2,9 @@
 package org.python.core;
 
 import com.google.common.collect.MapMaker;
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
 import org.python.bootstrap.Import;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.annotations.ExposedClassMethod;

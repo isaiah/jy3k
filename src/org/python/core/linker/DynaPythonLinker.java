@@ -16,6 +16,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyMethod;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
+import org.python.core.PyType;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -66,12 +67,15 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 break;
             case CALL:
                 if (self instanceof PyNewWrapper) {
+                    return ((PyNewWrapper) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyBuiltinMethod) {
                     return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyFunction) {
                     return ((PyFunction) self).findCallMethod(desc, linkRequest);
                 } else if (self instanceof PyMethod) {
                     return ((PyMethod) self).findCallMethod(desc, linkRequest);
+//                } else if (self instanceof PyType) {
+//                    return ((PyType) self).findCallMethod(desc, linkRequest);
                 }
                 /** PyBuiltinFuction from builtins module */
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));

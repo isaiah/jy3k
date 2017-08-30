@@ -82,7 +82,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             throw Py.TypeError("throw() third argument must be a traceback object");
         }
 
-        if (gi_frame.f_yieldfrom != null) {
+        if (gi_frame != null && gi_frame.f_yieldfrom != null) {
             PyObject ret = null;
             Object err = null;
             if (type == Py.GeneratorExit) {
@@ -207,7 +207,9 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             pye = new PyException(type, value);
         }
         pye.traceback = (PyTraceback) tb;
-        gi_frame.previousException = pye;
+        if (gi_frame != null) {
+            gi_frame.previousException = pye;
+        }
         return gen_send_ex(Py.getThreadState(), pye);
     }
     
