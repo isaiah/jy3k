@@ -68,6 +68,7 @@ copy.py
 copyreg.py
 Cookie.py
 csv.py
+datetime.py
 decimal.py
 difflib.py
 dircache.py
