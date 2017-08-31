@@ -572,7 +572,7 @@ public class PyLong extends PyObject {
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___add___doc)
     public final PyObject int___add__(PyObject right) {
         if (!canCoerce(right)) {
-            return null;
+            return Py.NotImplemented;
         }
         return Py.newLong(getValue().add(coerce(right)));
     }
@@ -595,7 +595,7 @@ public class PyLong extends PyObject {
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___sub___doc)
     public final PyObject int___sub__(PyObject right) {
         if (!canCoerce(right)) {
-            return null;
+            return Py.NotImplemented;
         }
         return Py.newLong(getValue().subtract(coerce(right)));
     }
@@ -626,7 +626,7 @@ public class PyLong extends PyObject {
         }
 
         if (!canCoerce(right)) {
-            return null;
+            return Py.NotImplemented;
         }
         return Py.newLong(getValue().multiply(coerce(right)));
     }

@@ -449,7 +449,7 @@ public class PyFloat extends PyObject {
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___add___doc)
     final PyObject float___add__(PyObject right) {
         if (!canCoerce(right)) {
-            return null;
+            return Py.NotImplemented;
         }
         double rightv = coerce(right);
         return new PyFloat(getValue() + rightv);
@@ -807,11 +807,10 @@ public class PyFloat extends PyObject {
         if (Double.isInfinite(r) && !Double.isInfinite(x)) {
             // Rounding caused magnitude to increase beyond representable range
             throw Py.OverflowError("rounded value too large to represent");
-        } else {
-            if (!Double.isInfinite(r) && args.length > 0)
-                return new PyFloat(r);
-            return new PyLong(r);
         }
+        if (!Double.isInfinite(r) && args.length > 0)
+            return new PyFloat(r);
+        return new PyLong(r);
     }
 
     @Override

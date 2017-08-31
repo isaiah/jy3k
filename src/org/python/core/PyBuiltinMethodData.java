@@ -117,7 +117,7 @@ public class PyBuiltinMethodData {
                 target.invoke(self, args, keywords);
                 return Py.None;
             }
-            return (PyUnicode) target.invokeExact(self, args, keywords);
+            return (PyObject) target.invoke(self, args, keywords);
         } catch (PyException e) {
             throw e;
         } catch (Throwable throwable) {
@@ -144,7 +144,10 @@ public class PyBuiltinMethodData {
 
     public PyObject invoke(PyObject arg) {
         if (isWide) {
-            return invoke(new PyObject[]{arg}, Py.NoKeywords);
+            if (isStatic) {
+                return invoke(new PyObject[]{arg}, Py.NoKeywords);
+            }
+            return invoke(arg, Py.EmptyObjects, Py.NoKeywords);
         }
         try {
             int i = 0, j = 0;
