@@ -1793,16 +1793,16 @@ public class PyObject implements Serializable {
             t1 = t2;
             t2 = ttmp;
         }
-        PyObject res = null;
+        PyObject res;
         if (impl1 != null) {
             res = impl1.__get__(o1, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
+            if (res != null && res != Py.NotImplemented) {
                 return res;
             }
         }
         if (impl2 != null) {
             res = impl2.__get__(o2, t2).__call__(o1);
-            if (res != Py.NotImplemented) {
+            if (res != null && res != Py.NotImplemented) {
                 return res;
             }
         }
@@ -1870,11 +1870,11 @@ public class PyObject implements Serializable {
      **/
     final PyObject _basic_add(PyObject o2) {
         PyObject x=__add__(o2);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         x=o2.__radd__(this);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         throw Py.TypeError(_unsupportedop("+",o2));
@@ -1980,11 +1980,11 @@ public class PyObject implements Serializable {
      **/
     final PyObject _basic_sub(PyObject o2) {
         PyObject x=__sub__(o2);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         x=o2.__rsub__(this);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         throw Py.TypeError(_unsupportedop("-",o2));
@@ -2090,11 +2090,11 @@ public class PyObject implements Serializable {
      **/
     final PyObject _basic_mul(PyObject o2) {
         PyObject x=__mul__(o2);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         x=o2.__rmul__(this);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         throw Py.TypeError(_unsupportedop("*",o2));
@@ -2291,11 +2291,11 @@ public class PyObject implements Serializable {
      **/
     final PyObject _basic_div(PyObject o2) {
         PyObject x=__truediv__(o2);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         x=o2.__rtruediv__(this);
-        if (x!=null) {
+        if (x!=null && x != Py.NotImplemented) {
             return x;
         }
         throw Py.TypeError(_unsupportedop("/",o2));
@@ -3866,6 +3866,11 @@ public class PyObject implements Serializable {
         }
 
         return slotnames;
+    }
+
+    @ExposedClassMethod
+    public final static PyObject __init_class__(PyType cls) {
+        return Py.None;
     }
 
     private PyObject reduce_2() {

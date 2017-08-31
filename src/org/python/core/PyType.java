@@ -2,11 +2,6 @@
 package org.python.core;
 
 import com.google.common.collect.MapMaker;
-import jdk.dynalink.CallSiteDescriptor;
-import jdk.dynalink.linker.GuardedInvocation;
-import jdk.dynalink.linker.LinkRequest;
-import org.python.bootstrap.Import;
-import org.python.expose.ExposeAsSuperclass;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedDelete;
 import org.python.annotations.ExposedGet;
@@ -14,6 +9,8 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.bootstrap.Import;
+import org.python.expose.ExposeAsSuperclass;
 import org.python.expose.TypeBuilder;
 import org.python.modules._weakref.WeakrefModule;
 
@@ -241,6 +238,8 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             if (cur instanceof PyType)
                 ((PyType)cur).attachSubclass(type);
         }
+        setNames(type);
+        initSubclass(type, dict);
 
         return type;
     }
@@ -815,6 +814,28 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
     boolean isAbstract() {
         return (tp_flags & Py.TPFLAGS_IS_ABSTRACT) != 0;
+    }
+
+    /**
+     * Call __set_name__ on all descriptors in a newly generated type
+     */
+    private static boolean setNames(PyType type) {
+        Map<? extends PyObject, PyObject> namesToSet = new HashMap(((PyDict)type.dict).getMap());
+        for (Map.Entry<? extends PyObject, PyObject> entry: namesToSet.entrySet()) {
+            PyObject func = entry.getValue().__findattr__("__set_name__");
+            if (func != null) {
+                func.__call__(type, entry.getKey());
+            }
+        }
+        return true;
+    }
+
+    private static boolean initSubclass(PyType type, PyObject kwargs) {
+        PyObject func = type.super_lookup(type, "__init_subclass__");
+        if (func != null) {
+            func.__call__(kwargs);
+        }
+        return true;
     }
 
     private void mro_internal() {
