@@ -53,23 +53,4 @@ public class ClassMethodExposer extends MethodExposer {
         }
         return filledInArgs;
     }
-
-    @Override
-    protected void makeCall() {
-        callStatic(onType, methodName, returnType, actualArgs);
-    }
-
-    @Override
-    protected void checkSelf() {
-        mv.visitTypeInsn(CHECKCAST, PYTYPE.getInternalName());
-    }
-
-    @Override
-    protected void loadSelfAndThreadState() {
-        // ThreadState precedes self for ClassMethods, load it first if necessary
-        loadThreadState();
-        // Push self on the stack so we can call it
-        get("self", PYOBJ);
-        checkSelf();
-    }
 }

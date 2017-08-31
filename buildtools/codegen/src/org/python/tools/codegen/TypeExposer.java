@@ -87,12 +87,12 @@ public class TypeExposer extends Exposer {
         for(DescriptorExposer de : descriptors) {
             de.load(l);
         }
-        for(MethodExposer me : methods) {
-            me.load(l);
-        }
+//        for(MethodExposer me : methods) {
+//            me.load(l);
+//        }
         Class descriptor = load(l);
         try {
-            return (TypeBuilder)descriptor.newInstance();
+            return (TypeBuilder) descriptor.getDeclaredConstructor().newInstance();
         } catch(Exception e) {
             // If we're unable to create the generated class, the process is
             // definitely ill, but that shouldn't be the case most of the time
@@ -122,8 +122,6 @@ public class TypeExposer extends Exposer {
         mv.visitVarInsn(ASTORE, 1);
         int i = 0;
 
-        // FIXME
-        // instead of generating the instance of anonymous class, generate PyBuiltinMethod directly
         for(MethodExposer exposer : methods) {
             if (exposer instanceof ClassMethodExposer) {
                 for (final String name : exposer.getNames()) {

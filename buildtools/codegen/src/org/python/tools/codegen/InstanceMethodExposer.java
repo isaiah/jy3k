@@ -56,27 +56,4 @@ public class InstanceMethodExposer extends MethodExposer {
         }
         this.type = type;
     }
-
-    protected void checkSelf() {
-        mv.visitTypeInsn(CHECKCAST, onType.getInternalName());
-    }
-
-    protected void makeCall() {
-        // Actually call the exposed method
-        call(onType, methodName, returnType, args);
-        if (type == MethodType.BINARY) {
-            checkBinaryResult();
-        }
-    }
-
-    /** Throw NotImplemented if a binary method returned null. */
-    private void checkBinaryResult() {
-        // If this is a binary method,
-        mv.visitInsn(DUP);
-        Label regularReturn = new Label();
-        mv.visitJumpInsn(IFNONNULL, regularReturn);
-        getStatic(PY, "NotImplemented", PYOBJ);
-        mv.visitInsn(ARETURN);
-        mv.visitLabel(regularReturn);
-    }
 }

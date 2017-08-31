@@ -32,19 +32,4 @@ public class FunctionExposer extends MethodExposer {
             }
         }
     }
-
-    @Override
-    protected void checkSelf() {
-        // noop
-    }
-
-    @Override
-    protected void makeCall() {
-        callStatic(onType, methodName, returnType, args);
-    }
-
-    @Override
-    protected void loadSelfAndThreadState() {
-        // noop
-    }
 }

@@ -4,7 +4,7 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-public abstract class MethodExposer extends Exposer {
+public class MethodExposer extends Exposer {
 
     protected String[] defaults;
 
@@ -95,22 +95,7 @@ public abstract class MethodExposer extends Exposer {
         return asNames;
     }
 
-    protected void generate() {
-//        generateNamedConstructor();
-//        generateFullConstructor();
-//        generateBind();
-        if(isWide(args)) {
-            generateWideCall();
-        } else {
-            for(int i = 0; i < defaults.length + 1; i++) {
-                generateCall(i);
-            }
-        }
-    }
-
     public void generateNamedConstructor(MethodVisitor mv) {
-        // name
-//        mv.visitVarInsn(ALOAD, 1);
         // defaultVals
         mv.visitLdcInsn(String.join(",", defaults));
         // target
@@ -126,161 +111,6 @@ public abstract class MethodExposer extends Exposer {
         mv.visitLdcInsn(isStatic);
         // wide
         mv.visitLdcInsn(isWide(args));
-    }
-
-//    private void generateBind() {
-//        startMethod("bind", BUILTIN_FUNCTION, PYOBJ);
-//        instantiate(thisType, new Instantiator(PYTYPE, PYOBJ, BUILTIN_METHOD_DATA) {
-//
-//            public void pushArgs() {
-//                mv.visitVarInsn(ALOAD, 0);
-//                call(thisType, "getType", PYTYPE);
-//                mv.visitVarInsn(ALOAD, 1);
-//                get("info", BUILTIN_METHOD_DATA);
-//            }
-//        });
-//        endMethod(ARETURN);
-//    }
-
-    private void generateWideCall() {
-        boolean needsThreadState = needsThreadState(args);
-        int offset = needsThreadState ? 1 : 0;
-        Type[] callArgs;
-
-        if (needsThreadState) {
-            callArgs = new Type[] {THREAD_STATE, APYOBJ, ASTRING};
-        } else {
-            callArgs = new Type[] {APYOBJ, ASTRING};
-        }
-        startMethod("__call__", PYOBJ, callArgs);
-
-        loadSelfAndThreadState();
-        mv.visitVarInsn(ALOAD, offset + 1);
-        mv.visitVarInsn(ALOAD, offset + 2);
-        makeCall();
-        toPy(returnType);
-        endMethod(ARETURN);
-
-        if (needsThreadState) {
-            generateCallNoThreadState(callArgs);
-        }
-    }
-
-    private boolean hasDefault(int argIndex) {
-        return defaults.length - args.length + argIndex >= 0;
-    }
-
-    private String getDefault(int argIndex) {
-        return defaults[defaults.length - args.length + argIndex];
-    }
-
-    private void generateCall(int numDefaults) {
-        boolean needsThreadState = needsThreadState(args);
-        int requiredLength = args.length - numDefaults;
-        int offset = needsThreadState ? 1 : 0;
-        // We always have one used local for self, and possibly one for ThreadState
-        int usedLocals = 1 + offset;
-        Type[] callArgs = new Type[requiredLength];
-
-        if (needsThreadState) {
-            callArgs[0] = THREAD_STATE;
-        }
-        for(int i = offset; i < callArgs.length; i++) {
-            callArgs[i] = PYOBJ;
-        }
-        startMethod("__call__", PYOBJ, callArgs);
-
-        loadSelfAndThreadState();
-        // Push the passed in callArgs onto the stack, and convert them if necessary
-        int i;
-        for(i = offset; i < requiredLength; i++) {
-            mv.visitVarInsn(ALOAD, usedLocals++);
-            if(PRIMITIVES.containsKey(args[i])) {
-                callStatic(PY, "py2" + args[i].getClassName(), args[i], PYOBJ);
-            } else if(args[i].equals(STRING)) {
-                if(hasDefault(i) && getDefault(i).equals("null")) {
-                    call(PYOBJ, "asStringOrNull", STRING);
-                } else {
-                    call(PYOBJ, "asString", STRING);
-                }
-            }
-        }
-        // Push the defaults onto the stack
-        for(; i < args.length; i++) {
-            pushDefault(getDefault(i), args[i]);
-        }
-        makeCall();
-        toPy(returnType);
-        endMethod(ARETURN);
-
-        if (needsThreadState) {
-            generateCallNoThreadState(callArgs);
-        }
-    }
-
-    private void generateCallNoThreadState(Type[] callArgs) {
-        Type[] noThreadStateArgs = new Type[callArgs.length - 1];
-        System.arraycopy(callArgs, 1, noThreadStateArgs, 0, noThreadStateArgs.length);
-        startMethod("__call__", PYOBJ, noThreadStateArgs);
-
-        mv.visitVarInsn(ALOAD, 0);
-        callStatic(PY, "getThreadState", THREAD_STATE);
-        for (int i = 0; i < noThreadStateArgs.length; i++) {
-            mv.visitVarInsn(ALOAD, i + 1);
-        }
-
-        call(thisType, "__call__", PYOBJ, callArgs);
-        endMethod(ARETURN);
-    }
-
-    protected void loadSelfAndThreadState() {
-        // Push self on the stack so we can call it
-        get("self", PYOBJ);
-        checkSelf();
-        // Load ThreadState if necessary
-        loadThreadState();
-    }
-
-    protected void loadThreadState() {
-        if (needsThreadState(args)) {
-            mv.visitVarInsn(ALOAD, 1);
-        }
-    }
-
-    protected abstract void checkSelf();
-
-    protected abstract void makeCall();
-
-    private void pushDefault(String def, Type arg) {
-        if(def.equals("Py.None")) {
-            getStatic(PY, "None", PYOBJ);
-        } else if(def.equals("null")) {
-            mv.visitInsn(ACONST_NULL);
-        } else if(arg.equals(Type.LONG_TYPE)) {
-            // For primitive types, parse using the Java wrapper for that type and push onto the
-            // stack as a constant. If the default is malformed, a NumberFormatException will be
-            // raised.
-            mv.visitLdcInsn(Long.valueOf(def));
-        } else if(arg.equals(INT)) {
-            mv.visitLdcInsn(Integer.valueOf(def));
-        } else if(arg.equals(BYTE)) {
-            // byte, char, boolean and short go as int constants onto the stack, so convert them
-            // to ints to get the right type
-            mv.visitLdcInsn(Byte.valueOf(def).intValue());
-        } else if(arg.equals(SHORT)) {
-            mv.visitLdcInsn(Short.valueOf(def).intValue());
-        } else if(arg.equals(CHAR)) {
-            if(def.length() != 1) {
-                throwInvalid("A default for a char argument must be one character in length");
-            }
-            mv.visitLdcInsn((int)Character.valueOf(def.charAt(0)).charValue());
-        } else if(arg.equals(BOOLEAN)) {
-            mv.visitLdcInsn(Boolean.valueOf(def) ? 1 : 0);
-        } else if(arg.equals(Type.FLOAT_TYPE)) {
-            mv.visitLdcInsn(Float.valueOf(def));
-        } else if(arg.equals(Type.DOUBLE_TYPE)) {
-            mv.visitLdcInsn(Double.valueOf(def));
-        }
     }
 
     protected static boolean needsThreadState(Type[] args) {

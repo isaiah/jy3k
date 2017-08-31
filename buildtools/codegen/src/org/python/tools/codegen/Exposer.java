@@ -63,7 +63,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
      * Implemented by subclasses to fill in the actual implementation of the class. cv is set to the
      * ClassVisitor to be used when this is called.
      */
-    protected abstract void generate();
+    protected void generate() {};
 
     /**
      * Generates this Exposer and loads it into the given Loader.
