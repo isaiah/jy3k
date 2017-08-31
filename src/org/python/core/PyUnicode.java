@@ -619,11 +619,12 @@ public class PyUnicode extends PySequence implements Iterable {
         PyObject S = ap.getPyObject(0, null);
         String encoding = ap.getString(1, null);
         String errors = ap.getString(2, null);
-        if (S == null) {
-            return Py.EmptyUnicode;
-        }
 
         if (new_.for_type == subtype) {
+            if (S == null) {
+                return Py.EmptyUnicode;
+            }
+
             if (encoding == null) {
                 return S.__str__();
             }
@@ -648,10 +649,10 @@ public class PyUnicode extends PySequence implements Iterable {
             return S.__str__();
         } else {
             if (S == null) {
-                return new PyUnicodeDerived(subtype, Py.EmptyByte);
+                return new PyUnicodeDerived(subtype, Py.EmptyUnicode);
             }
             if (S instanceof PyUnicode) {
-                return new PyUnicodeDerived(subtype, (PyUnicode)S);
+                return new PyUnicodeDerived(subtype, S);
             } else {
                 return new PyUnicodeDerived(subtype, S.__str__());
             }
