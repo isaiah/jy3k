@@ -30,7 +30,7 @@ public class CompilerFacade {
         return new LegacyCompiler();
     }
 
-    public static PyCode compile(mod node, String name, String filename,
+    public static PythonCodeBundle compile(mod node, String name, String filename,
             boolean linenumbers, boolean printResults, CompilerFlags cflags) {
         if (printResults) {
             List<stmt> stmts = ((Interactive) node).getInternalBody();
@@ -39,11 +39,18 @@ public class CompilerFacade {
             }
         }
         try {
-            PythonCodeBundle bundle = compiler.compile(node, name, filename,
-                    linenumbers, cflags);
-            return bundle.loadCode();
+            return compiler.compile(node, name, filename, linenumbers, cflags);
         } catch (Throwable t) {
             throw ParserFacade.fixParseError(t, filename);
+        }
+    }
+
+    public static PyCode loadCode(mod node, String name, String filename,
+                                 boolean linenumbers, boolean printResults, CompilerFlags cflags) {
+        try {
+            return compile(node, name, filename, linenumbers, printResults, cflags).loadCode();
+        } catch (Exception e) {
+            throw ParserFacade.fixParseError(e, filename);
         }
     }
 }

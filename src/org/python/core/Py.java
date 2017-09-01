@@ -1422,7 +1422,7 @@ public final class Py {
             displayException(exc.type, exc.value, exc.traceback, file);
         }
 
-//        ts.exceptions.pop();
+        ts.exceptions.pop();
     }
 
     // PyErr_Display
@@ -1866,10 +1866,9 @@ public final class Py {
     //public static StdinWrapper stdin;
     public static void print(PyObject file, PyObject o) {
         if (file == None) {
-            print(o);
-        } else {
-            new FixedFileWrapper(file).print(o);
+            file = SysModule.getObject("stdout");
         }
+        new FixedFileWrapper(file).print(o);
     }
 
     public static void printComma(PyObject file, PyObject o) {
@@ -1882,10 +1881,9 @@ public final class Py {
 
     public static void println(PyObject file, PyObject o) {
         if (file == None) {
-            println(o);
-        } else {
-            new FixedFileWrapper(file).println(o);
+            file = SysModule.getObject("stdout");
         }
+        new FixedFileWrapper(file).println(o);
     }
 
     public static void printlnv(PyObject file) {
@@ -1897,7 +1895,7 @@ public final class Py {
     }
 
     public static void print(PyObject o) {
-        stdout.print(o);
+        print(None, o);
     }
 
     public static void printComma(PyObject o) {
@@ -1905,7 +1903,7 @@ public final class Py {
     }
 
     public static void println(PyObject o) {
-        stdout.println(o);
+        println(None, o);
     }
 
     public static void println() {
@@ -2279,7 +2277,7 @@ public final class Py {
     public static PyCode compile_flags(mod node, String name, String filename,
                                        boolean linenumbers, boolean printResults,
                                        CompilerFlags cflags) {
-        return CompilerFacade.compile(node, name, filename, linenumbers, printResults, cflags);
+        return CompilerFacade.loadCode(node, name, filename, linenumbers, printResults, cflags);
     }
 
     public static PyCode compile_flags(mod node, String filename,
@@ -2433,7 +2431,7 @@ public final class Py {
     }
 
     public static void printResult(PyObject ret) {
-        Py.getSystemState().invoke("displayhook", ret);
+        SysModule.getObject("displayhook").__call__(ret);
     }
 
     public static final int ERROR = -1;

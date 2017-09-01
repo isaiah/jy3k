@@ -73,7 +73,7 @@ public class OperandStackSaver extends InstructionAdapter {
                     }
                     mv.visitInsn(AASTORE);
                 }
-                mv.visitVarInsn(ALOAD, 1); // load frame
+                mv.visitVarInsn(ALOAD, 2); // load frame
                 mv.visitVarInsn(ALOAD, tmpIndex);
                 mv.visitFieldInsn(PUTFIELD, PYFRAME.getInternalName(), "f_savedStack", OBJARR.getDescriptor());
                 return;
@@ -81,7 +81,7 @@ public class OperandStackSaver extends InstructionAdapter {
                 if (stack == null) {
                     return;
                 }
-                mv.visitVarInsn(ALOAD, 1); // load frame
+                mv.visitVarInsn(ALOAD, 2); // load frame
                 mv.visitFieldInsn(GETFIELD, PYFRAME.getInternalName(), "f_savedStack", OBJARR.getDescriptor());
                 mv.visitVarInsn(ASTORE, tmpIndex);
                 int stackSize = stack.size();

@@ -8,6 +8,7 @@ import org.python.core.PythonCodeBundle;
 import org.python.core.PythonCompiler;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 public class LegacyCompiler implements PythonCompiler {
@@ -36,6 +37,10 @@ public class LegacyCompiler implements PythonCompiler {
         }
 
         public PyCode loadCode() throws Exception {
+            byte[] bytes = ostream().toByteArray();
+
+            FileOutputStream out = new FileOutputStream("/tmp/foo.class");
+            out.write(bytes);
             return BytecodeLoader.makeCode(name, ostream().toByteArray(),
                     filename);
         }

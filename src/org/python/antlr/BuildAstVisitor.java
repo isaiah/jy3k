@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.python.Version;
 import org.python.antlr.ast.AnnAssign;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
@@ -83,12 +84,20 @@ import org.python.compiler.AnnotationsCreator;
 import org.python.compiler.ClassClosureGenerator;
 import org.python.compiler.Lower;
 import org.python.compiler.NameMangler;
+import org.python.core.CompileMode;
+import org.python.core.CompilerFacade;
+import org.python.core.CompilerFlags;
+import org.python.core.ParserFacade;
 import org.python.core.Py;
 import org.python.core.PySyntaxError;
+import org.python.core.PythonCodeBundle;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1259,7 +1268,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         String module = "encodings";
         File src = new File("/tmp/foo.py");
 //        byte[] bytes = org.python.core.imp.compileSource(module, src);
-        byte[] bytes = org.python.bootstrap.Import.compileSource(module, new FileInputStream(src), module);
+//        byte[] bytes = org.python.bootstrap.Import.compileSource(module, new FileInputStream(src), module);
+
+        byte[] bytes = compileSource(module, new FileInputStream(src), module);
         BuildAstVisitor v = new BuildAstVisitor("<string>");
 
         ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
@@ -1272,8 +1283,29 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         new ClassClosureGenerator().visit(ast);
         new Lower().visit(ast);
         new AnnotationsCreator().visit(ast);
-        System.out.println(ast.toStringTree());
+//        System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
         out.write(bytes);
+    }
+
+    private static byte[] compileSource(String name, InputStream fp, String filename) {
+        ByteArrayOutputStream ofp = new ByteArrayOutputStream();
+        ParserFacade.ExpectedEncodingBufferedReader bufReader = null;
+        try {
+            org.python.antlr.base.mod node;
+            CompilerFlags cflags = new CompilerFlags();
+            bufReader = ParserFacade.prepBufReader(fp, cflags, filename, false);
+            node = ParserFacade.parseOnly(bufReader, CompileMode.single, filename, cflags);
+            CompilerFacade.compile(node, name + Version.PY_CACHE_TAG, filename, true, true,cflags).writeTo(ofp);
+            return ofp.toByteArray();
+        } catch (Throwable t) {
+            throw ParserFacade.fixParseError(t, filename);
+        } finally {
+            try {
+                bufReader.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
     }
 }

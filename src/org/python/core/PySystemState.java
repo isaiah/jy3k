@@ -1557,7 +1557,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
         PyObject currentBuiltins = Py.getSystemState().getBuiltins();
         currentBuiltins.__setitem__("_", Py.None);
-        Py.stdout.println(o.__repr__());
+        Py.println(o.__repr__());
         currentBuiltins.__setitem__("_", o);
         return Py.None;
     }
