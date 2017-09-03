@@ -199,13 +199,6 @@ public class BaseCode {
                 System.arraycopy(args, 0, fastlocals, 0, n);
             }
 
-            // insert the extra parameter to the vararg slot
-            if (code.varargs) {
-                PyObject[] u = new PyObject[argcount - n];
-                if (u.length > 0)
-                    System.arraycopy(args, n, u, 0, u.length);
-                fastlocals[n] = new PyTuple(u);
-            }
             for (int i = 0; i < kws.length; i++) {
                 String keyword = kws[i];
                 PyObject value = args[i + argcount];
@@ -293,6 +286,17 @@ public class BaseCode {
                     if (fastlocals[m + i] == null) {
                         fastlocals[m + i] = defs[i];
                     }
+                }
+            }
+            // insert the extra parameter to the vararg slot
+            if (code.varargs) {
+                n = argcount - code.co_argcount;
+                if (n > 0) {
+                    PyObject[] u = new PyObject[n];
+                    System.arraycopy(args, code.co_argcount, u, 0, n);
+                    fastlocals[code.co_argcount] = new PyTuple(u);
+                } else {
+                    fastlocals[code.co_argcount] = Py.EmptyTuple;
                 }
             }
         } else if ((argcount > 0) || (args.length > 0 && (paramCount == 0 && !code.varargs && !code.varkwargs))) {
