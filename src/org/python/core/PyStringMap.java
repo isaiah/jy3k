@@ -292,9 +292,12 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return stringmap_get(key, defaultObj);
     }
 
-    @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_get_doc)
+    @ExposedMethod(defaults = "null", doc = BuiltinDocs.dict_get_doc)
     public final PyObject stringmap_get(PyObject key, PyObject defaultObj) {
         PyObject obj = __finditem__(key);
+        if (defaultObj == null) {
+            defaultObj = Py.None;
+        }
         return obj == null ? defaultObj : obj;
     }
 
