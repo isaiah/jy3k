@@ -231,7 +231,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     void parse(mod node, Code code, boolean fast_locals, String className, ScopeInfo scope,
-               CompilerFlags cflags) throws Exception {
+               CompilerFlags cflags, boolean needsClassClosure) throws Exception {
         this.fast_locals = fast_locals;
         this.className = className;
         this.code = code;
@@ -251,7 +251,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (nparamcell > 0) {
             java.util.List<String> paramcells = my_scope.jy_paramcells;
             for (int i = 0; i < nparamcell; i++) {
-                code.aload(2);
+                loadFrame();
                 SymInfo syminf = tbl.get(paramcells.get(i));
                 code.iconst(syminf.locals_index);
                 code.iconst(syminf.env_index);
@@ -264,7 +264,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         optimizeGlobals = checkOptimizeGlobals(fast_locals, my_scope);
 
         Object exit = visit(node);
-        if (exit == null) {
+        if (needsClassClosure) {
+            loadFrame();
+            code.iconst(0);
+            code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
+            code.dup();
+            set(new Name(node, "__classcell__", expr_contextType.Store));
+            code.areturn();
+        } else if (exit == null) {
             setLastI(-1);
 
             getNone();
@@ -441,7 +448,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         scope.setup_closure();
 //        scope.dump();
         module.codeConstant(new Suite(node, body), name, true, className,
-                node.getLine(), scope, cflags).get(code);
+                node.getLine(), scope, cflags, false).get(code);
 
         Str docStr = getDocStr(body);
         if (docStr != null) {
@@ -1810,7 +1817,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         scope.setup_closure();
         scope.dump();
-        module.codeConstant(new Suite(node, node.getInternalBody()), name, true, className, node.getLine(), scope, cflags).get(code);
+        module.codeConstant(new Suite(node, node.getInternalBody()), name, true, className, node.getLine(), scope, cflags, false).get(code);
 
         if (!makeClosure(scope)) {
             code.aconst_null();
@@ -1907,7 +1914,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         // Make code object out of suite
 
         module.codeConstant(new Suite(node, node.getInternalBody()), name, false, name,
-                node.getLine(), scope, cflags).get(code);
+                node.getLine(), scope, cflags, node.isNeedsClassClosure()).get(code);
 
         // Make class out of name, bases, and code
         if (!makeClosure(scope)) {

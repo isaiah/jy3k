@@ -238,6 +238,16 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             if (cur instanceof PyType)
                 ((PyType)cur).attachSubclass(type);
         }
+
+        PyObject cell = dict.__finditem__("__classcell__");
+        if (cell != null) {
+            if (!(cell instanceof PyCell)) {
+                throw Py.TypeError(String.format("__classcell__ must be a nonlocal cell, not %s", cell.getType()));
+            }
+            ((PyCell) cell).ob_ref = type;
+            dict.__delitem__("__classcell__");
+        }
+
         setNames(type);
         initSubclass(type, dict);
 

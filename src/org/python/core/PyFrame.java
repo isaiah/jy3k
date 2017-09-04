@@ -413,9 +413,6 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public void setderef(int index, PyObject value) {
-        if (f_env[index] == null) {
-            f_env[index] = new PyCell();
-        }
         f_env[index].ob_ref = value;
     }
 

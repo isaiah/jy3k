@@ -180,7 +180,7 @@ public class ScopeInfo extends Object implements ScopeConstants {
                 continue;
             }
             int flags = info.flags;
-            if (func) {
+//            if (func) {
                 // not func global and bound ?
                 if ((flags&NGLOBAL) == 0 && (flags&BOUND) != 0) {
                     info.flags |= CELL;
@@ -191,9 +191,9 @@ public class ScopeInfo extends Object implements ScopeConstants {
                     if ((flags&PARAM) == 0) purecells.add(name);
                     continue;
                 }
-            } else {
-                info.flags |= FREE;
-            }
+//            } else {
+//                info.flags |= FREE;
+//            }
         }
         boolean some_free = false;
 

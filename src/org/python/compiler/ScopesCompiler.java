@@ -30,7 +30,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     public ScopesCompiler(CompilationContext code_compiler, Map<PythonTree,ScopeInfo> nodeScopes) {
         this.code_compiler = code_compiler;
         this.nodeScopes = nodeScopes;
-        scopes = new Stack<ScopeInfo>();
+        scopes = new Stack<>();
     }
 
     public void beginScope(String name, int kind, PythonTree node,
@@ -80,10 +80,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         //See PEP 227
         int dist = 1;
         ScopeInfo referenceable = up;
-        for (int i = scopes.size() - 1; i >= 0
-                && referenceable.kind == CLASSSCOPE;i--,dist++) {
-            referenceable = scopes.get(i);
-        }
+//        for (int i = scopes.size() - 1; i >= 0
+//                && referenceable.kind == CLASSSCOPE;i--,dist++) {
+//            referenceable = scopes.get(i);
+//        }
 
         cur.cook(referenceable, dist, code_compiler);
         cur.dump(); // debug
@@ -301,6 +301,9 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         }
         beginScope(node.getInternalName(), CLASSSCOPE, node, null);
         suite(node.getInternalBody());
+        if (node.isNeedsClassClosure()) {
+            cur.addBound("__class__");
+        }
         endScope();
         return null;
     }

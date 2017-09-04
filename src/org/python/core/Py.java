@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /** Builtin types that are used to setup PyObject.
  *
@@ -1650,6 +1651,7 @@ public final class Py {
         }
         PyTableCode  code = (PyTableCode) codeObj;
         PyFrame f = new PyFrame(code, globals, locals);
+        f.setupEnv(closure);
         return runCode(ts, code, f, closure);
     }
 
@@ -2175,9 +2177,7 @@ public final class Py {
             dict.__setitem__("__doc__", classDoc);
         }
 
-//        PyFrame f = new PyFrame((PyTableCode) code, dict, state.frame.f_globals);
         Py.runCode(state, code, state.frame.f_globals, dict, new PyTuple(closure_cells));
-//        code.call(state, f, new PyTuple(closure_cells));
 
         try {
             if (isWide) {

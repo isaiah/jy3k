@@ -498,7 +498,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-                                int firstlineno, ScopeInfo scope, CompilerFlags cflags) throws Exception {
+                                int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) throws Exception {
         PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, firstlineno, scope, cflags, this);
         codes.add(code);
 
@@ -507,7 +507,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         Code c = classfile.addMethod(code.fname, //
                 sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
-        compiler.parse(tree, c, fast_locals, className, scope, cflags);
+        compiler.parse(tree, c, fast_locals, className, scope, cflags, needsClassClosure);
         return code;
     }
 
@@ -712,7 +712,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
         // Add __doc__ if it exists
         Constant main = module.codeConstant(node, "<module>", false, null,
-                0, module.getScopeInfo(node), cflags);
+                0, module.getScopeInfo(node), cflags, false);
         module.mainCode = main;
         module.write(ostream);
     }

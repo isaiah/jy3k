@@ -90,11 +90,11 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.core.PyStringMap;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
             print('import org.python.core.Visitproc;', file=self.file)
-            print('import org.python.expose.ExposedGet;', file=self.file)
-            print('import org.python.expose.ExposedMethod;', file=self.file)
-            print('import org.python.expose.ExposedNew;', file=self.file)
-            print('import org.python.expose.ExposedSet;', file=self.file)
-            print('import org.python.expose.ExposedType;', file=self.file)
+            print('import org.python.annotations.ExposedGet;', file=self.file)
+            print('import org.python.annotations.ExposedMethod;', file=self.file)
+            print('import org.python.annotations.ExposedNew;', file=self.file)
+            print('import org.python.annotations.ExposedSet;', file=self.file)
+            print('import org.python.annotations.ExposedType;', file=self.file)
 
         if useDataOutput:
             print('import java.io.DataOutputStream;', file=self.file)
@@ -195,11 +195,11 @@ class JavaVisitor(EmitVisitor):
             self.emit('import org.python.core.PyObject;', depth)
             self.emit('import org.python.core.PyUnicode;', depth)
             self.emit('import org.python.core.PyType;', depth)
-            self.emit('import org.python.expose.ExposedGet;', depth)
-            self.emit('import org.python.expose.ExposedMethod;', depth)
-            self.emit('import org.python.expose.ExposedNew;', depth)
-            self.emit('import org.python.expose.ExposedSet;', depth)
-            self.emit('import org.python.expose.ExposedType;', depth)
+            self.emit('import org.python.annotations.ExposedGet;', depth)
+            self.emit('import org.python.annotations.ExposedMethod;', depth)
+            self.emit('import org.python.annotations.ExposedNew;', depth)
+            self.emit('import org.python.annotations.ExposedSet;', depth)
+            self.emit('import org.python.annotations.ExposedType;', depth)
             self.emit('', 0)
 
             self.emit('@ExposedType(name = "_ast.%s", base = %s.class)' % (type.name, name), depth)
@@ -684,11 +684,11 @@ class JavaVisitor(EmitVisitor):
             tmpl = f"""
     private boolean {f};
 
-    public boolean is{f.capitalize()}() {{
+    public boolean is{f}() {{
         return {f};
     }}
 
-    public void set{f.capitalize()}(boolean {f}) {{
+    public void set{f}(boolean {f}) {{
         this.{f} = {f};
     }}
 """
@@ -758,7 +758,13 @@ def main(outdir, grammar="Python.asdl"):
     c.visit(mod)
 
 # Extra fields to add to the AST nodes
-extra_fields = { "FunctionDef": ["split"], "Expr": ["print"], 'Name': ['expr'], 'BinOp': ['inplace'] }
+extra_fields = {
+        "ClassDef": ["NeedsClassClosure"],
+        "FunctionDef": ["Split"],
+        "Expr": ["Print"],
+        'Name': ['Expr'],
+        'BinOp': ['Inplace']
+        }
 
 if __name__ == "__main__":
     import getopt

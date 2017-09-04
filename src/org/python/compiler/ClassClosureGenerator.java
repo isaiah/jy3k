@@ -46,34 +46,7 @@ public class ClassClosureGenerator extends Visitor {
         inClass.pop();
         boolean thisNeedClosure = needsClosure.pop();
         if (thisNeedClosure) {
-            List<expr> bases = node.getInternalBases();
-            List<keyword> keywords = node.getInternalKeywords();
-            java.util.List<stmt> bod = new ArrayList<>();
-            String name = node.getInternalName();
-            String vararg = "__args__";
-            String kwarg = "__kw__";
-            // replace inner class parameters
-            Starred starred = new Starred(node.getToken(), new Name(node.getToken(), vararg, expr_contextType.Load), expr_contextType.Load);
-            node.setBases(new PyList(new PyObject[]{starred}));
-            keyword kw = new keyword(node.getToken(), null, new Name(node.getToken(), kwarg, expr_contextType.Load));
-            node.setKeywords(new PyList(new PyObject[]{kw}));
-            bod.add(node.copy());
-
-            Name innerName = new Name(node, name, expr_contextType.Load);
-            String funcName = "__$" + name;
-            Name outerName = new Name(node, funcName, expr_contextType.Load);
-            Assign assign = new Assign(node, Arrays.asList(new Name(node, "__class__", expr_contextType.Store)),
-                    innerName);
-            bod.add(assign);
-            Return _ret = new Return(node.getToken(), innerName);
-            bod.add(_ret);
-            arguments args = new arguments(node, new ArrayList<>(),
-                    new arg(node, vararg, null), new ArrayList<>(), new ArrayList<>(),
-                    new arg(node, kwarg, null), new ArrayList<>());
-            FunctionDef funcdef = new FunctionDef(node.getToken(), funcName, args, bod, new ArrayList<>(), null);
-            assign = new Assign(node, Arrays.asList(new Name(node, name, expr_contextType.Store)),
-                    new Call(node, outerName, bases, keywords));
-            node.replaceSelf(new Block(node.getToken(), Arrays.asList(funcdef, assign)));
+            node.setNeedsClassClosure(thisNeedClosure);
         }
         return null;
     }
