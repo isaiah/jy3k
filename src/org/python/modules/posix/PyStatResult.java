@@ -136,7 +136,7 @@ public class PyStatResult extends PyTuple {
                 Py.newInteger(size),
                 Py.newFloat(fromFileTime((FileTime)stat.get("lastAccessTime"))),
                 Py.newFloat(fromFileTime((FileTime)stat.get("lastModifiedTime"))),
-                Py.newFloat(fromFileTime((FileTime) stat.get("ctime"))));
+                Py.newFloat(fromFileTime((FileTime) stat.get("creationTime"))));
     }
 
     public static PyStatResult fromDosFileAttributes(int mode, DosFileAttributes stat) {

@@ -37,10 +37,6 @@ public class LegacyCompiler implements PythonCompiler {
         }
 
         public PyCode loadCode() throws Exception {
-            byte[] bytes = ostream().toByteArray();
-
-            FileOutputStream out = new FileOutputStream("/tmp/foo.class");
-            out.write(bytes);
             return BytecodeLoader.makeCode(name, ostream().toByteArray(),
                     filename);
         }

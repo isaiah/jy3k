@@ -1324,7 +1324,7 @@ public class PosixModule {
         }
         Path absolutePath = absolutePath(path);
         try {
-            Map<String, Object> attributes = Files.readAttributes(absolutePath, "unix:*");
+            Map<String, Object> attributes = Files.readAttributes(absolutePath, "*");
             checkTrailingSlash(path, attributes);
             return PyStatResult.fromUnixFileAttributes(attributes);
         } catch (NoSuchFileException ex) {

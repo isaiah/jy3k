@@ -38,3 +38,4 @@ dist
 target
 profile.txt
 tags
+*.jar
