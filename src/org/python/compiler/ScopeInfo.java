@@ -59,7 +59,6 @@ public class ScopeInfo extends Object implements ScopeConstants {
     public boolean unqual_exec;
     public boolean exec;
     public boolean from_import_star;
-    public boolean contains_ns_free_vars;
     public boolean generator;
     public boolean async;
     public boolean async_gen;
@@ -182,15 +181,16 @@ public class ScopeInfo extends Object implements ScopeConstants {
             int flags = info.flags;
 //            if (func) {
                 // not func global and bound ?
-                if ((flags&NGLOBAL) == 0 && (flags&BOUND) != 0) {
-                    info.flags |= CELL;
-                    if ((info.flags&PARAM) != 0)
-                        jy_paramcells.add(name);
-                    cellvars.add(name);
-                    info.env_index = cell++;
-                    if ((flags&PARAM) == 0) purecells.add(name);
-                    continue;
-                }
+            if ((flags&NGLOBAL) == 0 && (flags&BOUND) != 0) {
+                info.flags |= CELL;
+                if ((flags&PARAM) != 0)
+                    jy_paramcells.add(name);
+                cellvars.add(name);
+                info.env_index = cell++;
+                if ((flags&PARAM) == 0) purecells.add(name);
+                continue;
+            }
+            info.flags |= FREE;
 //            } else {
 //                info.flags |= FREE;
 //            }
@@ -216,15 +216,9 @@ public class ScopeInfo extends Object implements ScopeConstants {
             }
         }
         if ((jy_npurecell = purecells.size()) > 0) {
-            int sz = purecells.size();
-            for (int i = 0; i < sz; i++) {
-                varNames.add(purecells.get(i));
-            }
+            varNames.addAll(purecells);
         }
 
-        if (some_free && nested) {
-            up.contains_ns_free_vars = true;
-        }
         // XXX - this doesn't catch all cases - may depend subtly
         // on how visiting NOW works with antlr compared to javacc
         if ((unqual_exec || from_import_star)) {

@@ -2177,17 +2177,18 @@ public final class Py {
             dict.__setitem__("__doc__", classDoc);
         }
 
-        Py.runCode(state, code, state.frame.f_globals, dict, new PyTuple(closure_cells));
-
+        PyObject cell = Py.runCode(state, code, state.frame.f_globals, dict, new PyTuple(closure_cells));
+        PyObject cls;
         try {
             if (isWide) {
                 PyObject[] newArgs = new PyObject[args.length + 1];
                 System.arraycopy(args, 0, newArgs, 0, 2);
                 newArgs[2] = dict;
                 System.arraycopy(args, 2, newArgs, 3, args.length - 2);
-                return metaclass.__call__(newArgs, keywords);
+                cls = metaclass.__call__(newArgs, keywords);
+            } else {
+                cls = metaclass.__call__(clsname, basesArray, dict);
             }
-            return metaclass.__call__(clsname, basesArray, dict);
         } catch (PyException pye) {
             if (!pye.match(TypeError)) {
                 throw pye;
@@ -2196,6 +2197,19 @@ public final class Py {
                     + "%s", pye.value.__repr__().toString()));
             throw pye;
         }
+        if (cls instanceof PyType && cell instanceof PyCell) {
+            PyObject cell_cls = ((PyCell) cell).ob_ref;
+            if (cell_cls != cls) {
+                if (cell_cls == null) {
+                    String msg = "__class__ not set defining %.200s as %.200s. Was __classcell__ propagated to type.__new__?";
+                    Py.warning(Py.DeprecationWarning, String.format(msg, name, cls));
+                    ((PyCell) cell).ob_ref = cls;
+                } else {
+                    throw Py.TypeError(String.format("__class__ set to %.200s defining %.200s as %.200s", cell_cls, name, cls));
+                }
+            }
+        }
+        return cls;
     }
 
     /**
