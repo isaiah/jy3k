@@ -52,6 +52,10 @@ public class ScopeInfo extends Object implements ScopeConstants {
         this.kind = kind;
         this.func_level = func_level;
         this.ac = ac;
+        // FIXME a free variable could be overriden by a method defined by the same name
+        // we have to differeciate the types
+        tbl = new LinkedHashMap<>();
+        varNames = new ArrayList<>();
     }
 
     public int kind;
@@ -69,8 +73,8 @@ public class ScopeInfo extends Object implements ScopeConstants {
 
     public ArgListCompiler ac;
 
-    public Map<String, SymInfo> tbl = new LinkedHashMap<String, SymInfo>();
-    public List<String> varNames = new ArrayList<>();
+    public Map<String, SymInfo> tbl;
+    public List<String> varNames;
 
     public int addNonlocal(String name) {
         SymInfo info = tbl.get(name);
@@ -156,17 +160,15 @@ public class ScopeInfo extends Object implements ScopeConstants {
 
     public int jy_npurecell;
 
-    public int cell, distance;
+    public int cell;
 
     public ScopeInfo up;
 
     //Resolve the names used in the given scope, and mark any freevars used in the up scope
-    public void cook(ScopeInfo up, int distance, CompilationContext ctxt) throws Exception {
+    public void cook(ScopeInfo up, CompilationContext ctxt) throws Exception {
         if(up == null)
             return; // top level => nop
         this.up = up;
-        this.distance = distance;
-        boolean func = kind == FUNCSCOPE;
         List<String> purecells = new ArrayList<>();
         cell = 0;
         boolean some_inner_free = inner_free.size() > 0;
