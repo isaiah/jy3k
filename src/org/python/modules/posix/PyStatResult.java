@@ -142,7 +142,8 @@ public class PyStatResult extends PyTuple {
                 Py.newFloat(fromFileTime((FileTime) stat.get("creationTime"))));
     }
 
-    static final Map<PosixFilePermission, Integer> nameBits = Map.of(PosixFilePermission.OTHERS_EXECUTE, 00001,
+    private static final Map<PosixFilePermission, Integer> nameBits = Map.of(
+            PosixFilePermission.OTHERS_EXECUTE, 00001,
             PosixFilePermission.OTHERS_WRITE, 00002,
             PosixFilePermission.OTHERS_READ, 00004,
             PosixFilePermission.GROUP_EXECUTE, 00010,
@@ -151,6 +152,9 @@ public class PyStatResult extends PyTuple {
             PosixFilePermission.OWNER_EXECUTE, 00100,
             PosixFilePermission.OWNER_WRITE, 00200,
             PosixFilePermission.OWNER_READ, 00400);
+    private static final int READABLE   = 00400 | 00040 | 00004;
+    private static final int WRITABLE   = 00200 | 00020 | 00002;
+    private static final int EXECUTABLE = 00100 | 00010 | 00001;
 
     private static int permissionsToMode(Set<PosixFilePermission> permissions) {
         int mode = 0;
@@ -158,6 +162,35 @@ public class PyStatResult extends PyTuple {
             mode |= nameBits.get(permission);
         }
         return mode;
+    }
+
+    private static int dosMode(DosFileAttributes stat) {
+        int mode = READABLE;
+        if (!stat.isReadOnly()) {
+            mode |= WRITABLE;
+        }
+        if (stat.isDirectory()) {
+            mode |= 040000;
+            mode |= EXECUTABLE;
+        } else if (stat.isRegularFile()) {
+            mode |= 010000;
+        }
+        return mode;
+    }
+
+    public static PyStatResult fromDosFileAttributes(DosFileAttributes stat) {
+        int mode = dosMode(stat);
+        return new PyStatResult(
+                Py.newInteger(mode),
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
+                Py.newInteger(stat.size()),
+                Py.newFloat(fromFileTime(stat.lastAccessTime())),
+                Py.newFloat(fromFileTime(stat.lastModifiedTime())),
+                Py.newFloat(fromFileTime(stat.creationTime())));
     }
 
     public static PyStatResult fromPosixFileAttributes(PosixFileAttributes stat) {
