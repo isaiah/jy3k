@@ -64,6 +64,7 @@ import java.nio.file.NotLinkException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1324,7 +1325,11 @@ public class PosixModule {
         }
         Path absolutePath = absolutePath(path);
         try {
-            Map<String, Object> attributes = Files.readAttributes(absolutePath, "*");
+            if (os == OS.NT) {
+                PosixFileAttributes attributes = Files.readAttributes(absolutePath, PosixFileAttributes.class);
+                return PyStatResult.fromPosixFileAttributes(attributes);
+            }
+            Map<String, Object> attributes = Files.readAttributes(absolutePath, "unix:*");
             checkTrailingSlash(path, attributes);
             return PyStatResult.fromUnixFileAttributes(attributes);
         } catch (NoSuchFileException ex) {

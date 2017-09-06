@@ -22,7 +22,10 @@ import org.python.expose.MethodType;
 
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @ExposedType(name = "stat_result", isBaseType = false)
@@ -139,14 +142,38 @@ public class PyStatResult extends PyTuple {
                 Py.newFloat(fromFileTime((FileTime) stat.get("creationTime"))));
     }
 
-    public static PyStatResult fromDosFileAttributes(int mode, DosFileAttributes stat) {
+    static final Map<PosixFilePermission, Integer> nameBits = Map.of(PosixFilePermission.OTHERS_EXECUTE, 00001,
+            PosixFilePermission.OTHERS_WRITE, 00002,
+            PosixFilePermission.OTHERS_READ, 00004,
+            PosixFilePermission.GROUP_EXECUTE, 00010,
+            PosixFilePermission.GROUP_WRITE, 00020,
+            PosixFilePermission.GROUP_READ, 00040,
+            PosixFilePermission.OWNER_EXECUTE, 00100,
+            PosixFilePermission.OWNER_WRITE, 00200,
+            PosixFilePermission.OWNER_READ, 00400);
+
+    private static int permissionsToMode(Set<PosixFilePermission> permissions) {
+        int mode = 0;
+        for (PosixFilePermission permission : permissions) {
+            mode |= nameBits.get(permission);
+        }
+        return mode;
+    }
+
+    public static PyStatResult fromPosixFileAttributes(PosixFileAttributes stat) {
+        int mode = permissionsToMode(stat.permissions());
+        if (stat.isDirectory()) {
+            mode |= 040000;
+        } else if (stat.isRegularFile()) {
+            mode |= 010000;
+        }
         return new PyStatResult(
                 Py.newInteger(mode),
-                Py.newInteger(0),
-                Py.newLong(0),
-                Py.newInteger(0),
-                Py.newInteger(0),
-                Py.newInteger(0),
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
+                Py.Zero,
                 Py.newInteger(stat.size()),
                 Py.newFloat(fromFileTime(stat.lastAccessTime())),
                 Py.newFloat(fromFileTime(stat.lastModifiedTime())),
