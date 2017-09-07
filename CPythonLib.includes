@@ -124,6 +124,7 @@ mutex.py
 netrc.py
 nntplib.py
 numbers.py
+ntpath.py
 nturl2path.py
 opcode.py
 operator.py
@@ -165,6 +166,7 @@ shelve.py
 shlex.py
 shutil.py
 SimpleXMLRPCServer.py
+site.py
 site-packages/README
 smtpd.py
 smtplib.py
