@@ -173,7 +173,7 @@ public class PyStatResult extends PyTuple {
             mode |= 040000;
             mode |= EXECUTABLE;
         } else if (stat.isRegularFile()) {
-            mode |= 010000;
+            mode |= 0100000;
         }
         return mode;
     }

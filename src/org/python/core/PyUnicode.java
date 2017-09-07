@@ -1507,27 +1507,21 @@ public class PyUnicode extends PySequence implements Iterable {
         }
     }
 
-    @ExposedMethod(defaults = {"null", "-1"}, doc = BuiltinDocs.str_split_doc)
-    public final PyList str_split(PyObject sepObj, int maxsplit) {
-        PyUnicode sep = coerceToUnicodeOrNull(sepObj);
-        Collection<CharSequence> list;
-        if (sep != null) {
-            list = Encoding._split(getString(), sep.getString(), maxsplit);
-        } else {
-            list = Encoding._split(getString(), null, maxsplit);
-        }
+    @ExposedMethod(doc = BuiltinDocs.str_split_doc)
+    public final PyList str_split(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("split", args, keywords, "sep", "maxsplit");
+        String sep = ap.getString(0, null);
+        int maxsplit = ap.getInt(1, -1);
+        Collection<CharSequence> list = Encoding._split(getString(), sep, maxsplit);
         return new PyList(list.stream().map(PyUnicode::new).collect(Collectors.toList()));
     }
 
-    @ExposedMethod(defaults = {"null", "-1"}, doc = BuiltinDocs.str_rsplit_doc)
-    public final PyList str_rsplit(PyObject sepObj, int maxsplit) {
-        PyUnicode sep = coerceToUnicodeOrNull(sepObj);
-        Collection<CharSequence> list;
-        if (sep != null) {
-            list = Encoding._rsplit(getString(), sep.getString(), maxsplit);
-        } else {
-            list = Encoding._rsplit(getString(), null, maxsplit);
-        }
+    @ExposedMethod(doc = BuiltinDocs.str_rsplit_doc)
+    public final PyList str_rsplit(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("rsplit", args, keywords, "sep", "maxsplit");
+        String sep = ap.getString(0, null);
+        int maxsplit = ap.getInt(1, -1);
+        Collection<CharSequence> list = Encoding._rsplit(getString(), sep, maxsplit);
         return new PyList(list.stream().map(PyUnicode::new).collect(Collectors.toList()));
     }
 
