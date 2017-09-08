@@ -1,5 +1,6 @@
 package org.python.core;
 
+import jnr.posix.util.Platform;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
@@ -11,7 +12,12 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "JavaImporter")
 public class JavaImporter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(JavaImporter.class);
-    public static final String JAVA_IMPORT_PATH_ENTRY = "__classpath__";
+
+    /**
+     * Make sure the path an absolute path, because site.py will try to convert them, which will break the link between
+     * the path and the {@link JavaImporter}
+     */
+    public static final String JAVA_IMPORT_PATH_ENTRY = (Platform.IS_WINDOWS ? "C:\\" : "/") + "__classpath__";
 
     public JavaImporter(PyType objtype) {
         super(objtype);

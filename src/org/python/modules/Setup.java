@@ -4,6 +4,8 @@ package org.python.modules;
 // This is sort of analogous to CPython's Modules/Setup file.  Use this to
 // specify additional builtin modules.
 
+import jnr.posix.util.Platform;
+
 public class Setup {
     // Each element of this array is a string naming a builtin module to
     // add to the system.  The string has the following allowable forms:
@@ -69,7 +71,7 @@ public class Setup {
             "jffi:org.python.modules.jffi.jffi",
             "marshal",
             "math",
-            "nt:org.python.modules.posix.PosixModule",
+            (Platform.IS_WINDOWS ? "nt" : "posix") + ":org.python.modules.posix.PosixModule",
             "parser:org.python.modules.parser.ParserModule",
             "_struct:org.python.modules._struct._struct",
             "subprocess:org.python.modules.subprocess.SubprocessModule",
