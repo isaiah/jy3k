@@ -157,11 +157,11 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitTuple(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (elts != null) {
             for (PythonTree t : elts) {
                 if (t != null)

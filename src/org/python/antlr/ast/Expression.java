@@ -111,11 +111,11 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitExpression(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (body != null)
             body.accept(visitor);
     }

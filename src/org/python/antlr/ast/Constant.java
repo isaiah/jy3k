@@ -118,11 +118,11 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitConstant(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
     }
 
     public void replaceField(expr value, expr newValue) {

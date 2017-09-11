@@ -280,11 +280,11 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitClassDef(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (bases != null) {
             for (PythonTree t : bases) {
                 if (t != null)

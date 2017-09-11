@@ -189,11 +189,11 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitDictComp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (key != null)
             key.accept(visitor);
         if (value != null)

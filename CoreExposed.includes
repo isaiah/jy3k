@@ -1,3 +1,4 @@
+org/python/compiler/PySTEntryObject.class
 org/python/core/AstList.class
 org/python/core/ClasspathPyImporter.class
 org/python/core/JavaImporter.class
@@ -153,7 +154,6 @@ org/python/modules/jffi/StringCData.class
 org/python/modules/jffi/StructLayout.class
 org/python/modules/jffi/StructLayout$Field.class
 org/python/modules/jffi/StructLayout$ScalarField.class
-org/python/modules/thread/PyLock.class
 org/python/modules/_weakref/CallableProxyType.class
 org/python/modules/_weakref/ProxyType.class
 org/python/modules/_weakref/ReferenceType.class
@@ -174,6 +174,7 @@ org/python/modules/sys/FloatInfo.class
 org/python/modules/sys/Flags.class
 org/python/modules/sys/IntInfo.class
 org/python/modules/thread/PyLocal.class
+org/python/modules/thread/PyLock.class
 org/python/modules/time/PyTimeTuple.class
 org/python/modules/unicodedata/UCD.class
 org/python/modules/zipimport/zipimporter.class

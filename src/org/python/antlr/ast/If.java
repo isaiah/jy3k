@@ -196,11 +196,11 @@ public static final PyType TYPE = PyType.fromClass(If.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitIf(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (test != null)
             test.accept(visitor);
         if (body != null) {

@@ -138,12 +138,12 @@ public class withitem extends PythonTree {
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         traverse(visitor);
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (context_expr != null)
             context_expr.accept(visitor);
         if (optional_vars != null)

@@ -226,11 +226,11 @@ public static final PyType TYPE = PyType.fromClass(For.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitFor(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (target != null)
             target.accept(visitor);
         if (iter != null)

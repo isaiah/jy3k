@@ -453,7 +453,7 @@ class JavaVisitor(EmitVisitor):
         self.emit("", 0)
 
         # The accept() method
-        self.emit("public <R> R accept(VisitorIF<R> visitor) throws Exception {", depth)
+        self.emit("public <R> R accept(VisitorIF<R> visitor) {", depth)
         if is_product:
             self.emit('traverse(visitor);', depth+1)
             self.emit('return null;', depth+1)
@@ -463,7 +463,7 @@ class JavaVisitor(EmitVisitor):
         self.emit("", 0)
 
         # The visitChildren() method
-        self.emit("public void traverse(VisitorIF<?> visitor) throws Exception {", depth)
+        self.emit("public void traverse(VisitorIF<?> visitor) {", depth)
         for f in fields:
             if str(f.type) in self.bltinnames:
                 continue
@@ -705,7 +705,7 @@ class VisitorVisitor(EmitVisitor):
         self.open("ast", "VisitorIF", refersToPythonTree=0)
         self.emit('public interface VisitorIF<R> {', 0)
         for ctor in self.ctors:
-            self.emit("public R visit%s(%s node) throws Exception;" % 
+            self.emit("public R visit%s(%s node);" % 
                     (ctor, ctor), 1)
         self.emit('}', 0)
         self.close()
@@ -713,7 +713,7 @@ class VisitorVisitor(EmitVisitor):
         self.open("ast", "VisitorBase")
         self.emit('public abstract class VisitorBase<R> implements VisitorIF<R> {', 0)
         for ctor in self.ctors:
-            self.emit("public R visit%s(%s node) throws Exception {" % 
+            self.emit("public R visit%s(%s node) {" % 
                     (ctor, ctor), 1)
             self.emit("R ret = unhandled_node(node);", 2)
             self.emit("traverse(node);", 2)
@@ -721,8 +721,8 @@ class VisitorVisitor(EmitVisitor):
             self.emit('}', 1)
             self.emit('', 0)
 
-        self.emit("abstract protected R unhandled_node(PythonTree node) throws Exception;", 1)
-        self.emit("abstract public void traverse(PythonTree node) throws Exception;", 1)
+        self.emit("abstract protected R unhandled_node(PythonTree node);", 1)
+        self.emit("abstract public void traverse(PythonTree node);", 1)
         self.emit('}', 0)
         self.close()
 

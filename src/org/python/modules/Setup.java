@@ -75,6 +75,7 @@ public class Setup {
             "parser:org.python.modules.parser.ParserModule",
             "_struct:org.python.modules._struct._struct",
             "subprocess:org.python.modules.subprocess.SubprocessModule",
+            "_symtable:org.python.modules._symtable.SymtableModule",
             "synchronize",
             "sys:org.python.modules.sys.SysModule",
             "time:org.python.modules.time.TimeModule",

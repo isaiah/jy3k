@@ -181,11 +181,11 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitImportFrom(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (names != null) {
             for (PythonTree t : names) {
                 if (t != null)

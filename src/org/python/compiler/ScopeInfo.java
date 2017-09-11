@@ -165,7 +165,7 @@ public class ScopeInfo extends Object implements ScopeConstants {
     public ScopeInfo up;
 
     //Resolve the names used in the given scope, and mark any freevars used in the up scope
-    public void cook(ScopeInfo up, CompilationContext ctxt) throws Exception {
+    public void cook(ScopeInfo up, CompilationContext ctxt) {
         if(up == null)
             return; // top level => nop
         this.up = up;
@@ -231,7 +231,7 @@ public class ScopeInfo extends Object implements ScopeConstants {
 
     }
 
-    private void dynastuff_trouble(boolean inner_free, CompilationContext ctxt) throws Exception {
+    private void dynastuff_trouble(boolean inner_free, CompilationContext ctxt) {
         StringBuilder illegal = new StringBuilder();
         if (unqual_exec && from_import_star) {
             illegal.append("function '")
@@ -274,7 +274,6 @@ public class ScopeInfo extends Object implements ScopeConstants {
             int flags = info.flags;
             if ((flags&FREE) != 0) {
                 SymInfo up_info = up_tbl.get(name);
-                // ?? differs from CPython -- what is the intended behaviour?
                 if (up_info != null) {
                     int up_flags = up_info.flags;
                     if ((up_flags&(CELL|FREE)) != 0) {
@@ -282,8 +281,8 @@ public class ScopeInfo extends Object implements ScopeConstants {
                         freevars.add(name);
                         continue;
                     }
-                    // ! func global affect nested scopes
-                    if (nested && (up_flags&NGLOBAL) != 0) {
+                    // if refer to top scope, then it's global
+                    if (!nested || (up_flags&NGLOBAL) != 0) {
                         info.flags = NGLOBAL|BOUND;
                         continue;
                     }

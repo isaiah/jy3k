@@ -172,11 +172,11 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAugAssign(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (target != null)
             target.accept(visitor);
         if (value != null)

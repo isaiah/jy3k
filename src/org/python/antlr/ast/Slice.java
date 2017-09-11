@@ -165,11 +165,11 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSlice(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (lower != null)
             lower.accept(visitor);
         if (upper != null)

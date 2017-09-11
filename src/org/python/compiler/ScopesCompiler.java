@@ -67,7 +67,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         nodeScopes.put(node, cur);
     }
 
-    public void endScope() throws Exception {
+    public void endScope() {
         if (cur.kind == FUNCSCOPE) {
             func_level--;
         }
@@ -81,12 +81,12 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         cur = up;
     }
 
-    public void parse(PythonTree node) throws Exception {
+    public void parse(PythonTree node) {
         visit(node);
     }
 
     @Override
-    public Object visitInteractive(Interactive node) throws Exception {
+    public Object visitInteractive(Interactive node) {
         beginScope("<single-top>", TOPSCOPE, node, null);
         suite(node.getInternalBody());
         endScope();
@@ -95,7 +95,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
 
     @Override
     public Object visitModule(org.python.antlr.ast.Module node)
-            throws Exception {
+            {
         beginScope("<file-top>", TOPSCOPE, node, null);
         suite(node.getInternalBody());
         endScope();
@@ -103,7 +103,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitExpression(Expression node) throws Exception {
+    public Object visitExpression(Expression node) {
         beginScope("<eval-top>", TOPSCOPE, node, null);
         visit(new Return(node,node.getInternalBody()));
         endScope();
@@ -115,7 +115,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitAsyncFunctionDef(AsyncFunctionDef node) throws Exception {
+    public Object visitAsyncFunctionDef(AsyncFunctionDef node) {
         String name = node.getInternalName();
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
@@ -125,7 +125,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitFunctionDef(FunctionDef node) throws Exception {
+    public Object visitFunctionDef(FunctionDef node) {
         String name = node.getInternalName();
         arguments args = node.getInternalArgs();
         List<expr> decs = node.getInternalDecorator_list();
@@ -134,7 +134,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         return compileFunction(name, args, decs, body, node, return_);
     }
 
-    private Object compileFunction(String name, arguments args, List<expr> decs, List<stmt> body, stmt node, expr return_) throws Exception {
+    private Object compileFunction(String name, arguments args, List<expr> decs, List<stmt> body, stmt node, expr return_) {
         def(name);
         ArgListCompiler ac = new ArgListCompiler();
         ac.visitArgs(args);
@@ -174,7 +174,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitAnonymousFunction(AnonymousFunction node) throws Exception {
+    public Object visitAnonymousFunction(AnonymousFunction node) {
         ArgListCompiler ac = new ArgListCompiler();
         ac.visitArgs(node.getInternalArgs());
 
@@ -198,14 +198,14 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
         return null;
     }
 
-    public Object visitBlock(Block node) throws Exception {
+    public Object visitBlock(Block node) {
         for (stmt s: node.getInternalBody()) {
             visit(s);
         }
         return null;
     }
 
-    public void suite(List<stmt> stmts) throws Exception {
+    public void suite(List<stmt> stmts) {
         if (stmts == null) return;
         for (int i = 0; i < stmts.size(); i++) {
             if (stmts.get(i) != null) {
@@ -215,7 +215,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitImport(Import node) throws Exception {
+    public Object visitImport(Import node) {
         for (int i = 0; i < node.getInternalNames().size(); i++) {
             if (node.getInternalNames().get(i).getInternalAsname() != null) {
                 cur.addBound(node.getInternalNames().get(i).getInternalAsname());
@@ -231,7 +231,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitImportFrom(ImportFrom node) throws Exception {
+    public Object visitImportFrom(ImportFrom node) {
         Future.checkFromFuture(node); // future stmt support
         int n = node.getInternalNames().size();
         if (n == 0) {
@@ -249,7 +249,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitGlobal(Global node) throws Exception {
+    public Object visitGlobal(Global node) {
         int n = node.getInternalNames().size();
         for (int i = 0; i < n; i++) {
             String name = node.getInternalNames().get(i);
@@ -280,7 +280,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitClassDef(ClassDef node) throws Exception {
+    public Object visitClassDef(ClassDef node) {
         List<expr> decs = node.getInternalDecorator_list();
         for (int i = decs.size() - 1; i >= 0; i--) {
             visit(decs.get(i));
@@ -300,25 +300,25 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitNum(Num num) throws Exception {
+    public Object visitNum(Num num) {
         cur.addConst(num);
         return null;
     }
 
     @Override
-    public Object visitStr(Str s) throws Exception {
+    public Object visitStr(Str s) {
         cur.addConst(s);
         return null;
     }
 
     @Override
-    public Object visitBytes(Bytes b) throws Exception {
+    public Object visitBytes(Bytes b) {
         cur.addConst(b);
         return null;
     }
 
     @Override
-    public Object visitAnnAssign(AnnAssign node) throws Exception {
+    public Object visitAnnAssign(AnnAssign node) {
         if (cur.isClassScope()) {
             // TODO collect the types here, and evaluate them in the class scope
             cur.addUsed("__annotations__");
@@ -333,7 +333,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
 
 
     @Override
-    public Object visitName(Name node) throws Exception {
+    public Object visitName(Name node) {
         String name = node.getInternalId();
 
         if (cur.async && name.equals("await"))
@@ -360,7 +360,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitNonlocal(Nonlocal node) throws Exception {
+    public Object visitNonlocal(Nonlocal node) {
         for (String name : node.getInternalNames()) {
             cur.addNonlocal(name);
         }
@@ -368,7 +368,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitAwait(Await node) throws Exception {
+    public Object visitAwait(Await node) {
         if (!cur.isFunction()) {
             throw new ParseException("'await' outside function", node);
         } else if (cur.comprehension) {
@@ -381,7 +381,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitYieldFrom(YieldFrom node) throws Exception {
+    public Object visitYieldFrom(YieldFrom node) {
         if (cur.async) {
             throw new ParseException("'yield from' inside async function", node);
         }
@@ -391,7 +391,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitYield(Yield node) throws Exception {
+    public Object visitYield(Yield node) {
         if (cur.async) {
             cur.async_gen = true;
         }
@@ -402,7 +402,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitReturn(Return node) throws Exception {
+    public Object visitReturn(Return node) {
         if (node.getInternalValue() != null) {
             cur.noteReturnValue();
         }
@@ -411,14 +411,14 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
     }
 
     @Override
-    public Object visitAsyncWith(AsyncWith node) throws Exception {
+    public Object visitAsyncWith(AsyncWith node) {
         cur.max_with_count++;
         traverse(node);
         return null;
     }
 
     @Override
-    public Object visitExceptHandler(ExceptHandler node) throws Exception {
+    public Object visitExceptHandler(ExceptHandler node) {
         traverse(node);
         if (node.getInternalName() != null) {
             def(node.getInternalName());
@@ -428,7 +428,7 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
 
     private boolean isSplit;
     @Override
-    public Object visitSplitNode(SplitNode node) throws Exception {
+    public Object visitSplitNode(SplitNode node) {
         String name = node.getInternalName();
         def(name);
         beginScope(name, FUNCSCOPE, node, new ArgListCompiler());

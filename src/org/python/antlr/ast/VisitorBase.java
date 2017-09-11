@@ -26,414 +26,414 @@ import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 
 public abstract class VisitorBase<R> implements VisitorIF<R> {
-    public R visitModule(Module node) throws Exception {
+    public R visitModule(Module node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitInteractive(Interactive node) throws Exception {
+    public R visitInteractive(Interactive node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitExpression(Expression node) throws Exception {
+    public R visitExpression(Expression node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSuite(Suite node) throws Exception {
+    public R visitSuite(Suite node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitFunctionDef(FunctionDef node) throws Exception {
+    public R visitFunctionDef(FunctionDef node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAsyncFunctionDef(AsyncFunctionDef node) throws Exception {
+    public R visitAsyncFunctionDef(AsyncFunctionDef node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitClassDef(ClassDef node) throws Exception {
+    public R visitClassDef(ClassDef node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitReturn(Return node) throws Exception {
+    public R visitReturn(Return node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitDelete(Delete node) throws Exception {
+    public R visitDelete(Delete node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAssign(Assign node) throws Exception {
+    public R visitAssign(Assign node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAugAssign(AugAssign node) throws Exception {
+    public R visitAugAssign(AugAssign node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAnnAssign(AnnAssign node) throws Exception {
+    public R visitAnnAssign(AnnAssign node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitFor(For node) throws Exception {
+    public R visitFor(For node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAsyncFor(AsyncFor node) throws Exception {
+    public R visitAsyncFor(AsyncFor node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitWhile(While node) throws Exception {
+    public R visitWhile(While node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitIf(If node) throws Exception {
+    public R visitIf(If node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitWith(With node) throws Exception {
+    public R visitWith(With node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAsyncWith(AsyncWith node) throws Exception {
+    public R visitAsyncWith(AsyncWith node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitRaise(Raise node) throws Exception {
+    public R visitRaise(Raise node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitTry(Try node) throws Exception {
+    public R visitTry(Try node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAssert(Assert node) throws Exception {
+    public R visitAssert(Assert node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitImport(Import node) throws Exception {
+    public R visitImport(Import node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitImportFrom(ImportFrom node) throws Exception {
+    public R visitImportFrom(ImportFrom node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitGlobal(Global node) throws Exception {
+    public R visitGlobal(Global node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitNonlocal(Nonlocal node) throws Exception {
+    public R visitNonlocal(Nonlocal node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitExpr(Expr node) throws Exception {
+    public R visitExpr(Expr node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitPass(Pass node) throws Exception {
+    public R visitPass(Pass node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitBreak(Break node) throws Exception {
+    public R visitBreak(Break node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitContinue(Continue node) throws Exception {
+    public R visitContinue(Continue node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitExitFor(ExitFor node) throws Exception {
+    public R visitExitFor(ExitFor node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitPopExcept(PopExcept node) throws Exception {
+    public R visitPopExcept(PopExcept node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSplitNode(SplitNode node) throws Exception {
+    public R visitSplitNode(SplitNode node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitBlock(Block node) throws Exception {
+    public R visitBlock(Block node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitBoolOp(BoolOp node) throws Exception {
+    public R visitBoolOp(BoolOp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitBinOp(BinOp node) throws Exception {
+    public R visitBinOp(BinOp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitUnaryOp(UnaryOp node) throws Exception {
+    public R visitUnaryOp(UnaryOp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitLambda(Lambda node) throws Exception {
+    public R visitLambda(Lambda node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAnonymousFunction(AnonymousFunction node) throws Exception {
+    public R visitAnonymousFunction(AnonymousFunction node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitIfExp(IfExp node) throws Exception {
+    public R visitIfExp(IfExp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitDict(Dict node) throws Exception {
+    public R visitDict(Dict node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSet(Set node) throws Exception {
+    public R visitSet(Set node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitListComp(ListComp node) throws Exception {
+    public R visitListComp(ListComp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSetComp(SetComp node) throws Exception {
+    public R visitSetComp(SetComp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitDictComp(DictComp node) throws Exception {
+    public R visitDictComp(DictComp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitGeneratorExp(GeneratorExp node) throws Exception {
+    public R visitGeneratorExp(GeneratorExp node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAwait(Await node) throws Exception {
+    public R visitAwait(Await node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitYield(Yield node) throws Exception {
+    public R visitYield(Yield node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitYieldFrom(YieldFrom node) throws Exception {
+    public R visitYieldFrom(YieldFrom node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitCompare(Compare node) throws Exception {
+    public R visitCompare(Compare node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitCall(Call node) throws Exception {
+    public R visitCall(Call node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitNum(Num node) throws Exception {
+    public R visitNum(Num node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitStr(Str node) throws Exception {
+    public R visitStr(Str node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitFormattedValue(FormattedValue node) throws Exception {
+    public R visitFormattedValue(FormattedValue node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitJoinedStr(JoinedStr node) throws Exception {
+    public R visitJoinedStr(JoinedStr node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitBytes(Bytes node) throws Exception {
+    public R visitBytes(Bytes node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitNameConstant(NameConstant node) throws Exception {
+    public R visitNameConstant(NameConstant node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitEllipsis(Ellipsis node) throws Exception {
+    public R visitEllipsis(Ellipsis node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitConstant(Constant node) throws Exception {
+    public R visitConstant(Constant node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitAttribute(Attribute node) throws Exception {
+    public R visitAttribute(Attribute node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSubscript(Subscript node) throws Exception {
+    public R visitSubscript(Subscript node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitStarred(Starred node) throws Exception {
+    public R visitStarred(Starred node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitName(Name node) throws Exception {
+    public R visitName(Name node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitList(List node) throws Exception {
+    public R visitList(List node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitTuple(Tuple node) throws Exception {
+    public R visitTuple(Tuple node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitSlice(Slice node) throws Exception {
+    public R visitSlice(Slice node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitExtSlice(ExtSlice node) throws Exception {
+    public R visitExtSlice(ExtSlice node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitIndex(Index node) throws Exception {
+    public R visitIndex(Index node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    public R visitExceptHandler(ExceptHandler node) throws Exception {
+    public R visitExceptHandler(ExceptHandler node) {
         R ret = unhandled_node(node);
         traverse(node);
         return ret;
     }
 
-    abstract protected R unhandled_node(PythonTree node) throws Exception;
-    abstract public void traverse(PythonTree node) throws Exception;
+    abstract protected R unhandled_node(PythonTree node);
+    abstract public void traverse(PythonTree node);
 }

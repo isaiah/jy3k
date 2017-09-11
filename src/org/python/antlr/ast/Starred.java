@@ -145,11 +145,11 @@ public static final PyType TYPE = PyType.fromClass(Starred.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitStarred(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (value != null)
             value.accept(visitor);
     }

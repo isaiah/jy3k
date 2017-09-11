@@ -248,11 +248,11 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitTry(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (body != null) {
             for (PythonTree t : body) {
                 if (t != null)

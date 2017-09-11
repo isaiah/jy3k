@@ -202,11 +202,11 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitCall(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (func != null)
             func.accept(visitor);
         if (args != null) {

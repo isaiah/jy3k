@@ -149,11 +149,11 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitRaise(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (exc != null)
             exc.accept(visitor);
         if (cause != null)

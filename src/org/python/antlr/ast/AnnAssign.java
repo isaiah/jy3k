@@ -201,11 +201,11 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAnnAssign(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (target != null)
             target.accept(visitor);
         if (annotation != null)

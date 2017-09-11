@@ -182,6 +182,7 @@ stringprep.py
 struct.py
 subprocess.py
 symbol.py
+symtable.py
 sysconfig.py
 tabnanny.py
 telnetlib.py

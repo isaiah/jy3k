@@ -145,11 +145,11 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitUnaryOp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (operand != null)
             operand.accept(visitor);
     }

@@ -235,11 +235,11 @@ public abstract class PythonTree extends AST implements Traverseproc {
         throw new RuntimeException("Only support statement: " + this);
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         throw new RuntimeException("Unexpected node: " + this);
     }
     
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         throw new RuntimeException("Cannot traverse node: " + this);
     }
 

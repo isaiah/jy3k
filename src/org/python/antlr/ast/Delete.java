@@ -134,11 +134,11 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitDelete(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (targets != null) {
             for (PythonTree t : targets) {
                 if (t != null)

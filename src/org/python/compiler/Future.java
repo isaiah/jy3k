@@ -93,7 +93,7 @@ public class Future {
         }
     }
 
-    public static void checkFromFuture(ImportFrom node) throws Exception {
+    public static void checkFromFuture(ImportFrom node) {
         if (node.from_future_checked) return;
         String module = node.getInternalModule();
         if (module != null && module.equals(FutureFeature.MODULE_NAME)) {

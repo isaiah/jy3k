@@ -172,11 +172,11 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSubscript(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (value != null)
             value.accept(visitor);
         if (slice != null)

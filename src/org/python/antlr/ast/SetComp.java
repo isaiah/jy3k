@@ -161,11 +161,11 @@ public static final PyType TYPE = PyType.fromClass(SetComp.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSetComp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (elt != null)
             elt.accept(visitor);
         if (generators != null) {

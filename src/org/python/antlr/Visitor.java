@@ -8,12 +8,12 @@ public class Visitor extends VisitorBase {
      * Visit each of the children one by one.
      * @args node The node whose children will be visited.
      */
-    public void traverse(PythonTree node) throws Exception {
+    public void traverse(PythonTree node) {
         node.traverse(this);
     }
 
 
-    public void visit(PythonTree[] nodes) throws Exception {
+    public void visit(PythonTree[] nodes) {
         for (int i = 0; i < nodes.length; i++) {
             visit(nodes[i]);
         }
@@ -22,12 +22,12 @@ public class Visitor extends VisitorBase {
     /**
      * Visit the node by calling a visitXXX method.
      */
-    public Object visit(PythonTree node) throws Exception {
+    public Object visit(PythonTree node) {
         Object ret = node.accept(this);
         return ret;
     }
 
-    protected Object unhandled_node(PythonTree node) throws Exception {
+    protected Object unhandled_node(PythonTree node) {
         return this;
     }
 

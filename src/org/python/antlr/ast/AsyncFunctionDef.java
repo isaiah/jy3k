@@ -254,11 +254,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         return sb.toString();
     }
 
-    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+    public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAsyncFunctionDef(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) throws Exception {
+    public void traverse(VisitorIF<?> visitor) {
         if (args != null)
             args.accept(visitor);
         if (body != null) {

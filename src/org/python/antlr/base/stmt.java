@@ -39,6 +39,8 @@ public abstract class stmt extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     public abstract stmt copy();
+    public abstract int getLineno();
+    public abstract int getCol_offset();
     public stmt(PyType subtype) {
         super(subtype);
     }

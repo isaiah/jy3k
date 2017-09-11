@@ -62,7 +62,7 @@ public class ArgListCompiler extends Visitor
         if (annotation != null) annotations.put(name, annotation);
     }
 
-    public void visitArgs(arguments args) throws Exception {
+    public void visitArgs(arguments args) {
         if (args == null) {
             return;
         }
@@ -122,7 +122,7 @@ public class ArgListCompiler extends Visitor
     }
 
     @Override
-    public Object visitName(Name node) throws Exception {
+    public Object visitName(Name node) {
         //FIXME: do we need Store and Param, or just Param?
         if (node.getInternalCtx() != expr_contextType.Store && node.getInternalCtx() != expr_contextType.Param) {
             return null;
@@ -137,7 +137,7 @@ public class ArgListCompiler extends Visitor
     }
 
     @Override
-    public Object visitTuple(Tuple node) throws Exception {
+    public Object visitTuple(Tuple node) {
         StringBuffer name = new StringBuffer("(");
         int n = node.getInternalElts().size();
         for (int i = 0; i < n-1; i++) {
