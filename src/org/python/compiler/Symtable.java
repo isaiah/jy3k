@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,26 +69,6 @@ import java.util.Map;
 public class Symtable extends Visitor {
     public static final int SCOPE_OFFSET = 11;
 
-    public static final int LOCAL = 1 << SCOPE_OFFSET;
-    public static final int GLOBAL_EXPLICIT = 2 << SCOPE_OFFSET;
-    public static final int GLOBAL_IMPLICIT = 3 << SCOPE_OFFSET;
-    public static final int FREE = 4 << SCOPE_OFFSET;
-    public static final int CELL = 5 << SCOPE_OFFSET;
-
-    public static final int DEF_GLOBAL = 1;
-    public static final int DEF_LOCAL = 2;
-    public static final int DEF_PARAM = 2 << 1;
-    public static final int DEF_NONLOCAL = 2 << 2;
-    public static final int USE = 2 << 3;
-    public static final int DEF_FREE = 2 << 4;
-    public static final int DEF_FREE_CLASS = 2 << 5;
-    public static final int DEF_IMPORT = 2 << 6;
-    public static final int DEF_ANNOT = 2 << 7;
-    public static final int DEF_BOUND = DEF_LOCAL | DEF_PARAM | DEF_IMPORT;
-    public static final int SCOPE_MASK = DEF_GLOBAL | DEF_LOCAL | DEF_PARAM | DEF_NONLOCAL;
-    public static final int TYPE_FUNCTION = 0;
-    public static final int TYPE_CLASS = 1;
-    public static final int TYPE_MODULE = 2;
     private static final String GLOBAL_ANNO = "annotated name %s cannot be global";
     private static final String NONLOCAL_ANNO = "annotated name %s cannot be nonlocal";
     private static final String GLOBAL_AFTER_ASSIGN = "name %s is assigned to before global declaration";
@@ -112,16 +93,17 @@ public class Symtable extends Visitor {
 //    int recursion_depth;            /* current recursion depth */
 //    int recursion_limit;            /* recursion limit */
     private String filename;
-    private PySTEntryObject cur;
+    PySTEntryObject cur;
     private PySTEntryObject top;
-    private Map<?, ?> blocks;
+    Map<Integer, PySTEntryObject> blocks;
     private Deque<PySTEntryObject> stack;
-    private Map<String, EnumSet<Defs>> global;
+    private Map<String, EnumSet<Flag>> global;
     private int nblocks;
     private PyObject _private;
     //    private PyFutureFeatures future;
     private int recursionDeps;
     private int recursionLimit;
+
     private Symtable() {
         stack = new LinkedList<>();
         blocks = new HashMap<>();
@@ -149,7 +131,7 @@ public class Symtable extends Visitor {
     }
 
     private void analyze() {
-        top.analyzeBlock(null, new ArrayList<>(), new ArrayList<>());
+        top.analyzeBlock(new HashSet<>(), new HashSet<>(), new HashSet<>());
     }
 
     public PySTEntryObject getTop() {
@@ -179,11 +161,11 @@ public class Symtable extends Visitor {
         }
     }
 
-    private void addDef(String name, Defs flag, Defs... otherFlags) {
-        EnumSet<Defs> flags = EnumSet.of(flag, otherFlags);
-        EnumSet<Defs> val = cur.symbols.get(name);
+    private void addDef(String name, Flag flag, Flag... otherFlags) {
+        EnumSet<Flag> flags = EnumSet.of(flag, otherFlags);
+        EnumSet<Flag> val = cur.symbols.get(name);
         if (val != null) {
-            if (flags.contains(Defs.PARAM) && val.contains(Defs.PARAM)) {
+            if (flags.contains(Flag.DEF_PARAM) && val.contains(Flag.DEF_PARAM)) {
                 throw new PySyntaxError(String.format("duplicated definition of argument: %s", name), cur.lineno, cur.colOffset, "", filename);
             }
             val.addAll(flags);
@@ -191,9 +173,9 @@ public class Symtable extends Visitor {
             val = flags;
         }
         cur.symbols.put(name, val);
-        if (flags.contains(Defs.PARAM)) {
+        if (flags.contains(Flag.DEF_PARAM)) {
             cur.varnames.add(name);
-        } else if (flags.contains(Defs.DEF_GLOBAL)) {
+        } else if (flags.contains(Flag.DEF_GLOBAL)) {
             val = flags;
             if (global.containsKey(name)) {
                 val.addAll(global.get(name));
@@ -237,7 +219,7 @@ public class Symtable extends Visitor {
         }
     }
 
-    private EnumSet<Defs> lookup(String name) {
+    private EnumSet<Flag> lookup(String name) {
         return cur.symbols.get(name);
     }
 
@@ -256,7 +238,7 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitFunctionDef(FunctionDef node) {
-        addDef(node.getInternalName(), Defs.LOCAL);
+        addDef(node.getInternalName(), Flag.DEF_LOCAL);
         arguments args = node.getInternalArgs();
         if (args != null) {
             visitSeq(args.getInternalDefaults());
@@ -273,7 +255,7 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitAsyncFunctionDef(AsyncFunctionDef node) {
-        addDef(node.getInternalName(), Defs.LOCAL);
+        addDef(node.getInternalName(), Flag.DEF_LOCAL);
         visitSeq(node.getInternalArgs().getInternalDefaults());
         visitSeq(node.getInternalArgs().getInternalKw_defaults());
         visitAnnotations(node.getInternalArgs(), node.getInternalReturns());
@@ -288,7 +270,7 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitClassDef(ClassDef node) {
-        addDef(node.getInternalName(), Defs.LOCAL);
+        addDef(node.getInternalName(), Flag.DEF_LOCAL);
         visitSeq(node.getInternalBases());
         visitSeq(node.getInternalKeywords());
         visitSeq(node.getInternalDecorator_list());
@@ -334,18 +316,18 @@ public class Symtable extends Visitor {
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalTarget() instanceof Name) {
             expr eName = node.getInternalTarget();
-            EnumSet<Defs> flags = lookup(((Name) node.getInternalTarget()).getInternalId());
-            if ((flags.contains(Defs.DEF_GLOBAL) || flags.contains(Defs.NONLOCAL)) && node.getInternalSimple() > 0) {
+            EnumSet<Flag> flags = lookup(((Name) node.getInternalTarget()).getInternalId());
+            if ((flags.contains(Flag.DEF_GLOBAL) || flags.contains(Flag.DEF_NONLOCAL)) && node.getInternalSimple() > 0) {
                 throw new PySyntaxError(
-                        String.format(flags.contains(Defs.DEF_GLOBAL) ? GLOBAL_ANNO : NONLOCAL_ANNO,
+                        String.format(flags.contains(Flag.DEF_GLOBAL) ? GLOBAL_ANNO : NONLOCAL_ANNO,
                                 ((Name) eName).getInternalId()),
                         node.getLine(), node.getCol_offset(), "", filename);
             }
 
             if (node.getInternalSimple() > 0) {
-                addDef(((Name) eName).getInternalId(), Defs.ANNOT, Defs.LOCAL);
+                addDef(((Name) eName).getInternalId(), Flag.DEF_ANNO, Flag.DEF_LOCAL);
             } else if (node.getInternalValue() != null) {
-                addDef(((Name) eName).getInternalId(), Defs.LOCAL);
+                addDef(((Name) eName).getInternalId(), Flag.DEF_LOCAL);
             }
         } else {
             visit(node.getInternalTarget());
@@ -437,36 +419,36 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitImport(Import node) {
-        visitSeq(node.getInternalNames());
+        node.getInternalNames().stream().forEach(this::visitAlias);
         return null;
     }
 
     @Override
     public Object visitImportFrom(ImportFrom node) {
-        visitSeq(node.getInternalNames());
+        node.getInternalNames().stream().forEach(this::visitAlias);
         return null;
     }
 
     @Override
     public Object visitGlobal(Global node) {
-        EnumSet<Defs> toCheck = EnumSet.of(Defs.LOCAL, Defs.USE, Defs.ANNOT);
+        EnumSet<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO);
         for (String name : node.getInternalNames()) {
-            EnumSet<Defs> cur = lookup(name);
+            EnumSet<Flag> cur = lookup(name);
             if (cur == null) {
                 continue;
             }
             if (cur.stream().anyMatch(toCheck::contains)) {
                 String msg;
-                if (cur.contains(Defs.USE)) {
+                if (cur.contains(Flag.DEF_USE)) {
                     msg = GLOBAL_AFTER_USE;
-                } else if (cur.contains(Defs.ANNOT)) {
+                } else if (cur.contains(Flag.DEF_ANNO)) {
                     msg = GLOBAL_ANNO;
                 } else {
                     msg = GLOBAL_AFTER_ASSIGN;
                 }
                 throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
             }
-            addDef(name, Defs.DEF_GLOBAL);
+            addDef(name, Flag.DEF_GLOBAL);
             recordDirective(name, node);
         }
         return null;
@@ -474,24 +456,24 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitNonlocal(Nonlocal node) {
-        EnumSet<Defs> toCheck = EnumSet.of(Defs.LOCAL, Defs.USE, Defs.ANNOT);
+        EnumSet<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO);
         for (String name : node.getInternalNames()) {
-            EnumSet<Defs> cur = lookup(name);
+            EnumSet<Flag> cur = lookup(name);
             if (cur == null) {
                 continue;
             }
             if (cur.stream().anyMatch(toCheck::contains)) {
                 String msg;
-                if (cur.contains(Defs.USE)) {
+                if (cur.contains(Flag.DEF_USE)) {
                     msg = NONLOCAL_AFTER_USE;
-                } else if (cur.contains(Defs.ANNOT)) {
+                } else if (cur.contains(Flag.DEF_ANNO)) {
                     msg = NONLOCAL_ANNO;
                 } else {
                     msg = NONLOCAL_AFTER_ASSIGN;
                 }
                 throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
             }
-            addDef(name, Defs.NONLOCAL);
+            addDef(name, Flag.DEF_NONLOCAL);
             recordDirective(name, node);
         }
         return null;
@@ -632,9 +614,9 @@ public class Symtable extends Visitor {
     @Override
     public Object visitName(Name node) {
         boolean isLoad = node.getInternalCtx() == expr_contextType.Load;
-        addDef(node.getInternalId(), isLoad ? Defs.USE : Defs.LOCAL);
+        addDef(node.getInternalId(), isLoad ? Flag.DEF_USE : Flag.DEF_LOCAL);
         if (isLoad && cur.type == PySTEntryObject.BlockType.FunctionBlock && node.getInternalId().equals("super")) {
-            addDef("__class__", Defs.USE);
+            addDef("__class__", Flag.DEF_USE);
         }
         return null;
     }
@@ -659,7 +641,7 @@ public class Symtable extends Visitor {
             visit(node.getInternalType());
         }
         if (node.getInternalName() != null) {
-            addDef(node.getInternalName(), Defs.LOCAL);
+            addDef(node.getInternalName(), Flag.DEF_LOCAL);
         }
         visitSeq(node.getInternalBody());
         return null;
@@ -681,7 +663,7 @@ public class Symtable extends Visitor {
             storeName = name;
         }
         if (!name.equals("*")) {
-            addDef(storeName, Defs.IMPORT);
+            addDef(storeName, Flag.DEF_IMPORT);
         } else {
             if (cur.type != PySTEntryObject.BlockType.ModuleBlock) {
                 throw new PySyntaxError("import * only allowed at module level", cur.lineno, cur.colOffset, "", filename);
@@ -697,11 +679,11 @@ public class Symtable extends Visitor {
         visitParams(a.getInternalArgs());
         visitParams(a.getInternalKwonlyargs());
         if (a.getInternalVararg() != null) {
-            addDef(a.getInternalVararg().getInternalArg(), Defs.PARAM);
+            addDef(a.getInternalVararg().getInternalArg(), Flag.DEF_PARAM);
             cur.varargs = true;
         }
         if (a.getInternalKwarg() != null) {
-            addDef(a.getInternalKwarg().getInternalArg(), Defs.PARAM);
+            addDef(a.getInternalKwarg().getInternalArg(), Flag.DEF_PARAM);
             cur.varkeywords = true;
         }
     }
@@ -711,18 +693,22 @@ public class Symtable extends Visitor {
             return;
         }
         for (arg a : args) {
-            addDef(a.getInternalArg(), Defs.PARAM);
+            addDef(a.getInternalArg(), Flag.DEF_PARAM);
         }
     }
 
-    public enum Defs {
-        DEF_GLOBAL(1), LOCAL(2), PARAM(2 << 1), NONLOCAL(2 << 2),
-        USE(2 << 3), FREE(2 << 4), FREE_CLASS(2 << 5), IMPORT(2 << 6),
-        ANNOT(2 << 7), BOUND(LOCAL.value | PARAM.value | IMPORT.value);
+    public enum Flag {
+        DEF_GLOBAL(1), DEF_LOCAL(2), DEF_PARAM(2 << 1), DEF_NONLOCAL(2 << 2),
+        DEF_USE(2 << 3), DEF_FREE(2 << 4), DEF_FREE_CLASS(2 << 5), DEF_IMPORT(2 << 6),
+        DEF_ANNO(2 << 7), LOCAL(1 << SCOPE_OFFSET), GLOBAL_EXPLICIT(2 << SCOPE_OFFSET),
+        GLOBAL_IMPLICIT(3 << SCOPE_OFFSET),
+        FREE(4 << SCOPE_OFFSET), CELL(5 << SCOPE_OFFSET);
+
+        static EnumSet<Flag> DEF_BOUND = EnumSet.of(DEF_LOCAL, DEF_PARAM, DEF_IMPORT);
 
         int value;
 
-        private Defs(int val) {
+        Flag(int val) {
             value = val;
         }
     }

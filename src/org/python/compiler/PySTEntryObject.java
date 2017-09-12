@@ -3,6 +3,7 @@ package org.python.compiler;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedType;
 import org.python.antlr.PythonTree;
+import org.python.compiler.Symtable.Flag;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyLong;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.python.compiler.Symtable.*;
+import static org.python.compiler.Symtable.Flag.*;
 
 @ExposedType
 public class PySTEntryObject extends PyObject {
@@ -52,7 +53,7 @@ public class PySTEntryObject extends PyObject {
 //    int ste_tmpname;         /* counter for listcomp temp vars */
 
     //    struct symtable *ste_table;
-    Map<String, EnumSet<Symtable.Defs>> symbols;
+    Map<String, EnumSet<Flag>> symbols;
     String name;
     List<String> varnames;
     List<PySTEntryObject> children;
@@ -66,11 +67,15 @@ public class PySTEntryObject extends PyObject {
     int optLineno;
     int optColOffset;
     int tmpName;
-    private PyObject id;
+    private int id;
     PySTEntryObject(Symtable st, String name, PySTEntryObject.BlockType block, PythonTree key, int lineno, int colOffset) {
         super(TYPE);
         this.table = st;
+        this.id = System.identityHashCode(key);
         this.name = name;
+        if (st.cur != null && (st.cur.nested || st.cur.type == BlockType.FunctionBlock)) {
+            nested = true;
+        }
         this.symbols = new HashMap<>();
         this.varnames = new ArrayList<>();
         this.children = new ArrayList<>();
@@ -78,25 +83,81 @@ public class PySTEntryObject extends PyObject {
         this.type = block;
         this.lineno = lineno;
         this.colOffset = colOffset;
-
+        st.blocks.put(id, this);
     }
+
     public PySTEntryObject() {
         super(TYPE);
         type = BlockType.FunctionBlock;
     }
 
+    /* Enter the final scope information into the ste_symbols dict.
+     *
+     * All arguments are dicts.  Modifies symbols, others are read-only.
+    */
+    private static void updateSymbols(Map<String, EnumSet<Flag>> symbols, Map<String, Flag> scopes,
+                                      Set<String> bound, Set<String> free, boolean isClass) {
+        for (String name : symbols.keySet()) {
+            EnumSet<Flag> flags = symbols.get(name);
+            Flag vScope = scopes.get(name);
+            flags.add(vScope);
+            symbols.put(name, flags);
+        }
+
+        /* Record not yet resolved free variables from children (if any) */
+        for (String name : free) {
+            /* Handle symbol that already exists in this scope */
+            if (symbols.containsKey(name)) {
+                EnumSet<Flag> flags = symbols.get(name);
+                if (isClass && (flags.contains(DEF_GLOBAL) || flags.stream().anyMatch(DEF_BOUND::contains))) {
+                    flags.add(DEF_FREE_CLASS);
+                }
+                /* It's a cell, or already free in this scope */
+                continue;
+            }
+            /* Handle global symbol */
+            if (!bound.contains(name)) {
+                continue; /* it's a global */
+            }
+            /* Propagate new free symbol up the lexical stack */
+            symbols.put(name, EnumSet.of(FREE));
+        }
+    }
+
+    private static void analyzeCells(Map<String, Flag> scopes, Set<String> free) {
+        for (String name : scopes.keySet()) {
+            if (scopes.get(name) == LOCAL) {
+                continue;
+            }
+            if (!free.contains(name)) {
+                continue;
+            }
+            /* Replace DEF_LOCAL with CELL for this name, and remove
+               from free. It is safe to replace the value of name
+               in the dict, because it will not cause a resize.
+             */
+            scopes.put(name, Flag.CELL);
+            free.remove(name);
+        }
+    }
+
+    @ExposedGet(name = "lineno")
+    public int getLineno() {
+        return lineno;
+    }
+
     @ExposedGet(name = "symbols")
-    public Map<String, EnumSet<Symtable.Defs>> getSymbols() {
+    public Map<String, EnumSet<Flag>> getSymbols() {
         Map<PyObject, PyObject> ret = new HashMap<>(symbols.size());
-        for(String key : symbols.keySet()) {
+        for (String key : symbols.keySet()) {
             ret.put(new PyUnicode(key), new PyLong(getFlags(symbols.get(key))));
         }
         return new PyDictionary(ret);
     }
 
-    private long getFlags(EnumSet<Symtable.Defs> flags) {
+    private long getFlags(EnumSet<Flag> flags) {
         long ret = 0;
-        for (Symtable.Defs flag : flags) {
+        for (Flag flag : flags) {
             ret |= flag.value;
         }
         return ret;
@@ -127,7 +188,7 @@ public class PySTEntryObject extends PyObject {
 
     public void analyzeBlock(Set<String> bound, Set<String> free, Set<String> global) {
         Set<String> local = new HashSet<>();
-        Map<String, Integer> scopes = new HashMap<>();
+        Map<String, Flag> scopes = new HashMap<>();
         Set<String> newGlobal = new HashSet<>();
         Set<String> newFree = new HashSet<>();
         Set<String> newBound = new HashSet<>();
@@ -136,7 +197,7 @@ public class PySTEntryObject extends PyObject {
             newBound.addAll(bound);
         }
         for (String name : symbols.keySet()) {
-            EnumSet<Symtable.Defs> flags = symbols.get(name);
+            EnumSet<Flag> flags = symbols.get(name);
             analyzeName(scopes, name, flags, bound, local, free, global);
         }
         /* Populate global and bound sets to be passed to children. */
@@ -178,38 +239,9 @@ public class PySTEntryObject extends PyObject {
         free.addAll(newFree);
     }
 
-    /* Enter the final scope information into the ste_symbols dict.
-     *
-     * All arguments are dicts.  Modifies symbols, others are read-only.
-    */
-    private static void updateSymbols(Map<String, EnumSet<Defs>> symbols, Map<String, Integer> scopes,
-                                      Set<String> bound, Set<String> free, boolean isClass) {
-        for (String name : symbols.keySet()) {
-            EnumSet<Defs> flags = symbols.get(name);
-            int vScope = scopes.get(name);
-        }
-    }
-
     private void dropClassFree(Set<String> free) {
         free.remove("__class__");
         needsClassClosure = true;
-    }
-
-    private static void analyzeCells(Map<String, Integer> scopes, Set<String> free) {
-        for (String name : scopes.keySet()) {
-            if (scopes.get(name) == LOCAL) {
-                continue;
-            }
-            if (!free.contains(name)) {
-                continue;
-            }
-            /* Replace LOCAL with CELL for this name, and remove
-               from free. It is safe to replace the value of name
-               in the dict, because it will not cause a resize.
-             */
-            scopes.put(name, CELL);
-            free.remove(name);
-        }
     }
 
     private void analyzeChildBlock(Set<String> bound, Set<String> free, Set<String> global, Set<String> childFree) {
@@ -227,13 +259,13 @@ public class PySTEntryObject extends PyObject {
        about the new name.  For example, a new global will add an entry to
        global.  A name that was global can be changed to local.
     */
-    private void analyzeName(Map<String, Integer> scopes, String name, EnumSet<Symtable.Defs> flags, Set<String> bound,
+    private void analyzeName(Map<String, Flag> scopes, String name, EnumSet<Flag> flags, Set<String> bound,
                              Set<String> local, Set<String> free, Set<String> global) {
-        if (flags.contains(Symtable.Defs.DEF_GLOBAL)) {
-            if (flags.contains(Symtable.Defs.PARAM)) {
+        if (flags.contains(DEF_GLOBAL)) {
+            if (flags.contains(DEF_PARAM)) {
                 throw errorAtDirective(name, "name '%s' is parameter and global");
             }
-            if (flags.contains(Symtable.Defs.NONLOCAL)) {
+            if (flags.contains(DEF_NONLOCAL)) {
                 throw errorAtDirective(name, "name '%s' is nonlocal and global");
             }
             scopes.put(name, GLOBAL_EXPLICIT);
@@ -244,8 +276,8 @@ public class PySTEntryObject extends PyObject {
             return;
         }
 
-        if (flags.contains(Symtable.Defs.NONLOCAL)) {
-            if (flags.contains(Symtable.Defs.PARAM)) {
+        if (flags.contains(Flag.DEF_NONLOCAL)) {
+            if (flags.contains(Flag.DEF_PARAM)) {
                 throw errorAtDirective(name, "name '%s' is parameter and nonlocal");
             }
             if (bound.isEmpty()) {
@@ -260,7 +292,7 @@ public class PySTEntryObject extends PyObject {
             return;
         }
 
-        if (flags.contains(Symtable.Defs.BOUND)) {
+        if (flags.stream().anyMatch(Flag.DEF_BOUND::contains)) {
             scopes.put(name, LOCAL);
             local.add(name);
             global.remove(name);
