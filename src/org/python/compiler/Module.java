@@ -55,13 +55,13 @@ class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.ldc(Double.valueOf(value));
         c.invokestatic(p(Py.class), "newFloat", sig(PyFloat.class, Double.TYPE));
     }
 
     @Override
-    void put(Code c) throws IOException {}
+    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -90,13 +90,13 @@ class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.ldc(Double.valueOf(value));
         c.invokestatic(p(Py.class), "newImaginary", sig(PyComplex.class, Double.TYPE));
     }
 
     @Override
-    void put(Code c) throws IOException {}
+    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -125,13 +125,13 @@ class PyStringConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.ldc(value);
         c.invokestatic(p(PyBytes.class), "fromInterned", sig(PyBytes.class, String.class));
     }
 
     @Override
-    void put(Code c) throws IOException {}
+    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -158,13 +158,13 @@ class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.ldc(value);
         c.invokestatic(p(PyUnicode.class), "fromInterned", sig(PyUnicode.class, String.class));
     }
 
     @Override
-    void put(Code c) throws IOException {}
+    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -191,13 +191,13 @@ class PyLongConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.ldc(value);
         c.invokestatic(p(Py.class), "newLong", sig(PyLong.class, String.class));
     }
 
     @Override
-    void put(Code c) throws IOException {}
+    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -234,7 +234,7 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
     final int moreflags;
 
     PyCodeConstant(mod tree, String name, boolean fast_locals, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
-            Module module) throws Exception {
+            Module module) {
         this.co_name = name;
         this.co_firstlineno = firstlineno;
         this.module = module;
@@ -339,12 +339,12 @@ class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) throws IOException {
+    void get(Code c) {
         c.getstatic(module.classfile.name, name, ci(PyTableCode.class));
     }
 
     @Override
-    void put(Code c) throws IOException {
+    void put(Code c) {
         module.classfile.addField(name, ci(PyTableCode.class), access);
         c.iconst(argcount);
 
@@ -498,7 +498,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-                                int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) throws Exception {
+                                int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) {
         PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, firstlineno, scope, cflags, this);
         codes.add(code);
 
@@ -512,7 +512,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     /** This block of code writes out the various standard methods */
-    public void addInit() throws IOException {
+    public void addInit() {
         Code c = classfile.addMethod("<init>", sig(Void.TYPE, String.class), ACC_PUBLIC);
         c.aload(0);
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
@@ -521,13 +521,13 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.return_();
     }
 
-    public void addRunnable() throws IOException {
+    public void addRunnable() {
         Code c = classfile.addMethod("getMain", sig(PyTableCode.class), ACC_PUBLIC);
         mainCode.get(c);
         c.areturn();
     }
 
-//    public void addMain() throws IOException {
+//    public void addMain() {
 //        Code c = classfile.addMethod("main", //
 //                sig(Void.TYPE, String[].class), ACC_PUBLIC | ACC_STATIC);
 //        c.new_(classfile.name);
@@ -542,7 +542,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 //        c.return_();
 //    }
 
-    public void addBootstrap() throws IOException {
+    public void addBootstrap() {
         Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME, //
                 sig(CodeBootstrap.class), ACC_PUBLIC | ACC_STATIC);
         c.ldc(Type.getType("L" + classfile.name + ";"));
@@ -551,7 +551,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.areturn();
     }
 
-    void addCodeInit() throws IOException {
+    void addCodeInit() {
         for (int i = 0; i < codes.size(); i++) {
             PyCodeConstant pyc = codes.get(i);
             Code c = classfile.addMethod("init" + pyc.fname,
@@ -561,7 +561,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
     }
 
-    void addConstants(Code c) throws IOException {
+    void addConstants(Code c) {
         classfile.addField("self", "L" + classfile.name + ";", ACC_STATIC);
         c.aload(0);
         c.putstatic(classfile.name, "self", "L" + classfile.name + ";");
@@ -578,7 +578,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
     }
 
-    public void addFunctions() throws IOException {
+    public void addFunctions() {
         Code code = classfile.addMethod("call_function", //
                 sig(PyObject.class, Integer.TYPE, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
@@ -640,7 +640,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     @Override
-    public void error(String msg, boolean err, PythonTree node) throws Exception {
+    public void error(String msg, boolean err, PythonTree node) {
         if (!err) {
             try {
                 Py.warning(Py.SyntaxWarning, msg, (sfilename != null) ? sfilename : "?",
@@ -655,7 +655,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         throw Py.SyntaxError(node.getToken(), msg, sfilename);
     }
 
-    public int makeConstArray(Code code, java.util.List<? extends PythonTree> nodes) throws IOException {
+    public int makeConstArray(Code code, java.util.List<? extends PythonTree> nodes) {
         int n = 1;
 
         if (nodes != null) {
@@ -683,13 +683,12 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,
-            boolean linenumbers, CompilerFlags cflags) throws Exception {
+            boolean linenumbers, CompilerFlags cflags) throws IOException {
         compile(node, ostream, name, filename, linenumbers, cflags, -1);
     }
 
     public static void compile(mod node, OutputStream ostream, String name, String filename,
-            boolean linenumbers, CompilerFlags cflags, long mtime)
-            throws Exception {
+            boolean linenumbers, CompilerFlags cflags, long mtime) throws IOException {
         Module module = new Module(name, filename, linenumbers, mtime);
         if (cflags == null) {
             cflags = new CompilerFlags();
@@ -717,7 +716,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         module.write(ostream);
     }
 
-    public void emitNum(Num node, Code code) throws Exception {
+    public void emitNum(Num node, Code code) {
         if (node.getInternalN() instanceof PyLong) {
             longConstant(((PyObject)node.getInternalN()).__str__().toString()).get(code);
         } else if (node.getInternalN() instanceof PyFloat) {
@@ -727,13 +726,13 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
     }
 
-    public void emitStr(Str node, Code code) throws Exception {
+    public void emitStr(Str node, Code code) {
         String s = node.getInternalS();
         unicodeConstant(s).get(code);
     }
 
     public boolean emitPrimitiveArraySetters(java.util.List<? extends PythonTree> nodes, Code code)
-            throws Exception {
+            {
         final int n = nodes.size();
         if (n < USE_SETTERS_LIMIT) {
             return false;  // Too small to matter, so bail

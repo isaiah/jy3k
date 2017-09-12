@@ -3,24 +3,52 @@ package org.python.compiler;
 import org.python.antlr.PythonTree;
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnnAssign;
+import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.AsyncFor;
+import org.python.antlr.ast.AsyncFunctionDef;
+import org.python.antlr.ast.AsyncWith;
+import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.Await;
+import org.python.antlr.ast.BinOp;
+import org.python.antlr.ast.BoolOp;
+import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
+import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Delete;
+import org.python.antlr.ast.Dict;
+import org.python.antlr.ast.ExceptHandler;
+import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
+import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
+import org.python.antlr.ast.IfExp;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
+import org.python.antlr.ast.JoinedStr;
+import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
+import org.python.antlr.ast.Nonlocal;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
+import org.python.antlr.ast.Set;
+import org.python.antlr.ast.Starred;
+import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.Try;
+import org.python.antlr.ast.Tuple;
+import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
+import org.python.antlr.ast.With;
+import org.python.antlr.ast.Yield;
+import org.python.antlr.ast.YieldFrom;
+import org.python.antlr.ast.alias;
 import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
+import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 import org.python.core.PyLong;
@@ -30,27 +58,21 @@ import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class Symtable extends Visitor {
-    public enum Defs {
-        GLOBAL(1), LOCAL(2), PARAM(2<<1), NON_LOCAL(2<<2),
-        USE(2<<3), FREE(2<<4), FREE_CLASS(2<<5), IMPORT(2<<6),
-        ANNOT(2<<7), BOUND(LOCAL.value | PARAM.value | IMPORT.value);
+    public static final int SCOPE_OFFSET = 11;
 
-        int value;
-        private Defs(int val) {
-            value = val;
-        }
-    }
-    public static final int LOCAL = 1;
-    public static final int GLOBAL_EXPLICIT = 2;
-    public static final int GLOBAL_IMPLICIT = 3;
-    public static final int FREE = 4;
-    public static final int CELL = 5;
+    public static final int LOCAL = 1 << SCOPE_OFFSET;
+    public static final int GLOBAL_EXPLICIT = 2 << SCOPE_OFFSET;
+    public static final int GLOBAL_IMPLICIT = 3 << SCOPE_OFFSET;
+    public static final int FREE = 4 << SCOPE_OFFSET;
+    public static final int CELL = 5 << SCOPE_OFFSET;
 
     public static final int DEF_GLOBAL = 1;
     public static final int DEF_LOCAL = 2;
@@ -62,17 +84,18 @@ public class Symtable extends Visitor {
     public static final int DEF_IMPORT = 2 << 6;
     public static final int DEF_ANNOT = 2 << 7;
     public static final int DEF_BOUND = DEF_LOCAL | DEF_PARAM | DEF_IMPORT;
-
     public static final int SCOPE_MASK = DEF_GLOBAL | DEF_LOCAL | DEF_PARAM | DEF_NONLOCAL;
-
     public static final int TYPE_FUNCTION = 0;
     public static final int TYPE_CLASS = 1;
     public static final int TYPE_MODULE = 2;
-
-
-    public static final int SCOPE_OFFSET = 11;
-
-//    PyObject *st_filename;          /* name of file being compiled,
+    private static final String GLOBAL_ANNO = "annotated name %s cannot be global";
+    private static final String NONLOCAL_ANNO = "annotated name %s cannot be nonlocal";
+    private static final String GLOBAL_AFTER_ASSIGN = "name %s is assigned to before global declaration";
+    private static final String NONLOCAL_AFTER_ASSIGN = "name %s is assigned to before nonlocal declaration";
+    private static final String GLOBAL_AFTER_USE = "name %s is used prior to global declaration";
+    private static final String NONLOCAL_AFTER_USE = "name %s is used prior to nonlocal declaration";
+    private static PyObject _top = null;
+    //    PyObject *st_filename;          /* name of file being compiled,
 //                                       decoded from the filesystem encoding */
 //    struct _symtable_entry *st_cur; /* current symbol table entry */
 //    struct _symtable_entry *st_top; /* symbol table entry for module */
@@ -92,19 +115,15 @@ public class Symtable extends Visitor {
     private PySTEntryObject cur;
     private PySTEntryObject top;
     private Map<?, ?> blocks;
-    private List<PySTEntryObject> stack;
+    private Deque<PySTEntryObject> stack;
     private Map<String, EnumSet<Defs>> global;
-
     private int nblocks;
     private PyObject _private;
-//    private PyFutureFeatures future;
+    //    private PyFutureFeatures future;
     private int recursionDeps;
     private int recursionLimit;
-
-    private static PyObject _top = null;
-
     private Symtable() {
-        stack = new ArrayList<>();
+        stack = new LinkedList<>();
         blocks = new HashMap<>();
     }
 
@@ -115,16 +134,32 @@ public class Symtable extends Visitor {
 
         /* Make the initial symbol information gathering pass */
         if (_top == null) {
-            st.enterBlock(_top.toString() /** FIXME */, PySTEntryObject.BlockType.ModuleBlock, mod, 0, 0);
+            st.enterBlock("top" /** FIXME */, PySTEntryObject.BlockType.ModuleBlock, mod, 0, 0);
         }
         st.top = st.cur;
-        mod.traverse(st);
+        mod.accept(st);
+        st.exitBlock(mod);
+        /* Make the second symbol analysis pass */
+        st.analyze();
+        return st;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    private void analyze() {
+        top.analyzeBlock(null, new ArrayList<>(), new ArrayList<>());
+    }
+
+    public PySTEntryObject getTop() {
+        return top;
     }
 
     private void enterBlock(String name, PySTEntryObject.BlockType block, PythonTree ast, int lineno, int colOffset) {
         PySTEntryObject prev = null;
         PySTEntryObject ste = new PySTEntryObject(this, name, block, ast, lineno, colOffset);
-        stack.add(ste);
+        stack.push(ste);
         prev = cur;
         cur = ste;
         if (block == PySTEntryObject.BlockType.ModuleBlock) {
@@ -139,7 +174,8 @@ public class Symtable extends Visitor {
         cur = null;
         int size = stack.size();
         if (size > 1) {
-            cur = stack.get(size - 1);
+            stack.pop();
+            cur = stack.peek();
         }
     }
 
@@ -157,7 +193,7 @@ public class Symtable extends Visitor {
         cur.symbols.put(name, val);
         if (flags.contains(Defs.PARAM)) {
             cur.varnames.add(name);
-        } else if (flags.contains(Defs.GLOBAL)) {
+        } else if (flags.contains(Defs.DEF_GLOBAL)) {
             val = flags;
             if (global.containsKey(name)) {
                 val.addAll(global.get(name));
@@ -165,6 +201,8 @@ public class Symtable extends Visitor {
             global.put(name, val);
         }
     }
+
+    //region AST Visitor Implementation
 
     private void visitArgannotations(List<arg> args) {
         for (arg a : args) {
@@ -175,14 +213,16 @@ public class Symtable extends Visitor {
     }
 
     private void visitAnnotations(arguments a, expr returns) {
-        visitArgannotations(a.getInternalArgs());
-        if (a.getInternalVararg() != null && a.getInternalVararg().getInternalAnnotation() != null) {
-            visit(a.getInternalVararg().getInternalAnnotation());
+        if (a != null) {
+            visitArgannotations(a.getInternalArgs());
+            if (a.getInternalVararg() != null && a.getInternalVararg().getInternalAnnotation() != null) {
+                visit(a.getInternalVararg().getInternalAnnotation());
+            }
+            if (a.getInternalKwarg() != null && a.getInternalKwarg().getInternalAnnotation() != null) {
+                visit(a.getInternalVararg().getInternalAnnotation());
+            }
+            visitArgannotations(a.getInternalKwonlyargs());
         }
-        if (a.getInternalKwarg() != null && a.getInternalKwarg().getInternalAnnotation() != null) {
-            visit(a.getInternalVararg().getInternalAnnotation());
-        }
-        visitArgannotations(a.getInternalKwonlyargs());
         if (returns != null) {
             visit(returns);
         }
@@ -192,7 +232,7 @@ public class Symtable extends Visitor {
         if (seq == null) {
             return;
         }
-        for (PythonTree s: seq) {
+        for (PythonTree s : seq) {
             s.accept(this);
         }
     }
@@ -208,18 +248,39 @@ public class Symtable extends Visitor {
         cur.directives.add(new PyTuple(new PyUnicode(name), new PyLong(s.getLineno()), new PyLong(s.getCol_offset())));
     }
 
-    //region AST Visitor Implementation
+    @Override
+    public Object visitModule(Module node) {
+        visitSeq(node.getInternalBody());
+        return null;
+    }
 
     @Override
     public Object visitFunctionDef(FunctionDef node) {
         addDef(node.getInternalName(), Defs.LOCAL);
         arguments args = node.getInternalArgs();
-        visitSeq(args.getInternalDefaults());
-        visitSeq(args.getInternalDefaults());
+        if (args != null) {
+            visitSeq(args.getInternalDefaults());
+            visitSeq(args.getInternalDefaults());
+        }
         visitAnnotations(args, node.getInternalReturns());
         visitSeq(node.getInternalDecorator_list());
         enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
-        visit(args);
+        visitArguments(args);
+        visitSeq(node.getInternalBody());
+        exitBlock(node);
+        return null;
+    }
+
+    @Override
+    public Object visitAsyncFunctionDef(AsyncFunctionDef node) {
+        addDef(node.getInternalName(), Defs.LOCAL);
+        visitSeq(node.getInternalArgs().getInternalDefaults());
+        visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        visitAnnotations(node.getInternalArgs(), node.getInternalReturns());
+        visitSeq(node.getInternalDecorator_list());
+        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
+        cur.coroutine = true;
+        visitArguments(node.getInternalArgs());
         visitSeq(node.getInternalBody());
         exitBlock(node);
         return null;
@@ -263,13 +324,20 @@ public class Symtable extends Visitor {
     }
 
     @Override
+    public Object visitAugAssign(AugAssign node) {
+        visit(node.getInternalTarget());
+        visit(node.getInternalValue());
+        return null;
+    }
+
+    @Override
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalTarget() instanceof Name) {
             expr eName = node.getInternalTarget();
             EnumSet<Defs> flags = lookup(((Name) node.getInternalTarget()).getInternalId());
-            if ((flags.contains(Defs.GLOBAL) || flags.contains(Defs.NON_LOCAL)) && node.getInternalSimple() > 0) {
+            if ((flags.contains(Defs.DEF_GLOBAL) || flags.contains(Defs.NONLOCAL)) && node.getInternalSimple() > 0) {
                 throw new PySyntaxError(
-                        String.format(flags.contains(Defs.GLOBAL) ? GLOBAL_ANNO : NONLOCAL_ANNO,
+                        String.format(flags.contains(Defs.DEF_GLOBAL) ? GLOBAL_ANNO : NONLOCAL_ANNO,
                                 ((Name) eName).getInternalId()),
                         node.getLine(), node.getCol_offset(), "", filename);
             }
@@ -291,14 +359,16 @@ public class Symtable extends Visitor {
     }
 
     @Override
-    public Object visitAugAssign(AugAssign node) {
+    public Object visitFor(For node) {
         visit(node.getInternalTarget());
-        visit(node.getInternalValue());
+        visit(node.getInternalIter());
+        visitSeq(node.getInternalBody());
+        visitSeq(node.getInternalOrelse());
         return null;
     }
 
     @Override
-    public Object visitFor(For node) {
+    public Object visitAsyncFor(AsyncFor node) {
         visit(node.getInternalTarget());
         visit(node.getInternalIter());
         visitSeq(node.getInternalBody());
@@ -319,6 +389,20 @@ public class Symtable extends Visitor {
         visit(node.getInternalTest());
         visitSeq(node.getInternalBody());
         visitSeq(node.getInternalOrelse());
+        return null;
+    }
+
+    @Override
+    public Object visitWith(With node) {
+        visitSeq(node.getInternalItems());
+        visitSeq(node.getInternalBody());
+        return null;
+    }
+
+    @Override
+    public Object visitAsyncWith(AsyncWith node) {
+        visitSeq(node.getInternalItems());
+        visitSeq(node.getInternalBody());
         return null;
     }
 
@@ -365,9 +449,12 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitGlobal(Global node) {
+        EnumSet<Defs> toCheck = EnumSet.of(Defs.LOCAL, Defs.USE, Defs.ANNOT);
         for (String name : node.getInternalNames()) {
             EnumSet<Defs> cur = lookup(name);
-            EnumSet<Defs> toCheck = EnumSet.of(Defs.LOCAL, Defs.USE, Defs.ANNOT);
+            if (cur == null) {
+                continue;
+            }
             if (cur.stream().anyMatch(toCheck::contains)) {
                 String msg;
                 if (cur.contains(Defs.USE)) {
@@ -379,17 +466,264 @@ public class Symtable extends Visitor {
                 }
                 throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
             }
-            addDef(name, Defs.GLOBAL);
+            addDef(name, Defs.DEF_GLOBAL);
             recordDirective(name, node);
         }
         return null;
     }
+
+    @Override
+    public Object visitNonlocal(Nonlocal node) {
+        EnumSet<Defs> toCheck = EnumSet.of(Defs.LOCAL, Defs.USE, Defs.ANNOT);
+        for (String name : node.getInternalNames()) {
+            EnumSet<Defs> cur = lookup(name);
+            if (cur == null) {
+                continue;
+            }
+            if (cur.stream().anyMatch(toCheck::contains)) {
+                String msg;
+                if (cur.contains(Defs.USE)) {
+                    msg = NONLOCAL_AFTER_USE;
+                } else if (cur.contains(Defs.ANNOT)) {
+                    msg = NONLOCAL_ANNO;
+                } else {
+                    msg = NONLOCAL_AFTER_ASSIGN;
+                }
+                throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
+            }
+            addDef(name, Defs.NONLOCAL);
+            recordDirective(name, node);
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitExpr(Expr node) {
+        visit(node.getInternalValue());
+        return null;
+    }
+
+    /**
+     * symtable_visit_expr
+     */
+    @Override
+    public Object visitBoolOp(BoolOp node) {
+        visitSeq(node.getInternalValues());
+        return null;
+    }
+
+    @Override
+    public Object visitBinOp(BinOp node) {
+        visit(node.getInternalLeft());
+        visit(node.getInternalRight());
+        return null;
+    }
+
+    @Override
+    public Object visitUnaryOp(UnaryOp node) {
+        visit(node.getInternalOperand());
+        return null;
+    }
+
+    @Override
+    public Object visitAnonymousFunction(AnonymousFunction node) {
+        visitSeq(node.getInternalArgs().getInternalDefaults());
+        visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        enterBlock("<lambda>", PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
+        visitArguments(node.getInternalArgs());
+        visitSeq(node.getInternalBody());
+        exitBlock(node);
+        return null;
+    }
+
+    @Override
+    public Object visitIfExp(IfExp node) {
+        visit(node.getInternalTest());
+        visit(node.getInternalBody());
+        visit(node.getInternalOrelse());
+        return null;
+    }
+
+    @Override
+    public Object visitDict(Dict node) {
+        visitSeq(node.getInternalKeys());
+        visitSeq(node.getInternalValues());
+        return null;
+    }
+
+    @Override
+    public Object visitSet(Set node) {
+        visitSeq(node.getInternalElts());
+        return null;
+    }
+
+    @Override
+    public Object visitAwait(Await node) {
+        visit(node.getInternalValue());
+        cur.coroutine = true;
+        return null;
+    }
+
+    @Override
+    public Object visitYield(Yield node) {
+        if (node.getInternalValue() != null) {
+            visit(node.getInternalValue());
+        }
+        cur.generator = true;
+        return null;
+    }
+
+    @Override
+    public Object visitYieldFrom(YieldFrom node) {
+        visit(node.getInternalValue());
+        cur.generator = true;
+        return null;
+    }
+
+    @Override
+    public Object visitCompare(Compare node) {
+        visit(node.getInternalLeft());
+        visitSeq(node.getInternalComparators());
+        return null;
+    }
+
+    @Override
+    public Object visitCall(Call node) {
+        visit(node.getInternalFunc());
+        visitSeq(node.getInternalArgs());
+        visitSeq(node.getInternalKeywords());
+        return null;
+    }
+
+    @Override
+    public Object visitFormattedValue(FormattedValue node) {
+        visit(node.getInternalValue());
+        if (node.getInternalFormat_spec() != null) {
+            visit(node.getInternalFormat_spec());
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitJoinedStr(JoinedStr node) {
+        visitSeq(node.getInternalValues());
+        return null;
+    }
+
+    @Override
+    public Object visitAttribute(Attribute node) {
+        visit(node.getInternalValue());
+        return null;
+    }
+
+    @Override
+    public Object visitSubscript(Subscript node) {
+        visit(node.getInternalValue());
+        visit(node.getInternalSlice());
+        return null;
+    }
+
+    @Override
+    public Object visitStarred(Starred node) {
+        visit(node.getInternalValue());
+        return null;
+    }
+
+    @Override
+    public Object visitName(Name node) {
+        boolean isLoad = node.getInternalCtx() == expr_contextType.Load;
+        addDef(node.getInternalId(), isLoad ? Defs.USE : Defs.LOCAL);
+        if (isLoad && cur.type == PySTEntryObject.BlockType.FunctionBlock && node.getInternalId().equals("super")) {
+            addDef("__class__", Defs.USE);
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitList(org.python.antlr.ast.List node) {
+        visitSeq(node.getInternalElts());
+        return null;
+    }
+
     //endregion
 
-    private static final String GLOBAL_ANNO = "annotated name %s cannot be global";
-    private static final String NONLOCAL_ANNO = "annotated name %s cannot be nonlocal";
-    private static final String GLOBAL_AFTER_ASSIGN = "name %s is assigned to before global declaration";
-    private static final String NONLOCAL_AFTER_ASSIGN = "name %s is assigned to before nonlocal declaration";
-    private static final String GLOBAL_AFTER_USE = "name %s is used prior to global declaration";
-    private static final String NONLOCAL_AFTER_USE = "name %s is used prior to nonlocal declaration";
+    @Override
+    public Object visitTuple(Tuple node) {
+        visitSeq(node.getInternalElts());
+        return null;
+    }
+
+    @Override
+    public Object visitExceptHandler(ExceptHandler node) {
+        if (node.getInternalType() != null) {
+            visit(node.getInternalType());
+        }
+        if (node.getInternalName() != null) {
+            addDef(node.getInternalName(), Defs.LOCAL);
+        }
+        visitSeq(node.getInternalBody());
+        return null;
+    }
+
+    /**
+     * end symtable_visit_expr
+     */
+    public void visitAlias(alias a) {
+        String name = a.getInternalAsname();
+        if (name == null) {
+            name = a.getInternalName();
+        }
+        int dot = name.indexOf('.');
+        String storeName;
+        if (dot >= 0) {
+            storeName = name.substring(0, dot);
+        } else {
+            storeName = name;
+        }
+        if (!name.equals("*")) {
+            addDef(storeName, Defs.IMPORT);
+        } else {
+            if (cur.type != PySTEntryObject.BlockType.ModuleBlock) {
+                throw new PySyntaxError("import * only allowed at module level", cur.lineno, cur.colOffset, "", filename);
+            }
+        }
+
+    }
+
+    public void visitArguments(arguments a) {
+        if (a == null) {
+            return;
+        }
+        visitParams(a.getInternalArgs());
+        visitParams(a.getInternalKwonlyargs());
+        if (a.getInternalVararg() != null) {
+            addDef(a.getInternalVararg().getInternalArg(), Defs.PARAM);
+            cur.varargs = true;
+        }
+        if (a.getInternalKwarg() != null) {
+            addDef(a.getInternalKwarg().getInternalArg(), Defs.PARAM);
+            cur.varkeywords = true;
+        }
+    }
+
+    public void visitParams(List<arg> args) {
+        if (args == null) {
+            return;
+        }
+        for (arg a : args) {
+            addDef(a.getInternalArg(), Defs.PARAM);
+        }
+    }
+
+    public enum Defs {
+        DEF_GLOBAL(1), LOCAL(2), PARAM(2 << 1), NONLOCAL(2 << 2),
+        USE(2 << 3), FREE(2 << 4), FREE_CLASS(2 << 5), IMPORT(2 << 6),
+        ANNOT(2 << 7), BOUND(LOCAL.value | PARAM.value | IMPORT.value);
+
+        int value;
+
+        private Defs(int val) {
+            value = val;
+        }
+    }
 }

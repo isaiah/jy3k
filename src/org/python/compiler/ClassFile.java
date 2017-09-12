@@ -94,7 +94,7 @@ public class ClassFile
         sfilename = name;
     }
 
-    public void addInterface(String name) throws IOException {
+    public void addInterface(String name) {
         String[] new_interfaces = new String[interfaces.length+1];
         System.arraycopy(interfaces, 0, new_interfaces, 0, interfaces.length);
         new_interfaces[interfaces.length] = name;
@@ -102,7 +102,6 @@ public class ClassFile
     }
 
     public Code addMethod(String name, String type, int access)
-        throws IOException
     {
         MethodVisitor mv = cw.visitMethod(access, name, type, null, null);
         Code pmv = new Code(mv, type, access);
@@ -110,7 +109,7 @@ public class ClassFile
         return pmv;
     }
     public Code addMethod(String name, String type, int access, String[] exceptions)
-            throws IOException
+
         {
             MethodVisitor mv = cw.visitMethod(access, name, type, null, exceptions);
             Code pmv = new Code(mv, type, access);
@@ -120,7 +119,7 @@ public class ClassFile
     
     public Code addMethod(String name, String type, int access, String[] exceptions,
             AnnotationDescr[]methodAnnotationDescrs, AnnotationDescr[][] parameterAnnotationDescrs)
-        throws IOException
+
     {
         MethodVisitor mv = cw.visitMethod(access, name, type, null, exceptions);
 
@@ -157,23 +156,18 @@ public class ClassFile
         annotationVisitors.add(av);
     }
     
-    public void addField(String name, String type, int access)
-        throws IOException
-    {
+    public void addField(String name, String type, int access) {
         FieldVisitor fv = cw.visitField(access, name, type, null, null);
         fieldVisitors.add(fv);
     }
 
-    public void endFields()
-        throws IOException
-    {
+    public void endFields() {
         for (FieldVisitor fv : fieldVisitors) {
             fv.visitEnd();
         }
     }
     
     public void endMethods()
-        throws IOException
     {
         for (int i=0; i<methodVisitors.size(); i++) {
             MethodVisitor mv = methodVisitors.get(i);

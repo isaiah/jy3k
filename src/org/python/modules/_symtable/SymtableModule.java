@@ -3,8 +3,15 @@ package org.python.modules._symtable;
 import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
+import org.python.antlr.base.mod;
 import org.python.compiler.PySTEntryObject;
+import org.python.compiler.Symtable;
+import org.python.core.CompileMode;
+import org.python.core.CompilerFlags;
+import org.python.core.ParserFacade;
 import org.python.core.PyObject;
+
+import java.io.StringReader;
 
 @ExposedModule
 public class SymtableModule {
@@ -74,11 +81,16 @@ public class SymtableModule {
     public static final int SCOPE_OFFSET = 11;
 
     public static void init(PyObject dict) {
-//        dict.__setitem__("SymbolTable", PySymbolTable.TYPE);
     }
 
     @ExposedFunction
-    public static PyObject symtable(PyObject code, PyObject filename, PyObject compileType) {
-        return new PySTEntryObject();
+    public static PyObject symtable(String code, String filename, String compileType) {
+        Symtable st = symtableString(code + "\n", filename, compileType);
+        return st.getTop();
+    }
+
+    private static Symtable symtableString(String code, String filename, String start) {
+        mod ast = ParserFacade.parse(new StringReader(code), CompileMode.valueOf(start), filename, CompilerFlags.getCompilerFlags());
+        return Symtable.buildObject(ast, filename, 0);
     }
 }

@@ -11,7 +11,7 @@ abstract class Constant implements Opcodes{
     static int access = ACC_STATIC | ACC_FINAL;
     String name;
 
-    abstract void get(Code mv) throws IOException;
+    abstract void get(Code mv);
 
-    abstract void put(Code mv) throws IOException;
+    abstract void put(Code mv);
 }

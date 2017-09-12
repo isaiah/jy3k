@@ -33,7 +33,7 @@ public class Future {
 
     };
 
-    private boolean check(ImportFrom cand) throws Exception {
+    private boolean check(ImportFrom cand) {
         if (!cand.getInternalModule().equals(FutureFeature.MODULE_NAME))
             return false;
         if (cand.getInternalNames().isEmpty()) {
@@ -51,8 +51,7 @@ public class Future {
         return true;
     }
 
-    public void preprocessFutures(mod node, org.python.core.CompilerFlags cflags)
-            throws Exception {
+    public void preprocessFutures(mod node, org.python.core.CompilerFlags cflags) {
         if (cflags != null) {
 //            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION))
 //                FutureFeature.division.addTo(features);

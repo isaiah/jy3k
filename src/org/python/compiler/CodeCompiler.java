@@ -144,21 +144,21 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         stack = new LinkedList<>();
     }
 
-    public void popException() throws Exception {
+    public void popException() {
         loadThreadState();
         code.invokestatic(p(Py.class), "popException", sig(Void.TYPE, ThreadState.class));
     }
 
-    public void doRaise() throws Exception {
+    public void doRaise() {
         loadThreadState();
         code.invokestatic(p(PyException.class), "doRaise", sig(PyException.class, ThreadState.class));
     }
 
-    public void getNone() throws IOException {
+    public void getNone() {
         code.getstatic(p(Py.class), "None", ci(PyObject.class));
     }
 
-    public void getExcInfo() throws Exception {
+    public void getExcInfo() {
         int exc = code.getLocal(p(PyException.class));
         loadThreadState();
         code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
@@ -172,15 +172,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.freeLocal(exc);
     }
 
-    public void loadFrame() throws Exception {
+    public void loadFrame() {
         code.aload(2);
     }
 
-    public void loadThreadState() throws Exception {
+    public void loadThreadState() {
         code.aload(1);
     }
 
-    public void setLastI(int idx) throws Exception {
+    public void setLastI(int idx) {
         loadFrame();
         code.iconst(idx);
         code.putfield(p(PyFrame.class), "f_lasti", "I");
@@ -190,17 +190,17 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.getfield(p(PyFrame.class), "f_lasti", "I");
     }
 
-    private void loadf_back() throws Exception {
+    private void loadf_back() {
         code.getfield(p(PyFrame.class), "f_back", ci(PyFrame.class));
     }
 
-    public int storeTop() throws Exception {
+    public int storeTop() {
         int tmp = code.getLocal(p(PyObject.class));
         code.astore(tmp);
         return tmp;
     }
 
-    public void setline(int line) throws Exception {
+    public void setline(int line) {
         if (module.linenumbers) {
             code.setline(line);
             loadFrame();
@@ -209,11 +209,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public void setline(PythonTree node) throws Exception {
+    public void setline(PythonTree node) {
         setline(node.getLine());
     }
 
-    public void set(PythonTree node) throws Exception {
+    public void set(PythonTree node) {
         int tmp = storeTop();
         set(node, tmp);
 //        code.aconst_null();
@@ -221,7 +221,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.freeLocal(tmp);
     }
 
-    public void set(PythonTree node, int tmp) throws Exception {
+    public void set(PythonTree node, int tmp) {
         temporary = tmp;
         visit(node);
     }
@@ -231,7 +231,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     void parse(mod node, Code code, boolean fast_locals, String className, ScopeInfo scope,
-               CompilerFlags cflags, boolean needsClassClosure) throws Exception {
+               CompilerFlags cflags, boolean needsClassClosure) {
         this.fast_locals = fast_locals;
         this.className = className;
         this.code = code;
@@ -293,13 +293,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitInteractive(Interactive node) throws Exception {
+    public Object visitInteractive(Interactive node) {
         traverse(node);
         return null;
     }
 
     @Override
-    public Object visitModule(org.python.antlr.ast.Module suite) throws Exception {
+    public Object visitModule(org.python.antlr.ast.Module suite) {
         Str docStr = getDocStr(suite.getInternalBody());
         if (docStr != null) {
             loadFrame();
@@ -313,11 +313,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitExpression(Expression node) throws Exception {
+    public Object visitExpression(Expression node) {
         return visitReturn(new Return(node, node.getInternalBody()), true);
     }
 
-    public void loadList(Code code, java.util.List<? extends PythonTree> nodes) throws Exception {
+    public void loadList(Code code, java.util.List<? extends PythonTree> nodes) {
         final int n = nodes.size();
         code.new_(p(ArrayList.class));
         code.dup();
@@ -339,7 +339,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) throws Exception {
+    public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) {
         final int n;
 
         if (nodes == null) {
@@ -375,7 +375,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public boolean makeClosure(ScopeInfo scope) throws Exception {
+    public boolean makeClosure(ScopeInfo scope) {
         if (scope == null || scope.freevars == null) {
             return false;
         }
@@ -401,7 +401,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAsyncFunctionDef(AsyncFunctionDef node) throws Exception {
+    public Object visitAsyncFunctionDef(AsyncFunctionDef node) {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
@@ -409,14 +409,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitFunctionDef(FunctionDef node) throws Exception {
+    public Object visitFunctionDef(FunctionDef node) {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
         return compileFunction(name, decs, body, node);
     }
 
-    private Object compileFunction(String internalName, java.util.List<expr> decs, java.util.List<stmt> body, stmt node) throws Exception {
+    private Object compileFunction(String internalName, java.util.List<expr> decs, java.util.List<stmt> body, stmt node) {
         String name = getName(internalName);
         setline(node);
 
@@ -470,7 +470,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    private void applyDecorators(java.util.List<expr> decorators) throws Exception {
+    private void applyDecorators(java.util.List<expr> decorators) {
         if (decorators != null && !decorators.isEmpty()) {
             int res = storeTop();
             for (expr decorator : decorators) {
@@ -489,7 +489,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitExpr(Expr node) throws Exception {
+    public Object visitExpr(Expr node) {
         setline(node);
         visit(node.getInternalValue());
 
@@ -502,7 +502,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAssign(Assign node) throws Exception {
+    public Object visitAssign(Assign node) {
         setline(node);
         visit(node.getInternalValue());
         if (node.getInternalTargets().size() == 1) {
@@ -518,20 +518,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitDelete(Delete node) throws Exception {
+    public Object visitDelete(Delete node) {
         setline(node);
         traverse(node);
         return null;
     }
 
     @Override
-    public Object visitPass(Pass node) throws Exception {
+    public Object visitPass(Pass node) {
         setline(node);
         return null;
     }
 
     @Override
-    public Object visitExitFor(ExitFor node) throws Exception {
+    public Object visitExitFor(ExitFor node) {
         popException();
 
         code.goto_(exitLabels.peek());
@@ -539,13 +539,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitPopExcept(PopExcept node) throws Exception {
+    public Object visitPopExcept(PopExcept node) {
         popException();
         return null;
     }
 
     @Override
-    public Object visitBreak(Break node) throws Exception {
+    public Object visitBreak(Break node) {
         // setline(node); Not needed here...
         if (breakLabels.isEmpty()) {
             throw Py.SyntaxError(node.getToken(), "'break' outside loop", module.getFilename());
@@ -558,7 +558,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitContinue(Continue node) throws Exception {
+    public Object visitContinue(Continue node) {
         // setline(node); Not needed here...
         if (continueLabels.isEmpty()) {
             throw Py.SyntaxError(node.getToken(), "'continue' not properly in loop", module.getFilename());
@@ -572,7 +572,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
 
     @Override
-    public Object visitAwait(Await node) throws Exception {
+    public Object visitAwait(Await node) {
         setline(node);
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         visit(node.getInternalValue());
@@ -612,7 +612,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * so it can return to yield from repeatly, until f_lasti is modified by the generator
      */
     @Override
-    public Object visitYieldFrom(YieldFrom node) throws Exception {
+    public Object visitYieldFrom(YieldFrom node) {
         if (!fast_locals) {
             throw Py.SyntaxError(node.getToken(), "'yield from' outside function", module.getFilename());
         }
@@ -641,7 +641,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitYield(Yield node) throws Exception {
+    public Object visitYield(Yield node) {
         setline(node);
         if (!fast_locals) {
             throw Py.SyntaxError(node.getToken(), "'yield' outside function", module.getFilename());
@@ -673,7 +673,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    private void restoreLocals() throws Exception {
+    private void restoreLocals() {
         endExceptionHandlers();
 
         String[] v = code.getActiveLocals();
@@ -719,7 +719,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    private void saveLocals() throws Exception {
+    private void saveLocals() {
         String[] v = code.getActiveLocals();
         loadFrame();
         code.iconst(v.length);
@@ -745,11 +745,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitReturn(Return node) throws Exception {
+    public Object visitReturn(Return node) {
         return visitReturn(node, false);
     }
 
-    public Object visitReturn(Return node, boolean inEval) throws Exception {
+    public Object visitReturn(Return node, boolean inEval) {
         setline(node);
         if (!inEval && !fast_locals) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
@@ -774,7 +774,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitRaise(Raise node) throws Exception {
+    public Object visitRaise(Raise node) {
         setline(node);
         if (node.getInternalExc() != null) {
             visit(node.getInternalExc());
@@ -799,7 +799,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitImport(Import node) throws Exception {
+    public Object visitImport(Import node) {
         setline(node);
         for (alias a : node.getInternalNames()) {
             String asname, name = a.getInternalName();
@@ -841,7 +841,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitImportFrom(ImportFrom node) throws Exception {
+    public Object visitImportFrom(ImportFrom node) {
         java.util.List<alias> aliases = node.getInternalNames();
         setline(node);
         loadFrame();
@@ -881,17 +881,17 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitGlobal(Global node) throws Exception {
+    public Object visitGlobal(Global node) {
         return null;
     }
 
     @Override
-    public Object visitNonlocal(Nonlocal node) throws Exception {
+    public Object visitNonlocal(Nonlocal node) {
         return null;
     }
 
     @Override
-    public Object visitAssert(Assert node) throws Exception {
+    public Object visitAssert(Assert node) {
         setline(node);
         Label end_of_assert = new Label();
 
@@ -933,7 +933,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public Object doTest(Label end_of_if, If node, int index) throws Exception {
+    public Object doTest(Label end_of_if, If node, int index) {
         Label end_of_suite = new Label();
 
         setline(node.getInternalTest());
@@ -958,7 +958,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitIf(If node) throws Exception {
+    public Object visitIf(If node) {
         Label end_of_if = null;
         if (node.getInternalOrelse() != null) {
             end_of_if = new Label();
@@ -972,7 +972,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitIfExp(IfExp node) throws Exception {
+    public Object visitIfExp(IfExp node) {
         setline(node.getInternalTest());
         Label end = new Label();
         Label end_of_else = new Label();
@@ -1009,7 +1009,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitWhile(While node) throws Exception {
+    public Object visitWhile(While node) {
         int savebcf = beginLoop();
         Label continue_loop = continueLabels.peek();
         Label break_loop = breakLabels.peek();
@@ -1051,7 +1051,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
 
     public void exceptionTest(int exc, Label end_of_exceptions, Try node)
-            throws Exception {
+            {
         for (int i = 0; i < node.getInternalHandlers().size(); i++) {
             ExceptHandler handler = (ExceptHandler) node.getInternalHandlers().get(i);
 
@@ -1087,7 +1087,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitTry(Try node) throws Exception {
+    public Object visitTry(Try node) {
         Label start = new Label();
         Label end = new Label();
         Label handler_start = new Label();
@@ -1139,19 +1139,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitSuite(Suite node) throws Exception {
+    public Object visitSuite(Suite node) {
         return suite(node.getInternalBody());
     }
 
     @Override
-    public Object visitBlock(Block node) throws Exception {
+    public Object visitBlock(Block node) {
         for (stmt s: node.getInternalBody()) {
             visit(s);
         }
         return null;
     }
 
-    public Object suite(java.util.List<stmt> stmts) throws Exception {
+    public Object suite(java.util.List<stmt> stmts) {
         for (stmt s : stmts) {
             Object exit = visit(s);
             if (exit != null) {
@@ -1162,7 +1162,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitBoolOp(BoolOp node) throws Exception {
+    public Object visitBoolOp(BoolOp node) {
         Label end = new Label();
         visit(node.getInternalValues().get(0));
         for (int i = 1; i < node.getInternalValues().size(); i++) {
@@ -1184,7 +1184,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitCompare(Compare node) throws Exception {
+    public Object visitCompare(Compare node) {
         Label end = new Label();
 
         visit(node.getInternalLeft());
@@ -1212,7 +1212,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public void visitCmpop(cmpopType op) throws Exception {
+    public void visitCmpop(cmpopType op) {
         if (op == cmpopType.In) {
             code.invokevirtual(p(PyObject.class), "_in", sig(PyObject.class, PyObject.class));
         } else if (op == cmpopType.Is) {
@@ -1249,7 +1249,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitBinOp(BinOp node) throws Exception {
+    public Object visitBinOp(BinOp node) {
         visit(node.getInternalLeft());
         visit(node.getInternalRight());
         String name = null;
@@ -1304,7 +1304,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitUnaryOp(UnaryOp node) throws Exception {
+    public Object visitUnaryOp(UnaryOp node) {
         visit(node.getInternalOperand());
         String name = null;
         switch (node.getInternalOp()) {
@@ -1326,7 +1326,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAnnAssign(AnnAssign node) throws Exception {
+    public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalValue() != null) {
             setline(node);
             visit(node.getInternalValue());
@@ -1342,7 +1342,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * @return
      * @throws IOException
      */
-    static void loadStrings(Code c, Collection<String> names) throws IOException {
+    static void loadStrings(Code c, Collection<String> names) {
         if (names != null) {
             c.iconst(names.size());
         } else {
@@ -1361,7 +1361,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public Object invokeNoKeywords(Attribute node, java.util.List<expr> values) throws Exception {
+    public Object invokeNoKeywords(Attribute node, java.util.List<expr> values) {
         String name = getName(node.getInternalAttr());
         visit(node.getInternalValue());
         code.ldc(name);
@@ -1422,7 +1422,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitCall(Call node) throws Exception {
+    public Object visitCall(Call node) {
         java.util.List<expr> kwargs = new ArrayList<>();
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = node.getInternalArgs();
@@ -1543,7 +1543,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public Object Slice(Subscript node, Slice slice) throws Exception {
+    public Object Slice(Subscript node, Slice slice) {
         expr_contextType ctx = node.getInternalCtx();
         visit(node.getInternalValue());
         if (slice.getInternalLower() != null) {
@@ -1586,7 +1586,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitSubscript(Subscript node) throws Exception {
+    public Object visitSubscript(Subscript node) {
         int value = temporary;
         expr_contextType ctx = node.getInternalCtx();
         visit(node.getInternalValue());
@@ -1613,13 +1613,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitIndex(Index node) throws Exception {
+    public Object visitIndex(Index node) {
         traverse(node);
         return null;
     }
 
     @Override
-    public Object visitExtSlice(ExtSlice node) throws Exception {
+    public Object visitExtSlice(ExtSlice node) {
         code.new_(p(PyTuple.class));
         code.dup();
         loadArray(code, node.getInternalDims());
@@ -1628,7 +1628,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAttribute(Attribute node) throws Exception {
+    public Object visitAttribute(Attribute node) {
         visit(node.getInternalValue());
 //        code.ldc(getName(node.getInternalAttr()));
         expr_contextType ctx = node.getInternalCtx();
@@ -1654,11 +1654,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public Object seqSet(java.util.List<expr> nodes) throws Exception {
+    public Object seqSet(java.util.List<expr> nodes) {
         return seqSet(nodes, nodes.size(), -1);
     }
 
-    public Object seqSet(java.util.List<expr> nodes, int count, int countAfter) throws Exception {
+    public Object seqSet(java.util.List<expr> nodes, int count, int countAfter) {
         code.aload(temporary);
         code.iconst(count);
         code.iconst(countAfter);
@@ -1675,14 +1675,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public Object seqDel(java.util.List<expr> nodes) throws Exception {
+    public Object seqDel(java.util.List<expr> nodes) {
         for (expr e : nodes) {
             visit(e);
         }
         return null;
     }
 
-    private Object checkStarred(java.util.List<expr> elts, PythonTree node) throws Exception {
+    private Object checkStarred(java.util.List<expr> elts, PythonTree node) {
         boolean foundStarred = false;
         int count = elts.size();
         int countAfter = -1;
@@ -1705,7 +1705,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitTuple(Tuple node) throws Exception {
+    public Object visitTuple(Tuple node) {
         if (node.getInternalCtx() == expr_contextType.Store) {
             return checkStarred(node.getInternalElts(), node);
         }
@@ -1720,7 +1720,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitList(List node) throws Exception {
+    public Object visitList(List node) {
         if (node.getInternalCtx() == expr_contextType.Store) {
             return checkStarred(node.getInternalElts(), node);
         }
@@ -1734,7 +1734,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitDict(Dict node) throws Exception {
+    public Object visitDict(Dict node) {
         java.util.List<PythonTree> elts = new ArrayList<PythonTree>();
         java.util.List<expr> keys = node.getInternalKeys();
         java.util.List<expr> vals = node.getInternalValues();
@@ -1765,7 +1765,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitSet(Set node) throws Exception {
+    public Object visitSet(Set node) {
         java.util.List<expr> elts = node.getInternalElts();
         java.util.List<expr> stars = new ArrayList<>();
         java.util.List<expr> scalars = new ArrayList<>();
@@ -1788,7 +1788,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitAnonymousFunction(AnonymousFunction node) throws Exception {
+    public Object visitAnonymousFunction(AnonymousFunction node) {
         String name = "<lambda>";
 
 //        // Add a synthetic return node onto the outside of suite;
@@ -1831,13 +1831,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitEllipsis(Ellipsis node) throws Exception {
+    public Object visitEllipsis(Ellipsis node) {
         code.getstatic(p(Py.class), "Ellipsis", ci(PyObject.class));
         return null;
     }
 
     @Override
-    public Object visitSlice(Slice node) throws Exception {
+    public Object visitSlice(Slice node) {
         if (node.getInternalLower() == null) {
             getNone();
         } else {
@@ -1869,7 +1869,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitClassDef(ClassDef node) throws Exception {
+    public Object visitClassDef(ClassDef node) {
         ScopeInfo scope = module.getScopeInfo(node);
         String name = getName(node.getInternalName());
         setline(node);
@@ -1935,7 +1935,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitNum(Num node) throws Exception {
+    public Object visitNum(Num node) {
         module.constant(node).get(code);
         return null;
     }
@@ -1952,19 +1952,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return name;
     }
 
-    void emitGetGlobal(String name) throws Exception {
+    void emitGetGlobal(String name) {
         code.ldc(name);
         code.invokevirtual(p(PyFrame.class), "getglobal", sig(PyObject.class, String.class));
     }
 
     @Override
-    public Object visitStarred(Starred node) throws Exception {
+    public Object visitStarred(Starred node) {
         visit(node.getInternalValue());
         return null;
     }
 
     @Override
-    public Object visitNameConstant(NameConstant node) throws Exception {
+    public Object visitNameConstant(NameConstant node) {
         String name = node.getInternalValue();
         if (name.equals("None")) {
             getNone();
@@ -1978,7 +1978,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitName(Name node) throws Exception {
+    public Object visitName(Name node) {
         String name;
         if (fast_locals) {
             name = node.getInternalId();
@@ -2092,7 +2092,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitJoinedStr(JoinedStr node) throws Exception {
+    public Object visitJoinedStr(JoinedStr node) {
         java.util.List<expr> values = node.getInternalValues();
         int n = values.size();
         code.iconst(n);
@@ -2109,7 +2109,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitFormattedValue(FormattedValue node) throws Exception {
+    public Object visitFormattedValue(FormattedValue node) {
         visit(node.getInternalValue());
         int conversion = node.getInternalConversion();
         if (conversion == 'r') {
@@ -2127,20 +2127,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitBytes(Bytes node) throws Exception {
+    public Object visitBytes(Bytes node) {
         module.constant(node).get(code);
         return null;
     }
 
     @Override
-    public Object visitStr(Str node) throws Exception {
+    public Object visitStr(Str node) {
         module.constant(node).get(code);
         return null;
     }
 
     @Override
-    protected Object unhandled_node(PythonTree node) throws Exception {
-        throw new Exception("Unhandled node " + node);
+    protected Object unhandled_node(PythonTree node) {
+        throw new RuntimeException("Unhandled node " + node);
     }
 
     /**
@@ -2177,7 +2177,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             return node != null;
         }
 
-        public void addExceptionHandlers(Label handlerStart) throws Exception {
+        public void addExceptionHandlers(Label handlerStart) {
             for (int i = 0; i < exceptionStarts.size(); ++i) {
                 Label start = exceptionStarts.elementAt(i);
                 Label end = exceptionEnds.elementAt(i);
@@ -2189,7 +2189,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         }
 
-        public void finalBody(CodeCompiler compiler) throws Exception {
+        public void finalBody(CodeCompiler compiler) {
             if (node instanceof Try) {
                 compiler.suite(((Try) node).getInternalFinalbody());
             }
