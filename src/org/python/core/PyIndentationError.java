@@ -20,7 +20,7 @@ public class PyIndentationError extends PyException {
         super(Py.IndentationError);
         PyObject[] tmp = new PyObject[] {
             new PyUnicode(filename), new PyLong(line),
-            new PyLong(column), new PyUnicode(text)
+            new PyLong(column + 1), new PyUnicode(text)
         };
 
         this.value = new PyTuple(new PyUnicode(s), new PyTuple(tmp));

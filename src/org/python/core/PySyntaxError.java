@@ -33,7 +33,7 @@ public class PySyntaxError extends PyException {
         }
         PyObject[] tmp = new PyObject[] {
             new PyUnicode(filename), new PyLong(line),
-            new PyLong(column), new PyUnicode(text)
+            new PyLong(column + 1), new PyUnicode(text) /** cpython col offset starts from 1 */
         };
 
         this.value = new PyTuple(new PyUnicode(s), new PyTuple(tmp));

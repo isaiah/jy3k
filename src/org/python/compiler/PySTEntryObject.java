@@ -26,7 +26,7 @@ import static org.python.compiler.Symtable.Flag.*;
 @ExposedType
 public class PySTEntryObject extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PySTEntryObject.class);
-//        PyObject *ste_id;        /* int: key in ste_table->st_blocks */
+//    PyObject *ste_id;        /* int: key in ste_table->st_blocks */
 //    PyObject *ste_symbols;   /* dict: variable names to flags */
 //    PyObject *ste_name;      /* string: name of current block */
 //    PyObject *ste_varnames;  /* list of function parameters */
@@ -245,9 +245,9 @@ public class PySTEntryObject extends PyObject {
     }
 
     private void analyzeChildBlock(Set<String> bound, Set<String> free, Set<String> global, Set<String> childFree) {
-        Set<String> tempBound = new HashSet<>();
-        Set<String> tempFree = new HashSet<>();
-        Set<String> tempGlobal = new HashSet<>();
+        Set<String> tempBound = new HashSet<>(bound);
+        Set<String> tempFree = new HashSet<>(free);
+        Set<String> tempGlobal = new HashSet<>(global);
 
         analyzeBlock(tempBound, tempFree, tempGlobal);
         childFree.addAll(tempFree);

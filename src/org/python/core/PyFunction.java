@@ -625,11 +625,11 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
                     break;
             }
             MethodHandle guard = null;
-            if (self != null) {
-                guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
-            } else {
+//            if (self != null) {
+//                guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
+//            } else {
                 guard = Guards.getIdentityGuard(this);
-            }
+//            }
             return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
 

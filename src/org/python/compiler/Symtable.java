@@ -65,6 +65,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class Symtable extends Visitor {
     public static final int SCOPE_OFFSET = 11;
@@ -431,22 +432,21 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitGlobal(Global node) {
-        EnumSet<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO);
+        Stream<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO).stream();
         for (String name : node.getInternalNames()) {
             EnumSet<Flag> cur = lookup(name);
-            if (cur == null) {
-                continue;
-            }
-            if (cur.stream().anyMatch(toCheck::contains)) {
-                String msg;
-                if (cur.contains(Flag.DEF_USE)) {
-                    msg = GLOBAL_AFTER_USE;
-                } else if (cur.contains(Flag.DEF_ANNO)) {
-                    msg = GLOBAL_ANNO;
-                } else {
-                    msg = GLOBAL_AFTER_ASSIGN;
+            if (cur != null) {
+                if (toCheck.anyMatch(cur::contains)) {
+                    String msg;
+                    if (cur.contains(Flag.DEF_USE)) {
+                        msg = GLOBAL_AFTER_USE;
+                    } else if (cur.contains(Flag.DEF_ANNO)) {
+                        msg = GLOBAL_ANNO;
+                    } else {
+                        msg = GLOBAL_AFTER_ASSIGN;
+                    }
+                    throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
                 }
-                throw new PySyntaxError(String.format(msg, name), node.getLineno(), node.getCol_offset(), "", filename);
             }
             addDef(name, Flag.DEF_GLOBAL);
             recordDirective(name, node);
