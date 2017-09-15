@@ -38,7 +38,7 @@ import static org.python.compiler.CompilerConstants.ANNOT;
 public class AnnotationsCreator extends Visitor {
 
     @Override
-    public Object visitFunctionDef(FunctionDef node) throws Exception {
+    public Object visitFunctionDef(FunctionDef node) {
         for (stmt s : node.getInternalBody()) {
             if (s instanceof ClassDef) {
                 visitClassDef((ClassDef) s);
@@ -60,7 +60,7 @@ public class AnnotationsCreator extends Visitor {
     }
 
     @Override
-    public Object visitClassDef(ClassDef node) throws Exception {
+    public Object visitClassDef(ClassDef node) {
         if (findAnno(node.getInternalBody())) {
             Name anno = new Name(node, ANNOT.symbolName(), expr_contextType.Store);
             Dict value = new Dict(anno, null, null);
@@ -71,7 +71,7 @@ public class AnnotationsCreator extends Visitor {
     }
 
     @Override
-    public Object visitModule(org.python.antlr.ast.Module node) throws Exception {
+    public Object visitModule(org.python.antlr.ast.Module node) {
         /**
          * if __annotations__ not in locals():
          *   __annotations__ == {}

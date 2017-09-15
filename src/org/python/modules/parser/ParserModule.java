@@ -2,18 +2,36 @@ package org.python.modules.parser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.python.annotations.ModuleInit;
 import org.python.antlr.PythonLexer;
 import org.python.antlr.PythonParser;
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
+import org.python.core.PyStringMap;
+import org.python.core.PyUnicode;
 
-/**
- * Created by isaiah on 3/22/17.
- */
 @ExposedModule(name = "parser")
 public class ParserModule {
+    /** _csv.Error exception. */
+    public static final PyObject Error = Py.makeClass("ParserError", exceptionNamespace(), Py.Exception);
+
+    public static PyException ParserError(String message) {
+        return new PyException(Error, message);
+    }
+
+    private static PyObject exceptionNamespace() {
+        PyObject dict = new PyStringMap();
+        dict.__setitem__("__module__", new PyUnicode("parser"));
+        return dict;
+    }
+
+    @ModuleInit
+    public static void init(PyObject dict) {
+        dict.__setitem__("ParserError", Error);
+    }
 
     @ExposedFunction
     public static PySTType expr(PyObject string) {

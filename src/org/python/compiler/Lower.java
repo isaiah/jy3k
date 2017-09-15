@@ -92,7 +92,7 @@ public class Lower extends Visitor {
      * @return
      */
     @Override
-    public Object visitAsyncFor(AsyncFor node) throws Exception {
+    public Object visitAsyncFor(AsyncFor node) {
         traverse(node);
         String tmp = "(tmp)" + counter++;
         Name storeTmp = new Name(node, tmp, expr_contextType.Store);
@@ -137,10 +137,9 @@ public class Lower extends Visitor {
      *
      * @param node
      * @return
-     * @throws Exception
      */
     @Override
-    public Object visitFor(For node) throws Exception {
+    public Object visitFor(For node) {
         traverse(node);
         String tmp = "(tmp)" + counter++;
         Name storeTmp = new Name(node, tmp, expr_contextType.Store);
@@ -167,10 +166,9 @@ public class Lower extends Visitor {
      * https://www.python.org/dev/peps/pep-0343/
      * @param node
      * @return
-     * @throws Exception
      */
     @Override
-    public Object visitWith(With node) throws Exception {
+    public Object visitWith(With node) {
         traverse(node);
         stmt enterStmt;
         withitem item = node.getInternalItems().get(0);
@@ -260,7 +258,7 @@ public class Lower extends Visitor {
      * @return
      */
     @Override
-    public Object visitAsyncWith(AsyncWith node) throws Exception {
+    public Object visitAsyncWith(AsyncWith node) {
         traverse(node);
         stmt enterStmt;
         withitem item = node.getInternalItems().get(0);
@@ -342,31 +340,30 @@ public class Lower extends Visitor {
       *
       * @param node
       * @return
-      * @throws Exception
       */
     @Override
-    public Object visitListComp(ListComp node) throws Exception {
+    public Object visitListComp(ListComp node) {
 //        traverse(node);
         org.python.antlr.ast.List emptyList = new org.python.antlr.ast.List(node, null, expr_contextType.Load);
         return visitComp(emptyList, "append", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
-    public Object visitSetComp(SetComp node) throws Exception {
+    public Object visitSetComp(SetComp node) {
 //        traverse(node);
         org.python.antlr.ast.Set emptySet = new org.python.antlr.ast.Set(node, null);
         return visitComp(emptySet, "add", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
-    public Object visitDictComp(DictComp node) throws Exception {
+    public Object visitDictComp(DictComp node) {
 //        traverse(node);
         org.python.antlr.ast.Dict emptyDict = new org.python.antlr.ast.Dict(node, null, null);
         return visitComp(emptyDict, "__setitem__", node, node.getInternalGenerators(), node.getInternalKey(), node.getInternalValue());
     }
 
     @Override
-    public Object visitGeneratorExp(GeneratorExp node) throws Exception {
+    public Object visitGeneratorExp(GeneratorExp node) {
         traverse(node);
         stmt n = new Expr(node, new Yield(node, node.getInternalElt()));
         expr iter = null;
@@ -407,7 +404,7 @@ public class Lower extends Visitor {
      * @return
      */
     @Override
-    public Object visitLambda(Lambda node) throws Exception {
+    public Object visitLambda(Lambda node) {
         traverse(node);
         java.util.List<stmt> bod = asList(new Return(node, node.getInternalBody()));
         expr anonymousFunction = new AnonymousFunction(node, node.getInternalArgs(), bod);
@@ -429,11 +426,10 @@ public class Lower extends Visitor {
      *
      * @param node
      * @return
-     * @throws Exception
      */
 
     @Override
-    public Object visitAugAssign(AugAssign node) throws Exception {
+    public Object visitAugAssign(AugAssign node) {
         traverse(node);
         expr left = node.getInternalTarget().copy();
         ((Context) left).setContext(expr_contextType.Load);
@@ -447,7 +443,7 @@ public class Lower extends Visitor {
     }
 
     @Override
-    public Object visitTry(Try node) throws Exception {
+    public Object visitTry(Try node) {
         // apply other lowers in this visitor first
         traverse(node);
         final List<stmt> finalBody = node.getInternalFinalbody();
@@ -503,7 +499,7 @@ public class Lower extends Visitor {
             }
 
             @Override
-            public Object visitTry(Try node) throws Exception {
+            public Object visitTry(Try node) {
                 return Lower.this.visitTry(node);
             }
 
@@ -557,7 +553,7 @@ public class Lower extends Visitor {
         return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
     }
 
-    private Object visitComp(expr initVal, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) throws Exception {
+    private Object visitComp(expr initVal, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) {
         String tmp = "(tmp)";
         Name loadTmp = new Name(node, tmp, expr_contextType.Load);
         expr append = new Attribute(node, loadTmp, appendMeth, expr_contextType.Load);

@@ -39,7 +39,7 @@ public class ClassClosureGenerator extends Visitor {
     private Deque<Boolean> needsClosure = new LinkedList<>();
 
     @Override
-    public Object visitClassDef(ClassDef node) throws Exception {
+    public Object visitClassDef(ClassDef node) {
         inClass.push(true);
         needsClosure.push(false);
         traverse(node);
@@ -52,7 +52,7 @@ public class ClassClosureGenerator extends Visitor {
     }
 
     @Override
-    public Object visitName(Name node) throws Exception {
+    public Object visitName(Name node) {
         if (!inClass.isEmpty() && inClass.peek() && !needsClosure.peek()) {
             String name = node.getInternalId();
             if (name.equals("__class__") || name.equals("super")) {
