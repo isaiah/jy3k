@@ -4,7 +4,6 @@ package org.python.compiler;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Num;
@@ -17,7 +16,6 @@ import org.python.core.CodeLoader;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyBytes;
-import org.python.core.PyCode;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -34,13 +32,9 @@ import org.python.core.ThreadState;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.python.util.CodegenUtils.*;
 
@@ -215,201 +209,17 @@ class PyLongConstant extends Constant implements ClassConstants, Opcodes {
 }
 
 
-class PyCodeConstant extends Constant implements ClassConstants, Opcodes {
-
-    final String co_name;
-    final int argcount;
-    final int kwonlyargcount;
-    final List<String> varnames;
-    final List<String> names;
-    final List<PythonTree> constants;
-    final int id;
-    final int co_firstlineno;
-    final boolean arglist, keywordlist;
-    final String fname;
-    // for nested scopes
-    final List<String> cellvars;
-    final List<String> freevars;
-    final int jy_npurecell;
-    final int moreflags;
-
-    PyCodeConstant(mod tree, String name, boolean fast_locals, int firstlineno, ScopeInfo scope, CompilerFlags cflags,
-            Module module) {
-        this.co_name = name;
-        this.co_firstlineno = firstlineno;
-        this.module = module;
-
-        // Needed so that moreflags can be final.
-        int _moreflags = 0;
-
-        if (scope.ac != null) {
-            arglist = scope.ac.arglist;
-            keywordlist = scope.ac.keywordlist;
-            kwonlyargcount = scope.ac.kwonlyargcount;
-            argcount = scope.ac.names.size() - kwonlyargcount;
-
-            // Do something to add init_code to tree
-            // XXX: not sure we should be modifying scope.ac in a PyCodeConstant
-            // constructor.
-            if (scope.ac.init_code.size() > 0) {
-                scope.ac.appendInitCode((Suite)tree);
-            }
-        } else {
-            arglist = false;
-            keywordlist = false;
-            argcount = 0;
-            kwonlyargcount = 0;
-        }
-
-        id = module.codes.size();
-
-        // Better names in the future?
-        if (isJavaIdentifier(name)) {
-            fname = name + "$" + id;
-        } else {
-            fname = "f$" + id;
-        }
-        // XXX: is fname needed at all, or should we just use "name"?
-        this.name = fname;
-
-
-        varnames = toNameAr(scope.varNames, false);
-        constants = scope.constants;
-        names = toNameAr(scope.globalNames, true);
-        cellvars = toNameAr(scope.cellvars, true);
-        freevars = toNameAr(scope.freevars, true);
-        jy_npurecell = scope.jy_npurecell;
-
-        if (CodeCompiler.checkOptimizeGlobals(fast_locals, scope)) {
-            _moreflags |= CodeFlag.CO_OPTIMIZED.flag | CodeFlag.CO_NEWLOCALS.flag;
-        }
-
-        if (scope.isNested()) {
-            _moreflags |= CodeFlag.CO_NESTED.flag;
-        }
-
-        if (scope.freevars.isEmpty() && scope.cellvars.isEmpty()) {
-            _moreflags |= CodeFlag.CO_NOFREE.flag;
-        }
-
-        if (scope.async_gen) {
-            _moreflags |= CodeFlag.CO_ASYNC_GENERATOR.flag;
-        } else if (scope.async) {
-            _moreflags |= CodeFlag.CO_COROUTINE.flag;
-        } else if (scope.generator) {
-            _moreflags |= CodeFlag.CO_GENERATOR.flag;
-        }
-//        if (cflags != null) {
-//            if (cflags.isFlagSet(CodeFlag.CO_GENERATOR_ALLOWED)) {
-//                _moreflags |= CodeFlag.CO_GENERATOR_ALLOWED.flag;
-//            }
-//            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
-//                _moreflags |= CodeFlag.CO_FUTURE_DIVISION.flag;
-//            }
-//        }
-        moreflags = _moreflags;
-    }
-
-    // XXX: this can probably go away now that we can probably just copy the list.
-    private List<String> toNameAr(List<String> names, boolean nullok) {
-        int sz = names.size();
-        if (sz == 0 && nullok) {
-            return null;
-        }
-        List<String> nameArray = new ArrayList<String>();
-        nameArray.addAll(names);
-        return nameArray;
-    }
-
-    private boolean isJavaIdentifier(String s) {
-        char[] chars = s.toCharArray();
-        if (chars.length == 0) {
-            return false;
-        }
-        if (!Character.isJavaIdentifierStart(chars[0])) {
-            return false;
-        }
-
-        for (int i = 1; i < chars.length; i++) {
-            if (!Character.isJavaIdentifierPart(chars[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    void get(Code c) {
-        c.getstatic(module.classfile.name, name, ci(PyTableCode.class));
-    }
-
-    @Override
-    void put(Code c) {
-        module.classfile.addField(name, ci(PyTableCode.class), access);
-        c.iconst(argcount);
-
-        // Make all var names
-        CodeCompiler.loadStrings(c, varnames);
-        c.aload(1);
-        c.ldc(co_name);
-        c.iconst(co_firstlineno);
-
-        c.iconst(arglist ? 1 : 0);
-        c.iconst(keywordlist ? 1 : 0);
-
-        c.getstatic(module.classfile.name, "self", "L" + module.classfile.name + ";");
-
-        c.iconst(id);
-
-        if (cellvars != null) {
-            CodeCompiler.loadStrings(c, cellvars);
-        } else {
-            c.aconst_null();
-        }
-        if (freevars != null) {
-            CodeCompiler.loadStrings(c, freevars);
-        } else {
-            c.aconst_null();
-        }
-
-        if (names != null) {
-            CodeCompiler.loadStrings(c, names);
-        } else {
-            c.aconst_null();
-        }
-        if (constants != null) {
-            int constArr = module.makeConstArray(c, constants);
-            c.aload(constArr);
-            c.freeLocal(constArr);
-        }
-
-        c.iconst(jy_npurecell);
-        c.iconst(kwonlyargcount);
-        c.iconst(moreflags);
-        c.ldc(name);
-
-        c.invokestatic(
-                p(Py.class),
-                "newCode",
-                sig(PyTableCode.class, Integer.TYPE, String[].class, String.class, String.class,
-                        Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
-                        Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,
-                        Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class));
-        c.putstatic(module.classfile.name, name, ci(PyTableCode.class));
-    }
-}
-
 public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     ClassFile classfile;
     Constant filename;
     String name;
     String sfilename;
-    Constant mainCode;
+    CompileUnit mainCode;
     boolean linenumbers;
     Future futures;
     Map<PythonTree, ScopeInfo> scopes;
-    List<PyCodeConstant> codes;
+    List<CompileUnit> codes;
     long mtime;
     private int setter_count = 0;
     private final static int USE_SETTERS_LIMIT = 100;
@@ -497,9 +307,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return findConstant(new PyLongConstant(value));
     }
 
-    PyCodeConstant codeConstant(mod tree, String name, boolean fast_locals, String className,
-                                int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) {
-        PyCodeConstant code = new PyCodeConstant(tree, name, fast_locals, firstlineno, scope, cflags, this);
+    CompileUnit codeConstant(mod tree, String name, boolean fast_locals, String className,
+                             int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) {
+        CompileUnit code = new CompileUnit(tree, name, fast_locals, firstlineno, scope, cflags, this);
         codes.add(code);
 
         CodeCompiler compiler = new CodeCompiler(this);
@@ -553,7 +363,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     void addCodeInit() {
         for (int i = 0; i < codes.size(); i++) {
-            PyCodeConstant pyc = codes.get(i);
+            CompileUnit pyc = codes.get(i);
             Code c = classfile.addMethod("init" + pyc.fname,
                     sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_FINAL);
             pyc.put(c);
@@ -571,7 +381,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
 
         for (int i = 0; i < codes.size(); i++) {
-            PyCodeConstant pyc = codes.get(i);
+            CompileUnit pyc = codes.get(i);
             c.aload(0); // this
             c.aload(1); // filename
             c.invokevirtual(classfile.name, "init" + pyc.fname, sig(Void.TYPE, String.class));
@@ -710,7 +520,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
         // Add __doc__ if it exists
-        Constant main = module.codeConstant(node, "<module>", false, null,
+        CompileUnit main = module.codeConstant(node, "<module>", false, null,
                 0, module.getScopeInfo(node), cflags, false);
         module.mainCode = main;
         module.write(ostream);

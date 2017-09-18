@@ -123,7 +123,6 @@ public class ArgListCompiler extends Visitor
 
     @Override
     public Object visitName(Name node) {
-        //FIXME: do we need Store and Param, or just Param?
         if (node.getInternalCtx() != expr_contextType.Store && node.getInternalCtx() != expr_contextType.Param) {
             return null;
         } 
