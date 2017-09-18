@@ -46,19 +46,10 @@ public class ScopesCompiler extends Visitor implements ScopeConstants {
             qualname = name;
         } else if (level > 1) {
             qualname = cur.qualname;
-            if (cur.kind == FUNCSCOPE && kind != CLASSSCOPE) { // ignore the __class__ closure
+            if (cur.kind == FUNCSCOPE) {
                  qualname += ".<locals>";
             }
-            if (kind == CLASSSCOPE) {
-                int dot = qualname.lastIndexOf(".");
-                if (dot != -1) {
-                    qualname = qualname.substring(0, dot + 1) + name; // remove the __class__ closure
-                } else {
-                    qualname = name;
-                }
-            } else {
-                qualname += "." + name;
-            }
+            qualname += "." + name;
         } else {
             qualname = "";
         }
