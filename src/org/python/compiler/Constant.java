@@ -2,8 +2,6 @@
 
 package org.python.compiler;
 
-import java.io.IOException;
-
 import org.objectweb.asm.Opcodes;
 
 abstract class Constant implements Opcodes{

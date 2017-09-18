@@ -3,6 +3,7 @@ package org.python.compiler;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedType;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.arguments;
 import org.python.compiler.Symtable.Flag;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
@@ -68,7 +69,10 @@ public class PySTEntryObject extends PyObject {
     int optColOffset;
     int tmpName;
     private int id;
-    PySTEntryObject(Symtable st, String name, PySTEntryObject.BlockType block, PythonTree key, int lineno, int colOffset) {
+
+    /** XXX Old compiler stuff, it could be merged with CompileUnit */
+    ArgListCompiler ac;
+    PySTEntryObject(Symtable st, String name, PySTEntryObject.BlockType block, PythonTree key, int lineno, int colOffset, arguments args) {
         super(TYPE);
         this.table = st;
         this.id = System.identityHashCode(key);
@@ -83,6 +87,8 @@ public class PySTEntryObject extends PyObject {
         this.type = block;
         this.lineno = lineno;
         this.colOffset = colOffset;
+        this.ac = new ArgListCompiler();
+        ac.visitArgs(args);
         st.blocks.put(id, this);
     }
 

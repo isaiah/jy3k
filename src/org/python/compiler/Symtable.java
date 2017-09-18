@@ -117,7 +117,7 @@ public class Symtable extends Visitor {
 
         /* Make the initial symbol information gathering pass */
         if (_top == null) {
-            st.enterBlock("top" /** FIXME */, PySTEntryObject.BlockType.ModuleBlock, mod, 0, 0);
+            st.enterBlock("top" /** FIXME */, PySTEntryObject.BlockType.ModuleBlock, mod, 0, 0, null);
         }
         st.top = st.cur;
         mod.accept(st);
@@ -139,9 +139,9 @@ public class Symtable extends Visitor {
         return top;
     }
 
-    private void enterBlock(String name, PySTEntryObject.BlockType block, PythonTree ast, int lineno, int colOffset) {
+    private void enterBlock(String name, PySTEntryObject.BlockType block, PythonTree ast, int lineno, int colOffset, arguments args) {
         PySTEntryObject prev = null;
-        PySTEntryObject ste = new PySTEntryObject(this, name, block, ast, lineno, colOffset);
+        PySTEntryObject ste = new PySTEntryObject(this, name, block, ast, lineno, colOffset, args);
         stack.push(ste);
         prev = cur;
         cur = ste;
@@ -247,7 +247,7 @@ public class Symtable extends Visitor {
         }
         visitAnnotations(args, node.getInternalReturns());
         visitSeq(node.getInternalDecorator_list());
-        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
+        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset(), node.getInternalArgs());
         visitArguments(args);
         visitSeq(node.getInternalBody());
         exitBlock(node);
@@ -261,7 +261,7 @@ public class Symtable extends Visitor {
         visitSeq(node.getInternalArgs().getInternalKw_defaults());
         visitAnnotations(node.getInternalArgs(), node.getInternalReturns());
         visitSeq(node.getInternalDecorator_list());
-        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
+        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset(), node.getInternalArgs());
         cur.coroutine = true;
         visitArguments(node.getInternalArgs());
         visitSeq(node.getInternalBody());
@@ -275,7 +275,7 @@ public class Symtable extends Visitor {
         visitSeq(node.getInternalBases());
         visitSeq(node.getInternalKeywords());
         visitSeq(node.getInternalDecorator_list());
-        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.ClassBlock, node, node.getLineno(), node.getCol_offset());
+        enterBlock(node.getInternalName(), PySTEntryObject.BlockType.ClassBlock, node, node.getLineno(), node.getCol_offset(), null);
         PyObject tmp = _private;
         _private = node.getName();
         visitSeq(node.getInternalBody());
@@ -511,7 +511,7 @@ public class Symtable extends Visitor {
     public Object visitAnonymousFunction(AnonymousFunction node) {
         visitSeq(node.getInternalArgs().getInternalDefaults());
         visitSeq(node.getInternalArgs().getInternalKw_defaults());
-        enterBlock("<lambda>", PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset());
+        enterBlock("<lambda>", PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset(), node.getInternalArgs());
         visitArguments(node.getInternalArgs());
         visitSeq(node.getInternalBody());
         exitBlock(node);
