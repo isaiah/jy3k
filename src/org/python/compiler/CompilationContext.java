@@ -11,5 +11,5 @@ public interface CompilationContext {
     public String getFilename();
 
 
-    public ScopeInfo getScopeInfo(PythonTree node);
+    public PySTEntryObject getScopeInfo(PythonTree node);
 }

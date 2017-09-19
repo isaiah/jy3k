@@ -92,11 +92,6 @@ public class PySTEntryObject extends PyObject {
         st.blocks.put(id, this);
     }
 
-    public PySTEntryObject() {
-        super(TYPE);
-        type = BlockType.FunctionBlock;
-    }
-
     /* Enter the final scope information into the ste_symbols dict.
      *
      * All arguments are dicts.  Modifies symbols, others are read-only.
@@ -333,6 +328,10 @@ public class PySTEntryObject extends PyObject {
 
     private PySyntaxError errorAtDirective(String name, String template) {
         return new PySyntaxError(String.format(template, name), lineno, colOffset, "", table.getFilename());
+    }
+
+    public Flag getScope(String mangled) {
+        return symbols.get(mangled).stream().filter(flag -> flag.value > LOCAL.value).findFirst().orElse(Flag.SENTINAL);
     }
 
     public enum BlockType {

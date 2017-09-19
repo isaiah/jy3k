@@ -220,6 +220,10 @@ public class Symtable extends Visitor {
         }
     }
 
+    public PySTEntryObject Symtable_Lookup(PythonTree node) {
+        return blocks.get(node);
+    }
+
     private EnumSet<Flag> lookup(String name) {
         return cur.symbols.get(name);
     }
@@ -698,7 +702,7 @@ public class Symtable extends Visitor {
     }
 
     public enum Flag {
-        DEF_GLOBAL(1), DEF_LOCAL(2), DEF_PARAM(2 << 1), DEF_NONLOCAL(2 << 2),
+        SENTINAL(0), DEF_GLOBAL(1), DEF_LOCAL(2), DEF_PARAM(2 << 1), DEF_NONLOCAL(2 << 2),
         DEF_USE(2 << 3), DEF_FREE(2 << 4), DEF_FREE_CLASS(2 << 5), DEF_IMPORT(2 << 6),
         DEF_ANNO(2 << 7), LOCAL(1 << SCOPE_OFFSET), GLOBAL_EXPLICIT(2 << SCOPE_OFFSET),
         GLOBAL_IMPLICIT(3 << SCOPE_OFFSET),

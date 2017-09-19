@@ -218,7 +218,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     CompileUnit mainCode;
     boolean linenumbers;
     Future futures;
-    Map<PythonTree, ScopeInfo> scopes;
+    Symtable st;
     List<CompileUnit> codes;
     long mtime;
     private int setter_count = 0;
@@ -247,7 +247,6 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
         codes = new ArrayList<>();
         futures = new Future();
-        scopes = new HashMap<>();
     }
 
     public Module(String name) {
@@ -308,16 +307,18 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     CompileUnit codeConstant(mod tree, String name, boolean fast_locals, String className,
-                             int firstlineno, ScopeInfo scope, CompilerFlags cflags, boolean needsClassClosure) {
-        CompileUnit code = new CompileUnit(tree, name, fast_locals, firstlineno, scope, cflags, this);
-        codes.add(code);
+                             int firstlineno, CompilerFlags cflags, boolean needsClassClosure) {
+//        CompileUnit code = new CompileUnit(tree, name, fast_locals, firstlineno, scope, cflags, this);
+//        codes.add(code);
 
         CodeCompiler compiler = new CodeCompiler(this);
 
+        CompileUnit code = compiler.enterScope(name, CompilerScope.MODULE, tree, firstlineno);
         Code c = classfile.addMethod(code.fname, //
                 sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
-        compiler.parse(tree, c, fast_locals, className, scope, cflags, needsClassClosure);
+        compiler.parse(tree, c, fast_locals, className, cflags, needsClassClosure);
+        compiler.exitScope();
         return code;
     }
 
@@ -445,8 +446,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     @Override
-    public ScopeInfo getScopeInfo(PythonTree node) {
-        return scopes.get(node);
+    public PySTEntryObject getScopeInfo(PythonTree node) {
+        return st.Symtable_Lookup(node);
     }
 
     @Override
@@ -515,13 +516,14 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
         module.futures.preprocessFutures(node, cflags);
         /** create symbol table */
-        new ScopesCompiler(module, module.scopes).parse(node);
+//        new ScopesCompiler(module, module.scopes).parse(node);
+        module.st = Symtable.buildObject(node, filename, 0);
         /** convert SplitNode to function definitions */
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
         // Add __doc__ if it exists
         CompileUnit main = module.codeConstant(node, "<module>", false, null,
-                0, module.getScopeInfo(node), cflags, false);
+                0, cflags, false);
         module.mainCode = main;
         module.write(ostream);
     }
