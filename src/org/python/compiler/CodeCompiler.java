@@ -603,14 +603,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitAssign(Assign node) {
         setline(node);
         visit(node.getInternalValue());
-        if (node.getInternalTargets().size() == 1) {
-            set(node.getInternalTargets().get(0));
-        } else {
-            int tmp = storeTop();
-            for (expr target : node.getInternalTargets()) {
-                set(target, tmp);
+        java.util.List<expr> targets = node.getInternalTargets();
+        for (int i = 0; i < targets.size(); i++) {
+            if (i < targets.size() - 1) {
+                code.dup();
             }
-            code.freeLocal(tmp);
+            visit(targets.get(i));
         }
         return null;
     }
@@ -2306,11 +2304,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.swap();
         }
         if (dict.containsKey(mangled)) {
-            code.ldc(dict.get(mangled));
+            code.iconst(dict.get(mangled));
         } else {
             int i = dict.size();
             dict.put(mangled, i);
-            code.ldc(i);
+            code.iconst(i);
         }
         op.invoke(code);
     }
