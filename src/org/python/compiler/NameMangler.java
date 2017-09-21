@@ -16,11 +16,11 @@ import org.python.antlr.base.stmt;
  */
 public class NameMangler extends Visitor {
     @Override
-    public Object visitClassDef(ClassDef classDef) throws Exception {
+    public Object visitClassDef(ClassDef classDef) {
         String prefix = "_" + classDef.getInternalName();
         Visitor visitor = new Visitor() {
             @Override
-            public Object visitAttribute(Attribute node) throws Exception {
+            public Object visitAttribute(Attribute node) {
                 String name = node.getInternalAttr();
                 if (name.startsWith("__") && !name.endsWith("__")) {
                     node.setInternalAttr(prefix + name);
@@ -38,12 +38,12 @@ public class NameMangler extends Visitor {
             }
 
             @Override
-            public Object visitClassDef(ClassDef node) throws Exception {
+            public Object visitClassDef(ClassDef node) {
                 return NameMangler.this.visit(node);
             }
 
             @Override
-            public Object visitFunctionDef(FunctionDef node) throws Exception {
+            public Object visitFunctionDef(FunctionDef node) {
                 String name = node.getInternalName();
                 if (name.startsWith("__") && !name.endsWith("__")) {
                     node.setInternalName(prefix + name);

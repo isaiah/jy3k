@@ -328,7 +328,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.aload(0);
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
         addConstants(c);
-        addCodeInit();
+        codes.stream().forEach(this::addCodeInit);
+        addCodeInit(mainCode);
         c.return_();
     }
 
@@ -362,14 +363,11 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.areturn();
     }
 
-    void addCodeInit() {
-        for (int i = 0; i < codes.size(); i++) {
-            CompileUnit pyc = codes.get(i);
-            Code c = classfile.addMethod("init" + pyc.fname,
-                    sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_FINAL);
-            pyc.put(c);
-            c.return_();
-        }
+    void addCodeInit(CompileUnit pyc) {
+        Code c = classfile.addMethod("init" + pyc.fname,
+                sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_FINAL);
+        pyc.put(c);
+        c.return_();
     }
 
     void addConstants(Code c) {
@@ -387,6 +385,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
             c.aload(1); // filename
             c.invokevirtual(classfile.name, "init" + pyc.fname, sig(Void.TYPE, String.class));
         }
+        c.aload(0); // this
+        c.aload(1); // filename
+        c.invokevirtual(classfile.name, "init" + mainCode.fname, sig(Void.TYPE, String.class));
     }
 
     public void addFunctions() {
@@ -423,9 +424,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         addInit();
         addRunnable();
 //        addMain();
-        addBootstrap();
+//        addBootstrap();
 
-        addFunctions();
+//        addFunctions();
 
         classfile.addInterface(p(PyRunnable.class));
         if (sfilename != null) {
@@ -522,9 +523,17 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
         // Add __doc__ if it exists
-        CompileUnit main = module.codeConstant(node, "<module>", false, null,
-                0, cflags, false);
-        module.mainCode = main;
+        CodeCompiler compiler = new CodeCompiler(module);
+
+        CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
+        Code c = module.classfile.addMethod(code.fname, //
+                sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
+
+        compiler.parse(node, c, false, null, cflags, false);
+        compiler.exitScope();
+//        CompileUnit main = module.codeConstant(node, "<module>", false, null,
+//                0, cflags, false);
+        module.mainCode = code;
         module.write(ostream);
     }
 

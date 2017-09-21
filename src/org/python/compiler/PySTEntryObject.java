@@ -89,7 +89,7 @@ public class PySTEntryObject extends PyObject {
         this.colOffset = colOffset;
         this.ac = new ArgListCompiler();
         ac.visitArgs(args);
-        st.blocks.put(id, this);
+        st.blocks.put(key, this);
     }
 
     /* Enter the final scope information into the ste_symbols dict.
@@ -331,7 +331,7 @@ public class PySTEntryObject extends PyObject {
     }
 
     public Flag getScope(String mangled) {
-        return symbols.get(mangled).stream().filter(flag -> flag.value > LOCAL.value).findFirst().orElse(Flag.SENTINAL);
+        return symbols.getOrDefault(mangled, EnumSet.of(Flag.SENTINAL)).stream().filter(flag -> flag.value > LOCAL.value).findFirst().orElse(Flag.SENTINAL);
     }
 
     public enum BlockType {

@@ -28,7 +28,7 @@ public class SplitIntoFunctions extends Visitor {
     }
 
     @Override
-    public Object visitFunctionDef(FunctionDef node) throws Exception {
+    public Object visitFunctionDef(FunctionDef node) {
         if (!node.isSplit()) {
             return node;
         }

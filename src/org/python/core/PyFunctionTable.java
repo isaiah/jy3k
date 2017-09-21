@@ -12,5 +12,5 @@ import java.io.Serializable;
  */
 
 public abstract class PyFunctionTable implements Serializable {
-    abstract public PyObject call_function(int index, ThreadState ts, PyFrame frame);
+//    abstract public PyObject call_function(int index, ThreadState ts, PyFrame frame);
 }

@@ -96,7 +96,7 @@ public class Symtable extends Visitor {
     private String filename;
     PySTEntryObject cur;
     private PySTEntryObject top;
-    Map<Integer, PySTEntryObject> blocks;
+    Map<PythonTree, PySTEntryObject> blocks;
     private Deque<PySTEntryObject> stack;
     private Map<String, EnumSet<Flag>> global;
     private int nblocks;

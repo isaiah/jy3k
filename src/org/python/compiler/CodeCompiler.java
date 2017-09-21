@@ -273,6 +273,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     void exitScope() {
+        nestlevel--;
+        if (!stack.isEmpty()) {
+            u = stack.pop();
+        }
     }
 
     CompileUnit enterScope(String name, CompilerScope scopeType, PythonTree key, int lineno) {
@@ -441,8 +445,85 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return compileFunction(name, decs, body, node);
     }
 
+    private void compileBody(java.util.List<stmt> stmts) {
+    }
+
     @Override
     public Object visitClassDef(ClassDef node) {
+        enterScope(node.getInternalName(), CompilerScope.CLASS, node, node.getLineno());
+        u._private = node.getInternalName();
+        nameop("__name__", expr_contextType.Load);
+        nameop("__module__", expr_contextType.Store);
+        assert u.qualname != null: "class qualname is null";
+        code.ldc(u.qualname);
+        nameop("__qualname__", expr_contextType.Store);
+        compileBody(node.getInternalBody());
+
+        if (u.ste.needsClassClosure) {
+            int i = u.cellvars.get("__class__");
+            assert i == 0: "__class__ must be the only cell var in class scope";
+            loadFrame();
+            code.ldc(i);
+            code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
+            code.dup();
+            nameop("__classcell__", expr_contextType.Store);
+        } else {
+            assert u.cellvars.isEmpty(): "class scope should have cell vars other than __class__";
+            getNone();
+        }
+        code.areturn();
+        exitScope();
+        loadBuildClass();
+        make_closure(u, 0, null);
+        callHelper(2, node.getInternalBases(), node.getInternalKeywords());
+        code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+        return null;
+    }
+
+    private void callHelper(int n /** args already pushed */,
+                            java.util.List<expr> args, java.util.List<keyword> keywords) {
+        loadArray(code, args);
+        java.util.List<String> keys = new ArrayList<>();
+        java.util.List<expr> values = new ArrayList<>();
+
+        expr kwarg = null;
+        for (int i = 0; i < keywords.size(); i++) {
+            keyword kw = keywords.get(i);
+            if (kw.getInternalArg() == null) {
+                kwarg = kw.getInternalValue();
+                break;
+            }
+            keys.add(kw.getInternalArg());
+            values.add(kw.getInternalValue());
+        }
+        loadStrings(code, keys);
+        loadArray(code, values);
+        code.invokestatic(p(PyDictionary.class), "fromKV",
+                sig(PyDictionary.class, String[].class, PyObject[].class));
+
+        if (kwarg != null) {
+            code.dup();
+            visit(kwarg);
+            code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
+        }
+    }
+
+    private void make_closure(CompileUnit u, int funcflags, String qualname) {
+        makeClosure(u);
+        code.invokespecial(
+                p(PyFunction.class),
+                "<init>",
+                sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
+                        PyCode.class, PyObject.class, String.class, PyObject[].class));
+    }
+
+    private void loadBuildClass() {
+        loadFrame();
+        code.invokevirtual(p(PyFrame.class), "loadbuildclass", sig(PyObject.class));
+    }
+
+    public void visitClassDef(ClassDef node, boolean ignore) {
         PySTEntryObject scope = module.getScopeInfo(node);
         String name = getName(node.getInternalName());
         setline(node);
@@ -504,7 +585,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         // Assign this new class to the given name
         set(new Name(node, node.getInternalName(), expr_contextType.Store));
-        return null;
     }
 
     @Override
@@ -2221,6 +2301,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     private void addop_o(Op op, String mangled, Map<String, Integer> dict) {
         loadFrame();
+        if (op.isSet()) {
+            // swap the stack top with frame if this is a set operation
+            code.swap();
+        }
         if (dict.containsKey(mangled)) {
             code.ldc(dict.get(mangled));
         } else {
@@ -2263,7 +2347,22 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         public void invoke(Code code) {
-            code.invokevirtual(p(PyFrame.class), name, sig(PyObject.class, Integer.TYPE));
+            Class<? extends Object> argType;
+            argType = int.class;
+//            if (name.endsWith("local")) {
+//                argType = int.class;
+//            } else {
+//                argType = String.class;
+//            }
+            if (isSet()) {
+                code.invokevirtual(p(PyFrame.class), name, sig(void.class, PyObject.class, argType));
+            } else {
+                code.invokevirtual(p(PyFrame.class), name, sig(PyObject.class, argType));
+            }
+        }
+
+        public boolean isSet() {
+            return name.startsWith("set");
         }
     }
 

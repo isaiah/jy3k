@@ -7,15 +7,15 @@ package org.python.core;
 public abstract class PyCode extends PyObject {
     public String co_name;
 
-    abstract public PyObject call(ThreadState state, PyFrame frame, PyObject closure);
+//    abstract public PyObject call(ThreadState state, PyFrame frame, PyObject closure);
 
-    public PyObject call(PyFrame frame) {
-        return call(Py.getThreadState(), frame);
-    }
-
-    public PyObject call(ThreadState state, PyFrame frame) {
-        return call(state, frame, null);
-    }
+//    public PyObject call(PyFrame frame) {
+//        return call(Py.getThreadState(), frame);
+//    }
+//
+//    public PyObject call(ThreadState state, PyFrame frame) {
+//        return call(state, frame, null);
+//    }
 
     abstract public PyObject call(ThreadState state,
                                   PyObject args[], String keywords[],

@@ -53,6 +53,7 @@ class CompileUnit {
 
 
     public CompileUnit(CompilerScope scopeType, String name, PySTEntryObject ste, int lineno, Module module) {
+        this.module = module;
         this.scopeType = scopeType;
         this.name = name;
         this.ste = ste;
@@ -70,6 +71,7 @@ class CompileUnit {
         this.names = new HashMap<>();
         this.id = module.codes.size();
         this.fname = isJavaIdentifier(name) ? name + "$" + id : "f$" + id;
+        this.co_name = fname;
     }
 
     private static Map<String, Integer> list2dict(List<String> varnames) {
@@ -112,6 +114,10 @@ class CompileUnit {
     }
 
     void get(Code c) {
+        assert module != null: "module should not be null";
+        assert module.classfile != null: "classfile should not be null";
+        assert module.classfile.name != null: "no classfile name";
+        assert name != null: "no name";
         c.getstatic(module.classfile.name, name, ci(PyTableCode.class));
     }
 
@@ -152,12 +158,14 @@ class CompileUnit {
             int constArr = module.makeConstArray(c, constants);
             c.aload(constArr);
             c.freeLocal(constArr);
+        } else {
+            c.aconst_null();
         }
 
         c.iconst(jy_npurecell);
         c.iconst(kwonlyargcount);
         c.iconst(moreflags);
-        c.ldc(name);
+        c.ldc(co_name);
 
         c.invokestatic(
                 p(Py.class),

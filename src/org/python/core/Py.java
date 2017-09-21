@@ -2791,14 +2791,6 @@ class JavaCode extends PyCode implements Traverseproc {
     }
 
     @Override
-    public PyObject call(ThreadState state, PyFrame frame, PyObject closure) {
-        //XXX: what the heck is this?  Looks like debug code, but it's
-        //     been here a long time...
-        System.out.println("call #1");
-        return Py.None;
-    }
-
-    @Override
     public PyObject call(ThreadState state, PyObject args[], String keywords[],
                          PyObject globals, PyObject[] defaults, PyDictionary kw_defaults,
                          PyObject closure) {

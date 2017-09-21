@@ -11,6 +11,7 @@ import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 import org.python.core.PyTraceback;
+import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
@@ -291,7 +292,8 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         gi_running = true;
         PyObject result = null;
         try {
-            result = gi_frame.f_code.call(state, gi_frame, closure);
+            result = Py.runCode(state, gi_frame.f_code, gi_frame, (PyTuple) closure);
+//            result = gi_frame.f_code.call(state, gi_frame, closure);
         } catch (PyException pye) {
             gi_frame = null;
             if (this instanceof PyCoroutine && pye.match(Py.StopIteration)) {

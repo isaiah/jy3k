@@ -290,6 +290,11 @@ public class PyFrame extends PyObject implements Traverseproc {
         throw Py.UnboundLocalError(String.format(UNBOUNDLOCAL_ERROR_MSG, name));
     }
 
+    public PyObject getname(int index) {
+        String name = f_code.co_names[index];
+        return getname(name);
+    }
+
     public PyObject getname(String index) {
         PyObject ret;
         if (f_locals == null || f_locals == f_globals) {

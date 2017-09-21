@@ -166,95 +166,95 @@ public class PyTableCode extends PyCode {
         return co_flags.toBits();
     }
 
-    @Override
-    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
-        if (ts.systemState == null) {
-            ts.systemState = Py.defaultSystemState;
-        }
-
-        // Cache previously defined exception
-//        PyException previous_exception = ts.exceptions.peekFirst();
-        int exceptionsLength = ts.exceptions.size();
-
-        // Push frame
-        frame.f_back = ts.frame;
-        // nested scopes: setup env with closure
-        // this should only be done once, so let the frame take care of it
-        frame.setupEnv((PyTuple)closure);
-
-        ts.frame = frame;
-
-        // Handle trace function for debugging
-        if (ts.tracefunc != null) {
-            frame.f_lineno = co_firstlineno;
-            frame.tracefunc = ts.tracefunc.traceCall(frame);
-        }
-
-        // Handle trace function for profiling
-        if (ts.profilefunc != null) {
-            ts.profilefunc.traceCall(frame);
-        }
-
-        PyObject ret;
-        ThreadStateMapping.enterCall(ts);
-        try {
-            ret = funcs.call_function(func_id, ts, frame);
-        } catch (Throwable t) {
-            // Convert Exceptions that occurred in Java code to PyExceptions
-            PyException pye = Py.JavaError(t);
-            pye.normalize();
-            pye.tracebackHere(frame);
-
-            frame.f_lasti = -1;
-
-            if (frame.tracefunc != null) {
-                frame.tracefunc.traceException(frame, pye);
-            }
-            if (ts.profilefunc != null) {
-                ts.profilefunc.traceException(frame, pye);
-            }
-
-            // Rethrow the exception to the next stack frame
-//            ts.exceptions.addFirst(previous_exception);
-            while(ts.exceptions.size() > exceptionsLength) {
-                ts.exceptions.pop();
-            }
-
-            ts.frame = frame.f_back;
-            throw pye;
-        } finally {
-            ThreadStateMapping.exitCall(ts);
-        }
-
-        if (frame.tracefunc != null) {
-            frame.tracefunc.traceReturn(frame, ret);
-        }
-        // Handle trace function for profiling
-        if (ts.profilefunc != null) {
-            ts.profilefunc.traceReturn(frame, ret);
-        }
-
-        // Restore previously defined exception
-//        ts.exceptions.poll();
-//        ts.exceptions.addFirst(previous_exception);
-        if (exceptionsLength == 0) {
-            ts.exceptions.clear();
-        } else {
-            while (ts.exceptions.size() > exceptionsLength) {
-                ts.exceptions.pop();
-            }
-        }
-
-
-        ts.frame = ts.frame.f_back;
-
-        // Check for interruption, which is used for restarting the interpreter
-        // on Jython
-        if (ts.systemState._systemRestart && Thread.currentThread().isInterrupted()) {
-            throw new PyException(_systemrestart.SystemRestart);
-        }
-        return ret;
-    }
+//    @Override
+//    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
+//        if (ts.systemState == null) {
+//            ts.systemState = Py.defaultSystemState;
+//        }
+//
+//        // Cache previously defined exception
+////        PyException previous_exception = ts.exceptions.peekFirst();
+//        int exceptionsLength = ts.exceptions.size();
+//
+//        // Push frame
+//        frame.f_back = ts.frame;
+//        // nested scopes: setup env with closure
+//        // this should only be done once, so let the frame take care of it
+//        frame.setupEnv((PyTuple)closure);
+//
+//        ts.frame = frame;
+//
+//        // Handle trace function for debugging
+//        if (ts.tracefunc != null) {
+//            frame.f_lineno = co_firstlineno;
+//            frame.tracefunc = ts.tracefunc.traceCall(frame);
+//        }
+//
+//        // Handle trace function for profiling
+//        if (ts.profilefunc != null) {
+//            ts.profilefunc.traceCall(frame);
+//        }
+//
+//        PyObject ret;
+//        ThreadStateMapping.enterCall(ts);
+//        try {
+//            ret = funcs.call_function(func_id, ts, frame);
+//        } catch (Throwable t) {
+//            // Convert Exceptions that occurred in Java code to PyExceptions
+//            PyException pye = Py.JavaError(t);
+//            pye.normalize();
+//            pye.tracebackHere(frame);
+//
+//            frame.f_lasti = -1;
+//
+//            if (frame.tracefunc != null) {
+//                frame.tracefunc.traceException(frame, pye);
+//            }
+//            if (ts.profilefunc != null) {
+//                ts.profilefunc.traceException(frame, pye);
+//            }
+//
+//            // Rethrow the exception to the next stack frame
+////            ts.exceptions.addFirst(previous_exception);
+//            while(ts.exceptions.size() > exceptionsLength) {
+//                ts.exceptions.pop();
+//            }
+//
+//            ts.frame = frame.f_back;
+//            throw pye;
+//        } finally {
+//            ThreadStateMapping.exitCall(ts);
+//        }
+//
+//        if (frame.tracefunc != null) {
+//            frame.tracefunc.traceReturn(frame, ret);
+//        }
+//        // Handle trace function for profiling
+//        if (ts.profilefunc != null) {
+//            ts.profilefunc.traceReturn(frame, ret);
+//        }
+//
+//        // Restore previously defined exception
+////        ts.exceptions.poll();
+////        ts.exceptions.addFirst(previous_exception);
+//        if (exceptionsLength == 0) {
+//            ts.exceptions.clear();
+//        } else {
+//            while (ts.exceptions.size() > exceptionsLength) {
+//                ts.exceptions.pop();
+//            }
+//        }
+//
+//
+//        ts.frame = ts.frame.f_back;
+//
+//        // Check for interruption, which is used for restarting the interpreter
+//        // on Jython
+//        if (ts.systemState._systemRestart && Thread.currentThread().isInterrupted()) {
+//            throw new PyException(_systemrestart.SystemRestart);
+//        }
+//        return ret;
+//    }
 
     public boolean hasFreevars() {
         return co_freevars != null && co_freevars.length > 0;
