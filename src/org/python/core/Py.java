@@ -709,6 +709,7 @@ public final class Py {
         return mod;
     }
 
+    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
     public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
@@ -716,13 +717,14 @@ public final class Py {
                                  PyFunctionTable funcs, int func_id,
                                  String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
                                  int npurecell, int kwonlyargcount, int moreflags) {
-        PyTableCode code = new PyTableCode(argcount, varnames,
+        PyTableCode code = new PyTableCode(argcount, names,
                 filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
                 kwonlyargcount, moreflags, null);
         return code;
     }
 
+    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
     public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
@@ -730,13 +732,14 @@ public final class Py {
                                  PyFunctionTable funcs, int func_id,
                                  String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
                                  int npurecell, int kwonlyargcount, int moreflags, String fname) {
-        PyTableCode code = new PyTableCode(argcount, varnames,
+        PyTableCode code = new PyTableCode(argcount, names,
                 filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
                 kwonlyargcount, moreflags, fname);
         return code;
     }
 
+    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
     public static PyTableCode newCode(int argcount, String varnames[],
                                  String filename, String name,
                                  int firstlineno,
@@ -744,14 +747,28 @@ public final class Py {
                                  PyFunctionTable funcs, int func_id,
                                  String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
                                  int npurecell, int kwonlyargcount, int moreflags, Class<?> klazz, String funcname) {
-        PyTableCode code = new PyTableCode(argcount, varnames,
+        PyTableCode code = new PyTableCode(argcount, names,
                 filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, names, consts, npurecell,
+                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
                 kwonlyargcount, moreflags, funcname);
         code.klazz = klazz;
         return code;
     }
 
+    /** TODO Remove the suffix once recompiled everything */
+    public static PyTableCode newCode1(int argcount, String names[],
+                                 String filename, String name,
+                                 int firstlineno,
+                                 boolean args, boolean keywords,
+                                 PyFunctionTable funcs, int func_id,
+                                 String[] cellvars, String[] freevars, String[] varnames, PyObject[] consts,
+                                 int npurecell, int kwonlyargcount, int moreflags, String funcname) {
+        PyTableCode code = new PyTableCode(argcount, names,
+                filename, name, firstlineno, args, keywords,
+                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
+                kwonlyargcount, moreflags, funcname);
+        return code;
+    }
 
     public static PyObject newJavaFunc(Class<?> cls, String name) {
         try {

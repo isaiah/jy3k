@@ -23,8 +23,10 @@ public class PyTableCode extends PyCode {
     public int co_kwonlyargcount;
     @ExposedGet
     public int co_firstlineno = -1;
-    public String[] co_varnames;
+    /** All names */
     public String[] co_names;
+    /** local var names */
+    public String[] co_varnames;
     public String[] co_cellvars;
     public String[] co_freevars;
     public PyObject[] co_consts;
@@ -42,22 +44,22 @@ public class PyTableCode extends PyCode {
     public String funcname;
     int nargs;
 
-    public PyTableCode(int argcount, String varnames[],
+    public PyTableCode(int argcount, String names[],
                        String filename, String name,
                        int firstlineno,
                        boolean varargs, boolean varkwargs,
                        PyFunctionTable funcs, int func_id)
     {
-        this(argcount, varnames, filename, name, firstlineno, varargs,
+        this(argcount, names, filename, name, firstlineno, varargs,
              varkwargs, funcs, func_id, null, null, null, null, 0, 0, 0, null);
     }
 
-    public PyTableCode(int argcount, String[] varnames,
+    public PyTableCode(int argcount, String[] names,
                        String filename, String name,
                        int firstlineno,
                        boolean varargs, boolean varkwargs,
                        PyFunctionTable funcs, int func_id,
-                       String[] cellvars, String[] freevars, String[] names,
+                       String[] cellvars, String[] freevars, String[] varnames,
                        PyObject[] consts, int npurecell,
                        int kwonlyargcount, int moreflags, String funcname) // may change
     {
@@ -65,7 +67,7 @@ public class PyTableCode extends PyCode {
         co_varnames = varnames;
         co_names = names;
         co_consts = consts;
-        co_nlocals = varnames.length;
+        co_nlocals = varnames == null ? 0 : varnames.length;
         co_filename = filename;
         co_firstlineno = firstlineno;
         co_cellvars = cellvars;

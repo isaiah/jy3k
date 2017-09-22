@@ -1,16 +1,11 @@
 package org.python.compiler;
 
 import org.python.antlr.PythonTree;
-import org.python.antlr.ast.Suite;
-import org.python.antlr.base.mod;
-import org.python.core.CodeFlag;
-import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -127,7 +122,7 @@ class CompileUnit {
         c.iconst(argcount);
 
         // Make all var names
-        CodeCompiler.loadStrings(c, varnames.keySet());
+        CodeCompiler.loadStrings(c, names);
         c.aload(1);
         c.ldc(co_name);
         c.iconst(co_firstlineno);
@@ -139,22 +134,10 @@ class CompileUnit {
 
         c.iconst(id);
 
-        if (cellvars != null) {
-            CodeCompiler.loadStrings(c, cellvars.keySet());
-        } else {
-            c.aconst_null();
-        }
-        if (freevars != null) {
-            CodeCompiler.loadStrings(c, freevars.keySet());
-        } else {
-            c.aconst_null();
-        }
+        CodeCompiler.loadStrings(c, cellvars);
+        CodeCompiler.loadStrings(c, freevars);
+        CodeCompiler.loadStrings(c, varnames);
 
-        if (names != null) {
-            CodeCompiler.loadStrings(c, names.keySet());
-        } else {
-            c.aconst_null();
-        }
         if (constants != null) {
             int constArr = module.makeConstArray(c, constants);
             c.aload(constArr);
@@ -170,7 +153,7 @@ class CompileUnit {
 
         c.invokestatic(
                 p(Py.class),
-                "newCode",
+                "newCode1",
                 sig(PyTableCode.class, Integer.TYPE, String[].class, String.class, String.class,
                         Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
                         Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,

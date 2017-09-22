@@ -92,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
@@ -167,10 +168,28 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * Counterpart of makeStrings, instead of put the string array in local variable slot, leave it in stack
      *
      * @param c
-     * @param names
+     * @param entries
      * @return
      * @throws IOException
      */
+    static void loadStrings(Code c, Map<String, Integer> entries) {
+        if (entries != null) {
+            c.iconst(entries.size());
+        } else {
+            c.iconst(0);
+        }
+        c.anewarray(p(String.class));
+        if (entries != null) {
+            int i = 0;
+            for (Map.Entry<String, Integer> entry : entries.entrySet()) {
+                c.dup();
+                c.iconst(entry.getValue());
+                c.ldc(entry.getKey());
+                c.aastore();
+                i++;
+            }
+        }
+    }
     static void loadStrings(Code c, Collection<String> names) {
         if (names != null) {
             c.iconst(names.size());
@@ -1879,7 +1898,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public Object visitReturn(Return node, boolean inEval) {
         setline(node);
-        if (!inEval && !fast_locals) {
+        if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
         int tmp = 0;
