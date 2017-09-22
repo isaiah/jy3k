@@ -50,6 +50,7 @@ class CompileUnit {
     String _private;
     int nestedlevel;
     public String qualname;
+    public Code methodEmitter;
 
 
     public CompileUnit(CompilerScope scopeType, String name, PySTEntryObject ste, int lineno, Module module) {
@@ -118,11 +119,11 @@ class CompileUnit {
         assert module.classfile != null: "classfile should not be null";
         assert module.classfile.name != null: "no classfile name";
         assert name != null: "no name";
-        c.getstatic(module.classfile.name, name, ci(PyTableCode.class));
+        c.getstatic(module.classfile.name, co_name, ci(PyTableCode.class));
     }
 
     void put(Code c) {
-        module.classfile.addField(name, ci(PyTableCode.class), access);
+        module.classfile.addField(co_name, ci(PyTableCode.class), access);
         c.iconst(argcount);
 
         // Make all var names
@@ -174,6 +175,6 @@ class CompileUnit {
                         Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
                         Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,
                         Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class));
-        c.putstatic(module.classfile.name, name, ci(PyTableCode.class));
+        c.putstatic(module.classfile.name, co_name, ci(PyTableCode.class));
     }
 }

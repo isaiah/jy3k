@@ -308,16 +308,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     CompileUnit codeConstant(mod tree, String name, boolean fast_locals, String className,
                              int firstlineno, CompilerFlags cflags, boolean needsClassClosure) {
-//        CompileUnit code = new CompileUnit(tree, name, fast_locals, firstlineno, scope, cflags, this);
-//        codes.add(code);
-
         CodeCompiler compiler = new CodeCompiler(this);
-
         CompileUnit code = compiler.enterScope(name, CompilerScope.MODULE, tree, firstlineno);
-        Code c = classfile.addMethod(code.fname, //
-                sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
-
-        compiler.parse(tree, c, fast_locals, className, cflags, needsClassClosure);
+        compiler.parse(tree, fast_locals, className, cflags, needsClassClosure);
         compiler.exitScope();
         return code;
     }
@@ -329,7 +322,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
         addConstants(c);
         codes.stream().forEach(this::addCodeInit);
-        addCodeInit(mainCode);
+//        addCodeInit(mainCode);
         c.return_();
     }
 
@@ -385,9 +378,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
             c.aload(1); // filename
             c.invokevirtual(classfile.name, "init" + pyc.fname, sig(Void.TYPE, String.class));
         }
-        c.aload(0); // this
-        c.aload(1); // filename
-        c.invokevirtual(classfile.name, "init" + mainCode.fname, sig(Void.TYPE, String.class));
+//        c.aload(0); // this
+//        c.aload(1); // filename
+//        c.invokevirtual(classfile.name, "init" + mainCode.fname, sig(Void.TYPE, String.class));
     }
 
     public void addFunctions() {
@@ -526,10 +519,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         CodeCompiler compiler = new CodeCompiler(module);
 
         CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
-        Code c = module.classfile.addMethod(code.fname, //
-                sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
 
-        compiler.parse(node, c, false, null, cflags, false);
+        compiler.parse(node, false, null, cflags, false);
         compiler.exitScope();
 //        CompileUnit main = module.codeConstant(node, "<module>", false, null,
 //                0, cflags, false);

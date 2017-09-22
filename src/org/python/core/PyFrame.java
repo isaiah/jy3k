@@ -316,6 +316,10 @@ public class PyFrame extends PyObject implements Traverseproc {
         return getglobal(index);
     }
 
+    public PyObject getglobal(int index) {
+        return getglobal(f_code.co_names[index]);
+    }
+
     public PyObject getglobal(String index) {
         PyObject ret = doGetglobal(index);
         if (ret != null) {

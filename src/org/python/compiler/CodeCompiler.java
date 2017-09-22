@@ -274,9 +274,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     void exitScope() {
         nestlevel--;
+        CompileUnit cur = u;
         if (!stack.isEmpty()) {
             u = stack.pop();
+            code = u.methodEmitter;
         }
+        cur.get(code); // place the getstatic instruction in the parent scope
     }
 
     CompileUnit enterScope(String name, CompilerScope scopeType, PythonTree key, int lineno) {
@@ -292,10 +295,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             compileUnit._private = u._private;
         }
         this.u = compileUnit;
+        module.codes.add(u);
         this.nestlevel++;
         if (u.scopeType != CompilerScope.MODULE) {
             this.setQualname();
         }
+        Code c = module.classfile.addMethod(u.fname, //
+                sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
+        u.methodEmitter = c;
+        this.code = c;
+
         return compileUnit;
     }
 
@@ -339,7 +348,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         u.qualname = name;
     }
 
-    void parse(mod node, Code code, boolean fast_locals, String className, CompilerFlags cflags, boolean needsClassClosure) {
+    void parse(mod node, boolean fast_locals, String className, CompilerFlags cflags, boolean needsClassClosure) {
         this.fast_locals = fast_locals;
         this.className = className;
         this.code = code;
@@ -446,6 +455,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private void compileBody(java.util.List<stmt> stmts) {
+        stmts.stream().forEach(this::visit);
+        getNone();
+        code.areturn();
     }
 
     @Override
@@ -1723,10 +1735,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, stmt node) {
-        String name = getName(internalName);
+//        String name = getName(internalName);
         setline(node);
-
-        PySTEntryObject scope = module.getScopeInfo(node);
+        decos.stream().forEach(this::visit);
 
         // NOTE: this is attached to the constructed PyFunction, so it cannot be nulled out
         // with freeArray, unlike other usages of makeArray here
@@ -1734,24 +1745,28 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.dup();
         loadFrame();
         code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-        loadArray(code, scope.ac.getDefaults());
+        loadArray(code, ste.ac.getDefaults());
 
         // kw_defaults
-        loadStrings(code, scope.ac.kw_defaults.keySet());
-        loadArray(code, new ArrayList<>(scope.ac.kw_defaults.values()));
+        loadStrings(code, ste.ac.kw_defaults.keySet());
+        loadArray(code, new ArrayList<>(ste.ac.kw_defaults.values()));
         code.invokestatic(p(PyDictionary.class), "fromKV",
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
         // annotations
-        loadStrings(code, scope.ac.annotations.keySet());
-        loadArray(code, new ArrayList<>(scope.ac.annotations.values()));
+        loadStrings(code, ste.ac.annotations.keySet());
+        loadArray(code, new ArrayList<>(ste.ac.annotations.values()));
         code.invokestatic(p(PyDictionary.class), "fromKV",
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
 //        scope.setup_closure();
 //        scope.dump();
-        module.codeConstant(new Suite(node, body), name, true, className,
-                node.getLine(), cflags, false).get(code);
+        enterScope(internalName, CompilerScope.FUNCTION, node, node.getLineno());
+
+        compileBody(body);
+        exitScope();
+//        module.codeConstant(new Suite(node, body), name, true, className,
+//                node.getLine(), cflags, false).get(code);
 
         Str docStr = getDocStr(body);
         if (docStr != null) {
@@ -1760,7 +1775,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.aconst_null();
         }
 //      FIXME  code.ldc(scope.qualname);
-        code.ldc(scope.name);
+        code.ldc(ste.name);
 
         if (!makeClosure(u)) {
             code.aconst_null();
@@ -1771,27 +1786,23 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
                         PyCode.class, PyObject.class, String.class, PyObject[].class));
 
-        applyDecorators(decos);
+//        applyDecorators(decos);
+        for (int i = 0; i < decos.size(); i++) {
 
-        set(new Name(node, internalName, expr_contextType.Store));
+        }
+
+        nameop(internalName, expr_contextType.Store);
         return null;
     }
 
     private void applyDecorators(java.util.List<expr> decorators) {
         if (decorators != null && !decorators.isEmpty()) {
-            int res = storeTop();
-            for (expr decorator : decorators) {
-                visit(decorator);
-            }
             for (int i = decorators.size(); i > 0; i--) {
                 loadThreadState();
-                code.aload(res);
+                code.swap();
                 code.invokevirtual(p(PyObject.class), "__call__",
                         sig(PyObject.class, ThreadState.class, PyObject.class));
-                code.astore(res);
             }
-            code.aload(res);
-            code.freeLocal(res);
         }
     }
 
