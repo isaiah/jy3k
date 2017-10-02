@@ -68,6 +68,7 @@ class CompileUnit {
         this.id = module.codes.size();
         this.fname = isJavaIdentifier(name) ? name + "$" + id : "f$" + id;
         this.co_name = fname;
+        this.argcount = ste.ac.argcount;
     }
 
     private static Map<String, Integer> list2dict(List<String> varnames) {
@@ -124,11 +125,11 @@ class CompileUnit {
         // Make all var names
         CodeCompiler.loadStrings(c, names);
         c.aload(1);
-        c.ldc(co_name);
+        c.ldc(name);
         c.iconst(co_firstlineno);
 
-        c.iconst(arglist ? 1 : 0);
-        c.iconst(keywordlist ? 1 : 0);
+        c.iconst(arglist);
+        c.iconst(keywordlist);
 
         c.getstatic(module.classfile.name, "self", "L" + module.classfile.name + ";");
 

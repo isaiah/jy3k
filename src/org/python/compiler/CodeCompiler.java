@@ -1756,10 +1756,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, stmt node) {
 //        String name = getName(internalName);
         setline(node);
+
+        u.argcount = ste.ac.argcount;
+        u.kwonlyargcount = ste.ac.kwonlyargcount;
+
         decos.stream().forEach(this::visit);
 
-        // NOTE: this is attached to the constructed PyFunction, so it cannot be nulled out
-        // with freeArray, unlike other usages of makeArray here
         code.new_(p(PyFunction.class));
         code.dup();
         loadFrame();

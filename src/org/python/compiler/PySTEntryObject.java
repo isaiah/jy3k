@@ -4,6 +4,7 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedType;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.arguments;
+import org.python.antlr.base.expr;
 import org.python.compiler.Symtable.Flag;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
@@ -72,7 +73,7 @@ public class PySTEntryObject extends PyObject {
 
     /** XXX Old compiler stuff, it could be merged with CompileUnit */
     ArgListCompiler ac;
-    PySTEntryObject(Symtable st, String name, PySTEntryObject.BlockType block, PythonTree key, int lineno, int colOffset, arguments args) {
+    PySTEntryObject(Symtable st, String name, PySTEntryObject.BlockType block, PythonTree key, int lineno, int colOffset, arguments args, expr return_) {
         super(TYPE);
         this.table = st;
         this.id = System.identityHashCode(key);
@@ -89,6 +90,7 @@ public class PySTEntryObject extends PyObject {
         this.colOffset = colOffset;
         this.ac = new ArgListCompiler();
         ac.visitArgs(args);
+        ac.addAnnotation("return", return_);
         st.blocks.put(key, this);
     }
 
@@ -331,7 +333,7 @@ public class PySTEntryObject extends PyObject {
     }
 
     public Flag getScope(String mangled) {
-        return symbols.getOrDefault(mangled, EnumSet.of(Flag.SENTINAL)).stream().filter(flag -> flag.value > LOCAL.value).findFirst().orElse(Flag.SENTINAL);
+        return symbols.getOrDefault(mangled, EnumSet.of(Flag.SENTINAL)).stream().filter(flag -> flag.value >= LOCAL.value).findFirst().orElse(Flag.SENTINAL);
     }
 
     public enum BlockType {

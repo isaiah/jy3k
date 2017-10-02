@@ -26,6 +26,7 @@ public class ArgListCompiler extends Visitor
     public List<expr> defaults;
     public List<String> names;
     public Map<String, expr> kw_defaults;
+    public int argcount;
     public int kwonlyargcount;
     public List<String> fpnames;
     public List<stmt> init_code;
@@ -67,11 +68,12 @@ public class ArgListCompiler extends Visitor
             return;
         }
         List<arg> argslist = args.getInternalArgs();
+        argcount = argslist.size();
         String name;
-        for (int i = 0; i < argslist.size(); i++) {
-            name = argslist.get(i).getInternalArg();
+        for (arg arg : argslist) {
+            name = arg.getInternalArg();
             names.add(name);
-            addAnnotation(name, argslist.get(i).getInternalAnnotation());
+            addAnnotation(name, arg.getInternalAnnotation());
         }
         if (args.getInternalVararg() != null) {
             arglist = true;
@@ -82,12 +84,12 @@ public class ArgListCompiler extends Visitor
             names.add(name);
             addAnnotation(name, args.getInternalVararg().getInternalAnnotation());
         }
-        kwonlyargcount = args.getInternalKwonlyargs().size();
         List<arg> kwonlyargs = args.getInternalKwonlyargs();
-        for (int i = 0; i < kwonlyargcount; i++) {
-            name = kwonlyargs.get(i).getInternalArg();
+        kwonlyargcount = kwonlyargs.size();
+        for (arg arg : kwonlyargs) {
+            name = arg.getInternalArg();
             names.add(name);
-            addAnnotation(name, kwonlyargs.get(i).getInternalAnnotation());
+            addAnnotation(name, arg.getInternalAnnotation());
         }
         if (args.getInternalKwarg() != null) {
             keywordlist = true;

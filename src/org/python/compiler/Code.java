@@ -482,6 +482,11 @@ public class Code extends MethodVisitor implements Opcodes {
                                        Object... bmsArgs) {
         mv.visitInvokeDynamicInsn(name, descriptor, bsmHandle, bmsArgs);
     }
+
+    public void iconst(boolean value) {
+        inst.iconst(value ? 1 : 0);
+    }
+
     public void iconst(int value) {
         inst.iconst(value);
     }
