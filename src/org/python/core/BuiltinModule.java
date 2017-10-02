@@ -11,6 +11,8 @@ import org.python.core.stringlib.IntegerFormatter;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
 
+import java.util.Arrays;
+
 /**
  * The builtin module. All builtin functions are defined here
  */
@@ -122,6 +124,7 @@ public class BuiltinModule {
         dict.__setitem__("print", PyBuiltinFunction.named( "print", BuiltinDocs.builtins_print_doc).wide(BuiltinModule::print));
         dict.__setitem__("next", PyBuiltinFunction.named( "next", BuiltinDocs.builtins_next_doc).wide(BuiltinModule::next));
         dict.__setitem__("bin", PyBuiltinFunction.named( "bin", BuiltinDocs.builtins_bin_doc).wide(BuiltinModule::bin));
+        dict.__setitem__("__build_class__", PyBuiltinFunction.named( "__build_class__", BuiltinDocs.builtins___build_class___doc).wide(BuiltinModule::buildClass));
     }
 
     public static void fillWithBuiltinExceptions(PyObject dict) {
@@ -923,6 +926,69 @@ public class BuiltinModule {
             }
             throw e;
         }
+    }
+
+    public static PyObject buildClass(PyObject[] args, String[] keywords) {
+        PyFunction func = (PyFunction) args[0];
+        PyObject className = args[1];
+        PyObject[] bases = new PyObject[args.length - keywords.length - 2];
+        System.arraycopy(args, 1, bases, 0, bases.length);
+        PyObject metaclass = null;
+        int index = -1;
+        for (int i = 0; i < keywords.length; i++) {
+            if ("metaclass".equals(keywords[i])) {
+                index = i;
+                break;
+            }
+        }
+        if (index > 0) {
+            metaclass = args[bases.length + index + 2];
+        }
+        if (metaclass == null) {
+            metaclass = Py.findMetaclass(bases);
+        }
+        PyObject prepare = metaclass.__findattr__("__prepare__");
+        PyObject basesArray = new PyTuple(bases);
+        PyObject[] newArgs = new PyObject[keywords.length + 2];
+        args[0] = className;
+        args[1] = basesArray;
+        System.arraycopy(args, bases.length + 2, newArgs, 2, keywords.length);
+        PyObject ns = prepare.__call__(newArgs, keywords);
+        ThreadState state = Py.getThreadState();
+        PyObject cell = Py.runCode(state, func.__code__, func.__globals__, ns, (PyTuple) func.__closure__);
+        PyObject cls;
+        boolean isWide = false;
+        try {
+            if (isWide) {
+                PyObject[] newArgs2 = new PyObject[args.length + 1];
+                System.arraycopy(newArgs, 0, newArgs2, 0, 2);
+                newArgs[2] = ns;
+                System.arraycopy(newArgs, 2, newArgs2, 3, newArgs.length - 2);
+                cls = metaclass.__call__(newArgs2, keywords);
+            } else {
+                cls = metaclass.__call__(className, basesArray, ns);
+            }
+        } catch (PyException pye) {
+            if (!pye.match(Py.TypeError)) {
+                throw pye;
+            }
+            pye.value = Py.newUnicode(String.format("Error when calling the metaclass bases\n    "
+                    + "%s", pye.value.__repr__().toString()));
+            throw pye;
+        }
+        if (cls instanceof PyType && cell instanceof PyCell) {
+            PyObject cell_cls = ((PyCell) cell).ob_ref;
+            if (cell_cls != cls) {
+                if (cell_cls == null) {
+                    String msg = "__class__ not set defining %.200s as %.200s. Was __classcell__ propagated to type.__new__?";
+                    Py.warning(Py.DeprecationWarning, String.format(msg, className, cls));
+                    ((PyCell) cell).ob_ref = cls;
+                } else {
+                    throw Py.TypeError(String.format("__class__ set to %.200s defining %.200s as %.200s", cell_cls, className, cls));
+                }
+            }
+        }
+        return cls;
     }
 
     /**

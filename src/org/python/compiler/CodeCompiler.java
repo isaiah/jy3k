@@ -475,18 +475,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     private void compileBody(java.util.List<stmt> stmts) {
         stmts.stream().forEach(this::visit);
-        getNone();
-        code.areturn();
     }
 
     @Override
     public Object visitClassDef(ClassDef node) {
+        loadBuildClass();
+        code.new_(p(PyFunction.class));
+        code.dup();
+
         enterScope(node.getInternalName(), CompilerScope.CLASS, node, node.getLineno());
         u._private = node.getInternalName();
         nameop("__name__", expr_contextType.Load);
         nameop("__module__", expr_contextType.Store);
         assert u.qualname != null: "class qualname is null";
-        code.ldc(u.qualname);
+        module.unicodeConstant(u.qualname).get(code); // TODO check how to handle constants in the better way
         nameop("__qualname__", expr_contextType.Store);
         compileBody(node.getInternalBody());
 
@@ -504,17 +506,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         code.areturn();
         exitScope();
-        loadBuildClass();
         make_closure(u, 0, null);
+        module.unicodeConstant(node.getInternalName()).get(code);
         callHelper(2, node.getInternalBases(), node.getInternalKeywords());
         code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
                 PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+        nameop(node.getInternalName(), expr_contextType.Store);
         return null;
     }
 
     private void callHelper(int n /** args already pushed */,
                             java.util.List<expr> args, java.util.List<keyword> keywords) {
-        loadArray(code, args);
+
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = new ArrayList<>();
 
@@ -528,16 +531,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             keys.add(kw.getInternalArg());
             values.add(kw.getInternalValue());
         }
+        loadArray(code, args, values, n);
+        loadThreadState();
+        code.swap();
         loadStrings(code, keys);
-        loadArray(code, values);
-        code.invokestatic(p(PyDictionary.class), "fromKV",
-                sig(PyDictionary.class, String[].class, PyObject[].class));
-
-        if (kwarg != null) {
-            code.dup();
-            visit(kwarg);
-            code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
-        }
+//        code.invokestatic(p(PyDictionary.class), "fromKV",
+//                sig(PyDictionary.class, String[].class, PyObject[].class));
+//
+//        if (kwarg != null) {
+//            code.dup();
+//            visit(kwarg);
+//            code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
+//        }
     }
 
     private void make_closure(CompileUnit u, int funcflags, String qualname) {
@@ -545,8 +550,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokespecial(
                 p(PyFunction.class),
                 "<init>",
-                sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
-                        PyCode.class, PyObject.class, String.class, PyObject[].class));
+                sig(Void.TYPE, PyCode.class));
     }
 
     private void loadBuildClass() {
@@ -1694,14 +1698,21 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.pop();
         }
     }
-
     public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) {
-        final int n;
+        loadArray(code, nodes, null, 0);
+    }
 
-        if (nodes == null) {
-            n = 0;
-        } else {
-            n = nodes.size();
+    public void loadArray(Code code, java.util.List<? extends PythonTree> nodes, java.util.List<? extends PythonTree> moreNodes, int enqueued) {
+        int n = enqueued;
+
+        if (nodes != null) {
+            n += nodes.size();
+        }
+
+        int m = n;
+
+        if (moreNodes != null) {
+            n += moreNodes.size();
         }
 
         if (n == 0) {
@@ -1712,10 +1723,24 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         code.iconst(n);
         code.anewarray(p(PyObject.class));
-        for (int i = 0; i < n; i++) {
+        for (int i = enqueued - 1; i >= 0; i--) {
+            code.dup_x1();
+            code.swap();
+            code.iconst(i);
+            code.swap();
+            code.aastore();
+        }
+
+        for (int i = enqueued; i < m; i++) {
             code.dup();
             code.iconst(i);
             visit(nodes.get(i));
+            code.aastore();
+        }
+        for (int i = m; i < n; i++) {
+            code.dup();
+            code.iconst(i);
+            visit(moreNodes.get(i));
             code.aastore();
         }
     }
@@ -1785,6 +1810,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         enterScope(internalName, CompilerScope.FUNCTION, node, node.getLineno());
 
         compileBody(body);
+        // blindly appending `return None`, asm will eliminate it
+        getNone();
+        code.areturn();
         exitScope();
 //        module.codeConstant(new Suite(node, body), name, true, className,
 //                node.getLine(), cflags, false).get(code);
@@ -1941,9 +1969,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         if (node.getInternalOrelse() != null) {
             return suite(node.getInternalOrelse()) != null ? exit : null;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public int beginLoop() {

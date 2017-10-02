@@ -2659,7 +2659,7 @@ public final class Py {
         return bases;
     }
 
-    private static PyObject findMetaclass(PyObject[] bases) {
+    public static PyObject findMetaclass(PyObject[] bases) {
         PyObject metaclass = null;
         // metaclass resolution
         for (PyObject base : bases) {

@@ -316,6 +316,10 @@ public class PyFrame extends PyObject implements Traverseproc {
         return getglobal(index);
     }
 
+    public PyObject loadbuildclass() {
+        return f_builtins.__finditem__("__build_class__");
+    }
+
     public PyObject getglobal(int index) {
         return getglobal(f_code.co_names[index]);
     }
