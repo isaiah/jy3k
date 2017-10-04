@@ -1,6 +1,7 @@
 package org.python.compiler;
 
 import org.python.antlr.PythonTree;
+import org.python.antlr.base.expr;
 import org.python.core.Py;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyObject;
@@ -31,7 +32,7 @@ class CompileUnit {
     int kwonlyargcount;
     Map<String, Integer> varnames;
     Map<String, Integer> names;
-    List<PythonTree> constants;
+    List<expr> constants;
     int id;
     int co_firstlineno;
     boolean arglist, keywordlist;

@@ -117,10 +117,16 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     @ExposedSet
     public PyObject __module__;
 
-    public PyFunction(PyCode code) {
+    public PyFunction(PyCode code, PyObject[] cells) {
         super(TYPE);
         __code__ = code;
+        __closure__ = cells == null ? null : new PyTuple(cells);
     }
+    public PyFunction(PyObject globals, PyObject[] defaults, PyDictionary kw_defaults, PyDictionary annotations, PyCode code, PyObject doc,
+                      PyObject qualname, PyObject[] closure_cells) {
+        this(globals, defaults, kw_defaults, annotations, code, doc, qualname.toString(), closure_cells);
+    }
+
     public PyFunction(PyObject globals, PyObject[] defaults, PyDictionary kw_defaults, PyDictionary annotations, PyCode code, PyObject doc,
                       String qualname) {
         this(globals, defaults, kw_defaults, annotations, code, doc, (PyObject[]) null);
@@ -137,6 +143,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         __annotations__ = annotations;
         __qualname__ = qualname;
     }
+
     public PyFunction(PyObject globals, PyObject[] defaults, PyDictionary kw_defaults, PyDictionary annotations, PyCode code, PyObject doc,
                       PyObject[] closure_cells) {
         this(globals, defaults, kw_defaults, code, doc, closure_cells);

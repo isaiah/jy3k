@@ -429,11 +429,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitModule(org.python.antlr.ast.Module suite) {
-        Str docStr = getDocStr(suite.getInternalBody());
-        if (docStr != null) {
+        int docstring = getDocStr(suite.getInternalBody());
+        if (docstring == 0) {
             loadFrame();
             code.ldc("__doc__");
-            visit(docStr);
+            visit(suite.getInternalBody().get(0));
             code.invokevirtual(p(PyFrame.class), "setglobal",
                     sig(Void.TYPE, String.class, PyObject.class));
         }
@@ -501,7 +501,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.dup();
             nameop("__classcell__", expr_contextType.Store);
         } else {
-            assert u.cellvars.isEmpty(): "class scope should have cell vars other than __class__";
+            assert u.cellvars.isEmpty(): "class scope should not have cell vars other than __class__";
             getNone();
         }
         code.areturn();
@@ -546,11 +546,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private void make_closure(CompileUnit u, int funcflags, String qualname) {
-        makeClosure(u);
+        if (!makeClosure(u)) {
+            code.aconst_null();
+        }
         code.invokespecial(
                 p(PyFunction.class),
                 "<init>",
-                sig(Void.TYPE, PyCode.class));
+                sig(Void.TYPE, PyCode.class, PyObject[].class));
     }
 
     private void loadBuildClass() {
@@ -606,9 +608,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (!makeClosure(u)) {
             code.aconst_null();
         }
-        Str docStr = getDocStr(node.getInternalBody());
-        if (docStr != null) {
-            visit(docStr);
+        int docstring = getDocStr(node.getInternalBody());
+        if (docstring == 0) {
+            visit(node.getInternalBody().get(0));
         } else {
             code.aconst_null();
         }
@@ -1745,37 +1747,39 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public Str getDocStr(java.util.List<stmt> suite) {
+    public int getDocStr(java.util.List<stmt> suite) {
         if (suite.size() > 0) {
             stmt stmt = suite.get(0);
             if (stmt instanceof Expr && ((Expr) stmt).getInternalValue() instanceof Str) {
-                return (Str) ((Expr) stmt).getInternalValue();
+                return 0;
             }
         }
-        return null;
+        return -1;
     }
 
     public boolean makeClosure(CompileUnit u) {
-        if (u == null || u.freevars == null) {
-            return false;
-        }
-        int n = u.freevars.size();
+        int n = u.cellvars.size() + u.freevars.size();
+
         if (n == 0) {
             return false;
         }
 
         code.iconst(n);
         code.anewarray(p(PyObject.class));
-        for (int i = 0; i < n; i++) {
+        loadClosure(u.cellvars);
+        loadClosure(u.freevars);
+        return true;
+    }
+
+    private void loadClosure(Map<String, Integer> mapping) {
+        mapping.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(e -> {
             code.dup();
-            code.iconst(i);
+            code.iconst(e.getValue());
             loadFrame();
-            code.iconst(u.freevars.get(i));
+            code.iconst(e.getValue());
             code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
             code.aastore();
-        }
-
-        return true;
+        });
     }
 
     private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, stmt node) {
@@ -1805,26 +1809,23 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokestatic(p(PyDictionary.class), "fromKV",
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
-//        scope.setup_closure();
-//        scope.dump();
         enterScope(internalName, CompilerScope.FUNCTION, node, node.getLineno());
 
-        compileBody(body);
+        int docstring = getDocStr(body);
+        for (int i = docstring + 1; i < body.size(); i++) {
+            visit(body.get(i));
+        }
         // blindly appending `return None`, asm will eliminate it
         getNone();
         code.areturn();
         exitScope();
-//        module.codeConstant(new Suite(node, body), name, true, className,
-//                node.getLine(), cflags, false).get(code);
 
-        Str docStr = getDocStr(body);
-        if (docStr != null) {
-            visit(docStr);
+        if (docstring == 0) {
+            visit(body.get(0));
         } else {
-            code.aconst_null();
+            getNone();
         }
-//      FIXME  code.ldc(scope.qualname);
-        code.ldc(ste.name);
+        module.unicodeConstant(u.qualname).get(code);
 
         if (!makeClosure(u)) {
             code.aconst_null();
@@ -1833,7 +1834,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 p(PyFunction.class),
                 "<init>",
                 sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
-                        PyCode.class, PyObject.class, String.class, PyObject[].class));
+                        PyCode.class, PyObject.class, PyObject.class, PyObject[].class));
 
 //        applyDecorators(decos);
         for (int i = 0; i < decos.size(); i++) {

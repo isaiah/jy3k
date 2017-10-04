@@ -63,8 +63,6 @@ public class PyFrame extends PyObject implements Traverseproc {
     /** Nested scopes: cell + free env. */
     public PyCell[] f_env;
 
-    private int env_j = 0;
-
     public int f_ncells;
 
     public int f_nfreevars;
@@ -155,6 +153,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     void setupEnv(PyTuple freevars) {
         int ntotal = f_ncells + f_nfreevars;
         // add space for the cellvars
+        int env_j = 0;
         for (; env_j < f_ncells; env_j++) {
             f_env[env_j] = new PyCell();
         }

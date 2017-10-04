@@ -9,6 +9,7 @@ import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Suite;
+import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.core.CodeBootstrap;
 import org.python.core.CodeFlag;
@@ -266,7 +267,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return ret;
     }
 
-    Constant constant(PythonTree node) {
+    Constant constant(expr node) {
         if (node instanceof Num) {
             PyObject n = (PyObject) ((Num) node).getInternalN();
             if (n instanceof PyLong) {
@@ -460,7 +461,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         throw Py.SyntaxError(node.getToken(), msg, sfilename);
     }
 
-    public int makeConstArray(Code code, java.util.List<? extends PythonTree> nodes) {
+    public int makeConstArray(Code code, java.util.List<? extends expr> nodes) {
         int n = 1;
 
         if (nodes != null) {
