@@ -21,9 +21,9 @@ import java.util.Map;
  * A visitor that replaces {@link SplitNode} into nested function and invocations
  */
 public class SplitIntoFunctions extends Visitor {
-    private Map<PythonTree, ScopeInfo> nodeScopes;
+    private Map<PythonTree, PySTEntryObject> nodeScopes;
 
-    public SplitIntoFunctions(Map<PythonTree, ScopeInfo> scopeInfoMap) {
+    public SplitIntoFunctions(Map<PythonTree, PySTEntryObject> scopeInfoMap) {
         this.nodeScopes = scopeInfoMap;
     }
 
