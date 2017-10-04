@@ -46,17 +46,17 @@ class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
     final double value;
 
     PyFloatConstant(double value) {
+        super("_f$" + value);
         this.value = value;
     }
 
     @Override
-    void get(Code c) {
+    void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(Double.valueOf(value));
         c.invokestatic(p(Py.class), "newFloat", sig(PyFloat.class, Double.TYPE));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
     }
-
-    @Override
-    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -81,17 +81,21 @@ class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
     final double value;
 
     PyComplexConstant(double value) {
+        super("_d$" + value);
         this.value = value;
     }
 
     @Override
     void get(Code c) {
-        c.ldc(Double.valueOf(value));
-        c.invokestatic(p(Py.class), "newImaginary", sig(PyComplex.class, Double.TYPE));
     }
 
     @Override
-    void put(Code c) {}
+    void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
+        c.ldc(Double.valueOf(value));
+        c.invokestatic(p(Py.class), "newImaginary", sig(PyComplex.class, Double.TYPE));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
+    }
 
     @Override
     public int hashCode() {
@@ -116,17 +120,17 @@ class PyStringConstant extends Constant implements ClassConstants, Opcodes {
     final String value;
 
     PyStringConstant(String value) {
+        super("_b$" + value);
         this.value = value;
     }
 
     @Override
-    void get(Code c) {
+    void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(value);
         c.invokestatic(p(PyBytes.class), "fromInterned", sig(PyBytes.class, String.class));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
     }
-
-    @Override
-    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -145,21 +149,20 @@ class PyStringConstant extends Constant implements ClassConstants, Opcodes {
 
 
 class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
-
     final String value;
 
     PyUnicodeConstant(String value) {
+        super("_s$" + value);
         this.value = value;
     }
 
     @Override
-    void get(Code c) {
+    void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(value);
         c.invokestatic(p(PyUnicode.class), "fromInterned", sig(PyUnicode.class, String.class));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
     }
-
-    @Override
-    void put(Code c) {}
 
     @Override
     public int hashCode() {
@@ -179,30 +182,30 @@ class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
 
 class PyLongConstant extends Constant implements ClassConstants, Opcodes {
 
-    final String value;
+    final long value;
 
-    PyLongConstant(String value) {
+    PyLongConstant(long value) {
+        super("_l$" + value);
         this.value = value;
     }
 
     @Override
-    void get(Code c) {
-        c.ldc(value);
-        c.invokestatic(p(Py.class), "newLong", sig(PyLong.class, String.class));
+    void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
+        c.lconst(value);
+        c.invokestatic(p(Py.class), "newLong", sig(PyLong.class, long.class));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
     }
 
     @Override
-    void put(Code c) {}
-
-    @Override
     public int hashCode() {
-        return value.hashCode();
+        return (int) value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof PyLongConstant) {
-            return ((PyLongConstant)o).value.equals(value);
+            return ((PyLongConstant)o).name.equals(name);
         } else {
             return false;
         }
@@ -271,7 +274,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         if (node instanceof Num) {
             PyObject n = (PyObject) ((Num) node).getInternalN();
             if (n instanceof PyLong) {
-                return longConstant(n.__str__().toString());
+                return longConstant(n.asLong());
             } else if (n instanceof PyFloat) {
                 return floatConstant(((PyFloat) n).getValue());
             } else if (n instanceof PyComplex) {
@@ -303,7 +306,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return findConstant(new PyUnicodeConstant(value));
     }
 
-    Constant longConstant(String value) {
+    Constant longConstant(long value) {
         return findConstant(new PyLongConstant(value));
     }
 
@@ -531,7 +534,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     public void emitNum(Num node, Code code) {
         if (node.getInternalN() instanceof PyLong) {
-            longConstant(((PyObject)node.getInternalN()).__str__().toString()).get(code);
+            longConstant(((PyLong)node.getInternalN()).asLong()).get(code);
         } else if (node.getInternalN() instanceof PyFloat) {
             floatConstant(((PyFloat)node.getInternalN()).getValue()).get(code);
         } else if (node.getInternalN() instanceof PyComplex) {

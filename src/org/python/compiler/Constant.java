@@ -3,13 +3,22 @@
 package org.python.compiler;
 
 import org.objectweb.asm.Opcodes;
+import org.python.core.PyObject;
+
+import static org.python.util.CodegenUtils.ci;
 
 abstract class Constant implements Opcodes{
+    Constant(String name) {
+        this.name = name;
+    }
+
     Module module;
     static int access = ACC_STATIC | ACC_FINAL;
     String name;
 
-    abstract void get(Code mv);
+    void get(Code mv) {
+        mv.getstatic(module.classfile.name, name, ci(PyObject.class));
+    }
 
     abstract void put(Code mv);
 }
