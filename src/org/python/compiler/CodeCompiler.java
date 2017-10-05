@@ -593,8 +593,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalValue() != null) {
             setline(node);
+            node.getInternalTarget().enter(this);
             visit(node.getInternalValue());
-            set(node.getInternalTarget());
+            node.getInternalTarget().leave(this);
         }
         return null;
     }
@@ -1553,7 +1554,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public void leaveName(Name node) {
-        code.dup_x1();
+        if (node.getInternalCtx() == expr_contextType.Store) {
+            code.dup_x1();
+        }
         nameop(node.getInternalId(), node.getInternalCtx());
     }
 
@@ -1595,6 +1598,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitSlice(Slice node) {
+        code.new_(p(PySlice.class));
+        code.dup();
         if (node.getInternalLower() == null) {
             getNone();
         } else {
@@ -1610,15 +1615,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         } else {
             visit(node.getInternalStep());
         }
-        int step = storeTop();
-
-        code.new_(p(PySlice.class));
-        code.dup();
-        code.dup2_x2();
-        code.pop2();
-
-        code.aload(step);
-        code.freeLocal(step);
 
         code.invokespecial(p(PySlice.class), "<init>",
                 sig(Void.TYPE, PyObject.class, PyObject.class, PyObject.class));

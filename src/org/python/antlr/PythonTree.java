@@ -75,6 +75,10 @@ public abstract class PythonTree extends AST implements Traverseproc {
         return node.getCharPositionInLine();
     }
 
+    public int getCol_offset() {
+        return node.getCharPositionInLine();
+    }
+
     public PythonTree getParent() {
         return parent;
     }

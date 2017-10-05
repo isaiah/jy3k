@@ -225,7 +225,7 @@ public class Symtable extends Visitor {
     }
 
     private EnumSet<Flag> lookup(String name) {
-        return cur.symbols.get(name);
+        return cur.symbols.getOrDefault(name, EnumSet.of(Flag.SENTINAL));
     }
 
     private void recordDirective(String name, stmt s) {
@@ -320,19 +320,20 @@ public class Symtable extends Visitor {
     @Override
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalTarget() instanceof Name) {
-            expr eName = node.getInternalTarget();
-            EnumSet<Flag> flags = lookup(((Name) node.getInternalTarget()).getInternalId());
+            Name eName = (Name) node.getInternalTarget();
+            EnumSet<Flag> flags = lookup(eName.getInternalId());
+            assert flags != null: "flags shouldn't be null";
             if ((flags.contains(Flag.DEF_GLOBAL) || flags.contains(Flag.DEF_NONLOCAL)) && node.getInternalSimple() > 0) {
                 throw new PySyntaxError(
                         String.format(flags.contains(Flag.DEF_GLOBAL) ? GLOBAL_ANNO : NONLOCAL_ANNO,
-                                ((Name) eName).getInternalId()),
+                                eName.getInternalId()),
                         node.getLine(), node.getCol_offset(), "", filename);
             }
 
             if (node.getInternalSimple() > 0) {
-                addDef(((Name) eName).getInternalId(), Flag.DEF_ANNO, Flag.DEF_LOCAL);
+                addDef(eName.getInternalId(), Flag.DEF_ANNO, Flag.DEF_LOCAL);
             } else if (node.getInternalValue() != null) {
-                addDef(((Name) eName).getInternalId(), Flag.DEF_LOCAL);
+                addDef(eName.getInternalId(), Flag.DEF_LOCAL);
             }
         } else {
             visit(node.getInternalTarget());
