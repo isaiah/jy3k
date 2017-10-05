@@ -464,30 +464,26 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         throw Py.SyntaxError(node.getToken(), msg, sfilename);
     }
 
-    public int makeConstArray(Code code, java.util.List<? extends expr> nodes) {
+    public void makeConstArray(Code code, java.util.List<? extends expr> nodes) {
         int n = 1;
 
         if (nodes != null) {
             n += nodes.size();
         }
 
-        int array = code.getLocal(ci(PyObject[].class));
-
         code.iconst(n);
         code.anewarray(p(PyObject.class));
-        code.astore(array);
-        code.aload(array);
+        code.dup();
         code.iconst(0);
         code.getstatic(p(Py.class), "None", ci(PyObject.class));
         code.aastore();
 
         for (int i = 1; i < n; i++) {
-            code.aload(array);
+            code.dup();
             code.iconst(i);
             constant(nodes.get(i - 1)).get(code);
             code.aastore();
         }
-        return array;
     }
 
 

@@ -74,6 +74,7 @@ import org.python.core.BaseCode;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyCode;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -224,17 +225,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public void getExcInfo() {
-        int exc = code.getLocal(p(PyException.class));
         loadThreadState();
         code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
-        code.astore(exc);
-        code.aload(exc);
+        code.dup();
         code.getfield(p(PyException.class), "type", ci(PyObject.class));
-        code.aload(exc);
+        code.dup();
         code.getfield(p(PyException.class), "value", ci(PyObject.class));
-        code.aload(exc);
         code.getfield(p(PyException.class), "traceback", ci(PyTraceback.class));
-        code.freeLocal(exc);
     }
 
     public void loadFrame() {
@@ -1219,25 +1216,26 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitCompare(Compare node) {
         Label end = new Label();
+        Label _return = new Label();
 
         visit(node.getInternalLeft());
 
         int n = node.getInternalOps().size();
         if (n > 1) {
-            int result = code.getLocal(p(PyObject.class));
             for (int i = 0; i < n; i++) {
                 visit(node.getInternalComparators().get(i));
                 code.dup_x1();
                 visitCmpop(node.getInternalOps().get(i));
-                code.dup();
-                code.astore(result);
                 code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
                 code.ifeq(end);
             }
+            code.pop();
+            code.getstatic(p(Py.class), "True", ci(PyBoolean.class));
+            code.goto_(_return);
             code.mark(end);
             code.pop();
-            code.aload(result);
-            code.freeLocal(result);
+            code.getstatic(p(Py.class), "False", ci(PyBoolean.class));
+            code.mark(_return);
         } else {
             visit(node.getInternalComparators().get(n - 1));
             visitCmpop(node.getInternalOps().get(n - 1));

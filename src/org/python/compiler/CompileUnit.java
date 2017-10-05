@@ -141,9 +141,7 @@ class CompileUnit {
         CodeCompiler.loadStrings(c, varnames);
 
         if (constants != null) {
-            int constArr = module.makeConstArray(c, constants);
-            c.aload(constArr);
-            c.freeLocal(constArr);
+            module.makeConstArray(c, constants);
         } else {
             c.aconst_null();
         }
