@@ -142,6 +142,14 @@ public static final PyType TYPE = PyType.fromClass(Name.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterName(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveName(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitName(this);
     }

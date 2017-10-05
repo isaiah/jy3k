@@ -69,6 +69,7 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public int getLine() {
         return node.getLine();
     }
+    public int getLineno() { return node.getLine(); }
 
     public int getCharPositionInLine() {
         return node.getCharPositionInLine();
@@ -149,28 +150,6 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public void replaceField(expr value, expr newValue) {}
 
     public abstract String toStringTree();
-//    public String toStringTree() {
-//        if (children == null || children.size() == 0) {
-//            return this.toString();// + "[" + this.info() + "]";
-//        }
-//        StringBuffer buf = new StringBuffer();
-//        if (!isNil()) {
-//            buf.append("(");
-//            buf.append(this.toString());// + "[" + this.info() + "]");
-//            buf.append(' ');
-//        }
-//        for (int i = 0; children != null && i < children.size(); i++) {
-//            PythonTree t = children.get(i);
-//            if (i > 0) {
-//                buf.append(' ');
-//            }
-//            buf.append(t.toStringTree());
-//        }
-//        if (!isNil()) {
-//            buf.append(")");
-//        }
-//        return buf.toString();
-//    }
 
     protected String dumpThis(String s) {
         return s;
@@ -235,12 +214,20 @@ public abstract class PythonTree extends AST implements Traverseproc {
         throw new RuntimeException("Only support statement: " + this);
     }
 
-    public <R> R accept(VisitorIF<R> visitor) {
-        throw new RuntimeException("Unexpected node: " + this);
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        throw new RuntimeException("not a node");
     }
-    
-    public void traverse(VisitorIF<?> visitor) {
-        throw new RuntimeException("Cannot traverse node: " + this);
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        throw new RuntimeException("not a node");
+    }
+
+    public <R> R accept(VisitorIF<R> visitor) {
+        throw new RuntimeException("not a node");
+    }
+
+    public <R> void traverse(VisitorIF<R> visitor) {
+        throw new RuntimeException("not a node");
     }
 
     /* Traverseproc implementation */

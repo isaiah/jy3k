@@ -172,6 +172,14 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterSubscript(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveSubscript(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSubscript(this);
     }

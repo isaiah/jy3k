@@ -452,6 +452,22 @@ class JavaVisitor(EmitVisitor):
         self.emit("}", depth)
         self.emit("", 0)
 
+        # The enter() method
+        self.emit("public <R> boolean enter(VisitorIF<R> visitor) {", depth)
+        if is_product:
+            self.emit('return false;', depth+1)
+        else:
+            self.emit('return visitor.enter%s(this);' % clsname, depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
+        # The leave() method
+        self.emit("public <R> void leave(VisitorIF<R> visitor) {", depth)
+        if not is_product:
+            self.emit('visitor.leave%s(this);' % clsname, depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
         # The accept() method
         self.emit("public <R> R accept(VisitorIF<R> visitor) {", depth)
         if is_product:
@@ -705,8 +721,13 @@ class VisitorVisitor(EmitVisitor):
         self.open("ast", "VisitorIF", refersToPythonTree=0)
         self.emit('public interface VisitorIF<R> {', 0)
         for ctor in self.ctors:
+            self.emit("public boolean enter%s(%s node);" % 
+                    (ctor, ctor), 1)
             self.emit("public R visit%s(%s node);" % 
                     (ctor, ctor), 1)
+            self.emit("public void leave%s(%s node);" % 
+                    (ctor, ctor), 1)
+
         self.emit('}', 0)
         self.close()
 
@@ -718,6 +739,17 @@ class VisitorVisitor(EmitVisitor):
             self.emit("R ret = unhandled_node(node);", 2)
             self.emit("traverse(node);", 2)
             self.emit("return ret;", 2)
+            self.emit('}', 1)
+            self.emit('', 0)
+
+            self.emit("public boolean enter%s(%s node) {" % 
+                    (ctor, ctor), 1)
+            self.emit("return true;", 2)
+            self.emit('}', 1)
+            self.emit('', 0)
+
+            self.emit("public void leave%s(%s node) {" % 
+                    (ctor, ctor), 1)
             self.emit('}', 1)
             self.emit('', 0)
 

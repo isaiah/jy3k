@@ -123,6 +123,14 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterExtSlice(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveExtSlice(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitExtSlice(this);
     }

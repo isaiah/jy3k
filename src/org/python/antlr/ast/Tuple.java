@@ -157,6 +157,14 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterTuple(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveTuple(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitTuple(this);
     }

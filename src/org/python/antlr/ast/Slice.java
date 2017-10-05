@@ -165,6 +165,14 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterSlice(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveSlice(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSlice(this);
     }

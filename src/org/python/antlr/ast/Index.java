@@ -111,6 +111,14 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterIndex(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveIndex(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitIndex(this);
     }

@@ -159,6 +159,14 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterAnonymousFunction(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveAnonymousFunction(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAnonymousFunction(this);
     }

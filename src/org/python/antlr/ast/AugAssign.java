@@ -172,6 +172,14 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterAugAssign(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveAugAssign(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAugAssign(this);
     }

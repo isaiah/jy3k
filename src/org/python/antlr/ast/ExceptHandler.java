@@ -183,6 +183,14 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterExceptHandler(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveExceptHandler(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitExceptHandler(this);
     }

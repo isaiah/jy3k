@@ -124,6 +124,14 @@ public static final PyType TYPE = PyType.fromClass(Global.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterGlobal(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveGlobal(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitGlobal(this);
     }

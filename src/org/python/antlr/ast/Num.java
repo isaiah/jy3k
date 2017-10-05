@@ -118,6 +118,14 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterNum(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveNum(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitNum(this);
     }

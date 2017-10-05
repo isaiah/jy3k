@@ -254,6 +254,14 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterAsyncFunctionDef(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveAsyncFunctionDef(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAsyncFunctionDef(this);
     }

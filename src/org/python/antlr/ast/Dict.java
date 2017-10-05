@@ -173,6 +173,14 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterDict(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveDict(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitDict(this);
     }

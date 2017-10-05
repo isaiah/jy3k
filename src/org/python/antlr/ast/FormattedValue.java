@@ -173,6 +173,14 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterFormattedValue(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveFormattedValue(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitFormattedValue(this);
     }

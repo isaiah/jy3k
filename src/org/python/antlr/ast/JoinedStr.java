@@ -134,6 +134,14 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterJoinedStr(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveJoinedStr(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitJoinedStr(this);
     }

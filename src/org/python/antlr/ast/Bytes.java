@@ -118,6 +118,14 @@ public static final PyType TYPE = PyType.fromClass(Bytes.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterBytes(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveBytes(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitBytes(this);
     }

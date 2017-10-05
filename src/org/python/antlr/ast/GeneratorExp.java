@@ -161,6 +161,14 @@ public static final PyType TYPE = PyType.fromClass(GeneratorExp.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterGeneratorExp(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveGeneratorExp(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitGeneratorExp(this);
     }

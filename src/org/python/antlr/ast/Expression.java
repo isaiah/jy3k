@@ -111,6 +111,14 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterExpression(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveExpression(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitExpression(this);
     }

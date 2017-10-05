@@ -118,6 +118,14 @@ public static final PyType TYPE = PyType.fromClass(NameConstant.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterNameConstant(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveNameConstant(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitNameConstant(this);
     }

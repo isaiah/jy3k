@@ -280,6 +280,14 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterClassDef(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveClassDef(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitClassDef(this);
     }

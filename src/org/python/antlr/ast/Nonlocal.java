@@ -124,6 +124,14 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterNonlocal(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveNonlocal(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitNonlocal(this);
     }

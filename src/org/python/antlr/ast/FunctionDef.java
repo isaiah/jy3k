@@ -254,6 +254,14 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterFunctionDef(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveFunctionDef(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitFunctionDef(this);
     }

@@ -183,6 +183,14 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterSplitNode(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveSplitNode(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSplitNode(this);
     }

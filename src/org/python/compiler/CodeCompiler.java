@@ -478,12 +478,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitClassDef(ClassDef node) {
+        loadFrame(); // pair with nameop
         loadBuildClass();
         code.new_(p(PyFunction.class));
         code.dup();
 
         enterScope(node.getInternalName(), CompilerScope.CLASS, node, node.getLineno());
         u._private = node.getInternalName();
+        loadFrame();
+        code.dup();
+        code.dup();
         nameop("__name__", expr_contextType.Load);
         nameop("__module__", expr_contextType.Store);
         assert u.qualname != null: "class qualname is null";
@@ -495,9 +499,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             int i = u.cellvars.get("__class__");
             assert i == 0: "__class__ must be the only cell var in class scope";
             loadFrame();
+            code.dup();
             code.ldc(i);
             code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
-            code.dup();
+            code.dup_x1();
             nameop("__classcell__", expr_contextType.Store);
         } else {
             assert u.cellvars.isEmpty(): "class scope should not have cell vars other than __class__";
@@ -574,15 +579,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitAssign(Assign node) {
         setline(node);
-        visit(node.getInternalValue());
-        temporary = storeTop();
         java.util.List<expr> targets = node.getInternalTargets();
-        for (int i = 0; i < targets.size(); i++) {
-//            if (i < targets.size() - 1) {
-//                code.dup();
-//            }
-            visit(targets.get(i));
+        targets.stream().forEach(e -> e.enter(this));
+        visit(node.getInternalValue());
+        for (int i = targets.size() - 1; i >= 0; i--) {
+            targets.get(i).leave(this);
         }
+        code.pop(); // pop the value from stack
         return null;
     }
 
@@ -1442,6 +1445,32 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public boolean enterAttribute(Attribute node) {
+        visit(node.getInternalValue());
+        return true;
+    }
+
+    @Override
+    public void leaveAttribute(Attribute node) {
+        expr_contextType ctx = node.getInternalCtx();
+
+        switch (ctx) {
+            case Del:
+                code.ldc(getName(node.getInternalAttr()));
+                code.invokevirtual(p(PyObject.class), "__delattr__", sig(Void.TYPE, String.class));
+                break;
+            case Load:
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
+                break;
+            case Param:
+            case Store:
+                code.dup_x1();
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(void.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_PROPERTY);
+                break;
+        }
+    }
+
+    @Override
     public Object visitAttribute(Attribute node) {
         int value = temporary;
         visit(node.getInternalValue());
@@ -1465,12 +1494,35 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
-    public Object visitSubscript(Subscript node) {
-        int value = temporary;
-        expr_contextType ctx = node.getInternalCtx();
+    public boolean enterSubscript(Subscript node) {
         visit(node.getInternalValue());
         visit(node.getInternalSlice());
 
+        return true;
+    }
+
+    @Override
+    public void leaveSubscript(Subscript node) {
+        expr_contextType ctx = node.getInternalCtx();
+        switch (ctx) {
+            case Del:
+                code.invokevirtual(p(PyObject.class), "__delitem__", sig(Void.TYPE, PyObject.class));
+                break;
+            case Load:
+                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_ELEMENT);
+                break;
+            case Param:
+            case Store:
+                code.dup_x2();
+                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(void.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_ELEMENT);
+                break;
+        }
+    }
+
+    @Override
+    public Object visitSubscript(Subscript node) {
+        int value = temporary;
+        expr_contextType ctx = node.getInternalCtx();
         switch (ctx) {
             case Del:
                 code.invokevirtual(p(PyObject.class), "__delitem__", sig(Void.TYPE, PyObject.class));
@@ -1494,7 +1546,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public boolean enterName(Name node) {
+        loadFrame();
+        return true;
+    }
+
+    @Override
+    public void leaveName(Name node) {
+        code.dup_x1();
+        nameop(node.getInternalId(), node.getInternalCtx());
+    }
+
+    @Override
     public Object visitName(Name node) {
+        loadFrame();
         nameop(node.getInternalId(), node.getInternalCtx());
         return null;
     }
@@ -2193,11 +2258,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private void addop_o(Op op, String mangled, Map<String, Integer> dict) {
-        loadFrame();
-        if (op.isSet()) {
-            // TODO start from here: nameop with Store is not compatible with assignment and class definition, one use stack the other uses temporary variable
-            code.aload(temporary);
-        }
         if (dict.containsKey(mangled)) {
             code.iconst(dict.get(mangled));
         } else {
@@ -2240,12 +2300,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
 
         public void invoke(Code code) {
-            Class<? extends Object> argType;
-            argType = int.class;
             if (isSet()) {
-                code.invokevirtual(p(PyFrame.class), name, sig(void.class, PyObject.class, argType));
+                code.invokevirtual(p(PyFrame.class), name, sig(void.class, PyObject.class, int.class));
             } else {
-                code.invokevirtual(p(PyFrame.class), name, sig(PyObject.class, argType));
+                code.invokevirtual(p(PyFrame.class), name, sig(PyObject.class, int.class));
             }
         }
 

@@ -171,6 +171,14 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterAsyncWith(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveAsyncWith(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAsyncWith(this);
     }

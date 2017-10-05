@@ -132,6 +132,13 @@ public class alias extends PythonTree {
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return false;
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         traverse(visitor);
         return null;

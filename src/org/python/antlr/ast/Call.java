@@ -202,6 +202,14 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterCall(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveCall(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitCall(this);
     }

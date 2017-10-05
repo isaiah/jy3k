@@ -149,6 +149,14 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterLambda(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveLambda(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitLambda(this);
     }

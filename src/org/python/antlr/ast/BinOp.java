@@ -172,6 +172,14 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterBinOp(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveBinOp(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitBinOp(this);
     }

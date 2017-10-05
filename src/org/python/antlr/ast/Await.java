@@ -122,6 +122,14 @@ public static final PyType TYPE = PyType.fromClass(Await.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterAwait(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveAwait(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitAwait(this);
     }

@@ -145,6 +145,14 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterUnaryOp(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveUnaryOp(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitUnaryOp(this);
     }

@@ -134,6 +134,14 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         return sb.toString();
     }
 
+    public <R> boolean enter(VisitorIF<R> visitor) {
+        return visitor.enterSet(this);
+    }
+
+    public <R> void leave(VisitorIF<R> visitor) {
+        visitor.leaveSet(this);
+    }
+
     public <R> R accept(VisitorIF<R> visitor) {
         return visitor.visitSet(this);
     }
