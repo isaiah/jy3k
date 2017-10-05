@@ -173,7 +173,7 @@ public static final PyType TYPE = PyType.fromClass(GeneratorExp.class);
         return visitor.visitGeneratorExp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (elt != null)
             elt.accept(visitor);
         if (generators != null) {

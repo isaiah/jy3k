@@ -135,7 +135,7 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
         return visitor.visitExtSlice(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (dims != null) {
             for (PythonTree t : dims) {
                 if (t != null)

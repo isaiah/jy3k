@@ -3,6 +3,7 @@ package org.python.antlr;
 import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -102,6 +103,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -242,11 +244,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
             return visit(ctx.test(0));
         }
-        java.util.List<expr> elts = ctx.test().stream()
-                .map(testContext -> (expr) visit(testContext))
-                .collect(Collectors.toList());
-        ctx.star_expr().stream()
-                .forEach(star_exprContext -> elts.add((expr) visit(star_exprContext)));
+        java.util.List<expr> elts = ctx.children.stream().map(t -> (expr) visit(t)).filter(Objects::nonNull).collect(Collectors.toList());
+
         return new Tuple(ctx.getStart(), elts, exprContextType);
     }
 
@@ -1005,14 +1004,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
      * helper method
      */
     private java.util.List<expr> visit_Exprlist(PythonParser.ExprlistContext ctx) {
-        java.util.List<expr> elts = new ArrayList<>();
-        for (PythonParser.ExprContext exprContext : ctx.expr()) {
-            elts.add((expr) visit(exprContext));
-        }
-        for (PythonParser.Star_exprContext starExpr : ctx.star_expr()) {
-            elts.add((expr) visit(starExpr));
-        }
-        return elts;
+        java.util.List<ParseTree> children = ctx.children;
+
+        return children.stream().map(t -> (expr) visit(t)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private java.util.List<alias> visit_Dotted_as_names(PythonParser.Dotted_as_namesContext ctx) {

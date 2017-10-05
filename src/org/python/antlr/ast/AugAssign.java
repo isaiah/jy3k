@@ -184,7 +184,7 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
         return visitor.visitAugAssign(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (target != null)
             target.accept(visitor);
         if (value != null)

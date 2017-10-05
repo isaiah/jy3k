@@ -169,7 +169,7 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
         return visitor.visitBoolOp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (values != null) {
             for (PythonTree t : values) {
                 if (t != null)

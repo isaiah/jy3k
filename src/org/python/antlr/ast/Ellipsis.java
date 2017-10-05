@@ -103,7 +103,7 @@ public static final PyType TYPE = PyType.fromClass(Ellipsis.class);
         return visitor.visitEllipsis(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
     }
 
     public void replaceField(expr value, expr newValue) {

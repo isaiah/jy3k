@@ -181,7 +181,7 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
         return visitor.visitAttribute(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (value != null)
             value.accept(visitor);
     }

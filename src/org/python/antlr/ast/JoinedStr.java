@@ -146,7 +146,7 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
         return visitor.visitJoinedStr(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (values != null) {
             for (PythonTree t : values) {
                 if (t != null)

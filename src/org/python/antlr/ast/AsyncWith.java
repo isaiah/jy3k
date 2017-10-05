@@ -183,7 +183,7 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
         return visitor.visitAsyncWith(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (items != null) {
             for (PythonTree t : items) {
                 if (t != null)

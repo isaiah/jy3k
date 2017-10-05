@@ -144,7 +144,7 @@ public class alias extends PythonTree {
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
     }
 
     public void replaceField(expr value, expr newValue) {

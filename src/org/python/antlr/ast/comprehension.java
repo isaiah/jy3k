@@ -189,7 +189,7 @@ public class comprehension extends PythonTree {
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (target != null)
             target.accept(visitor);
         if (iter != null)

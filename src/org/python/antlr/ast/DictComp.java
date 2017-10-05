@@ -201,7 +201,7 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
         return visitor.visitDictComp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (key != null)
             key.accept(visitor);
         if (value != null)

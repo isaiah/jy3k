@@ -171,7 +171,7 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
         return visitor.visitAnonymousFunction(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (args != null)
             args.accept(visitor);
         if (body != null) {

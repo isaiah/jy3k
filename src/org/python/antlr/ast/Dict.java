@@ -185,7 +185,7 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
         return visitor.visitDict(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (keys != null) {
             for (PythonTree t : keys) {
                 if (t != null)

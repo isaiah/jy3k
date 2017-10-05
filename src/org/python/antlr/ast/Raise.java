@@ -161,7 +161,7 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
         return visitor.visitRaise(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (exc != null)
             exc.accept(visitor);
         if (cause != null)

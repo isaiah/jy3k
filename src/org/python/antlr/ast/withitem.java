@@ -150,7 +150,7 @@ public class withitem extends PythonTree {
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (context_expr != null)
             context_expr.accept(visitor);
         if (optional_vars != null)

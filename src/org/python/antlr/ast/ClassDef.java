@@ -292,7 +292,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         return visitor.visitClassDef(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (bases != null) {
             for (PythonTree t : bases) {
                 if (t != null)

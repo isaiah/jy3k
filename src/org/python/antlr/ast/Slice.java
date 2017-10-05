@@ -177,7 +177,7 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
         return visitor.visitSlice(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (lower != null)
             lower.accept(visitor);
         if (upper != null)

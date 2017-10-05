@@ -157,7 +157,7 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
         return visitor.visitUnaryOp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (operand != null)
             operand.accept(visitor);
     }

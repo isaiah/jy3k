@@ -173,7 +173,7 @@ public static final PyType TYPE = PyType.fromClass(ListComp.class);
         return visitor.visitListComp(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (elt != null)
             elt.accept(visitor);
         if (generators != null) {

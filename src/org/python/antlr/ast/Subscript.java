@@ -184,7 +184,7 @@ public static final PyType TYPE = PyType.fromClass(Subscript.class);
         return visitor.visitSubscript(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (value != null)
             value.accept(visitor);
         if (slice != null)

@@ -58,6 +58,8 @@ import org.python.antlr.ast.Suite;
 import org.python.antlr.ast.Try;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.UnaryOp;
+import org.python.antlr.ast.VisitorBase;
+import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.YieldFrom;
@@ -582,9 +584,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<expr> targets = node.getInternalTargets();
         targets.stream().forEach(e -> e.enter(this));
         visit(node.getInternalValue());
-        for (int i = targets.size() - 1; i >= 0; i--) {
-            targets.get(i).leave(this);
-        }
+        targets.stream().forEach(e -> e.leave(this));
         code.pop(); // pop the value from stack
         return null;
     }
@@ -793,6 +793,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 }
             }
             loadFrame();
+            code.dup();
             code.ldc(name);
             code.aconst_null();
             code.iconst(0);
@@ -812,7 +813,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     dot = nextDot;
                 }
             }
-            set(new Name(a, asname, expr_contextType.Store));
+            nameop(asname, expr_contextType.Store);
         }
         return null;
     }
@@ -850,20 +851,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.ldc(from);
                 code.invokestatic(p(org.python.bootstrap.Import.class), "importFrom",
                         sig(PyObject.class, PyObject.class, String.class));
-                set(new Name(node, as, expr_contextType.Store));
+                loadFrame();
+                code.swap();
+                nameop(as, expr_contextType.Store);
             }
             code.pop();
         }
-        return null;
-    }
-
-    @Override
-    public Object visitGlobal(Global node) {
-        return null;
-    }
-
-    @Override
-    public Object visitNonlocal(Nonlocal node) {
         return null;
     }
 
@@ -1473,7 +1466,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAttribute(Attribute node) {
-        int value = temporary;
         visit(node.getInternalValue());
         expr_contextType ctx = node.getInternalCtx();
 
@@ -1487,7 +1479,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 return null;
             case Param:
             case Store:
-                code.aload(value);
                 code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(void.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_PROPERTY);
                 return null;
         }
@@ -1541,6 +1532,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public boolean enterStarred(Starred node) {
+        return node.getInternalValue().enter(this);
+    }
+
+    @Override
+    public void leaveStarred(Starred node) {
+        node.getInternalValue().leave(this);
+    }
+
+    @Override
     public Object visitStarred(Starred node) {
         visit(node.getInternalValue());
         return null;
@@ -1579,6 +1580,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadArray(code, node.getInternalElts());
         code.invokestatic(p(Py.class), "newList", sig(PyList.class, PyObject[].class));
         return null;
+    }
+
+    @Override
+    public boolean enterTuple(Tuple node) {
+        node.getInternalElts().stream().forEach(e -> e.enter(this));
+        return true;
+    }
+
+    @Override
+    public void leaveTuple(Tuple node) {
+        java.util.List<expr> elts = node.getInternalElts();
+        checkStarred(elts, node);
     }
 
     @Override
@@ -2069,24 +2082,45 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     }
 
-    public Object seqSet(java.util.List<expr> nodes) {
-        return seqSet(nodes, nodes.size(), -1);
-    }
-
     public Object seqSet(java.util.List<expr> nodes, int count, int countAfter) {
-        code.aload(temporary);
         code.iconst(count);
         code.iconst(countAfter);
         code.invokestatic(p(Py.class), "unpackIterator",
                 sig(PyObject[].class, PyObject.class, Integer.TYPE, Integer.TYPE));
 
-        for (int i = 0; i < nodes.size(); i++) {
-            code.dup();
+        VisitorIF<?> visitor = new VisitorBase<Object>() {
+            @Override
+            public Object visitName(Name node) {
+                nameop(node.getInternalId(), expr_contextType.Store);
+                return null;
+            }
+
+            @Override
+            public Object visitAttribute(Attribute node) {
+                return null;
+            }
+
+            @Override
+            protected Object unhandled_node(PythonTree node) {
+                return null;
+            }
+
+            @Override
+            public void traverse(PythonTree node) {
+                node.traverse(this);
+            }
+        };
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            expr elt = nodes.get(i);
+            if (elt instanceof Subscript) {
+                code.dup_x2();
+            } else {
+                code.dup_x1();
+            }
             code.iconst(i);
             code.aaload();
-            set(nodes.get(i));
+            elt.accept(visitor);
         }
-        code.pop();
         return null;
     }
 
@@ -2104,16 +2138,15 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         for (int i = 0; i < elts.size(); i++) {
             expr elt = elts.get(i);
             if (elt instanceof Starred) {
-                if (!foundStarred) {
-                    if (i >= 256) {
-                        throw Py.SyntaxError(node.getToken(), "too many expressions in star-unpacking assignment", module.getFilename());
-                    }
-                    count = i;
-                    countAfter = elts.size() - i - 1;
-                    foundStarred = true;
-                } else {
+                if (foundStarred) {
                     throw Py.SyntaxError(node.getToken(), "two starred expressions in assignment", module.getFilename());
                 }
+                if (i >= 256) {
+                    throw Py.SyntaxError(node.getToken(), "too many expressions in star-unpacking assignment", module.getFilename());
+                }
+                count = i;
+                countAfter = elts.size() - i - 1;
+                foundStarred = true;
             }
         }
         return seqSet(elts, count, countAfter);
@@ -2136,6 +2169,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokevirtual(p(PyFrame.class), "getglobal", sig(PyObject.class, String.class));
     }
 
+    /** a named operation in frame
+     *  NOTE: frame is not loaded here, please pair loadFrame() manually
+     * @param name
+     * @param ctx
+     */
     private void nameop(String name, expr_contextType ctx) {
         Map<String, Integer> dict = u.names;
         String mangled = mangle(u._private, name);

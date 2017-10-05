@@ -133,7 +133,7 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
         return visitor.visitInteractive(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (body != null) {
             for (PythonTree t : body) {
                 if (t != null)

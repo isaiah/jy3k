@@ -195,7 +195,7 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
         return visitor.visitExceptHandler(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (type != null)
             type.accept(visitor);
         if (body != null) {

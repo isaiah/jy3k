@@ -144,7 +144,7 @@ public static final PyType TYPE = PyType.fromClass(Block.class);
         return visitor.visitBlock(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (body != null) {
             for (PythonTree t : body) {
                 if (t != null)

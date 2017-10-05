@@ -147,7 +147,7 @@ public class keyword extends PythonTree {
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (value != null)
             value.accept(visitor);
     }

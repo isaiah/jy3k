@@ -146,7 +146,7 @@ public static final PyType TYPE = PyType.fromClass(Set.class);
         return visitor.visitSet(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (elts != null) {
             for (PythonTree t : elts) {
                 if (t != null)

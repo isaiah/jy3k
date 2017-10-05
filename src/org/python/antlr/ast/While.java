@@ -209,7 +209,7 @@ public static final PyType TYPE = PyType.fromClass(While.class);
         return visitor.visitWhile(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (test != null)
             test.accept(visitor);
         if (body != null) {

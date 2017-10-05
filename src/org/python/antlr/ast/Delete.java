@@ -146,7 +146,7 @@ public static final PyType TYPE = PyType.fromClass(Delete.class);
         return visitor.visitDelete(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (targets != null) {
             for (PythonTree t : targets) {
                 if (t != null)

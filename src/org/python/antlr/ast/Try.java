@@ -260,7 +260,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
         return visitor.visitTry(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (body != null) {
             for (PythonTree t : body) {
                 if (t != null)

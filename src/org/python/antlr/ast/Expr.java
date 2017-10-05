@@ -134,7 +134,7 @@ public static final PyType TYPE = PyType.fromClass(Expr.class);
         return visitor.visitExpr(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (value != null)
             value.accept(visitor);
     }

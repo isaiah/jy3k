@@ -479,7 +479,7 @@ class JavaVisitor(EmitVisitor):
         self.emit("", 0)
 
         # The visitChildren() method
-        self.emit("public void traverse(VisitorIF<?> visitor) {", depth)
+        self.emit("public <R> void traverse(VisitorIF<R> visitor) {", depth)
         for f in fields:
             if str(f.type) in self.bltinnames:
                 continue

@@ -123,7 +123,7 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
         return visitor.visitExpression(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (body != null)
             body.accept(visitor);
     }

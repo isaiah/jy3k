@@ -147,7 +147,7 @@ public class arg extends PythonTree {
         return null;
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (annotation != null)
             annotation.accept(visitor);
     }

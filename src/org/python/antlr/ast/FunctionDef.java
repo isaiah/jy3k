@@ -266,7 +266,7 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
         return visitor.visitFunctionDef(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (args != null)
             args.accept(visitor);
         if (body != null) {

@@ -185,7 +185,7 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
         return visitor.visitFormattedValue(this);
     }
 
-    public void traverse(VisitorIF<?> visitor) {
+    public <R> void traverse(VisitorIF<R> visitor) {
         if (value != null)
             value.accept(visitor);
         if (format_spec != null)
