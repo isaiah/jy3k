@@ -118,7 +118,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private Module module;
     private Code code;
     private CompilerFlags cflags;
-    private int temporary;
 
     private boolean fast_locals;
     private boolean optimizeGlobals = true;
@@ -260,12 +259,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.getfield(p(PyFrame.class), "f_back", ci(PyFrame.class));
     }
 
-    public int storeTop() {
-        int tmp = code.getLocal(p(PyObject.class));
-        code.astore(tmp);
-        return tmp;
-    }
-
     public void setline(int line) {
         if (module.linenumbers) {
             code.setline(line);
@@ -277,19 +270,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public void setline(PythonTree node) {
         setline(node.getLine());
-    }
-
-    public void set(PythonTree node) {
-        int tmp = storeTop();
-        set(node, tmp);
-//        code.aconst_null();
-//        code.astore(tmp);
-        code.freeLocal(tmp);
-    }
-
-    public void set(PythonTree node, int tmp) {
-        temporary = tmp;
-        visit(node);
     }
 
     void exitScope() {
@@ -1513,7 +1493,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitSubscript(Subscript node) {
-        int value = temporary;
         expr_contextType ctx = node.getInternalCtx();
         switch (ctx) {
             case Del:
@@ -1524,8 +1503,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 return null;
             case Param:
             case Store:
-                code.aload(value);
-                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(void.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_ELEMENT);
+                assert false: "use two phase compile for Subscript";
                 return null;
         }
         return null;
@@ -1979,9 +1957,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
 
             if (handler.getInternalName() != null) {
+                loadFrame();
                 code.aload(exc);
                 code.getfield(p(PyException.class), "value", ci(PyObject.class));
-                set(new Name(handler, handler.getInternalName(), expr_contextType.Store));
+                nameop(handler.getInternalName(), expr_contextType.Store);
             }
 
             // do exception body
@@ -2040,47 +2019,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public Object Slice(Subscript node, Slice slice) {
-        expr_contextType ctx = node.getInternalCtx();
-        visit(node.getInternalValue());
-        if (slice.getInternalLower() != null) {
-            visit(slice.getInternalLower());
-        } else {
-            code.aconst_null();
-        }
-        if (slice.getInternalUpper() != null) {
-            visit(slice.getInternalUpper());
-        } else {
-            code.aconst_null();
-        }
-        if (slice.getInternalStep() != null) {
-            visit(slice.getInternalStep());
-        } else {
-            code.aconst_null();
-        }
-
-        switch (ctx) {
-            case Del:
-                code.invokevirtual(p(PyObject.class), "__delslice__",
-                        sig(Void.TYPE, PyObject.class, PyObject.class, PyObject.class));
-                break;
-            case Load:
-                code.invokevirtual(p(PyObject.class), "__getslice__",
-                        sig(PyObject.class, PyObject.class, PyObject.class, PyObject.class));
-                break;
-            case Param:
-            case Store:
-                code.aload(temporary);
-                code.invokevirtual(
-                        p(PyObject.class),
-                        "__setslice__",
-                        sig(Void.TYPE, PyObject.class, PyObject.class, PyObject.class,
-                                PyObject.class));
-                break;
-        }
-        return null;
-
-    }
 
     public Object seqSet(java.util.List<expr> nodes, int count, int countAfter) {
         code.iconst(count);
@@ -2097,6 +2035,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
             @Override
             public Object visitAttribute(Attribute node) {
+                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(void.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_PROPERTY);
+                return null;
+            }
+
+            @Override
+            public Object visitSubscript(Subscript node) {
+                code.visitInvokeDynamicInsn(EMPTY_NAME, sig(void.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_ELEMENT);
                 return null;
             }
 
