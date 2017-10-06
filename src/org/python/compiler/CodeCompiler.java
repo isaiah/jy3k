@@ -479,7 +479,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             assert i == 0: "__class__ must be the only cell var in class scope";
             loadFrame();
             code.dup();
-            code.ldc(i);
+            code.iconst(i);
             code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
             code.dup_x1();
             nameop("__classcell__", expr_contextType.Store);
@@ -1682,13 +1682,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         for (int i = enqueued; i < m; i++) {
             code.dup();
             code.iconst(i);
-            visit(nodes.get(i));
+            visit(nodes.get(i - enqueued));
             code.aastore();
         }
         for (int i = m; i < n; i++) {
             code.dup();
             code.iconst(i);
-            visit(moreNodes.get(i));
+            visit(moreNodes.get(i - m));
             code.aastore();
         }
     }
@@ -1735,6 +1735,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         u.argcount = ste.ac.argcount;
         u.kwonlyargcount = ste.ac.kwonlyargcount;
 
+        loadFrame(); // pairing nameop
         decos.stream().forEach(this::visit);
 
         code.new_(p(PyFunction.class));
@@ -1766,16 +1767,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.areturn();
         exitScope();
 
-        if (docstring == 0) {
-            visit(body.get(0));
-        } else {
-            getNone();
-        }
+        // FIXME the docstring is not created correctly on stack
+//        if (docstring == 0) {
+//            visit(body.get(0));
+//        } else {
+            code.aconst_null();
+//        }
         module.unicodeConstant(u.qualname).get(code);
 
         if (!makeClosure(u)) {
             code.aconst_null();
         }
+
         code.invokespecial(
                 p(PyFunction.class),
                 "<init>",
@@ -1784,7 +1787,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
 //        applyDecorators(decos);
         for (int i = 0; i < decos.size(); i++) {
-
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
+                    PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
         }
 
         nameop(internalName, expr_contextType.Store);

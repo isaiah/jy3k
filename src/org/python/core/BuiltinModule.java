@@ -932,7 +932,7 @@ public class BuiltinModule {
         PyFunction func = (PyFunction) args[0];
         PyObject className = args[1];
         PyObject[] bases = new PyObject[args.length - keywords.length - 2];
-        System.arraycopy(args, 1, bases, 0, bases.length);
+        System.arraycopy(args, 2, bases, 0, bases.length);
         PyObject metaclass = null;
         int index = -1;
         for (int i = 0; i < keywords.length; i++) {
