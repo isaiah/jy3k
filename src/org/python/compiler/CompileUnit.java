@@ -2,6 +2,8 @@ package org.python.compiler;
 
 import org.python.antlr.PythonTree;
 import org.python.antlr.base.expr;
+import org.python.core.CodeFlag;
+import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyObject;
@@ -70,6 +72,15 @@ class CompileUnit {
         this.fname = isJavaIdentifier(name) ? name + "$" + id : "f$" + id;
         this.co_name = fname;
         this.argcount = ste.ac.argcount;
+        this.moreflags = computeCodeFlags(ste);
+    }
+
+    private static int computeCodeFlags(PySTEntryObject ste) {
+        int flags = 0;
+        if (ste.generator) {
+            flags |= CodeFlag.CO_GENERATOR.flag;
+        }
+        return flags;
     }
 
     private static Map<String, Integer> list2dict(List<String> varnames) {

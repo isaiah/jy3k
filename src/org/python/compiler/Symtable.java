@@ -225,7 +225,7 @@ public class Symtable extends Visitor {
     }
 
     private EnumSet<Flag> lookup(String name) {
-        return cur.symbols.getOrDefault(name, EnumSet.of(Flag.SENTINAL));
+        return cur.symbols.getOrDefault(name, Flag.NULL);
     }
 
     private void recordDirective(String name, stmt s) {
@@ -710,6 +710,7 @@ public class Symtable extends Visitor {
         FREE(4 << SCOPE_OFFSET), CELL(5 << SCOPE_OFFSET);
 
         static EnumSet<Flag> DEF_BOUND = EnumSet.of(DEF_LOCAL, DEF_PARAM, DEF_IMPORT);
+        static EnumSet<Flag> NULL = EnumSet.of(SENTINAL);
 
         int value;
 

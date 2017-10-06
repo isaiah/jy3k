@@ -92,6 +92,7 @@ import org.python.core.linker.Bootstrap;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -120,7 +121,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     private Code code;
     private CompilerFlags cflags;
 
-    private boolean fast_locals;
     private boolean optimizeGlobals = true;
     private String className;
     private Deque<Label> continueLabels, breakLabels, exitLabels;
@@ -153,7 +153,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         stack = new LinkedList<>();
     }
 
-    static boolean checkOptimizeGlobals(boolean fast_locals, PySTEntryObject scope) {
+    static boolean checkOptimizeGlobals(PySTEntryObject scope) {
         return false;
 //        return fast_locals && !scope.exec && !scope.from_import_star;
     }
@@ -318,7 +318,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                     || u.scopeType == CompilerScope.CLASS) {
                 assert u.name != null;
 //                String mangled = mangle(parent._private, u.name);
-                EnumSet<Symtable.Flag> scope = parent.ste.symbols.get(u.name);
+                EnumSet<Symtable.Flag> scope = parent.ste.symbols.getOrDefault(u.name, Symtable.Flag.NULL);
 
                 assert !scope.contains(Symtable.Flag.GLOBAL_IMPLICIT);
                 if (scope.contains(Symtable.Flag.GLOBAL_EXPLICIT)) {
@@ -345,10 +345,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         u.qualname = name;
     }
 
-    void parse(mod node, boolean fast_locals, String className, CompilerFlags cflags, boolean needsClassClosure) {
-        this.fast_locals = fast_locals;
+    void parse(mod node, String className, CompilerFlags cflags, boolean needsClassClosure) {
         this.className = className;
-        this.code = code;
         this.cflags = cflags;
 //        this.tbl = scope.tbl;
 
@@ -374,7 +372,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //        }
         // END preparse
 
-        optimizeGlobals = checkOptimizeGlobals(fast_locals, ste);
+        optimizeGlobals = checkOptimizeGlobals(ste);
 
         Object exit = visit(node);
         if (needsClassClosure) {
@@ -1001,6 +999,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitAnonymousFunction(AnonymousFunction node) {
         String name = "<lambda>";
+        return compileFunction(name, Arrays.asList(), node.getInternalBody(), node);
+    }
+
+    public Object visitAnonymousFunction(AnonymousFunction node, boolean ignore) {
+        String name = "<lambda>";
 
         setline(node);
         PySTEntryObject scope = module.getScopeInfo(node);
@@ -1020,7 +1023,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokespecial(p(PyDictionary.class), "<init>",
                 sig(Void.TYPE, String[].class, PyObject[].class));
 
-        module.codeConstant(new Suite(node, node.getInternalBody()), name, true, className, node.getLine(), cflags, false).get(code);
+        module.codeConstant(new Suite(node, node.getInternalBody()), name, className, node.getLine(), cflags, false).get(code);
 
         if (!makeClosure(u)) {
             code.aconst_null();
@@ -1142,7 +1145,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitYield(Yield node) {
         setline(node);
-        if (!fast_locals) {
+        if (u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'yield' outside function", module.getFilename());
         }
 
@@ -1186,7 +1189,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      */
     @Override
     public Object visitYieldFrom(YieldFrom node) {
-        if (!fast_locals) {
+        if (u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'yield from' outside function", module.getFilename());
         }
 
@@ -1728,14 +1731,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         });
     }
 
-    private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, stmt node) {
-//        String name = getName(internalName);
+    private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, PythonTree node) {
         setline(node);
+        boolean anonymous = node instanceof expr;
 
         u.argcount = ste.ac.argcount;
         u.kwonlyargcount = ste.ac.kwonlyargcount;
 
-        loadFrame(); // pairing nameop
+        if (!anonymous) {
+            loadFrame(); // pairing nameop
+        }
         decos.stream().forEach(this::visit);
 
         code.new_(p(PyFunction.class));
@@ -1757,6 +1762,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
         enterScope(internalName, CompilerScope.FUNCTION, node, node.getLineno());
+        String qualname = u.qualname;
 
         int docstring = getDocStr(body);
         for (int i = docstring + 1; i < body.size(); i++) {
@@ -1773,7 +1779,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //        } else {
             code.aconst_null();
 //        }
-        module.unicodeConstant(u.qualname).get(code);
+        module.unicodeConstant(qualname).get(code);
 
         if (!makeClosure(u)) {
             code.aconst_null();
@@ -1787,11 +1793,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
 //        applyDecorators(decos);
         for (int i = 0; i < decos.size(); i++) {
-            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
-                    PyObject.class), LINKERBOOTSTRAP, Bootstrap.CALL);
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, PyObject.class),
+                    LINKERBOOTSTRAP, Bootstrap.CALL);
         }
 
-        nameop(internalName, expr_contextType.Store);
+        if (!anonymous) {
+            nameop(internalName, expr_contextType.Store);
+        }
         return null;
     }
 

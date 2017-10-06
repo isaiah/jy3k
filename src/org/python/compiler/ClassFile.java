@@ -203,8 +203,8 @@ public class ClassFile
         endClassAnnotations();
         endFields();
         endMethods();
-        final byte[] ba = cw.toByteArray();//CoroutineFixer.transform(cw.toByteArray());
-//        final byte[] ba = CoroutineFixer.transform(cw.toByteArray());
+//        final byte[] ba = cw.toByteArray();//CoroutineFixer.transform(cw.toByteArray());
+        final byte[] ba = CoroutineFixer.transform(cw.toByteArray());
         stream.write(ba);
     }
 

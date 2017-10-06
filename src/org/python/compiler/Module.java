@@ -8,11 +8,9 @@ import org.python.antlr.PythonTree;
 import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Str;
-import org.python.antlr.ast.Suite;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.core.CodeBootstrap;
-import org.python.core.CodeFlag;
 import org.python.core.CodeLoader;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
@@ -153,6 +151,7 @@ class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
 
     PyUnicodeConstant(String value) {
         super("_s$" + value);
+        assert value != null: "string constant doesn't support null";
         this.value = value;
     }
 
@@ -310,11 +309,11 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return findConstant(new PyLongConstant(value));
     }
 
-    CompileUnit codeConstant(mod tree, String name, boolean fast_locals, String className,
+    CompileUnit codeConstant(mod tree, String name, String className,
                              int firstlineno, CompilerFlags cflags, boolean needsClassClosure) {
         CodeCompiler compiler = new CodeCompiler(this);
         CompileUnit code = compiler.enterScope(name, CompilerScope.MODULE, tree, firstlineno);
-        compiler.parse(tree, fast_locals, className, cflags, needsClassClosure);
+        compiler.parse(tree, className, cflags, needsClassClosure);
         compiler.exitScope();
         return code;
     }
@@ -520,7 +519,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
         CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
 
-        compiler.parse(node, false, null, cflags, false);
+        compiler.parse(node, null, cflags, false);
         compiler.exitScope();
 //        CompileUnit main = module.codeConstant(node, "<module>", false, null,
 //                0, cflags, false);

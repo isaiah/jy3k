@@ -341,6 +341,10 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public void setlocal(int index, PyObject value) {
+        setlocal(value, index);
+    }
+
+    public void setlocal(PyObject value, int index) {
         if (f_fastlocals != null) {
             f_fastlocals[index] = value;
         } else {
