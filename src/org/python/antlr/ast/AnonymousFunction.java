@@ -31,6 +31,23 @@ import java.util.ArrayList;
 @ExposedType(name = "_ast.AnonymousFunction", base = expr.class)
 public class AnonymousFunction extends expr {
 public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
+    private String name;
+    public String getInternalName() {
+        return name;
+    }
+    public void setInternalName(String name) {
+        this.name = name;
+    }
+    @ExposedGet(name = "name")
+    public PyObject getName() {
+        if (name == null) return Py.None;
+        return new PyUnicode(name);
+    }
+    @ExposedSet(name = "name")
+    public void setName(PyObject name) {
+        this.name = AstAdapters.py2identifier(name);
+    }
+
     private arguments args;
     public arguments getInternalArgs() {
         return args;
@@ -65,7 +82,7 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
 
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("args"), new PyUnicode("body")};
+    new PyUnicode[] {new PyUnicode("name"), new PyUnicode("args"), new PyUnicode("body")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -81,23 +98,25 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
     @ExposedMethod
     public void AnonymousFunction___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("AnonymousFunction", args, keywords, new String[]
-            {"args", "body", "lineno", "col_offset"}, 2, true);
-        setArgs(ap.getPyObject(0, Py.None));
-        setBody(ap.getPyObject(1, Py.None));
-        int lin = ap.getInt(2, -1);
+            {"name", "args", "body", "lineno", "col_offset"}, 3, true);
+        setName(ap.getPyObject(0, Py.None));
+        setArgs(ap.getPyObject(1, Py.None));
+        setBody(ap.getPyObject(2, Py.None));
+        int lin = ap.getInt(3, -1);
         if (lin != -1) {
             setLineno(lin);
         }
 
-        int col = ap.getInt(3, -1);
+        int col = ap.getInt(4, -1);
         if (col != -1) {
             setLineno(col);
         }
 
     }
 
-    public AnonymousFunction(PyObject args, PyObject body) {
+    public AnonymousFunction(PyObject name, PyObject args, PyObject body) {
         super(TYPE);
+        setName(name);
         setArgs(args);
         setBody(body);
     }
@@ -107,8 +126,9 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
         super(subtype);
     }
 
-    public AnonymousFunction(Token token, arguments args, java.util.List<stmt> body) {
+    public AnonymousFunction(Token token, String name, arguments args, java.util.List<stmt> body) {
         super(TYPE, token);
+        this.name = name;
         this.args = args;
         if (this.args != null)
             this.args.setParent(this);
@@ -122,8 +142,10 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
         }
     }
 
-    public AnonymousFunction(PythonTree tree, arguments args, java.util.List<stmt> body) {
+    public AnonymousFunction(PythonTree tree, String name, arguments args, java.util.List<stmt>
+    body) {
         super(TYPE, tree);
+        this.name = name;
         this.args = args;
         if (this.args != null)
             this.args.setParent(this);
@@ -138,7 +160,7 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
     }
 
     public AnonymousFunction copy() {
-        return new AnonymousFunction(this.getToken(), this.args, this.body);
+        return new AnonymousFunction(this.getToken(), this.name, this.args, this.body);
     }
 
     @ExposedGet(name = "repr")
@@ -149,6 +171,9 @@ public static final PyType TYPE = PyType.fromClass(AnonymousFunction.class);
     @Override
     public String toStringTree() {
         StringBuffer sb = new StringBuffer("AnonymousFunction(");
+        sb.append("name=");
+        sb.append(dumpThis(name));
+        sb.append(",");
         sb.append("args=");
         sb.append(dumpThis(args));
         sb.append(",");

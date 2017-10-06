@@ -345,21 +345,21 @@ public class Lower extends Visitor {
     public Object visitListComp(ListComp node) {
 //        traverse(node);
         org.python.antlr.ast.List emptyList = new org.python.antlr.ast.List(node, null, expr_contextType.Load);
-        return visitComp(emptyList, "append", node, node.getInternalGenerators(), node.getInternalElt());
+        return visitComp(emptyList, "<listcomp>","append", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
     public Object visitSetComp(SetComp node) {
 //        traverse(node);
         org.python.antlr.ast.Set emptySet = new org.python.antlr.ast.Set(node, null);
-        return visitComp(emptySet, "add", node, node.getInternalGenerators(), node.getInternalElt());
+        return visitComp(emptySet, "<setcomp>","add", node, node.getInternalGenerators(), node.getInternalElt());
     }
 
     @Override
     public Object visitDictComp(DictComp node) {
 //        traverse(node);
         org.python.antlr.ast.Dict emptyDict = new org.python.antlr.ast.Dict(node, null, null);
-        return visitComp(emptyDict, "__setitem__", node, node.getInternalGenerators(), node.getInternalKey(), node.getInternalValue());
+        return visitComp(emptyDict, "<dictcomp>", "__setitem__", node, node.getInternalGenerators(), node.getInternalKey(), node.getInternalValue());
     }
 
     @Override
@@ -389,7 +389,7 @@ public class Lower extends Visitor {
 
         arg arg = new arg(node, elt, null);
         arguments args = new arguments(node, asList(arg), null, null, null, null, null);
-        AnonymousFunction lambda = new AnonymousFunction(node, args, asList(n));
+        AnonymousFunction lambda = new AnonymousFunction(node, "<genexp>", args, asList(n));
         Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
         expr result = new Call(node, lambda, asList(getIter), null);
 
@@ -407,7 +407,7 @@ public class Lower extends Visitor {
     public Object visitLambda(Lambda node) {
         traverse(node);
         java.util.List<stmt> bod = asList(new Return(node, node.getInternalBody()));
-        expr anonymousFunction = new AnonymousFunction(node, node.getInternalArgs(), bod);
+        expr anonymousFunction = new AnonymousFunction(node, "<lambda>", node.getInternalArgs(), bod);
         node.replaceSelf(anonymousFunction);
         return node;
     }
@@ -553,7 +553,7 @@ public class Lower extends Visitor {
         return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
     }
 
-    private Object visitComp(expr initVal, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) {
+    private Object visitComp(expr initVal, String name, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) {
         String tmp = "(tmp)";
         Name loadTmp = new Name(node, tmp, expr_contextType.Load);
         expr append = new Attribute(node, loadTmp, appendMeth, expr_contextType.Load);
@@ -580,7 +580,7 @@ public class Lower extends Visitor {
         arg arg = new arg(node, elt, null);
         arguments args = new arguments(node, asList(arg), null, null, null, null, null);
         stmt newList = new Assign(node, asList(new Name(node, tmp, expr_contextType.Store)), initVal);
-        AnonymousFunction lambda = new AnonymousFunction(node, args, asList(newList, n, new Return(node, loadTmp)));
+        AnonymousFunction lambda = new AnonymousFunction(node, name, args, asList(newList, n, new Return(node, loadTmp)));
 
         Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
         expr result = new Call(node, lambda, asList(getIter), null);

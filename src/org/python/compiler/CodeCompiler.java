@@ -998,8 +998,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAnonymousFunction(AnonymousFunction node) {
-        String name = "<lambda>";
-        return compileFunction(name, Arrays.asList(), node.getInternalBody(), node);
+        return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalBody(), node);
     }
 
     public Object visitAnonymousFunction(AnonymousFunction node, boolean ignore) {
