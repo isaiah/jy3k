@@ -301,6 +301,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
         u.methodEmitter = c;
         this.code = c;
+        u.genswitch = new Label();
+        if (ste.generator) {
+            code.goto_(u.genswitch);
+        }
+        u.start = new Label();
+        code.mark(u.start);
 
         return compileUnit;
     }
@@ -351,12 +357,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //        this.tbl = scope.tbl;
 
         // BEGIN preparse
-        Label genswitch = new Label();
-        if (ste.generator) {
-            code.goto_(genswitch);
-        }
-        Label start = new Label();
-        code.mark(start);
 
 //        int nparamcell = ste.jy_paramcells.size();
 //        if (nparamcell > 0) {
@@ -374,32 +374,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         optimizeGlobals = checkOptimizeGlobals(ste);
 
-        Object exit = visit(node);
+        visit(node);
         if (needsClassClosure) {
             loadFrame();
             code.iconst(0);
             code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
             code.dup();
             nameop("__classcell__", expr_contextType.Store);
-            code.areturn();
-        } else if (exit == null) {
+        } else {
             setLastI(-1);
-
             getNone();
-            code.areturn();
         }
+        code.areturn();
 
         // BEGIN postparse
-
-        // similar to visitResume code in pyasm.py
-        if (ste.generator) {
-            code.mark(genswitch);
-
-            code.aload(2);
-            getLastI();
-            Label[] y = {start};
-            code.tableswitch(0, y.length - 1, start, y);
-        }
         // END postparse
     }
 
@@ -1001,43 +989,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalBody(), node);
     }
 
-    public Object visitAnonymousFunction(AnonymousFunction node, boolean ignore) {
-        String name = "<lambda>";
-
-        setline(node);
-        PySTEntryObject scope = module.getScopeInfo(node);
-        code.new_(p(PyFunction.class));
-
-        code.dup();
-        loadArray(code, scope.ac.getDefaults());
-
-        loadFrame();
-        code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-        code.swap();
-
-        code.new_(p(PyDictionary.class));
-        code.dup();
-        loadStrings(code, scope.ac.kw_defaults.keySet());
-        loadArray(code, new ArrayList<>(scope.ac.kw_defaults.values()));
-        code.invokespecial(p(PyDictionary.class), "<init>",
-                sig(Void.TYPE, String[].class, PyObject[].class));
-
-        module.codeConstant(new Suite(node, node.getInternalBody()), name, className, node.getLine(), cflags, false).get(code);
-
-        if (!makeClosure(u)) {
-            code.aconst_null();
-
-        }
-        code.invokespecial(
-                p(PyFunction.class),
-                "<init>",
-                sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyCode.class, PyObject[].class));
-        code.dup();
-        code.ldc(scope.name);
-        code.putfield(p(PyFunction.class), "__qualname__", ci(String.class));
-        return null;
-    }
-
     @Override
     public Object visitIfExp(IfExp node) {
         setline(node.getInternalTest());
@@ -1161,10 +1112,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             getNone();
         }
         setLastI(++yield_count);
-        saveLocals();
         code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-        restoreLocals();
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
         loadFrame();
@@ -1768,8 +1717,17 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(body.get(i));
         }
         // blindly appending `return None`, asm will eliminate it
+        setLastI(-1);
         getNone();
         code.areturn();
+        if (ste.generator) {
+            code.mark(u.genswitch);
+
+            loadFrame();
+            getLastI();
+            Label[] y = {u.start};
+            code.tableswitch(0, y.length - 1, u.start, y);
+        }
         exitScope();
 
         // FIXME the docstring is not created correctly on stack

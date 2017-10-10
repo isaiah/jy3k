@@ -1,5 +1,6 @@
 package org.python.compiler;
 
+import org.objectweb.asm.Label;
 import org.python.antlr.PythonTree;
 import org.python.antlr.base.expr;
 import org.python.core.CodeFlag;
@@ -49,6 +50,10 @@ class CompileUnit {
     int nestedlevel;
     public String qualname;
     public Code methodEmitter;
+
+    // This are the labels used for generator/coroutine lookup table
+    public Label genswitch;
+    public Label start;
 
 
     public CompileUnit(CompilerScope scopeType, String name, PySTEntryObject ste, int lineno, Module module) {

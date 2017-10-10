@@ -58,17 +58,25 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
 
     @ExposedMethod(doc = BuiltinDocs.generator_send_doc)
     public final PyObject generator_send(PyObject value) {
+        ThreadState state = Py.getThreadState();
         if (gi_frame == null) {
             if (this instanceof PyAsyncGenerator) {
                 throw Py.StopAsyncIteration();
             }
-            throw Py.StopIteration();
+            PyException exc = Py.StopIteration();
+            exc.tracebackHere(state.frame);
+            throw exc;
         }
 
         if (gi_frame.f_lasti == 0 && value != Py.None && value != null) {
             throw Py.TypeError("can't send non-None value to a just-started " + tp());
         }
-        return gen_send_ex(Py.getThreadState(), value);
+        try {
+            return gen_send_ex(state, value);
+        } catch (PyException e) {
+            e.tracebackHere(state.frame);
+            throw e;
+        }
     }
 
     public PyObject throw$(PyObject type, PyObject value, PyObject tb) {
@@ -187,7 +195,13 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
 
     @ExposedMethod(doc = BuiltinDocs.generator___next___doc)
     public final PyObject generator___next__() {
-        return gen_send_ex(Py.getThreadState(), Py.None);
+        ThreadState state = Py.getThreadState();
+        try {
+            return gen_send_ex(state, Py.None);
+        } catch (PyException e) {
+            e.tracebackHere(state.frame);
+            throw e;
+        }
     }
 
     @Override
