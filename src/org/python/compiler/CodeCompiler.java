@@ -393,15 +393,17 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitModule(org.python.antlr.ast.Module suite) {
-        int docstring = getDocStr(suite.getInternalBody());
+        java.util.List<stmt> body = suite.getInternalBody();
+        int docstring = getDocStr(body);
         if (docstring == 0) {
             loadFrame();
-            code.ldc("__doc__");
-            visit(suite.getInternalBody().get(0));
-            code.invokevirtual(p(PyFrame.class), "setglobal",
-                    sig(Void.TYPE, String.class, PyObject.class));
+            visit(((Expr) body.get(0)).getInternalValue());
+            nameop("__doc__", expr_contextType.Store);
         }
-        traverse(suite);
+        int size = body.size();
+        for (int i = docstring + 1; i < size; i++) {
+            visit(body.get(i));
+        }
         return null;
     }
 
@@ -2261,6 +2263,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         public void invoke(Code code) {
             if (isSet()) {
                 code.invokevirtual(p(PyFrame.class), name, sig(void.class, PyObject.class, int.class));
+            } else if (isDel()) {
+                code.invokevirtual(p(PyFrame.class), name, sig(void.class, int.class));
             } else {
                 code.invokevirtual(p(PyFrame.class), name, sig(PyObject.class, int.class));
             }
@@ -2268,6 +2272,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         public boolean isSet() {
             return name.startsWith("set");
+        }
+
+        public boolean isDel() {
+            return name.startsWith("del");
         }
     }
 
@@ -2291,7 +2299,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          */
         public Vector<Label> exceptionStarts = new Vector<Label>();
         public Vector<Label> exceptionEnds = new Vector<Label>();
-        public boolean bodyDone = false;
         public PythonTree node = null;
 
         public ExceptionHandler() {
