@@ -1512,7 +1512,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitList(List node) {
         if (node.getInternalCtx() == expr_contextType.Store) {
-            return checkStarred(node.getInternalElts(), node);
+            return checkStarred(node.getInternalElts(), node, false);
         }
         if (node.getInternalCtx() == expr_contextType.Del) {
             return seqDel(node.getInternalElts());
@@ -1531,14 +1531,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public void leaveTuple(Tuple node) {
+        leaveTuple(node, false);
+    }
+
+    private void leaveTuple(Tuple node, boolean nested) {
         java.util.List<expr> elts = node.getInternalElts();
-        checkStarred(elts, node);
+        checkStarred(elts, node, nested);
     }
 
     @Override
     public Object visitTuple(Tuple node) {
         if (node.getInternalCtx() == expr_contextType.Store) {
-            return checkStarred(node.getInternalElts(), node);
+            return checkStarred(node.getInternalElts(), node, false);
         }
 
         if (node.getInternalCtx() == expr_contextType.Del) {
@@ -2002,7 +2006,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
 
-    public Object seqSet(java.util.List<expr> nodes, int count, int countAfter) {
+    public Object seqSet(java.util.List<expr> nodes, int count, int countAfter, boolean nested) {
         code.iconst(count);
         code.iconst(countAfter);
         code.invokestatic(p(Py.class), "unpackIterator",
@@ -2038,6 +2042,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         };
         for (int i = nodes.size() - 1; i >= 0; i--) {
+            if (nested && i > 0) {
+                // drop the parent unpacked array if nested
+                code.swap();
+                code.pop();
+            }
             expr elt = nodes.get(i);
             if (elt instanceof Subscript) {
                 code.dup_x2();
@@ -2046,7 +2055,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
             code.iconst(i);
             code.aaload();
-            elt.accept(visitor);
+            if (elt instanceof Tuple) {
+                leaveTuple((Tuple) elt, true);
+            } else {
+                elt.accept(visitor);
+            }
         }
         return null;
     }
@@ -2058,7 +2071,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    private Object checkStarred(java.util.List<expr> elts, PythonTree node) {
+    private Object checkStarred(java.util.List<expr> elts, PythonTree node, boolean nested) {
         boolean foundStarred = false;
         int count = elts.size();
         int countAfter = -1;
@@ -2076,7 +2089,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 foundStarred = true;
             }
         }
-        return seqSet(elts, count, countAfter);
+        return seqSet(elts, count, countAfter, nested);
     }
 
     private String getName(String name) {
