@@ -274,6 +274,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         CompileUnit cur = u;
         if (!stack.isEmpty()) {
             u = stack.pop();
+            ste = u.ste;
             code = u.methodEmitter;
         }
         cur.get(code); // place the getstatic instruction in the parent scope
@@ -301,12 +302,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(PyObject.class, ThreadState.class, PyFrame.class), ACC_PUBLIC);
         u.methodEmitter = c;
         this.code = c;
-        u.genswitch = new Label();
         if (ste.generator) {
+            u.genswitch = new Label();
             code.goto_(u.genswitch);
+            u.start = new Label();
+            code.mark(u.start);
         }
-        u.start = new Label();
-        code.mark(u.start);
 
         return compileUnit;
     }
@@ -1116,7 +1117,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          *  to save and restore the operand stack
          */
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
-
         expr value = node.getInternalValue();
         if (value != null) {
             visit(value);
@@ -1735,10 +1735,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(body.get(i));
         }
         // blindly appending `return None`, asm will eliminate it
-        setLastI(-1);
-        getNone();
-        code.areturn();
+        if (!anonymous) {
+            getNone();
+            code.areturn();
+        }
         if (ste.generator) {
+            setLastI(-1);
             code.mark(u.genswitch);
 
             loadFrame();
@@ -1748,12 +1750,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         exitScope();
 
-        // FIXME the docstring is not created correctly on stack
-//        if (docstring == 0) {
-//            visit(body.get(0));
-//        } else {
+        if (docstring == 0) {
+            visit(((Expr) body.get(0)).getInternalValue());
+        } else {
             code.aconst_null();
-//        }
+        }
         module.unicodeConstant(qualname).get(code);
 
         if (!makeClosure(u)) {
@@ -1865,18 +1866,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
-//        int tmp = 0;
-        if (node.getInternalValue() != null) {
-            visit(node.getInternalValue());
-//            tmp = code.getReturnLocal();
-//            code.astore(tmp);
-        }
-
-//        setLastI(-1);
 
         if (node.getInternalValue() != null) {
             visit(node.getInternalValue());
-//            code.aload(tmp);
         } else {
             getNone();
         }
