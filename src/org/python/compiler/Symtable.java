@@ -437,11 +437,11 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitGlobal(Global node) {
-        Stream<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO).stream();
+        EnumSet<Flag> toCheck = EnumSet.of(Flag.DEF_LOCAL, Flag.DEF_USE, Flag.DEF_ANNO);
         for (String name : node.getInternalNames()) {
             EnumSet<Flag> cur = lookup(name);
             if (cur != null) {
-                if (toCheck.anyMatch(cur::contains)) {
+                if (toCheck.stream().anyMatch(cur::contains)) {
                     String msg;
                     if (cur.contains(Flag.DEF_USE)) {
                         msg = GLOBAL_AFTER_USE;
