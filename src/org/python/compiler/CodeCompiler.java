@@ -644,6 +644,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public Object visitGlobal(Global node) {
+        return null;
+    }
+
+    @Override
+    public Object visitNonlocal(Nonlocal node) {
+        return null;
+    }
+
+    @Override
     public Object visitTry(Try node) {
         Label start = new Label();
         Label end = new Label();
@@ -1442,6 +1452,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitSubscript(Subscript node) {
+        visit(node.getInternalValue());
+        visit(node.getInternalSlice());
         expr_contextType ctx = node.getInternalCtx();
         switch (ctx) {
             case Del:
@@ -1847,17 +1859,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
-        int tmp = 0;
+//        int tmp = 0;
         if (node.getInternalValue() != null) {
             visit(node.getInternalValue());
-            tmp = code.getReturnLocal();
-            code.astore(tmp);
+//            tmp = code.getReturnLocal();
+//            code.astore(tmp);
         }
 
-        setLastI(-1);
+//        setLastI(-1);
 
         if (node.getInternalValue() != null) {
-            code.aload(tmp);
+            visit(node.getInternalValue());
+//            code.aload(tmp);
         } else {
             getNone();
         }
