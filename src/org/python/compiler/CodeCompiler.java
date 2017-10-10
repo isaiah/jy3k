@@ -2042,9 +2042,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             }
         };
         for (int i = nodes.size() - 1; i >= 0; i--) {
-            if (nested && i > 0) {
+            if (nested && i != nodes.size() - 1) {
                 // drop the parent unpacked array if nested
                 code.swap();
+                // propagate the parent unpacked array
+                code.dup_x2();
                 code.pop();
             }
             expr elt = nodes.get(i);
@@ -2059,6 +2061,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 leaveTuple((Tuple) elt, true);
             } else {
                 elt.accept(visitor);
+            }
+            // nested destructive assignment have to clean the value by itself
+            if (nested && i == 0) {
+                code.pop();
             }
         }
         return null;

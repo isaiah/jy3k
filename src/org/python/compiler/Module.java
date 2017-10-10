@@ -485,7 +485,6 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
     }
 
-
     public static void compile(mod node, OutputStream ostream, String name, String filename,
             boolean linenumbers, CompilerFlags cflags) throws IOException {
         compile(node, ostream, name, filename, linenumbers, cflags, -1);
@@ -509,20 +508,14 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
         module.futures.preprocessFutures(node, cflags);
         /** create symbol table */
-//        new ScopesCompiler(module, module.scopes).parse(node);
         module.st = Symtable.buildObject(node, filename, 0);
         /** convert SplitNode to function definitions */
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
-        // Add __doc__ if it exists
         CodeCompiler compiler = new CodeCompiler(module);
-
         CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
-
         compiler.parse(node, null, cflags, false);
         compiler.exitScope();
-//        CompileUnit main = module.codeConstant(node, "<module>", false, null,
-//                0, cflags, false);
         module.mainCode = code;
         module.write(ostream);
     }

@@ -1280,26 +1280,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 //        System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
         out.write(bytes);
+        out.close();
     }
 
     private static byte[] compileSource(String name, InputStream fp, String filename) {
-        ByteArrayOutputStream ofp = new ByteArrayOutputStream();
-        ParserFacade.ExpectedEncodingBufferedReader bufReader = null;
         try {
-            org.python.antlr.base.mod node;
-            CompilerFlags cflags = new CompilerFlags();
-            bufReader = ParserFacade.prepBufReader(fp, cflags, filename, false);
-            node = ParserFacade.parseOnly(bufReader, CompileMode.single, filename, cflags);
-            CompilerFacade.compile(node, name + Version.PY_CACHE_TAG, filename, true, true,cflags).writeTo(ofp);
-            return ofp.toByteArray();
+            return org.python.bootstrap.Import.compileSource(name, fp, name);
         } catch (Throwable t) {
             throw ParserFacade.fixParseError(t, filename);
-        } finally {
-            try {
-                bufReader.close();
-            } catch (IOException e) {
-                // ignore
-            }
+
         }
     }
 }
