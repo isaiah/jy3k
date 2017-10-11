@@ -808,7 +808,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitTypedargslist(PythonParser.TypedargslistContext ctx) {
         arg kwarg = null;
         arg vararg = null;
-        java.util.List<expr> kwdefaults = new ArrayList<>(ctx.tfpdkv().size());
+        java.util.List<expr> kwdefaults = new ArrayList<>();
         java.util.List<expr> defaults = new ArrayList<>();
         java.util.List<arg> args = new ArrayList<>();
         java.util.List<arg> kwonlyargs = new ArrayList<>(ctx.tfpdkv().size());
@@ -819,8 +819,6 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             kwonlyargs.add((arg) visit(tfpdkvContext.tfpdef()));
             if (tfpdkvContext.ASSIGN() != null) {
                 kwdefaults.add((expr) visit(tfpdkvContext.test()));
-            } else {
-                kwdefaults.add(null);
             }
         }
         if (ctx.vararg != null) {

@@ -215,9 +215,7 @@ public class Symtable extends Visitor {
         if (seq == null) {
             return;
         }
-        for (PythonTree s : seq) {
-            s.accept(this);
-        }
+        seq.stream().forEach(this::visit);
     }
 
     public PySTEntryObject Symtable_Lookup(PythonTree node) {
@@ -247,7 +245,7 @@ public class Symtable extends Visitor {
         arguments args = node.getInternalArgs();
         if (args != null) {
             visitSeq(args.getInternalDefaults());
-            visitSeq(args.getInternalDefaults());
+            visitSeq(args.getInternalKw_defaults());
         }
         visitAnnotations(args, node.getInternalReturns());
         visitSeq(node.getInternalDecorator_list());
@@ -261,8 +259,10 @@ public class Symtable extends Visitor {
     @Override
     public Object visitAsyncFunctionDef(AsyncFunctionDef node) {
         addDef(node.getInternalName(), Flag.DEF_LOCAL);
-        visitSeq(node.getInternalArgs().getInternalDefaults());
-        visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        if (node.getInternalArgs() != null) {
+            visitSeq(node.getInternalArgs().getInternalDefaults());
+            visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        }
         visitAnnotations(node.getInternalArgs(), node.getInternalReturns());
         visitSeq(node.getInternalDecorator_list());
         enterBlock(node.getInternalName(), PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset(), node.getInternalArgs(), node.getInternalReturns());
@@ -514,8 +514,10 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitAnonymousFunction(AnonymousFunction node) {
-        visitSeq(node.getInternalArgs().getInternalDefaults());
-        visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        if (node.getInternalArgs() != null) {
+            visitSeq(node.getInternalArgs().getInternalDefaults());
+            visitSeq(node.getInternalArgs().getInternalKw_defaults());
+        }
         enterBlock("<lambda>", PySTEntryObject.BlockType.FunctionBlock, node, node.getLineno(), node.getCol_offset(), node.getInternalArgs(), null);
         visitArguments(node.getInternalArgs());
         visitSeq(node.getInternalBody());
