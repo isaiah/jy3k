@@ -364,6 +364,11 @@ public class PyFrame extends PyObject implements Traverseproc {
         }
     }
 
+    public void setglobal(PyObject value, int index) {
+        String name = f_code.co_names[index];
+        setglobal(name, value);
+    }
+
     public void setglobal(String index, PyObject value) {
         f_globals.__setitem__(index, value);
     }
@@ -393,6 +398,10 @@ public class PyFrame extends PyObject implements Traverseproc {
         } else {
             throw Py.SystemError(String.format("no locals when deleting '%s'", index));
         }
+    }
+
+    public void delname(int index) {
+        dellocal(f_code.co_names[index]);
     }
 
     public void delglobal(String index) {
