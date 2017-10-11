@@ -64,6 +64,7 @@ import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 import org.python.antlr.ast.YieldFrom;
 import org.python.antlr.ast.alias;
+import org.python.antlr.ast.arguments;
 import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.keyword;
@@ -229,8 +230,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
         code.dup();
         code.getfield(p(PyException.class), "type", ci(PyObject.class));
+        code.swap();
         code.dup();
         code.getfield(p(PyException.class), "value", ci(PyObject.class));
+        code.swap();
         code.getfield(p(PyException.class), "traceback", ci(PyTraceback.class));
     }
 
@@ -293,6 +296,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             compileUnit._private = u._private;
         }
         this.u = compileUnit;
+        u.argcount = ste.ac.argcount;
+        u.kwonlyargcount = ste.ac.kwonlyargcount;
+
         module.codes.add(u);
         this.nestlevel++;
         if (u.scopeType != CompilerScope.MODULE) {
@@ -429,7 +435,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
-        return compileFunction(name, decs, body, node);
+        return compileFunction(name, decs, node.getInternalArgs(), body, node);
     }
 
     @Override
@@ -437,7 +443,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
-        return compileFunction(name, decs, body, node);
+        return compileFunction(name, decs, node.getInternalArgs(), body, node);
     }
 
     private void compileBody(java.util.List<stmt> stmts) {
@@ -999,7 +1005,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAnonymousFunction(AnonymousFunction node) {
-        return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalBody(), node);
+        return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalArgs(), node.getInternalBody(), node);
     }
 
     @Override
@@ -1697,12 +1703,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         });
     }
 
-    private Object compileFunction(String internalName, java.util.List<expr> decos, java.util.List<stmt> body, PythonTree node) {
+    private Object compileFunction(String internalName, java.util.List<expr> decos, arguments args, java.util.List<stmt> body, PythonTree node) {
         setline(node);
         boolean anonymous = node instanceof expr;
-
-        u.argcount = ste.ac.argcount;
-        u.kwonlyargcount = ste.ac.kwonlyargcount;
 
         if (!anonymous) {
             loadFrame(); // pairing nameop
@@ -1713,17 +1716,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.dup();
         loadFrame();
         code.getfield(p(PyFrame.class), "f_globals", ci(PyObject.class));
-        loadArray(code, ste.ac.getDefaults());
+        ArgListCompiler ac = new ArgListCompiler();
+        ac.visitArgs(args);
+        loadArray(code, ac.getDefaults());
 
         // kw_defaults
-        loadStrings(code, ste.ac.kw_defaults.keySet());
-        loadArray(code, new ArrayList<>(ste.ac.kw_defaults.values()));
+        loadStrings(code, ac.kw_defaults.keySet());
+        loadArray(code, new ArrayList(ac.kw_defaults.values()));
         code.invokestatic(p(PyDictionary.class), "fromKV",
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
         // annotations
-        loadStrings(code, ste.ac.annotations.keySet());
-        loadArray(code, new ArrayList<>(ste.ac.annotations.values()));
+        loadStrings(code, ac.annotations.keySet());
+        loadArray(code, new ArrayList(ac.annotations.values()));
         code.invokestatic(p(PyDictionary.class), "fromKV",
                 sig(PyDictionary.class, String[].class, PyObject[].class));
 
