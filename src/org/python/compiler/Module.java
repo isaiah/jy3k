@@ -84,10 +84,6 @@ class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void get(Code c) {
-    }
-
-    @Override
     void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(Double.valueOf(value));
