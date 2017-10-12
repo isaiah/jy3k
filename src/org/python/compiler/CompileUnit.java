@@ -84,6 +84,8 @@ class CompileUnit {
         int flags = 0;
         if (ste.generator) {
             flags |= CodeFlag.CO_GENERATOR.flag;
+        } else if (ste.coroutine) {
+            flags |= CodeFlag.CO_COROUTINE.flag;
         }
         return flags;
     }

@@ -72,7 +72,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             throw Py.TypeError("can't send non-None value to a just-started " + tp());
         }
         try {
-            return gen_send_ex(state, value);
+            return gen_send_ex(state, value, false, false);
         } catch (PyException e) {
             e.tracebackHere(state.frame);
             throw e;
@@ -93,7 +93,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
 
         if (gi_frame != null && gi_frame.f_yieldfrom != null) {
             PyObject ret = null;
-            Object err = null;
+            PyException err = null;
             if (type == Py.GeneratorExit) {
                 gi_running = true;
                 try {
@@ -132,14 +132,12 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             }
             if (ret == null) {
                 gi_frame.f_yieldfrom = null;
-                Object val;
                 if (err == null) {
-                    val = Py.None;
                     gi_frame.f_lasti++;
                 } else {
-                    val = err;
+                    gi_frame.previousException = err;
                 }
-                ret = gen_send_ex(Py.getThreadState(), val);
+                ret = gen_send_ex(Py.getThreadState(), Py.None, err != null, false);
             }
             return ret;
         }
@@ -179,7 +177,8 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         }
         try {
             // clean up
-            retval = gen_send_ex(Py.getThreadState(), pye);
+            gi_frame.previousException = pye;
+            retval = gen_send_ex(Py.getThreadState(), Py.None, true, true);
         } catch (PyException e) {
             if (e.match(Py.StopIteration) || e.match(Py.GeneratorExit)) {
                 return Py.None;
@@ -197,7 +196,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     public final PyObject generator___next__() {
         ThreadState state = Py.getThreadState();
         try {
-            return gen_send_ex(state, Py.None);
+            return gen_send_ex(state, Py.None, false, false);
         } catch (PyException e) {
             e.tracebackHere(state.frame);
             throw e;
@@ -225,7 +224,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         if (gi_frame != null) {
             gi_frame.previousException = pye;
         }
-        return gen_send_ex(Py.getThreadState(), pye);
+        return gen_send_ex(Py.getThreadState(), Py.None, true, false);
     }
     
     @Override
@@ -261,7 +260,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
     @Override
     public PyObject __next__() {
         try {
-            return gen_send_ex(Py.getThreadState(), Py.None);
+            return gen_send_ex(Py.getThreadState(), Py.None, false, false);
         } catch (PyException e) {
             if (e.match(Py.StopIteration)) {
                 return null;
@@ -285,7 +284,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         return gi_frame.f_yieldfrom;
     }
 
-    private PyObject gen_send_ex(ThreadState state, Object value) {
+    private PyObject gen_send_ex(ThreadState state, Object value, boolean exc, boolean closing) {
         if (gi_running) {
             throw Py.ValueError(tp() + " already executing");
         }
@@ -306,15 +305,18 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         gi_running = true;
         PyObject result = null;
         try {
+            gi_frame.f_back = state.frame;
             result = Py.runCode(state, gi_frame.f_code, gi_frame, (PyTuple) closure);
-//            result = gi_frame.f_code.call(state, gi_frame, closure);
+            gi_frame.f_back = null;
+            if (exc) {
+                assert gi_frame.previousException != null: "exception not provided in exc mode";
+                throw gi_frame.previousException;
+            }
         } catch (PyException pye) {
             gi_frame = null;
             if (this instanceof PyCoroutine && pye.match(Py.StopIteration)) {
-//                PyException stop = pye;
                 pye = Py.RuntimeError("coroutine raised StopIteration"); // PEP-479
                 pye.normalize();
-//                pye.context = (PyBaseException) stop.value;
             }
             throw pye;
         } finally {
@@ -324,7 +326,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         if (result == null && gi_frame.f_yieldfrom != null) {
             gi_frame.f_yieldfrom = null;
             gi_frame.f_lasti++;
-            return gen_send_ex(state, value);
+            return gen_send_ex(state, value, false, false);
         }
 
         if (gi_frame.f_lasti == -1) {
