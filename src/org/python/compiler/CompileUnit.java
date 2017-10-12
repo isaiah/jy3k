@@ -77,6 +77,9 @@ class CompileUnit {
         this.fname = isJavaIdentifier(name) ? name + "$" + id : "f$" + id;
         this.co_name = fname;
         this.argcount = ste.ac.argcount;
+        this.kwonlyargcount = ste.ac.kwonlyargcount;
+        this.arglist = ste.ac.arglist;
+        this.keywordlist = ste.ac.keywordlist;
         this.moreflags = computeCodeFlags(ste);
     }
 
@@ -155,7 +158,7 @@ class CompileUnit {
         c.iconst(id);
 
         CodeCompiler.loadStrings(c, cellvars);
-        CodeCompiler.loadStrings(c, freevars);
+        CodeCompiler.loadStrings(c, freevars.keySet());
         CodeCompiler.loadStrings(c, varnames);
 
         if (constants != null) {
@@ -164,18 +167,17 @@ class CompileUnit {
             c.aconst_null();
         }
 
-        c.iconst(jy_npurecell);
         c.iconst(kwonlyargcount);
         c.iconst(moreflags);
         c.ldc(co_name);
 
         c.invokestatic(
                 p(Py.class),
-                "newCode1",
+                "newCode",
                 sig(PyTableCode.class, Integer.TYPE, String[].class, String.class, String.class,
                         Integer.TYPE, Boolean.TYPE, Boolean.TYPE, PyFunctionTable.class,
                         Integer.TYPE, String[].class, String[].class, String[].class, PyObject[].class,
-                        Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class));
+                        Integer.TYPE, Integer.TYPE, String.class));
         c.putstatic(module.classfile.name, co_name, ci(PyTableCode.class));
     }
 }

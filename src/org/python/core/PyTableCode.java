@@ -13,9 +13,13 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedType;
 import org.python.modules._systemrestart;
 
+import java.util.Arrays;
+
 @Untraversable
 @ExposedType(name = "code", base = PyObject.class, doc = BuiltinDocs.code_doc)
 public class PyTableCode extends PyCode {
+
+    public static final int CO_CELL_NOT_AN_ARG = 255;
 
     @ExposedGet
     public int co_argcount;
@@ -28,11 +32,11 @@ public class PyTableCode extends PyCode {
     /** local var names */
     public String[] co_varnames;
     public String[] co_cellvars;
+    public int[] co_cell2arg; // maps cellvars which are arguments
     public String[] co_freevars;
     public PyObject[] co_consts;
     @ExposedGet
     public String co_filename;
-    public int jy_npurecell; // internal: jython specific
     public CompilerFlags co_flags = new CompilerFlags();
     @ExposedGet
     public int co_nlocals;
@@ -51,7 +55,8 @@ public class PyTableCode extends PyCode {
                        PyFunctionTable funcs, int func_id)
     {
         this(argcount, names, filename, name, firstlineno, varargs,
-             varkwargs, funcs, func_id, null, null, null, null, 0, 0, 0, null);
+             varkwargs, funcs, func_id, null, null, null, null,
+                0, 0, null);
     }
 
     public PyTableCode(int argcount, String[] names,
@@ -60,8 +65,7 @@ public class PyTableCode extends PyCode {
                        boolean varargs, boolean varkwargs,
                        PyFunctionTable funcs, int func_id,
                        String[] cellvars, String[] freevars, String[] varnames,
-                       PyObject[] consts, int npurecell,
-                       int kwonlyargcount, int moreflags, String funcname) // may change
+                       PyObject[] consts, int kwonlyargcount, int moreflags, String funcname) // may change
     {
         co_argcount = nargs = argcount;
         co_varnames = varnames;
@@ -72,7 +76,6 @@ public class PyTableCode extends PyCode {
         co_firstlineno = firstlineno;
         co_cellvars = cellvars;
         co_freevars = freevars;
-        this.jy_npurecell = npurecell;
         this.varargs = varargs;
         co_name = name;
         if (varargs) {
@@ -84,11 +87,32 @@ public class PyTableCode extends PyCode {
             co_argcount--;
             co_flags.setFlag(CodeFlag.CO_VARKEYWORDS);
         }
-        co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
+        this.co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
         this.funcs = funcs;
         this.func_id = func_id;
         this.funcname = funcname;
-        co_kwonlyargcount = kwonlyargcount;
+        this.co_kwonlyargcount = kwonlyargcount;
+        if (cellvars.length > 0) {
+            this.co_cell2arg = mapCellToArg(cellvars, varnames);
+        }
+    }
+
+    private int[] mapCellToArg(String[] cellvars, String[] varnames) {
+        boolean usedCellToArg = false;
+        int[] mapping = new int[cellvars.length];
+        Arrays.fill(mapping, CO_CELL_NOT_AN_ARG);
+        for (int i = 0; i < cellvars.length; i++) {
+            for (int j = 0; j < varnames.length; j++) {
+                if (cellvars[i].equals(varnames[j])) {
+                    usedCellToArg = true;
+                    mapping[i] = j;
+                }
+            }
+        }
+        if (usedCellToArg) {
+            return mapping;
+        }
+        return null;
     }
 
     private static final String[] __members__ = {
@@ -273,7 +297,8 @@ public class PyTableCode extends PyCode {
         if (!extractArg(0))
             return call(state, Py.EmptyObjects, Py.NoKeywords, globals, defaults,
                         kw_defaults, closure);
-        PyFrame frame = new PyFrame(this, globals);
+        PyFrame frame = new PyFrame(this, globals, null, closure);
+        frame.setupEnv((PyTuple) closure);
         if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
@@ -281,7 +306,7 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
 //        return call(state, frame, closure);
     }
 
@@ -292,7 +317,7 @@ public class PyTableCode extends PyCode {
         if (!extractArg(1))
             return call(state, new PyObject[] {arg1},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
-        PyFrame frame = new PyFrame(this, globals);
+        PyFrame frame = new PyFrame(this, globals, null, closure);
         frame.f_fastlocals[0] = arg1;
         if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
             return new PyCoroutine(frame, closure);
@@ -301,7 +326,7 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
 //        return call(state, frame, closure);
     }
 
@@ -312,7 +337,7 @@ public class PyTableCode extends PyCode {
         if (!extractArg(2))
             return call(state, new PyObject[] {arg1, arg2},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
-        PyFrame frame = new PyFrame(this, globals);
+        PyFrame frame = new PyFrame(this, globals, null, closure);
         frame.f_fastlocals[0] = arg1;
         frame.f_fastlocals[1] = arg2;
         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
@@ -322,7 +347,7 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
 //        return call(state, frame, closure);
     }
 
@@ -334,7 +359,7 @@ public class PyTableCode extends PyCode {
         if (!extractArg(3))
             return call(state, new PyObject[] {arg1, arg2, arg3},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
-        PyFrame frame = new PyFrame(this, globals);
+        PyFrame frame = new PyFrame(this, globals, null, closure);
         frame.f_fastlocals[0] = arg1;
         frame.f_fastlocals[1] = arg2;
         frame.f_fastlocals[2] = arg3;
@@ -345,7 +370,7 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
 //        return call(state, frame, closure);
     }
 
@@ -356,7 +381,7 @@ public class PyTableCode extends PyCode {
         if (!extractArg(4))
             return call(state, new PyObject[]{arg1, arg2, arg3, arg4},
                         Py.NoKeywords, globals, defaults, kw_defaults, closure);
-        PyFrame frame = new PyFrame(this, globals);
+        PyFrame frame = new PyFrame(this, globals, null, closure);
         frame.f_fastlocals[0] = arg1;
         frame.f_fastlocals[1] = arg2;
         frame.f_fastlocals[2] = arg3;
@@ -369,7 +394,7 @@ public class PyTableCode extends PyCode {
         } else if (co_flags.isFlagSet(CodeFlag.CO_ASYNC_GENERATOR)) {
             return new PyAsyncGenerator(frame, closure);
         }
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
 //        return call(state, frame, closure);
     }
 
@@ -394,7 +419,7 @@ public class PyTableCode extends PyCode {
     @Override
     public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals,
                          PyObject[] defs, PyDictionary kw_defaults, PyObject closure) {
-        PyFrame frame = BaseCode.createFrame(this, args, kws, globals, defs, kw_defaults);
+        PyFrame frame = BaseCode.createFrame(this, args, kws, globals, defs, kw_defaults, closure);
         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         } else if (co_flags.isFlagSet(CodeFlag.CO_COROUTINE)) {
@@ -403,7 +428,7 @@ public class PyTableCode extends PyCode {
             return new PyAsyncGenerator(frame, closure);
         }
 //        return call(state, frame, closure);
-        return Py.runCode(state, this, frame, (PyTuple) closure);
+        return Py.runCode(state, this, frame);
     }
 
     public String toString() {

@@ -709,63 +709,16 @@ public final class Py {
         return mod;
     }
 
-    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
-    public static PyTableCode newCode(int argcount, String varnames[],
+    public static PyTableCode newCode(int argcount, String names[],
                                  String filename, String name,
                                  int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
-                                 int npurecell, int kwonlyargcount, int moreflags) {
-        PyTableCode code = new PyTableCode(argcount, names,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
-                kwonlyargcount, moreflags, null);
-        return code;
-    }
-
-    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
-    public static PyTableCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
-                                 int npurecell, int kwonlyargcount, int moreflags, String fname) {
-        PyTableCode code = new PyTableCode(argcount, names,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
-                kwonlyargcount, moreflags, fname);
-        return code;
-    }
-
-    @Deprecated(since = "the varnames and names of the old code construcor is reversed")
-    public static PyTableCode newCode(int argcount, String varnames[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
-                                 PyFunctionTable funcs, int func_id,
-                                 String[] cellvars, String[] freevars, String[] names, PyObject[] consts,
-                                 int npurecell, int kwonlyargcount, int moreflags, Class<?> klazz, String funcname) {
-        PyTableCode code = new PyTableCode(argcount, names,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
-                kwonlyargcount, moreflags, funcname);
-        code.klazz = klazz;
-        return code;
-    }
-
-    /** TODO Remove the suffix once recompiled everything */
-    public static PyTableCode newCode1(int argcount, String names[],
-                                 String filename, String name,
-                                 int firstlineno,
-                                 boolean args, boolean keywords,
+                                 boolean varargs, boolean keywords,
                                  PyFunctionTable funcs, int func_id,
                                  String[] cellvars, String[] freevars, String[] varnames, PyObject[] consts,
-                                 int npurecell, int kwonlyargcount, int moreflags, String funcname) {
+                                 int kwonlyargcount, int moreflags, String funcname) {
         PyTableCode code = new PyTableCode(argcount, names,
-                filename, name, firstlineno, args, keywords,
-                funcs, func_id, cellvars, freevars, varnames, consts, npurecell,
+                filename, name, firstlineno, varargs, keywords,
+                funcs, func_id, cellvars, freevars, varnames, consts,
                 kwonlyargcount, moreflags, funcname);
         return code;
     }
@@ -1669,17 +1622,16 @@ public final class Py {
         PyTableCode  code = (PyTableCode) codeObj;
         PyFrame f = new PyFrame(code, globals, locals);
         f.setupEnv(closure);
-        return runCode(ts, code, f, closure);
+        return runCode(ts, code, f);
     }
 
-    public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f, PyTuple closure) {
+    public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f) {
         try {
             MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
                      MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
             f.f_back = ts.frame;
             f.fBackExecSize = ts.exceptions.size();
             ts.frame = f;
-            f.setupEnv(closure);
             return (PyObject) main.invokeExact(ts, f);
          } catch (Throwable t) {
             throw Py.JavaError(t);

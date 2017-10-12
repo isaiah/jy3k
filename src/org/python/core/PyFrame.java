@@ -121,7 +121,7 @@ public class PyFrame extends PyObject implements Traverseproc {
             if (code.co_flags.isFlagSet(CodeFlag.CO_OPTIMIZED) || code.nargs > 0) {
                 if (code.co_nlocals > 0) {
                     // internal: may change
-                    f_fastlocals = new PyObject[code.co_nlocals - code.jy_npurecell];
+                    f_fastlocals = new PyObject[code.co_nlocals];
                 }
             } else {
                 f_locals = new PyStringMap();
@@ -139,6 +139,11 @@ public class PyFrame extends PyObject implements Traverseproc {
                 f_env = new PyCell[env_sz];
             }
         }
+    }
+
+    public PyFrame(PyTableCode code, PyObject globals, PyObject locals, PyObject closure) {
+        this(code, globals, locals);
+        setupEnv((PyTuple) closure);
     }
 
     public PyFrame(PyTableCode code, PyObject globals) {

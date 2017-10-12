@@ -227,7 +227,7 @@ public class Import {
         }
         try {
             PyFrame f = new PyFrame(code, module.__dict__, module.__dict__);
-            Py.runCode(Py.getThreadState(), code, f, new PyTuple());
+            Py.runCode(Py.getThreadState(), code, f);
             return true;
         } catch (Throwable t) {
             removeModule(name);

@@ -129,7 +129,7 @@ public class PySTEntryObject extends PyObject {
 
     private static void analyzeCells(Map<String, Flag> scopes, Set<String> free) {
         for (String name : scopes.keySet()) {
-            if (scopes.get(name) == LOCAL) {
+            if (scopes.get(name) != LOCAL) {
                 continue;
             }
             if (!free.contains(name)) {
@@ -243,8 +243,7 @@ public class PySTEntryObject extends PyObject {
     }
 
     private void dropClassFree(Set<String> free) {
-        free.remove("__class__");
-        needsClassClosure = true;
+        needsClassClosure = free.remove("__class__");
     }
 
     private void analyzeChildBlock(Set<String> bound, Set<String> free, Set<String> global, Set<String> childFree) {

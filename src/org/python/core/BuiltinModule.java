@@ -941,7 +941,7 @@ public class BuiltinModule {
                 break;
             }
         }
-        if (index > 0) {
+        if (index >= 0) {
             metaclass = args[bases.length + index + 2];
         }
         if (metaclass == null) {

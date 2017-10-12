@@ -95,6 +95,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -296,8 +297,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             compileUnit._private = u._private;
         }
         this.u = compileUnit;
-        u.argcount = ste.ac.argcount;
-        u.kwonlyargcount = ste.ac.kwonlyargcount;
 
         module.codes.add(u);
         this.nestlevel++;
@@ -382,16 +381,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         optimizeGlobals = checkOptimizeGlobals(ste);
 
         visit(node);
-        if (needsClassClosure) {
-            loadFrame();
-            code.iconst(0);
-            code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
-            code.dup();
-            nameop("__classcell__", expr_contextType.Store);
-        } else {
-            setLastI(-1);
-            getNone();
-        }
+
+        setLastI(-1);
+        getNone();
         code.areturn();
 
         // BEGIN postparse
@@ -513,14 +505,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadThreadState();
         code.swap();
         loadStrings(code, keys);
-//        code.invokestatic(p(PyDictionary.class), "fromKV",
-//                sig(PyDictionary.class, String[].class, PyObject[].class));
-//
-//        if (kwarg != null) {
-//            code.dup();
-//            visit(kwarg);
-//            code.invokevirtual(p(PyDictionary.class), "update", sig(Void.TYPE, PyObject.class));
-//        }
     }
 
     private void make_closure(CompileUnit u, int funcflags, String qualname) {
@@ -554,9 +538,14 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object visitAssign(Assign node) {
         setline(node);
         java.util.List<expr> targets = node.getInternalTargets();
-        targets.stream().forEach(e -> e.enter(this));
+        for (expr e : targets) {
+            e.enter(this);
+        }
         visit(node.getInternalValue());
-        targets.stream().forEach(e -> e.leave(this));
+
+        for (int i = targets.size() - 1; i >= 0; i--) {
+            targets.get(i).leave(this);
+        }
         code.pop(); // pop the value from stack
         return null;
     }
@@ -1679,6 +1668,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public boolean makeClosure(CompileUnit u) {
+        if (u.name.equals("_requires_builtin_wrapper")) {
+            System.out.println("found");
+        }
         int n = u.cellvars.size() + u.freevars.size();
 
         if (n == 0) {
@@ -1710,7 +1702,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (!anonymous) {
             loadFrame(); // pairing nameop
         }
-        decos.stream().forEach(this::visit);
+        decos.stream().forEach(deco -> {
+            visit(deco);
+            loadThreadState();
+        });
 
         code.new_(p(PyFunction.class));
         code.dup();
@@ -1772,9 +1767,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 sig(Void.TYPE, PyObject.class, PyObject[].class, PyDictionary.class, PyDictionary.class,
                         PyCode.class, PyObject.class, PyObject.class, PyObject[].class));
 
-//        applyDecorators(decos);
         for (int i = 0; i < decos.size(); i++) {
-            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, PyObject.class),
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class),
                     LINKERBOOTSTRAP, Bootstrap.CALL);
         }
 
@@ -1782,17 +1776,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             nameop(internalName, expr_contextType.Store);
         }
         return null;
-    }
-
-    private void applyDecorators(java.util.List<expr> decorators) {
-        if (decorators != null && !decorators.isEmpty()) {
-            for (int i = decorators.size(); i > 0; i--) {
-                loadThreadState();
-                code.swap();
-                code.invokevirtual(p(PyObject.class), "__call__",
-                        sig(PyObject.class, ThreadState.class, PyObject.class));
-            }
-        }
     }
 
     private void restoreLocals() {
