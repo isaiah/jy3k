@@ -89,8 +89,7 @@ public class BaseCode {
             function = null;
         }
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, Py.NoKeywords, function.__globals__,
-                function.__defaults__, function.__kwdefaults__);
-        frame.setupEnv((PyTuple) function.__closure__);
+                function.__defaults__, function.__kwdefaults__, function.__closure__);
         return frame;
     }
 
@@ -123,8 +122,7 @@ public class BaseCode {
             function = (PyFunction) ((PyMethod) funcObj).__func__;
         }
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
-                function.__defaults__, function.__kwdefaults__);
-        frame.setupEnv((PyTuple) function.__closure__);
+                function.__defaults__, function.__kwdefaults__, function.__closure__);
         return frame;
     }
 
@@ -146,11 +144,10 @@ public class BaseCode {
             function = (PyFunction) ((PyMethod) funcObj).__func__;
         }
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
-                function.__defaults__, function.__kwdefaults__);
+                function.__defaults__, function.__kwdefaults__, function.__closure__);
         frame.f_back = ts.frame;
         frame.fBackExecSize = ts.exceptions.size();
         ts.frame = frame;
-        frame.setupEnv((PyTuple) function.__closure__);
         return frame;
     }
 
@@ -164,7 +161,7 @@ public class BaseCode {
      * @return
      */
     public static PyFrame createFrame(PyTableCode code, PyObject[] args, String kws[], PyObject globals,
-                                      PyObject[] defs, PyDictionary kwDefaults) {
+                                      PyObject[] defs, PyDictionary kwDefaults, PyObject closure) {
         final PyFrame frame = new PyFrame(code, globals);
         final int argcount = args.length - kws.length;
         int paramCount = code.paramCount();
@@ -302,6 +299,18 @@ public class BaseCode {
         } else if ((argcount > 0) || (args.length > 0 && (paramCount == 0 && !code.varargs && !code.varkwargs))) {
             throw Py.TypeError(String.format("%.200s() takes no arguments (%d given)",
                                              code.co_name, args.length));
+        }
+        // check possible arguements which are also cellvar
+        frame.setupEnv((PyTuple) closure);
+        if (code.co_cell2arg != null) {
+            for (int i = 0; i < code.co_cell2arg.length; i++) {
+                int j = code.co_cell2arg[i];
+                if (i != PyTableCode.CO_CELL_NOT_AN_ARG) {
+                    PyObject arg = frame.f_fastlocals[j];
+                    frame.f_fastlocals[j] = null;
+                    frame.setderef(i, arg);
+                }
+            }
         }
         return frame;
     }
