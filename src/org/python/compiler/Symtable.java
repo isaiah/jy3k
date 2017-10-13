@@ -684,11 +684,11 @@ public class Symtable extends Visitor {
             return;
         }
         visitParams(a.getInternalArgs());
-        visitParams(a.getInternalKwonlyargs());
         if (a.getInternalVararg() != null) {
             addDef(a.getInternalVararg().getInternalArg(), Flag.DEF_PARAM);
             cur.varargs = true;
         }
+        visitParams(a.getInternalKwonlyargs());
         if (a.getInternalKwarg() != null) {
             addDef(a.getInternalKwarg().getInternalArg(), Flag.DEF_PARAM);
             cur.varkeywords = true;
