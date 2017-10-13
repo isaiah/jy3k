@@ -84,7 +84,7 @@ class CompileUnit {
     }
 
     private static int computeCodeFlags(PySTEntryObject ste) {
-        int flags = 0;
+        int flags = CodeFlag.CO_OPTIMIZED.flag;
         if (ste.generator) {
             flags |= CodeFlag.CO_GENERATOR.flag;
         } else if (ste.coroutine) {
