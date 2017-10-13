@@ -390,6 +390,7 @@ public class Lower extends Visitor {
         arg arg = new arg(node, elt, null);
         arguments args = new arguments(node, asList(arg), null, null, null, null, null);
         AnonymousFunction lambda = new AnonymousFunction(node, "<genexp>", args, asList(n));
+        // keep this or a new iterator is created for the for loop
         Call getIter = new Call(node, new Name(node, "iter", expr_contextType.Load), asList(iter), null);
         expr result = new Call(node, lambda, asList(getIter), null);
 

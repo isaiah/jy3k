@@ -32,6 +32,7 @@ import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.IfExp;
@@ -1735,12 +1736,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(body.get(i));
         }
         // blindly appending `return None`, asm will eliminate it
-        if (!anonymous) {
-            getNone();
-            code.areturn();
-        }
+        setLastI(-1);
+        getNone();
+        code.areturn();
         if (ste.generator) {
-            setLastI(-1);
             code.mark(u.genswitch);
 
             loadFrame();

@@ -177,7 +177,9 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         }
         try {
             // clean up
-            gi_frame.previousException = pye;
+            if (gi_frame != null) {
+                gi_frame.previousException = pye;
+            }
             retval = gen_send_ex(Py.getThreadState(), Py.None, true, true);
         } catch (PyException e) {
             if (e.match(Py.StopIteration) || e.match(Py.GeneratorExit)) {
