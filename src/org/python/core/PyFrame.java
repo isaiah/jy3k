@@ -448,6 +448,10 @@ public class PyFrame extends PyObject implements Traverseproc {
         throw Py.NameError(String.format(FREEVAR_ERROR_MSG, name));
     }
 
+    public void setderef(PyObject value, int index) {
+        f_env[index].ob_ref = value;
+    }
+
     public void setderef(int index, PyObject value) {
         f_env[index].ob_ref = value;
     }
