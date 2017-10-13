@@ -285,7 +285,7 @@ public class PyTableCode extends PyCode {
     }
 
     private boolean extractArg(int arg) {
-        return co_argcount == arg && co_kwonlyargcount == 0 && !varargs && !varkwargs;
+        return co_argcount == arg && co_kwonlyargcount == 0 && !varargs && !varkwargs && co_cell2arg == null;
     }
 
     @Override

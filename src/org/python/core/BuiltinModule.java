@@ -941,18 +941,40 @@ public class BuiltinModule {
                 break;
             }
         }
+        PyObject[] newArgs;
         if (index >= 0) {
             metaclass = args[bases.length + index + 2];
-        }
-        if (metaclass == null) {
+            // fast path
+            if (keywords.length == 1) {
+                keywords = new String[0];
+            } else {
+                String[] newKeywords = new String[keywords.length - 1];
+                for (int i = 0; i < keywords.length; i++) {
+                    if (i == index) {
+                        continue;
+                    }
+                    if (i < index) {
+                        newKeywords[i] = keywords[i];
+                    } else {
+                        newKeywords[i - 1] = keywords[i];
+                    }
+                }
+                keywords = newKeywords;
+            }
+            newArgs = new PyObject[keywords.length + 2];
+            if (keywords.length > 0) {
+                System.arraycopy(args, bases.length, newArgs, 2, index + 1);
+                System.arraycopy(args, bases.length + index + 1, newArgs, index + 3, keywords.length - index - 1);
+            }
+        } else {
             metaclass = Py.findMetaclass(bases);
+            newArgs = new PyObject[keywords.length + 2];
+            System.arraycopy(args, bases.length, newArgs, 2, keywords.length);
         }
         PyObject prepare = metaclass.__findattr__("__prepare__");
         PyObject basesArray = new PyTuple(bases);
-        PyObject[] newArgs = new PyObject[keywords.length + 2];
-        args[0] = className;
-        args[1] = basesArray;
-        System.arraycopy(args, bases.length + 2, newArgs, 2, keywords.length);
+        newArgs[0] = className;
+        newArgs[1] = basesArray;
         PyObject ns = prepare.__call__(newArgs, keywords);
         ThreadState state = Py.getThreadState();
         PyObject cell = Py.runCode(state, func.__code__, func.__globals__, ns, (PyTuple) func.__closure__);
