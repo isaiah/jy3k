@@ -305,7 +305,7 @@ public class BaseCode {
         if (code.co_cell2arg != null) {
             for (int i = 0; i < code.co_cell2arg.length; i++) {
                 int j = code.co_cell2arg[i];
-                if (i != PyTableCode.CO_CELL_NOT_AN_ARG) {
+                if (j != PyTableCode.CO_CELL_NOT_AN_ARG) {
                     PyObject arg = frame.f_fastlocals[j];
                     frame.f_fastlocals[j] = null;
                     frame.setderef(i, arg);
