@@ -79,12 +79,10 @@ public class PyTableCode extends PyCode {
         this.varargs = varargs;
         co_name = name;
         if (varargs) {
-            co_argcount--;
             co_flags.setFlag(CodeFlag.CO_VARARGS);
         }
         this.varkwargs = varkwargs;
         if (varkwargs) {
-            co_argcount--;
             co_flags.setFlag(CodeFlag.CO_VARKEYWORDS);
         }
         this.co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
