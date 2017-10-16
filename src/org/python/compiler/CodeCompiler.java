@@ -1675,10 +1675,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.iconst(n);
         code.anewarray(p(PyObject.class));
         Map<String, Integer> innerFreeVars = innerUnit.freevars;
-        int i = 0;
+        int cellSize = innerUnit.cellvars.size();
         for (String name : innerFreeVars.keySet()) {
             code.dup();
-            code.iconst(innerFreeVars.get(name));
+            code.iconst(innerFreeVars.get(name) - cellSize);
             loadFrame();
             if (u.cellvars.containsKey(name)) {
                 code.iconst(u.cellvars.get(name));
