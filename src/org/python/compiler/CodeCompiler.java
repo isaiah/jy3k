@@ -473,8 +473,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             getNone();
         }
         code.areturn();
+        CompileUnit innerUnit = u;
         exitScope();
-        make_closure(u, 0, null);
+        make_closure(innerUnit, 0, null);
         module.unicodeConstant(node.getInternalName()).get(code);
         callHelper(2, node.getInternalBases(), node.getInternalKeywords());
         code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,

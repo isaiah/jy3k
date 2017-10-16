@@ -1620,8 +1620,7 @@ public final class Py {
             globals.__setitem__("__builtins__", ts.systemState.builtins);
         }
         PyTableCode  code = (PyTableCode) codeObj;
-        PyFrame f = new PyFrame(code, globals, locals);
-        f.setupEnv(closure);
+        PyFrame f = new PyFrame(code, globals, locals, closure);
         return runCode(ts, code, f);
     }
 

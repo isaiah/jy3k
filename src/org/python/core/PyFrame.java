@@ -159,12 +159,12 @@ public class PyFrame extends PyObject implements Traverseproc {
         int ntotal = f_ncells + f_nfreevars;
         // add space for the cellvars
         int env_j = 0;
-        for (; env_j < f_ncells; env_j++) {
-            f_env[env_j] = new PyCell();
+        while (env_j < f_ncells) {
+            f_env[env_j++] = new PyCell();
         }
         // inherit the freevars
-        for (int i = 0; env_j < ntotal; i++, env_j++) {
-            f_env[env_j] = (PyCell)freevars.pyget(i);
+        for (int i = 0; env_j < ntotal; i++) {
+            f_env[env_j++] = (PyCell)freevars.pyget(i);
         }
     }
 
