@@ -20,6 +20,9 @@ public class SysModule {
     @ExposedConst(name = "maxunicode")
     public static final int MAXUNICODE = 0x10FFFF;
 
+    @ExposedConst
+    public static final String abiflags = "m";
+
     @ModuleInit
     public static final void classDictInit(PyObject dict) {
         dict.__setitem__("hash_info", new HashInfo());
@@ -41,6 +44,11 @@ public class SysModule {
     @ExposedFunction
     public static PyObject getfilesystemencoding() {
         return Py.getSystemState().getfilesystemencoding();
+    }
+
+    @ExposedFunction
+    public static String getfilesystemencodeerrors() {
+        return "surrogateescape";
     }
 
     @ExposedFunction(defaults = "-1")
