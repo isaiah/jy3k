@@ -1145,10 +1145,11 @@ public class PosixModule {
         } catch (SecurityException se) {
             return environ;
         }
+        // don't change the type, the key and values have to be bytes
         for (Map.Entry<String, String> entry : env.entrySet()) {
             environ.__setitem__(
-                    new PyUnicode(entry.getKey()),
-                    new PyUnicode(entry.getValue()));
+                    new PyBytes(entry.getKey()),
+                    new PyBytes(entry.getValue()));
         }
         return environ;
     }
