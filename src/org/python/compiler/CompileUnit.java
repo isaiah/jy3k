@@ -1,10 +1,8 @@
 package org.python.compiler;
 
 import org.objectweb.asm.Label;
-import org.python.antlr.PythonTree;
 import org.python.antlr.base.expr;
 import org.python.core.CodeFlag;
-import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyObject;
@@ -26,6 +24,7 @@ class CompileUnit {
     final CompilerScope scopeType;
     private final Map<?, ?> consts;
     private final int firstlineno;
+    int yieldCount;
     Module module;
     static int access = ACC_STATIC | ACC_FINAL;
     String name;
@@ -81,6 +80,7 @@ class CompileUnit {
         this.arglist = ste.ac.arglist;
         this.keywordlist = ste.ac.keywordlist;
         this.moreflags = computeCodeFlags(ste);
+        this.yieldCount = 0;
     }
 
     private static int computeCodeFlags(PySTEntryObject ste) {

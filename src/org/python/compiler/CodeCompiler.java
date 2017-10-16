@@ -32,7 +32,6 @@ import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
-import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.IfExp;
@@ -96,7 +95,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -141,7 +139,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      * are executed.
      */
     private int bcfLevel = 0;
-    private int yield_count = 0;
     private Deque<CompileUnit> stack;
     private int nestlevel;
 
@@ -1079,7 +1076,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         visit(node.getInternalValue());
 
-        setLastI(++yield_count);
+        setLastI(++u.yieldCount);
         code.invokestatic(p(Py.class), "getAwaitableIter", sig(PyObject.class, PyObject.class));
         loadFrame();
         code.swap();
@@ -1090,7 +1087,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
-        yield_count++;
+        u.yieldCount++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
@@ -1119,7 +1116,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         } else {
             getNone();
         }
-        setLastI(++yield_count);
+        setLastI(++u.yieldCount);
         code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
@@ -1151,7 +1148,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         visit(node.getInternalValue());
-        setLastI(++yield_count);
+        setLastI(++u.yieldCount);
         loadFrame();
         code.invokestatic(p(Py.class), "getYieldFromIter", sig(Void.TYPE, PyObject.class, PyFrame.class));
         saveLocals();
@@ -1161,7 +1158,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadFrame();
         code.invokestatic(p(Py.class), "yieldFrom", sig(PyObject.class, PyFrame.class));
         code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
-        yield_count++;
+        u.yieldCount++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
         restoreLocals();
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
@@ -1668,11 +1665,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return -1;
     }
 
-    public boolean makeClosure(CompileUnit u) {
-        if (u.name.equals("_requires_builtin_wrapper")) {
-            System.out.println("found");
-        }
-        int n = u.cellvars.size() + u.freevars.size();
+    public boolean makeClosure(CompileUnit innerUnit) {
+        int n = innerUnit.freevars.size();
 
         if (n == 0) {
             return false;
@@ -1680,20 +1674,21 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         code.iconst(n);
         code.anewarray(p(PyObject.class));
-        loadClosure(u.cellvars);
-        loadClosure(u.freevars);
-        return true;
-    }
-
-    private void loadClosure(Map<String, Integer> mapping) {
-        mapping.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(e -> {
+        Map<String, Integer> innerFreeVars = innerUnit.freevars;
+        int i = 0;
+        for (String name : innerFreeVars.keySet()) {
             code.dup();
-            code.iconst(e.getValue());
+            code.iconst(innerFreeVars.get(name));
             loadFrame();
-            code.iconst(e.getValue());
+            if (u.cellvars.containsKey(name)) {
+                code.iconst(u.cellvars.get(name));
+            } else {
+                code.iconst(u.freevars.get(name));
+            }
             code.invokevirtual(p(PyFrame.class), "getclosure", sig(PyObject.class, Integer.TYPE));
             code.aastore();
-        });
+        }
+        return true;
     }
 
     private Object compileFunction(String internalName, java.util.List<expr> decos, arguments args, java.util.List<stmt> body, PythonTree node) {
@@ -1747,6 +1742,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             Label[] y = {u.start};
             code.tableswitch(0, y.length - 1, u.start, y);
         }
+        CompileUnit innerUnit = u;
         exitScope();
 
         if (docstring == 0) {
@@ -1756,7 +1752,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         module.unicodeConstant(qualname).get(code);
 
-        if (!makeClosure(u)) {
+        if (!makeClosure(innerUnit)) {
             code.aconst_null();
         }
 
