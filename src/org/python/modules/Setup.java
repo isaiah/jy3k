@@ -54,6 +54,7 @@ public class Setup {
             "_sha3:org.python.modules._sha3._sha3module",
             "_sre:org.python.modules.sre._sre",
             "_string",
+            "_sysconfigdata_m_java9_",
             "_systemrestart",
             "_types",
             "_thread:org.python.modules.thread._thread",
