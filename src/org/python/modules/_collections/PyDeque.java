@@ -39,12 +39,12 @@ public class PyDeque extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyDeque.class);
 
-    private long state = 0;
+    long state = 0;
     private int size = 0;
 
     private int maxlen = -1;
 
-    private Node header = new Node(null, null, null);
+    Node header = new Node(null, null, null);
 
     public PyDeque() {
         this(TYPE);
@@ -459,7 +459,7 @@ public class PyDeque extends PyObject implements Traverseproc {
 
     @ExposedMethod
     final PyObject deque___iter__() {
-        return new PyDequeIter();
+        return new PyDequeIter(this);
     }
 
     @Override
@@ -642,47 +642,15 @@ public class PyDeque extends PyObject implements Traverseproc {
         return true;
     }
 
-    private static class Node {
-        private Node left;
-        private Node right;
-        private PyObject data;
+    static class Node {
+        Node left;
+        Node right;
+        PyObject data;
 
         Node(PyObject data, Node right, Node left) {
             this.data = data;
             this.right = right;
             this.left = left;
-        }
-    }
-
-    @ExposedType(name = "_deque_iterator")
-    class PyDequeIter extends PyObject {
-
-        private Node lastReturned = header;
-        private long startState;
-
-        public PyDequeIter() {
-            startState = state;
-        }
-
-        @Override
-        @ExposedMethod(names = "__iter__")
-        public PyObject __iter__() {
-            return this;
-        }
-
-        @Override
-        @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
-            synchronized (PyDeque.this) {
-                if (startState != state) {
-                    throw Py.RuntimeError("deque changed size during iteration");
-                }
-                if (lastReturned.right != header) {
-                    lastReturned = lastReturned.right;
-                    return lastReturned.data;
-                }
-                throw Py.StopIteration();
-            }
         }
     }
 
