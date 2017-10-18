@@ -71,6 +71,7 @@ import org.python.antlr.ast.keyword;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.antlr.base.stmt;
+import org.python.antlr.op.Sub;
 import org.python.core.BaseCode;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
@@ -1519,7 +1520,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public boolean enterTuple(Tuple node) {
-        node.getInternalElts().stream().forEach(e -> e.enter(this));
+//        loadFrame();
+//        node.getInternalElts().stream().forEach(e -> e.enter(this));
         return true;
     }
 
@@ -1536,6 +1538,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitTuple(Tuple node) {
         if (node.getInternalCtx() == expr_contextType.Store) {
+            assert false: "use two phase compile for destructive assignment";
             return checkStarred(node.getInternalElts(), node, false);
         }
 
@@ -1609,6 +1612,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.pop();
         }
     }
+
     public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) {
         loadArray(code, nodes, null, 0);
     }
@@ -1988,60 +1992,96 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokestatic(p(Py.class), "unpackIterator",
                 sig(PyObject[].class, PyObject.class, Integer.TYPE, Integer.TYPE));
 
-        VisitorIF<?> visitor = new VisitorBase<Object>() {
+        VisitorIF<?> visitor = new Visitor() {
             @Override
-            public Object visitName(Name node) {
+            public boolean enterName(Name node) {
+                loadFrame();
+                code.swap();
+                return true;
+            }
+
+            @Override
+            public boolean enterAttribute(Attribute node) {
+                CodeCompiler.this.visit(node.getInternalValue());
+                code.swap();
+                return true;
+            }
+
+            @Override
+            public boolean enterSubscript(Subscript node) {
+                CodeCompiler.this.visit(node.getInternalValue());
+                code.swap();
+                CodeCompiler.this.visit(node.getInternalSlice());
+                code.swap();
+                return true;
+            }
+
+            @Override
+            public boolean enterStarred(Starred node) {
+                return node.getInternalValue().enter(this);
+            }
+
+            @Override
+            public void leaveName(Name node) {
                 nameop(node.getInternalId(), expr_contextType.Store);
-                return null;
             }
 
             @Override
-            public Object visitAttribute(Attribute node) {
+            public void leaveStarred(Starred node) {
+                node.getInternalValue().leave(this);
+            }
+
+            @Override
+            public void leaveAttribute(Attribute node) {
                 code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(void.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_PROPERTY);
-                return null;
             }
 
             @Override
-            public Object visitSubscript(Subscript node) {
+            public void leaveSubscript(Subscript node) {
                 code.visitInvokeDynamicInsn(EMPTY_NAME, sig(void.class, PyObject.class, PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.SET_ELEMENT);
-                return null;
             }
 
             @Override
-            protected Object unhandled_node(PythonTree node) {
-                return null;
+            public void leaveTuple(Tuple node) {
+                CodeCompiler.this.leaveTuple(node, true);
             }
 
-            @Override
-            public void traverse(PythonTree node) {
-                node.traverse(this);
-            }
+//            @Override
+//            protected Object unhandled_node(PythonTree node) {
+//                return null;
+//            }
+
+//            @Override
+//            public void traverse(PythonTree node) {
+//                node.traverse(this);
+//            }
         };
         for (int i = nodes.size() - 1; i >= 0; i--) {
-            if (nested && i != nodes.size() - 1) {
-                // drop the parent unpacked array if nested
-                code.swap();
-                // propagate the parent unpacked array
-                code.dup_x2();
-                code.pop();
-            }
+//            if (nested && i != nodes.size() - 1) {
+//                // drop the parent unpacked array if nested
+//                code.swap();
+//                // propagate the parent unpacked array
+//                code.dup_x2();
+//                code.pop();
+//            }
             expr elt = nodes.get(i);
-            if (elt instanceof Subscript) {
-                code.dup_x2();
-            } else {
-                code.dup_x1();
-            }
+//            if (elt instanceof Subscript) {
+//                code.dup_x2();
+//            } else {
+//                code.dup_x1();
+//            }
+            code.dup();
+            elt.enter(visitor);
             code.iconst(i);
             code.aaload();
-            if (elt instanceof Tuple) {
-                leaveTuple((Tuple) elt, true);
-            } else {
-                elt.accept(visitor);
-            }
+            elt.leave(visitor);
             // nested destructive assignment have to clean the value by itself
-            if (nested && i == 0) {
-                code.pop();
-            }
+//            if (nested && i == 0) {
+//                code.pop();
+//            }
+        }
+        if (nested) {
+            code.pop();
         }
         return null;
     }

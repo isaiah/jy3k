@@ -308,10 +308,10 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             gi_frame.f_back = state.frame;
             result = Py.runCode(state, gi_frame.f_code, gi_frame);
             gi_frame.f_back = null;
-            if (exc) {
-                assert gi_frame.previousException != null: "exception not provided in exc mode";
-                throw gi_frame.previousException;
-            }
+//            if (exc) {
+//                assert gi_frame.previousException != null: "exception not provided in exc mode";
+//                throw gi_frame.previousException;
+//            }
         } catch (PyException pye) {
             gi_frame = null;
             if (this instanceof PyCoroutine && pye.match(Py.StopIteration)) {
