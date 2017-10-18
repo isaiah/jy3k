@@ -172,7 +172,7 @@ public class Lower extends Visitor {
         traverse(node);
         stmt enterStmt;
         withitem item = node.getInternalItems().get(0);
-        String mgr = "(mgr)" + counter;
+        String mgr = "(mgr)" + counter++;
         Name setMgr = new Name(node, mgr, expr_contextType.Store);
         Name getMgr = new Name(node, mgr, expr_contextType.Load);
         Assign assignMgr = new Assign(node, Arrays.asList(setMgr), item.getInternalContext_expr());
@@ -262,7 +262,7 @@ public class Lower extends Visitor {
         traverse(node);
         stmt enterStmt;
         withitem item = node.getInternalItems().get(0);
-        String mgr = "(mgr)" + counter;
+        String mgr = "(mgr)" + counter++;
         Name setMgr = new Name(node, mgr, expr_contextType.Store);
         Name getMgr = new Name(node, mgr, expr_contextType.Load);
         Assign assignMgr = new Assign(node, Arrays.asList(setMgr), item.getInternalContext_expr());
