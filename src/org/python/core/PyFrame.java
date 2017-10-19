@@ -179,7 +179,9 @@ public class PyFrame extends PyObject implements Traverseproc {
     public Object getGeneratorInput() {
         // NOTE: This is the only entrance for exceptions to be thrown in the generator context
         if (previousException != null) {
-            throw previousException;
+            PyException exc = previousException;
+            previousException = null;
+            throw exc;
         }
         Object input = generatorInput;
         generatorInput = Py.None;
