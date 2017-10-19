@@ -10,6 +10,8 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 
+import java.util.Deque;
+
 /**
  * A Python frame object.
  */
@@ -88,6 +90,8 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     private static final String FREEVAR_ERROR_MSG =
             "free variable '%.200s' referenced before assignment";
+
+    public Deque<PyException> exceptions;
 
     /**
      * Create a frame from code and context

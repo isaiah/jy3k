@@ -374,40 +374,20 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     // xxx fix this accessors
     @Override
     public PyObject __findattr_ex__(String name) {
-        if (name == "exc_value") {
-            PyException exc = Py.getThreadState().exceptions.peek();
-            if (exc == null) {
-                return null;
-            }
-            return exc.value;
-        } else if (name == "exc_type") {
-            PyException exc = Py.getThreadState().exceptions.peek();
-            if (exc == null) {
-                return null;
-            }
-            return exc.type;
-        } else if (name == "exc_traceback") {
-            PyException exc = Py.getThreadState().exceptions.peek();
-            if (exc == null) {
-                return null;
-            }
-            return exc.traceback;
-        } else {
-            PyObject ret = super.__findattr_ex__(name);
-            if (ret != null) {
-                if (ret instanceof PyMethod) {
-                    if (__dict__.__finditem__(name) instanceof PyReflectedFunction) {
-                        return ret; // xxx depends on nonstandard __dict__
-                    }
-                } else if (ret == PyAttributeDeleted.INSTANCE) {
-                    return null;
-                } else {
-                    return ret;
+        PyObject ret = super.__findattr_ex__(name);
+        if (ret != null) {
+            if (ret instanceof PyMethod) {
+                if (__dict__.__finditem__(name) instanceof PyReflectedFunction) {
+                    return ret; // xxx depends on nonstandard __dict__
                 }
+            } else if (ret == PyAttributeDeleted.INSTANCE) {
+                return null;
+            } else {
+                return ret;
             }
-
-            return __dict__.__finditem__(name);
         }
+
+        return __dict__.__finditem__(name);
     }
 
     @Override
@@ -1570,17 +1550,13 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     }
 
     public static PyTuple exc_info() {
-        PyException exc = Py.getThreadState().exceptions.peek();
+        PyException exc = Py.getThreadState().peekexc();
         if (exc == null) {
             return new PyTuple(Py.None, Py.None, Py.None);
         }
         PyObject tb = exc.traceback;
         PyObject value = exc.value;
         return new PyTuple(exc.type, value == null ? Py.None : value, tb == null ? Py.None : tb);
-    }
-
-    public static void exc_clear() {
-        Py.getThreadState().exceptions.clear();
     }
 
     public void cleanup() {

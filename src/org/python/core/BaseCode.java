@@ -146,7 +146,6 @@ public class BaseCode {
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__, function.__closure__);
         frame.f_back = ts.frame;
-        frame.fBackExecSize = ts.exceptions.size();
         ts.frame = frame;
         return frame;
     }

@@ -32,7 +32,7 @@ public class SysModule {
 
     @ExposedFunction(doc = BuiltinDocs.sys_exc_info_doc)
     public static PyObject exc_info() {
-        PyException exc = Py.getThreadState().exceptions.peek();
+        PyException exc = Py.getThreadState().peekexc();
         if (exc == null) {
             return new PyTuple(Py.None, Py.None, Py.None);
         }

@@ -73,7 +73,7 @@ public class PyException extends RuntimeException implements Traverseproc
             isReRaise = true;
         }
         if (value != null && !isExceptionInstance(value)) {
-            PyException pye = Py.getThreadState().exceptions.pollFirst();
+            PyException pye = Py.getThreadState().peekexc();
             if (pye != null && pye.value instanceof PyBaseException) {
                 context = (PyBaseException) pye.value;
             }
@@ -215,7 +215,7 @@ public class PyException extends RuntimeException implements Traverseproc
     }
 
     public static PyException doRaise(ThreadState state) {
-        PyException pye = state.exceptions.peekFirst();
+        PyException pye = state.peekexc();
 
         if (pye == null) {
             throw Py.RuntimeError("No active exception to reraise");
@@ -243,7 +243,8 @@ public class PyException extends RuntimeException implements Traverseproc
             type = value;
             // null flags context has been take care of
             pye = new PyException(type, null, cause);
-            PyException context = state.exceptions.pollFirst();
+            // FIXME is peek or pop here?
+            PyException context = state.peekexc();
             if (context != null && context.value instanceof PyBaseException) {
                 pye.context = (PyBaseException) context.value;
             }

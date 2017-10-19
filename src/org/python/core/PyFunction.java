@@ -753,14 +753,6 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     }
 
     public static PyObject restoreFrame(Throwable t, PyObject v, PyObject arg, ThreadState ts) {
-        PyFrame f = ts.frame;
-        if (f.fBackExecSize == 0) {
-            ts.exceptions.clear();
-        } else {
-            while(ts.exceptions.size() > f.fBackExecSize) {
-                ts.exceptions.pop();
-            }
-        }
         ts.frame = ts.frame.f_back;
         return v;
     }

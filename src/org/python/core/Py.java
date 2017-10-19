@@ -1369,11 +1369,7 @@ public final class Py {
         maybeSystemExit(exc);
 
         ThreadState ts = getThreadState();
-        setException(exc, f, ts);
-
-//        ts.systemState.last_value = exc.value;
-//        ts.systemState.last_type = exc.type;
-//        ts.systemState.last_traceback = exc.traceback;
+//        setException(exc, f, ts);
 
         PyObject exceptHook = SysModule.getObject("excepthook");
         if (exceptHook != null) {
@@ -1393,7 +1389,7 @@ public final class Py {
             displayException(exc.type, exc.value, exc.traceback, file);
         }
 
-        ts.exceptions.pop();
+//        ts.popexc();
     }
 
     // PyErr_Display
@@ -1566,18 +1562,18 @@ public final class Py {
         PyException pye = Py.JavaError(t);
         pye.normalize();
         pye.tracebackHere(frame);
-        ts.exceptions.offerFirst(pye);
+        ts.pushexc(pye);
         return pye;
     }
 
     public static void popException(ThreadState state, PyFrame frame) {
         frame.previousException = null;
-        state.exceptions.pollFirst();
+        state.popexc();
     }
 
     public static void popException(ThreadState state) {
         state.frame.previousException = null;
-        state.exceptions.pollFirst();
+        state.popexc();
     }
 
     /**
@@ -1625,24 +1621,17 @@ public final class Py {
     }
 
     public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f) {
+        PyFrame fback = null;
         try {
             MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
                      MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
-            f.f_back = ts.frame;
-            f.fBackExecSize = ts.exceptions.size();
+            fback = f.f_back = ts.frame;
             ts.frame = f;
             return (PyObject) main.invokeExact(ts, f);
          } catch (Throwable t) {
             throw Py.JavaError(t);
          } finally {
-            if (f.fBackExecSize == 0) {
-                ts.exceptions.clear();
-            } else {
-                while(ts.exceptions.size() > f.fBackExecSize) {
-                    ts.exceptions.pop();
-                }
-            }
-            ts.frame = f.f_back;
+            ts.frame = fback;
         }
     }
 

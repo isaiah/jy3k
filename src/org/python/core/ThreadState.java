@@ -35,7 +35,29 @@ public class ThreadState {
      * @return
      */
     public PyException getexc() {
-        return exceptions.peek();
+        return peekexc();
+    }
+
+    public PyException peekexc() {
+        if (frame == null || frame.exceptions == null) {
+            return null;
+        }
+        return frame.exceptions.peek();
+    }
+
+    public PyException popexc() {
+        return frame.exceptions.pollFirst();
+    }
+
+    public void pushexc(PyException exc) {
+        if (frame.exceptions == null) {
+            if (frame.f_back == null || frame.f_back.exceptions == null) {
+                frame.exceptions = new LinkedList<>();
+            } else {
+                frame.exceptions = new LinkedList<>(frame.f_back.exceptions);
+            }
+        }
+        frame.exceptions.offerFirst(exc);
     }
 
     public boolean enterRepr(PyObject obj) {
