@@ -217,10 +217,20 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
 
     private PyObject raiseException(PyObject type, PyObject value, PyObject tb) {
         PyException pye;
-        if (value == null) {
-            pye = PyException.doRaise(type);
+        if (type instanceof PyType && ((PyType) type).isSubType((PyType) Py.Exception)) {
+            if (value == null) {
+                pye = PyException.doRaise(type);
+            } else {
+                pye = new PyException(type, value);
+            }
+        } else if (type.getType().isSubType((PyType) Py.Exception)) {
+            // Raising an instance. The value should be dummy
+            if (value != null && value != Py.None) {
+                throw Py.TypeError("instance exception may not have a separate value");
+            }
+            pye = new PyException(type.getType(), type);
         } else {
-            pye = new PyException(type, value);
+            throw Py.TypeError(String.format("exceptions must be classes or instances deriving from BaseException, not %", type.getType()));
         }
         pye.traceback = (PyTraceback) tb;
         if (gi_frame != null) {
