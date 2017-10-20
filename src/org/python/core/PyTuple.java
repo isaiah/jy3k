@@ -10,6 +10,7 @@ import java.util.ListIterator;
 import java.lang.reflect.Array;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedModule;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
@@ -510,10 +511,42 @@ public class PyTuple extends PySequenceList implements List {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.tuple_index_doc)
-    final int tuple_index(PyObject value, PyObject start, PyObject stop) {
+    public final int tuple_index(PyObject value, PyObject start, PyObject stop) {
         int startInt = start == null ? 0 : PySlice.calculateSliceIndex(start);
         int stopInt = stop == null ? size() : PySlice.calculateSliceIndex(stop);
         return tuple_index(value, startInt, stopInt);
+    }
+
+    @Override
+    public final PyObject do_richCompare(PyObject other, CompareOp op) {
+        if (!(other instanceof PyTuple)) {
+            return Py.NotImplemented;
+        }
+        PyTuple ot = (PyTuple) other;
+        int l = __len__();
+        int ol = ot.__len__();
+
+        int i = 0;
+        for (; i < l && l < ol; i++) {
+            boolean k = array[i].do_richCompareBool(ot.array[i], CompareOp.EQ);
+            if (!k) {
+                break;
+            }
+        }
+        if (i >= l || i >= ol) {
+            // no more items to compare, compare size
+            return op.bool(l - ol);
+        }
+        if (op == CompareOp.EQ) {
+            return Py.False;
+        }
+
+        if (op == CompareOp.NE) {
+            return Py.True;
+        }
+
+        // compare the final item again using the proper operator
+        return array[i].do_richCompare(ot.array[i], op);
     }
 
     final int tuple_index(PyObject value, int start, int stop) {

@@ -1301,7 +1301,7 @@ public class PyObject implements Serializable {
         if (res != Py.NotImplemented && res.__bool__()) {
             return 0;
         }
-        res = richCompare(o, CompareOp.LT);
+        res = do_richCompare(o, CompareOp.LT);
         if (res != Py.NotImplemented) {
             if (res.__bool__()) {
                 return -1;
@@ -1411,7 +1411,7 @@ public class PyObject implements Serializable {
     }
 
     // Rich comparison entry for bytecode
-    public final PyObject do_richCompare(PyObject other, CompareOp op) {
+    public PyObject do_richCompare(PyObject other, CompareOp op) {
         PyObject token = null;
         ThreadState ts = Py.getThreadState();
         try {
