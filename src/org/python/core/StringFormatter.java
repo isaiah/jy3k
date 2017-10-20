@@ -105,8 +105,11 @@ final class StringFormatter {
                 int numStart = index - 1;
                 while (Character.isDigit(c = pop())) {}
                 index -= 1;
-                Integer i = Integer.valueOf(format.substring(numStart, index));
-                return i.intValue();
+                long i = Long.valueOf(format.substring(numStart, index));
+                if (i > Integer.MAX_VALUE) {
+                    throw Py.ValueError("precision too big");
+                }
+                return (int) i;
             }
             index -= 1;
             return 0;

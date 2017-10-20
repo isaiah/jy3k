@@ -718,6 +718,10 @@ public class PyUnicode extends PySequence implements Iterable {
             int[] indices = ((PySlice) index).indicesEx(__len__());
             return getslice(indices[0], indices[1], indices[2]);
         }
+        int idx = index.asIndex();
+        if (idx >= string.length()) {
+            throw Py.IndexError(String.format("string index out of range"));
+        }
         int codepoint = string.codePointAt(string.offsetByCodePoints(0, index.asIndex()));
         return new PyUnicode(new String(Character.toChars(codepoint)));
     }
@@ -954,7 +958,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
     @Override
     public PyObject _is(PyObject o) {
-        return new PyBoolean(o instanceof PyUnicode && ((PyUnicode) o).getString().equals(getString()));
+        return Py.newBoolean(this == o);
     }
 
     @Override
@@ -1014,7 +1018,11 @@ public class PyUnicode extends PySequence implements Iterable {
 
     @ExposedMethod(doc = BuiltinDocs.str_lower_doc)
     public final PyObject str_lower() {
-        return new PyUnicode(getString().toLowerCase());
+        StringBuffer buffer = new StringBuffer(getString().length());
+        for (int i = 0; i < __len__(); i++) {
+            buffer.appendCodePoint(Character.toLowerCase(string.codePointAt(i)));
+        }
+        return new PyUnicode(buffer);
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_upper_doc)
@@ -1775,6 +1783,7 @@ public class PyUnicode extends PySequence implements Iterable {
     final PyUnicode unicodeJoin(PyObject obj) {
         StringJoiner joiner = new StringJoiner(getString());
         PyObject item;
+        long totalSize = 0;
         PyObject iter = obj.__iter__();
         try {
             for (int i = 0; (item = iter.__next__()) != null; i++) {
@@ -1782,7 +1791,13 @@ public class PyUnicode extends PySequence implements Iterable {
                     throw Py.TypeError(String.format("sequence item %d: expected str instance, %s found",
                             i, item.getType().fastGetName()));
                 }
-                joiner.add(((PyUnicode) item).getString());
+                String s = ((PyUnicode) item).getString();
+                totalSize += s.length();
+                // A string cannot be longer than the maximum array length
+                if (totalSize > Integer.MAX_VALUE) {
+                    throw Py.OverflowError("max str len is " + Integer.MAX_VALUE);
+                }
+                joiner.add(s);
             }
         } catch (PyException e) {
             if (!e.match(Py.StopIteration)) throw e;
@@ -2023,19 +2038,6 @@ public class PyUnicode extends PySequence implements Iterable {
     public final PyObject str___format__(PyObject formatSpec) {
         return Encoding.format(getString(), formatSpec, false);
     }
-
-/*
-    @ExposedMethod(doc = BuiltinDocs.str__formatter_parser_doc)
-    final PyObject unicode__formatter_parser() {
-        return new MarkupIterator(this);
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.str__formatter_field_name_split_doc)
-    final PyObject unicode__formatter_field_name_split() {
-        FieldNameIterator iterator = new FieldNameIterator(this);
-        return new PyTuple(iterator.pyHead(), iterator);
-    }
-*/
 
     @ExposedMethod(doc = BuiltinDocs.str_format_doc)
     public final PyObject str_format(PyObject[] args, String[] keywords) {
