@@ -105,7 +105,7 @@ public class FieldNameIterator extends PyObject implements Traverseproc {
      */
     private PyObject wrap(Object value) {
         if (value instanceof Integer) {
-            return Py.newInteger(((Integer)value).intValue());
+            return Py.newInteger((Integer) value);
         } else {
             // It can only be a String (but if not, at least we see it).
             String s = value.toString();
