@@ -157,7 +157,7 @@ public class PyBuiltinMethodData {
                 if (paramCount == 2) {
                     return wrap(target.invoke(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1]));
                 } else {
-                    return wrap(target.invoke(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 1], defaults[defaults.length - 2]));
+                    return wrap(target.invoke(unwrap(arg, type.parameterType(i)), defaults[defaults.length - 2], defaults[defaults.length - 1]));
                 }
             } else {
                 return wrap(target.invoke(unwrap(arg, type.parameterType(i))));
