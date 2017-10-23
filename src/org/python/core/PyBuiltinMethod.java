@@ -152,9 +152,14 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
                 if (startIndex < 0) {
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
                 }
+
                 for (int i = argCount; i < paramCount; i++) {
                     mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults[defaultLength + i - paramCount]);
                 }
+            }
+
+            if (argCount > paramCount) {
+                throw Py.TypeError(String.format("%s() takes at most %d argument%s (%d given)", info.getName(), paramCount, paramCount > 1 ? "s" : "", argCount));
             }
             for (int i = argOffset; i < argCount + argOffset; i++) {
                 mh = convert(mh, i, paramArray[i]);

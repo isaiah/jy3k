@@ -230,7 +230,7 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             }
             pye = new PyException(type.getType(), type);
         } else {
-            throw Py.TypeError(String.format("exceptions must be classes or instances deriving from BaseException, not %", type.getType()));
+            throw Py.TypeError(String.format("exceptions must be classes or instances deriving from BaseException, not %s", type));
         }
         pye.traceback = (PyTraceback) tb;
         if (gi_frame != null) {

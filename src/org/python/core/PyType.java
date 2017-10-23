@@ -341,42 +341,48 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         needs_finalizer = needsFinalizer();
     }
 
+    public static class PyTypeDictDescr extends PyDataDescr {
+        public PyTypeDictDescr(PyType onType, String name, Class ofType, String doc) {
+            super(onType, name, ofType, doc);
+        }
+
+        @Override
+        public boolean implementsDescrGet() {
+            return true;
+        }
+
+        @Override
+        public Object invokeGet(PyObject obj) {
+            return obj.getDict();
+        }
+
+        @Override
+        public boolean implementsDescrSet() {
+            return true;
+        }
+
+        @Override
+        public void invokeSet(PyObject obj, Object value) {
+            obj.setDict((PyObject)value);
+        }
+
+        @Override
+        public boolean implementsDescrDelete() {
+            return true;
+        }
+
+        @Override
+        public void invokeDelete(PyObject obj) {
+            obj.delDict();
+        }
+    }
+
     /**
      * Create the __dict__ descriptor.
      */
     private void createDictSlot() {
         String doc = "dictionary for instance variables (if defined)";
-        dict.__setitem__("__dict__", new PyDataDescr(this, "__dict__", PyObject.class, doc) {
-                @Override
-                public boolean implementsDescrGet() {
-                    return true;
-                }
-
-                @Override
-                public Object invokeGet(PyObject obj) {
-                    return obj.getDict();
-                }
-
-                @Override
-                public boolean implementsDescrSet() {
-                    return true;
-                }
-
-                @Override
-                public void invokeSet(PyObject obj, Object value) {
-                    obj.setDict((PyObject)value);
-                }
-
-                @Override
-                public boolean implementsDescrDelete() {
-                    return true;
-                }
-
-                @Override
-                public void invokeDelete(PyObject obj) {
-                    obj.delDict();
-                }
-            });
+        dict.__setitem__("__dict__", new PyTypeDictDescr(this, "__dict__", PyObject.class, doc));
         needs_userdict = true;
     }
 
