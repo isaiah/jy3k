@@ -1151,7 +1151,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         setLastI(++u.yieldCount);
         loadFrame();
         code.invokestatic(p(Py.class), "getYieldFromIter", sig(Void.TYPE, PyObject.class, PyFrame.class));
-        saveLocals();
 
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
 
@@ -1160,7 +1159,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.invokestatic(p(Py.class), YIELD.symbolName(), sig(Void.TYPE, PyObject.class));
         u.yieldCount++;
         code.invokestatic(p(Py.class), MARK.symbolName(), sig(Void.TYPE));
-        restoreLocals();
         code.invokestatic(p(Py.class), RESTORE_OPRANDS.symbolName(), sig(Void.TYPE));
 
         // restore return value from subgenerator
@@ -1734,7 +1732,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(body.get(i));
         }
         // blindly appending `return None`, asm will eliminate it
-        setLastI(-1);
+        if (ste.generator) {
+            setLastI(-1);
+        }
         getNone();
         code.areturn();
         if (ste.generator) {
@@ -1851,6 +1851,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         setline(node);
         if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
+        }
+        if (ste.generator) {
+            setLastI(-1);
         }
 
         if (node.getInternalValue() != null) {
