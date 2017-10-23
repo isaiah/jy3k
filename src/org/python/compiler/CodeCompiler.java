@@ -1732,7 +1732,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(body.get(i));
         }
         // blindly appending `return None`, asm will eliminate it
-        if (ste.generator) {
+        if (ste.coroutine || ste.generator) {
             setLastI(-1);
         }
         getNone();
@@ -1852,7 +1852,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
-        if (ste.generator) {
+        if (ste.coroutine || ste.generator) {
             setLastI(-1);
         }
 
