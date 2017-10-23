@@ -3,12 +3,14 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
+import jdk.dynalink.linker.support.Guards;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.SwitchPoint;
 
 public abstract class PyNewWrapper extends PyBuiltinMethod implements Traverseproc {
     MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
@@ -58,12 +60,12 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
     public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest request) {
         MethodType argType = desc.getMethodType();
         if (BaseCode.isWideCall(argType)) {
-            return new GuardedInvocation(MethodHandles.dropArguments(WIDE_CALL, 1, ThreadState.class));
+            return new GuardedInvocation(MethodHandles.dropArguments(WIDE_CALL, 1, ThreadState.class), Guards.getClassGuard(PyNewWrapper.class));
         }
         MethodHandle mh = MethodHandles.insertArguments(WIDE_CALL, 2, (Object) Py.NoKeywords);
         mh = mh.asCollector(1, PyObject[].class, argType.parameterCount() - 2);
         mh = MethodHandles.dropArguments(mh,1, ThreadState.class);
-        return new GuardedInvocation(mh);
+        return new GuardedInvocation(mh, Guards.getClassGuard(PyNewWrapper.class));
     }
 
     public void setWrappedType(PyType type) {
