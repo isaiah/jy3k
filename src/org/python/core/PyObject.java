@@ -3820,12 +3820,12 @@ public class PyObject implements Serializable {
      * @return a tuple of (class, tuple)
      */
     public PyObject __reduce__() {
-        return object___reduce__();
+        return object___reduce__(0);
     }
 
     @ExposedMethod(doc = BuiltinDocs.object___reduce___doc)
-    final PyObject object___reduce__() {
-        return commonReduce(0);
+    public final PyObject object___reduce__(int proto) {
+        return commonReduce(proto);
     }
 
     /** Used for pickling.  If the subclass specifies __reduce__, it will
