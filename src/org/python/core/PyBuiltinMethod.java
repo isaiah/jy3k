@@ -168,7 +168,10 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             /** Drop receiver for static method */
             mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
         }
-        mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+
+        if (methodType.parameterCount() < 2 || methodType.parameterType(1) != ThreadState.class) {
+            mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+        }
         mh = asTypesafeReturn(mh, methodType);
         return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
