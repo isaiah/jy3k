@@ -25,7 +25,7 @@ public abstract class PyBuiltinCallable extends PyObject {
     public PyObject getQualname() {
         PyObject self = getSelf();
         String qualname = info.getName();
-        if (self != null && self != Py.None) {
+        if (self != null && self != Py.None && !(self instanceof PyModule)) {
             if (!info.isStatic) {
                 self = self.getType();
             }
@@ -63,6 +63,9 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     @Override
     public String toString() {
+        if (getSelf() == null || getSelf() instanceof PyModule) {
+            return String.format("<built-in function %s>", fastGetName());
+        }
         return String.format("<built-in method %s of %s object at %s>", fastGetName(), getSelf().getType().fastGetName(), Py.idstr(getSelf()));
     }
 }

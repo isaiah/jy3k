@@ -527,15 +527,25 @@ public class PyTuple extends PySequenceList implements List {
         int ol = ot.__len__();
 
         int i = 0;
-        for (; i < l && l < ol; i++) {
+        for (; i < l && i < ol; i++) {
             boolean k = array[i].do_richCompareBool(ot.array[i], CompareOp.EQ);
             if (!k) {
                 break;
             }
         }
+        int result = l - ol;
+
+        // sanitize the result, because -2 means NotImplemented
+        if (result < 0) {
+            result = -1;
+        }
+        if (result > 0) {
+            result = 1;
+        }
+
         if (i >= l || i >= ol) {
             // no more items to compare, compare size
-            return op.bool(l - ol);
+            return op.bool(result);
         }
         if (op == CompareOp.EQ) {
             return Py.False;

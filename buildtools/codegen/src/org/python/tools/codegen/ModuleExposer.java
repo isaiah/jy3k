@@ -67,7 +67,6 @@ public class ModuleExposer extends Exposer {
         callStatic(PY, "newUnicode", PYSTR, STRING);
         call(PYOBJ, "__setitem__", VOID, STRING, PYOBJ);
         mv.visitVarInsn(ALOAD, 0);
-        call(PYMODULE, "getType", PYTYPE);
         mv.visitVarInsn(ASTORE, 1);
         for(MethodExposer exposer : methods) {
             for(final String name : exposer.getNames()) {
