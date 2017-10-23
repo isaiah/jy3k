@@ -13,6 +13,7 @@ import org.python.internal.lookup.MethodHandleFunctionality;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.SwitchPoint;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -43,6 +44,12 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
         if (self == Py.None){
             self = null;
         }
+        if (type == Py.None || type == null) {
+            if (self == null) {
+                throw Py.TypeError("unbound methods must have non-NULL im_class");
+            }
+            type = self.getType();
+        }
         __func__ = function;
         __self__ = self;
         im_class = type;
@@ -59,9 +66,6 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
 
         if (!func.isCallable()) {
             throw Py.TypeError("first argument must be callable");
-        }
-        if (self == Py.None && classObj == null) {
-            throw Py.TypeError("unbound methods must have non-NULL im_class");
         }
         return new PyMethod(func, self, classObj);
     }
@@ -239,7 +243,7 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
 
         // FIXME fix dynamically linking reflected Java method
         MethodHandle mh = MH.findVirtual(LOOKUP, getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));
-        return new GuardedInvocation(mh);
+        return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
     }
 
     private PyObject checkSelf(PyObject arg, PyObject[] args) {
