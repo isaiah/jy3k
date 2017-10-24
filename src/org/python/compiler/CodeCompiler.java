@@ -211,7 +211,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public void popException() {
         loadThreadState();
-        code.invokestatic(p(Py.class), "popException", sig(Void.TYPE, ThreadState.class));
+        code.invokevirtual(p(ThreadState.class), "popexc", sig(PyException.class));
+        code.pop();
     }
 
     public void doRaise() {

@@ -360,10 +360,10 @@ public class Exceptions {
         String result;
         if (filename != null && filename.__bool__()) {
             result = String.format("[Errno %s] %s: %s", errno, strerror, filename.__repr__());
-        } else if (errno.__bool__() && strerror.__bool__()) {
+        } else if (errno != null && strerror != null && errno.__bool__() && strerror.__bool__()) {
             result = String.format("[Errno %s] %s", errno, strerror);
         } else {
-            return (PyUnicode) PyBaseException.TYPE.invoke("__str__", self, args, kwargs);
+            return ((PyBaseException) self).BaseException_toString();
         }
         return Py.newUnicode(result);
     }
