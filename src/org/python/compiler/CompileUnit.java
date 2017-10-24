@@ -23,7 +23,6 @@ class CompileUnit {
     final PySTEntryObject ste;
     final CompilerScope scopeType;
     private final Map<?, ?> consts;
-    private final int firstlineno;
     int yieldCount;
     Module module;
     static int access = ACC_STATIC | ACC_FINAL;
@@ -37,6 +36,8 @@ class CompileUnit {
     List<expr> constants;
     int id;
     int co_firstlineno;
+    int co_lineno;
+    boolean co_lineno_set;
     boolean arglist, keywordlist;
     String fname;
     // for nested scopes
@@ -69,7 +70,7 @@ class CompileUnit {
             cellvars.put("__class__", 0);
         }
         this.freevars = dictbytype(ste.symbols, FREE, DEF_FREE_CLASS, cellvars.size());
-        this.firstlineno = lineno;
+        this.co_lineno = this.co_firstlineno = lineno;
         this.consts = new HashMap<>();
         this.names = new HashMap<>();
         this.id = module.codes.size();

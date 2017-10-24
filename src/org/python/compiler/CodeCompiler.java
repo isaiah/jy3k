@@ -257,7 +257,19 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.getfield(p(PyFrame.class), "f_back", ci(PyFrame.class));
     }
 
+    /* Set the i_lineno member of the instruction at offset off if the
+       jine number for the current expression/statement has not
+       already been set.  If it has been set, the call has no effect.
+
+       The line number is reset in the following cases:
+       - when entering a new scope
+       - on each statement
+       - on each expression that start a new line
+       - before the "except" clause
+       - before the "for" and "while" expressions
+    */
     public void setline(int line) {
+        u.co_lineno = line;
         if (module.linenumbers) {
             code.setline(line);
             loadFrame();
@@ -266,9 +278,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public void setline(PythonTree node) {
-        setline(node.getLine());
+    @Override
+    public Object visit(PythonTree node) {
+        int lineno = node.getLineno();
+        if (node instanceof stmt) {
+            setline(lineno);
+        } else if (node instanceof expr) {
+            if (lineno > u.co_lineno) {
+                u.co_lineno = lineno;
+                setline(lineno);
+            }
+        }
+        return super.visit(node);
     }
+
 
     void exitScope() {
         nestlevel--;
@@ -311,6 +334,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.mark(u.start);
         }
 
+        setline(lineno);
         return compileUnit;
     }
 
@@ -527,14 +551,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitDelete(Delete node) {
-        setline(node);
         traverse(node);
         return null;
     }
 
     @Override
     public Object visitAssign(Assign node) {
-        setline(node);
         java.util.List<expr> targets = node.getInternalTargets();
         for (expr e : targets) {
             e.enter(this);
@@ -551,7 +573,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitAnnAssign(AnnAssign node) {
         if (node.getInternalValue() != null) {
-            setline(node);
             node.getInternalTarget().enter(this);
             visit(node.getInternalValue());
             node.getInternalTarget().leave(this);
@@ -575,7 +596,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         suite(node.getInternalBody());
 
         code.mark(continue_loop);
-        setline(node);
 
         // Do test
         expr test = node.getInternalTest();
@@ -616,7 +636,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitRaise(Raise node) {
-        setline(node);
         if (node.getInternalExc() != null) {
             visit(node.getInternalExc());
         }
@@ -703,7 +722,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAssert(Assert node) {
-        setline(node);
         Label end_of_assert = new Label();
 
         /* First do an if __debug__: */
@@ -746,7 +764,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitImport(Import node) {
-        setline(node);
         for (alias a : node.getInternalNames()) {
             String asname, name = a.getInternalName();
             int dot = name.indexOf('.');
@@ -790,7 +807,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitImportFrom(ImportFrom node) {
         java.util.List<alias> aliases = node.getInternalNames();
-        setline(node);
         loadFrame();
         code.ldc(node.getInternalModule());
         loadStrings(code, aliases.stream().map(a -> a.getInternalName()).collect(Collectors.toList()));
@@ -831,7 +847,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitExpr(Expr node) {
-        setline(node);
         visit(node.getInternalValue());
 
         if (node.isPrint()) {
@@ -844,7 +859,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitPass(Pass node) {
-        setline(node);
         return null;
     }
 
@@ -860,7 +874,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitContinue(Continue node) {
-        // setline(node); Not needed here...
         if (continueLabels.isEmpty()) {
             throw Py.SyntaxError(node.getToken(), "'continue' not properly in loop", module.getFilename());
         }
@@ -991,7 +1004,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitIfExp(IfExp node) {
-        setline(node.getInternalTest());
         Label end = new Label();
         Label end_of_else = new Label();
 
@@ -1066,7 +1078,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAwait(Await node) {
-        setline(node);
         code.invokestatic(p(Py.class), SAVE_OPRANDS.symbolName(), sig(Void.TYPE));
         visit(node.getInternalValue());
 
@@ -1094,7 +1105,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitYield(Yield node) {
-        setline(node);
         if (u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'yield' outside function", module.getFilename());
         }
@@ -1687,7 +1697,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     private Object compileFunction(String internalName, java.util.List<expr> decos, arguments args, java.util.List<stmt> body, PythonTree node) {
-        setline(node);
         boolean anonymous = node instanceof expr;
 
         if (!anonymous) {
@@ -1842,7 +1851,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public Object visitReturn(Return node, boolean inEval) {
-        setline(node);
         if (!inEval && u.scopeType != CompilerScope.FUNCTION) {
             throw Py.SyntaxError(node.getToken(), "'return' outside function", module.getFilename());
         }
@@ -1861,8 +1869,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public Object doTest(Label end_of_if, If node, int index) {
         Label end_of_suite = new Label();
-
-        setline(node.getInternalTest());
         visit(node.getInternalTest());
         code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
 
@@ -1902,9 +1908,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         for (int i = 0; i < node.getInternalHandlers().size(); i++) {
             ExceptHandler handler = (ExceptHandler) node.getInternalHandlers().get(i);
 
-            // setline(name);
             Label end_of_self = new Label();
 
+            setline(handler.getLineno());
             if (handler.getInternalType() != null) {
                 code.aload(exc);
                 // get specific exception
