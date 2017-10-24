@@ -28,7 +28,6 @@ import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.NameConstant;
 import org.python.antlr.ast.Num;
-import org.python.antlr.ast.PopExcept;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.SetComp;

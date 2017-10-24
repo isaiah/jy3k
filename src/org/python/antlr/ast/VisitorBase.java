@@ -416,19 +416,6 @@ public abstract class VisitorBase<R> implements VisitorIF<R> {
     public void leaveExitFor(ExitFor node) {
     }
 
-    public R visitPopExcept(PopExcept node) {
-        R ret = unhandled_node(node);
-        traverse(node);
-        return ret;
-    }
-
-    public boolean enterPopExcept(PopExcept node) {
-        return true;
-    }
-
-    public void leavePopExcept(PopExcept node) {
-    }
-
     public R visitSplitNode(SplitNode node) {
         R ret = unhandled_node(node);
         traverse(node);

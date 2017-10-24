@@ -49,7 +49,7 @@ module Python
           | Global(identifier* names)
           | Nonlocal(identifier* names)
           | Expr(expr value)
-          | Pass | Break | Continue | ExitFor | PopExcept
+          | Pass | Break | Continue | ExitFor
           -- A synthetic AST node that represents a subset of function body
           | SplitNode(identifier name, stmt* body, stmt funcdef)
           -- A helper stmt that includes multiple stmts, it's useful when modify ast tree

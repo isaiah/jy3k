@@ -92,9 +92,6 @@ public interface VisitorIF<R> {
     public boolean enterExitFor(ExitFor node);
     public R visitExitFor(ExitFor node);
     public void leaveExitFor(ExitFor node);
-    public boolean enterPopExcept(PopExcept node);
-    public R visitPopExcept(PopExcept node);
-    public void leavePopExcept(PopExcept node);
     public boolean enterSplitNode(SplitNode node);
     public R visitSplitNode(SplitNode node);
     public void leaveSplitNode(SplitNode node);
