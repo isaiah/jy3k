@@ -202,7 +202,7 @@ public class Symtable extends Visitor {
                 visit(a.getInternalVararg().getInternalAnnotation());
             }
             if (a.getInternalKwarg() != null && a.getInternalKwarg().getInternalAnnotation() != null) {
-                visit(a.getInternalVararg().getInternalAnnotation());
+                visit(a.getInternalKwarg().getInternalAnnotation());
             }
             visitArgannotations(a.getInternalKwonlyargs());
         }
