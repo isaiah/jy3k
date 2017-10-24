@@ -35,6 +35,12 @@ public class PyNamespace extends PyObject {
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___init___doc)
     final void SimpleNamespace___init__(PyObject[] args, String[] kwds) {
+        if (args.length > kwds.length) {
+            throw Py.TypeError("no positional arguments expected");
+        }
+        for (int i = 0; i < args.length; i++) {
+            dict.put(kwds[i], args[i]);
+        }
     }
 
     @Override
