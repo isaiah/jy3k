@@ -64,6 +64,18 @@ public class PySlice extends PyObject implements Traverseproc {
     }
 
     @Override
+    public PyObject do_richCompare(PyObject other, CompareOp op) {
+        if (!(other instanceof PySlice)) {
+            return Py.NotImplemented;
+        }
+
+        PySlice o = (PySlice) other;
+        PyObject[] v = new PyObject[] { start, stop, step };
+        PyObject[] w = new PyObject[] { o.start, o.stop, o.step };
+        return new PyTuple(v).do_richCompare(new PyTuple(w), op);
+    }
+
+    @Override
     public int hashCode() {
         return slice___hash__();
     }
@@ -71,32 +83,6 @@ public class PySlice extends PyObject implements Traverseproc {
     @ExposedMethod(doc = BuiltinDocs.slice___hash___doc)
     final int slice___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
-    }
-
-    @Override
-    public PyObject __eq__(PyObject o) {
-        if (getType() != o.getType() && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        if (this == o) {
-            return Py.True;
-        }
-        PySlice oSlice = (PySlice)o;
-        return Py.newBoolean(eq(getStart(), oSlice.getStart()) && eq(getStop(), oSlice.getStop())
-                             && eq(getStep(), oSlice.getStep()));
-    }
-
-    private static final boolean eq(PyObject o1, PyObject o2) {
-        return o1._cmp(o2) == 0;
-    }
-
-    @Override
-    public PyObject __ne__(PyObject o) {
-        return __eq__(o).__not__();
-    }
-
-    public PyObject indices(PyObject len) {
-        return slice_indices(len);
     }
 
     @ExposedMethod(doc = BuiltinDocs.slice_indices_doc)
@@ -170,39 +156,6 @@ public class PySlice extends PyObject implements Traverseproc {
         return new int[]{result_start, result_stop, result_step, result_slicelength};
     }
 
-
-    /**
-     * Calculate indices for the deprecated __get/set/delslice__ methods.
-     *
-     * @param obj the object being sliced
-     * @param start the slice operation's start
-     * @param stop the slice operation's stop
-     * @return an array with start at index 0 and stop at index 1
-     */
-    public static PyObject[] indices2(PyObject obj, PyObject start, PyObject stop) {
-        PyObject[] indices = new PyObject[2];
-        int istart = (start == null || start == Py.None) ? 0 : calculateSliceIndex(start);
-        int istop = (stop == null || stop == Py.None)
-                ? PySystemState.maxint : calculateSliceIndex(stop);
-        if (istart < 0 || istop < 0) {
-            try {
-                int len = obj.__len__();
-                if (istart < 0) {
-                    istart += len;
-                }
-                if (istop < 0) {
-                    istop += len;
-                }
-            } catch (PyException pye) {
-                if (!pye.match(Py.TypeError)) {
-                    throw pye;
-                }
-            }
-        }
-        indices[0] = Py.newInteger(istart);
-        indices[1] = Py.newInteger(istop);
-        return indices;
-    }
 
     public static int calculateSliceIndex(PyObject v) {
         if (v.isIndex()) {

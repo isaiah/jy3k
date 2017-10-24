@@ -207,7 +207,12 @@ public class PyRange extends PySequence {
 
     @Override
     public PyObject getslice(int start, int stop, int step) {
-        throw Py.TypeError("range index must be integer, not 'slice'");
+        return new PyRange(TYPE, computeItem(start), computeItem(stop), this.step.multiply(BigInteger.valueOf(step)));
+    }
+
+    private BigInteger computeItem(int i) {
+        BigInteger incr = step.multiply(BigInteger.valueOf(i));
+        return incr.add(start);
     }
 
     @Override
