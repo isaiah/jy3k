@@ -971,8 +971,8 @@ public class PyLong extends PyObject {
         return int___int__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.int___round___doc)
-    public final PyObject int___round__(PyObject[] args, String[] kwds) {
+    @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.int___round___doc)
+    public final PyObject int___round__(PyObject ndigits) {
         return this;
     }
 

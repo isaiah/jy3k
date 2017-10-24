@@ -799,16 +799,22 @@ public class PyFloat extends PyObject {
         return new PyFloat(Math.abs(getValue()));
     }
 
-    @ExposedMethod(doc = BuiltinDocs.float___round___doc)
-    final PyObject float___round__(PyObject[] args, String[] kwds) {
-        int ndigits = args.length > 0 ? args[0].asIndex() : 0;
+    @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.float___round___doc)
+    final PyObject float___round__(PyObject ndigitsObj) {
+        int ndigits = 0;
+        if (ndigitsObj == Py.None) {
+            ndigitsObj = null;
+        }
+        if (ndigitsObj != null) {
+            ndigits = ndigitsObj.asIndex();
+        }
         double x = asDouble();
         double r = ExtraMath.round(x, ndigits);
         if (Double.isInfinite(r) && !Double.isInfinite(x)) {
             // Rounding caused magnitude to increase beyond representable range
             throw Py.OverflowError("rounded value too large to represent");
         }
-        if (!Double.isInfinite(r) && args.length > 0)
+        if (!Double.isInfinite(r) && ndigitsObj != null)
             return new PyFloat(r);
         return new PyLong(r);
     }
