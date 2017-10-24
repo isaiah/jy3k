@@ -112,7 +112,7 @@ public class PySRE_Pattern extends PyObject {
             if (!matcher.find(pos)) {
                 break;
             }
-            pos = matcher.end() + 1;
+            pos = matcher.end();
             switch (matcher.groupCount()) {
                 case 0:
                     list.add(wrap(matcher.group(), isByte));
@@ -127,6 +127,11 @@ public class PySRE_Pattern extends PyObject {
                     }
                     list.add(new PyTuple(objs));
             }
+        }
+        if (isByte) {
+            list.add(Py.EmptyByte);
+        } else {
+            list.add(Py.EmptyUnicode);
         }
         return new PyList(list);
     }
