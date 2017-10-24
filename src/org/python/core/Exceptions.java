@@ -692,7 +692,7 @@ public class Exceptions {
     private static void defineSlots(PyObject dict, String... slotNames) {
         PyObject[] slots = new PyObject[slotNames.length];
         for (int i = 0; i < slotNames.length; i++) {
-            slots[i] = Py.newString(slotNames[i]);
+            slots[i] = new PyUnicode(slotNames[i]);
         }
         dict.__setitem__("__slots__", new PyTuple(slots));
     }

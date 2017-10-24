@@ -2005,7 +2005,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     public String encode() {
-        return encode(null, null);
+        return encode("UTF-8", null);
     }
 
     public String encode(String encoding) {

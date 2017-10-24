@@ -1901,16 +1901,16 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     //XXX: consider pulling this out into a generally accessible place
     //     I bet this is duplicated more or less in other places.
     private static String confirmIdentifier(PyObject obj) {
-        String identifier;
+        String identifier = obj.toString();
 //        if (!(obj instanceof PyBytes)) {
 //            throw Py.TypeError(String.format("__slots__ items must be strings, not '%.200s'",
 //                                             obj.getType().fastGetName()));
 //        } else
-        if (obj instanceof PyUnicode) {
-            identifier = ((PyUnicode)obj).encode();
-        } else {
-            identifier = obj.toString();
-        }
+//        if (obj instanceof PyUnicode) {
+//            identifier = ((PyUnicode)obj).encode();
+//        } else {
+//            identifier = obj.toString();
+//        }
 
         String msg = "__slots__ must be identifiers";
         if (identifier.length() == 0
