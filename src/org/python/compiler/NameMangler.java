@@ -31,7 +31,7 @@ public class NameMangler extends Visitor {
             @Override
             public Object visitName(Name node) {
                 String name = node.getInternalId();
-                if (name.startsWith("__") && !name.endsWith("__")) {
+                if (prefix != null && name.startsWith("__") && !name.endsWith("__")) {
                     node.setInternalId(prefix + name);
                 }
                 return node;
@@ -39,7 +39,7 @@ public class NameMangler extends Visitor {
 
             @Override
             public Object visitClassDef(ClassDef node) {
-                return NameMangler.this.visit(node);
+                return NameMangler.this.visitClassDef(node);
             }
 
             @Override

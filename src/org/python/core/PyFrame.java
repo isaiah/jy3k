@@ -303,7 +303,7 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     public void setname(PyObject value, int index) {
         String name = f_code.co_names[index];
-        if (f_locals != f_globals) {
+        if (f_locals != null && f_locals != f_globals) {
             f_locals.__setitem__(name, value);
         } else {
             f_globals.__setitem__(name, value);
