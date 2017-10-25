@@ -35,6 +35,8 @@ public class _io {
         dict.__setitem__("_IOBase", PyIOBase.TYPE);
         dict.__setitem__("_RawIOBase", PyRawIOBase.TYPE);
         dict.__setitem__("FileIO", PyFileIO.TYPE);
+        dict.__setitem__("BytesIO", PyBytesIO.TYPE);
+        dict.__setitem__("IncrementalNewlineDecoder", PyIncrementalNewlineDecoder.TYPE);
 
         // Define UnsupportedOperation exception by constructing the type
 

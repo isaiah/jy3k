@@ -1,0 +1,4 @@
+base_class: PyBytesIO
+want_dict: false
+ctr: PyObject initvalue
+no_toString: true

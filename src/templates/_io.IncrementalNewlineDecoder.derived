@@ -1,0 +1,4 @@
+base_class: PyIncrementalNewlineDecoder
+want_dict: false
+ctr: PyObject decoder, boolean translate, PyObject errors
+no_toString: true

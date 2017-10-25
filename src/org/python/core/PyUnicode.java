@@ -2246,6 +2246,10 @@ public class PyUnicode extends PySequence implements Iterable {
         return result.toString();
     }
 
+    public int readChar(int pos) {
+        return string.codePointAt(pos);
+    }
+
     /**
      * A little helper for converting str.find to str.index that will raise
      * <code>ValueError("substring not found")</code> if the argument is negative, otherwise passes

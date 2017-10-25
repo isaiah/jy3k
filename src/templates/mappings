@@ -154,3 +154,5 @@ op_USub.derived:org.python.antlr.op.USubDerived
 _io._IOBase.derived:org.python.modules._io.PyIOBaseDerived
 _io._RawIOBase.derived:org.python.modules._io.PyRawIOBaseDerived
 _io.FileIO.derived:org.python.modules._io.PyFileIODerived
+_io.BytesIO.derived:org.python.modules._io.PyBytesIODerived
+_io.IncrementalNewlineDecoder.derived:org.python.modules._io.PyIncrementalNewlineDecoderDerived
