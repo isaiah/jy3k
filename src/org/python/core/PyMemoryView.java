@@ -103,6 +103,11 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         return format;
     }
 
+    @ExposedGet
+    public int nbytes() {
+        return backing.getLen();
+    }
+
     @ExposedGet(doc = BuiltinDocs.memoryview_itemsize_doc)
     public int itemsize() {
         checkNotReleased();
@@ -369,42 +374,6 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
     final PyObject memoryview_cast(String format) {
         this.format = format;
         return this;
-    }
-
-    /*
-     * ============================================================================================
-     * Python API comparison operations
-     * ============================================================================================
-     */
-
-    @Override
-    public PyObject __eq__(PyObject other) {
-        return memoryview___eq__(other);
-    }
-
-    @Override
-    public PyObject __ne__(PyObject other) {
-        return memoryview___ne__(other);
-    }
-
-    @Override
-    public PyObject __lt__(PyObject other) {
-        return memoryview___lt__(other);
-    }
-
-    @Override
-    public PyObject __le__(PyObject other) {
-        return memoryview___le__(other);
-    }
-
-    @Override
-    public PyObject __ge__(PyObject other) {
-        return memoryview___ge__(other);
-    }
-
-    @Override
-    public PyObject __gt__(PyObject other) {
-        return memoryview___gt__(other);
     }
 
     /**
