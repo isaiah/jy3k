@@ -723,7 +723,47 @@ public class PyList extends PySequenceList implements List {
         }
     }
 
-    // a bunch of optimized paths for sort to avoid unnecessary work, such as DSU or checking compare functions for null
+    @Override
+    public PyObject do_richCompare(PyObject other, CompareOp op) {
+        if (!(other instanceof PyList)) {
+            return Py.NotImplemented;
+        }
+
+        PyList ol = (PyList) other;
+
+        if (size() != ol.size()) {
+            if (op == CompareOp.EQ) {
+                return Py.False;
+            } else if (op == CompareOp.NE) {
+                return Py.True;
+            }
+        }
+        int i = 0;
+        for (; i < size(); i++) {
+            if (!__getitem__(i).do_richCompareBool(ol.__getitem__(i), op)) {
+                break;
+            }
+        }
+
+        if (i >= size() || i >= ol.size()) {
+            // No more items to compare -- compare sizes
+            int diff = size() - ol.size();
+            // -2 is NotImplemented, reset to -1
+            if (diff < -1) {
+                diff = -1;
+            }
+            return op.bool(diff);
+        }
+
+        if (op == CompareOp.EQ) {
+            return Py.False;
+        }
+        if (op == CompareOp.NE) {
+            return Py.True;
+        }
+
+        return __getitem__(i).richCompare(ol.__getitem__(i), op);
+    }
 
     public void sort() {
         sort(false);
@@ -767,53 +807,6 @@ public class PyList extends PySequenceList implements List {
             return false;
         }
     }
-
-//    public void sort(PyObject compare) {
-//        sort(compare, false);
-//    }
-//
-//    private synchronized void sort(PyObject compare, boolean reverse) {
-//        gListAllocatedStatus = -1;
-//        if (reverse) {
-//            Collections.reverse(list); // maintain stability of sort by reversing first
-//        }
-//        PyObjectComparator c = new PyObjectComparator(this, compare);
-//        Collections.sort(list, c);
-//        if (reverse) {
-//            Collections.reverse(list);
-//        }
-//        gListAllocatedStatus = list.size();
-//    }
-
-//    private static class PyObjectComparator implements Comparator<PyObject> {
-//
-//        private final PyList list;
-//        private final PyObject cmp;
-//
-//        PyObjectComparator(PyList list, PyObject cmp) {
-//            this.list = list;
-//            this.cmp = cmp;
-//        }
-//
-//        public int compare(PyObject o1, PyObject o2) {
-//            int result = cmp.__call__(o1, o2).asInt();
-//            if (this.list.gListAllocatedStatus >= 0) {
-//                throw Py.ValueError("list modified during sort");
-//            }
-//            return result;
-//        }
-//
-//        public boolean equals(Object o) {
-//            if (o == this) {
-//                return true;
-//            }
-//
-//            if (o instanceof PyObjectComparator) {
-//                return cmp.equals(((PyObjectComparator) o).cmp);
-//            }
-//            return false;
-//        }
-//    }
 
     private static class KV {
 
