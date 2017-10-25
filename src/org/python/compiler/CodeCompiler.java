@@ -2139,7 +2139,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      */
     private void nameop(String name, expr_contextType ctx) {
         Map<String, Integer> dict = u.names;
-        String mangled = mangle(u._private, name);
+        String mangled = name; // mangle(u._private, name);
         Op op = Op.EMPTY;
         OpType optype = OpType.OP_NAME;
         Symtable.Flag scope = u.ste.getScope(mangled);

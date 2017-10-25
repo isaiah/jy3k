@@ -17,7 +17,13 @@ import org.python.antlr.base.stmt;
 public class NameMangler extends Visitor {
     @Override
     public Object visitClassDef(ClassDef classDef) {
-        String prefix = "_" + classDef.getInternalName();
+        String clsName = classDef.getInternalName();
+        String prefix;
+        if (clsName.startsWith("_")) {
+            prefix = clsName;
+        } else {
+            prefix ="_" + clsName;
+        }
         Visitor visitor = new Visitor() {
             @Override
             public Object visitAttribute(Attribute node) {
