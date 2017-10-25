@@ -60,7 +60,7 @@ public class PyDictProxy extends PyObject implements Traverseproc {
         return dict.__contains__(key);
     }
 
-    @ExposedMethod(defaults = "Py.None")
+    @ExposedMethod(defaults = "null")
     public PyObject mappingproxy_get(PyObject key, PyObject default_object) {
         return dict.invoke("get", key, default_object);
     }
