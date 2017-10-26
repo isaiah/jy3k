@@ -15,6 +15,7 @@ import org.python.core.PyFileWriter;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
+import org.python.core.PyUnicode;
 import org.python.modules.sys.SysModule;
 
 import java.io.Closeable;
@@ -280,10 +281,18 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         Py.flushLine();
     }
 
-    public void execfile(java.io.InputStream s, String name) {
+    public void execfile(java.io.InputStream s, String filename) {
         setSystemState();
-        Py.runCode(Py.compile_flags(s, name, CompileMode.exec, cflags), getLocals(), null);
+        setMainLoader(filename, "SourceFileLoader");
+        Py.runCode(Py.compile_flags(s, filename, CompileMode.exec, cflags), getLocals(), null);
         Py.flushLine();
+    }
+
+    private void setMainLoader(String filename, String loaderName) {
+        PyObject bootstrap = interp.importlib.__getattr__("_bootstrap_external");
+        PyObject loaderType = bootstrap.__getattr__(loaderName);
+        PyObject loader = loaderType.__call__(new PyUnicode("__main__"), new PyUnicode(filename));
+        globals.__setitem__("__loader__", loader);
     }
 
     /**
