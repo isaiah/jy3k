@@ -529,7 +529,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
                 return Py.False;
             }
             for (PyObject key: otherDict.keys_as_list().asIterable()) {
-                if (!get(key).equals(otherDict.get(key))) {
+                if (!get(key).do_richCompareBool(otherDict.get(key), op)) {
                     return Py.False;
                 }
             }
@@ -537,7 +537,13 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         }
         if (op == CompareOp.EQ && other instanceof PyStringMap) {
             PyStringMap otherDict = (PyStringMap) other;
-            return otherDict.table.equals(table) ? Py.True : Py.False;
+            Map<Object, PyObject> otherMap = otherDict.table;
+            for (Entry<Object, PyObject> entry : table.entrySet()) {
+                if (!entry.getValue().do_richCompareBool(otherMap.get(entry.getKey()), op)) {
+                    return Py.False;
+                }
+            }
+            return Py.True;
         }
         return super.richCompare(other, op);
     }
