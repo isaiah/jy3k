@@ -63,12 +63,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
         if (args.length == 1) {
             message = args[0];
         }
-        PyException pye = Py.getThreadState().peekexc();
-        if (pye != null) {
-            __context__ = pye.value;
-        } else {
-            __context__ = Py.None;
-        }
+        __context__ = Py.None;
         __suppress_context__ = Py.False;
     }
 

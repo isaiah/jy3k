@@ -72,12 +72,6 @@ public class PyException extends RuntimeException implements Traverseproc
             this.cause = cause;
             isReRaise = true;
         }
-        if (value != null && !isExceptionInstance(value)) {
-            PyException pye = Py.getThreadState().peekexc();
-            if (pye != null && pye.value instanceof PyBaseException) {
-                context = (PyBaseException) pye.value;
-            }
-        }
 
         if (value == null) {
             this.value = Py.None;
@@ -223,25 +217,24 @@ public class PyException extends RuntimeException implements Traverseproc
             type = value;
             // null flags context has been take care of
             pye = new PyException(type, null, cause);
-            // FIXME is peek or pop here?
-            PyException context = state.peekexc();
-            if (context != null && context.value instanceof PyBaseException) {
-                pye.context = (PyBaseException) context.value;
-            }
             pye.normalize();
             if (!isExceptionInstance(pye.value)) {
                 throw Py.TypeError(String.format(
                     "calling %s() should have returned an instance of BaseException, not '%s'",
                     pye.type, pye.value));
             }
-            return pye;
         } else if (isExceptionInstance(value)) {
             // ignore the context for now
             type = value.getType();
-            return new PyException(type, value, cause);
+            pye = new PyException(type, value, cause);
         } else {
             throw Py.TypeError("exceptions must derive from BaseException");
         }
+        PyException context = state.peekexc();
+        if (context != null && context.value instanceof PyBaseException) {
+            pye.context = (PyBaseException) context.value;
+        }
+        return pye;
     }
 
     /**
