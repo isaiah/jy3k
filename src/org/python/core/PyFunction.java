@@ -641,7 +641,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
 //            } else {
                 guard = Guards.getIdentityGuard(this);
 //            }
-            return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
+            return new GuardedInvocation(mh, guard);
         }
 
         mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
@@ -721,7 +721,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         } else {
             guard = Guards.getIdentityGuard(this);
         }
-        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
+        return new GuardedInvocation(mh, guard);
     }
 
     private static boolean isSameReceiver(PyObject boundMethod, PyObject self) {
@@ -753,6 +753,9 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
     }
 
     public static PyObject restoreFrame(Throwable t, PyObject v, PyObject arg, ThreadState ts) {
+        if (t != null && t instanceof PyException) {
+            ((PyException) t).tracebackHere(ts.frame);
+        }
         ts.frame = ts.frame.f_back;
         return v;
     }

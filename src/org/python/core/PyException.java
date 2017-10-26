@@ -138,17 +138,11 @@ public class PyException extends RuntimeException implements Traverseproc
      *
      */
     public PyException normalize() {
-//        if (normalized) {
-//            return this;
-//        }
         PyObject inClass = null;
         if (isExceptionInstance(value)) {
             inClass = value.fastGetClass();
         }
 
-//        if (type instanceof PyJavaType) {
-//            type = Py.JavaException;
-//        }
         if (inClass == null || !Py.isSubClass(inClass, type)) {
             PyObject[] args;
 
@@ -167,25 +161,14 @@ public class PyException extends RuntimeException implements Traverseproc
             type = inClass;
         }
         // FIXME: all exceptions thrown into Python should compliant to PEP-3134
-//        if (value instanceof PyBaseException) {
-            if (cause != null) {
-                ((PyBaseException) value).setCause(cause);
-            }
-            if (context != null) {
-                ((PyBaseException) value).setContext(context);
-            }
-            normalized = true;
-//        }
+        if (cause != null) {
+            ((PyBaseException) value).setCause(cause);
+        }
+        if (context != null) {
+            ((PyBaseException) value).setContext(context);
+        }
+        normalized = true;
         return this;
-    }
-
-    /**
-     * Register frame as having been visited in the traceback.
-     *
-     * @param here the current PyFrame
-     */
-    public void tracebackHere(PyFrame here) {
-        tracebackHere(here, false);
     }
 
     /**
@@ -194,20 +177,17 @@ public class PyException extends RuntimeException implements Traverseproc
      * @param here the current PyFrame
      * @param isFinally whether caller is a Python finally block
      */
-    public void tracebackHere(PyFrame here, boolean isFinally) {
+    public void tracebackHere(PyFrame here) {
         if (!isReRaise && here != null) {
             // the frame is either inapplicable or already registered (from a finally)
             // during a re-raise
             traceback = new PyTraceback(traceback, here);
             // since this is called after normalize, we can only amend it
             if (value instanceof PyBaseException) {
-                traceback.tb_next = ((PyBaseException) value).__traceback__;
                 ((PyBaseException) value).__traceback__ = traceback;
             }
         }
-        // finally blocks immediately tracebackHere: so they toggle isReRaise to skip the
-        // next tracebackHere hook
-        isReRaise = isFinally;
+        isReRaise = false;
     }
 
     public static PyException doRaise(PyObject value) {

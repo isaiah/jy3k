@@ -26,7 +26,7 @@ public class PyTraceback extends PyObject implements Traverseproc {
         super(TYPE);
         tb_next = next;
         tb_frame = frame;
-        tb_lineno = frame.f_code.getline(frame);
+        tb_lineno = frame.f_lineno;
     }
 
     private String tracebackInfo() {
