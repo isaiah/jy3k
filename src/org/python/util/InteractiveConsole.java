@@ -82,15 +82,15 @@ public class InteractiveConsole extends InteractiveInterpreter {
      * @param file from which to read commands, or if <code>null</code>, read the console.
      */
     public void interact(String banner, PyObject file) {
-        PyObject old_ps1 = systemState.ps1;
-        PyObject old_ps2 = systemState.ps2;
-        systemState.ps1 = new PyUnicode(">>> ");
-        systemState.ps2 = new PyUnicode("... ");
+        PyObject old_ps1 = interp.ps1;
+        PyObject old_ps2 = interp.ps2;
+        interp.ps1 = new PyUnicode(">>> ");
+        interp.ps2 = new PyUnicode("... ");
         try {
             _interact(banner, file);
         } finally {
-            systemState.ps1 = old_ps1;
-            systemState.ps2 = old_ps2;
+            interp.ps1 = old_ps1;
+            interp.ps2 = old_ps2;
         }
     }
 
@@ -104,7 +104,7 @@ public class InteractiveConsole extends InteractiveInterpreter {
         // System.err.println("interp2");
         boolean more = false;
         while (true) {
-            PyObject prompt = more ? systemState.ps2 : systemState.ps1;
+            PyObject prompt = more ? interp.ps2 : interp.ps1;
             String line;
             try {
                 if (file == null) {

@@ -1,7 +1,7 @@
 package org.python.util;
 
 import org.python.antlr.base.mod;
-import org.python.core.BuiltinModule;
+import org.python.bootstrap.Import;
 import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
@@ -29,10 +29,10 @@ import java.util.Properties;
 public class PythonInterpreter implements AutoCloseable, Closeable {
 
     // Defaults if the interpreter uses thread-local state
-    protected PySystemState systemState;
+    protected PySystemState interp;
     PyObject globals;
 
-    protected final boolean useThreadLocalState;
+    protected boolean useThreadLocalState;
 
     protected static ThreadLocal<Object[]> threadLocals = new ThreadLocal<Object[]>() {
 
@@ -92,34 +92,46 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         this(dict, systemState, false);
     }
 
-    protected PythonInterpreter(PyObject dict, PySystemState systemState,
-            boolean useThreadLocalState) {
-        if (dict == null) {
-            dict = Py.newStringMap();
-        }
-        globals = dict;
-
+    protected PythonInterpreter(PyObject dict, PySystemState systemState, boolean useThreadLocalState) {
         if (systemState == null) {
             systemState = Py.getSystemState();
         }
-        this.systemState = systemState;
+        this.interp = systemState;
         setSystemState();
 
         this.useThreadLocalState = useThreadLocalState;
         if (!useThreadLocalState) {
-            PyModule module = new PyModule("__main__", dict);
+            PyModule module = Import.addModule("__main__");
+            dict = module.__dict__;
+            dict.__setitem__("__annotations__", Py.newStringMap());
             systemState.modules.__setitem__("__main__", module);
         }
 
+        if (dict == null) {
+            dict = Py.newStringMap();
+        }
+
+        PyObject loader = dict.__getitem__("__loader__");
+
+        if (loader == null || loader == Py.None) {
+            loader = interp.importlib.__getattr__("BuiltinImporter");
+            if (loader == null) {
+                // FIXME throw Py.FatalError
+                throw new RuntimeException("Failed to retrieve BuiltinImporter");
+            }
+            dict.__setitem__("__loader__", loader);
+        }
+
+        globals = dict;
         Py.importSiteIfSelected();
     }
 
-    public PySystemState getSystemState() {
-        return systemState;
+    public PySystemState getInterp() {
+        return interp;
     }
 
     protected void setSystemState() {
-        Py.setSystemState(getSystemState());
+        Py.setSystemState(getInterp());
     }
 
     /**
