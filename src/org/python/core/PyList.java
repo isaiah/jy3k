@@ -740,7 +740,7 @@ public class PyList extends PySequenceList implements List {
         }
         int i = 0;
         for (; i < size(); i++) {
-            if (!__getitem__(i).do_richCompareBool(ol.__getitem__(i), op)) {
+            if (!__getitem__(i).do_richCompareBool(ol.__getitem__(i), CompareOp.EQ)) {
                 break;
             }
         }
