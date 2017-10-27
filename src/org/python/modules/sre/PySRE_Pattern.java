@@ -108,8 +108,18 @@ public class PySRE_Pattern extends PyObject {
         boolean isByte = args[0] instanceof PyBytes;
         List<PyObject> list = new ArrayList<>();
         Matcher matcher = reg.matcher(s);
-        for (int pos = 0; pos < s.length(); ) {
+        int pos = 0;
+        for (;;) {
             if (!matcher.find(pos)) {
+                break;
+            }
+            // if the pattern match the empty string, then append a empty string to the collection
+            if (pos == matcher.end()) {
+                if (isByte) {
+                    list.add(Py.EmptyByte);
+                } else {
+                    list.add(Py.EmptyUnicode);
+                }
                 break;
             }
             pos = matcher.end();
@@ -127,11 +137,9 @@ public class PySRE_Pattern extends PyObject {
                     }
                     list.add(new PyTuple(objs));
             }
-        }
-        if (isByte) {
-            list.add(Py.EmptyByte);
-        } else {
-            list.add(Py.EmptyUnicode);
+            if (pos > s.length()) {
+                break;
+            }
         }
         return new PyList(list);
     }
