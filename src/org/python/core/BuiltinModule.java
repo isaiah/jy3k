@@ -963,8 +963,8 @@ public class BuiltinModule {
             }
             newArgs = new PyObject[keywords.length + 2];
             if (keywords.length > 0) {
-                System.arraycopy(args, bases.length, newArgs, 2, index + 1);
-                System.arraycopy(args, bases.length + index + 1, newArgs, index + 3, keywords.length - index - 1);
+                System.arraycopy(args, bases.length + 3, newArgs, 2, index);
+                System.arraycopy(args, bases.length + index + 3, newArgs, index + 2, keywords.length - index);
             }
         } else {
             metaclass = Py.findMetaclass(bases);
@@ -979,12 +979,12 @@ public class BuiltinModule {
         ThreadState state = Py.getThreadState();
         PyObject cell = Py.runCode(state, func.__code__, func.__globals__, ns, (PyTuple) func.__closure__);
         PyObject cls;
-        boolean isWide = false;
+        boolean isWide = keywords.length > 0;
         try {
             if (isWide) {
-                PyObject[] newArgs2 = new PyObject[args.length + 1];
+                PyObject[] newArgs2 = new PyObject[newArgs.length + 1];
                 System.arraycopy(newArgs, 0, newArgs2, 0, 2);
-                newArgs[2] = ns;
+                newArgs2[2] = ns;
                 System.arraycopy(newArgs, 2, newArgs2, 3, newArgs.length - 2);
                 cls = metaclass.__call__(newArgs2, keywords);
             } else {
