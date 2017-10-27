@@ -576,6 +576,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             node.getInternalTarget().enter(this);
             visit(node.getInternalValue());
             node.getInternalTarget().leave(this);
+            code.pop();
         }
         return null;
     }
@@ -1988,6 +1989,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
 
     public Object seqSet(java.util.List<expr> nodes, int count, int countAfter, boolean nested) {
+        code.dup();
         code.iconst(count);
         code.iconst(countAfter);
         code.invokestatic(p(Py.class), "unpackIterator",
@@ -2084,6 +2086,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         if (nested) {
             code.pop();
         }
+        code.pop();
         return null;
     }
 
