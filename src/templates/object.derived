@@ -303,8 +303,16 @@ rest:
 
   public PyObject richCompare(PyObject other,CompareOp op) {
       PyType type=getType();
-      PyObject meth=type.lookup(op.meth());
-      return meth.__get__(this,type).__call__(other);
+      PyObject meth;
+      try {
+          meth = type.lookup(op.meth()).__get__(this, type);
+      } catch (PyException e) {
+          if (e.match(Py.AttributeError)) {
+              return super.richCompare(other, op);
+          }
+          throw e;
+      }
+      return meth.__call__(other);
   }
 
   public PyObject __index__() {
