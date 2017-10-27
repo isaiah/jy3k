@@ -466,6 +466,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitClassDef(ClassDef node) {
         loadFrame(); // pair with nameop
+        java.util.List<expr> decos = node.getInternalDecorator_list();
+        decos.stream().forEach(deco -> {
+            visit(deco);
+            loadThreadState();
+        });
         loadBuildClass();
         code.new_(p(PyFunction.class));
         code.dup();
@@ -503,6 +508,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         callHelper(2, node.getInternalBases(), node.getInternalKeywords());
         code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class,
                 PyObject[].class, String[].class), LINKERBOOTSTRAP, Bootstrap.CALL);
+        for (int i = 0; i < decos.size(); i++) {
+            code.visitInvokeDynamicInsn(EMPTY_NAME, sig(PyObject.class, PyObject.class, ThreadState.class, PyObject.class),
+                    LINKERBOOTSTRAP, Bootstrap.CALL);
+        }
+
         nameop(node.getInternalName(), expr_contextType.Store);
         return null;
     }
