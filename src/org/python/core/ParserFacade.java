@@ -54,16 +54,23 @@ public class ParserFacade {
                 int tokType = tok.getType();
                 indentationError = tokType == PythonParser.INDENT || tokType == PythonParser.DEDENT;
                 text = tok.getText();
-                if (tokType == PythonParser.EOF) {
-                    msg = "unexpected EOF while parsing";
-                } else if (indentationError) {
-                    msg = "unexpected indent";
-                } else {
-                    IntervalSet toks = ((InputMismatchException) cause).getExpectedTokens();
-                    indentationError = toks.contains(PythonParser.INDENT);
-                    if (indentationError) {
-                        msg = "expected an indented block";
-                    }
+                switch(tokType) {
+                    case PythonParser.EOF:
+                        msg = "unexpected EOF while parsing";
+                        break;
+                    case PythonParser.INDENT:
+                        msg = "unexpected indent";
+                        break;
+                    case PythonParser.DEDENT:
+                        msg = "unindent does not match any outer indentation level";
+                        break;
+                    default:
+                        IntervalSet toks = ((InputMismatchException) cause).getExpectedTokens();
+                        indentationError = toks.contains(PythonParser.INDENT);
+                        if (indentationError) {
+                            msg = "expected an indented block";
+                        }
+                        break;
                 }
             } else if (cause instanceof NoViableAltException) {
                 String cmd = ((NoViableAltException) cause).getCtx().getText();

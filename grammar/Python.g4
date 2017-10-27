@@ -904,8 +904,12 @@ NEWLINE
          } else {
           // Possibly emit more than 1 DEDENT token.
            while(!indents.isEmpty() && indents.peek() > indent) {
-             this.emit(createDedent());
              indents.pop();
+             this.emit(createDedent());
+           }
+           if (indents.isEmpty() && indent > 0) {
+             // trigger SyntaxError
+             this.emit(createDedent());
            }
          }
          if (indents.isEmpty() && this.single && newlines >= 1) {
