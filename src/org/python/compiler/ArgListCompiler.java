@@ -106,18 +106,7 @@ public class ArgListCompiler extends Visitor
             }
         }
 
-        List<expr> internalDefaults = args.getInternalDefaults();
-        for (int i = 0; i < internalDefaults.size(); i++) {
-            expr val = internalDefaults.get(i);
-            if (val == null && ! defaults.isEmpty()) {
-                 throw new ParseException(
-                    "non-default argument follows default argument",
-                    args.getInternalArgs().get(args.getInternalArgs().size() - defaults.size() + i));
-            }
-            if (val != null) {
-                defaults.add(val);
-            }
-        }
+        defaults.addAll(args.getInternalDefaults());
         if (names.size() > 255) {
             throw Py.SyntaxError("more than 255 arguments");
         }

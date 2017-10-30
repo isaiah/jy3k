@@ -200,12 +200,17 @@ parameters
 ///   | '*' [tfpdef] (',' tfpdef ['=' test])* [',' ['**' tfpdef [',']]]
 ///   | '**' tfpdef [','])
 typedargslist
- : args+=tfpdef ( ASSIGN defaults+=test )? ( COMMA args+=tfpdef ( ASSIGN defaults+=test )? )*
+ : args+=tdefparameter ( COMMA args+=tdefparameter )*
                   ( COMMA ( STAR vararg=tfpdef? ( COMMA tfpdkv )* ( COMMA (POWER kwarg=tfpdef COMMA? )? )?
                           | POWER kwarg=tfpdef COMMA? )?
                   )?
  | STAR vararg=tfpdef? ( COMMA tfpdkv )* ( COMMA ( POWER kwarg=tfpdef COMMA? )? )?
  | POWER kwarg=tfpdef COMMA?
+ ;
+
+// not in CPython's Grammar
+tdefparameter
+ : tfpdef (ASSIGN test)?
  ;
 
 /// tfpdef: NAME [':' test]

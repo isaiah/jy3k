@@ -824,11 +824,17 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.vararg != null) {
             vararg = (arg) visit(ctx.vararg);
         }
-        for (PythonParser.TestContext testContext : ctx.defaults) {
-            defaults.add((expr) visit(testContext));
-        }
-        for (PythonParser.TfpdefContext tfpdefContext : ctx.args) {
-            args.add((arg) visit(tfpdefContext));
+        for (PythonParser.TdefparameterContext tdefparameterContext : ctx.args) {
+            arg param = (arg) visit(tdefparameterContext.tfpdef());
+            args.add(param);
+            PythonParser.TestContext testContext = tdefparameterContext.test();
+            if (testContext != null) {
+                defaults.add((expr) visit(testContext));
+            } else {
+                if (!defaults.isEmpty()) {
+                    throw Py.SyntaxError(tdefparameterContext, "non-default argument follows default argument", filename);
+                }
+            }
         }
         return new arguments(ctx.getStart(), args, vararg, kwonlyargs, kwdefaults, kwarg, defaults);
     }
