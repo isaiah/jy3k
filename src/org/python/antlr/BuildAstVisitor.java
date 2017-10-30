@@ -301,6 +301,12 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             if (key instanceof Name) {
                 return new keyword(ctx.getStart(), ((Name) key).getInternalId(), (expr) visit(ctx.val));
             }
+            if (key instanceof Lambda) {
+                // This is a special case: f(lambda x: x=1) is parsed as:
+                // f(key=value) where (key=lambda, value=1)
+                // But we want the error message to be consistent with lambda definition
+                throw Py.SyntaxError(ctx, "lambda cannot contain assignment", filename);
+            }
             throw Py.SyntaxError("keyword can't be an expression");
         } else if (ctx.POWER() != null) {
             return new keyword(ctx.getStart(), null, (expr) visit(ctx.test(0)));
@@ -1279,7 +1285,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         PythonTree ast = v.visit(ctx);
         new NameMangler().visit(ast);
         new ClassClosureGenerator().visit(ast);
-        new Lower().visit(ast);
+        new Lower("/tmp/foo.py").visit(ast);
         new AnnotationsCreator().visit(ast);
 //        System.out.println(ast.toStringTree());
         FileOutputStream out = new FileOutputStream("/tmp/foo.class");
