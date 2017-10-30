@@ -114,6 +114,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
      */
     private static final String EMPTY_NAME = String.valueOf(new char[]{ESCAPE_C, NULL_ESCAPE_C});
 
+    public static final int CO_MAXBLOCKS = 20; // Max static block nesting within a function
+
     private static final Object Exit = Integer.valueOf(1);
     private static final Object NoExit = null;
     private Module module;
@@ -1903,6 +1905,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public int beginLoop() {
+        if (continueLabels.size() >= CO_MAXBLOCKS) {
+            throw Py.SyntaxError("too many statically nested blocks");
+        }
         continueLabels.push(new Label());
         breakLabels.push(new Label());
         exitLabels.push(new Label());

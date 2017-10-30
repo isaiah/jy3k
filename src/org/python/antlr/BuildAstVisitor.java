@@ -1161,7 +1161,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
         }
         if (ngens > 1 || (ngens > 0 && (nkeywords > 0 || nargs > ngens))) {
-            throw Py.SyntaxError(ctx,"Generator expression must be parenthesized if not solo argument", filename);
+            throw Py.SyntaxError(ctx,"Generator expression must be parenthesized if not sole argument", filename);
         }
         return ret;
     }
