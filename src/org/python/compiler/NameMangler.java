@@ -2,13 +2,16 @@ package org.python.compiler;
 
 import org.python.antlr.Visitor;
 import org.python.antlr.ast.Attribute;
-import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
+import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Name;
+import org.python.antlr.ast.Nonlocal;
 import org.python.antlr.ast.arg;
 import org.python.antlr.ast.arguments;
-import org.python.antlr.base.stmt;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mangle identifiers prefixed with leading underscores
@@ -28,18 +31,21 @@ public class NameMangler extends Visitor {
             @Override
             public Object visitAttribute(Attribute node) {
                 String name = node.getInternalAttr();
-                if (name.startsWith("__") && !name.endsWith("__")) {
-                    node.setInternalAttr(prefix + name);
-                }
+                node.setInternalAttr(mangle(name));
                 return super.visitAttribute(node);
             }
 
             @Override
             public Object visitName(Name node) {
                 String name = node.getInternalId();
-                if (prefix != null && name.startsWith("__") && !name.endsWith("__")) {
-                    node.setInternalId(prefix + name);
-                }
+                node.setInternalId(mangle(name));
+                return node;
+            }
+
+            @Override
+            public Object visitNonlocal(Nonlocal node) {
+                List<String> names = node.getInternalNames().stream().map(this::mangle).collect(Collectors.toList());
+                node.setInternalNames(names);
                 return node;
             }
 
@@ -51,30 +57,33 @@ public class NameMangler extends Visitor {
             @Override
             public Object visitFunctionDef(FunctionDef node) {
                 String name = node.getInternalName();
-                if (name.startsWith("__") && !name.endsWith("__")) {
-                    node.setInternalName(prefix + name);
-                }
+                node.setInternalName(mangle(name));
                 arguments args = node.getInternalArgs();
                 if (args != null) {
-                    mangling(args.getInternalVararg());
-                    mangling(args.getInternalKwarg());
+                    manglingArg(args.getInternalVararg());
+                    manglingArg(args.getInternalKwarg());
                     for (arg argument: args.getInternalArgs()) {
-                        mangling(argument);
+                        manglingArg(argument);
                     }
                     for (arg argument: args.getInternalKwonlyargs()) {
-                        mangling(argument);
+                        manglingArg(argument);
                     }
                 }
 
                 return super.visitFunctionDef(node);
             }
 
-            private void mangling(arg argument) {
+            private void manglingArg(arg argument) {
                 if (argument == null) return;
                 String name = argument.getInternalArg();
-                if (name.startsWith("__") && !name.endsWith("__")) {
-                    argument.setInternalArg(prefix + name);
+                argument.setInternalArg(mangle(name));
+            }
+
+            private String mangle(String name) {
+                 if (prefix != null && name.startsWith("__") && !name.endsWith("__")) {
+                    return prefix + name;
                 }
+                return name;
             }
         };
         visitor.traverse(classDef);

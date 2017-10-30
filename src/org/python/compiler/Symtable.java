@@ -72,10 +72,10 @@ public class Symtable extends Visitor {
 
     private static final String GLOBAL_ANNO = "annotated name %s cannot be global";
     private static final String NONLOCAL_ANNO = "annotated name %s cannot be nonlocal";
-    private static final String GLOBAL_AFTER_ASSIGN = "name %s is assigned to before global declaration";
-    private static final String NONLOCAL_AFTER_ASSIGN = "name %s is assigned to before nonlocal declaration";
-    private static final String GLOBAL_AFTER_USE = "name %s is used prior to global declaration";
-    private static final String NONLOCAL_AFTER_USE = "name %s is used prior to nonlocal declaration";
+    private static final String GLOBAL_AFTER_ASSIGN = "name '%s' is assigned to before global declaration";
+    private static final String NONLOCAL_AFTER_ASSIGN = "name '%s' is assigned to before nonlocal declaration";
+    private static final String GLOBAL_AFTER_USE = "name '%s' is used prior to global declaration";
+    private static final String NONLOCAL_AFTER_USE = "name '%s' is used prior to nonlocal declaration";
     private static PyObject _top = null;
     //    PyObject *st_filename;          /* name of file being compiled,
 //                                       decoded from the filesystem encoding */
@@ -132,7 +132,8 @@ public class Symtable extends Visitor {
     }
 
     private void analyze() {
-        top.analyzeBlock(new HashSet<>(), new HashSet<>(), new HashSet<>());
+        // null means this is a top block
+        top.analyzeBlock(null, new HashSet<>(), new HashSet<>());
     }
 
     public PySTEntryObject getTop() {

@@ -209,7 +209,7 @@ public class PySTEntryObject extends PyObject {
             if (type == BlockType.FunctionBlock) {
                 newBound.addAll(local);
             }
-            if (!bound.isEmpty()) {
+            if (bound != null) {
                 newBound.addAll(bound);
             }
             newGlobal.addAll(global);
@@ -272,7 +272,7 @@ public class PySTEntryObject extends PyObject {
             }
             scopes.put(name, GLOBAL_EXPLICIT);
             global.add(name);
-            if (!bound.isEmpty()) {
+            if (bound != null) {
                 bound.remove(name);
             }
             return;
@@ -282,12 +282,14 @@ public class PySTEntryObject extends PyObject {
             if (flags.contains(Flag.DEF_PARAM)) {
                 throw errorAtDirective(name, "name '%s' is parameter and nonlocal");
             }
-            if (bound.isEmpty()) {
+            // bound is null means it's a top scope, don't pass an empty set
+            if (bound == null) {
                 String template = "nonlocal declaration not allowed at module level";
                 throw new PySyntaxError(template, lineno, colOffset, "", table.getFilename());
-            }
-            if (!bound.contains(name)) {
-                throw errorAtDirective(name, "no binding for nonlocal '%s' found");
+            } else {
+                if (!bound.contains(name)) {
+                    throw errorAtDirective(name, "no binding for nonlocal '%s' found");
+                }
             }
             scopes.put(name, FREE);
             this.free = true;
@@ -307,7 +309,7 @@ public class PySTEntryObject extends PyObject {
            Note that having a non-NULL bound implies that the block
            is nested.
         */
-        if (bound.contains(name)) {
+        if (bound != null && bound.contains(name)) {
             scopes.put(name, FREE);
             this.free = true;
             free.add(name);
