@@ -98,6 +98,9 @@ class CompileUnit {
         Map<String, Integer> dict = new HashMap<>(varnames.size());
         int i = 0;
         for (String name : varnames) {
+            if (name.equals("__debug__")) {
+                throw Py.SyntaxError("assignment to keyword");
+            }
             dict.put(name, i++);
         }
         return dict;
