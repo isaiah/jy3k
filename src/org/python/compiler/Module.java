@@ -497,7 +497,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         /** create class closure if necessary */
         ClassClosureGenerator classClosure = new ClassClosureGenerator();
         classClosure.visit(node);
-        new Lower().visit(node);
+        new Lower(filename).visit(node);
         new AnnotationsCreator().visit(node);
         /** split long functions into small SplitNode fragments */
 //        new Splitter().visit(node);

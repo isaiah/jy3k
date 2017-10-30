@@ -4,7 +4,6 @@ import org.python.antlr.Visitor;
 import org.python.antlr.ast.AnonymousFunction;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.AsyncFor;
-import org.python.antlr.ast.AsyncFunctionDef;
 import org.python.antlr.ast.AsyncWith;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
@@ -46,6 +45,7 @@ import org.python.antlr.ast.withitem;
 import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
+import org.python.core.Py;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +64,12 @@ import static org.python.compiler.CompilerConstants.RETURN;
  * lower comprehensions: convert to anonymous function call
  */
 public class Lower extends Visitor {
+    private String filename;
     private int counter;
+
+    public Lower(String filename) {
+        this.filename = filename;
+    }
 
     /**
      * Desugar async for, see PEP-492
@@ -496,7 +501,26 @@ public class Lower extends Visitor {
                 return node;
             }
         };
+        Visitor finalVisitor = new Visitor() {
+            @Override
+            public Object visitTry(Try node) {
+                traverse(node);
+                return node;
+            }
+
+            @Override
+            public Object visitWhile(While node) {
+                // ignore loops
+                return node;
+            }
+
+            @Override
+            public Object visitContinue(Continue node) {
+                throw Py.SyntaxError(node.getToken(), "'continue' not supported inside 'finally' clause", filename);
+            }
+        };
         traverse(finalBlock);
+        finalVisitor.traverse(finalBlock);
         tryVisitor.traverse(node);
 
         excepthandler catchAll = catchAllBlock(node, finalBlock);
