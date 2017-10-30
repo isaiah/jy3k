@@ -1217,9 +1217,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         java.util.List<expr> kwargs = new ArrayList<>();
         java.util.List<String> keys = new ArrayList<>();
         java.util.List<expr> values = node.getInternalArgs();
+        java.util.List<keyword> keywords = node.getInternalKeywords();
+        if (values.size() + keywords.size() > 255) {
+            throw Py.SyntaxError("more than 255 arguments");
+        }
         boolean stararg = values.stream().anyMatch(a -> a instanceof Starred);
 
-        java.util.List<keyword> keywords = node.getInternalKeywords();
         for (int i = 0; i < keywords.size(); i++) {
             String key = keywords.get(i).getInternalArg();
             expr value = keywords.get(i).getInternalValue();
