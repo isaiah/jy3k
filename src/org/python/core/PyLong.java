@@ -183,20 +183,51 @@ public class PyLong extends PyObject {
         boolean signed = ap.getBoolean(2, false);
         ByteOrder order = getByteOrder(byteorder);
 
-        try (PyBuffer view = ((BufferProtocol) bytes).getBuffer(PyBUF.FULL_RO)) {
-            int length = view.getLen();
-            byte[] buf = new byte[length];
-            view.copyTo(buf, 0);
-            if (order == ByteOrder.LITTLE_ENDIAN) {
-                byte b;
-                for (int i = 0, j = length - 1; i < j; i++, j--) {
-                    b = buf[i];
-                    buf[i] = buf[j];
-                    buf[j] = b;
+        if (bytes instanceof BufferProtocol) {
+            try (PyBuffer view = ((BufferProtocol) bytes).getBuffer(PyBUF.FULL_RO)) {
+                int length = view.getLen();
+                byte[] buf = new byte[length];
+                view.copyTo(buf, 0);
+                if (order == ByteOrder.LITTLE_ENDIAN) {
+                    byte b;
+                    for (int i = 0, j = length - 1; i < j; i++, j--) {
+                        b = buf[i];
+                        buf[i] = buf[j];
+                        buf[j] = b;
+                    }
                 }
+                return new PyLong(new BigInteger(buf));
             }
-            return new PyLong(new BigInteger(buf));
         }
+        PyObject iter;
+        try {
+            iter = bytes.__iter__();
+        } catch(PyException e) {
+            throw Py.TypeError(String.format("cannot convert '%s' object to bytes", bytes.getType().fastGetName()));
+        }
+        int i = 0;
+        PyObject next;
+        byte[] b = new byte[10];
+        try {
+            while ((next = iter.__next__()) != null) {
+                if (i > b.length) {
+                    byte[] tmp = b;
+                    b = new byte[b.length + 10];
+                    System.arraycopy(tmp, 0, b, 0, tmp.length);
+                }
+                b[i++] = (byte) (next.asIndex() & 0xFF);
+            }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
+            }
+        }
+        if (b.length >= i) {
+            byte[] tmp = b;
+            b = new byte[i - 1];
+            System.arraycopy(tmp, 0, b, 0, b.length);
+        }
+        return new PyLong(new BigInteger(b));
     }
 
     private static ByteOrder getByteOrder(String byteorder) {

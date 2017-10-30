@@ -104,6 +104,7 @@ imghdr.py
 imp.py
 inspect.py
 io.py
+ipaddress.py
 keyword.py
 linecache.py
 locale.py
@@ -158,6 +159,7 @@ robotparser.py
 runpy.py
 sched.py
 sha.py
+select.py
 selectors.py
 sets.py
 sgmllib.py
@@ -175,6 +177,7 @@ socketserver.py
 sre_compile.py
 sre_constants.py
 sre_parse.py
+ssl.py
 stat.py
 string.py
 stringprep.py
