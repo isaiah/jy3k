@@ -867,19 +867,20 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             kwdefaults.add((expr) visit(testContext));
         }
         if (ctx.STAR() != null) {
-            if (ctx.kw.isEmpty()) {
-                throw Py.SyntaxError("named arguments must follow bare *");
-            }
             exprContextType = expr_contextType.Param;
+            if (ctx.vararg == null) {
+                if (ctx.kw.isEmpty()) {
+                    throw Py.SyntaxError("named arguments must follow bare *");
+                }
+            } else {
+                vararg = (arg) visit(ctx.vararg);
+            }
             for (PythonParser.VfpdefContext vfpdefContext : ctx.kw) {
                 kwonlyargs.add((arg) visit(vfpdefContext));
             }
             exprContextType = expr_contextType.Load;
         }
-        exprContextType = expr_contextType.Param;
-        if (ctx.vararg != null) {
-            vararg = (arg) visit(ctx.vararg);
-        }
+
         exprContextType = expr_contextType.Load;
         for (PythonParser.TestContext testContext : ctx.defaults) {
             defaults.add((expr) visit(testContext));
