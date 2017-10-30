@@ -283,7 +283,8 @@ public class PySTEntryObject extends PyObject {
                 throw errorAtDirective(name, "name '%s' is parameter and nonlocal");
             }
             if (bound.isEmpty()) {
-                throw errorAtDirective(name, "nonlocal declaration '%s' not allowed at module level");
+                String template = "nonlocal declaration not allowed at module level";
+                throw new PySyntaxError(template, lineno, colOffset, "", table.getFilename());
             }
             if (!bound.contains(name)) {
                 throw errorAtDirective(name, "no binding for nonlocal '%s' found");
