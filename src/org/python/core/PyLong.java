@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 /**
  * A builtin python int. This is implemented as a java.math.BigInteger.
@@ -189,12 +190,7 @@ public class PyLong extends PyObject {
                 byte[] buf = new byte[length];
                 view.copyTo(buf, 0);
                 if (order == ByteOrder.LITTLE_ENDIAN) {
-                    byte b;
-                    for (int i = 0, j = length - 1; i < j; i++, j--) {
-                        b = buf[i];
-                        buf[i] = buf[j];
-                        buf[j] = b;
-                    }
+                    reverseByteArray(buf);
                 }
                 return new PyLong(new BigInteger(buf));
             }
@@ -205,29 +201,34 @@ public class PyLong extends PyObject {
         } catch(PyException e) {
             throw Py.TypeError(String.format("cannot convert '%s' object to bytes", bytes.getType().fastGetName()));
         }
-        int i = 0;
         PyObject next;
-        byte[] b = new byte[10];
+        long ret = 0L;
+        int i = 0;
         try {
             while ((next = iter.__next__()) != null) {
-                if (i > b.length) {
-                    byte[] tmp = b;
-                    b = new byte[b.length + 10];
-                    System.arraycopy(tmp, 0, b, 0, tmp.length);
+                int v = next.asIndex() & 0xFF;
+                if (order == ByteOrder.BIG_ENDIAN) {
+                    ret = (ret << 8) | v;
+                } else {
+                    ret = ((v << 8 * i++) | ret);
                 }
-                b[i++] = (byte) (next.asIndex() & 0xFF);
             }
         } catch (PyException e) {
             if (!e.match(Py.StopIteration)) {
                 throw e;
             }
         }
-        if (b.length >= i) {
-            byte[] tmp = b;
-            b = new byte[i - 1];
-            System.arraycopy(tmp, 0, b, 0, b.length);
+        return new PyLong(BigInteger.valueOf(ret));
+    }
+
+    private static void reverseByteArray(byte[] buf) {
+        int length = buf.length;
+        byte b;
+        for (int i = 0, j = length - 1; i < j; i++, j--) {
+            b = buf[i];
+            buf[i] = buf[j];
+            buf[j] = b;
         }
-        return new PyLong(new BigInteger(b));
     }
 
     private static ByteOrder getByteOrder(String byteorder) {
