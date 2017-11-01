@@ -15,6 +15,9 @@ import java.util.Arrays;
 @ExposedModule(name = "_socket")
 public class SocketModule {
 
+    @ExposedConst
+    public static final boolean has_ipv6 = true;
+
     @ModuleInit
     public static void classDictInit(final PyObject dict) {
         dict.__setitem__("socket", PySocket.TYPE);
