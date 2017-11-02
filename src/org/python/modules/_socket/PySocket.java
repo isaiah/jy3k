@@ -4,12 +4,15 @@ import jnr.constants.platform.AddressFamily;
 import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
+import jnr.constants.platform.SocketLevel;
+import jnr.constants.platform.SocketOption;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -22,9 +25,16 @@ import org.python.io.util.FilenoUtil;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketOptions;
+import java.net.StandardSocketOptions;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.NetworkChannel;
 import java.nio.channels.SocketChannel;
+
+import static java.net.StandardSocketOptions.SO_KEEPALIVE;
+import static java.net.StandardSocketOptions.SO_REUSEADDR;
+import static java.net.StandardSocketOptions.SO_REUSEPORT;
 
 @ExposedType(name = "socket")
 public class PySocket extends PyObject {
@@ -173,9 +183,58 @@ public class PySocket extends PyObject {
         return Py.None;
     }
 
+    @ExposedMethod
+    public PyObject getsockopt(int level, int name) {
+        SocketOption opt = SocketOption.valueOf(name);
+        NetworkChannel ch = (NetworkChannel) fd.ch;
+        Object value;
+        try {
+            value = ch.getOption(getOption(opt));
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        if (opt == SocketOption.SO_REUSEADDR || opt == SocketOption.SO_REUSEPORT) {
+            return new PyLong((boolean) value ? 1 : 0);
+        }
+        return Py.None;
+    }
+
+    @ExposedMethod
+    public PyObject setsockopt(int level, int name, PyObject value) {
+        SocketOption opt = SocketOption.valueOf(name);
+        NetworkChannel ch = (NetworkChannel) fd.ch;
+        try {
+            switch (opt) {
+                case SO_REUSEADDR:
+                    ch.setOption(SO_REUSEADDR, value.__bool__());
+                    break;
+                case SO_REUSEPORT:
+                    ch.setOption(SO_REUSEPORT, value.__bool__());
+                    break;
+                default:
+                    break;
+            }
+            return Py.None;
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    private java.net.SocketOption<?> getOption(SocketOption opt) {
+        switch(opt) {
+            case SO_REUSEADDR:
+                return SO_REUSEADDR;
+            case SO_REUSEPORT:
+                return SO_REUSEPORT;
+            default:
+                break;
+        }
+        throw Py.ValueError("unrecognised socket option");
+    }
+
     private ChannelFD initChannelFD() {
         try {
-            Channel channel;
+            NetworkChannel channel;
             switch (sockType) {
                 case SOCK_STREAM:
                     channel = SocketChannel.open();

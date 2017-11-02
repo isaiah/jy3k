@@ -8,6 +8,8 @@ import jnr.constants.platform.SocketOption;
 import jnr.netdb.Service;
 import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
@@ -15,14 +17,11 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
-import org.python.annotations.ExposedModule;
-import org.python.annotations.ModuleInit;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 @ExposedModule(name = "_socket")
 public class SocketModule {
