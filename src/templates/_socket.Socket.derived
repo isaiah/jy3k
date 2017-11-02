@@ -2,3 +2,11 @@ base_class: PySocket
 want_dict: false
 ctr: jnr.constants.platform.AddressFamily af, jnr.constants.platform.Sock sock, jnr.constants.platform.ProtocolFamily pf
 incl: object
+noinherit:
+    public PySocketDerived(PyType subtype, int fileno) {
+        super(subtype, fileno);
+        slots=new PyObject[subtype.getNumSlots()];
+        if (subtype.needsFinalizer()) {
+            FinalizeTrigger.ensureFinalizer(this);
+        }
+    }
