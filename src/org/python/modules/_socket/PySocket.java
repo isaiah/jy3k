@@ -5,6 +5,9 @@ import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
 import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyLong;
@@ -12,9 +15,6 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
 import org.python.core.PyUnicode;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
@@ -22,8 +22,6 @@ import org.python.io.util.FilenoUtil;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
@@ -109,13 +107,24 @@ public class PySocket extends PyObject {
         switch (domain) {
             case AF_INET:
             case AF_INET6:
-                SocketChannel sockChannel = (SocketChannel) fd.ch;
-                InetAddress inetAddress = sockChannel.socket().getInetAddress();
-                if (inetAddress == null) {
-                    addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
+                if (sockType == Sock.SOCK_STREAM) {
+                    SocketChannel sockChannel = (SocketChannel) fd.ch;
+                    InetAddress inetAddress = sockChannel.socket().getInetAddress();
+                    if (inetAddress == null) {
+                        addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
+                    } else {
+                        addr = inetAddress.toString();
+                    }
                 } else {
-                    addr = inetAddress.toString();
+                    DatagramChannel datagramChannel = (DatagramChannel) fd.ch;
+                    InetAddress inetAddress = datagramChannel.socket().getInetAddress();
+                    if (inetAddress == null) {
+                        addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
+                    } else {
+                        addr = inetAddress.toString();
+                    }
                 }
+                break;
             default:
                 break;
         }
@@ -154,6 +163,14 @@ public class PySocket extends PyObject {
     @ExposedMethod
     public int fileno() {
         return fd.fileno;
+    }
+
+    @ExposedMethod
+    public PyObject gettimeout() {
+        if (SocketModule.defaulttimeout > 0) {
+            return SocketModule.getdefaulttimeout();
+        }
+        return Py.None;
     }
 
     private ChannelFD initChannelFD() {
