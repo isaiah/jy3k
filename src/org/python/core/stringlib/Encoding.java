@@ -347,7 +347,10 @@ public class Encoding {
     }
 
     public static final boolean isUppercase(CharSequence s) {
-        return s.length() != 0 && s.chars().allMatch(Character::isUpperCase);
+        if (s.length() == 0) {
+            return false;
+        }
+        return s.chars().anyMatch(Character::isUpperCase) && s.chars().noneMatch(Character::isLowerCase);
     }
 
     public static final boolean isAlpha(CharSequence s) {
