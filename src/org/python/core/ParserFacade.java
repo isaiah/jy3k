@@ -268,11 +268,11 @@ public class ParserFacade {
         cflags.encoding = "utf-8";
 
         BufferedReader bufferedReader = new BufferedReader(reader);
-        bufferedReader.mark(MARK_LIMIT);
-        if (findEncoding(bufferedReader) != null) {
-            throw new ParseException("encoding declaration in Unicode string");
-        }
-        bufferedReader.reset();
+//        bufferedReader.mark(MARK_LIMIT);
+//        if (findEncoding(bufferedReader) != null) {
+//            throw new ParseException("encoding declaration in Unicode string");
+//        }
+//        bufferedReader.reset();
 
         return new ExpectedEncodingBufferedReader(bufferedReader, null);
     }
