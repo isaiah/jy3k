@@ -50,6 +50,7 @@ public class AstModule {
         dict.__setitem__("Expression", Expression.TYPE);
         dict.__setitem__("ExtSlice", ExtSlice.TYPE);
         dict.__setitem__("For", For.TYPE);
+        dict.__setitem__("FormattedValue", FormattedValue.TYPE);
         dict.__setitem__("FunctionDef", FunctionDef.TYPE);
         dict.__setitem__("GeneratorExp", GeneratorExp.TYPE);
         dict.__setitem__("Global", Global.TYPE);
@@ -59,6 +60,7 @@ public class AstModule {
         dict.__setitem__("ImportFrom", ImportFrom.TYPE);
         dict.__setitem__("Index", Index.TYPE);
         dict.__setitem__("Interactive", Interactive.TYPE);
+        dict.__setitem__("JoinedStr", JoinedStr.TYPE);
         dict.__setitem__("Lambda", Lambda.TYPE);
         dict.__setitem__("List", List.TYPE);
         dict.__setitem__("ListComp", ListComp.TYPE);
