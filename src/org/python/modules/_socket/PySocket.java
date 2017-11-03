@@ -4,7 +4,6 @@ import jnr.constants.platform.AddressFamily;
 import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
-import jnr.constants.platform.SocketLevel;
 import jnr.constants.platform.SocketOption;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -12,7 +11,6 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyBoolean;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -23,16 +21,18 @@ import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketOptions;
-import java.net.StandardSocketOptions;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.NetworkChannel;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import static java.net.StandardSocketOptions.SO_KEEPALIVE;
 import static java.net.StandardSocketOptions.SO_REUSEADDR;
 import static java.net.StandardSocketOptions.SO_REUSEPORT;
 
@@ -44,7 +44,9 @@ public class PySocket extends PyObject {
     private ProtocolFamily protocolFamily;
     private Sock sockType;
     private ChannelFD fd;
+    private SocketAddress bindAddr;
     private boolean connected;
+    private boolean inUse;
 
     public PySocket(PyType subtype, AddressFamily family, Sock socket, ProtocolFamily proto) {
         super(subtype);
@@ -55,6 +57,7 @@ public class PySocket extends PyObject {
     }
 
     public PySocket(PyType subtype, int fileno) {
+        super(subtype);
         ChannelFD fd = FilenoUtil.getInstance().getWrapperFromFileno(fileno);
         if (fd != null) {
             initFromFD(fd);
@@ -92,12 +95,75 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod()
-    public final PyObject socket_bind(PyObject address) {
-        PyObject host, port;
+    public final PyObject bind(PyObject address) {
+        String host;
+        int port;
         if (address instanceof PyTuple) {
-            host = ((PyTuple) address).pyget(0);
-            port = ((PyTuple) address).pyget(1);
+            host = ((PyTuple) address).pyget(0).asString();
+            port = ((PyTuple) address).pyget(1).asInt();
+            if (port > 65535 || port < 0) {
+                throw Py.OverflowError("getsockaddrarg: port must be 0-65535");
+            }
+            bindAddr = new InetSocketAddress(host, port);
+            return this;
         }
+        throw Py.TypeError("expected a (address, port) tuple");
+    }
+
+    @ExposedMethod(defaults = "-1")
+    public final PyObject listen(int backlog) {
+        NetworkChannel channel = (NetworkChannel) fd.ch;
+        ServerSocketChannel ch;
+        if (!(channel instanceof ServerSocketChannel)) {
+            try {
+                channel.close();
+                ch = ServerSocketChannel.open();
+                fd.ch = ch;
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        } else {
+            ch = (ServerSocketChannel) channel;
+        }
+        try {
+            ch.bind(bindAddr, backlog);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        return this;
+    }
+
+    @ExposedMethod
+    public final PyObject accept() {
+        if (inUse) {
+            throw Py.IOError(Errno.EISCONN);
+        }
+        NetworkChannel channel = (NetworkChannel) fd.ch;
+        ServerSocketChannel ch;
+        if (!(channel instanceof ServerSocketChannel)) {
+            try {
+                channel.close();
+                ch = ServerSocketChannel.open();
+                fd.ch = ch;
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        } else {
+            ch = (ServerSocketChannel) channel;
+        }
+        try {
+            ch.accept();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        inUse = true;
+        return Py.None;
+    }
+
+    @ExposedMethod
+    public final PyObject connect(PyObject addr) {
+        inUse = true;
+
         return this;
     }
 
@@ -114,31 +180,28 @@ public class PySocket extends PyObject {
     @ExposedMethod
     public PyObject getsockname() {
         String addr = "";
+        int port = 0;
         switch (domain) {
             case AF_INET:
             case AF_INET6:
-                if (sockType == Sock.SOCK_STREAM) {
-                    SocketChannel sockChannel = (SocketChannel) fd.ch;
-                    InetAddress inetAddress = sockChannel.socket().getInetAddress();
-                    if (inetAddress == null) {
-                        addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
-                    } else {
-                        addr = inetAddress.toString();
-                    }
+                NetworkChannel sockChannel = (NetworkChannel) fd.ch;
+                InetSocketAddress inetAddress = null;
+                try {
+                    inetAddress = (InetSocketAddress) sockChannel.getLocalAddress();
+                } catch (IOException e) {
+                    throw Py.IOError(e);
+                }
+                if (inetAddress == null) {
+                    addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
                 } else {
-                    DatagramChannel datagramChannel = (DatagramChannel) fd.ch;
-                    InetAddress inetAddress = datagramChannel.socket().getInetAddress();
-                    if (inetAddress == null) {
-                        addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
-                    } else {
-                        addr = inetAddress.toString();
-                    }
+                    addr = inetAddress.toString();
+                    port = inetAddress.getPort();
                 }
                 break;
             default:
                 break;
         }
-        return new PyTuple(new PyUnicode(addr));
+        return new PyTuple(new PyUnicode(addr), new PyLong(port));
     }
 
     @ExposedMethod
