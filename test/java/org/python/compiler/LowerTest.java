@@ -17,7 +17,7 @@ public class LowerTest extends TestCase {
     public void testLowerTryFinally() throws Exception {
         String expected = "foo";
         PythonTree ast = CompilerUtil.parse(program, "single");
-        new Lower().visit(ast);
+        new Lower("<string>").visit(ast);
         assertEquals(expected, ast.toStringTree());
     }
 
@@ -31,7 +31,7 @@ public class LowerTest extends TestCase {
 
         genexp = "if (any(\"__next__\" in B.__dict__ for B in C.__mro__):\n  pass";
         ast = CompilerUtil.parse(genexp, "file");
-        new Lower().visit(ast);
+        new Lower("<string>").visit(ast);
         assertEquals(expected, ast.toStringTree());
     }
 }
