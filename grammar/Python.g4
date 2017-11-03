@@ -934,7 +934,7 @@ NAME
 /// stringliteral   ::=  [stringprefix](shortstring | longstring)
 /// stringprefix    ::=  "r" | "R" | "f" | "F"
 STRING_LITERAL
- : [uU]? [rR]? [fF]? ( SHORT_STRING | LONG_STRING )
+ : ( [rR] | [uU] | [fF] | ( [fF] [rR] ) | ( [rR] [fF] ) )? ( SHORT_STRING | LONG_STRING )
  ;
 
 /// bytesliteral   ::=  bytesprefix(shortbytes | longbytes)
