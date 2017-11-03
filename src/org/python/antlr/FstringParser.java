@@ -11,6 +11,7 @@ import org.python.core.*;
 import org.python.core.stringlib.Encoding;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Code and comments adopted from cpython Python/ast.c
@@ -101,8 +102,7 @@ public class FstringParser {
 
         /* Can only nest one level deep. */
         if (recurseLvl >= 2) {
-            // TOOD ast_error(c, n, "f-string: expressions nested too deeply");
-            throw new RuntimeException("f-string: expressions nested too deeply");
+            throw Py.SyntaxError("f-string: expressions nested too deeply");
         }
         int i = exprStart;
         for (; i < s.length(); i++) {
@@ -125,11 +125,15 @@ public class FstringParser {
                     if (stringType == 3) {
                         if (i + 2 < s.length() && s.charAt(i + 1) == ch && s.charAt(i + 2) == ch) {
                             i += 2;
+                            stringType = 0;
+                            quoteChar = 0;
+                            continue;
                         }
+                    } else {
+                        stringType = 0;
+                        quoteChar = 0;
+                        continue;
                     }
-                    stringType = 0;
-                    quoteChar = 0;
-                    continue;
                 }
             } else if (ch == '\'' || ch == '"') {
                 if (i + 2 < s.length() && s.charAt(i + 1) == ch && s.charAt(i + 2) == ch) {
@@ -144,8 +148,7 @@ public class FstringParser {
             } else if (nestedDepth != 0 && (ch == ']' || ch == '}' || ch == ')')) {
                 nestedDepth--;
             } else if (ch == '#') {
-                // TODO ast_error
-                throw new RuntimeException("f-string expression part cannot include '#'");
+                throw Py.SyntaxError("f-string expression part cannot include '#'");
             } else if (nestedDepth == 0 && (ch == '!' || ch == ':' || ch == '}')) {
                 /* First, test for the special case of "!=". Since '=' is
                    not an allowed conversion character, nothing is lost in
@@ -161,10 +164,10 @@ public class FstringParser {
         }
         exprEnd = i;
         if (quoteChar != 0) {
-            throw new RuntimeException("f-string: unterminated string");
+            throw Py.SyntaxError("f-string: unterminated string");
         }
         if (nestedDepth > 0) {
-            throw new RuntimeException("f-string: unmatched '(', '{', or '['");
+            throw Py.SyntaxError("f-string: unmatched '(', '{', or '['");
         }
         simpleExpr = compileExpr(s.substring(exprStart, exprEnd));
         /* Check for a conversion char, if present. */
@@ -172,7 +175,7 @@ public class FstringParser {
             conversion = s.charAt(++i);
             i++;
             if (conversion != 's' && conversion != 'r' && conversion != 'a') {
-                throw new RuntimeException("f-string: invalid conversion character: expected 's', 'r', or 'a'");
+                throw Py.SyntaxError("f-string: invalid conversion character: expected 's', 'r', or 'a'");
             }
         }
         if (s.charAt(i) == ':') {
@@ -188,8 +191,14 @@ public class FstringParser {
                 new FormattedValue(token, simpleExpr, conversion, formatSpec), 0);
     }
 
+    /* Compile this expression in to an expr_ty.  Add parens around the
+       expression, in order to allow leading spaces in the expression. */
     private expr compileExpr(String s) {
-        mod m = ParserFacade.parse(s, CompileMode.eval, "<fstring>", new CompilerFlags(CompilerFlags.PyCF_ONLY_AST));
+        Pattern allSpace = Pattern.compile("^\\s*$");
+        if (allSpace.matcher(s).matches()) {
+            throw Py.SyntaxError("f-string: empty expression not allowed");
+        }
+        mod m = ParserFacade.parse("(" + s + ")", CompileMode.eval, "<fstring>", new CompilerFlags(CompilerFlags.PyCF_ONLY_AST));
         return ((Expression) m).getInternalBody();
     }
 
@@ -233,8 +242,7 @@ public class FstringParser {
                    /* Where a single '{' is the start of a new expression, a
                        single '}' is not allowed. */
                    if (ch == '}') {
-                       // TODO ast_error(c, n, "f-string: single '}' is not allowed");
-                       throw new RuntimeException("f-string: single '}' is not allowed");
+                       throw Py.SyntaxError("f-string: single '}' is not allowed");
                    }
                }
                /* We're either at a '{', which means we're starting another
@@ -248,7 +256,8 @@ public class FstringParser {
             ret = s.substring(i);
         }
         if (literalEnd != 0) {
-            if (!raw) {
+            // liternalEnd == 1 means the literal is a single \
+            if (!raw && literalEnd > 1) {
                 return new ParseResult(
                         ret,
                         Encoding.decode_UnicodeEscape(s, 0, literalEnd, "strict", true),
@@ -315,7 +324,7 @@ public class FstringParser {
         //}
         if (recurseLvl != 0 && r.input.charAt(0) != '}') {
             // ast_error(c, n, "f-string: expecting '}'");
-            throw new RuntimeException("f-string: expecting '}'");
+            throw Py.SyntaxError("f-string: expecting '}'");
         }
         return r.input;
     }
@@ -338,10 +347,6 @@ public class FstringParser {
         }
         if (lastStr != null) {
             exprList.add(makeStrAndDel());
-        }
-        /* If there's only one expression, return it. Otherwise, we need to join them together */
-        if (exprList.size() == 1) {
-            return exprList.get(0);
         }
         return new JoinedStr(token, exprList);
     }
