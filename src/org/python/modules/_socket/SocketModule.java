@@ -35,16 +35,27 @@ public class SocketModule {
         dict.__setitem__("socket", PySocket.TYPE);
         dict.__setitem__("error", Py.OSError);
         for (AddressFamily value : AddressFamily.values()) {
-            dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            if (value == AddressFamily.AF_UNIX) {
+                continue; // disable unix domain socket
+            }
+            if (value.defined()) {
+                dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            }
         }
         for (Sock value : Sock.values()) {
-            dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            if (value.defined()) {
+                dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            }
         };
         for (SocketOption value : SocketOption.values()) {
-            dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            if (value.defined()) {
+                dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            }
         };
         for (SocketLevel value : SocketLevel.values()) {
-            dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            if (value.defined()) {
+                dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            }
         }
     }
 
