@@ -74,6 +74,7 @@ public class PySocket extends PyObject {
             domain = AddressFamily.AF_INET;
             sockType = Sock.SOCK_DGRAM;
         }
+        protocolFamily = ProtocolFamily.PF_INET;
         this.fd = fd;
     }
 
@@ -83,7 +84,7 @@ public class PySocket extends PyObject {
         ArgParser ap = new ArgParser("socket", args, keywords, "family", "type", "proto", "fileno");
         long af = ap.getInt(0, AddressFamily.AF_INET.intValue());
         long st = ap.getInt(1, Sock.SOCK_STREAM.intValue());
-        int p = ap.getInt(2, 0);
+        int p = ap.getInt(2, ProtocolFamily.PF_INET.intValue());
         int fileno = ap.getInt(3, -1);
         if (subtype == TYPE) {
             return new PySocket(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p));
@@ -252,16 +253,19 @@ public class PySocket extends PyObject {
 
     @ExposedMethod
     public PyObject getpeername() {
-        SocketChannel sockChannel = (SocketChannel) fd.ch;
-        if (!sockChannel.isConnected()) {
-            throw Py.OSError(Errno.valueOf(107));
+        if (fd.ch instanceof SocketChannel) {
+            SocketChannel sockChannel = (SocketChannel) fd.ch;
+            if (!sockChannel.isConnected()) {
+                throw Py.OSError(Errno.valueOf(107));
+            }
+            try {
+                InetSocketAddress raddr = (InetSocketAddress) sockChannel.getRemoteAddress();
+                return new PyTuple(new PyUnicode(raddr.getHostName()), new PyLong(raddr.getPort()));
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
         }
-        try {
-            InetSocketAddress raddr = (InetSocketAddress) sockChannel.getRemoteAddress();
-            return new PyTuple(new PyUnicode(raddr.getHostName()), new PyLong(raddr.getPort()));
-        } catch (IOException e) {
-            throw Py.IOError(e);
-        }
+        throw Py.OSError(Errno.valueOf(107));
     }
 
     @ExposedGet
