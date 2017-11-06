@@ -21,6 +21,7 @@ import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -96,18 +97,8 @@ public class PySocket extends PyObject {
 
     @ExposedMethod()
     public final PyObject bind(PyObject address) {
-        String host;
-        int port;
-        if (address instanceof PyTuple) {
-            host = ((PyTuple) address).pyget(0).asString();
-            port = ((PyTuple) address).pyget(1).asInt();
-            if (port > 65535 || port < 0) {
-                throw Py.OverflowError("getsockaddrarg: port must be 0-65535");
-            }
-            bindAddr = new InetSocketAddress(host, port);
-            return this;
-        }
-        throw Py.TypeError("expected a (address, port) tuple");
+        bindAddr = getsockaddrarg(address);
+        return this;
     }
 
     @ExposedMethod(defaults = "-1")
@@ -135,9 +126,7 @@ public class PySocket extends PyObject {
 
     @ExposedMethod
     public final PyObject accept() {
-        if (inUse) {
-            throw Py.IOError(Errno.EISCONN);
-        }
+        checkConnected();
         NetworkChannel channel = (NetworkChannel) fd.ch;
         ServerSocketChannel ch;
         if (!(channel instanceof ServerSocketChannel)) {
@@ -161,10 +150,67 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod
-    public final PyObject connect(PyObject addr) {
-        inUse = true;
+    public final PyObject _accept() {
+        checkConnected();
 
+        NetworkChannel channel = (NetworkChannel) fd.ch;
+        ServerSocketChannel ch;
+        SocketChannel client;
+        if (!(channel instanceof ServerSocketChannel)) {
+            try {
+                channel.close();
+                ch = ServerSocketChannel.open();
+                fd.ch = ch;
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        } else {
+            ch = (ServerSocketChannel) channel;
+        }
+        try {
+            client = ch.accept();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        inUse = true;
+        ChannelFD fd = new ChannelFD(client, FilenoUtil.getInstance());
+        InetSocketAddress remoteAddress = null;
+        try {
+            remoteAddress = (InetSocketAddress) client.getRemoteAddress();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        PyTuple addr = new PyTuple(new PyUnicode(remoteAddress.getHostName()), new PyLong(remoteAddress.getPort()));
+        return new PyTuple(new PyLong(fd.fileno), addr);
+    }
+
+    @ExposedMethod
+    public final PyObject connect(PyObject address) {
+        inUse = true;
+        SocketChannel ch = (SocketChannel) fd.ch;
+        try {
+            ch.connect(getsockaddrarg(address));
+        } catch(ConnectException e) {
+            throw Py.IOError(Errno.ECONNREFUSED);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
         return this;
+
+    }
+
+    private SocketAddress getsockaddrarg(PyObject address) {
+        String host;
+        int port;
+        if (address instanceof PyTuple) {
+            host = ((PyTuple) address).pyget(0).asString();
+            port = ((PyTuple) address).pyget(1).asInt();
+            if (port > 65535 || port < 0) {
+                throw Py.OverflowError("getsockaddrarg: port must be 0-65535");
+            }
+            return new InetSocketAddress(host, port);
+        }
+        throw Py.TypeError("expected a (address, port) tuple");
     }
 
     @ExposedMethod
@@ -316,5 +362,11 @@ public class PySocket extends PyObject {
 
     private RuntimeException sockerr(IOException cause) {
         return new RuntimeException(cause);
+    }
+
+    private void checkConnected() {
+        if (inUse) {
+            throw Py.IOError(Errno.EISCONN);
+        }
     }
 }
