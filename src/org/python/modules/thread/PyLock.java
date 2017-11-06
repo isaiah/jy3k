@@ -8,6 +8,8 @@ import org.python.core.Untraversable;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 
+import java.util.Objects;
+
 @Untraversable
 @ExposedType(name = "_thread.lock")
 public class PyLock extends PyObject {
@@ -17,7 +19,7 @@ public class PyLock extends PyObject {
         super(TYPE);
     }
 
-    private boolean locked = false;
+    private volatile boolean locked = false;
 
     public boolean acquire() {
         return acquire(true, -1);
@@ -70,5 +72,10 @@ public class PyLock extends PyObject {
     public boolean lock___exit__(PyObject type, PyObject value, PyObject traceback) {
         release();
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<%s _thread.lock object at %s>", locked ? "locked" : "unlocked", Objects.hash(this));
     }
 }

@@ -11,6 +11,7 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.core.ThreadState;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -105,7 +106,12 @@ public class _thread {
 
     @ExposedFunction
     public static PyObject _set_sentinel() {
-        return new PyLock();
+        final PyLock lock = new PyLock();
+        ThreadState ts = Py.getThreadState();
+        ts.onDelete = () -> {
+            lock.release();
+        };
+        return lock;
     }
 
     @ExposedFunction

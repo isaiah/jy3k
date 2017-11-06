@@ -26,6 +26,8 @@ public class ThreadState {
 
     private PyDictionary compareStateDict;
 
+    public Runnable onDelete;
+
     public ThreadState(PySystemState systemState) {
         this.systemState = systemState;
     }
