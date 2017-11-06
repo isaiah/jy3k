@@ -22,12 +22,9 @@ import org.python.io.util.FilenoUtil;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.NetworkChannel;
@@ -65,22 +62,9 @@ public class PySocket extends PyObject {
         }
     }
 
-    private void initFromFD(ChannelFD fd) {
-        Channel ch = fd.ch;
-        if (ch instanceof SocketChannel) {
-            domain = AddressFamily.AF_INET;
-            sockType = Sock.SOCK_STREAM;
-        } else if (ch instanceof DatagramChannel) {
-            domain = AddressFamily.AF_INET;
-            sockType = Sock.SOCK_DGRAM;
-        }
-        protocolFamily = ProtocolFamily.PF_INET;
-        this.fd = fd;
-    }
-
     @ExposedNew
     public static final PyObject socket___new__(PyNewWrapper new_, boolean init, PyType subtype,
-                                         PyObject[] args, String[] keywords) {
+                                                PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("socket", args, keywords, "family", "type", "proto", "fileno");
         long af = ap.getInt(0, AddressFamily.AF_INET.intValue());
         long st = ap.getInt(1, Sock.SOCK_STREAM.intValue());
@@ -96,14 +80,22 @@ public class PySocket extends PyObject {
         }
     }
 
+    private void initFromFD(ChannelFD fd) {
+        Channel ch = fd.ch;
+        if (ch instanceof SocketChannel) {
+            domain = AddressFamily.AF_INET;
+            sockType = Sock.SOCK_STREAM;
+        } else if (ch instanceof DatagramChannel) {
+            domain = AddressFamily.AF_INET;
+            sockType = Sock.SOCK_DGRAM;
+        }
+        protocolFamily = ProtocolFamily.PF_INET;
+        this.fd = fd;
+    }
+
     @ExposedMethod()
     public final PyObject bind(PyObject address) {
         bindAddr = getsockaddrarg(address);
-        return this;
-    }
-
-    @ExposedMethod(defaults = "-1")
-    public final PyObject listen(int backlog) {
         NetworkChannel channel = (NetworkChannel) fd.ch;
         ServerSocketChannel ch;
         if (!(channel instanceof ServerSocketChannel)) {
@@ -118,11 +110,35 @@ public class PySocket extends PyObject {
             ch = (ServerSocketChannel) channel;
         }
         try {
-            ch.bind(bindAddr, backlog);
+            ch.bind(bindAddr);
         } catch (IOException e) {
             throw Py.IOError(e);
         }
         return this;
+    }
+
+    @ExposedMethod(defaults = "-1")
+    public final void listen(int backlog) {
+        NetworkChannel channel = (NetworkChannel) fd.ch;
+        ServerSocketChannel ch;
+        if (!(channel instanceof ServerSocketChannel || backlog != -1)) {
+            try {
+                channel.close();
+                ch = ServerSocketChannel.open();
+                fd.ch = ch;
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        } else {
+            ch = (ServerSocketChannel) channel;
+        }
+        if (backlog != -1) {
+            try {
+                ch.bind(bindAddr, backlog);
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        }
     }
 
     @ExposedMethod
@@ -186,29 +202,42 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod
-    public final PyObject connect(PyObject address) {
+    public final void connect(PyObject address) {
         inUse = true;
         SocketChannel ch = (SocketChannel) fd.ch;
         try {
             ch.connect(getsockaddrarg(address));
-        } catch(ConnectException e) {
+        } catch (ConnectException e) {
             throw Py.IOError(Errno.ECONNREFUSED);
         } catch (IOException e) {
             throw Py.IOError(e);
         }
-        return this;
 
+    }
+
+    @ExposedMethod(defaults = {"-1"})
+    public final int send(PyObject data, int flags) {
+        SocketChannel ch = (SocketChannel) fd.ch;
+        byte[] buf = Py.unwrapBuffer(data);
+        try {
+            return ch.write(ByteBuffer.wrap(buf));
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
     }
 
     private SocketAddress getsockaddrarg(PyObject address) {
         String host;
         int port;
         if (address instanceof PyTuple) {
-            host = ((PyTuple) address).pyget(0).asString();
             port = ((PyTuple) address).pyget(1).asInt();
             if (port > 65535 || port < 0) {
                 throw Py.OverflowError("getsockaddrarg: port must be 0-65535");
             }
+            if (port == 0) {
+                return null;
+            }
+            host = ((PyTuple) address).pyget(0).asString();
             return new InetSocketAddress(host, port);
         }
         throw Py.TypeError("expected a (address, port) tuple");
@@ -334,7 +363,7 @@ public class PySocket extends PyObject {
     }
 
     private java.net.SocketOption<?> getOption(SocketOption opt) {
-        switch(opt) {
+        switch (opt) {
             case SO_REUSEADDR:
                 return SO_REUSEADDR;
             case SO_REUSEPORT:
