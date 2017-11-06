@@ -53,7 +53,7 @@ public class PyLock extends PyObject {
             locked = false;
             notifyAll();
         } else {
-            throw Py.ValueError("lock not acquired");
+            throw Py.RuntimeError("lock not acquired");
         }
     }
 

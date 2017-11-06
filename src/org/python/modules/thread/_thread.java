@@ -37,7 +37,7 @@ public class _thread {
     }
 
     @ExposedFunction
-    public static void start_new_thread(PyObject func, PyObject args) {
+    public static long start_new_thread(PyObject func, PyObject args) {
         Thread pt = newFunctionThread(func, (PyTuple) args);
         PyObject currentThread = func.__findattr__("__self__");
         if (currentThread != null) {
@@ -53,6 +53,7 @@ public class _thread {
             }
         }
         pt.start();
+        return pt.getId();
     }
 
     /**
