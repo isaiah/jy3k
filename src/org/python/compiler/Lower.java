@@ -523,23 +523,23 @@ public class Lower extends Visitor {
         finalVisitor.traverse(finalBlock);
         tryVisitor.traverse(node);
 
-        excepthandler catchAll = catchAllBlock(node, finalBlock);
+        List<excepthandler> catchAll = catchAllBlock(node, finalBlock);
         List<excepthandler> excepthandlers = node.getInternalHandlers();
         Try newTryNode;
         // when there is no except clause
         if (excepthandlers == null || excepthandlers.isEmpty()) {
-            Block newBody = new Block(node.getToken(), node.getInternalBody());
-            newTryNode = new Try(node.getToken(), asList(newBody, finalBlock), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), node.getInternalBody(), catchAll, finalBody, null);
         } else {
-            newTryNode = new Try(node.getToken(), asList(node.copy(), finalBlock), asList(catchAll), null, null);
+            newTryNode = new Try(node.getToken(), asList(node.copy()), catchAll, finalBody, null);
         }
         node.replaceSelf(newTryNode);
         return null;
     }
 
-    private excepthandler catchAllBlock(stmt node, stmt body) {
+    private List<excepthandler> catchAllBlock(stmt node, stmt body) {
         Raise raiseNode = new Raise(node.getToken(), null, null);
-        return new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
+        excepthandler rest = new ExceptHandler(node.getToken(), null, null, asList(body, raiseNode));
+        return asList(rest);
     }
 
     private Object visitComp(expr initVal, String name, String appendMeth, expr node, List<comprehension> generators, expr... internalElt) {
