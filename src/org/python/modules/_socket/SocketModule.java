@@ -2,6 +2,7 @@ package org.python.modules._socket;
 
 import jnr.constants.platform.AddressFamily;
 import jnr.constants.platform.Errno;
+import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
 import jnr.constants.platform.SocketLevel;
 import jnr.constants.platform.SocketOption;
@@ -54,6 +55,11 @@ public class SocketModule {
         };
         for (SocketLevel value : SocketLevel.values()) {
             if (value.defined()) {
+                dict.__setitem__(value.description(), new PyLong(value.intValue()));
+            }
+        }
+        for (ProtocolFamily value : ProtocolFamily.values()) {
+             if (value.defined()) {
                 dict.__setitem__(value.description(), new PyLong(value.intValue()));
             }
         }

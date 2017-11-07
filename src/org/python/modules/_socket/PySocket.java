@@ -5,6 +5,7 @@ import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
 import jnr.constants.platform.SocketOption;
+import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
@@ -24,6 +25,9 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketOptions;
+import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
@@ -244,13 +248,14 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject close() {
-        try {
-            fd.close();
-        } catch (IOException e) {
-            throw Py.IOError(Errno.EBADF);
+    public void close() {
+        if (fd.ch.isOpen()) {
+            try {
+                fd.close();
+            } catch (IOException e) {
+                throw Py.IOError(Errno.EBADF);
+            }
         }
-        return Py.None;
     }
 
     @ExposedMethod
@@ -322,7 +327,39 @@ public class PySocket extends PyObject {
         if (SocketModule.defaulttimeout > 0) {
             return SocketModule.getdefaulttimeout();
         }
+        NetworkChannel ch = (NetworkChannel) fd.ch;
+        if (ch instanceof SocketChannel) {
+            try {
+                ((SocketChannel) ch).socket().getSoTimeout();
+            } catch (SocketException e) {
+                throw Py.IOError(e);
+            }
+        } else if (ch instanceof ServerSocketChannel) {
+            try {
+                ((ServerSocketChannel) ch).socket().getSoTimeout();
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        }
         return Py.None;
+    }
+
+    @ExposedMethod
+    public void settimeout(int timeout) {
+        NetworkChannel ch = (NetworkChannel) fd.ch;
+        if (ch instanceof SocketChannel) {
+            try {
+                ((SocketChannel) ch).socket().setSoTimeout(timeout);
+            } catch (SocketException e) {
+                throw Py.IOError(e);
+            }
+        } else if (ch instanceof ServerSocketChannel) {
+            try {
+                ((ServerSocketChannel) ch).socket().setSoTimeout(timeout);
+            } catch (SocketException e) {
+                throw Py.IOError(e);
+            }
+        }
     }
 
     @ExposedMethod
