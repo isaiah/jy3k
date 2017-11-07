@@ -5,13 +5,13 @@ import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
 import jnr.constants.platform.Sock;
 import jnr.constants.platform.SocketOption;
-import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
+import org.python.core.PyBytes;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -24,10 +24,9 @@ import org.python.io.util.FilenoUtil;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.SocketOptions;
-import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
@@ -37,6 +36,7 @@ import java.nio.channels.SocketChannel;
 
 import static java.net.StandardSocketOptions.SO_REUSEADDR;
 import static java.net.StandardSocketOptions.SO_REUSEPORT;
+import static org.python.modules._socket.SocketModule.*;
 
 @ExposedType(name = "socket")
 public class PySocket extends PyObject {
@@ -230,6 +230,58 @@ public class PySocket extends PyObject {
         }
     }
 
+    @ExposedMethod(defaults = {"-1"})
+    public final void sendall(PyObject data, int flags) {
+        SocketChannel ch = (SocketChannel) fd.ch;
+        byte[] buf = Py.unwrapBuffer(data);
+        ByteBuffer src = ByteBuffer.wrap(buf);
+        try {
+            while (src.remaining() > 0) {
+                ch.write(src);
+            }
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
+    public final PyObject recv(PyObject[] args, String[] kws) {
+        ArgParser ap = new ArgParser("recvfrom", args, kws, "buffersize", "flags");
+        int bufsize = ap.getInt(0);
+        int flags = ap.getInt(1, -1);
+        ByteBuffer data = recv(bufsize, flags);
+        return new PyBytes(data);
+    }
+
+    private final ByteBuffer recv(int bufsize, int flags) {
+        checkConnected();
+        ByteBuffer buf = ByteBuffer.allocate(bufsize);
+        SocketChannel ch = (SocketChannel) fd.ch;
+        try {
+            int size = ch.read(buf);
+            if (size <= 0) {
+                return ByteBuffer.allocate(0);
+            }
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        buf.flip();
+        return buf;
+    }
+
+    @ExposedMethod()
+    public final PyObject recvfrom(PyObject args[], String[] kws) {
+        PyObject data = recv(args, kws);
+        return new PyTuple(data, getpeername());
+    }
+
+    @ExposedMethod
+    public final int detach() {
+        int fileno = fileno();
+        fd = null;
+        return fileno;
+    }
+
     private SocketAddress getsockaddrarg(PyObject address) {
         String host;
         int port;
@@ -248,8 +300,36 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod
+    public void shutdown(int flag) {
+        NetworkChannel ch = (NetworkChannel) fd.ch;
+        if (ch instanceof SocketChannel) {
+            Socket sock = ((SocketChannel) ch).socket();
+            try {
+                switch (flag) {
+                    case SHUT_RD:
+                        sock.shutdownInput();
+                        break;
+                    case SHUT_WR:
+                        sock.shutdownOutput();
+                        break;
+                    case SHUT_RDWR:
+                        sock.shutdownInput();
+                        sock.shutdownOutput();
+                        break;
+                    default:
+                        throw Py.ValueError(String.format("unrecognised flag: %d", flag));
+                }
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+        } else {
+            throw Py.IOError(Errno.EBADF);
+        }
+    }
+
+    @ExposedMethod
     public void close() {
-        if (fd.ch.isOpen()) {
+        if (fd != null && fd.ch.isOpen()) {
             try {
                 fd.close();
             } catch (IOException e) {
@@ -345,7 +425,11 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod
-    public void settimeout(int timeout) {
+    public void settimeout(PyObject timeoutObj) {
+        if (timeoutObj == Py.None) {
+            return;
+        }
+        int timeout = timeoutObj.asInt();
         NetworkChannel ch = (NetworkChannel) fd.ch;
         if (ch instanceof SocketChannel) {
             try {
@@ -435,6 +519,9 @@ public class PySocket extends PyObject {
     }
 
     private void checkConnected() {
+        if (fd == null) {
+            throw Py.IOError(Errno.EBADF);
+        }
         if (inUse) {
             throw Py.IOError(Errno.EISCONN);
         }

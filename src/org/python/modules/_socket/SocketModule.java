@@ -18,6 +18,7 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
+import org.python.io.util.FilenoUtil;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -30,6 +31,15 @@ public class SocketModule {
 
     @ExposedConst
     public static final boolean has_ipv6 = true;
+
+    @ExposedConst
+    public static final int SHUT_RD = 0;
+
+    @ExposedConst
+    public static final int SHUT_WR = 1;
+
+    @ExposedConst
+    public static final int SHUT_RDWR = 2;
 
     @ModuleInit
     public static void classDictInit(final PyObject dict) {
@@ -198,5 +208,10 @@ public class SocketModule {
         } catch (UnknownHostException e) {
             throw Py.IOError(e);
         }
+    }
+
+    @ExposedFunction
+    public static int dup(int fileno) {
+        return FilenoUtil.getInstance().dup(fileno);
     }
 }
