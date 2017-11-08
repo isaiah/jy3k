@@ -84,7 +84,7 @@ public class PyIncrementalNewlineDecoder extends PyObject {
         /* if, up to now newlines are consistently \n, do a quick check
            for the \r *byte* */
         if (seennl == SEEN_LF || seennl == 0) {
-            onlyLf = inStr.indexOf('\r') >= 0;
+            onlyLf = inStr.indexOf('\r') < 0;
         }
 
         if (onlyLf) {
