@@ -304,7 +304,7 @@ public class GrammarActions {
 
     expr parsestrplus(List<PythonParser.StrContext> s) {
         boolean bytesmode = false;
-        String bytesStr = null;
+        StringBuilder bytesStr = new StringBuilder();
         FstringParser state = new FstringParser(s.get(0).getStart());
         int i = 0;
         for (PythonParser.StrContext last : s) {
@@ -312,9 +312,9 @@ public class GrammarActions {
             ParseStrResult ret = parsestr(last);
             this_bytesmode = ret.bytesmode;
             /* Check that we're not mixing bytes with unicode. */
-            if (i != 0 && bytesmode != this_bytesmode) {
+            if (i++ != 0 && bytesmode != this_bytesmode) {
                 // TODO ast error "cannot mix bytes and nonbytes literals"
-                throw new RuntimeException("cannot mix bytes and nonbytes literals");
+                throw Py.SyntaxError("cannot mix bytes and nonbytes literals");
             }
             bytesmode = this_bytesmode;
             if (ret.fstr != null) {
@@ -325,12 +325,7 @@ public class GrammarActions {
                 /* A string or byte string. */
                 if (bytesmode) {
                     /* For bytes, concat as we go. */
-                    if (i == 0) {
-                        /* First time, just remember this value. */
-                        bytesStr = ret.s;
-                    } else {
-                        bytesStr += ret.s;
-                    }
+                    bytesStr.append(ret.s);
                 } else {
                     /* This is a regular string. Concatenate it. */
                     state.concat(ret.s);
@@ -339,7 +334,7 @@ public class GrammarActions {
         }
 
         if (bytesmode) {
-            return new Bytes(extractStringToken(s), bytesStr);
+            return new Bytes(extractStringToken(s), bytesStr.toString());
         }
 
         return state.finish();
