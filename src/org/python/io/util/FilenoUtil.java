@@ -35,4 +35,13 @@ public class FilenoUtil {
     public ChannelFD getWrapperFromFileno(int fileno) {
         return filenoMap.get(fileno);
     }
+
+    // This is a fake dup for file descriptors, don't use it across processes
+    public int dup(int fileno) {
+        ChannelFD origin = getWrapperFromFileno(fileno);
+        int fd = getNewFileno();
+        ChannelFD _new = new ChannelFD(origin.ch, this);
+        registerWrapper(fd, _new);
+        return fd;
+    }
 }
