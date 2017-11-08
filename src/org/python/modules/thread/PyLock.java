@@ -62,14 +62,14 @@ public class PyLock extends PyObject {
         return locked;
     }
 
-    @ExposedMethod
-    public PyObject lock___enter__() {
+    @ExposedMethod(names = {"__enter__"})
+    public PyObject enter() {
         acquire();
         return this;
     }
 
-    @ExposedMethod
-    public boolean lock___exit__(PyObject type, PyObject value, PyObject traceback) {
+    @ExposedMethod(names = {"__exit__"})
+    public boolean exit(PyObject type, PyObject value, PyObject traceback) {
         release();
         return false;
     }
