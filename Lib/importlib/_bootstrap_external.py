@@ -762,13 +762,13 @@ class SourceLoader(_LoaderBasics):
         else:
             try:
                 st = self.path_stats(source_path)
-                byte_st = self.path_stats(bytecode_path)
             except IOError:
                 pass
             else:
                 source_mtime = int(st['mtime'])
                 try:
                     data = self.get_data(bytecode_path)
+                    byte_st = self.path_stats(bytecode_path)
                 except OSError:
                     pass
                 else:
