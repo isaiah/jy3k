@@ -199,16 +199,16 @@ public class _imp {
      */
     @ExposedFunction
     public static final PyObject _compile_source(PyObject name, PyObject data, PyObject filename) {
-        byte[] source;
+        String source;
         if (data instanceof PyBytes) {
-            byte[] a = new byte[]{1,2};
-            source = ((PyBytes) data).toBytes();
+            source = ((PyBytes) data).getString();
         } else if (data instanceof PyUnicode) {
-            source = ((PyUnicode) data).getString().getBytes();
+            source = ((PyUnicode) data).getString();
         } else {
             throw Py.TypeError("bytes object expected for data");
         }
-        byte[] bytes = Import.compileSource(name.toString(), new ByteArrayInputStream(source), filename.toString());
+        source += "\n\n";
+        byte[] bytes = Import.compileSource(name.toString(), new ByteArrayInputStream(source.getBytes()), filename.toString());
         return new PyBytes(bytes);
     }
 
