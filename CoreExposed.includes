@@ -176,6 +176,7 @@ org/python/modules/subprocess/PyPopen.class
 org/python/modules/sys/FloatInfo.class
 org/python/modules/sys/Flags.class
 org/python/modules/sys/IntInfo.class
+org/python/modules/sys/VersionInfo.class
 org/python/modules/thread/PyLocal.class
 org/python/modules/thread/PyLock.class
 org/python/modules/thread/PyRLock.class
