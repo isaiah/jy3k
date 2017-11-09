@@ -1,22 +1,18 @@
 package org.python.modules._io;
 
+import org.jruby.util.ByteList;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.Py;
 import org.python.core.PyBytes;
-import org.python.core.PyIter;
-import org.python.core.PyIterator;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +20,7 @@ import java.util.List;
 public class PyBytesIO extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyBytesIO.class);
 
-    private ByteBuffer buf;
+    private ByteList buf;
     private int pos;
     private int stringSize;
     private PyObject dict;
@@ -37,7 +33,6 @@ public class PyBytesIO extends PyObject {
 
     public PyBytesIO(PyType type) {
         super(type);
-        buf = ByteBuffer.allocate(100);
     }
 
     public PyBytesIO(PyType subtype, PyObject initvalue) {
@@ -47,6 +42,7 @@ public class PyBytesIO extends PyObject {
     @ExposedNew
     @ExposedMethod
     public void __init__(PyObject[] args, String[] keywords) {
+        buf = new ByteList(Py.unwrapBuffer(args[0]));
     }
 
     @ExposedMethod
@@ -56,20 +52,17 @@ public class PyBytesIO extends PyObject {
 
     @ExposedMethod
     public int tell() {
-        return buf.position();
+        return buf.begin();
     }
 
     @ExposedMethod
     public PyObject getvalue() {
-        byte[] bytes = new byte[buf.position()];
-        buf.flip();
-        buf.get(bytes);
-        return new PyBytes(bytes);
+        return new PyBytes(buf.bytes());
     }
 
     @ExposedMethod(names = {"read", "read1"})
     public PyObject read(int size) {
-        size = Math.max(size, buf.remaining());
+        size = Math.min(size, buf.length());
         byte[] bytes = readBytes(size);
         return new PyBytes(bytes);
     }
@@ -77,22 +70,26 @@ public class PyBytesIO extends PyObject {
     @ExposedMethod(defaults = {"-1"})
     public PyObject readline(int size) {
         int n = scaneol(size);
-        return new PyBytes(readBytes(n));
+        int len;
+        if (n > 0) {
+            len = n - pos;
+            return new PyBytes(readBytes(len));
+        }
+        return Py.EmptyByte;
     }
 
     @ExposedMethod(defaults = {"-1"})
     public PyObject readlines(int maxsize) {
         List<PyObject> lines = new ArrayList<>();
-        int n = 0;
-        int size = 0;
-        while((n = scaneol(-1)) != 0) {
-            PyObject line = new PyBytes(readBytes(n));
+        for (int n = scaneol(-1), size = 0; n > 0; size += n) {
+            PyObject line = new PyBytes(readBytes(n - pos));
             lines.add(line);
             size += n;
 
             if (maxsize > 0 && size >= maxsize) {
                 break;
             }
+            n = scaneol(-1);
         }
         return new PyList(lines);
     }
@@ -148,7 +145,7 @@ public class PyBytesIO extends PyObject {
     public PyObject getstate() {
         PyObject initvalue = getvalue();
         PyObject dict = Py.None;
-        PyObject[] state = new PyObject[] { initvalue, new PyLong(buf.position()), dict};
+        PyObject[] state = new PyObject[] { initvalue, new PyLong(buf.begin()), dict};
         return new PyTuple(state);
     }
 
@@ -157,64 +154,51 @@ public class PyBytesIO extends PyObject {
      * Returns the length between the current position to the next newline character.
      */
     private int scaneol(int len) {
-        buf.mark();
-        int start = buf.position();
-        int maxlen = buf.remaining();
-        if (len < 0 || len > maxlen) {
-            len = maxlen;
+        int index = buf.indexOf('\n', pos + 1);
+        if (len > 0 && len < index) {
+            return len;
         }
-        try {
-            while(true) {
-                byte c = buf.get();
-                if (c == '\n') {
-                    len = buf.position() - start + 1;
-                    break;
-                }
-            }
-        } catch (BufferUnderflowException e) {
+        if (index < 0 && pos < buf.length()) {
+            return buf.length();
         }
-        buf.reset();
-        return len;
+        return index + 1;
     }
 
     private byte[] readBytes(int size) {
         byte[] output = new byte[size];
-        buf.get(output);
+        byte[] data = buf.getUnsafeBytes();
+        System.arraycopy(data, pos, output, 0, size);
+        pos += size;
         return output;
     }
 
     private int writeBytes(byte[] bytes) {
-        try {
-            buf.put(bytes);
-        } catch (BufferOverflowException e) {
-            resize(buf.position() + bytes.length);
-             buf.put(bytes);
-        }
+        buf.append(bytes);
         return bytes.length;
     }
 
-    private void resize(int size) {
-        int alloc = buf.capacity();
-        if (size > Integer.MAX_VALUE) {
-            throw Py.OverflowError("byteio size overflow");
-        }
-        if (size < alloc / 2) {
-            // Major downsize; resize down to exact size.
-            alloc = size + 1;
-        } else if (size < alloc) {
-            // Within allocated size; quick exit
-            return;
-        } else if (size < alloc * 1.125) {
-            // Moderate upsize
-            alloc = size + (size >> 3) + (size < 9 ? 3 : 6);
-        } else {
-            // Major upsize; resize up to exact size
-            alloc = size + 1;
-        }
-
-        ByteBuffer newBuf = ByteBuffer.allocate(alloc);
-        newBuf.put(buf);
-        buf.clear();
-        buf = newBuf;
-    }
+//    private void resize(int size) {
+//        int alloc = buf.capacity();
+//        if (size > Integer.MAX_VALUE) {
+//            throw Py.OverflowError("byteio size overflow");
+//        }
+//        if (size < alloc / 2) {
+//            // Major downsize; resize down to exact size.
+//            alloc = size + 1;
+//        } else if (size < alloc) {
+//            // Within allocated size; quick exit
+//            return;
+//        } else if (size < alloc * 1.125) {
+//            // Moderate upsize
+//            alloc = size + (size >> 3) + (size < 9 ? 3 : 6);
+//        } else {
+//            // Major upsize; resize up to exact size
+//            alloc = size + 1;
+//        }
+//
+//        ByteBuffer newBuf = ByteBuffer.allocate(alloc);
+//        newBuf.put(buf);
+//        buf.clear();
+//        buf = newBuf;
+//    }
 }
