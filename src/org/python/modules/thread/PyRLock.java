@@ -2,6 +2,7 @@
 package org.python.modules.thread;
 
 import org.python.annotations.ExposedNew;
+import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -35,39 +36,40 @@ public class PyRLock extends PyObject {
         return acquire(true, -1);
     }
 
-    @ExposedMethod(names = "acquire", defaults = {"true", "-1"})
-    public synchronized boolean acquire(boolean blocking, int timeout) {
+    @ExposedMethod(names = "acquire")
+    public PyObject acquire(PyObject[] args, String[] kws) {
+        ArgParser ap = new ArgParser("acqurie", args, kws, "blocking", "timeout");
+        boolean blocking = ap.getBoolean(0, true);
+        PyObject timeoutObj = ap.getPyObject(1, null);
+        double timeout = -1;
+        if (timeoutObj != null) {
+            timeout = timeoutObj.__float__().getValue();
+        }
+        return Py.newBoolean(acquire(blocking, (long) (timeout * 1000)));
+    }
+
+    private boolean acquire(boolean blocking, long timeout) {
         if (blocking) {
-            while (lock.isLocked()) {
-                try {
-                    if (timeout > 0) {
-                        lock.tryLock(timeout, TimeUnit.SECONDS);
-                    } else {
-                        lock.lockInterruptibly();
-                    }
-                } catch (InterruptedException e) {
-                    throw Py.RuntimeError("thread interrupted");
+            try {
+                if (timeout > 0) {
+                    return lock.tryLock(timeout, TimeUnit.MILLISECONDS);
                 }
-            }
-            lock.lock();
-            return true;
-        } else {
-            if (lock.isLocked()) {
-                return false;
-            } else {
-                lock.lock();
+                lock.lockInterruptibly();
                 return true;
+            } catch (InterruptedException e) {
+                throw Py.RuntimeError("thread interrupted");
             }
         }
+        return lock.tryLock();
     }
 
     @ExposedMethod(names = "release")
-    public synchronized void release() {
-        if (!lock.isLocked()) {
+    public void release() {
+        try {
+            lock.unlock();
+        } catch (IllegalMonitorStateException e) {
             throw Py.RuntimeError("lock not acquired");
         }
-        lock.unlock();
-        notifyAll();
     }
 
     @ExposedMethod

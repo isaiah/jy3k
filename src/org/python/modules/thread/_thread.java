@@ -1,6 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.modules.thread;
 
+import org.python.annotations.ExposedNew;
 import org.python.core.FunctionThread;
 import org.python.core.Py;
 import org.python.core.PyException;
@@ -27,6 +28,7 @@ public class _thread {
     @ModuleInit
     public static void classDictInit(PyObject dict) {
         dict.__setitem__("LockType", PyLock.TYPE);
+        dict.__setitem__("RLock", PyRLock.TYPE);
         dict.__setitem__("_local", PyLocal.TYPE);
         dict.__setitem__("error", Py.RuntimeError);
     }
@@ -36,9 +38,12 @@ public class _thread {
         return new PyLong(_count.get());
     }
 
-    @ExposedFunction
-    public static long start_new_thread(PyObject func, PyObject args) {
-        Thread pt = newFunctionThread(func, (PyTuple) args);
+    @ExposedFunction(defaults = {"null"})
+    public static long start_new_thread(PyObject func, PyObject args, PyObject kws) {
+        if (func == args) {
+            System.out.println("oh shit");
+        }
+        Thread pt = newFunctionThread(func, (PyTuple) args, kws);
         PyObject currentThread = func.__findattr__("__self__");
         if (currentThread != null) {
             PyObject isDaemon = currentThread.__findattr__("isDaemon");
@@ -56,20 +61,8 @@ public class _thread {
         return pt.getId();
     }
 
-    /**
-     * Initializes a {@link FunctionThread}, using the configured stack_size and
-     * registering the thread in the @link {@link #group} of threads spawned by
-     * the thread module.
-     *
-     * Also used from the threading.py module.
-     */
-    @ExposedFunction
-    public static PyObject _newFunctionThread(PyObject func, PyObject args) {
-        return Py.java2py(newFunctionThread(func, (PyTuple) args));
-    }
-
-    public static FunctionThread newFunctionThread(PyObject func, PyTuple args) {
-        return new FunctionThread(func, args.getArray(), stack_size, group);
+    public static FunctionThread newFunctionThread(PyObject func, PyTuple args, PyObject kws) {
+        return new FunctionThread(func, args.getArray(), kws, stack_size, group);
     }
 
     /**
@@ -102,7 +95,7 @@ public class _thread {
 
     @ExposedFunction
     public static void exit_thread() {
-        throw new PyException(Py.SystemExit, new PyLong(0));
+        throw new PyException(Py.SystemExit, Py.Zero);
     }
 
     @ExposedFunction
