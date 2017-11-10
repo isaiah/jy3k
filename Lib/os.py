@@ -25,6 +25,7 @@ and opendir), and leave all pathname manipulation to os.path
 
 import sys, errno
 import stat as st
+import abc
 
 _names = sys.builtin_module_names
 
@@ -1059,3 +1060,16 @@ def system(command):
     from subprocess import _os_system
     system = _os_system
     return _os_system(command)
+
+class PathLike(abc.ABC):
+
+    """Abstract base class for implementing the file system path protocol."""
+
+    @abc.abstractmethod
+    def __fspath__(self):
+        """Return the file system path representation of the object."""
+        raise NotImplementedError
+
+    @classmethod
+    def __subclasshook__(cls, subclass):
+        return hasattr(subclass, '__fspath__')
