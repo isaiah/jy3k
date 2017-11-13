@@ -12,6 +12,7 @@ import org.python.modules.PyNamespace;
 import org.python.modules.Setup;
 import org.python.modules._imp;
 import org.python.modules.sys.SysModule;
+import org.python.modules.sys.VersionInfo;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -278,8 +279,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         dict.put("hexversion", new PyLong(hexversion));
         dict.put("name", new PyUnicode("Jython"));
         dict.put("version", version_info);
-        dict.put("release_level", new PyUnicode(Version.PY_RELEASE_LEVEL));
-        dict.put("serial", new PyLong(Version.PY_RELEASE_SERIAL));
         implementation = new PyNamespace(dict);
     }
 
@@ -1152,7 +1151,8 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             throw new RuntimeException("Illegal value for PY_RELEASE_LEVEL: "
                     + Version.PY_RELEASE_LEVEL);
         }
-        return new PyTuple(
+
+        return new VersionInfo(
                 Py.newInteger(Version.PY_MAJOR_VERSION),
                 Py.newInteger(Version.PY_MINOR_VERSION),
                 Py.newInteger(Version.PY_MICRO_VERSION),

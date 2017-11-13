@@ -1443,7 +1443,6 @@ public final class Py {
         try {
             stderr.println(formatException(type, value));
         } catch (Exception ex) {
-            stderr.println(formatException(type, Py.None));
         }
     }
 
