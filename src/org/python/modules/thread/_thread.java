@@ -40,9 +40,6 @@ public class _thread {
 
     @ExposedFunction(defaults = {"null"})
     public static long start_new_thread(PyObject func, PyObject args, PyObject kws) {
-        if (func == args) {
-            System.out.println("oh shit");
-        }
         Thread pt = newFunctionThread(func, (PyTuple) args, kws);
         PyObject currentThread = func.__findattr__("__self__");
         if (currentThread != null) {
