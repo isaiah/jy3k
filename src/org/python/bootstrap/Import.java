@@ -147,10 +147,13 @@ public class Import {
             if (value != null) {
                 boolean initializing = value.__bool__();
                 if (initializing) {
-                    aquireLock(interp);
+//                    aquireLock(interp);
                     try {
                         value = interp.importlib.invoke("_lock_unlock_module", absName);
                         // if (value == null) goto error;
+                        if (value == null) {
+                            return finalMod;
+                        }
                     } catch (PyException pye) {
                         removeImportlibFrames(pye);
                         throw pye;
@@ -158,7 +161,7 @@ public class Import {
                 }
             }
         } else {
-            aquireLock(interp);
+//            aquireLock(interp);
             try {
                 mod = interp.importlib.invoke("_find_and_load", absName, interp.importFunc);
             } catch (PyException pye) {
@@ -202,7 +205,7 @@ public class Import {
         return finalMod;
     }
 
-    public static void aquireLock(PySystemState interp) {
+    private static void aquireLock(PySystemState interp) {
         ReentrantLock importLock = interp.getImportLock();
         importLock.lock();
     }
