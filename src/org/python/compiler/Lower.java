@@ -470,7 +470,8 @@ public class Lower extends Visitor {
 
             @Override
             public Object visitTry(Try node) {
-                return Lower.this.visitTry(node);
+                Lower.this.visitTry(node);
+                return super.visitTry(node);
             }
 
             @Override
