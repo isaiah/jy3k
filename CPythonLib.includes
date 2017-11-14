@@ -166,6 +166,7 @@ sgmllib.py
 shelve.py
 shlex.py
 shutil.py
+signal.py
 SimpleXMLRPCServer.py
 site.py
 site-packages/README

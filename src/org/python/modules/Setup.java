@@ -52,6 +52,7 @@ public class Setup {
             "_posixsubprocess",
             "_random:org.python.modules.random.RandomModule",
             "_sha3:org.python.modules._sha3._sha3module",
+            "_signal",
             "_socket:org.python.modules._socket.SocketModule",
             "_sre:org.python.modules.sre._sre",
             "_string",
