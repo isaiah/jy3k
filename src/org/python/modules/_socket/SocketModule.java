@@ -16,7 +16,9 @@ import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.io.util.FilenoUtil;
 
@@ -41,10 +43,14 @@ public class SocketModule {
     @ExposedConst
     public static final int SHUT_RDWR = 2;
 
+    protected static PyType TimeOutError;
+
     @ModuleInit
     public static void classDictInit(final PyObject dict) {
         dict.__setitem__("socket", PySocket.TYPE);
         dict.__setitem__("error", Py.OSError);
+        TimeOutError = makeException("timeout", Py.OSError);
+        dict.__setitem__("timeout", TimeOutError);
         for (AddressFamily value : AddressFamily.values()) {
             if (value == AddressFamily.AF_UNIX) {
                 continue; // disable unix domain socket
@@ -213,5 +219,21 @@ public class SocketModule {
     @ExposedFunction
     public static int dup(int fileno) {
         return FilenoUtil.getInstance().dup(fileno);
+    }
+
+    /**
+     * Convenience method for constructing a type object of a Python exception, named as given, and
+     * added to the namespace of the "_io" module.
+     *
+     * @param dict module dictionary
+     * @param excname name of the exception
+     * @param bases one or more bases (superclasses)
+     * @return the constructed exception type
+     */
+    private static PyType makeException(String excname, PyObject... bases) {
+        PyStringMap classDict = new PyStringMap();
+        classDict.__setitem__("__module__", Py.newUnicode("socket"));
+        PyType type = (PyType) Py.makeClass(excname, classDict, bases);
+        return type;
     }
 }

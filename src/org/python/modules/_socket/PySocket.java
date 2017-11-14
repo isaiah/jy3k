@@ -12,6 +12,7 @@ import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyException;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -27,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
@@ -49,6 +51,7 @@ public class PySocket extends PyObject {
     private SocketAddress bindAddr;
     private boolean connected;
     private boolean inUse;
+    private int timeout;
 
     public PySocket(PyType subtype, AddressFamily family, Sock socket, ProtocolFamily proto) {
         super(subtype);
@@ -56,6 +59,7 @@ public class PySocket extends PyObject {
         sockType = socket;
         protocolFamily = proto;
         fd = initChannelFD();
+        timeout = -1;
     }
 
     public PySocket(PyType subtype, int fileno) {
@@ -125,7 +129,7 @@ public class PySocket extends PyObject {
     public final void listen(int backlog) {
         NetworkChannel channel = (NetworkChannel) fd.ch;
         ServerSocketChannel ch;
-        if (!(channel instanceof ServerSocketChannel || backlog != -1)) {
+        if (!(channel instanceof ServerSocketChannel) || backlog != -1) {
             try {
                 channel.close();
                 ch = ServerSocketChannel.open();
@@ -162,6 +166,9 @@ public class PySocket extends PyObject {
             ch = (ServerSocketChannel) channel;
         }
         try {
+            if (timeout > 0) {
+                ch.socket().setSoTimeout(timeout);
+            }
             ch.accept();
         } catch (IOException e) {
             throw Py.IOError(e);
@@ -189,7 +196,12 @@ public class PySocket extends PyObject {
             ch = (ServerSocketChannel) channel;
         }
         try {
-            client = ch.accept();
+            if (timeout > 0) {
+                ch.socket().setSoTimeout(timeout);
+            }
+            client = ch.socket().accept().getChannel();
+        } catch (SocketTimeoutException e) {
+            throw new PyException(SocketModule.TimeOutError, e.getMessage());
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -212,6 +224,8 @@ public class PySocket extends PyObject {
         try {
             ch.connect(getsockaddrarg(address));
         } catch (ConnectException e) {
+            // Start from here, create a subclass of Exception for socket.timeout error
+            // reimplement signal.alarm with Timer
             throw Py.IOError(Errno.ECONNREFUSED);
         } catch (IOException e) {
             throw Py.IOError(e);
@@ -429,7 +443,7 @@ public class PySocket extends PyObject {
         if (timeoutObj == Py.None) {
             return;
         }
-        int timeout = timeoutObj.asInt();
+        timeout = timeoutObj.asInt();
         NetworkChannel ch = (NetworkChannel) fd.ch;
         if (ch instanceof SocketChannel) {
             try {
