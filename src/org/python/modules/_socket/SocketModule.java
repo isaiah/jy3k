@@ -11,6 +11,7 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
@@ -26,6 +27,8 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 @ExposedModule(name = "_socket")
 public class SocketModule {
@@ -221,6 +224,23 @@ public class SocketModule {
         return FilenoUtil.getInstance().dup(fileno);
     }
 
+    @ExposedFunction
+    public static PyObject getaddrinfo(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("getaddrinfo", args, keywords, "host", "port", "family", "type", "proto", "flags");
+        String host = ap.getString(0);
+        PyObject port = ap.getPyObject(1);
+        try {
+            InetAddress[] addrs = InetAddress.getAllByName(host);
+            List<PyObject> ret = new ArrayList<>(addrs.length);
+            for (InetAddress addr : addrs) {
+                PyTuple sockaddr = new PyTuple(new PyUnicode(addr.getHostName()), port);
+                ret.add(new PyTuple(new PyLong(10), Py.One, new PyLong(6), Py.EmptyUnicode, sockaddr));
+            }
+            return new PyTuple(ret);
+        } catch (UnknownHostException e) {
+            throw Py.IOError(e);
+        }
+    }
     /**
      * Convenience method for constructing a type object of a Python exception, named as given, and
      * added to the namespace of the "_io" module.
