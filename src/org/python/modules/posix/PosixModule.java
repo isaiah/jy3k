@@ -5,6 +5,7 @@ import com.kenai.jffi.Library;
 import com.sun.security.auth.module.UnixSystem;
 import jnr.constants.Constant;
 import jnr.constants.platform.Errno;
+import jnr.constants.platform.Signal;
 import jnr.constants.platform.Sysconf;
 import jnr.posix.FileStat;
 import jnr.posix.POSIX;
@@ -1357,5 +1358,11 @@ public class PosixModule {
         } catch (PyException ex) {
             throw Py.OSError(Errno.EBADF);
         }
+    }
+
+    public static final void signal(Signal signal, PyObject handler) {
+        posix.signal(signal, num -> {
+            handler.__call__(new PyLong(num));
+        });
     }
 }
