@@ -46,6 +46,9 @@ public class SocketModule {
     @ExposedConst
     public static final int SHUT_RDWR = 2;
 
+    @ExposedConst
+    public static final int SOCK_NONBLOCK = 1 << 11;
+
     protected static PyType TimeOutError;
 
     @ModuleInit

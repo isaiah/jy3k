@@ -1,6 +1,6 @@
 base_class: PySocket
 want_dict: false
-ctr: jnr.constants.platform.AddressFamily af, jnr.constants.platform.Sock sock, jnr.constants.platform.ProtocolFamily pf
+ctr: jnr.constants.platform.AddressFamily af, jnr.constants.platform.Sock sock, jnr.constants.platform.ProtocolFamily pf, boolean nonblocking
 incl: object
 noinherit:
     public PySocketDerived(PyType subtype, int fileno) {

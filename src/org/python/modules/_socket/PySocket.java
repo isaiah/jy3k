@@ -54,13 +54,15 @@ public class PySocket extends PyObject {
     private SocketAddress bindAddr;
     private boolean connected;
     private boolean inUse;
+    private boolean nonblocking;
     private int timeout;
 
-    public PySocket(PyType subtype, AddressFamily family, Sock socket, ProtocolFamily proto) {
+    public PySocket(PyType subtype, AddressFamily family, Sock socket, ProtocolFamily proto, boolean nonblocking) {
         super(subtype);
         domain = family;
         sockType = socket;
         protocolFamily = proto;
+        this.nonblocking = nonblocking;
         fd = initChannelFD();
         timeout = -1;
     }
@@ -81,18 +83,22 @@ public class PySocket extends PyObject {
         long st = ap.getInt(1, Sock.SOCK_STREAM.intValue());
         int p = ap.getInt(2, ProtocolFamily.PF_INET.intValue());
         int fileno = ap.getInt(3, -1);
+        boolean nonblocking = (st & SOCK_NONBLOCK) > 0;
+        if (nonblocking) {
+            st &= ~SOCK_NONBLOCK;
+        }
         if (subtype == TYPE) {
-            return new PySocket(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p));
+            return new PySocket(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
         } else {
             if (fileno >= 0) {
                 return new PySocketDerived(subtype, fileno);
             }
-            return new PySocketDerived(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p));
+            return new PySocketDerived(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
         }
     }
 
     private void initFromFD(ChannelFD fd) {
-        Channel ch = fd.ch;
+        SelectableChannel ch = (SelectableChannel) fd.ch;
         if (ch instanceof SocketChannel) {
             domain = AddressFamily.AF_INET;
             sockType = Sock.SOCK_STREAM;
@@ -101,7 +107,9 @@ public class PySocket extends PyObject {
             sockType = Sock.SOCK_DGRAM;
         }
         protocolFamily = ProtocolFamily.PF_INET;
+        this.nonblocking = ch.isBlocking();
         this.fd = fd;
+
     }
 
     @ExposedMethod()
@@ -525,20 +533,23 @@ public class PySocket extends PyObject {
             return SocketModule.getdefaulttimeout();
         }
         NetworkChannel ch = (NetworkChannel) fd.ch;
+        if (ch instanceof SelectableChannel && ((SelectableChannel) ch).isBlocking()) {
+            return Py.None;
+        }
         if (ch instanceof SocketChannel) {
             try {
-                ((SocketChannel) ch).socket().getSoTimeout();
+                timeout = ((SocketChannel) ch).socket().getSoTimeout();
             } catch (SocketException e) {
                 throw Py.IOError(e);
             }
         } else if (ch instanceof ServerSocketChannel) {
             try {
-                ((ServerSocketChannel) ch).socket().getSoTimeout();
+                timeout = ((ServerSocketChannel) ch).socket().getSoTimeout();
             } catch (IOException e) {
                 throw Py.IOError(e);
             }
         }
-        return Py.None;
+        return timeout < 0 ? Py.None : new PyLong(timeout);
     }
 
     @ExposedMethod
@@ -549,7 +560,7 @@ public class PySocket extends PyObject {
         }
         try {
             ((SelectableChannel) ch).configureBlocking(blocking);
-            timeout = 0;
+            timeout = blocking ? -1 : 0;
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -623,6 +634,10 @@ public class PySocket extends PyObject {
         }
     }
 
+    public ChannelFD getFD() {
+        return fd;
+    }
+
     private java.net.SocketOption<?> getOption(SocketOption opt) {
         switch (opt) {
             case SO_REUSEADDR:
@@ -637,7 +652,7 @@ public class PySocket extends PyObject {
 
     private ChannelFD initChannelFD() {
         try {
-            NetworkChannel channel;
+            SelectableChannel channel;
             switch (sockType) {
                 case SOCK_STREAM:
                     channel = SocketChannel.open();
@@ -647,6 +662,9 @@ public class PySocket extends PyObject {
                     break;
                 default:
                     throw Py.TypeError("wrong socket type");
+            }
+            if (nonblocking) {
+                channel.configureBlocking(false);
             }
             return new ChannelFD(channel, FilenoUtil.getInstance());
         } catch (IOException e) {
