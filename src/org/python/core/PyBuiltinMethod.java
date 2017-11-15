@@ -96,6 +96,10 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             selfType = methodType.parameterType(0);
             argOffset = 1;
         }
+        boolean needThreadState  = methodType.parameterCount() > argOffset && methodType.parameterType(argOffset) == ThreadState.class;
+        if (needThreadState) {
+            argOffset++;
+        }
         int paramCount = methodType.parameterCount() - argOffset;
         Class<?>[] paramArray = methodType.parameterArray();
         int defaultLength = info.defaults.length;
@@ -166,7 +170,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             }
         }
 
-        if (argOffset > 0) {
+        if (selfType != null) {
             MethodHandle filter = MethodHandles.explicitCastArguments(GET_REAL_SELF, MethodType.methodType(selfType, PyObject.class));
             mh = MethodHandles.filterArguments(mh, 0, filter);
         } else {
@@ -174,7 +178,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
         }
 
-        if (methodType.parameterCount() < 2 || methodType.parameterType(1) != ThreadState.class) {
+        if (!needThreadState) {
             mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         }
         mh = asTypesafeReturn(mh, methodType);
