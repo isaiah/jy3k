@@ -8,6 +8,8 @@ import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.core.packagecache.PackageManager;
 import org.python.core.packagecache.SysPackageManager;
+import org.python.io.util.FilenoUtil;
+import org.python.io.util.SelectorPool;
 import org.python.modules.PyNamespace;
 import org.python.modules.Setup;
 import org.python.modules._imp;
@@ -190,6 +192,10 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     private static final ConcurrentMap<WeakReference<PySystemState>, PySystemStateCloser> sysClosers =
             new ConcurrentHashMap<>();
 
+    private SelectorPool selectorPool;
+
+    private FilenoUtil filenoUtil;
+
     public PySystemState() {
         initialize();
         initImplementation();
@@ -231,6 +237,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         __dict__.__setitem__("displayhook", __displayhook__);
         __dict__.__setitem__("excepthook", __excepthook__);
 
+        selectorPool = new SelectorPool();
     }
 
     void reload() throws PyIgnoreMethodTag {
@@ -368,6 +375,14 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     public ClassLoader getSyspathJavaLoader() {
         return syspathJavaLoader;
+    }
+
+    public SelectorPool selectorPool() {
+        return selectorPool;
+    }
+
+    public FilenoUtil filenoUtil() {
+        return filenoUtil;
     }
 
     // xxx fix this accessors

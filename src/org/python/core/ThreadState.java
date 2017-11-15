@@ -1,6 +1,9 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import org.python.io.util.FilenoUtil;
+import org.python.io.util.SelectorPool;
+
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -94,4 +97,11 @@ public class ThreadState {
         return compareStateDict;
     }
 
+    public SelectorPool selectorPool() {
+        return systemState.selectorPool();
+    }
+
+    public FilenoUtil filenoUtil() {
+        return systemState.filenoUtil();
+    }
 }
