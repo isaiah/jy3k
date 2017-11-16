@@ -60,8 +60,7 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
      */
     public PyMemoryView(PyBuffer pybuf) {
         super(TYPE);
-        backing = pybuf;
-        view = backing.getNIOByteBuffer().order(ByteOrder.nativeOrder());
+        init(pybuf);
     }
 
     public PyMemoryView(BufferProtocol pybuf) {
@@ -72,7 +71,16 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
          * the PyBuffer will be writable.
          */
         int flag = pybuf instanceof PyBytes ? PyBUF.FULL_RO : PyBUF.FULL;
-        backing = pybuf.getBuffer(flag);
+        init(pybuf.getBuffer(flag));
+
+    }
+
+    public void setBuf(PyBuffer pybuf) {
+        init(pybuf);
+    }
+
+    private void init(PyBuffer pybuf) {
+        backing = pybuf;
         view = backing.getNIOByteBuffer().order(ByteOrder.nativeOrder());
     }
 

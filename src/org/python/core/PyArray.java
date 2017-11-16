@@ -1079,6 +1079,10 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
         frombytesInternal(StringUtil.toBytes(input));
     }
 
+    public void frombytes(byte[] input) {
+        frombytesInternal(input);
+    }
+
     /**
      * Appends items from the string, interpreting the string as an array of machine values (as if
      * it had been read from a file using the {@link #fromfile(PyObject, int) fromfile()} method).

@@ -157,7 +157,7 @@ public abstract class BaseBytes extends PySequence implements List<PyLong> {
      *
      * @param storage byte array allocated by client
      */
-    protected void setStorage(byte[] storage) {
+    public void setStorage(byte[] storage) {
         this.storage = storage;
         this.size = storage.length;
         this.offset = 0;
