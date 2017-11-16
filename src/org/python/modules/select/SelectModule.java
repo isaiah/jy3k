@@ -50,12 +50,18 @@ public class SelectModule {
                         ops = SelectionKey.OP_CONNECT;
                     }
                 }
-                ch.register(selector, ops);
+                boolean blocking = ch.isBlocking();
+                ch.configureBlocking(false);
+                SelectionKey key = ch.register(selector, ops);
+                key.attach(blocking);
             }
             for (SelectableChannel ch : wlist.keySet()) {
                 int ops = ch.validOps();
                 ops &= ~SelectionKey.OP_READ;
-                ch.register(selector, ops);
+                boolean blocking = ch.isBlocking();
+                ch.configureBlocking(false);
+                SelectionKey key = ch.register(selector, ops);
+                key.attach(blocking);
             }
 //            for (SelectableChannel ch : xlist) {
 //                ch.register(selector, 0);
@@ -71,6 +77,14 @@ public class SelectModule {
                     read.add(rlist.get(key.channel()));
                 } else if (wlist.containsKey(key.channel())) {
                     write.add(wlist.get(key.channel()));
+                }
+                boolean blocking = (boolean) key.attachment();
+                if (blocking) {
+                    try {
+                        key.channel().configureBlocking(false);
+                    } catch (IOException e) {
+                        // ignore
+                    }
                 }
             });
         } catch (ClosedChannelException e) {
