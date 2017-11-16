@@ -1,5 +1,6 @@
 package org.python.modules._socket;
 
+import io.netty.buffer.ByteBuf;
 import jnr.constants.platform.AddressFamily;
 import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
@@ -11,21 +12,27 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
+import org.python.core.PyArray;
+import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
 import org.python.core.PyLong;
+import org.python.core.PyMemoryView;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.core.buffer.SimpleBuffer;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -122,30 +129,33 @@ public class PySocket extends PyObject {
                     try {
                         channel.close();
                         channel = ServerSocketChannel.open();
+                        if (nonblocking) {
+                            ((SelectableChannel)channel).configureBlocking(false);
+                        }
                         fd.ch = channel;
                     } catch (IOException e) {
                         throw Py.IOError(e);
                     }
                 }
+                try {
+                    ServerSocket sock = ((ServerSocketChannel) channel).socket();
+                    sock.setReuseAddress(true);
+                    sock.bind(bindAddr);
+                } catch (IOException e) {
+                    throw Py.IOError(e);
+                }
                 break;
             case SOCK_DGRAM:
-                if (!(channel instanceof DatagramChannel)) {
-                    try {
-                        channel.close();
-                        channel = DatagramChannel.open();
-                        fd.ch = channel;
-                    } catch (IOException e) {
-                        throw Py.IOError(e);
-                    }
+                try {
+                    DatagramSocket sock = ((DatagramChannel) channel).socket();
+                    sock.setReuseAddress(true);
+                    sock.bind(bindAddr);
+                } catch (IOException e) {
+                    throw Py.IOError(e);
                 }
                 break;
             default:
                 throw Py.TypeError(String.format("wrong socket type: %s", sockType.description()));
-        }
-        try {
-            channel.bind(bindAddr);
-        } catch (IOException e) {
-            throw Py.IOError(e);
         }
         return this;
     }
@@ -250,6 +260,11 @@ public class PySocket extends PyObject {
         switch (sockType) {
             case SOCK_STREAM:
                 try {
+                    if (ch instanceof ServerSocketChannel) {
+                        // TODO Warning:
+//                    throw Py.OSError("Bind before connect is not possible on JVM");
+                        ch = SocketChannel.open();
+                    }
                     ((SocketChannel) ch).connect(getsockaddrarg(address));
                 } catch (ConnectException e) {
                     throw Py.IOError(Errno.ECONNREFUSED);
@@ -333,17 +348,38 @@ public class PySocket extends PyObject {
         ArgParser ap = new ArgParser("recv", args, kws, "buffersize", "flags");
         int bufsize = ap.getInt(0);
         int flags = ap.getInt(1, -1);
-        ByteBuffer data = recv(bufsize, flags).data;
+        byte[] data = recv(bufsize, flags).data;
         return new PyBytes(data);
     }
 
-    static class ReceiveFromResult {
-        ByteBuffer data;
-        SocketAddress address;
+    @ExposedMethod(defaults = {"-1", "-1"})
+    public final int recv_into(PyObject buffer, int buffersize, int flags) {
+        if (buffersize < 0) {
+            buffersize = buffer.__len__();
+        }
 
-        ReceiveFromResult(ByteBuffer data, SocketAddress addr) {
+        ReceiveFromResult ret = recv(buffersize, flags);
+
+        if (buffer instanceof PyByteArray) {
+            ((PyByteArray) buffer).setStorage(ret.data);
+        } else if (buffer instanceof PyArray) {
+            ((PyArray) buffer).frombytes(ret.data);
+        } else if (buffer instanceof PyMemoryView) {
+            ((PyMemoryView) buffer).setBuf(new SimpleBuffer(ret.data));
+        }
+
+        return ret.size;
+    }
+
+    static class ReceiveFromResult {
+        byte[] data;
+        SocketAddress address;
+        int size;
+
+        ReceiveFromResult(byte[] data, SocketAddress addr, int size) {
             this.data = data;
             this.address = addr;
+            this.size = size;
         }
     }
 
@@ -355,15 +391,21 @@ public class PySocket extends PyObject {
         NetworkChannel channel = (NetworkChannel) fd.ch;
         switch(sockType) {
             case SOCK_STREAM:
-                ByteBuffer buf = ByteBuffer.allocate(bufsize);
+                byte[] buf = new byte[bufsize];
                 SocketChannel ch = (SocketChannel) channel;
                 try {
-                    int size = ch.read(buf);
-                    if (size <= 0) {
-                        return new ReceiveFromResult(ByteBuffer.allocate(0), null);
+                    int size;
+                    if (timeout > 0) {
+                        size = ch.socket().getInputStream().read(buf);
+                    } else {
+                        size = ch.read(ByteBuffer.wrap(buf));
                     }
-                    buf.flip();
-                    return new ReceiveFromResult(buf, null);
+                    if (size == 0 || nonblocking) {
+                        throw Py.OSError(Errno.valueOf(11));
+                    }
+                    return new ReceiveFromResult(buf, null, size);
+                } catch (SocketTimeoutException e) {
+                    throw new PyException(TimeOutError, e.getMessage());
                 } catch (IOException e) {
                     throw Py.IOError(e);
                 }
@@ -373,7 +415,7 @@ public class PySocket extends PyObject {
                     DatagramPacket data = new DatagramPacket(new byte[bufsize], bufsize);
                     datagramChannel.socket().receive(data);
                     SocketAddress addr = data.getSocketAddress();
-                    return new ReceiveFromResult(ByteBuffer.wrap(data.getData()), addr);
+                    return new ReceiveFromResult(data.getData(), addr, data.getLength());
                 } catch (SocketTimeoutException e) {
                     throw new PyException(TimeOutError, e.getMessage());
                 } catch (IOException e) {
@@ -680,8 +722,8 @@ public class PySocket extends PyObject {
         if (fd == null) {
             throw Py.IOError(Errno.EBADF);
         }
-        if (inUse) {
-            throw Py.IOError(Errno.EISCONN);
-        }
+//        if (inUse) {
+//            throw Py.IOError(Errno.EISCONN);
+//        }
     }
 }
