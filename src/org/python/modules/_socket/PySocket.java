@@ -348,8 +348,8 @@ public class PySocket extends PyObject {
         ArgParser ap = new ArgParser("recv", args, kws, "buffersize", "flags");
         int bufsize = ap.getInt(0);
         int flags = ap.getInt(1, -1);
-        byte[] data = recv(bufsize, flags).data;
-        return new PyBytes(data);
+        ReceiveFromResult ret = recv(bufsize, flags);
+        return new PyBytes(ret.data, 0, ret.size);
     }
 
     @ExposedMethod(defaults = {"-1", "-1"})
@@ -522,7 +522,7 @@ public class PySocket extends PyObject {
                 if (inetAddress == null) {
                     addr = domain == AddressFamily.AF_INET ? "0.0.0.0" : "::";
                 } else {
-                    addr = inetAddress.toString();
+                    addr = inetAddress.getHostName();
                     port = inetAddress.getPort();
                 }
                 break;
