@@ -13,10 +13,14 @@ import org.python.io.util.FilenoUtil;
 import org.python.modules._socket.PySocket;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,15 +33,23 @@ public class SelectModule {
     @ExposedFunction(defaults={"0"})
     public static PyObject select(ThreadState ts, PyObject rlistObj, PyObject wlistObj, PyObject xlistObj, int timeout) {
         Map<SelectableChannel, PyObject> rlist = lookupFilenos(ts, rlistObj.asIterable());
-        Map<SelectableChannel, PyObject> wlist = lookupFilenos(ts, rlistObj.asIterable());
-        Map<SelectableChannel, PyObject> xlist = lookupFilenos(ts, rlistObj.asIterable());
+        Map<SelectableChannel, PyObject> wlist = lookupFilenos(ts, wlistObj.asIterable());
+        Map<SelectableChannel, PyObject> xlist = lookupFilenos(ts, xlistObj.asIterable());
         Selector selector = ts.selectorPool().get();
         List<PyObject> read = new ArrayList<>();
         List<PyObject> write = new ArrayList<>();
         try {
             for (SelectableChannel ch : rlist.keySet()) {
-                int ops = ch.validOps();
-                ops &= ~SelectionKey.OP_WRITE;
+                int ops = 0;
+                if (ch instanceof ServerSocketChannel) {
+                    ops = SelectionKey.OP_ACCEPT;
+                } else {
+                    if (((SocketChannel) ch).isConnected()) {
+                        ops = SelectionKey.OP_READ;
+                    } else {
+                        ops = SelectionKey.OP_CONNECT;
+                    }
+                }
                 ch.register(selector, ops);
             }
             for (SelectableChannel ch : wlist.keySet()) {
@@ -48,7 +60,11 @@ public class SelectModule {
 //            for (SelectableChannel ch : xlist) {
 //                ch.register(selector, 0);
 //            }
-            selector.select(timeout);
+            if (timeout > 0) {
+                selector.select(timeout);
+            } else {
+                selector.select();
+            }
             Set<SelectionKey> keys = selector.selectedKeys();
             keys.forEach(key -> {
                 if (rlist.containsKey(key.channel())) {
