@@ -141,7 +141,7 @@ public abstract class BaseBytes extends PySequence implements List<PyLong> {
      * @throws IllegalArgumentException if the range [0:size] is not within the array bounds of
      *             storage.
      */
-    protected void setStorage(byte[] storage, int size) throws IllegalArgumentException {
+    public void setStorage(byte[] storage, int size) throws IllegalArgumentException {
         if (size < 0 || size > storage.length) {
             throw new IllegalArgumentException();
         } else {
