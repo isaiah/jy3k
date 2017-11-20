@@ -1620,12 +1620,17 @@ public final class Py {
     }
 
     public static PyObject runCode(ThreadState ts, PyTableCode code, PyFrame f) {
-        PyFrame fback = null;
+        PyFrame fback;
+        MethodHandle main;
         try {
-            MethodHandle main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
-                     MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
-            fback = f.f_back = ts.frame;
-            ts.frame = f;
+            main = MethodHandles.lookup().findVirtual(code.funcs.getClass(), code.funcname,
+                    MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
+        fback = f.f_back = ts.frame;
+        ts.frame = f;
+        try {
             return (PyObject) main.invokeExact(ts, f);
          } catch (Throwable t) {
             throw Py.JavaError(t);
