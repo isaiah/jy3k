@@ -1,6 +1,5 @@
 package org.python.modules._socket;
 
-import io.netty.buffer.ByteBuf;
 import jnr.constants.platform.AddressFamily;
 import jnr.constants.platform.Errno;
 import jnr.constants.platform.ProtocolFamily;
@@ -16,6 +15,7 @@ import org.python.core.PyArray;
 import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
+import org.python.core.PyFloat;
 import org.python.core.PyLong;
 import org.python.core.PyMemoryView;
 import org.python.core.PyNewWrapper;
@@ -38,7 +38,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.IllegalBlockingModeException;
 import java.nio.channels.NetworkChannel;
@@ -204,7 +203,7 @@ public class PySocket extends PyObject {
             if (timeout > 0) {
                 ch.socket().setSoTimeout(timeout);
             }
-            ch.accept();
+            ch.socket().accept();
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -353,22 +352,26 @@ public class PySocket extends PyObject {
     }
 
     @ExposedMethod(defaults = {"-1", "-1"})
-    public final int recv_into(PyObject buffer, int buffersize, int flags) {
+    public final PyObject recv_into(PyObject buffer, int buffersize, int flags) {
         if (buffersize < 0) {
             buffersize = buffer.__len__();
         }
 
         ReceiveFromResult ret = recv(buffersize, flags);
 
+        // EOF
+        if (ret.size < 0) {
+            return Py.None;
+        }
         if (buffer instanceof PyByteArray) {
-            ((PyByteArray) buffer).setStorage(ret.data);
+            ((PyByteArray) buffer).setStorage(ret.data, ret.size);
         } else if (buffer instanceof PyArray) {
-            ((PyArray) buffer).frombytes(ret.data);
+            ((PyArray) buffer).frombytes(ret.data, ret.size);
         } else if (buffer instanceof PyMemoryView) {
-            ((PyMemoryView) buffer).setBuf(new SimpleBuffer(ret.data));
+            ((PyMemoryView) buffer).setBuf(new SimpleBuffer(ret.data, 0, ret.size));
         }
 
-        return ret.size;
+        return new PyLong(ret.size);
     }
 
     static class ReceiveFromResult {
@@ -395,12 +398,12 @@ public class PySocket extends PyObject {
                 SocketChannel ch = (SocketChannel) channel;
                 try {
                     int size;
-                    if (timeout > 0) {
+                    if (ch.isBlocking()) {
                         size = ch.socket().getInputStream().read(buf);
                     } else {
                         size = ch.read(ByteBuffer.wrap(buf));
                     }
-                    if (size == 0 || nonblocking) {
+                    if (size == 0 && nonblocking) {
                         throw Py.OSError(Errno.valueOf(11));
                     }
                     return new ReceiveFromResult(buf, null, size);
@@ -591,7 +594,7 @@ public class PySocket extends PyObject {
                 throw Py.IOError(e);
             }
         }
-        return timeout < 0 ? Py.None : new PyLong(timeout);
+        return timeout < 0 ? Py.None : new PyFloat(timeout / 1000.0);
     }
 
     @ExposedMethod
@@ -613,7 +616,7 @@ public class PySocket extends PyObject {
         if (timeoutObj == Py.None) {
             return;
         }
-        timeout = timeoutObj.asInt();
+        timeout = (int) timeoutObj.asDouble() * 1000;
         if (timeout == 0) {
             throw Py.OSError(Errno.EINVAL);
         }
