@@ -243,7 +243,7 @@ public class _json {
     }
 
     @ExposedFunction
-    public static PyBytes encode_basestring_ascii(PyObject pystr) {
+    public static PyObject encode_basestring_ascii(PyObject pystr) {
         if (pystr instanceof PyUnicode) {
             return ascii_escape((PyUnicode) pystr);
         } else if (pystr instanceof PyBytes) {
@@ -255,17 +255,17 @@ public class _json {
         }
     }
 
-    private static PyBytes ascii_escape(PyUnicode pystr) {
+    private static PyUnicode ascii_escape(PyUnicode pystr) {
         StringBuilder rval = new StringBuilder(pystr.__len__());
         rval.append("\"");
         for (Iterator<Integer> iter = pystr.newSubsequenceIterator(); iter.hasNext(); ) {
             _write_char(rval, iter.next());
         }
         rval.append("\"");
-        return new PyBytes(rval.toString());
+        return new PyUnicode(rval.toString());
     }
 
-    private static PyBytes ascii_escape(PyBytes pystr) {
+    private static PyObject ascii_escape(PyBytes pystr) {
         int len = pystr.__len__();
         String s = pystr.getString();
         StringBuilder rval = new StringBuilder(len);

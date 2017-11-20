@@ -1,5 +1,6 @@
 package org.python.modules._json;
 
+import org.python.annotations.ExposedMethod;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -61,7 +62,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
 
     public PyObject __call__(PyObject obj, PyObject indent_level) {
         PyList rval = new PyList();
-        encode_obj(rval, obj, 0);
+        encode_obj(rval, obj, indent_level.asInt());
         return rval;
     }
 
@@ -80,13 +81,12 @@ public class PyEncoder extends PyObject implements Traverseproc {
                 return new PyUnicode("NaN");
             }
         }
-        /* Use a better float format here? */
-        return obj.__repr__();
+        return ((PyFloat) obj).float___repr__();
     }
 
-    private PyBytes encode_string(PyObject obj) {
+    private PyObject encode_string(PyObject obj) {
         /* Return the JSON representation of a string */
-        return (PyBytes) encoder.__call__(obj);
+        return encoder.__call__(obj);
     }
 
     private PyObject checkCircularReference(PyObject obj) {
@@ -112,7 +112,8 @@ public class PyEncoder extends PyObject implements Traverseproc {
         } else if (obj instanceof PyUnicode) {
             rval.append(encode_string(obj));
         } else if (obj instanceof PyLong) {
-            rval.append(obj.__str__());
+            // use original __str__ method, because IntEnum override it.
+            rval.append(new PyUnicode(((PyLong) obj).int_toString()));
         } else if (obj instanceof PyFloat) {
             rval.append(encode_float(obj));
         } else if (obj instanceof PyList || obj instanceof PyTuple) {
@@ -174,7 +175,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
             }
 
             PyObject value = dct.__getitem__(key);
-            PyBytes encoded = encode_string(kstr);
+            PyObject encoded = encode_string(kstr);
             rval.append(encoded);
             rval.append(key_separator);
             encode_obj(rval, value, indent_level);

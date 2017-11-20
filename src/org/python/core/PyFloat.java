@@ -292,7 +292,7 @@ public class PyFloat extends PyObject {
     }
 
     @ExposedMethod(doc = BuiltinDocs.float___repr___doc)
-    final PyUnicode float___repr__() {
+    public final PyUnicode float___repr__() {
         return Py.newUnicode(formatDouble(SPEC_REPR));
     }
 
