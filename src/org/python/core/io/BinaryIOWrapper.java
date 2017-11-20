@@ -72,18 +72,16 @@ public class BinaryIOWrapper extends TextIOBase {
         // (this.builder) method calls in the inner loop by reading
         // directly from the readahead's backing array and writing to
         // an interim char array (this.interimBuilder)
-        byte[] readaheadArray;
         int readaheadPos;
         int interimBuilderPos;
 
         do {
-            readaheadArray = readahead.array();
             readaheadPos = readahead.position();
             interimBuilderPos = 0;
 
             while (readaheadPos < readahead.limit() &&
                    (size < 0 || builder.length() + interimBuilderPos < size)) {
-                char next = (char)(readaheadArray[readaheadPos++] & 0xff);
+                char next = (char) (readahead.get(readaheadPos++) & 0xff);
                 interimBuilder[interimBuilderPos++] = next;
 
                 if (next == '\n') {
