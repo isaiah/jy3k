@@ -520,24 +520,17 @@ public class marshal {
             }
         }
     }
-    public static void dump(PyObject value, PyObject file) {
-        dump(value, file, 2);
-    }
 
-    @ExposedFunction
+    @ExposedFunction(defaults = {"2"})
     public static void dump(PyObject value, PyObject file, int version) {
         new Marshaller(file).dump(value);
     }
 
-    @ExposedFunction
+    @ExposedFunction(defaults = {"2"})
     public static PyObject dumps(PyObject value, int version) {
         cStringIO.StringIO f = cStringIO.StringIO();
         dump(value, f, version);
         return f.getvalue();
-    }
-
-    public static PyObject dumps(PyObject value) {
-        return dumps(value, 2);
     }
 
     @ExposedFunction
