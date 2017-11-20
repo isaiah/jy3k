@@ -6,6 +6,7 @@ asyncio/*
 collections/**
 compiler/**
 concurrent/**
+ctypes/util.py
 dbm/**
 distutils/**
 email/**
