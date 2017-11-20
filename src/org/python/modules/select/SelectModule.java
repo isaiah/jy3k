@@ -78,14 +78,14 @@ public class SelectModule {
                 } else if (wlist.containsKey(key.channel())) {
                     write.add(wlist.get(key.channel()));
                 }
-                boolean blocking = (boolean) key.attachment();
-                if (blocking) {
-                    try {
-                        key.channel().configureBlocking(false);
-                    } catch (IOException e) {
-                        // ignore
-                    }
-                }
+//                boolean blocking = (boolean) key.attachment();
+//                if (blocking) {
+//                    try {
+//                        key.channel().configureBlocking(true);
+//                    } catch (IOException e) {
+//                        // ignore
+//                    }
+//                }
             });
         } catch (ClosedChannelException e) {
             throw Py.IOError(e);
