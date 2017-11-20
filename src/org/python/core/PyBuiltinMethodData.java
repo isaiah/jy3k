@@ -5,7 +5,7 @@ import java.lang.invoke.MethodType;
 
 public class PyBuiltinMethodData {
 
-    String name, defaultVals, doc;
+    String name, defaultVals, doc, module;
     Object[] defaults;
     MethodHandle target;
     // if this is implemented as a static method
@@ -46,10 +46,15 @@ public class PyBuiltinMethodData {
      * @param isWide
      */
     public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
+        this(name, defaultVals, mh, doc, isStatic, isWide, null);
+    }
+
+    public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, String module) {
         this.name = name;
         this.defaultVals = defaultVals;
         this.target = mh;
         this.doc = doc;
+        this.module = module;
         this.isStatic = isStatic;
         this.isWide = isWide;
         getDefaults();
@@ -57,6 +62,10 @@ public class PyBuiltinMethodData {
 
     public String getName() {
         return name;
+    }
+
+    public String getModule() {
+        return this.module;
     }
 
     public int getMaxargs() {

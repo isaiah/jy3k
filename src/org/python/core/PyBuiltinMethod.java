@@ -48,7 +48,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
-        super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide));
+        super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide, null));
     }
 
     @Override

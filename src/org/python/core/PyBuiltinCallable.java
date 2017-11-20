@@ -44,7 +44,7 @@ public abstract class PyBuiltinCallable extends PyObject {
 
     @ExposedGet(name = "__module__")
     public PyObject getModule() {
-        return Py.None;
+        return info.getModule() == null ? Py.None : new PyUnicode(info.getModule());
     }
 
     @ExposedGet(name = "__call__")

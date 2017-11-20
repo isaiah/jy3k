@@ -69,17 +69,18 @@ public class ModuleExposer extends Exposer {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitVarInsn(ASTORE, 1);
         for(MethodExposer exposer : methods) {
-            for(final String name : exposer.getNames()) {
+            for(final String methodName : exposer.getNames()) {
                 mv.visitInsn(DUP);
-                mv.visitLdcInsn(name);
+                mv.visitLdcInsn(methodName);
                 mv.visitTypeInsn(NEW, BUILTIN_METHOD.getInternalName());
                 mv.visitInsn(DUP);
                 mv.visitVarInsn(ALOAD, 1);
                 mv.visitTypeInsn(NEW, BUILTIN_METHOD_DATA.getInternalName());
                 mv.visitInsn(DUP);
-                mv.visitLdcInsn(name);
+                mv.visitLdcInsn(methodName);
                 exposer.generateNamedConstructor(mv);
-                callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                mv.visitLdcInsn(name);
+                callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN, STRING);
                 callConstructor(BUILTIN_METHOD, PYOBJ, BUILTIN_METHOD_DATA);
                 call(PYOBJ, "__setitem__", VOID, STRING, PYOBJ);
             }
