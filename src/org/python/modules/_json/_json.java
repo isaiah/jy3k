@@ -21,13 +21,13 @@ import java.util.Iterator;
  *
  * (Retained comments use the standard commenting convention for C.)
  */
-@ExposedModule(doc = BuiltinDocs._json_doc)
+@ExposedModule(name="_json", doc = BuiltinDocs._json_doc)
 public class _json {
 
     @ModuleInit
     public static void init(PyObject dict) {
-        dict.__setitem__("make_encoder", Encoder.TYPE);
-        dict.__setitem__("make_scanner", Scanner.TYPE);
+        dict.__setitem__("make_encoder", PyEncoder.TYPE);
+        dict.__setitem__("make_scanner", PyScanner.TYPE);
     }
 
     private static PyObject errmsg_fn;

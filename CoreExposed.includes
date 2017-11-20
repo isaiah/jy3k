@@ -109,8 +109,8 @@ org/python/modules/_io/PyRawIOBase.class
 org/python/modules/_io/PyBytesIO.class
 org/python/modules/_io/PyFileIO.class
 org/python/modules/_io/PyIncrementalNewlineDecoder.class
-org/python/modules/_json/Encoder.class
-org/python/modules/_json/Scanner.class
+org/python/modules/_json/PyEncoder.class
+org/python/modules/_json/PyScanner.class
 org/python/modules/_multiprocessing/PySemLock.class
 org/python/modules/_functools/PyPartial.class
 org/python/modules/_hashlib$Hash.class
