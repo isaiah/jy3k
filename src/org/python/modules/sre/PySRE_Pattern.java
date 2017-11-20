@@ -72,12 +72,18 @@ public class PySRE_Pattern extends PyObject {
         this.pattern = s;
     }
 
-    @ExposedMethod
-    public PyObject SRE_Pattern_match(PyObject s) {
+    @ExposedMethod(defaults = {"0"})
+    public PyObject SRE_Pattern_match(PyObject s, int pos) {
         String str = getString(s);
         Matcher m = reg.matcher(str);
-        if (!m.lookingAt()) {
-            return Py.None;
+        if (pos < str.length()) {
+            if (!m.find(pos)) {
+                return Py.None;
+            }
+        } else {
+            if (!m.lookingAt()) {
+                return Py.None;
+            }
         }
         return new PySRE_Match(m, s, this);
     }
