@@ -117,6 +117,7 @@ public class PosixModule {
     public static final int RTLD_LOCAL = Library.LOCAL;
     @ExposedConst
     public static final int WNOHANG = 0x00000001;
+
     /**
      * Current OS information.
      */
@@ -1068,6 +1069,16 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_WEXITSTATUS_doc)
     public static int WEXITSTATUS(long status) {
         return PosixShim.WAIT_MACROS.WEXITSTATUS(status);
+    }
+
+    @ExposedFunction(doc = BuiltinDocs.posix_WIFSTOPPED_doc)
+    public static boolean WIFSTOPPED(long status) {
+        return PosixShim.WAIT_MACROS.WIFSTOPPED(status);
+    }
+
+    @ExposedFunction(doc = BuiltinDocs.posix_WSTOPSIG_doc)
+    public static int WSTOPSIG(long status) {
+        return PosixShim.WAIT_MACROS.WSTOPSIG(status);
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_write_doc)
