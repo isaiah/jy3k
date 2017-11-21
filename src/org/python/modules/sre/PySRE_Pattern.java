@@ -76,7 +76,7 @@ public class PySRE_Pattern extends PyObject {
     public PyObject SRE_Pattern_match(PyObject s, int pos) {
         String str = getString(s);
         Matcher m = reg.matcher(str);
-        if (pos < str.length()) {
+        if (pos <= str.length()) {
             if (!m.find(pos)) {
                 return Py.None;
             }
