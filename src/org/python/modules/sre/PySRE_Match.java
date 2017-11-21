@@ -87,9 +87,10 @@ public class PySRE_Match extends PyObject {
 
     @ExposedMethod
     public PyObject SRE_Match_groups() {
+        // groups only returns subgroups, which starts from 1
         PyObject[] grps = new PyObject[matcher.groupCount()];
         for (int i = 0; i < matcher.groupCount(); i++) {
-            grps[i] = group(i);
+            grps[i] = group(i+1);
         }
         return new PyTuple(grps);
     }
