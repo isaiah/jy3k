@@ -86,7 +86,7 @@ public class PyScanner extends PyObject implements Traverseproc {
                 /* skip whitespace between key and : delimiter, read :, skip whitespace */
                 while (idx <= end_idx && IS_WHITESPACE(str.getInt(idx))) idx++;
                 if (idx > end_idx || str.getInt(idx) != ':') {
-                    _json.raise_errmsg("Expecting : delimiter", pystr, idx);
+                    _json.raise_errmsg("Expecting ':' delimiter", pystr, idx);
                 }
                 idx++;
                 while (idx <= end_idx && IS_WHITESPACE(str.getInt(idx))) idx++;
@@ -105,7 +105,7 @@ public class PyScanner extends PyObject implements Traverseproc {
                 if (str.getInt(idx) == '}') {
                     break;
                 } else if (str.getInt(idx) != ',') {
-                    _json.raise_errmsg("Expecting , delimiter", pystr, idx);
+                    _json.raise_errmsg("Expecting ',' delimiter", pystr, idx);
                 }
                 idx++;
 

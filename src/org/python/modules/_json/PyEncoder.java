@@ -137,12 +137,12 @@ public class PyEncoder extends PyObject implements Traverseproc {
     private void encode_dict(PyList rval, PyDictionary dct, int indent_level) {
         /* Encode Python dict dct a JSON term */
         if (dct.__len__() == 0) {
-            rval.append(new PyBytes("{}"));
+            rval.append(new PyUnicode("{}"));
             return;
         }
 
         PyObject ident = checkCircularReference(dct);
-        rval.append(new PyBytes("{"));
+        rval.append(new PyUnicode("{"));
 
         /* TODO: C speedup not implemented for sort_keys */
 
@@ -185,7 +185,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
         if (ident != null) {
             markers.__delitem__(ident);
         }
-        rval.append(new PyBytes("}"));
+        rval.append(new PyUnicode("}"));
     }
 
 
