@@ -1,9 +1,11 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._json;
 
+import org.python.bootstrap.Import;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -30,35 +32,31 @@ public class _json {
         dict.__setitem__("make_scanner", PyScanner.TYPE);
     }
 
-    private static PyObject errmsg_fn;
+    private static PyObject JSONDecodeError;
 
     private static synchronized PyObject get_errmsg_fn() {
-        if (errmsg_fn == null) {
-            PyObject json = Py.getSystemState().builtins.__finditem__("json");
-            if (json != null) {
-                PyObject decoder = json.__findattr__("decoder");
-                if (decoder != null) {
-                    errmsg_fn = decoder.__findattr__("errmsg");
-                }
+        if (JSONDecodeError == null) {
+            PyObject decoder = Import.importModule("json.decoder");
+            if (decoder != null) {
+                JSONDecodeError = decoder.__findattr__("JSONDecodeError");
             }
         }
-        return errmsg_fn;
-    }
-
-    static void raise_errmsg(String msg, PyObject s) {
-        raise_errmsg(msg, s, Py.None, Py.None);
+        return JSONDecodeError;
     }
 
     static void raise_errmsg(String msg, PyObject s, int pos) {
-        raise_errmsg(msg, s, Py.newInteger(pos), Py.None);
+        raise_errmsg(msg, s, Py.newInteger(pos));
     }
 
-    static void raise_errmsg(String msg, PyObject s, PyObject pos, PyObject end) {
+    static void raise_errmsg(String msg, PyObject s, PyObject pos) {
         /* Use the Python function json.decoder.errmsg to raise a nice
         looking ValueError exception */
-        final PyObject errmsg_fn = get_errmsg_fn();
-        if (errmsg_fn != null) {
-            throw Py.ValueError(errmsg_fn.__call__(Py.newString(msg), s, pos, end).asString());
+        if (JSONDecodeError == null) {
+            get_errmsg_fn();
+        }
+        if (JSONDecodeError != null) {
+            PyObject err = JSONDecodeError.__call__(new PyUnicode(msg), s, pos);
+            throw new PyException(err.getType(), err);
         } else {
             throw Py.ValueError(msg);
         }
@@ -228,10 +226,13 @@ public class _json {
                                 raise_errmsg("Invalid \\uXXXX escape", pystr, end - 5);
                         }
                     }
-                    if ((c2 & 0xfc00) != 0xdc00) {
-                        raise_errmsg("Unpaired high surrogate", pystr, end - 5);
+                    // if is low surrogate
+                    if ((c2 & 0xfc00) == 0xdc00) {
+                        c = 0x10000 + (((c - 0xd800) << 10) | (c2 - 0xdc00));
+                        chunks.append(new PyUnicode(c));
+                    } else {
+                        end -= 6;
                     }
-                    c = 0x10000 + (((c - 0xd800) << 10) | (c2 - 0xdc00));
                 } else if ((c & 0xfc00) == 0xdc00) {
                     raise_errmsg("Unpaired low surrogate", pystr, end - 5);
                 }
