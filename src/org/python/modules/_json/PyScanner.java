@@ -2,6 +2,7 @@ package org.python.modules._json;
 
 import org.python.annotations.ExposedMethod;
 import org.python.core.Py;
+import org.python.core.PyLong;
 import org.python.core.PyUnicode;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
@@ -192,7 +193,7 @@ public class PyScanner extends PyObject implements Traverseproc {
         PyUnicode str = pystr;
         int length = pystr.__len__();
         if (idx >= length) {
-            throw Py.StopIteration();
+            throw Py.StopIteration(new PyLong(idx));
         }
         if (idx < 0) {
             throw Py.ValueError("index cannot be negative");
@@ -286,7 +287,7 @@ public class PyScanner extends PyObject implements Traverseproc {
         }
         /* no integer digits, error */
         else {
-            throw Py.StopIteration();
+            throw Py.StopIteration(new PyLong(idx));
         }
 
         /* if the next char is '.' followed by a digit then read all float digits */
