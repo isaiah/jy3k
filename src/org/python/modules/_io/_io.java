@@ -104,7 +104,8 @@ public class _io {
         final String encoding = ap.getString(3, null);
         final String errors = ap.getString(4, null);
         final String newline = ap.getString(5, null);
-        boolean closefd = Py.py2boolean(ap.getPyObject(6, Py.True));
+        boolean closefd = ap.getBoolean(6, true);
+        final PyObject opener = ap.getPyObject(7, Py.None);
 
         // Decode the mode string
         OpenMode mode = new OpenMode(m) {
@@ -208,5 +209,5 @@ public class _io {
     }
 
     private static final String[] openKwds = {"file", "mode", "buffering", "encoding", "errors",
-            "newline", "closefd"};
+            "newline", "closefd", "opener"};
 }
