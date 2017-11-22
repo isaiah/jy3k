@@ -130,8 +130,8 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
                     }
                 }
 
-                for (int i = 0; i < argCount; i++) {
-                    mh = convert(mh, argOffset + i, paramArray[i]);
+                for (int i = argOffset; i < argOffset + argCount; i++) {
+                    mh = convert(mh, i, paramArray[i]);
                 }
 
                 missingArg = paramCount - argCount;
