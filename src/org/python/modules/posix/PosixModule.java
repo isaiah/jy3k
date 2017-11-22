@@ -58,6 +58,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
@@ -156,15 +157,11 @@ public class PosixModule {
         }
         dict.__setitem__("_have_functions", PyList.fromList(haveFuncs));
 
-        // Hide __doc__s
         PyList keys;
         if (dict instanceof PyStringMap) {
             keys = (PyList) ((PyStringMap) dict).keys();
         } else {
             keys = (PyList) dict.invoke("keys");
-        }
-        for (Iterator<?> it = keys.listIterator(); it.hasNext();) {
-            String key = (String)it.next();
         }
         dict.__setitem__("__all__", keys);
     }
@@ -682,7 +679,12 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_open_doc, defaults = {"0777"})
     public static PyObject open(PyObject path, int flag, int mode) {
-        Path p = absolutePath(path);
+        Path p;
+        try {
+            p = absolutePath(path);
+        } catch (InvalidPathException e) {
+            throw Py.ValueError(e.getMessage());
+        }
         File file = p.toFile();
         boolean reading = (flag & O_RDONLY) != 0;
         boolean writing = (flag & O_WRONLY) != 0;
@@ -1047,25 +1049,21 @@ public class PosixModule {
         }
     }
 
-    @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_WIFSIGNALED_doc)
     public static boolean WIFSIGNALED(long status) {
         return PosixShim.WAIT_MACROS.WIFSIGNALED(status);
     }
 
-    @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_WIFEXITED_doc)
     public static boolean WIFEXITED(long status) {
         return PosixShim.WAIT_MACROS.WIFEXITED(status);
     }
 
-    @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_WTERMSIG_doc)
     public static int WTERMSIG(long status) {
         return PosixShim.WAIT_MACROS.WTERMSIG(status);
     }
 
-    @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_WEXITSTATUS_doc)
     public static int WEXITSTATUS(long status) {
         return PosixShim.WAIT_MACROS.WEXITSTATUS(status);
@@ -1082,21 +1080,18 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_write_doc)
-    public static int write(PyObject fd, BufferProtocol bytes) {
+    public static int write(PyObject fd, PyObject bytes) {
         // Get a buffer view: we can cope with N-dimensional data, but not strided data.
-        try (PyBuffer buf = bytes.getBuffer(PyBUF.ND)) {
-            // Get a ByteBuffer of that data, setting the position and limit to the real data.
-            ByteBuffer bb = buf.getNIOByteBuffer();
-            Object javaobj = fd.__tojava__(RawIOBase.class);
-            if (javaobj != Py.NoConversion) {
-                try {
-                    return ((RawIOBase) javaobj).write(bb);
-                } catch (PyException pye) {
-                    throw badFD();
-                }
-            } else {
-                return posix.write(getFD(fd).getIntFD(), bb, bb.position());
-            }
+        // Get a ByteBuffer of that data, setting the position and limit to the real data.
+        Object javaobj = fd.__tojava__(RawIOBase.class);
+        byte[] buf = Py.unwrapBuffer(bytes);
+        if (javaobj == Py.NoConversion) {
+            return posix.write(getFD(fd).getIntFD(), buf, buf.length);
+        }
+        try {
+            return ((RawIOBase) javaobj).write(ByteBuffer.wrap(buf));
+        } catch (PyException pye) {
+            throw badFD();
         }
     }
 
@@ -1109,7 +1104,7 @@ public class PosixModule {
     public static PyObject urandom(int n) {
         byte[] buf = new byte[n];
         UrandomSource.INSTANCE.nextBytes(buf);
-        return new PyBytes(StringUtil.fromBytes(buf));
+        return new PyBytes(buf);
     }
 
     /**

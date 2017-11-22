@@ -124,7 +124,7 @@ public class SimpleStringBuffer extends SimpleBuffer {
     public ByteBuffer getNIOByteBuffer() {
         // Force creation of the actual byte array from the String.
         ensureHaveBytes();
-        return super.getNIOByteBuffer().asReadOnlyBuffer();
+        return super.getNIOByteBuffer();
     }
 
     /**
