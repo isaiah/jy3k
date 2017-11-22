@@ -401,12 +401,12 @@ public class PyFileIO extends PyRawIOBase {
         if (__closed) {
             throw closedValueError();
         }
-        return false;
-//        if (!seekableKnown) {
-//            seekable = ioDelegate.seek(0, 1) >= 0;  // Trial seek
-//            seekableKnown = true;
-//        }
-//        return seekable;
+//        return false;
+        if (!seekableKnown) {
+            seekable = ioDelegate.seek(0, 1) >= 0;  // Trial seek
+            seekableKnown = true;
+        }
+        return seekable;
     }
 
     @Override
