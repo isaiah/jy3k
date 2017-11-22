@@ -31,6 +31,7 @@ import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 
 import jnr.constants.platform.Errno;
+import org.python.modules.thread.PyLock;
 
 @Untraversable
 @ExposedType(name = "_io.FileIO", base = PyRawIOBase.class)
@@ -319,17 +320,20 @@ public class PyFileIO extends PyRawIOBase {
 
     @Override
     public long seek(long pos, int whence) {
-        return FileIO_seek(pos, whence);
-    }
-
-    @ExposedMethod(defaults = "0", doc = seek_doc)
-    public final long FileIO_seek(long pos, int whence) {
         if (__closed) {
             throw closedValueError();
         }
         synchronized (ioDelegate) {
             return ioDelegate.seek(pos, whence);
         }
+    }
+
+    @ExposedMethod(defaults = "0", doc = seek_doc)
+    public final long FileIO_seek(PyObject posObj, int whence) {
+        if (!(posObj instanceof PyLong)) {
+            throw Py.ValueError(String.format("'%s' object cannot be interpreted as an integer", posObj.getType().fastGetName()));
+        }
+        return seek(posObj.asInt(), whence);
     }
 
     // _IOBase.tell() is correct for us
