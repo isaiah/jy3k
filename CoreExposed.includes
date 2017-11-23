@@ -120,6 +120,8 @@ org/python/modules/_sha3/PySHA384.class
 org/python/modules/_sha3/PySHA512.class
 org/python/modules/_sha3/PyShake128.class
 org/python/modules/_sha3/PyShake256.class
+org/python/modules/array/PyArrayArray.class
+org/python/modules/array/PyArrayIter.class
 org/python/modules/bz2/PyBZ2File.class
 org/python/modules/bz2/PyBZ2Compressor.class
 org/python/modules/bz2/PyBZ2Decompressor.class

@@ -19,6 +19,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
+            checkInteger(val);
             int v = val.asInt();
             if (index >= 0) {
                 buf.put(index, (byte) v);
@@ -33,6 +34,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
+            checkInteger(val);
             int v = val.asInt();
             if (v < -128) {
                 throw Py.OverflowError("signed char is less than minimum");
@@ -52,7 +54,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     UNSIGNED_INT16_BE(3, 2) {
@@ -63,7 +65,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     SIGNED_INT16_LE(4, 2) {
@@ -74,7 +76,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     SIGNED_INT16_BE(5, 2) {
@@ -85,7 +87,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     UNSIGNED_INT32_LE(6, 4) {
@@ -96,7 +98,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     UNSIGNED_INT32_BE(7, 4) {
@@ -107,7 +109,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     SIGNED_INT32_LE(8, 4) {
@@ -118,7 +120,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     SIGNED_INT32_BE(9, 4) {
@@ -129,7 +131,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     UNSIGNED_INT64_LE(10, 8) {
@@ -140,7 +142,7 @@ enum MachineFormatCode {
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            checkInteger(val);
         }
     },
     UNSIGNED_INT64_BE(11, 8) {
@@ -152,6 +154,7 @@ enum MachineFormatCode {
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
 
+            checkInteger(val);
         }
     },
     SIGNED_INT64_LE(12, 8) {
@@ -163,6 +166,7 @@ enum MachineFormatCode {
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
 
+            checkInteger(val);
         }
     },
     SIGNED_INT64_BE(13, 8) {
@@ -174,6 +178,7 @@ enum MachineFormatCode {
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
 
+            checkInteger(val);
         }
     },
     IEEE_754_FLOAT_LE(14, 4) {
@@ -348,6 +353,12 @@ enum MachineFormatCode {
                 return 'L';
             default:
                 return 0;
+        }
+    }
+
+    protected void checkInteger(PyObject val) {
+        if (!(val instanceof PyLong)) {
+            throw Py.TypeError("array item must be integer");
         }
     }
 }

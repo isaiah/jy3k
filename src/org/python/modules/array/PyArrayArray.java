@@ -23,7 +23,7 @@ import java.util.List;
 public class PyArrayArray extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyArrayArray.class);
     private static final int INITIAL_CAPACITY = 128;
-    private MachineFormatCode formatCode;
+    protected MachineFormatCode formatCode;
     private ByteBuffer buf;
 
     public PyArrayArray(PyType subtype) {
@@ -98,10 +98,19 @@ public class PyArrayArray extends PyObject {
         return formatCode.getItemSize();
     }
 
+    @ExposedMethod(names = {"__len__"})
+    public int length() {
+        return readBuf().remaining();
+    }
+
+    @ExposedMethod
+    public PyObject __iter__() {
+        return new PyArrayIter(this);
+    }
+
     @Override
     public String toString() {
-        ByteBuffer readonly = buf.asReadOnlyBuffer();
-        readonly.flip();
+        ByteBuffer readonly = readBuf();
         int len = readonly.remaining();
         if (len == 0) {
             return String.format("array('%s')", formatCode.typecode());
@@ -121,10 +130,8 @@ public class PyArrayArray extends PyObject {
         if (other instanceof PyArrayArray) {
             PyArrayArray o = (PyArrayArray) other;
             int ret = 0;
-            ByteBuffer readThis = buf.asReadOnlyBuffer();
-            readThis.flip();
-            ByteBuffer readThat = o.buf.asReadOnlyBuffer();
-            readThat.flip();
+            ByteBuffer readThis = readBuf();
+            ByteBuffer readThat = o.readBuf();
             int len = readThis.remaining();
             if (readThis.remaining() == readThat.remaining()) {
                 for(int i = 0; i < len; i++) {
@@ -142,5 +149,11 @@ public class PyArrayArray extends PyObject {
             return op.bool(1);
         }
         return Py.NotImplemented;
+    }
+
+    protected ByteBuffer readBuf() {
+        ByteBuffer readonly = buf.asReadOnlyBuffer();
+        readonly.flip();
+        return readonly;
     }
 }
