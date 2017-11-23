@@ -64,7 +64,7 @@ public class Setup {
             "_thread:org.python.modules.thread._thread",
             "_warnings",
             "_weakref:org.python.modules._weakref.WeakrefModule",
-            "array:org.python.modules.ArrayModule",
+            "array:org.python.modules.array.ArrayModule",
             "binascii",
             "cmath",
             "errno",
