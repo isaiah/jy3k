@@ -90,7 +90,7 @@ enum MachineFormatCode {
     SIGNED_INT16_BE(5, 2) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return new PyLong(buf.get(index));
+            return new PyLong(buf.getShort(index));
         }
 
         @Override
@@ -110,7 +110,7 @@ enum MachineFormatCode {
     UNSIGNED_INT32_LE(6, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getInt(index));
         }
 
         @Override
@@ -121,18 +121,22 @@ enum MachineFormatCode {
     UNSIGNED_INT32_BE(7, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getInt(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
             checkInteger(val);
+            int v = val.asInt();
+            if (index >= 0) {
+                buf.putInt(index, v);
+            }
         }
     },
     SIGNED_INT32_LE(8, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getInt(index));
         }
 
         @Override
@@ -143,12 +147,21 @@ enum MachineFormatCode {
     SIGNED_INT32_BE(9, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getInt(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
             checkInteger(val);
+            int v = val.asInt();
+            if (v < Integer.MIN_VALUE) {
+                throw Py.OverflowError("signed char is less than minimum");
+            } else if (v > Integer.MAX_VALUE) {
+                throw Py.OverflowError("signed char is greater than minimum");
+            }
+            if (index >= 0) {
+                buf.putInt(index, v);
+            }
         }
     },
     UNSIGNED_INT64_LE(10, 8) {
@@ -165,13 +178,14 @@ enum MachineFormatCode {
     UNSIGNED_INT64_BE(11, 8) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getLong(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
             checkInteger(val);
+            long v = val.asLong();
+            buf.putLong(index, v);
         }
     },
     SIGNED_INT64_LE(12, 8) {
@@ -189,13 +203,14 @@ enum MachineFormatCode {
     SIGNED_INT64_BE(13, 8) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyLong(buf.getLong(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
             checkInteger(val);
+            long v = val.asLong();
+            buf.putLong(index, v);
         }
     },
     IEEE_754_FLOAT_LE(14, 4) {
