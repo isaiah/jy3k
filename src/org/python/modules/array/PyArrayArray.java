@@ -6,10 +6,12 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
+import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.CompareOp;
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
@@ -18,6 +20,10 @@ import org.python.core.PyType;
 import org.python.core.PyUnicode;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 @ExposedType(name = "array.array", doc = BuiltinDocs.array_array_doc)
 public class PyArrayArray extends PyObject {
@@ -71,6 +77,34 @@ public class PyArrayArray extends PyObject {
     @ExposedClassMethod
     public static PyArrayArray zeros(PyType subtype, int n, char typecode) {
         return new PyArrayArray(subtype, MachineFormatCode.formatCode(typecode), n);
+    }
+
+    @ExposedMethod
+    public PyObject frombytes(PyObject bytes) {
+        if (!(bytes instanceof BufferProtocol)) {
+            throw Py.TypeError(String.format("a bytes-like object is required, not '%s'", bytes.getType().fastGetName()));
+        }
+        doExtend(bytes);
+        return this;
+    }
+
+    @ExposedMethod
+    public PyObject tobytes() {
+        return new PyBytes(readBuf());
+    }
+
+    @ExposedMethod
+    public PyObject fromlist(PyObject list) {
+        if (!(list instanceof PyList)) {
+            throw Py.TypeError("arg must be list");
+        }
+        doExtend(list);
+        return this;
+    }
+
+    @ExposedMethod
+    public PyObject tolist() {
+        return new PyList(asList());
     }
 
     @ExposedMethod
@@ -167,21 +201,28 @@ public class PyArrayArray extends PyObject {
         return ret;
     }
 
+    @ExposedMethod
+    public PyObject __getitem__(PyObject index) {
+        return formatCode.getitem(bufferInternal(), index.asInt() * formatCode.getItemSize());
+    }
+
     @Override
     public String toString() {
-        ByteBuffer readonly = readBuf();
         int len = __len__();
         if (len == 0) {
             return String.format("array('%s')", typecode());
         }
-        StringBuilder bufStr = new StringBuilder(len * 3);
+        return String.format("array('%s', [%s])", typecode(), String.join(", ", asList().stream().map(PyObject::toString).collect(Collectors.toList())));
+    }
+
+    private List<PyObject> asList() {
+        ByteBuffer readonly = readBuf();
+        int len = __len__();
+        List<PyObject> ret = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            if (i != 0) {
-                bufStr.append(", ");
-            }
-            bufStr.append(formatCode.getitem(readonly, i * itemsize()));
+            ret.add(formatCode.getitem(readonly, i * itemsize()));
         }
-        return String.format("array('%s', [%s])", typecode(), bufStr);
+        return ret;
     }
 
     @Override
