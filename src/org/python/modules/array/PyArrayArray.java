@@ -14,10 +14,9 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 @ExposedType(name = "array.array", doc = BuiltinDocs.array_array_doc)
 public class PyArrayArray extends PyObject {
@@ -49,7 +48,11 @@ public class PyArrayArray extends PyObject {
         PyArrayArray ret = new PyArrayArray(subtype, MachineFormatCode.formatCode(typecode), INITIAL_CAPACITY);
         if (initial != null) {
             if (initial instanceof PyArrayArray) {
-                ByteBuffer readBuf = ((PyArrayArray) initial).buf.asReadOnlyBuffer();
+                PyArrayArray initArray = (PyArrayArray) initial;
+                if (initArray.formatCode.typecode() == 'u' && typecode != 'u') {
+                    throw Py.TypeError(String.format("cannot use a unicode array to initialize an array with typecode '%s'", typecode));
+                }
+                ByteBuffer readBuf = initArray.buf.asReadOnlyBuffer();
                 readBuf.flip();
                 ret.buf = ByteBuffer.allocate(readBuf.remaining());
                 ret.buf.put(readBuf);
@@ -82,6 +85,12 @@ public class PyArrayArray extends PyObject {
 
     @ExposedMethod
     public PyObject extend(PyObject bb) {
+        if (bb instanceof PyArrayArray && ((PyArrayArray) bb).typecode() == 'u' && typecode() != 'u') {
+            throw Py.TypeError(String.format("cannot use a unicode array to initialize an array with typecode '%s'", typecode()));
+        }
+        if (bb instanceof PyUnicode && typecode() != 'u') {
+            throw Py.TypeError(String.format("cannot use a str to initialize an array with typecode '%s'", typecode()));
+        }
         for (PyObject val: bb.asIterable()) {
             append(val);
         }
@@ -113,7 +122,7 @@ public class PyArrayArray extends PyObject {
         ByteBuffer readonly = readBuf();
         int len = readonly.remaining();
         if (len == 0) {
-            return String.format("array('%s')", formatCode.typecode());
+            return String.format("array('%s')", typecode());
         }
         StringBuilder bufStr = new StringBuilder(len * 3);
         for (int i = 0; i < len; i++) {
@@ -122,7 +131,7 @@ public class PyArrayArray extends PyObject {
             }
             bufStr.append(readonly.get());
         }
-        return String.format("array('%s', [%s])", formatCode.typecode(), bufStr);
+        return String.format("array('%s', [%s])", typecode(), bufStr);
     }
 
     @Override
@@ -155,5 +164,13 @@ public class PyArrayArray extends PyObject {
         ByteBuffer readonly = buf.asReadOnlyBuffer();
         readonly.flip();
         return readonly;
+    }
+
+    protected ByteBuffer bufferInternal() {
+        return buf;
+    }
+
+    private char typecode() {
+        return formatCode.typecode();
     }
 }

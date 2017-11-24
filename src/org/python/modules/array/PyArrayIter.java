@@ -12,11 +12,15 @@ import java.nio.ByteBuffer;
 public class PyArrayIter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyArrayIter.class);
     private MachineFormatCode formatCode;
-    private ByteBuffer readBuf;
+    private PyArrayArray array;
+    private int pos;
+    private boolean exhausted;
 
     PyArrayIter(PyArrayArray array) {
         this.formatCode = array.formatCode;
-        this.readBuf = array.readBuf();
+        this.array = array;
+        this.pos = 0;
+        this.exhausted = false;
     }
 
     @ExposedMethod
@@ -26,11 +30,11 @@ public class PyArrayIter extends PyObject {
 
     @ExposedMethod
     public PyObject __next__() {
-        if (readBuf.remaining() == 0) {
+        if (exhausted || pos >= array.bufferInternal().position()) {
+            exhausted = true;
             throw Py.StopIteration();
         }
-        PyObject ret = formatCode.getitem(readBuf, readBuf.position());
-        readBuf.position(readBuf.position() + 1);
+        PyObject ret = formatCode.getitem(array.bufferInternal(), pos++);
         return ret;
     }
 }
