@@ -15,6 +15,7 @@ import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
+import org.python.core.PySlice;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
@@ -353,28 +354,85 @@ public class PyArrayArray extends PyObject {
     @Override
     @ExposedMethod
     public PyObject __getitem__(PyObject indexObj) {
-        int index = indexObj.asIndex();
-        index = checkIndex(index);
-        try {
-            return formatCode.getitem(bufferInternal(), index * itemsize());
-        } catch (IndexOutOfBoundsException e) {
-            throw Py.IndexError("array index out of range");
+        if (indexObj.isIndex()) {
+            int index = indexObj.asIndex();
+            index = checkIndex(index);
+            try {
+                return formatCode.getitem(bufferInternal(), index * itemsize());
+            } catch (IndexOutOfBoundsException e) {
+                throw Py.IndexError("array index out of range");
+            }
+        } else if (indexObj instanceof PySlice) {
+            int[] indices = ((PySlice) indexObj).indicesEx(__len__());
+            int start = indices[0], end = indices[1];
+            int size = indices[3];
+            int step = indices[2];
+            int itemsize = itemsize();
+            PyArrayArray ret = new PyArrayArray(getType(), formatCode, size * itemsize);
+            if (step > 0) {
+                for (int i = start; i < end; i += step) {
+                    ret.append(formatCode.getitem(buf, i * itemsize));
+                }
+            } else {
+                for (int i = start; i > end; i += step) {
+                    ret.append(formatCode.getitem(buf, i * itemsize));
+                }
+            }
+            return ret;
+        } else {
+            throw Py.TypeError("array indices must be integer");
         }
     }
 
     @Override
     @ExposedMethod
     public void __setitem__(PyObject indexObj, PyObject val) {
-        int index = indexObj.asIndex();
-        index = checkIndex(index);
-        formatCode.setitem(bufferInternal(), index * itemsize(), val);
+        if (indexObj.isIndex()) {
+            int index = indexObj.asIndex();
+            index = checkIndex(index);
+            formatCode.setitem(bufferInternal(), index * itemsize(), val);
+        } else if (indexObj instanceof PySlice) {
+            int[] indices = ((PySlice) indexObj).indicesEx(__len__());
+            int itemsize = itemsize();
+            if (indices[2] != 1) {
+                for (int i = indices[0], j = 0; i < indices[1]; i++, j++) {
+                    formatCode.setitem(buf, i * itemsize, val.__getitem__(j));
+                }
+            } else {
+                int i = indices[0];
+                byte[] rest = new byte[(__len__() - indices[1]) * itemsize];
+                int offset = indices[1] * itemsize;
+                ByteBuffer readonly = readBuf();
+                readonly.position(offset);
+                readonly.get(rest);
+                for (PyObject v : val.asIterable()) {
+                    formatCode.setitem(buf, i, v);
+                    i += itemsize;
+                }
+                int pos = i + itemsize;
+                checkCapacity(pos + rest.length);
+                buf.position(pos);
+                buf.put(rest);
+            }
+        } else {
+            throw Py.TypeError("array indices must be integer");
+        }
     }
 
     @Override
     @ExposedMethod
     public void __delitem__(PyObject indexObj) {
-        int index = indexObj.asIndex();
-        pop(index);
+        if (indexObj.isIndex()) {
+            int index = indexObj.asIndex();
+            pop(index);
+        } else if (indexObj instanceof PySlice) {
+            int[] indices = ((PySlice) indexObj).indicesEx(__len__());
+            for (int i = indices[0]; i < indices[1]; i += indices[2]) {
+                pop(i);
+            }
+        } else {
+            throw Py.TypeError("array indices must be integer");
+        }
     }
 
     @Override
