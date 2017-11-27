@@ -526,8 +526,8 @@ public class PyList extends PySequenceList implements List {
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.list_index_doc)
     public final synchronized int list_index(PyObject o, PyObject start, PyObject stop) {
-        int startInt = start == null ? 0 : PySlice.calculateSliceIndex(start);
-        int stopInt = stop == null ? size() : PySlice.calculateSliceIndex(stop);
+        int startInt = start == Py.None ? 0 : PySlice.calculateSliceIndex(start);
+        int stopInt = stop == Py.None ? size() : PySlice.calculateSliceIndex(stop);
         return list_index(o, startInt, stopInt);
     }
 
