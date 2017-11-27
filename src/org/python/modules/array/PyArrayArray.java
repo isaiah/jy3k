@@ -225,15 +225,19 @@ public class PyArrayArray extends PyObject {
         } else if (index > __len__()) {
             index = __len__();
         }
-        checkCapacity(1 * itemsize());
+        insert(index, v);
+        return this;
+    }
+
+    private void insert(int index, PyObject v) {
         int itemsize = itemsize();
+        checkCapacity(itemsize);
         int len = (index + 1) * itemsize;
         for (int i = (__len__() + 1) * itemsize; i >= len; i--) {
             buf.put(i, buf.get(i - itemsize));
         }
         formatCode.setitem(buf, index * itemsize, v);
         buf.position(buf.position() + itemsize);
-        return this;
     }
 
     @ExposedMethod
@@ -349,18 +353,12 @@ public class PyArrayArray extends PyObject {
 
     }
 
-
     @Override
     @ExposedMethod
     public PyObject __getitem__(PyObject indexObj) {
         if (indexObj.isIndex()) {
             int index = indexObj.asIndex();
-            index = checkIndex(index);
-            try {
-                return formatCode.getitem(bufferInternal(), index * itemsize());
-            } catch (IndexOutOfBoundsException e) {
-                throw Py.IndexError("array index out of range");
-            }
+            return __getitem__(index);
         } else if (indexObj instanceof PySlice) {
             int[] indices = ((PySlice) indexObj).indicesEx(__len__());
             int start = indices[0], end = indices[1];
@@ -384,6 +382,16 @@ public class PyArrayArray extends PyObject {
     }
 
     @Override
+    public PyObject __getitem__(int index) {
+        index = checkIndex(index);
+        try {
+            return formatCode.getitem(bufferInternal(), index * itemsize());
+        } catch (IndexOutOfBoundsException e) {
+            throw Py.IndexError("array index out of range");
+        }
+    }
+
+    @Override
     @ExposedMethod
     public void __setitem__(PyObject indexObj, PyObject val) {
         if (val instanceof PyArrayArray) {
@@ -396,9 +404,32 @@ public class PyArrayArray extends PyObject {
         } else if (indexObj instanceof PySlice) {
             int[] indices = ((PySlice) indexObj).indicesEx(__len__());
             int itemsize = itemsize();
-            if (indices[2] != 1) {
-                for (int i = indices[0], j = 0; i < indices[1]; i++, j++) {
-                    formatCode.setitem(buf, i * itemsize, val.__getitem__(j));
+            int start = indices[0], end = indices[1], step = indices[2];
+            if (step != 1) {
+                if (val == this) {
+                    byte[] replica = new byte[byteLength()];
+                    ByteBuffer readonly = readBuf();
+                    readonly.get(replica); // copy
+                    readonly = ByteBuffer.wrap(replica);
+                    if (step > 0) {
+                        for (int i = start, j = 0; i < end; i += step, j++) {
+                            formatCode.setitem(buf, i * itemsize, formatCode.getitem(readonly, j * itemsize));
+                        }
+                    } else {
+                        for (int i = start, j = 0; i > end; i += step, j++) {
+                            formatCode.setitem(buf, i * itemsize, formatCode.getitem(readonly, j * itemsize));
+                        }
+                    }
+                } else {
+                    if (step > 0) {
+                        for (int i = start, j = 0; i < end; i += step, j++) {
+                            formatCode.setitem(buf, i * itemsize, val.__getitem__(j));
+                        }
+                    } else {
+                        for (int i = start, j = 0; i > end; i += step, j++) {
+                            formatCode.setitem(buf, i * itemsize, val.__getitem__(j));
+                        }
+                    }
                 }
             } else {
                 int i = indices[0] * itemsize;
