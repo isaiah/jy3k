@@ -10,6 +10,7 @@ import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.CompareOp;
 import org.python.core.Py;
+import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
@@ -22,9 +23,7 @@ import org.python.core.PyUnicode;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @ExposedType(name = "array.array", doc = BuiltinDocs.array_array_doc)
@@ -161,12 +160,12 @@ public class PyArrayArray extends PyObject {
             buf.put(((PyArrayArray) bb).readBuf());
             return;
         }
-        if (bb instanceof PyBytes) {
-            byte[] buf = ((PyBytes) bb).toBytes();
+        if (bb instanceof BufferProtocol) {
+            byte[] buf = Py.unwrapBuffer(bb);
             if (buf.length % itemsize() != 0) {
                 throw Py.ValueError("bytes length not a multiple of item size");
             }
-            for (byte b: buf) {
+            for (byte b : buf) {
                 ins1(b);
             }
         } else {
@@ -387,6 +386,9 @@ public class PyArrayArray extends PyObject {
     @Override
     @ExposedMethod
     public void __setitem__(PyObject indexObj, PyObject val) {
+        if (val instanceof PyArrayArray) {
+            checkFormatCode((PyArrayArray) val);
+        }
         if (indexObj.isIndex()) {
             int index = indexObj.asIndex();
             index = checkIndex(index);
@@ -399,19 +401,26 @@ public class PyArrayArray extends PyObject {
                     formatCode.setitem(buf, i * itemsize, val.__getitem__(j));
                 }
             } else {
-                int i = indices[0];
+                int i = indices[0] * itemsize;
                 byte[] rest = new byte[(__len__() - indices[1]) * itemsize];
                 int offset = indices[1] * itemsize;
-                ByteBuffer readonly = readBuf();
-                readonly.position(offset);
-                readonly.get(rest);
-                for (PyObject v : val.asIterable()) {
-                    formatCode.setitem(buf, i, v);
-                    i += itemsize;
+                if (rest.length > 0) {
+                    ByteBuffer readonly = readBuf();
+                    readonly.position(offset);
+                    readonly.get(rest);
                 }
-                int pos = i + itemsize;
-                checkCapacity(pos + rest.length);
-                buf.position(pos);
+                if (val == this) {
+                    ByteBuffer readonly = readBuf();
+                    buf.position(i);
+                    buf.put(readonly);
+                } else {
+                    for (PyObject v : val.asIterable()) {
+                        formatCode.setitem(buf, i, v);
+                        i += itemsize;
+                    }
+                    buf.position(i);
+                }
+                checkCapacity(byteLength() + rest.length);
                 buf.put(rest);
             }
         } else {
