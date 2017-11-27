@@ -80,7 +80,7 @@ public class PyArrayArray extends PyObject {
         return new PyArrayArray(subtype, MachineFormatCode.formatCode(typecode), n);
     }
 
-    @ExposedMethod
+    @ExposedMethod(names = {"fromstring", "frombytes"})
     public PyObject frombytes(PyObject bytes) {
         if (!(bytes instanceof BufferProtocol)) {
             throw Py.TypeError(String.format("a bytes-like object is required, not '%s'", bytes.getType().fastGetName()));
@@ -89,7 +89,7 @@ public class PyArrayArray extends PyObject {
         return this;
     }
 
-    @ExposedMethod
+    @ExposedMethod(names = {"tostring", "tobytes"})
     public PyObject tobytes() {
         return new PyBytes(readBuf());
     }
@@ -106,6 +106,17 @@ public class PyArrayArray extends PyObject {
     @ExposedMethod
     public PyObject tolist() {
         return new PyList(asList());
+    }
+
+    @ExposedMethod
+    public void tofile(PyObject f){
+        f.invoke("write", tobytes());
+    }
+
+    @ExposedMethod
+    public void fromfile(PyObject f, PyObject n) {
+        PyObject bytes = f.invoke("read", n);
+        doExtend(bytes);
     }
 
     @ExposedMethod
@@ -271,15 +282,26 @@ public class PyArrayArray extends PyObject {
     }
 
     @Override
-    @ExposedMethod(names = {"__mul__", "__rmul__"})
+    @ExposedMethod
+    public PyObject __rmul__(PyObject n) {
+        return __mul__(n);
+    }
+
+    @Override
+    @ExposedMethod
     public PyObject __mul__(PyObject n) {
         checkNumber(n);
         int x = n.asInt();
+        if (x < 0) {
+            return new PyArrayArray(TYPE, formatCode, 0);
+        }
         ByteBuffer readonly = readBuf();
-        int endLen = buf.position() * x;
+        readonly.mark();
+        int endLen = byteLength() * x;
         PyArrayArray ret = new PyArrayArray(TYPE, formatCode, endLen);
         for (int i = 0; i < x; i++) {
             ret.buf.put(readonly);
+            readonly.reset();
         }
         return ret;
     }
@@ -290,10 +312,12 @@ public class PyArrayArray extends PyObject {
         checkNumber(n);
         int x = n.asInt();
         ByteBuffer readonly = readBuf();
+        readonly.mark();
         int endLen = buf.position() * x;
         checkCapacity(endLen);
         for (int i = 1; i < x; i++) {
             buf.put(readonly);
+            readonly.reset();
         }
         return this;
     }
@@ -380,7 +404,7 @@ public class PyArrayArray extends PyObject {
             ByteBuffer readThis = readBuf();
             ByteBuffer readThat = o.readBuf();
             int len = readThis.remaining();
-            if (readThis.remaining() == readThat.remaining()) {
+            if (len == readThat.remaining()) {
                 for(int i = 0; i < len; i++) {
                     byte a = readThis.get();
                     byte b = readThat.get();
@@ -389,6 +413,8 @@ public class PyArrayArray extends PyObject {
                         break;
                     }
                 }
+            } else {
+                ret = len > readThat.remaining() ? 1 : -1;
             }
             return op.bool(ret);
         }
