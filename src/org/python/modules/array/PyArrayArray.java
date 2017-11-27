@@ -21,6 +21,7 @@ import org.python.core.PyUnicode;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -173,6 +174,86 @@ public class PyArrayArray extends PyObject {
         return formatCode.getItemSize();
     }
 
+    @ExposedMethod(defaults = {"-1"})
+    public PyObject pop(int index) {
+        if (buf.position() == 0) {
+            throw Py.IndexError("pop from empty array");
+        }
+
+        index = checkIndex(index);
+        int itemsize = itemsize();
+        int len = (__len__() - 1) * itemsize;
+        int bufIndex = index * itemsize;
+
+        PyObject ret = formatCode.getitem(bufferInternal(), bufIndex);
+        for (int i = bufIndex; i <= len; i++) {
+            buf.put(i, buf.get(i + itemsize));
+        }
+        buf.position(buf.position() - itemsize);
+
+        return ret;
+    }
+
+    @ExposedMethod
+    public PyObject reverse() {
+        int i = __len__() - 1;
+        for (PyObject v : asList()) {
+            formatCode.setitem(buf, i-- * itemsize(), v);
+        }
+        return this;
+    }
+
+    @ExposedMethod
+    public PyObject insert(PyObject indexObj, PyObject v) {
+        int index = indexObj.asIndex();
+        if (index < 0) {
+            index += __len__();
+        }
+        if (index < 0) {
+            index = 0;
+        } else if (index > __len__()) {
+            index = __len__();
+        }
+        checkCapacity(1 * itemsize());
+        int itemsize = itemsize();
+        int len = (index + 1) * itemsize;
+        for (int i = (__len__() + 1) * itemsize; i >= len; i--) {
+            buf.put(i, buf.get(i - itemsize));
+        }
+        formatCode.setitem(buf, index * itemsize, v);
+        buf.position(buf.position() + itemsize);
+        return this;
+    }
+
+    @ExposedMethod
+    public PyObject remove(PyObject v) {
+        pop(index(v));
+        return this;
+    }
+
+    @ExposedMethod
+    public int count(PyObject v) {
+        int i = 0;
+        for (PyObject obj: asList()) {
+            if (v.do_richCompareBool(obj, CompareOp.EQ)) {
+                i++;
+            }
+        }
+        return i;
+    }
+
+    @ExposedMethod
+    public int index(PyObject v) {
+        int i = 0;
+        for (PyObject obj: asList()) {
+            if (v.do_richCompareBool(obj, CompareOp.EQ)) {
+                return i;
+            }
+            i++;
+        }
+        throw Py.ValueError("array.index(x): x not in list");
+    }
+
     @Override
     @ExposedMethod
     public int __len__() {
@@ -183,11 +264,41 @@ public class PyArrayArray extends PyObject {
         return readBuf().remaining();
     }
 
+    @Override
     @ExposedMethod
     public PyObject __iter__() {
         return new PyArrayIter(this);
     }
 
+    @Override
+    @ExposedMethod(names = {"__mul__", "__rmul__"})
+    public PyObject __mul__(PyObject n) {
+        checkNumber(n);
+        int x = n.asInt();
+        ByteBuffer readonly = readBuf();
+        int endLen = buf.position() * x;
+        PyArrayArray ret = new PyArrayArray(TYPE, formatCode, endLen);
+        for (int i = 0; i < x; i++) {
+            ret.buf.put(readonly);
+        }
+        return ret;
+    }
+
+    @Override
+    @ExposedMethod
+    public PyObject __imul__(PyObject n) {
+        checkNumber(n);
+        int x = n.asInt();
+        ByteBuffer readonly = readBuf();
+        int endLen = buf.position() * x;
+        checkCapacity(endLen);
+        for (int i = 1; i < x; i++) {
+            buf.put(readonly);
+        }
+        return this;
+    }
+
+    @Override
     @ExposedMethod
     public PyObject __add__(PyObject other) {
         if (!(other instanceof PyArrayArray)) {
@@ -201,9 +312,45 @@ public class PyArrayArray extends PyObject {
         return ret;
     }
 
+    @Override
     @ExposedMethod
-    public PyObject __getitem__(PyObject index) {
-        return formatCode.getitem(bufferInternal(), index.asInt() * formatCode.getItemSize());
+    public PyObject __iadd__(PyObject other) {
+        if (!(other instanceof PyArrayArray)) {
+            throw Py.TypeError(String.format("can only append an array (not \"%s\") to array", other.getType().fastGetName()));
+        }
+        checkFormatCode((PyArrayArray) other);
+        checkCapacity(byteLength() + ((PyArrayArray) other).byteLength());
+        buf.put(((PyArrayArray) other).readBuf());
+        return this;
+
+    }
+
+
+    @Override
+    @ExposedMethod
+    public PyObject __getitem__(PyObject indexObj) {
+        int index = indexObj.asIndex();
+        index = checkIndex(index);
+        try {
+            return formatCode.getitem(bufferInternal(), index * itemsize());
+        } catch (IndexOutOfBoundsException e) {
+            throw Py.IndexError("array index out of range");
+        }
+    }
+
+    @Override
+    @ExposedMethod
+    public void __setitem__(PyObject indexObj, PyObject val) {
+        int index = indexObj.asIndex();
+        index = checkIndex(index);
+        formatCode.setitem(bufferInternal(), index * itemsize(), val);
+    }
+
+    @Override
+    @ExposedMethod
+    public void __delitem__(PyObject indexObj) {
+        int index = indexObj.asIndex();
+        pop(index);
     }
 
     @Override
@@ -261,6 +408,11 @@ public class PyArrayArray extends PyObject {
         return buf;
     }
 
+    @ExposedGet(name = "typecode")
+    public String getTypeCode() {
+        return String.valueOf(typecode());
+    }
+
     private char typecode() {
         return formatCode.typecode();
     }
@@ -278,6 +430,22 @@ public class PyArrayArray extends PyObject {
             readonly.flip();
             newBuf.put(readonly);
             buf = newBuf;
+        }
+    }
+
+    private int checkIndex(int index) {
+        if (index < 0) {
+            index += __len__();
+        }
+        if (index >= __len__() || index < 0) {
+            throw Py.IndexError("array index out of bounds");
+        }
+        return index;
+    }
+
+    private void checkNumber(PyObject n) {
+        if (!(n instanceof PyLong)) {
+            throw Py.TypeError(String.format("can't multiply sequence by non-int of type '%s'", n.getType().fastGetName()));
         }
     }
 }
