@@ -5,12 +5,12 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.CompareOp;
 import org.python.core.Py;
-import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
@@ -53,7 +53,12 @@ public class PyArrayArray extends PyObject {
         ArgParser ap = new ArgParser("array", args, keywords, "typecode", "initializer");
         char typecode = ap.getString(0).charAt(0);
         PyObject initial = ap.getPyObject(1, null);
-        PyArrayArray ret = new PyArrayArray(subtype, MachineFormatCode.formatCode(typecode), INITIAL_CAPACITY);
+        PyArrayArray ret;
+        if (subtype == TYPE) {
+            ret = new PyArrayArray(subtype, MachineFormatCode.formatCode(typecode), INITIAL_CAPACITY);
+        } else {
+            ret = new PyArrayArrayDerived(subtype, MachineFormatCode.formatCode(typecode), INITIAL_CAPACITY);
+        }
         if (initial != null) {
             if (initial instanceof PyArrayArray) {
                 PyArrayArray initArray = (PyArrayArray) initial;
@@ -473,6 +478,16 @@ public class PyArrayArray extends PyObject {
         } else {
             throw Py.TypeError("array indices must be integer");
         }
+    }
+
+    @ExposedMethod
+    public PyObject __reduce_ex__(int version) {
+        if (version < 3) {
+            return new PyTuple(getType(), new PyTuple(new PyUnicode(typecode()), new PyList(asList())), Py.None);
+        }
+        PyObject arrayModule = Import.importModule("array");
+        PyObject reconstructFunc = arrayModule.__findattr__("_array_reconstructor");
+        return new PyTuple(reconstructFunc, new PyTuple(getType(), new PyUnicode(typecode()), new PyLong(itemsize()), tobytes()), Py.None);
     }
 
     @Override

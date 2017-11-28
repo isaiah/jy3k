@@ -25,10 +25,11 @@ public class ArrayModule {
     }
 
     @ExposedFunction
-    public static final PyObject _array_reconstructor(PyObject arraytype, PyObject typecode, PyObject mformat_code,
+    public static final PyObject _array_reconstructor(PyType arraytype, String typecode, PyObject mformat_code,
                                                       PyObject items) {
-        // TODO: currently a placeholder to make the tests run 
-        return new PyArrayArray(PyArrayArray.TYPE);
+        PyArrayArray ret = new PyArrayArray(arraytype, MachineFormatCode.formatCode(typecode.charAt(0)), items.__len__());
+        ret.extend(items);
+        return ret;
     }
 
     /*

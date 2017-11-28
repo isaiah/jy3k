@@ -1,4 +1,4 @@
-base_class: PyArray
+base_class: PyArrayArray
 want_dict: true
-ctr:
+ctr: MachineFormatCode formatCode, int size
 incl: object
