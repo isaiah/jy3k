@@ -4,6 +4,7 @@ package org.python.core;
 import java.io.Serializable;
 
 import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 
 @Untraversable
@@ -55,6 +56,12 @@ public abstract class PyBuiltinCallable extends PyObject {
     @ExposedGet(name = "__self__")
     public PyObject getSelf() {
         return Py.None;
+    }
+
+    /** pickle support **/
+    @ExposedMethod
+    public String __reduce_ex__(PyObject proto) {
+        return info.name;
     }
 
     public void setInfo(PyBuiltinMethodData info) {
