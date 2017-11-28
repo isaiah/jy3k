@@ -306,8 +306,11 @@ public class PyArrayArray extends PyObject {
         }
         ByteBuffer readonly = readBuf();
         readonly.mark();
-        int endLen = byteLength() * x;
-        PyArrayArray ret = new PyArrayArray(TYPE, formatCode, endLen);
+        long endLen = byteLength() * (long) x;
+        if (endLen > Integer.MAX_VALUE || endLen < 0) {
+            throw Py.OverflowError("array size too big");
+        }
+        PyArrayArray ret = new PyArrayArray(TYPE, formatCode, (int) endLen);
         for (int i = 0; i < x; i++) {
             ret.buf.put(readonly);
             readonly.reset();
@@ -322,8 +325,11 @@ public class PyArrayArray extends PyObject {
         int x = n.asInt();
         ByteBuffer readonly = readBuf();
         readonly.mark();
-        int endLen = buf.position() * x;
-        checkCapacity(endLen);
+        long endLen = readonly.limit() * (long) x;
+        if (endLen > Integer.MAX_VALUE || endLen < 0) {
+            throw Py.OverflowError("array size too big");
+        }
+        checkCapacity((int) endLen - readonly.limit());
         for (int i = 1; i < x; i++) {
             buf.put(readonly);
             readonly.reset();
@@ -563,8 +569,13 @@ public class PyArrayArray extends PyObject {
     }
 
     private void checkCapacity(int size) {
+        int newSize = buf.position() + size;
         if (buf.position() + size >= buf.limit()) {
-            ByteBuffer newBuf = ByteBuffer.allocate(buf.limit() * 2 + INITIAL_CAPACITY);
+            int proposedSize = buf.limit() * 2 + INITIAL_CAPACITY;
+            if (newSize < proposedSize) {
+                newSize = proposedSize;
+            }
+            ByteBuffer newBuf = ByteBuffer.allocate(newSize);
             ByteBuffer readonly = buf.asReadOnlyBuffer();
             readonly.flip();
             newBuf.put(readonly);
