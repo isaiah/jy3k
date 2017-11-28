@@ -1,8 +1,10 @@
 package org.python.modules.array;
 
 import org.python.core.Py;
+import org.python.core.PyFloat;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyUnicode;
 
 import java.nio.ByteBuffer;
 
@@ -227,12 +229,12 @@ enum MachineFormatCode {
     IEEE_754_FLOAT_BE(15, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyFloat(buf.getFloat(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            buf.putFloat(index, (float) val.asDouble());
         }
     },
     IEEE_754_DOUBLE_LE(16, 8) {
@@ -249,12 +251,13 @@ enum MachineFormatCode {
     IEEE_754_DOUBLE_BE(7, 8) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            return new PyFloat(buf.getDouble(index));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            double d = val.asDouble();
+            buf.putDouble(index, d);
         }
     },
     UTF16_LE(18, 2) {
@@ -271,12 +274,13 @@ enum MachineFormatCode {
     UTF16_BE(19, 2) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            int charPoint = buf.getShort(index);
+            return new PyUnicode(String.valueOf(charPoint));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            buf.putShort(index, (short) val.asString().codePointAt(0));
         }
     },
     UTF32_LE(20, 4) {
@@ -293,12 +297,13 @@ enum MachineFormatCode {
     UTF32_BE(21, 4) {
         @Override
         PyObject getitem(ByteBuffer buf, int index) {
-            return null;
+            int charPoint = buf.getInt(index);
+            return new PyUnicode(new String(new int[]{charPoint}, 0, 1));
         }
 
         @Override
         void setitem(ByteBuffer buf, int index, PyObject val) {
-
+            buf.putInt(index, val.asString().codePointAt(0));
         }
     },
 
@@ -351,7 +356,7 @@ enum MachineFormatCode {
             case 'Q':
                 return UNSIGNED_INT64_BE;
             default:
-                return UNKNOWN_FORMAT;
+                throw Py.ValueError("bad typecode (must be b, B, u, h, H, i, I, l, L, q, Q, f or d)");
         }
     }
 
@@ -365,6 +370,7 @@ enum MachineFormatCode {
                 return 'b';
             case UNSIGNED_INT8:
                 return 'B';
+            case UTF16_BE:
             case UTF32_BE:
                 return 'u';
             case IEEE_754_FLOAT_BE:
