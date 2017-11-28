@@ -141,6 +141,8 @@ public class PySlice extends PyObject implements Traverseproc {
             if (result_stop < 0) result_stop = (result_step < 0) ? -1 : 0;
             if (result_stop >= length) {
                 result_stop = (result_step < 0) ? length - 1 : length;
+            } else if (result_stop == 0) {
+                result_stop = result_start;
             }
         }
 
