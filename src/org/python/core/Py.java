@@ -2227,8 +2227,11 @@ public final class Py {
     }
 
     public static String getString(PyObject str) {
-        if (str instanceof PyBytes)
+        if (str instanceof PyBytes) {
             return ((PyBytes) str).getString();
+        } else if (str instanceof BaseBytes) {
+            return ((BaseBytes) str).getString();
+        }
         return ((PyUnicode) str).getString();
     }
 

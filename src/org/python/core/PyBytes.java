@@ -269,21 +269,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
              * No existing export we can re-use. Return a buffer, but specialised to defer
              * construction of the buf object, and cache a soft reference to it.
              */
-            ByteBuffer readonly = readBuf();
-            byte[] bytes = new byte[buffer.limit()];
-            readonly.get(bytes);
-//            pybuf = new SimpleBuffer(flags, bytes);
-            if (!new String(bytes).equals(string)) {
-                System.out.println("found diff");
-                System.out.println(string.length());
-                for (byte b :bytes) {
-                    System.out.println(b);
-                }
-                System.out.println(new String(bytes).length());
-                throw new RuntimeException(string);
-//                System.out.println(new String(bytes));
-//                System.out.println(string);
-            }
             pybuf = new SimpleStringBuffer(flags, string);
             export = new SoftReference<>(pybuf);
         }

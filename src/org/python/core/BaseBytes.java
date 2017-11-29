@@ -4201,4 +4201,7 @@ public abstract class BaseBytes extends PySequence implements List<PyLong> {
      */
     protected abstract Builder/* <? extends BaseBytes> */getBuilder(int capacity);
 
+    public String getString() {
+        return new String(storage);
+    }
 }
