@@ -120,12 +120,7 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
         /*
          * Create a 'blank canvas' of the appropriate concrete class.
          */
-        PyArray self;
-        if (new_.for_type == subtype) {
-            self = new PyArray(subtype);
-        } else {
-            self = new PyArrayDerived(subtype);
-        }
+        PyArray self = new PyArray(subtype);
 
         // Initialize the typecode (and validate type) before creating the backing Array
         class2char(type);

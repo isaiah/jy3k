@@ -2,6 +2,7 @@
 package org.python.core;
 
 import org.python.core.buffer.BaseBuffer;
+import org.python.core.buffer.SimpleBuffer;
 import org.python.core.buffer.SimpleStringBuffer;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FieldNameIterator;
@@ -16,6 +17,7 @@ import org.python.expose.MethodType;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.python.core.stringlib.Encoding.asUTF16StringOrError;
 
@@ -37,6 +41,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     public static final PyType TYPE = PyType.fromClass(PyBytes.class);
     protected String string; // cannot make final because of Python intern support
+    private final ByteBuffer buffer;
     protected transient boolean interned = false;
     /** Supports the buffer API, see {@link #getBuffer(int)}. */
     private Reference<BaseBuffer> export;
@@ -60,6 +65,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
             v.appendCodePoint(buf[i] & 0xFF);
         }
         string = v.toString();
+        buffer = ByteBuffer.wrap(buf, off, ending - off);
     }
 
     public PyBytes(int[] buf) {
@@ -69,6 +75,10 @@ public class PyBytes extends PySequence implements BufferProtocol {
             v.appendCodePoint(i);
         }
         string = v.toString();
+        buffer = ByteBuffer.allocate(buf.length * 4);
+        for (int x : buf) {
+            buffer.putInt(x);
+        }
     }
 
     /**
@@ -86,6 +96,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
             throw Py.ValueError("Cannot create PyBytes with non-byte value");
         }
         this.string = string.toString();
+        buffer = ByteBuffer.allocate(string.length() * 2);
+        string.chars().forEach(chr -> buffer.putChar((char) chr));
     }
 
     public PyBytes(ByteBuffer buf) {
@@ -95,6 +107,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
             v.appendCodePoint(buf.get(i) & 0xFF);
         }
         string = v.toString();
+        buffer = buf.asReadOnlyBuffer();
     }
 
     public PyBytes(CharSequence string) {
@@ -121,6 +134,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         super(TYPE);
         if (isBytes || isBytes(string)) {
             this.string = string.toString();
+            buffer = ByteBuffer.allocate(string.length() * 2);
+            string.chars().forEach(chr -> buffer.putChar((char) chr));
         } else {
             throw new IllegalArgumentException("Cannot create PyBytes with non-byte value");
         }
@@ -230,6 +245,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return codePoints;
     }
 
+    private ByteBuffer readBuf() {
+        ByteBuffer readonly = buffer.asReadOnlyBuffer();
+        readonly.flip();
+        return readonly;
+    }
+
     /**
      * Return a read-only buffer view of the contents of the string, treating it as a sequence of
      * unsigned bytes. The caller specifies its requirements and navigational capabilities in the
@@ -248,8 +269,23 @@ public class PyBytes extends PySequence implements BufferProtocol {
              * No existing export we can re-use. Return a buffer, but specialised to defer
              * construction of the buf object, and cache a soft reference to it.
              */
-            pybuf = new SimpleStringBuffer(flags, getString());
-            export = new SoftReference<BaseBuffer>(pybuf);
+            ByteBuffer readonly = readBuf();
+            byte[] bytes = new byte[buffer.limit()];
+            readonly.get(bytes);
+//            pybuf = new SimpleBuffer(flags, bytes);
+            if (!new String(bytes).equals(string)) {
+                System.out.println("found diff");
+                System.out.println(string.length());
+                for (byte b :bytes) {
+                    System.out.println(b);
+                }
+                System.out.println(new String(bytes).length());
+                throw new RuntimeException(string);
+//                System.out.println(new String(bytes));
+//                System.out.println(string);
+            }
+            pybuf = new SimpleStringBuffer(flags, string);
+            export = new SoftReference<>(pybuf);
         }
         return pybuf;
     }
@@ -416,11 +452,13 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @Override
     protected PyObject pyget(int i) {
-        return new PyLong(string.charAt(i));
+        return new PyLong(buffer.get(i));
+//        return new PyLong(string.charAt(i));
     }
 
     public int getInt(int i) {
-        return string.charAt(i);
+        return buffer.get(i);
+//        return string.charAt(i);
     }
 
     @Override
