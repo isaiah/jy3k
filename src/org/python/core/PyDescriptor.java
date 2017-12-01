@@ -14,6 +14,12 @@ public abstract class PyDescriptor extends PyObject implements Traverseproc {
         return super.__findattr_ex__(field);
     }
 
+    protected void checkReceiver(PyObject[] args) {
+        if (args.length == 0) {
+            throw Py.TypeError(String.format("descriptor '%s' of '%s' object needs an argument", name, dtype.fastGetName()));
+        }
+    }
+
     protected void checkCallerType(PyType type) {
         if (type == dtype || type.isSubType(dtype)) {
             return;

@@ -53,6 +53,7 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
 
     @ExposedMethod
     final PyObject method_descriptor___call__(PyObject[] args, String[] kwargs) {
+        checkReceiver(args);
         checkCallerType(args[0].getType());
         PyObject[] actualArgs = new PyObject[args.length - 1];
         System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);

@@ -29,7 +29,7 @@ public abstract class SequenceIndexDelegate implements Serializable {
         } else if (idx instanceof PySlice) {
             checkIdxAndSetSlice((PySlice)idx, value);
         } else {
-            throw Py.TypeError(getTypeName() + String.format(" indices must be integers or slices, not %s", idx.getType().fastGetName()));
+            throw indiceError(idx);
         }
     }
 
@@ -53,7 +53,7 @@ public abstract class SequenceIndexDelegate implements Serializable {
             PySlice slice = (PySlice) idx;
             delSlice(slice.indicesEx(len()));
         } else {
-            throw Py.TypeError(getTypeName() + String.format(" indices must be integers or slices, not %s", idx.getType().fastGetName()));
+            throw indiceError(idx);
         }
     }
 
@@ -71,7 +71,7 @@ public abstract class SequenceIndexDelegate implements Serializable {
         } else if (idx instanceof PySlice) {
             return getSlice((PySlice)idx);
         } else {
-            throw Py.TypeError(getTypeName() + String.format(" indices must be integers or slices, not %s", idx.getType().fastGetName()));
+            throw indiceError(idx);
         }
     }
 
@@ -87,6 +87,14 @@ public abstract class SequenceIndexDelegate implements Serializable {
         } else {
             return getItem(idx);
         }
+    }
+
+    private PyException indiceError(PyObject idx) {
+        String name = getTypeName();
+        if (name.equals("bytes")) {
+            name = "byte";
+        }
+        return Py.TypeError(String.format("%s indices must be integers or slices, not %s", name, idx.getType().fastGetName()));
     }
 
     private int checkIdx(int idx) {

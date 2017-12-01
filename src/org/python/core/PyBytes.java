@@ -213,6 +213,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 str = v.toString();
             } else if (S instanceof PyLong) {
                 int n = ((PyLong) S).getValue().intValue();
+                if (n < 0) {
+                    throw Py.ValueError("negative count");
+                }
                 byte[] bytes = new byte[n];
                 Arrays.fill( bytes, (byte) 0 );
                 str = new String(bytes);
@@ -437,12 +440,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @Override
     protected PyObject pyget(int i) {
-        return new PyLong(buffer.get(i));
+        return new PyLong(buffer.getChar(i * 2));
 //        return new PyLong(string.charAt(i));
     }
 
     public int getInt(int i) {
-        return buffer.get(i);
+        return buffer.getChar(i * 2);
 //        return string.charAt(i);
     }
 
@@ -453,13 +456,11 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @Override
-    public boolean __contains__(PyObject o) {
-        return bytes___contains__(o);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes___contains___doc)
-    public final boolean bytes___contains__(PyObject o) {
+    public boolean __contains__(PyObject o) {
         if (o instanceof PyLong) {
+            int n = o.asInt();
+            byteCheck(n);
             return getString().contains(String.valueOf(Character.toChars(o.asInt())));
         }
         String other = asUTF16StringOrError(o);
@@ -512,25 +513,14 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return repeat(o.asIndex(Py.OverflowError));
     }
 
-    /**
-     * {@inheritDoc} For a <code>str</code> addition means concatenation and returns a
-     * <code>str</code> ({@link PyBytes}) result, except when a {@link PyUnicode} argument is
-     * given, when a <code>PyUnicode</code> results.
-     */
     @Override
-    public PyObject __add__(PyObject other) {
-        return bytes___add__(other);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___add___doc)
-    public final PyObject bytes___add__(PyObject other) {
-        // Expect other to be some kind of byte-like object.
+    public PyObject __add__(PyObject other) {
         String otherStr = Encoding.asStringOrNull(other);
         if (otherStr != null) {
-            // Yes it is: concatenate as strings, which are guaranteed byte-like.
             return new PyBytes(getString().concat(otherStr), true);
         } else if (other instanceof PyUnicode) {
-            return decode().__add__(other);
+            throw Py.TypeError("can't concat str to bytes");
         } else {
             // Allow PyObject._basic_add to pick up the pieces or raise informative error
             return null;
@@ -931,9 +921,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.endswith(getString(), suffix, startObj, endObj, __len__());
     }
 
-    @ExposedMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_translate_doc)
-    public final PyBytes bytes_translate(PyObject tableObj, PyObject deletecharsObj) {
+    @ExposedMethod(doc = BuiltinDocs.bytes_translate_doc)
+    public final PyBytes bytes_translate(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("translate", args, keywords, "table", "delete");
+        PyObject tableObj = ap.getPyObject(0);
         String table = Encoding.asStringOrNull(tableObj);
+        PyObject deletecharsObj = ap.getPyObject(1, null);
         String deletechars = null;
         if (deletecharsObj != null) {
             deletechars = Encoding.asStringOrError(deletecharsObj);
@@ -1098,17 +1091,52 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @Override
-    public PyObject __format__(PyObject formatSpec) {
-        return bytes___format__(formatSpec);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes___format___doc)
-    public final PyObject bytes___format__(PyObject formatSpec) {
+    public PyObject __format__(PyObject formatSpec) {
         return Encoding.format(getString(), formatSpec, true);
     }
 
     @Override
-    public String asString(int index) throws PyObject.ConversionException {
+    public PyObject do_richCompare(PyObject other, CompareOp op) {
+        if (!(other instanceof PyBytes)) {
+            return Py.NotImplemented;
+        }
+        if (this == other) {
+            switch (op) {
+                case EQ:
+                case GE:
+                case LE:
+                    return Py.True;
+                default:
+                    return Py.False;
+            }
+        }
+        if (__len__() != other.__len__()) {
+            if (op == CompareOp.EQ || op == CompareOp.NE) {
+                return op.bool(1);
+            }
+        }
+        int ret = 0;
+        ByteBuffer readonly = readBuf();
+        ByteBuffer otherRead = ((PyBytes) other).readBuf();
+        int minLen = Math.min(readonly.limit(), otherRead.limit());
+        for (int i = 0; i < minLen; i++) {
+            byte b1 = readonly.get(i);
+            byte b2 = otherRead.get(i);
+            if (b1 != b2) {
+                ret = b1 > b2 ? 1 : -1;
+                break;
+            }
+        }
+        int delta = readonly.limit() - otherRead.limit();
+        if (ret != 0 || delta == 0) {
+            return op.bool(ret);
+        }
+        return op.bool(delta > 0 ? 1 : -1);
+    }
+
+    @Override
+    public String asString(int index) {
         return getString();
     }
 
@@ -1150,6 +1178,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
             return "cannot concatenate ''{1}'' and ''{2}'' objects";
         }
         return super.unsupportedopMessage(op, o2);
+    }
+
+    private void byteCheck(int n) {
+        if (n > 0xFF || n < 0) {
+            throw Py.ValueError("byte must be in range(0, 255)");
+        }
     }
 }
 
