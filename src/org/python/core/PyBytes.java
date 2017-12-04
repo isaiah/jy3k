@@ -1010,7 +1010,11 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 throw Py.TypeError("Non-hexadecimal digit found");
             retbuf.append((char) ((top << 4) + bot));
         }
-        return new PyBytes(retbuf.toString());
+        PyObject value = new PyBytes(retbuf.toString());
+        if (type != TYPE) {
+            return type.__call__(new PyObject[]{value}, Py.NoKeywords);
+        }
+        return value;
     }
 
     @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_maketrans_doc)
