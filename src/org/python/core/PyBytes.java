@@ -16,6 +16,7 @@ import org.python.expose.MethodType;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.python.core.PyBUF.FULL_RO;
 import static org.python.core.stringlib.Encoding.asUTF16StringOrError;
 
 /**
@@ -45,6 +47,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     protected transient boolean interned = false;
     /** Supports the buffer API, see {@link #getBuffer(int)}. */
     private Reference<BaseBuffer> export;
+    private static final int INITIAL_CAPACITY = 1024;
 
     public String getString() {
         return string;
@@ -79,6 +82,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         for (int x : buf) {
             buffer.putInt(x);
         }
+        buffer.flip();
     }
 
     /**
@@ -97,7 +101,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
         this.string = string.toString();
         buffer = ByteBuffer.allocate(string.length() * 2);
-        string.chars().forEach(chr -> buffer.putChar((char) chr));
+        string.chars().forEach(chr -> buffer.put((byte) (chr & 0xFF)));
+        buffer.flip();
     }
 
     public PyBytes(ByteBuffer buf) {
@@ -134,8 +139,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
         super(TYPE);
         if (isBytes || isBytes(string)) {
             this.string = string.toString();
-            buffer = ByteBuffer.allocate(string.length() * 2);
-            string.chars().forEach(chr -> buffer.putChar((char) chr));
+            buffer = ByteBuffer.allocate(string.length());
+            string.chars().forEach(chr -> buffer.put((byte) (chr & 0xFF)));
+            buffer.flip();
         } else {
             throw new IllegalArgumentException("Cannot create PyBytes with non-byte value");
         }
@@ -202,7 +208,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
                 // Encoding will raise UnicodeEncodeError if not 7-bit clean.
                 str = codecs.encode(S, encoding, errors);
             } else if (S instanceof BufferProtocol) {
-                PyBuffer buffer = ((BufferProtocol) S).getBuffer(PyBUF.FULL_RO);
+                PyBuffer buffer = ((BufferProtocol) S).getBuffer(FULL_RO);
                 byte[] buf = new byte[buffer.getLen()];
                 buffer.copyTo(buf, 0);
                 buffer.close();
@@ -249,9 +255,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     private ByteBuffer readBuf() {
-        ByteBuffer readonly = buffer.asReadOnlyBuffer();
-        readonly.flip();
-        return readonly;
+        return buffer.asReadOnlyBuffer();
     }
 
     /**
@@ -440,7 +444,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @Override
     protected PyObject pyget(int i) {
-        return new PyLong(buffer.getChar(i * 2));
+        return new PyLong(buffer.get(i));
 //        return new PyLong(string.charAt(i));
     }
 
@@ -889,23 +893,38 @@ public class PyBytes extends PySequence implements BufferProtocol {
             return new PyBytes(Py.unwrapBuffer(item));
         }
 
-        // There are at least two things to join, or else we have a subclass of the
-        // builtin types in the sequence. Do a pre-pass to figure out the total amount of
-        // space we'll need, see whether any argument is absurd, and defer to the Unicode
-        // join if appropriate
-
-        // Catenate everything
-        StringBuilder buf = new StringBuilder();
+        ByteBuffer readonly = readBuf();
+        ByteBuffer ret = ByteBuffer.allocate(__len__() * seqLen + INITIAL_CAPACITY);
         for (int i = 0; i < seqLen; i++) {
             item = seq.pyget(i);
             if (i != 0) {
-                buf.append(getString());
+                try {
+                    ret.put(readonly);
+                } catch (BufferOverflowException e) {
+                    ret = resize(ret, readonly);
+                }
+                readonly.rewind();
             }
-            for (byte b : Py.unwrapBuffer(item)) {
-                buf.appendCodePoint(b & 0xFF);
+
+            requiresBytesLike(item);
+            try(PyBuffer buf = ((BufferProtocol) item).getBuffer(FULL_RO)) {
+                ByteBuffer bytes = buf.getNIOByteBuffer();
+                try {
+                    ret.put(bytes);
+                } catch (BufferOverflowException e) {
+                    ret = resize(ret, bytes);
+                }
             }
         }
-        return new PyBytes(buf.toString(), true); // Guaranteed to be byte-like
+        return new PyBytes(ret.flip());
+    }
+
+    private ByteBuffer resize(ByteBuffer buf, ByteBuffer bytes) {
+        ByteBuffer tmp = ByteBuffer.allocate(buf.limit() + bytes.limit() + INITIAL_CAPACITY);
+        buf.flip();
+        tmp.put(buf);
+        tmp.put(bytes);
+        return tmp;
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.str_startswith_doc)
@@ -1183,6 +1202,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
     private void byteCheck(int n) {
         if (n > 0xFF || n < 0) {
             throw Py.ValueError("byte must be in range(0, 255)");
+        }
+    }
+
+    private void requiresBytesLike(PyObject obj) {
+        if (!(obj instanceof BufferProtocol)) {
+            throw Py.TypeError(String.format("expected a bytes-like object, %s found", obj.getType().fastGetName()));
         }
     }
 }
