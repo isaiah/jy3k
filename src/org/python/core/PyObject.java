@@ -1862,7 +1862,7 @@ public class PyObject implements Serializable {
     public final PyObject _add(PyObject o2) {
         PyType t1=this.getType();
         PyType t2=o2.getType();
-        if (t1==t2||t1.builtin&&t2.builtin) {
+        if (t1 == t2 && t1.builtin) {
             return this._basic_add(o2);
         }
         return _binop_rule(t1,o2,t2,"__add__","__radd__","+");
