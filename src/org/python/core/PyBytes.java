@@ -197,16 +197,44 @@ public class PyBytes extends PySequence implements BufferProtocol {
             String[] keywords) {
         ArgParser ap = new ArgParser("str", args, keywords, new String[] {"object", "encoding", "errors"}, 0);
         PyObject S = ap.getPyObject(0, null);
+        PyObject encodingObj = ap.getPyObject(1, null);
+        PyObject errorsObj = ap.getPyObject(2, null);
+        if (encodingObj != null) {
+            if (!(encodingObj instanceof PyUnicode)) {
+                throw Py.TypeError(String.format("bytes() argument 2 must be str, not %s", encodingObj.getType().fastGetName()));
+            }
+            String errors = null;
+            if (errorsObj != null) {
+                if (!(errorsObj instanceof PyUnicode)) {
+                    throw Py.TypeError(String.format("bytes() argument 3 must be str, not %s", errorsObj.getType().fastGetName()));
+                }
+                errors = errorsObj.asString();
+            }
+            if (!(S instanceof PyUnicode)) {
+                throw Py.TypeError("encoding without a string argument");
+            }
+            return new PyBytes(((PyUnicode) S).encode(encodingObj.asString(), errors));
+        }
+        if (errorsObj != null) {
+            throw Py.TypeError(S instanceof PyUnicode ? "string argument without an encoding" : "errors without a string argument");
+        }
         // Get the textual representation of the object into str/bytes form
         String str;
         if (S == null) {
             str = "";
         } else {
-            if (S instanceof PyUnicode) {
-                String encoding = ap.getString(1, "utf-8");
-                String errors = ap.getString(2, "strict");
-                // Encoding will raise UnicodeEncodeError if not 7-bit clean.
-                str = codecs.encode(S, encoding, errors);
+            PyObject func = S.__findattr__("__bytes__");
+            if (func != null) {
+                PyObject newObj = func.__call__();
+                if (newObj instanceof PyBytes) {
+                    if (new_.for_type == subtype) {
+                        return newObj;
+                    }
+                    return subtype.__call__(new PyObject[]{ newObj }, Py.NoKeywords);
+                }
+                throw Py.TypeError(String.format("__bytes__ returned non-bytes (type %s)", newObj.getType().fastGetName()));
+            } else if (S instanceof PyUnicode) {
+                throw Py.TypeError("string arugment without an encoding");
             } else if (S instanceof BufferProtocol) {
                 PyBuffer buffer = ((BufferProtocol) S).getBuffer(FULL_RO);
                 byte[] buf = new byte[buffer.getLen()];
@@ -217,8 +245,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
                     v.appendCodePoint(b & 0xFF);
                 }
                 str = v.toString();
-            } else if (S instanceof PyLong) {
-                int n = ((PyLong) S).getValue().intValue();
+            } else if (S.isIndex()) {
+                int n = S.asIndex(Py.OverflowError);
                 if (n < 0) {
                     throw Py.ValueError("negative count");
                 }
@@ -228,10 +256,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
             } else { // an iterable yielding integers in range(256)
                 StringBuilder v = new StringBuilder();
                 for (PyObject x : S.asIterable()) {
-                    int i = x.asInt();
-                    if (i < 0 || i > 255) {
-                        throw Py.ValueError("bytes must be in range(0, 255)");
-                    }
+                    int i = x.asIndex(Py.ValueError);
+                    byteCheck(i);
                     v.appendCodePoint(i);
                 }
                 str = v.toString();
@@ -239,9 +265,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
         if (new_.for_type == subtype) {
             return new PyBytes(str);
-        } else {
-            return new PyBytesDerived(subtype, str);
         }
+        return new PyBytesDerived(subtype, str);
     }
 
     public int[] toCodePoints() {
@@ -444,7 +469,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
 
     @Override
     protected PyObject pyget(int i) {
-        return new PyLong(buffer.get(i));
+        return new PyLong(buffer.get(i) & 0xFF);
 //        return new PyLong(string.charAt(i));
     }
 
@@ -463,9 +488,21 @@ public class PyBytes extends PySequence implements BufferProtocol {
     @ExposedMethod(doc = BuiltinDocs.bytes___contains___doc)
     public boolean __contains__(PyObject o) {
         if (o instanceof PyLong) {
-            int n = o.asInt();
+            int n;
+            try {
+                n = o.asInt();
+            } catch (PyException e) {
+                if (e.match(Py.OverflowError)) {
+                    throw Py.ValueError("byte must be in range(0, 255)");
+                }
+                throw e;
+            }
+
             byteCheck(n);
-            return getString().contains(String.valueOf(Character.toChars(o.asInt())));
+            return getString().contains(String.valueOf(Character.toChars(n)));
+        }
+        if (o instanceof PyUnicode) {
+            throw Py.TypeError(BYTES_REQUIRED_ERROR);
         }
         String other = asUTF16StringOrError(o);
         return getString().contains(other);
@@ -1001,23 +1038,31 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(buf.toString());
     }
 
-    @ExposedClassMethod(defaults = {"null"}, doc = BuiltinDocs.bytes_fromhex_doc)
-    public static final PyObject bytes_fromhex(PyType type, PyObject obj) {
-        byte[] argbuf;
-        if (obj instanceof PyUnicode) {
-            argbuf = ((PyUnicode) obj).getString().getBytes();
-        } else {
-            argbuf = Py.unwrapBuffer(obj);
+    @ExposedClassMethod(doc = BuiltinDocs.bytes_fromhex_doc)
+    public static final PyObject fromhex(PyType type, PyObject obj) {
+        if (!(obj instanceof PyUnicode)) {
+            throw Py.TypeError(String.format("fromhex() argument must be str, not %s", obj.getType().fastGetName()));
         }
+        byte[] argbuf = ((PyUnicode) obj).getString().getBytes();
         int arglen = argbuf.length;
 
         StringBuilder retbuf = new StringBuilder(arglen/2);
 
         for (int i = 0; i < arglen;) {
-            int top = Character.digit(argbuf[i++], 16);
+            byte ch = argbuf[i++];
+            while (ch == ' ' && i < arglen) {
+                ch = argbuf[i++];
+            }
+            if (ch == ' ') {
+                break;
+            }
+            int top = Character.digit(ch, 16);
+            if (top == -1 || i >= arglen) {
+                throw Py.ValueError(String.format("Non-hexadecimal digit found in fromhex() arg at position %d", i - 1));
+            }
             int bot = Character.digit(argbuf[i++], 16);
-            if (top == -1 || bot == -1)
-                throw Py.TypeError("Non-hexadecimal digit found");
+            if (bot == -1)
+                throw Py.ValueError(String.format("Non-hexadecimal digit found in fromhex() arg at position %d", i - 1));
             retbuf.append((char) ((top << 4) + bot));
         }
         PyObject value = new PyBytes(retbuf.toString());
@@ -1129,9 +1174,22 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return Encoding.format(getString(), formatSpec, true);
     }
 
+    @ExposedMethod(doc = BuiltinDocs.bytearray_hex_doc)
+    public final PyObject hex() {
+        ByteBuffer readonly = readBuf();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < readonly.limit(); i++) {
+            sb.append(String.format("%02x", readonly.get(i)));
+        }
+        return new PyUnicode(sb.toString());
+    }
+
     @Override
     public PyObject do_richCompare(PyObject other, CompareOp op) {
-        if (!(other instanceof PyBytes)) {
+        if (!(other instanceof BufferProtocol)) {
+            if (op == CompareOp.EQ || op == CompareOp.NE) {
+                return op.bool(1);
+            }
             return Py.NotImplemented;
         }
         if (this == other) {
@@ -1151,21 +1209,23 @@ public class PyBytes extends PySequence implements BufferProtocol {
         }
         int ret = 0;
         ByteBuffer readonly = readBuf();
-        ByteBuffer otherRead = ((PyBytes) other).readBuf();
-        int minLen = Math.min(readonly.limit(), otherRead.limit());
-        for (int i = 0; i < minLen; i++) {
-            byte b1 = readonly.get(i);
-            byte b2 = otherRead.get(i);
-            if (b1 != b2) {
-                ret = b1 > b2 ? 1 : -1;
-                break;
+        try (PyBuffer buffer = ((BufferProtocol) other).getBuffer(FULL_RO)) {
+            ByteBuffer otherRead = buffer.getNIOByteBuffer();
+            int minLen = Math.min(readonly.limit(), otherRead.limit());
+            for (int i = 0; i < minLen; i++) {
+                byte b1 = readonly.get(i);
+                byte b2 = otherRead.get(i);
+                if (b1 != b2) {
+                    ret = b1 > b2 ? 1 : -1;
+                    break;
+                }
             }
+            int delta = readonly.limit() - otherRead.limit();
+            if (ret != 0 || delta == 0) {
+                return op.bool(ret);
+            }
+            return op.bool(delta > 0 ? 1 : -1);
         }
-        int delta = readonly.limit() - otherRead.limit();
-        if (ret != 0 || delta == 0) {
-            return op.bool(ret);
-        }
-        return op.bool(delta > 0 ? 1 : -1);
     }
 
     @Override
@@ -1213,7 +1273,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return super.unsupportedopMessage(op, o2);
     }
 
-    private void byteCheck(int n) {
+    private static void byteCheck(int n) {
         if (n > 0xFF || n < 0) {
             throw Py.ValueError("byte must be in range(0, 255)");
         }

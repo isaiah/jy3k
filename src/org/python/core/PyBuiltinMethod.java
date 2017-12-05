@@ -32,7 +32,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
 
     static final MethodHandle U_INTEGER = MH.findVirtual(LOOKUP, PyObject.class, "asInt", MethodType.methodType(int.class));
     static final MethodHandle U_BOOLEAN = MH.findVirtual(LOOKUP, PyObject.class, "__bool__", MethodType.methodType(boolean.class));
-    static final MethodHandle U_STRING = MH.findStatic(LOOKUP, Py.class, "getString", MethodType.methodType(String.class, PyObject.class));
+    static final MethodHandle U_STRING = MH.findVirtual(LOOKUP, PyObject.class, "asString", MethodType.methodType(String.class));
     static final MethodHandle U_DOUBLE = MH.findVirtual(LOOKUP, PyObject.class, "asDouble", MethodType.methodType(double.class));
     static final MethodHandle U_LONG = MH.findVirtual(LOOKUP, PyObject.class, "asLong", MethodType.methodType(long.class));
 
