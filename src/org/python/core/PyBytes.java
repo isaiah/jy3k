@@ -546,10 +546,20 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return bytes___mod__(other);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.str___mod___doc)
+    @ExposedMethod(doc = BuiltinDocs.bytes___mod___doc)
     public PyObject bytes___mod__(PyObject other) {
         StringFormatter fmt = new StringFormatter(getString(), false);
         return fmt.format(other);
+    }
+
+    @ExposedMethod(doc = BuiltinDocs.bytes___rmod___doc)
+    public PyObject __rmod__(PyObject other) {
+        if (other instanceof PyBytes) {
+            return other.__mod__(this);
+        } else if (other instanceof PyUnicode) {
+            return Py.NotImplemented;
+        }
+        throw Py.TypeError(String.format("unsupported operand type(s) for %%: '%s' and 'bytes'", other.getType().fastGetName()));
     }
 
     public PyObject atol(int base) {

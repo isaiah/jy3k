@@ -380,8 +380,12 @@ final class StringFormatter {
             IntegerFormatter fi;
             TextFormatter ft;
             InternalFormat.Formatter f; // = ff, fi or ft, whichever we actually use.
+            char type = spec.type;
+            if (!needUnicode && type == 's') {
+                type = 'b';
+            }
 
-            switch (spec.type) {
+            switch (type) {
                 case 'b':
                     PyObject arg = getarg();
                     f = ft = new TextFormatter(buffer, spec);
