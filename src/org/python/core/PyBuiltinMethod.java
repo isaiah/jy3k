@@ -3,6 +3,7 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
+import jdk.dynalink.linker.support.Guards;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
@@ -105,7 +106,6 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
         int defaultLength = info.defaults.length;
         int missingArg = paramCount - argCount;
         int startIndex = defaultLength - missingArg;
-        MethodHandle guard = IS_BUILTIN_METHOD_MH;
         // wide call
         if (defaultLength == 0 && info.isWide) {
             if (argCount == 0) {
@@ -147,7 +147,6 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
                 mh = mh.asSpreader(argOffset, PyObject[].class, argCount);
 
                 mh = MethodHandles.dropArguments(mh, argOffset + 1, String[].class);
-                guard = MethodHandles.insertArguments(VARARG_LEN, 4, argCount, self);
             } else {
                 throw Py.TypeError(String.format("%s() takes no keyword arguments", info.getName()));
             }
@@ -182,7 +181,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         }
         mh = asTypesafeReturn(mh, methodType);
-        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
+        return new GuardedInvocation(mh, Guards.getIdentityGuard(request.getReceiver()));
     }
 
     private MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {
