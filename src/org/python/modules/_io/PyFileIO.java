@@ -212,6 +212,7 @@ public class PyFileIO extends PyRawIOBase {
         OpenMode mode = new OpenMode(m.asString()) {
 
             {
+                binary = true;
                 invalid |= universal | text;    // These other modes are invalid
             }
         };

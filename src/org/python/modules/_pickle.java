@@ -14,7 +14,6 @@ package org.python.modules;
 
 import jdk.dynalink.linker.support.Lookup;
 import org.python.bootstrap.Import;
-import org.python.core.Exceptions;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
@@ -45,6 +44,8 @@ import org.python.annotations.ExposedModule;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ModuleInit;
+import org.python.modules._io.PyBytesIO;
+import org.python.modules._io.PyStringIO;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -562,8 +563,8 @@ public class _pickle {
      * @return         a string representing the pickled object.
      */
     @ExposedFunction(defaults = {"0"})
-    public static PyBytes dumps(PyObject object, int protocol) {
-        cStringIO.StringIO file = cStringIO.StringIO();
+    public static PyObject dumps(PyObject object, int protocol) {
+        PyBytesIO file = new PyBytesIO();
         dump(object, file, protocol);
         return file.getvalue();
     }
@@ -600,7 +601,7 @@ public class _pickle {
      */
     @ExposedFunction
     public static PyObject loads(PyObject str) {
-        cStringIO.StringIO file = cStringIO.StringIO(str.toString());
+        PyBytesIO file = new PyBytesIO(PyBytesIO.TYPE, str);
         return load(file);
     }
 

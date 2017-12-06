@@ -37,6 +37,7 @@ public class PyBytesIO extends PyObject {
 
     public PyBytesIO(PyType subtype, PyObject initvalue) {
         this(subtype);
+        buf = new ByteList(Py.unwrapBuffer(initvalue));
     }
 
     @ExposedNew

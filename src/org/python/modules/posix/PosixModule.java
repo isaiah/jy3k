@@ -40,6 +40,7 @@ import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
 import org.python.modules._io.OpenMode;
 import org.python.modules._io.PyFileIO;
+import org.python.util.ChannelFD;
 import org.python.util.FilenoUtil;
 import org.python.util.PosixShim;
 
@@ -504,9 +505,7 @@ public class PosixModule {
             }
             throw pye;
         }
-        throw Py.NotImplementedError(
-                "Integer file descriptor compatibility only "
-                + "available for stdin, stdout and stderr (0-2)");
+        return false;
     }
 
     @Hide(value=OS.NT, posixImpl = PosixImpl.JAVA)
@@ -734,8 +733,13 @@ public class PosixModule {
             } catch (IOException e) {
                 throw Py.IOError(e);
             }
-        } else {
+        } else if (path instanceof PyUnicode) {
             res = new FileIO((PyUnicode) path, fileIOMode);
+        } else if (path instanceof PyLong) {
+            org.python.io.ChannelFD fd = org.python.io.util.FilenoUtil.getInstance().getWrapperFromFileno(path.asInt());
+            res = new FileIO((FileChannel) fd.ch, fileIOMode);
+        } else {
+            throw Py.TypeError(String.format("unexpected path type: %s", path.getType().fastGetName()));
         }
         return new PyFileIO(res, new OpenMode(fileIOMode));
     }
@@ -1027,7 +1031,6 @@ public class PosixModule {
         return new PyTuple(Py.newLong(pid), new PyLong(status[0]));
     }
 
-    @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_waitpid_doc)
     public static PyObject waitpid(PyObject pidObj, int options) {
         Object ret = pidObj.__tojava__(Process.class);

@@ -20,6 +20,8 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.modules._io.PyBytesIO;
+import org.python.modules._io.PyStringIO;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
@@ -528,7 +530,7 @@ public class marshal {
 
     @ExposedFunction(defaults = {"2"})
     public static PyObject dumps(PyObject value, int version) {
-        cStringIO.StringIO f = cStringIO.StringIO();
+        PyBytesIO f = new PyBytesIO();
         dump(value, f, version);
         return f.getvalue();
     }
