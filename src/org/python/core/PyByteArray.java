@@ -946,6 +946,17 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return new PyByteArray(fmt.format(other));
     }
 
+    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___rmod___doc)
+    public final PyObject bytearray___rmod__(PyObject other) {
+        if (other instanceof PyByteArray) {
+            return other.__mod__(this);
+        } else if (other instanceof PyUnicode) {
+            return Py.NotImplemented;
+        }
+        throw Py.TypeError(String.format("unsupported operand type(s) for %%: '%s' and 'bytes'", other.getType().fastGetName()));
+    }
+
+
     @ExposedClassMethod(doc = BuiltinDocs.bytearray_maketrans_doc)
     public final static PyObject bytearray_maketrans(PyType type, PyObject from, PyObject to) {
         return PyBytes.bytes_maketrans(type, from, to, null);
@@ -1251,25 +1262,22 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      * @param hex specification of the bytes
      * @throws PyException (ValueError) if non-hex characters, or isolated ones, are encountered
      */
-    static PyByteArray fromhex(PyObject hex) throws PyException {
-        return bytearray_fromhex(TYPE, hex);
-    }
-
-    @ExposedClassMethod(doc = BuiltinDocs.bytearray_fromhex_doc)
-    public static PyByteArray bytearray_fromhex(PyType type, PyObject hex) {
-        // I think type tells us the actual class but we always return exactly a bytearray
-        // PyObject ba = type.__call__();
+   @ExposedClassMethod(doc = BuiltinDocs.bytearray_fromhex_doc)
+    public static PyObject fromhex(PyType type, PyObject hex) {
         if (!(hex instanceof PyUnicode)) {
-            throw Py.ValueError(String.format("fromhex() argument must be str, not %s", hex.getType().fastGetName()));
+            throw Py.TypeError(String.format("fromhex() argument must be str, not %s", hex.getType().fastGetName()));
         }
         PyByteArray result = new PyByteArray();
         basebytes_fromhex(result, hex.asString());
+        if (type != TYPE) {
+            return type.__call__(new PyObject[]{result}, Py.NoKeywords);
+        }
         return result;
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytearray_hex_doc)
     public final PyObject bytearray_hex() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(storage.length * 2);
         for (int i = offset; i < offset + size; i++) {
             sb.append(String.format("%02x", storage[i]));
         }
@@ -1644,7 +1652,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_replace_doc)
     public final PyByteArray bytearray_replace(PyObject oldB, PyObject newB, PyObject count) {
-        int maxcount = (count == null) ? -1 : count.asInt(); // or count.asIndex() ?
+        int maxcount = (count == null || count == Py.None) ? -1 : count.asInt(); // or count.asIndex() ?
         return basebytes_replace(oldB, newB, maxcount);
     }
 
@@ -2004,41 +2012,32 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return new PyUnicode(toString());
     }
 
-    /**
-     * Implementation of Python <code>translate(table).</code>
-     *
-     * Return a copy of the byte array where all bytes occurring in the optional argument
-     * <code>deletechars</code> are removed, and the remaining bytes have been mapped through the
-     * given translation table, which must be of length 256.
-     *
-     * @param table length 256 translation table (of a type that may be regarded as a byte array)
-     * @return translated byte array
-     */
-    public PyByteArray translate(PyObject table) {
-        return bytearray_translate(table, null);
-    }
-
-    /**
-     * Implementation of Python <code>translate(table[, deletechars]).</code>
-     *
-     * Return a copy of the byte array where all bytes occurring in the optional argument
-     * <code>deletechars</code> are removed, and the remaining bytes have been mapped through the
-     * given translation table, which must be of length 256.
-     *
-     * You can use the Python <code>maketrans()</code> helper function in the <code>string</code>
-     * module to create a translation table. For string objects, set the table argument to
-     * <code>None</code> for translations that only delete characters:
-     *
-     * @param table length 256 translation table (of a type that may be regarded as a byte array)
-     * @param deletechars object that may be regarded as a byte array, defining bytes to delete
-     * @return translated byte array
-     */
-    public PyByteArray translate(PyObject table, PyObject deletechars) {
-        return bytearray_translate(table, deletechars);
-    }
-
-    @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytearray_translate_doc)
-    public final PyByteArray bytearray_translate(PyObject table, PyObject deletechars) {
+    @ExposedMethod(doc = BuiltinDocs.bytearray_translate_doc)
+    public final PyByteArray bytearray_translate(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("translate", args, keywords, "table", "delete");
+        PyObject table = ap.getPyObject(0);
+        PyObject deletechars = ap.getPyObject(1, null);
+        if (table == Py.None) {
+            PyByteArray result = new PyByteArray();
+            if (deletechars == null) {
+                result.extend(this);
+            } else {
+                // Work with the deletion characters as a buffer too.
+                try (PyBuffer d = getViewOrError(deletechars)) {
+                    // Use a ByteSet to express which bytes to delete
+                    ByteSet del = new ByteSet(d);
+                    int limit = offset + size;
+                    // No translation table, so we're just copying with omissions
+                    for (int i = offset; i < limit; i++) {
+                        int b = storage[i] & 0xff;
+                        if (!del.contains(b)) {
+                            result.append((byte) b);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
         // Work with the translation table (if there is one) as a PyBuffer view.
         try (PyBuffer tab = getTranslationTable(table)) {
@@ -2055,37 +2054,20 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
                     // Use a ByteSet to express which bytes to delete
                     ByteSet del = new ByteSet(d);
                     int limit = offset + size;
-                    if (tab == null) {
-                        // No translation table, so we're just copying with omissions
-                        for (int i = offset; i < limit; i++) {
-                            int b = storage[i] & 0xff;
-                            if (!del.contains(b)) {
-                                result.append((byte)b);
-                            }
-                        }
-                    } else {
-                        // Loop over this byte array and write translated bytes to the result
-                        for (int i = offset; i < limit; i++) {
-                            int b = storage[i] & 0xff;
-                            if (!del.contains(b)) {
-                                result.append(tab.byteAt(b));
-                            }
-                        }
-                    }
-                }
-
-            } else {
-                // No deletion set.
-                if (tab == null) {
-                    // ... and no translation table either: just copy
-                    result.extend(this);
-                } else {
-                    int limit = offset + size;
                     // Loop over this byte array and write translated bytes to the result
                     for (int i = offset; i < limit; i++) {
                         int b = storage[i] & 0xff;
-                        result.append(tab.byteAt(b));
+                        if (!del.contains(b)) {
+                            result.append(tab.byteAt(b));
+                        }
                     }
+                }
+            } else {
+                int limit = offset + size;
+                // Loop over this byte array and write translated bytes to the result
+                for (int i = offset; i < limit; i++) {
+                    int b = storage[i] & 0xff;
+                    result.append(tab.byteAt(b));
                 }
             }
 

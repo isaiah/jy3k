@@ -3,6 +3,7 @@ package org.python.core;
 import org.python.core.buffer.SimpleBuffer;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -4203,5 +4204,45 @@ public abstract class BaseBytes extends PySequence implements List<PyLong> {
 
     public String getString() {
         return new String(storage);
+    }
+
+    public byte[] toBytes() {
+        return storage;
+    }
+
+    @Override
+    public Object __tojava__(Class<?> c) {
+        if (c.isAssignableFrom(String.class)) {
+            return getString();
+        }
+
+        if (c == Character.TYPE || c == Character.class) {
+            if (getString().length() == 1) {
+                return Character.valueOf(getString().charAt(0));
+            }
+        }
+
+        if (c.isArray()) {
+            if (c.getComponentType() == Byte.TYPE) {
+                return toBytes();
+            }
+            if (c.getComponentType() == Character.TYPE) {
+                return getString().toCharArray();
+            }
+        }
+
+        if (c.isAssignableFrom(Collection.class)) {
+            List<Object> list = new ArrayList();
+            for (int i = 0; i < __len__(); i++) {
+                list.add(pyget(i).__tojava__(String.class));
+            }
+            return list;
+        }
+
+        if (c.isInstance(this)) {
+            return this;
+        }
+
+        return Py.NoConversion;
     }
 }
