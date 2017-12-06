@@ -343,7 +343,7 @@ public class Encoding {
     }
 
     public static final boolean isLowercase(CharSequence s) {
-        return s.length() != 0 && s.chars().allMatch(Character::isLowerCase);
+        return s.chars().anyMatch(Character::isLowerCase)&& s.chars().noneMatch(Character::isUpperCase);
     }
 
     public static final boolean isUppercase(CharSequence s) {
@@ -888,6 +888,8 @@ public class Encoding {
                 chars[i] = Character.toLowerCase(c);
             } else if (Character.isLowerCase(c)) {
                 chars[i] = Character.toUpperCase(c);
+            } else {
+                chars[i] = c;
             }
         }
         return new String(chars);
@@ -1398,6 +1400,7 @@ public class Encoding {
             return count;
         }
     }
+
     public static final CharSequence zfill(CharSequence s, int width) {
         int n = s.length();
         if (n >= width) {
@@ -1410,9 +1413,12 @@ public class Encoding {
             char start = s.charAt(0);
             if (start == '+' || start == '-') {
                 ret.append(start);
-                i += 1;
+                i++;
                 nzeros++;
             }
+        }
+        if (i > 0) {
+            s = s.subSequence(i, s.length());
         }
         for (; i < nzeros; i++) {
             ret.append('0');

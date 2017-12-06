@@ -41,6 +41,7 @@ public class ArgParser {
     private static Object required = new Object();
 
     private static String[] emptyKws = new String[0];
+    private int starargIndex;
 
     // private PyBuiltinFunction.Info info;
 
@@ -290,7 +291,7 @@ public class ArgParser {
     }
 
     private void splitParams(String[] paramnames) {
-        int starargIndex = -1;
+        starargIndex = -1;
         for (int i = 0; i < paramnames.length; i++) {
             if (paramnames[i].startsWith("*")) {
                 starargIndex = i;
@@ -309,6 +310,11 @@ public class ArgParser {
     }
 
     private void check() {
+//        if (args.length > params.length) {
+//            if (starargIndex < 0) {
+//                throw Py.TypeError(String.format("%s() takes at most %d argument (%d given)", funcname, params.length, args.length));
+//            }
+//        }
         Set<Integer> usedKws = new HashSet<Integer>();
         int nargs = args.length - kws.length;
         l1: for (int i = 0; i < kws.length; i++) {
@@ -336,21 +342,6 @@ public class ArgParser {
             throw Py.TypeError("'" + kws[i] + "' is an invalid keyword "
                     + "argument for this function");
         }
-        // XXX need a way to handle default keyworldonlyargs, disable for now
-//        if (kwonlyargs == null) return;
-//        List<String> missingKwonlyArgs = new ArrayList<>();
-//        l2: for (int i = 0; i < kwonlyargs.length; i++) {
-//            for (int j = 0; j < kws.length; j++) {
-//                if (kws[j].equals(kwonlyargs[i])) {
-//                    continue l2;
-//                }
-//            }
-//            missingKwonlyArgs.add(kwonlyargs[i]);
-//        }
-//        if (!missingKwonlyArgs.isEmpty()) {
-//            throw Py.TypeError(String.format("%.200s() missing %d keyword-only %s: %s", funcname, missingKwonlyArgs.size(),
-//                    missingKwonlyArgs.size() > 1 ? "arguments" : "argument", Joiner.on(',').join(missingKwonlyArgs)));
-//        }
     }
 
     private PyObject getRequiredArg(int pos) {

@@ -638,23 +638,23 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_lower_doc)
-    public final String bytes_lower() {
-        return getString().toLowerCase(Locale.ROOT);
+    public final PyObject bytes_lower() {
+        return new PyBytes(getString().toLowerCase(Locale.ROOT));
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_upper_doc)
-    public final String bytes_uuper() {
-        return getString().toUpperCase(Locale.ROOT);
+    public final PyObject bytes_upper() {
+        return new PyBytes(getString().toUpperCase(Locale.ROOT));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_title_doc)
-    public final String bytes_title() {
-        return Encoding.title(getString());
+    public final PyObject bytes_title() {
+        return new PyBytes(Encoding.title(getString()));
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_swapcase_doc)
-    public final String bytes_swapcase() {
-        return Encoding.swapcase(getString());
+    public final PyObject bytes_swapcase() {
+        return new PyBytes(Encoding.swapcase(getString()));
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.bytes_strip_doc)
@@ -869,7 +869,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         char pad = parse_fillchar("ljust", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
-            return this;
+            return new PyBytes(getString());
         }
         return new PyBytes(getString() + padding(n, pad));
     }
@@ -879,7 +879,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         char pad = parse_fillchar("rjust", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
-            return this;
+            return new PyBytes(getString());
         }
         return new PyBytes(padding(n, pad) + getString());
     }
@@ -889,7 +889,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
         char pad = parse_fillchar("center", fillchar);
         int n = width - getString().length();
         if (n <= 0) {
-            return this;
+            return new PyBytes(getString());
         }
         int half = n / 2;
         if (n % 2 > 0 && width % 2 > 0) {
@@ -900,12 +900,14 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @ExposedMethod(doc = BuiltinDocs.bytes_zfill_doc)
-    public final PyBytes bytes_zfill(int width) {
+    public final PyObject bytes_zfill(int width) {
         return new PyBytes(Encoding.zfill(getString(), width).toString());
     }
 
-    @ExposedMethod(defaults = "8", doc = BuiltinDocs.bytes_expandtabs_doc)
-    public final PyBytes bytes_expandtabs(int tabsize) {
+    @ExposedMethod(doc = BuiltinDocs.bytes_expandtabs_doc)
+    public final PyBytes bytes_expandtabs(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("expandtabs", args, keywords, "tabsize");
+        int tabsize = ap.getInt(0, 8);
         return new PyBytes(Encoding.expandtabs(getString(), tabsize));
     }
 
@@ -991,6 +993,9 @@ public class PyBytes extends PySequence implements BufferProtocol {
     public final PyBytes bytes_translate(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("translate", args, keywords, "table", "delete");
         PyObject tableObj = ap.getPyObject(0);
+        if (!(tableObj instanceof BufferProtocol)) {
+            throw Py.TypeError(String.format("a bytes-like object is required, not '%s'", tableObj.getType().fastGetName()));
+        }
         String table = Encoding.asStringOrNull(tableObj);
         PyObject deletecharsObj = ap.getPyObject(1, null);
         String deletechars = null;
