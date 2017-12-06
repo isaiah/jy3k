@@ -1,0 +1,4 @@
+base_class: PyStringIO
+want_dict: false
+ctr:
+no_toString: true

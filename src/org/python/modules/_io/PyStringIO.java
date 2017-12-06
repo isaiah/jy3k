@@ -1,12 +1,15 @@
 package org.python.modules._io;
 
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 import org.python.modules.array.PyArrayArray;
 
 @ExposedType(name = "_io.StringIO")
@@ -16,6 +19,13 @@ public class PyStringIO extends PyObject {
     public boolean softspace = false;
     public boolean closed = false;
     public int pos = 0;
+
+    @ExposedGet
+    public String encoding;
+    @ExposedGet
+    public String errors;
+
+    private String newline;
 
     private StringBuilder buf;
 
@@ -41,7 +51,33 @@ public class PyStringIO extends PyObject {
 
     @ExposedNew
     public void __init__(PyObject[] args, String[] keywords) {
-        buf = new StringBuilder(new String(Py.unwrapBuffer(args[0])));
+        ArgParser ap = new ArgParser("StringIO", args, keywords, "initial_value", "newline");
+        PyObject initValue = ap.getPyObject(0, null);
+        PyObject newlineObj = ap.getPyObject(1, Py.None);
+
+        if (newlineObj != Py.None) {
+            if (!(newlineObj instanceof PyUnicode)) {
+                throw Py.TypeError(String.format("newline must be str or None, not %s", newlineObj.getType().fastGetName()));
+            }
+            newline = newlineObj.asString();
+            if (newline.length() > 0 && "\r\n".indexOf(newline) < 0) {
+                throw Py.ValueError(String.format("illegal newline value: '%s'", newline));
+            }
+        } else {
+            this.newline = "\n";
+        }
+        if (initValue != null) {
+            if (!(initValue instanceof PyUnicode)) {
+                throw Py.TypeError(String.format("initial_value must be str or None, not %s", initValue.getType().fastGetName()));
+            }
+            String initial = initValue.asString();
+            if (!newline.equals("\n")) {
+                initial = initial.replaceAll("\\n", newline);
+            }
+            buf = new StringBuilder(initial);
+        } else {
+            buf = new StringBuilder();
+        }
     }
 
     private void _complain_ifclosed() {
@@ -64,24 +100,27 @@ public class PyStringIO extends PyObject {
         super.__setattr__(name, value);
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod
     public PyObject __next__() {
         _complain_ifclosed();
-        PyBytes r = readline();
-        if (r.__len__() == 0)
+        String r = readline();
+        if (r.length() == 0)
             return null;
-        return r;
+        return new PyUnicode(r);
     }
 
     /**
      * Free the memory buffer.
      */
+    @ExposedMethod
     public void close() {
         closed = true;
-        // No point in zeroing the buf, because it won't be reused.
-        // buf is a final variable, so can't set to null.
-        // Therefore, just leave it and let it be GC'ed when the enclosing object is GC'ed
-        // Or remove the final declaration
-        // buf = null;
+        buf = null;
     }
 
 
@@ -89,8 +128,14 @@ public class PyStringIO extends PyObject {
      * Return false.
      * @return      false.
      */
+    @ExposedMethod
     public boolean isatty() {
         _complain_ifclosed();
+        return false;
+    }
+
+    @ExposedGet(name = "line_buffering")
+    public boolean lineBuffering() {
         return false;
     }
 
@@ -99,6 +144,7 @@ public class PyStringIO extends PyObject {
      * Position the file pointer to the absolute position.
      * @param       pos the position in the file.
      */
+    @ExposedMethod
     public void seek(long pos) {
         seek(pos, os.SEEK_SET);
     }
@@ -114,6 +160,9 @@ public class PyStringIO extends PyObject {
      */
     public synchronized void seek(long pos, int mode) {
         _complain_ifclosed();
+        if (pos < 0) {
+            throw Py.ValueError(String.format("negative seek position %d", pos));
+        }
         switch (mode) {
             case os.SEEK_CUR:
                 this.pos += pos;
@@ -139,22 +188,11 @@ public class PyStringIO extends PyObject {
      * Return the file position.
      * @return     the position in the file.
      */
+    @ExposedMethod
     public synchronized int tell() {
         _complain_ifclosed();
         return pos;
     }
-
-
-
-    /**
-     * Read all data until EOF is reached.
-     * An empty string is returned when EOF is encountered immediately.
-     * @return     A string containing the data.
-     */
-    public PyBytes read() {
-        return read(-1);
-    }
-
 
     /**
      * Read at most size bytes from the file (less if the read hits EOF).
@@ -164,8 +202,8 @@ public class PyStringIO extends PyObject {
      * @param size  the number of characters to read.
      * @return     A string containing the data read.
      */
-
-    public synchronized PyBytes read(long size) {
+    @ExposedMethod(defaults = {"-1"})
+    public synchronized String read(long size) {
         _complain_ifclosed();
         _convert_to_int(size);
         int len = buf.length();
@@ -179,7 +217,7 @@ public class PyStringIO extends PyObject {
             substr = buf.substring(pos, newpos);
             pos = newpos;
         }
-        return new PyBytes(substr);
+        return substr;
     }
 
     /**
@@ -189,7 +227,7 @@ public class PyStringIO extends PyObject {
      * An empty string is returned when EOF is hit immediately.
      * @return data from the file up to and including the newline.
      */
-    public PyBytes readline() {
+    public String readline() {
         return readline(-1);
     }
 
@@ -203,21 +241,22 @@ public class PyStringIO extends PyObject {
      * returned.
      * @return data from the file up to and including the newline.
      */
-    public synchronized PyBytes readline(long size) {
+    @ExposedMethod(defaults = {"-1"})
+    public synchronized String readline(long size) {
         _complain_ifclosed();
         _convert_to_int(size);
         int len = buf.length();
-        if (pos == len) {
-            return new PyBytes("");
+        if (pos >= len) {
+            return "";
         }
-        int i = buf.indexOf("\n", pos);
+        int i = buf.indexOf(newline, pos);
         int newpos = (i < 0) ? len : i + 1;
         if (size >= 0) {
             newpos = _convert_to_int(Math.min(newpos - pos, size) + pos);
         }
         String r = buf.substring(pos, newpos);
         pos = newpos;
-        return new PyBytes(r);
+        return r;
     }
 
 
@@ -225,16 +264,16 @@ public class PyStringIO extends PyObject {
      * Read and return a line without the trailing newline.
      * Usind by _pickle as an optimization.
      */
-    public synchronized PyBytes readlineNoNl() {
+    public synchronized String readlineNoNl() {
         _complain_ifclosed();
         int len = buf.length();
-        int i = buf.indexOf("\n", pos);
+        int i = buf.indexOf(newline, pos);
         int newpos = (i < 0) ? len : i;
         String r = buf.substring(pos, newpos);
         pos = newpos;
         if (pos  < len) // Skip the newline
             pos++;
-        return new PyBytes(r);
+        return r;
     }
 
 
@@ -260,10 +299,10 @@ public class PyStringIO extends PyObject {
         int sizehint_int = (int)sizehint;
         int total = 0;
         PyList lines = new PyList();
-        PyBytes line = readline();
-        while (line.__len__() > 0) {
-            lines.append(line);
-            total += line.__len__();
+        String line = readline();
+        while (line.length() > 0) {
+            lines.append(new PyUnicode(line));
+            total += line.length();
             if (0 < sizehint_int  && sizehint_int <= total)
                 break;
             line = readline();
@@ -272,35 +311,27 @@ public class PyStringIO extends PyObject {
     }
 
     /**
-     * truncate the file at the current position.
-     */
-    public synchronized void truncate() {
-        buf.setLength(this.pos);
-    }
-
-    /**
      * truncate the file at the position pos.
      */
-    public synchronized void truncate(long pos) {
+    @ExposedMethod(defaults = {"null"})
+    public synchronized int truncate(PyObject posObj) {
+        int pos = posObj == Py.None ? this.pos : posObj.asInt();
         if (pos < 0) {
-            throw Py.IOError("Negative size not allowed");
+            throw Py.ValueError("negative position value");
         }
-        int pos_int = _convert_to_int(pos);
-        if (pos_int < 0)
-            pos_int = this.pos;
-        buf.setLength(pos_int);
-        this.pos = pos_int;
+        pos = _convert_to_int(pos);
+        int slen = buf.length();
+        buf.setLength(pos);
+        this.pos = pos;
+        return slen - pos;
     }
 
     /**
      * Write a string to the file.
-     * @param obj     The data to write.
+     * @param s     The data to write.
      */
-    public void write(PyObject obj) {
-        write(obj.toString());
-    }
-
-    public synchronized void write(String s) {
+    @ExposedMethod
+    public synchronized int write(String s) {
         _complain_ifclosed();
 
         int spos = pos;
@@ -311,7 +342,7 @@ public class PyStringIO extends PyObject {
             buf.setLength(slen + s.length());
             pos = spos + s.length();
 
-            return;
+            return slen;
         }
 
         if (spos > slen) {
@@ -342,6 +373,7 @@ public class PyStringIO extends PyObject {
 
         buf.setLength(slen);
         pos = newpos;
+        return slen;
     }
 
     /**
@@ -359,9 +391,10 @@ public class PyStringIO extends PyObject {
     /**
      * Write a list of strings to the file.
      */
+    @ExposedMethod
     public void writelines(PyObject lines) {
         for (PyObject line : lines.asIterable()) {
-            write(line);
+            write(line.asString());
         }
     }
 
@@ -379,9 +412,10 @@ public class PyStringIO extends PyObject {
      * before the StringIO object's close() method is called.
      * @return      the contents of the StringIO.
      */
-    public synchronized PyBytes getvalue() {
+    @ExposedMethod
+    public String getvalue() {
         _complain_ifclosed();
-        return new PyBytes(buf.toString());
+        return buf.toString();
     }
 
     private static class os {

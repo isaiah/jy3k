@@ -108,6 +108,7 @@ org/python/modules/_io/PyIOBase.class
 org/python/modules/_io/PyRawIOBase.class
 org/python/modules/_io/PyBytesIO.class
 org/python/modules/_io/PyFileIO.class
+org/python/modules/_io/PyStringIO.class
 org/python/modules/_io/PyIncrementalNewlineDecoder.class
 org/python/modules/_json/PyEncoder.class
 org/python/modules/_json/PyScanner.class
