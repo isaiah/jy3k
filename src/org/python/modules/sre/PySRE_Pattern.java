@@ -3,6 +3,7 @@ package org.python.modules.sre;
 import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.Py;
+import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyCallIter;
 import org.python.core.PyDictionary;
@@ -111,7 +112,7 @@ public class PySRE_Pattern extends PyObject {
     public PyObject SRE_Pattern_findall(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("finditer", args, keywords, "string", "pos", "endpos");
         String s = ap.getString(0);
-        boolean isByte = args[0] instanceof PyBytes;
+        boolean isByte = args[0] instanceof PyBytes || args[0] instanceof PyByteArray;
         List<PyObject> list = new ArrayList<>();
         Matcher matcher = reg.matcher(s);
         int pos = 0;
