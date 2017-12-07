@@ -6,7 +6,6 @@ import org.python.annotations.ExposedType;
 
 @ExposedType(name = "_io.BufferedRandom")
 public class PyBufferedRandom extends PyObject {
-
     public static final PyType TYPE = PyType.fromClass(PyBufferedRandom.class);
 
     public PyBufferedRandom() {

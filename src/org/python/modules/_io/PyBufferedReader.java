@@ -7,6 +7,7 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
+import org.python.core.PyType;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -18,6 +19,8 @@ import java.nio.channels.FileChannel;
 
 @ExposedType(name = "_io.BufferedReader")
 public class PyBufferedReader extends PyObject {
+    public static final PyType TYPE = PyType.fromClass(PyBufferedReader.class);
+
     private BufferedInputStream input;
     private FileChannel fileChannel;
 

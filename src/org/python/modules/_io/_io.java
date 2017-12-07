@@ -34,20 +34,29 @@ public class _io {
     public static void init(PyObject dict) {
         dict.__setitem__("_IOBase", PyIOBase.TYPE);
         dict.__setitem__("_RawIOBase", PyRawIOBase.TYPE);
+        dict.__setitem__("_BufferedIOBase", PyBufferedIOBase.TYPE);
+        dict.__setitem__("BufferedRWPair", PyBufferedRWPair.TYPE);
+        dict.__setitem__("BufferedReader", PyBufferedReader.TYPE);
+        dict.__setitem__("BufferedWriter", PyBufferedWriter.TYPE);
+        dict.__setitem__("BufferedRandom", PyBufferedRandom.TYPE);
+        dict.__setitem__("_TextIOBase", PyTextIOBase.TYPE);
+        dict.__setitem__("TextIOWrapper", PyTextIOWrapper.TYPE);
         dict.__setitem__("FileIO", PyFileIO.TYPE);
         dict.__setitem__("BytesIO", PyBytesIO.TYPE);
         dict.__setitem__("StringIO", PyStringIO.TYPE);
         dict.__setitem__("IncrementalNewlineDecoder", PyIncrementalNewlineDecoder.TYPE);
 
         // Define UnsupportedOperation exception by constructing the type
-
         PyObject exceptions = Py.getSystemState().builtins;
         PyObject ValueError = exceptions.__finditem__("ValueError");
-        PyObject IOError = exceptions.__finditem__("IOError");
+        PyObject OSError = exceptions.__finditem__("OSError");
         // Equivalent to class UnsupportedOperation(ValueError, IOError) : pass
         // UnsupportedOperation = makeException(dict, "UnsupportedOperation", ValueError, IOError);
         // XXX Work-around: slots not properly initialised unless IOError comes first
-        UnsupportedOperation = makeException(dict, "UnsupportedOperation", IOError, ValueError);
+        UnsupportedOperation = makeException(dict, "UnsupportedOperation", OSError, ValueError);
+
+        PyObject BlockingIOError = exceptions.__finditem__("BlockingIOError");
+        dict.__setitem__("BlockingIOError", BlockingIOError);
     }
 
     /** A Python class for the <code>UnsupportedOperation</code> exception. */

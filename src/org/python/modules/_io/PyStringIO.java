@@ -13,7 +13,7 @@ import org.python.core.PyUnicode;
 import org.python.modules.array.PyArrayArray;
 
 @ExposedType(name = "_io.StringIO")
-public class PyStringIO extends PyObject {
+public class PyStringIO extends PyTextIOBase {
     public static final PyType TYPE = PyType.fromClass(PyStringIO.class);
 
     public boolean softspace = false;
@@ -118,7 +118,7 @@ public class PyStringIO extends PyObject {
     @ExposedMethod
     public PyObject __next__() {
         _complain_ifclosed();
-        String r = readline();
+        String r = readline(-1L);
         if (r.length() == 0)
             return null;
         return new PyUnicode(r);
@@ -158,7 +158,7 @@ public class PyStringIO extends PyObject {
      *            0=from the start, 1=relative, 2=from the end.
      */
     @ExposedMethod(defaults = {"0"})
-    public synchronized int seek(long pos, int mode) {
+    public synchronized long seek(long pos, int mode) {
         _complain_ifclosed();
         if (pos < 0) {
             throw Py.ValueError(String.format("negative seek position %d", pos));
@@ -191,7 +191,7 @@ public class PyStringIO extends PyObject {
      * @return     the position in the file.
      */
     @ExposedMethod
-    public synchronized int tell() {
+    public synchronized long tell() {
         _complain_ifclosed();
         return pos;
     }
@@ -221,18 +221,6 @@ public class PyStringIO extends PyObject {
         }
         return substr;
     }
-
-    /**
-     * Read one entire line from the file. A trailing newline character
-     * is kept in the string (but may be absent when a file ends with
-     * an incomplete line).
-     * An empty string is returned when EOF is hit immediately.
-     * @return data from the file up to and including the newline.
-     */
-    public String readline() {
-        return readline(-1);
-    }
-
 
     /**
      * Read one entire line from the file. A trailing newline character
@@ -317,13 +305,13 @@ public class PyStringIO extends PyObject {
         int sizehint_int = (int)sizehint;
         int total = 0;
         PyList lines = new PyList();
-        String line = readline();
+        String line = readline(-1L);
         while (line.length() > 0) {
             lines.append(new PyUnicode(line));
             total += line.length();
             if (0 < sizehint_int  && sizehint_int <= total)
                 break;
-            line = readline();
+            line = readline(-1L);
         }
         return lines;
     }
