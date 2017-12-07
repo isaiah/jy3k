@@ -25,7 +25,7 @@ public class PyBufferedWriter extends PyObject {
     private BufferedOutputStream output;
     private FileChannel fileChannel;
 
-    public PyBufferedWriter(OutputStream out) {
+    public PyBufferedWriter(BufferedOutputStream out) {
         output = new BufferedOutputStream(out);
     }
 

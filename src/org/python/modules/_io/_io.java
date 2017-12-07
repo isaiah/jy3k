@@ -1,6 +1,7 @@
 /* Copyright (c)2012 Jython Developers */
 package org.python.modules._io;
 
+import com.ibm.icu.util.Output;
 import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
@@ -16,6 +17,25 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The Python _io module implemented in Java.
@@ -104,7 +124,7 @@ public class _io {
      * @return the stream object
      */
     @ExposedFunction
-    public static PyObject open(PyObject[] args, String[] kwds) {
+    public static PyObject open(PyObject[] args, String[] kwds) throws IOException {
 
         // Get the arguments to variables
         ArgParser ap = new ArgParser("open", args, kwds, openKwds, 1);
@@ -133,8 +153,22 @@ public class _io {
          * Create the Raw file stream. Let the constructor deal with the variants and argument
          * checking.
          */
-        PyFileIO raw = new PyFileIO(file, mode, closefd);
+        Path path = Paths.get(file.toString());
+        Set<OpenOption> options = new HashSet<>();
+        if (mode.reading) {
+            options.add(StandardOpenOption.READ);
+        }
+        if (mode.writing) {
+            options.add(StandardOpenOption.WRITE);
+        }
+        FileChannel ch;
+        try {
+            ch = FileChannel.open(path, options);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
 
+        PyFileIO raw = new PyFileIO(file, mode, closefd);
         /*
          * From the Python documentation for io.open() buffering = 0 to switch buffering off (only
          * allowed in binary mode), 1 to select line buffering (only usable in text mode), and an
@@ -186,35 +220,29 @@ public class _io {
             return raw;
 
         } else {
-            // We are buffering, so wrap raw into a buffered file
-            PyObject bufferType = null;
-            PyObject io = Import.importModule("io");
-
+            PyObject buffer;
+            OutputStream outputStream = null;
+            InputStream inputStream = null;
             if (mode.updating) {
-                bufferType = io.__getattr__("BufferedRandom");
+                buffer = new PyBufferedRandom();
             } else if (mode.writing || mode.appending || mode.creating) {
-                bufferType = io.__getattr__("BufferedWriter");
-            } else {                        // = reading
-                bufferType = io.__getattr__("BufferedReader");
+                outputStream = Files.newOutputStream(path, options.toArray(new OpenOption[0]));
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, buffering);
+                buffer = new PyBufferedWriter(bufferedOutputStream);
+                if (mode.binary) {
+                    // If binary, return the just the buffered file
+                    return buffer;
+                }
+                return new PyTextIOWrapper(new OutputStreamWriter(bufferedOutputStream));
             }
-
-            PyLong pyBuffering = new PyLong(buffering);
-            PyObject buffer = bufferType.__call__(raw, pyBuffering);
-
+            inputStream = Files.newInputStream(path, options.toArray(new OpenOption[0]));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffering);
+            buffer = new PyBufferedReader(bufferedInputStream);
             if (mode.binary) {
                 // If binary, return the just the buffered file
                 return buffer;
-
-            } else {
-                // We are opening in text mode, so wrap buffered file in a TextIOWrapper.
-                PyObject textType = io.__getattr__("TextIOWrapper");
-                PyObject[] textArgs =
-                        {buffer, ap.getPyObject(3, Py.None), ap.getPyObject(4, Py.None),
-                                ap.getPyObject(5, Py.None), Py.newBoolean(line_buffering)};
-                PyObject wrapper = textType.__call__(textArgs);
-                wrapper.__setattr__("mode", new PyUnicode(m));
-                return wrapper;
             }
+            return new PyTextIOWrapper(new InputStreamReader(bufferedInputStream));
         }
     }
 

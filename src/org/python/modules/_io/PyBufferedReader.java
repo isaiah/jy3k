@@ -24,12 +24,9 @@ public class PyBufferedReader extends PyObject {
     private BufferedInputStream input;
     private FileChannel fileChannel;
 
-    public PyBufferedReader(InputStream in) {
+    public PyBufferedReader(BufferedInputStream in) {
         super(TYPE);
-        input = new BufferedInputStream(in);
-        if (in instanceof FileInputStream) {
-            fileChannel = ((FileInputStream) in).getChannel();
-        }
+        input = in;
     }
 
     public PyBufferedReader(File file) {
