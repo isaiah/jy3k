@@ -51,14 +51,14 @@ public class PyBufferedReader extends PyObject {
             buf = new byte[size];
             try {
                 int n = input.read(buf);
-                return new PyBytes(new String(buf, 0, n));
+                return new PyBytes(buf, 0, n);
             } catch (IOException e) {
                 throw Py.IOError(e);
             }
         }
         try {
             buf = input.readAllBytes();
-            return new PyBytes(new String(buf));
+            return new PyBytes(buf);
         } catch (IOException e) {
             throw Py.IOError(e);
         }

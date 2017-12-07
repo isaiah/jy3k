@@ -26,6 +26,8 @@ public class PyStringIO extends PyObject {
     public String errors;
 
     private String newline;
+    private String writenl = null;
+    private boolean writetranslate;
 
     private StringBuilder buf;
 
@@ -53,9 +55,9 @@ public class PyStringIO extends PyObject {
     public void __init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("StringIO", args, keywords, "initial_value", "newline");
         PyObject initValue = ap.getPyObject(0, null);
-        PyObject newlineObj = ap.getPyObject(1, Py.None);
+        PyObject newlineObj = ap.getPyObject(1, null);
 
-        if (newlineObj != Py.None) {
+        if (newlineObj != null && newlineObj != Py.None) {
             if (!(newlineObj instanceof PyUnicode)) {
                 throw Py.TypeError(String.format("newline must be str or None, not %s", newlineObj.getType().fastGetName()));
             }
@@ -63,15 +65,23 @@ public class PyStringIO extends PyObject {
             if (newline.length() > 0 && "\r\n".indexOf(newline) < 0) {
                 throw Py.ValueError(String.format("illegal newline value: '%s'", newline));
             }
+            writetranslate = newline.length() > 0;
+            if (writetranslate) {
+                writenl = newline;
+            }
         } else {
-            this.newline = "\n";
+            writetranslate = newlineObj == Py.None;
+            this.newline = System.lineSeparator();
         }
+
         if (initValue != null) {
             if (!(initValue instanceof PyUnicode)) {
                 throw Py.TypeError(String.format("initial_value must be str or None, not %s", initValue.getType().fastGetName()));
             }
             String initial = initValue.asString();
-            if (!newline.equals("\n")) {
+            if (newlineObj == Py.None) {
+                initial = initial.replaceAll("\\r[\\n]?", newline);
+            } else {
                 initial = initial.replaceAll("\\n", newline);
             }
             buf = new StringBuilder(initial);
@@ -139,17 +149,6 @@ public class PyStringIO extends PyObject {
         return false;
     }
 
-
-    /**
-     * Position the file pointer to the absolute position.
-     * @param       pos the position in the file.
-     */
-    @ExposedMethod
-    public void seek(long pos) {
-        seek(pos, os.SEEK_SET);
-    }
-
-
     /**
      * Position the file pointer to the position in the .
      *
@@ -158,7 +157,8 @@ public class PyStringIO extends PyObject {
      * @param mode
      *            0=from the start, 1=relative, 2=from the end.
      */
-    public synchronized void seek(long pos, int mode) {
+    @ExposedMethod(defaults = {"0"})
+    public synchronized int seek(long pos, int mode) {
         _complain_ifclosed();
         if (pos < 0) {
             throw Py.ValueError(String.format("negative seek position %d", pos));
@@ -171,10 +171,12 @@ public class PyStringIO extends PyObject {
                 this.pos = _convert_to_int(pos + buf.length());
                 break;
             case os.SEEK_SET:
-            default:
                 this.pos = _convert_to_int(pos);
                 break;
+            default:
+                throw Py.ValueError(String.format("unrecognised whence: %d", mode));
         }
+        return (int) pos;
     }
 
     /**
@@ -249,7 +251,23 @@ public class PyStringIO extends PyObject {
         if (pos >= len) {
             return "";
         }
-        int i = buf.indexOf(newline, pos);
+        int i;
+        if (newline.length() == 0) {
+            i = buf.indexOf("\\r\\n", pos);
+            if (i < 0) {
+                i = buf.indexOf("\\n", pos);
+                if (i < 0) {
+                    i = buf.indexOf("\\r", pos);
+                }
+            } else {
+                i++; // two chars
+            }
+        } else {
+            i = buf.indexOf(newline, pos);
+            if (i > 0 && newline.length() > 1) {
+                i++; // two chars
+            }
+        }
         int newpos = (i < 0) ? len : i + 1;
         if (size >= 0) {
             newpos = _convert_to_int(Math.min(newpos - pos, size) + pos);
@@ -262,7 +280,7 @@ public class PyStringIO extends PyObject {
 
     /**
      * Read and return a line without the trailing newline.
-     * Usind by _pickle as an optimization.
+     * Used by _pickle as an optimization.
      */
     public synchronized String readlineNoNl() {
         _complain_ifclosed();
@@ -337,12 +355,26 @@ public class PyStringIO extends PyObject {
         int spos = pos;
         int slen = buf.length();
 
+        int ret = s.length();
+        if (writetranslate) {
+            if (writenl == null) {
+                s = s.replaceAll("\\r[\\n]?", "\\\n");
+            } else if (!"\n".equals(writenl)) {
+                s = s.replaceAll("\\n", writenl);
+            } //else {
+//                s = s.replaceAll("\\r[\\n]?", writenl);
+//            }
+        }
+//        if (writetranslate || !"\n".equals(newline)) {
+//            s = s.replaceAll("\\n", newline);
+//        }
+
         if (spos == slen) {
             buf.append(s);
             buf.setLength(slen + s.length());
             pos = spos + s.length();
 
-            return slen;
+            return ret;
         }
 
         if (spos > slen) {
@@ -373,7 +405,7 @@ public class PyStringIO extends PyObject {
 
         buf.setLength(slen);
         pos = newpos;
-        return slen;
+        return ret;
     }
 
     /**
@@ -393,6 +425,7 @@ public class PyStringIO extends PyObject {
      */
     @ExposedMethod
     public void writelines(PyObject lines) {
+        _complain_ifclosed();
         for (PyObject line : lines.asIterable()) {
             write(line.asString());
         }

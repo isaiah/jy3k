@@ -74,6 +74,11 @@ public class PyFileIO extends PyRawIOBase {
         readonlyAttributeError("mode");
     }
 
+    @ExposedGet
+    public int _blk_size() {
+        return 4096;
+    }
+
     private static final PyUnicode defaultMode = new PyUnicode("r");
 
     public PyFileIO(RawIOBase ioBase, OpenMode mode) {
