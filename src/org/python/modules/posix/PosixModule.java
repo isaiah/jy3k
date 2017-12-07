@@ -11,14 +11,15 @@ import jnr.posix.FileStat;
 import jnr.posix.POSIX;
 import jnr.posix.POSIXFactory;
 import jnr.posix.Times;
-import jnr.posix.util.FieldAccess;
 import jnr.posix.util.Platform;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
-import org.python.core.PyBUF;
-import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -30,28 +31,16 @@ import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
-import org.python.core.io.FileIO;
-import org.python.core.io.IOBase;
 import org.python.core.io.RawIOBase;
-import org.python.core.util.StringUtil;
-import org.python.annotations.ExposedConst;
-import org.python.annotations.ExposedFunction;
-import org.python.annotations.ExposedModule;
-import org.python.annotations.ModuleInit;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 import org.python.modules._io.OpenMode;
 import org.python.modules._io.PyFileIO;
-import org.python.util.ChannelFD;
-import org.python.util.FilenoUtil;
 import org.python.util.PosixShim;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.ClosedChannelException;
@@ -72,11 +61,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -259,48 +246,30 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_close_doc)
     public static void close(PyObject fd) {
-        if (fd instanceof PyFileIO) {
-            ((PyFileIO) fd).close();
-            return;
-        }
-        Object obj = fd.__tojava__(RawIOBase.class);
-        if (obj != Py.NoConversion) {
-            ((RawIOBase)obj).close();
-        } else {
-            posix.close(getFD(fd).getIntFD());
-        }
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_closerange_doc)
     public static void closerange(PyObject fd_lowObj, PyObject fd_highObj) {
-        int fd_low = getFD(fd_lowObj).getIntFD(false);
-        int fd_high = getFD(fd_highObj).getIntFD(false);
-        for (int i = fd_low; i < fd_high; i++) {
-            try {
-                posix.close(i);
-            } catch (Exception e) {
-            }
-        }
     }
 
     @Hide(OS.NT)
     @ExposedFunction(doc = BuiltinDocs.posix_fdatasync_doc)
-    public static void fdatasync(PyObject fd) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            fsync((RawIOBase) javaobj, false);
-        } else {
-            posix.fdatasync(getFD(fd).getIntFD());
+    public static void fdatasync(int fileno) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        try {
+            ((FileChannel) fd.ch).force(false);
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_fsync_doc)
-    public static void fsync(PyObject fd) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            fsync((RawIOBase) javaobj, true);
-        } else {
-            posix.fsync(getFD(fd).getIntFD());
+    public static void fsync(int fileno) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        try {
+            ((FileChannel) fd.ch).force(true);
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
     }
 
@@ -325,16 +294,12 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_ftruncate_doc)
-    public static void ftruncate(PyObject fd, long length) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            try {
-                ((RawIOBase) javaobj).truncate(length);
-            } catch (PyException pye) {
-                throw Py.OSError(Errno.EBADF);
-            }
-        } else {
-            posix.ftruncate(getFD(fd).getIntFD(), length);
+    public static void ftruncate(int fileno, long length) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        try {
+            ((FileChannel) fd.ch).truncate(length);
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
     }
 
@@ -409,32 +374,8 @@ public class PosixModule {
 
     @Hide(posixImpl = PosixImpl.JAVA)
     @ExposedFunction(doc = BuiltinDocs.posix_isatty_doc)
-    public static boolean isatty(PyObject fdObj) {
-        Object tojava = fdObj.__tojava__(IOBase.class);
-        if (tojava != Py.NoConversion) {
-            try {
-                return ((IOBase) tojava).isatty();
-            } catch (PyException pye) {
-                if (pye.match(Py.ValueError)) {
-                    return false;
-                }
-                throw pye;
-            }
-        }
-
-        FDUnion fd = getFD(fdObj);
-        if (fd.javaFD != null) {
-            return posix.isatty(fd.javaFD);
-        }
-        try {
-            fd.getIntFD();  // evaluate for side effect of checking EBADF or raising TypeError
-        } catch (PyException pye) {
-            if (pye.match(Py.OSError)) {
-                return false;
-            }
-            throw pye;
-        }
-        return false;
+    public static boolean isatty(int fileno) {
+        return fileno < 3 && System.console() != null;
     }
 
     @Hide(value=OS.NT, posixImpl = PosixImpl.JAVA)
@@ -548,17 +489,8 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_lseek_doc)
-    public static long lseek(PyObject fd, long pos, int how) {
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        if (javaobj != Py.NoConversion) {
-            try {
-                return ((RawIOBase) javaobj).seek(pos, how);
-            } catch (PyException pye) {
-                throw badFD();
-            }
-        } else {
-            return posix.lseek(getFD(fd).getIntFD(), pos, how);
-        }
+    public static long lseek(int fileno, long pos, int how) {
+        return 0;
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_mkfifo_doc)
@@ -721,25 +653,16 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_read_doc)
-    public static PyObject read(PyObject fd, int buffersize) {
-        if (fd instanceof PyFileIO) {
-            RawIOBase readable = ((PyFileIO) fd).getRawIO();
-            return new PyBytes(readable.read(buffersize));
-        } else {
-            Object javaobj = fd.__tojava__(RawIOBase.class);
-            if (javaobj != Py.NoConversion) {
-                try {
-                    return new PyBytes(((RawIOBase) javaobj).read(buffersize));
-                } catch (PyException pye) {
-                    throw badFD();
-                }
-            } else {
-                // FIXME: this is broken
-                ByteBuffer buffer = ByteBuffer.allocate(buffersize);
-                posix.read(getFD(fd).getIntFD(), buffer, buffersize);
-                return new PyBytes(buffer);
-            }
+    public static PyObject read(int fileno, int buffersize) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        FileChannel ch = (FileChannel) fd.ch;
+        ByteBuffer buf = ByteBuffer.allocate(buffersize);
+        try {
+            ch.read(buf);
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
+        return new PyBytes(buf);
     }
 
     @Hide(OS.NT)
