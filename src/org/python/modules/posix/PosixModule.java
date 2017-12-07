@@ -38,6 +38,8 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.io.ChannelFD;
+import org.python.io.util.FilenoUtil;
 import org.python.modules._io.OpenMode;
 import org.python.modules._io.PyFileIO;
 import org.python.util.ChannelFD;
@@ -64,17 +66,23 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.NotLinkException;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import static org.python.core.PyBUF.FULL_RO;
 
 /**
  * The posix/nt module, depending on the platform.
@@ -165,38 +173,6 @@ public class PosixModule {
             keys = (PyList) dict.invoke("keys");
         }
         dict.__setitem__("__all__", keys);
-    }
-
-    public static FDUnion getFD(PyObject fdObj) {
-        if (fdObj.isInteger()) {
-            int intFd = fdObj.asInt();
-            switch (intFd) {
-                case 0:
-                    return new FDUnion(FileDescriptor.in);
-                case 1:
-                    return new FDUnion(FileDescriptor.out);
-                case 2:
-                    return new FDUnion(FileDescriptor.err);
-                default:
-                    return new FDUnion(intFd);
-            }
-        }
-        Object tojava = fdObj.__tojava__(FileDescriptor.class);
-        if (tojava != Py.NoConversion) {
-            return new FDUnion((FileDescriptor) tojava);
-        }
-        tojava = fdObj.__tojava__(FileIO.class);
-        if (tojava != Py.NoConversion) {
-            return new FDUnion(((FileIO)tojava).getFD());
-        }
-        if (fdObj instanceof PyFileIO) {
-            return new FDUnion(FilenoUtil.filenoFrom(fdObj));
-        }
-        tojava = fdObj.__tojava__(RawIOBase.class);
-        if (tojava != Py.NoConversion) {
-            return new FDUnion(FilenoUtil.filenoFrom(((RawIOBase) tojava).getChannel()));
-        }
-        throw Py.TypeError("an integer or Java/Jython file descriptor is required");
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix__exit_doc, defaults = {"0"})
@@ -327,53 +303,6 @@ public class PosixModule {
             posix.fsync(getFD(fd).getIntFD());
         }
     }
-
-    // Disable dup support until it fully works with fdopen;
-    // this incomplete support currently breaks py.test
-
-//    public static PyObject dup(PyObject fd1) {
-//        return Py.newLong(posix.dup(getFD(fd1).getIntFD()));
-//    }
-//
-//    public static PyObject dup2(PyObject fd1, PyObject fd2) {
-//        return Py.newLong(posix.dup2(getFD(fd1).getIntFD(), getFD(fd2).getIntFD()));
-//    }
-
-//    public static PyBytes __doc__fdopen = new PyBytes(
-//        "fdopen(fd [, mode='r' [, bufsize]]) -> file_object\n\n" +
-//        "Return an open file object connected to a file descriptor.");
-//    public static PyObject fdopen(PyObject fd) {
-//        return fdopen(fd, "r");
-//
-//    }
-//
-//    public static PyObject fdopen(PyObject fd, String mode) {
-//        return fdopen(fd, mode, -1);
-//
-//    }
-//    public static PyObject fdopen(PyObject fd, String mode, int bufsize) {
-//        if (mode.length() == 0 || !"rwa".contains("" + mode.charAt(0))) {
-//            throw Py.ValueError(String.format("invalid file mode '%s'", mode));
-//        }
-//        Object javaobj = fd.__tojava__(RawIOBase.class);
-//        if (javaobj == Py.NoConversion) {
-//            getFD(fd).getIntFD();
-//            throw Py.NotImplementedError("Integer file descriptors not currently supported for fdopen");
-//        }
-//        RawIOBase rawIO = (RawIOBase)javaobj;
-//        if (rawIO.closed()) {
-//            throw badFD();
-//        }
-//
-//        try {
-//            return new PyFile(rawIO, "<fdopen>", mode, bufsize);
-//        } catch (PyException pye) {
-//            if (!pye.match(Py.IOError)) {
-//                throw pye;
-//            }
-//            throw Py.OSError(Errno.EINVAL);
-//        }
-//    }
 
     /**
      * Internal fsync implementation.
@@ -677,7 +606,7 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_open_doc, defaults = {"0777"})
-    public static PyObject open(PyObject path, int flag, int mode) {
+    public static int open(PyObject path, int flag, int mode) {
         Path p;
         try {
             p = absolutePath(path);
@@ -709,39 +638,32 @@ public class PosixModule {
             }
         }
 
-        if (truncating && !writing) {
-            // Explicitly truncate, writing will truncate anyway
-            new FileIO((PyUnicode) path, "w").close();
+        Set<OpenOption> openOptions = new HashSet<>();
+        if (reading) {
+            openOptions.add(StandardOpenOption.READ);
         }
-
-        if (exclusive && creating) {
-            try {
-                if (!file.createNewFile()) {
-                    throw Py.OSError(Errno.EEXIST, path);
-                }
-            } catch (IOException ioe) {
-                throw Py.OSError(ioe);
-            }
+        if (writing) {
+            openOptions.add(StandardOpenOption.WRITE);
         }
-
-        String fileIOMode = (reading ? "r" : "") + (!appending && writing ? "w" : "")
-                + (appending && (writing || updating) ? "a" : "") + (updating ? "+" : "");
-        FileIO res;
-        if (sync && (writing || updating)) {
-            try {
-                res = new FileIO(new RandomAccessFile(file, "rws").getChannel(), fileIOMode);
-            } catch (IOException e) {
-                throw Py.IOError(e);
-            }
-        } else if (path instanceof PyUnicode) {
-            res = new FileIO((PyUnicode) path, fileIOMode);
-        } else if (path instanceof PyLong) {
-            org.python.io.ChannelFD fd = org.python.io.util.FilenoUtil.getInstance().getWrapperFromFileno(path.asInt());
-            res = new FileIO((FileChannel) fd.ch, fileIOMode);
-        } else {
-            throw Py.TypeError(String.format("unexpected path type: %s", path.getType().fastGetName()));
+        if (appending) {
+            openOptions.add(StandardOpenOption.APPEND);
         }
-        return new PyFileIO(res, new OpenMode(fileIOMode));
+        if (creating) {
+            openOptions.add(StandardOpenOption.CREATE);
+        }
+        if (truncating) {
+            openOptions.add(StandardOpenOption.TRUNCATE_EXISTING);
+        }
+        FileChannel ch;
+        try {
+            ch = FileChannel.open(p, openOptions);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
+        ChannelFD fd = new ChannelFD(ch, filenoUtil, p);
+        filenoUtil.registerWrapper(fd);
+        return fd.fileno;
     }
 
     // XXX handle IOException
@@ -1083,18 +1005,12 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_write_doc)
-    public static int write(PyObject fd, PyObject bytes) {
-        // Get a buffer view: we can cope with N-dimensional data, but not strided data.
-        // Get a ByteBuffer of that data, setting the position and limit to the real data.
-        Object javaobj = fd.__tojava__(RawIOBase.class);
-        byte[] buf = Py.unwrapBuffer(bytes);
-        if (javaobj == Py.NoConversion) {
-            return posix.write(getFD(fd).getIntFD(), buf, buf.length);
-        }
+    public static int write(int fileno, PyObject bytes) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
         try {
-            return ((RawIOBase) javaobj).write(ByteBuffer.wrap(buf));
-        } catch (PyException pye) {
-            throw badFD();
+            return ((FileChannel) fd.ch).write(((BufferProtocol) bytes).getBuffer(FULL_RO).getNIOByteBuffer());
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
     }
 
@@ -1174,6 +1090,7 @@ public class PosixModule {
         if (path instanceof PyUnicode || path instanceof PyBytes) {
             return path.toString();
         }
+
         throw Py.TypeError(String.format("coercing to Unicode: need string, %s type found",
                                          path.getType().fastGetName()));
     }
@@ -1218,11 +1135,10 @@ public class PosixModule {
         return os.getModuleName();
     }
 
-    private static void checkTrailingSlash(PyObject path, Map<String, Object> attributes) {
+    private static void checkTrailingSlash(String path, Map<String, Object> attributes) {
         Boolean isDirectory = (Boolean) attributes.get("isDirectory");
         if (isDirectory != null && !isDirectory.booleanValue()) {
-            String pathStr = path.toString();
-            if (pathStr.endsWith(File.separator) || pathStr.endsWith("/.")) {
+            if (path.endsWith(File.separator) || path.endsWith("/.")) {
                 throw Py.OSError(Errno.ENOTDIR, path);
             }
         }
@@ -1254,61 +1170,6 @@ public class PosixModule {
         static final SecureRandom INSTANCE = new SecureRandom();
     }
 
-    // Combine Java FileDescriptor objects with Posix int file descriptors in one representation.
-    // Unfortunate ugliness!
-    public static class FDUnion {
-        final FileDescriptor javaFD;
-        volatile int intFD;
-
-        FDUnion(int fd) {
-            intFD = fd;
-            javaFD = null;
-        }
-
-        FDUnion(FileDescriptor fd) {
-            intFD = -1;
-            javaFD = fd;
-        }
-
-        boolean isIntFD() {
-            return intFD != -1;
-        }
-
-        public int getIntFD() {
-            return getIntFD(true);
-        }
-
-        int getIntFD(boolean checkFD) {
-            if (intFD == -1) {
-                if (!(javaFD instanceof FileDescriptor)) {
-                    throw Py.OSError(Errno.EBADF);
-                }
-                try {
-                    Field fdField = FieldAccess.getProtectedField(FileDescriptor.class, "fd");
-                    intFD = fdField.getInt(javaFD);
-                } catch (SecurityException e) {
-                } catch (IllegalArgumentException e) {
-                } catch (IllegalAccessException e) {
-                } catch (NullPointerException e) {
-                }
-            }
-            if (checkFD) {
-                if (intFD == -1) {
-                    throw Py.OSError(Errno.EBADF);
-                } else {
-                    posix.fstat(intFD); // side effect of checking if this a good FD or not
-                }
-            }
-            return intFD;
-        }
-
-        @Override
-        public String toString() {
-            return "FDUnion(int=" + intFD + ", java=" + javaFD + ")";
-        }
-
-    }
-
     @ExposedFunction
     public static final PyObject lstat(PyObject path) {
         Path absolutePath = absolutePath(path);
@@ -1327,13 +1188,8 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_stat_doc)
     public static PyObject stat(PyObject path) {
-        // posix file descriptor
         if (path instanceof PyLong) {
-            return PyStatResult.fromFileStat(posix.fstat(path.asInt()));
-        }
-        Object fileIO = path.__tojava__(FileIO.class);
-        if (fileIO != Py.NoConversion) {
-            return PyStatResult.fromFileStat(posix.fstat(getFD(path).getIntFD()));
+            return fstat(path.asInt());
         }
         Path absolutePath = absolutePath(path);
         try {
@@ -1342,7 +1198,7 @@ public class PosixModule {
                 return PyStatResult.fromDosFileAttributes(attributes);
             }
             Map<String, Object> attributes = Files.readAttributes(absolutePath, "unix:*");
-            checkTrailingSlash(path, attributes);
+            checkTrailingSlash(path.toString(), attributes);
             return PyStatResult.fromUnixFileAttributes(attributes);
         } catch (NoSuchFileException ex) {
             throw Py.OSError(Errno.ENOENT, path);
@@ -1354,18 +1210,23 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_fstat_doc)
-    public static final PyObject fstat(PyObject fdObj) {
+    public static final PyObject fstat(int fileno) {
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        Path path = (Path) fd.getAttachment();
         try {
-            FDUnion fd = getFD(fdObj);
-            FileStat stat;
-            if (fd.isIntFD()) {
-                stat = posix.fstat(fd.intFD);
-            } else {
-                stat = posix.fstat(fd.javaFD);
+            if (os == OS.NT) {
+                DosFileAttributes attributes = Files.readAttributes(path, DosFileAttributes.class);
+                return PyStatResult.fromDosFileAttributes(attributes);
             }
-            return PyStatResult.fromFileStat(stat);
-        } catch (PyException ex) {
-            throw Py.OSError(Errno.EBADF);
+            Map<String, Object> attributes = Files.readAttributes(path, "unix:*");
+            checkTrailingSlash(path.toString(), attributes);
+            return PyStatResult.fromUnixFileAttributes(attributes);
+        } catch (NoSuchFileException ex) {
+            throw Py.OSError(Errno.ENOENT, path.toString());
+        } catch (IOException ioe) {
+            throw Py.OSError(Errno.EBADF, path.toString());
+        } catch (SecurityException ex) {
+            throw Py.OSError(Errno.EACCES, path.toString());
         }
     }
 

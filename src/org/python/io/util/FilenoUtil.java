@@ -24,6 +24,10 @@ public class FilenoUtil {
         return internalFilenoIndex.getAndIncrement();
     }
 
+    public void registerWrapper(ChannelFD wrapper) {
+        filenoMap.put(wrapper.fileno, wrapper);
+    }
+
     public void registerWrapper(int fileno, ChannelFD wrapper) {
         filenoMap.put(fileno, wrapper);
     }

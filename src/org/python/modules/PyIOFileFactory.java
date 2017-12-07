@@ -42,11 +42,11 @@ public class PyIOFileFactory {
         }
 
         public String read(int len) {
-            return file.read(len).asString();
+            return file.read(len);
         }
 
         public String readlineNoNl() {
-            return file.readlineNoNl().asString();
+            return file.readlineNoNl();
         }
     }
 

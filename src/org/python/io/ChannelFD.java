@@ -13,6 +13,12 @@ public class ChannelFD {
     public Channel ch;
     public FilenoUtil filenoUtil;
     public int fileno;
+    private Object attachment;
+
+    public ChannelFD(Channel ch, FilenoUtil filenoUtil, Object attachment) {
+        this(ch, filenoUtil);
+        this.attachment = attachment;
+    }
 
     public ChannelFD(Channel ch, FilenoUtil filenoUtil) {
         this.ch = ch;
@@ -35,5 +41,9 @@ public class ChannelFD {
 
     private void initFileno() {
         this.fileno = filenoUtil.getNewFileno();
+    }
+
+    public Object getAttachment() {
+        return attachment;
     }
 }
