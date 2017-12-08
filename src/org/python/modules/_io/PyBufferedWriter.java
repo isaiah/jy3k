@@ -1,5 +1,8 @@
 package org.python.modules._io;
 
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
@@ -7,8 +10,6 @@ import org.python.core.PyBUF;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedType;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,17 +20,20 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
 @ExposedType(name = "_io.BufferedWriter")
-public class PyBufferedWriter extends PyObject {
+public class PyBufferedWriter extends PyBufferedIOBase {
     public static final PyType TYPE = PyType.fromClass(PyBufferedWriter.class);
 
     private BufferedOutputStream output;
     private FileChannel fileChannel;
 
-    public PyBufferedWriter(BufferedOutputStream out) {
-        output = new BufferedOutputStream(out);
+    public PyBufferedWriter(OutputStream out, int bufferSize) {
+        super(TYPE);
+        output = new BufferedOutputStream(out, bufferSize);
+        blksize = bufferSize;
     }
 
     public PyBufferedWriter(File file) {
+        super(TYPE);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             output = new BufferedOutputStream(fileOutputStream);

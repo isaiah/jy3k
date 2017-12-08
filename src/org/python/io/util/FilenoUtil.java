@@ -2,6 +2,7 @@ package org.python.io.util;
 
 import org.python.io.ChannelFD;
 
+import java.nio.channels.Channel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +23,12 @@ public class FilenoUtil {
 
     public int getNewFileno() {
         return internalFilenoIndex.getAndIncrement();
+    }
+
+    public ChannelFD registerChannel(Channel ch) {
+        ChannelFD fd = new ChannelFD(ch, this);
+        registerWrapper(fd.fileno, fd);
+        return fd;
     }
 
     public void registerWrapper(ChannelFD wrapper) {

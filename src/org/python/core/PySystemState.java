@@ -197,6 +197,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     public PySystemState() {
         initialize();
         initImplementation();
+        filenoUtil = FilenoUtil.getInstance();
         closer = new PySystemStateCloser(this);
         modules = new PyStringMap();
         modules_reloading = new HashMap<>();

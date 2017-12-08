@@ -1,5 +1,7 @@
 package org.python.modules._io;
 
+import org.apache.tools.ant.taskdefs.Input;
+import org.python.annotations.ExposedGet;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -15,18 +17,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 
 @ExposedType(name = "_io.BufferedReader")
-public class PyBufferedReader extends PyObject {
+public class PyBufferedReader extends PyBufferedIOBase {
     public static final PyType TYPE = PyType.fromClass(PyBufferedReader.class);
 
     private BufferedInputStream input;
     private FileChannel fileChannel;
 
-    public PyBufferedReader(BufferedInputStream in) {
+    public PyBufferedReader(InputStream in, int bufferSize) {
         super(TYPE);
-        input = in;
+        this.input = new BufferedInputStream(in, bufferSize);
+        this.blksize = bufferSize;
     }
 
     public PyBufferedReader(File file) {
@@ -69,10 +73,10 @@ public class PyBufferedReader extends PyObject {
         int size = sizeObj.asInt();
         byte[] buf = new byte[size];
         try {
+            input.mark(size);
             int n = input.read(buf);
-            input.mark(n);
             input.reset();
-            return new PyBytes(new String(buf, 0, n));
+            return new PyBytes(buf, 0, n);
         } catch (IOException e) {
             throw Py.IOError(e);
         }

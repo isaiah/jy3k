@@ -17,10 +17,13 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.io.ChannelFD;
+import org.python.io.util.FilenoUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -124,7 +127,7 @@ public class _io {
      * @return the stream object
      */
     @ExposedFunction
-    public static PyObject open(PyObject[] args, String[] kwds) throws IOException {
+    public static PyObject open(PyObject[] args, String[] kwds) {
 
         // Get the arguments to variables
         ArgParser ap = new ArgParser("open", args, kwds, openKwds, 1);
@@ -136,6 +139,7 @@ public class _io {
         final String newline = ap.getString(5, null);
         boolean closefd = ap.getBoolean(6, true);
         final PyObject opener = ap.getPyObject(7, Py.None);
+        FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
 
         // Decode the mode string
         OpenMode mode = new OpenMode(m) {
@@ -161,14 +165,14 @@ public class _io {
         if (mode.writing) {
             options.add(StandardOpenOption.WRITE);
         }
-        FileChannel ch;
-        try {
-            ch = FileChannel.open(path, options);
-        } catch (IOException e) {
-            throw Py.IOError(e);
-        }
+//        FileChannel ch;
+//        try {
+//            ch = FileChannel.open(path, options);
+//        } catch (IOException e) {
+//            throw Py.IOError(e);
+//        }
 
-        PyFileIO raw = new PyFileIO(file, mode, closefd);
+        PyFileIO raw = new PyFileIO(path, options);
         /*
          * From the Python documentation for io.open() buffering = 0 to switch buffering off (only
          * allowed in binary mode), 1 to select line buffering (only usable in text mode), and an
@@ -221,28 +225,44 @@ public class _io {
 
         } else {
             PyObject buffer;
-            OutputStream outputStream = null;
-            InputStream inputStream = null;
             if (mode.updating) {
                 buffer = new PyBufferedRandom();
             } else if (mode.writing || mode.appending || mode.creating) {
-                outputStream = Files.newOutputStream(path, options.toArray(new OpenOption[0]));
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, buffering);
-                buffer = new PyBufferedWriter(bufferedOutputStream);
+                FileOutputStream outputStream = null;
+                try {
+                    outputStream = new FileOutputStream(file.toString(), mode.appending);
+                } catch (IOException e) {
+                    throw Py.IOError(e);
+                }
+                FileChannel ch = outputStream.getChannel();
+                ChannelFD fd = new ChannelFD(ch, filenoUtil);
+                fd.attach(path);
+                filenoUtil.registerWrapper(fd);
+                buffer = new PyBufferedWriter(outputStream, buffering);
                 if (mode.binary) {
                     // If binary, return the just the buffered file
                     return buffer;
                 }
-                return new PyTextIOWrapper(new OutputStreamWriter(bufferedOutputStream));
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, buffering);
+                return new PyTextIOWrapper(new OutputStreamWriter(bufferedOutputStream), buffering, fd.fileno);
             }
-            inputStream = Files.newInputStream(path, options.toArray(new OpenOption[0]));
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffering);
-            buffer = new PyBufferedReader(bufferedInputStream);
+            FileInputStream inputStream = null;
+            try {
+                inputStream = new FileInputStream(path.toString());
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+            FileChannel ch = inputStream.getChannel();
+            ChannelFD fd = new ChannelFD(ch, filenoUtil);
+            fd.attach(path);
+            filenoUtil.registerWrapper(fd);
+            buffer = new PyBufferedReader(inputStream, buffering);
             if (mode.binary) {
                 // If binary, return the just the buffered file
                 return buffer;
             }
-            return new PyTextIOWrapper(new InputStreamReader(bufferedInputStream));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffering);
+            return new PyTextIOWrapper(new InputStreamReader(bufferedInputStream), buffering, fd.fileno);
         }
     }
 

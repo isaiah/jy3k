@@ -46,4 +46,8 @@ public class ChannelFD {
     public Object getAttachment() {
         return attachment;
     }
+
+    public void attach(Object attachment) {
+        this.attachment = attachment;
+    }
 }

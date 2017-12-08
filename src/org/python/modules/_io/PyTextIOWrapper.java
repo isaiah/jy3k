@@ -12,13 +12,15 @@ public class PyTextIOWrapper extends PyTextIOBase {
     private InputStreamReader reader;
     private OutputStreamWriter writer;
 
-    public PyTextIOWrapper(OutputStreamWriter outputStreamWriter) {
+    public PyTextIOWrapper(OutputStreamWriter outputStreamWriter, int bufferSize, int fileno) {
         super(TYPE);
         this.writer = outputStreamWriter;
+        this.fileno = fileno;
     }
 
-    public PyTextIOWrapper(InputStreamReader inputStreamReader) {
+    public PyTextIOWrapper(InputStreamReader inputStreamReader, int bufferSize, int fileno) {
         super(TYPE);
         this.reader = inputStreamReader;
+        this.fileno = fileno;
     }
 }

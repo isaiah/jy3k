@@ -44,13 +44,20 @@ import org.python.util.FilenoUtil;
  * <code>readinto(bytearray)</code> would not pick up the version of <code>readinto</code> defined
  * in Python.
  */
-@ExposedType(name = "_io._IOBase", doc = PyIOBase.doc)
+@ExposedType(name = "_io._IOBase")
 public class PyIOBase extends PyObject implements FinalizableBuiltin, Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyIOBase.class);
 
     /** The ioDelegate's closer object; ensures the stream is closed at shutdown */
     private Closer<PyIOBase> closer;
+
+    protected int fileno;
+
+    @ExposedMethod(names = {"fileno"})
+    public int fileno() {
+        return fileno;
+    }
 
     protected PyIOBase() {
         this(TYPE);
@@ -136,7 +143,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return seek(pos, 0);
     }
 
-    @ExposedMethod(defaults = "0", doc = seek_doc)
+    @ExposedMethod(defaults = "0")
     public final long _IOBase_seek(long pos, int whence) {
         throw unsupported("seek");
     }
@@ -146,13 +153,9 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
      *
      * @return stream position
      */
+    @ExposedMethod
     public long tell() {
-        return _IOBase_tell();
-    }
-
-    @ExposedMethod(doc = tell_doc)
-    public final long _IOBase_tell() {
-        return seek(0, 1);
+        return 0;
     }
 
     /**
@@ -175,7 +178,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_truncate(null);
     }
 
-    @ExposedMethod(defaults = "null", doc = truncate_doc)
+    @ExposedMethod(defaults = "null")
     public final long _IOBase_truncate(PyObject size) {
         throw unsupported("truncate");
     }
@@ -189,7 +192,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         _IOBase_flush();
     }
 
-    @ExposedMethod(doc = flush_doc)
+    @ExposedMethod
     public final void _IOBase_flush() {
         // Even types for which this remains a no-op must complain if closed (e.g. BytesIO)
         _checkClosed();
@@ -207,7 +210,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
      * __IOBase_closed. You can find this exposed in CPython. _pyio.IOBase exposes _IOBase__closed
      * (aka "__closed") for a similar purpose (note different name).
      */
-    @ExposedGet(name = "closed", doc = closed_doc)
+    @ExposedGet(name = "closed")
     protected boolean __closed;
 
     @ExposedSet(name = "closed")
@@ -222,7 +225,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         _IOBase_close();
     }
 
-    @ExposedMethod(doc = close_doc)
+    @ExposedMethod
     public final void _IOBase_close() {
         if (!__closed) {
             /*
@@ -253,7 +256,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_seekable();
     }
 
-    @ExposedMethod(doc = seekable_doc)
+    @ExposedMethod
     public final boolean _IOBase_seekable() throws PyException {
         return false;
     }
@@ -298,7 +301,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_readable();
     }
 
-    @ExposedMethod(doc = readable_doc)
+    @ExposedMethod
     public final boolean _IOBase_readable() throws PyException {
         return false;
     }
@@ -341,7 +344,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_writable();
     }
 
-    @ExposedMethod(doc = writable_doc)
+    @ExposedMethod
     public final boolean _IOBase_writable() throws PyException {
         return false;
     }
@@ -437,24 +440,6 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     /**
-     * Return a file descriptor for the stream. A CPython file descriptor is an int, but this is not
-     * the natural choice in Jython, since Java has no such convention of using integers. File
-     * descriptors should be passed around opaquely, so their actual type is irrelevant, as long as
-     * (say) {@link _io#open(PyObject[], String[])} accepts the type that {@link FileIO#fileno()}
-     * returns.
-     *
-     * @return a file descriptor (as opaque object)
-     */
-    public PyObject fileno() {
-        return _IOBase_fileno();
-    }
-
-    @ExposedMethod(doc = fileno_doc)
-    public final PyObject _IOBase_fileno() {
-        throw unsupported("fileno");
-    }
-
-    /**
      * Is the stream known to be an interactive console? This relies on the ability of the
      * underlying stream to know, which is not always possible.
      *
@@ -464,7 +449,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_isatty();
     }
 
-    @ExposedMethod(doc = isatty_doc)
+    @ExposedMethod
     final boolean _IOBase_isatty() {
         _checkClosed();
         return false;
@@ -491,7 +476,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _readline(-1);
     }
 
-    @ExposedMethod(defaults = "null", doc = readline_doc)
+    @ExposedMethod(defaults = "null")
     public final PyObject _IOBase_readline(PyObject limit) {
         if (limit == null || limit == Py.None) {
             return _readline(-1);
@@ -688,7 +673,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return _IOBase_readlines(hint);
     }
 
-    @ExposedMethod(defaults = "null", doc = readlines_doc)
+    @ExposedMethod(defaults = "null")
     public final PyObject _IOBase_readlines(PyObject hint) {
 
         int h = 0;
@@ -726,7 +711,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         _IOBase_writelines(lines);
     }
 
-    @ExposedMethod(doc = writelines_doc)
+    @ExposedMethod
     final void _IOBase_writelines(PyObject lines) {
         _checkClosed();
         // Either an error, or a thing we can __call__()
@@ -737,21 +722,9 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         }
     }
 
-    @Override
-    public PyObject __lt__(PyObject other) {
-        return _IOBase___lt__(other);
-    }
-
     @ExposedMethod
-    public final PyObject _IOBase___lt__(PyObject other) {
-        if (other instanceof PyLong) {
-            PyObject fdObj = fileno();
-            Object io = fdObj.__tojava__(RawIOBase.class);
-            if (io != Py.NoConversion) {
-                return Py.newBoolean(FilenoUtil.filenoFrom(((RawIOBase) io).getChannel()) < ((PyLong) other).asInt());
-            }
-        }
-        return fileno().__lt__(other);
+    public final boolean _IOBase___lt__(PyObject other) {
+        return fileno() < other.asInt();
     }
 
     @Override
@@ -844,95 +817,6 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
         return Py.TypeError(String.format("%s argument expected, got %.100s.", type, arg.getType()
                 .fastGetName()));
     }
-
-    /*
-     * Documentation strings: public where they might be useful to a subclass.
-     */
-    public static final String seek_doc = "Change stream position.\n" + "\n"
-            + "Change the stream position to byte offset offset. offset is\n"
-            + "interpreted relative to the position indicated by whence.  Values\n"
-            + "for whence are:\n" + "\n"
-            + "* 0 -- start of stream (the default); offset should be zero or positive\n"
-            + "* 1 -- current stream position; offset may be negative\n"
-            + "* 2 -- end of stream; offset is usually negative\n" + "\n"
-            + "Return the new absolute position.";
-
-    public static final String tell_doc = "Return current stream position.";
-
-    public static final String truncate_doc = "Truncate file to size bytes.\n" + "\n"
-            + "File pointer is left unchanged.  Size defaults to the current IO\n"
-            + "position as reported by tell().  Returns the new size.";
-
-    public static final String flush_doc = "Flush write buffers, if applicable.\n" + "\n"
-            + "This is not implemented for read-only and non-blocking streams.";
-
-    // public static final String _flush_self_doc =
-    // "Flush write buffers (if any) into the downstream object\n"
-    // + "without flushing that object. The base implementations of\n"
-    // + "flush() and close() will call this method to move any\n"
-    // + "buffered write-data down to the next i/o object in the\n"
-    // + "stack before flushing or closing that downstream object.\n"
-    // + "A sub-class may override this method if it defines buffered\n"
-    // + "state. Generally sub-classes and clients should not call\n"
-    // + "this method directly.";
-
-    public static final String close_doc = "Flush and close the IO object.\n" + "\n"
-            + "This method has no effect if the file is already closed.";
-
-    public static final String closed_doc = "True if the stream is closed.\n";
-
-    public static final String seekable_doc = "Return whether object supports random access.\n"
-            + "\n" + "If False, seek(), tell() and truncate() will raise IOError.\n"
-            + "This method may need to do a test seek().";
-
-    public static final String readable_doc = "Return whether object was opened for reading.\n"
-            + "\n" + "If False, read() will raise IOError.";
-
-    public static final String writable_doc = "Return whether object was opened for writing.\n"
-            + "\n" + "If False, read() will raise IOError.";
-
-    public static final String fileno_doc = "Returns underlying file descriptor if one exists.\n"
-            + "\n" + "An IOError is raised if the IO object does not use a file descriptor.\n";
-
-    public static final String isatty_doc = "Return whether this is an 'interactive' stream.\n"
-            + "\n" + "Return False if it can't be determined.\n";
-
-    public static final String readline_doc = "Read and return a line from the stream.\n" + "\n"
-            + "If limit is specified, at most limit bytes will be read.\n" + "\n"
-            + "The line terminator is always b'\n' for binary files; for text\n"
-            + "files, the newlines argument to open can be used to select the line\n"
-            + "terminator(s) recognized.\n";
-
-    public static final String readlines_doc = "Return a list of lines from the stream.\n" + "\n"
-            + "hint can be specified to control the number of lines read: no more\n"
-            + "lines will be read if the total size (in bytes/characters) of all\n"
-            + "lines so far exceeds hint.";
-
-    public static final String writelines_doc =
-            "Write a list of lines to the stream. Line separators are not added,\n"
-                    + "so it is usual for each of the lines provided to have a line separator\n"
-                    + "at the end.";
-
-    static final String doc = "The abstract base class for all I/O classes, acting on streams of\n"
-            + "bytes. There is no public constructor.\n" + "\n"
-            + "This class provides dummy implementations for many methods that\n"
-            + "derived classes can override selectively; the default implementations\n"
-            + "represent a file that cannot be read, written or seeked.\n" + "\n"
-            + "Even though IOBase does not declare read, readinto, or write because\n"
-            + "their signatures will vary, implementations and clients should\n"
-            + "consider those methods part of the interface. Also, implementations\n"
-            + "may raise a IOError when operations they do not support are called.\n" + "\n"
-            + "The basic type used for binary data read from or written to a file is\n"
-            + "bytes. bytearrays are accepted too, and in some cases (such as\n"
-            + "readinto) needed. Text I/O classes work with str data.\n" + "\n"
-            + "Note that calling any method (even inquiries) on a closed stream is\n"
-            + "undefined. Implementations may raise IOError in this case.\n" + "\n"
-            + "IOBase (and its subclasses) support the iterator protocol, meaning\n"
-            + "that an IOBase object can be iterated over yielding the lines in a\n" + "stream.\n"
-            + "\n" + "IOBase also supports the :keyword:`with` statement. In this example,\n"
-            + "fp is closed after the suite of the with statement is complete:\n" + "\n"
-            + "with open('spam.txt', 'r') as fp:\n" + "    fp.write('Spam and eggs!')\n";
-
 
     /* Traverseproc implementation */
     @Override

@@ -47,6 +47,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.Pipe;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -601,50 +602,10 @@ public class PosixModule {
     // XXX handle IOException
     @ExposedFunction(doc = BuiltinDocs.posix_pipe_doc)
     public static PyObject pipe() throws IOException {
-        // This is ideal solution, but we need a wrapper in java to read and write into,
-        // or else when this file descriptor is passed back to java, we cannot handle it
-//        int[] fds = new int[2];
-//        int rc = posix.pipe(fds); // XXX check rc
-//        return new PyTuple(new PyLong(fds[0]), new PyLong(fds[1]));
         final Pipe pipe = Pipe.open();
         final ReadableByteChannel readChan = pipe.source();
-        RawIOBase read = new RawIOBase() {
-            @Override
-            public Channel getChannel() {
-                return readChan;
-            }
-
-            @Override
-            public boolean readable() {
-                return true;
-            }
-
-            @Override
-            public long seek(long pos, int whence) {
-                return -1;
-            }
-
-            @Override
-            public int readinto(ByteBuffer buf) {
-                try {
-                    return readChan.read(buf);
-                } catch (IOException e) {
-                    return -1;
-                }
-            }
-        };
-        RawIOBase write = new RawIOBase() {
-            @Override
-            public Channel getChannel() {
-                return pipe.sink();
-            }
-
-            @Override
-            public boolean writable() {
-                return true;
-            }
-        };
-        return new PyTuple(new PyFileIO(read, OpenMode.R_ONLY), new PyFileIO(write, OpenMode.W_ONLY));
+        final WritableByteChannel writeChan = pipe.sink();
+        return new PyTuple(new PyFileIO(readChan), new PyFileIO(writeChan));
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_putenv_doc)
@@ -1135,6 +1096,7 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_fstat_doc)
     public static final PyObject fstat(int fileno) {
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        System.out.println("fileno: " + fileno);
         Path path = (Path) fd.getAttachment();
         try {
             if (os == OS.NT) {
