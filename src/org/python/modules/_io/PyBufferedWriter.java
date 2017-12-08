@@ -1,6 +1,5 @@
 package org.python.modules._io;
 
-import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 import org.python.core.BufferProtocol;
@@ -44,7 +43,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_write_doc)
-    public final PyObject BufferedWriter_write(PyObject b) {
+    public final PyObject write(PyObject b) {
         if (!(b instanceof BufferProtocol)) {
             throw Py.TypeError("bytes-like object expected");
         }
@@ -57,7 +56,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_flush_doc)
-    public final void BufferedWriter_flush() {
+    public final void flush() {
         try {
             output.flush();
         } catch (IOException e) {
@@ -66,11 +65,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_tell_doc)
-    public final PyObject BufferedWriter_tell() {
-        try {
-            return new PyLong(fileChannel.position());
-        } catch (IOException e) {
-            throw Py.IOError(e);
-        }
+    public final long tell() {
+        throw unsupported("tell");
     }
 }

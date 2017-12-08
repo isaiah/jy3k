@@ -1,14 +1,11 @@
 package org.python.modules._io;
 
-import org.apache.tools.ant.taskdefs.Input;
-import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBytes;
-import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedType;
 import org.python.core.PyType;
 
 import java.io.BufferedInputStream;
@@ -17,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 
 @ExposedType(name = "_io.BufferedReader")
@@ -45,7 +41,7 @@ public class PyBufferedReader extends PyBufferedIOBase {
     }
 
     @ExposedMethod(names = {"read", "read1"}, defaults = {"-1"}, doc = BuiltinDocs.BufferedReader_read_doc)
-    public final PyObject BufferedReader_read(PyObject sizeObj) {
+    public final PyObject read(PyObject sizeObj) {
         int size = sizeObj.asInt();
         if (size < -1) {
             throw Py.ValueError("invalid number of bytes to read");
@@ -69,7 +65,7 @@ public class PyBufferedReader extends PyBufferedIOBase {
     }
 
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.BufferedReader_peek_doc)
-    public final PyObject BufferedReader_peek(PyObject sizeObj) {
+    public final PyObject peek(PyObject sizeObj) {
         int size = sizeObj.asInt();
         byte[] buf = new byte[size];
         try {
@@ -84,34 +80,45 @@ public class PyBufferedReader extends PyBufferedIOBase {
 
     @ExposedMethod
     public final PyObject BufferedReader_tell() {
-        try {
-            return new PyLong(fileChannel.position());
-        } catch (IOException e) {
-            throw Py.IOError(e);
-        }
+        throw unsupported("tell");
     }
 
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.BufferedReader_seek_doc)
-    public final PyObject BufferedReader_seek(PyObject pos, PyObject whence) {
+    public final PyObject seek(PyObject pos, PyObject whence) {
+        throw unsupported("seek");
+    }
+
+    @ExposedMethod
+    public final boolean readable() {
+        return true;
+    }
+
+    @ExposedMethod
+    public final boolean writable() {
+        return false;
+    }
+
+    @ExposedMethod
+    public final boolean seekable() {
+        return false;
+    }
+
+    @ExposedMethod
+    public final boolean markable() {
+        return input.markSupported();
+    }
+
+    @ExposedMethod
+    public void mark(int readLimit) {
+        input.mark(readLimit);
+    }
+
+    @ExposedMethod
+    public void reset() {
         try {
-            return new PyLong(fileChannel.position());
+            input.reset();
         } catch (IOException e) {
             throw Py.IOError(e);
         }
-    }
-
-    @ExposedMethod
-    public final PyObject BufferedReader_readable() {
-        return Py.True;
-    }
-
-    @ExposedMethod
-    public final PyObject BufferedReader_writable() {
-        return Py.False;
-    }
-
-    @ExposedMethod
-    public final PyObject BufferedReader_seekable() {
-        return Py.newBoolean(fileChannel != null);
     }
 }

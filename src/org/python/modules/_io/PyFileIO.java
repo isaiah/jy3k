@@ -54,7 +54,7 @@ public class PyFileIO extends PyIOBase {
         initFileno(filenoUtil, ch);
     }
 
-    public PyFileIO(int fileno, OpenOption... options) {
+    public PyFileIO(int fileno, Set<OpenOption> options) {
         this.fileno = fileno;
         FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
         ChannelFD fd = filenoUtil.getWrapperFromFileno(fileno);
@@ -88,11 +88,12 @@ public class PyFileIO extends PyIOBase {
         if (file instanceof PyFloat) {
             throw Py.TypeError("integer argument expected, got 'float'");
         }
+        Set<OpenOption> options = new OpenMode(mode).toOptions();
         if (file instanceof PyLong) {
             fileno = file.asInt();
-            return new PyFileIO(fileno, StandardOpenOption.READ);
+            return new PyFileIO(fileno, options);
         }
-        return new PyFileIO(Paths.get(file.asString()), Set.of(StandardOpenOption.READ));
+        return new PyFileIO(Paths.get(file.asString()), options);
     }
 
     @ExposedMethod

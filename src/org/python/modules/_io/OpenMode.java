@@ -3,6 +3,11 @@ package org.python.modules._io;
 import org.python.core.Py;
 import org.python.core.PyException;
 
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * An object able to check a file access mode provided as a String and represent it as boolean
  * attributes and in a normalised form. Such a string is the the mode argument of the several open()
@@ -286,4 +291,18 @@ public class OpenMode {
         return m.toString();
     }
 
+    public Set<OpenOption> toOptions() {
+        Set<OpenOption> options = new HashSet<>();
+        if (appending) {
+            options.add(StandardOpenOption.APPEND);
+        } else if (writing) {
+            options.add(StandardOpenOption.WRITE);
+            options.add(StandardOpenOption.CREATE);
+        } else if (creating) {
+            options.add(StandardOpenOption.CREATE_NEW);
+        } else {
+            options.add(StandardOpenOption.READ);
+        }
+        return options;
+    }
 }

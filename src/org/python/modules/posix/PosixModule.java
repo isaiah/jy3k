@@ -890,6 +890,9 @@ public class PosixModule {
 
     @ExposedFunction(doc = BuiltinDocs.posix_write_doc)
     public static int write(int fileno, PyObject bytes) {
+        if (!(bytes instanceof BufferProtocol)) {
+            throw Py.TypeError("bytes-like object required");
+        }
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
         try {
             return ((FileChannel) fd.ch).write(((BufferProtocol) bytes).getBuffer(FULL_RO).getNIOByteBuffer());
@@ -1096,7 +1099,6 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_fstat_doc)
     public static final PyObject fstat(int fileno) {
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
-        System.out.println("fileno: " + fileno);
         Path path = (Path) fd.getAttachment();
         try {
             if (os == OS.NT) {
