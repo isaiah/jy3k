@@ -11,7 +11,10 @@ import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.CompareOp;
 import org.python.core.Py;
+import org.python.core.PyBUF;
+import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
+import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
@@ -20,6 +23,8 @@ import org.python.core.PySlice;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.core.buffer.SimpleBuffer;
+import org.python.core.buffer.SimpleWritableBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -27,7 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ExposedType(name = "array.array", doc = BuiltinDocs.array_array_doc)
-public class PyArrayArray extends PyObject {
+public class PyArrayArray extends PyObject implements BufferProtocol {
     public static final PyType TYPE = PyType.fromClass(PyArrayArray.class);
     private static final int INITIAL_CAPACITY = 128;
     protected MachineFormatCode formatCode;
@@ -597,5 +602,26 @@ public class PyArrayArray extends PyObject {
         if (!(n instanceof PyLong)) {
             throw Py.TypeError(String.format("can't multiply sequence by non-int of type '%s'", n.getType().fastGetName()));
         }
+    }
+
+    @Override
+    public PyBuffer getBuffer(int flags) throws PyException {
+        return new SimpleBuffer(flags, buf.array());
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return readBuf();
+    }
+
+    @Override
+    public int write(ByteBuffer bytes) throws PyException {
+        int len = bytes.remaining();
+        if (len % itemsize() != 0) {
+            throw Py.ValueError("bytes length not a multiple of item size");
+        }
+        checkCapacity(len);
+        buf.put(bytes);
+        return len;
     }
 }

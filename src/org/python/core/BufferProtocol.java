@@ -1,20 +1,33 @@
 package org.python.core;
 
+import java.nio.ByteBuffer;
+
 /**
- * Interface marking an object as capable of exposing its internal state as a {@link PyBuffer}.
+ * This is not a real Python class, even though it has the Py* prefix. It's a simplified version of the PyBuffer in CPython
+ * Since Java has already provides all kinds of Buffers in java.nio package, we should take advantage of that
+ *
+ * This interface provides two possibilities, one is to read the content of BufferProtocol classes as ByteBuffer, and
+ * the other is to write data into the buf.
+ *
+ * As in practice, the BufferProtocol is only used in the senarios stated above, in case applications like NumPy for java
+ * comes up, this could be extended to have better control over the life cycle of the exported bytes view.
  */
 public interface BufferProtocol {
+    PyBuffer getBuffer(int flags) throws PyException;
 
     /**
-     * Method by which the consumer requests the buffer from the exporter. The consumer provides
-     * information on its intended method of navigation and the features the buffer object is asked
-     * (or assumed) to provide. Each consumer requesting a buffer in this way, when it has finished
-     * using it, should make a corresponding call to {@link PyBuffer#release()} on the buffer it
-     * obtained, since some objects alter their behaviour while buffers are exported.
-     * 
-     * @param flags specifying features demanded and the navigational capabilities of the consumer
-     * @return exported buffer
-     * @throws PyException (BufferError) when expectations do not correspond with the buffer
+     * Get a bytebuffer as the view
+     * @return ByteBuffer
      */
-    PyBuffer getBuffer(int flags) throws PyException;
+    ByteBuffer getBuffer();
+
+    /**
+     * Write the passed ByteBuffer into the object
+     *
+     * @param buf the data to be written
+     * @return n the length that been written
+     *
+     * @throws PyException if the buffer is immutable
+     */
+    int write(ByteBuffer buf) throws PyException;
 }

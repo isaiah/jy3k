@@ -758,6 +758,18 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         return backing.getBuffer(flags);
     }
 
+    @Override
+    public ByteBuffer getBuffer() {
+        return getBuffer(PyBuffer.FULL_RO).getNIOByteBuffer();
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        byte[] bytes = buf.array();
+        backing.copyFrom(bytes, 0, 0, bytes.length);
+        return bytes.length;
+    }
+
     /**
      * Request a release of the underlying buffer exposed by the <code>memoryview</code> object.
      * Many objects take special actions when a view is held on them (for example, a

@@ -36,6 +36,7 @@ import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 import org.python.modules._io.OpenMode;
 import org.python.modules._io.PyFileIO;
+import org.python.modules.thread.PyLock;
 import org.python.util.PosixShim;
 
 import java.io.File;
@@ -246,7 +247,19 @@ public class PosixModule {
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_close_doc)
-    public static void close(PyObject fd) {
+    public static void close(PyObject fileno) {
+        if (!(fileno instanceof PyLong)) {
+            throw Py.TypeError(String.format("an integer is required (got type %s)", fileno.getType().fastGetName()));
+        }
+        ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno.asInt());
+        if (fd == null) {
+            throw Py.IOError(Errno.EBADF);
+        }
+        try {
+            fd.ch.close();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_closerange_doc)

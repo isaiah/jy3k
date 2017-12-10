@@ -54,6 +54,12 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
 
     protected int fileno;
 
+    @ExposedGet
+    protected PyObject name;
+
+    @ExposedGet
+    protected String mode;
+
     @ExposedMethod(names = {"fileno"})
     public int fileno() {
         return fileno;

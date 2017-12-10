@@ -1,5 +1,7 @@
 package org.python.modules._io;
 
+import jnr.constants.platform.Errno;
+import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
@@ -21,10 +23,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.Channels;
+import java.nio.channels.NonReadableChannelException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,6 +62,9 @@ public class PyFileIO extends PyIOBase {
         this.fileno = fileno;
         FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
         ChannelFD fd = filenoUtil.getWrapperFromFileno(fileno);
+        if (fd == null) {
+            throw Py.IOError(Errno.EBADF);
+        }
         fileChannel = (SeekableByteChannel) fd.ch;
         read = fileChannel;
         write = fileChannel;
@@ -88,26 +95,39 @@ public class PyFileIO extends PyIOBase {
         if (file instanceof PyFloat) {
             throw Py.TypeError("integer argument expected, got 'float'");
         }
-        Set<OpenOption> options = new OpenMode(mode).toOptions();
+        OpenMode openMode = new OpenMode(mode);
+        Set<OpenOption> options = openMode.toOptions();
         if (file instanceof PyLong) {
             fileno = file.asInt();
             return new PyFileIO(fileno, options);
         }
-        return new PyFileIO(Paths.get(file.asString()), options);
+        Path path;
+        try {
+            path = Paths.get(file.asString());
+        } catch (InvalidPathException e) {
+            throw Py.ValueError(e.getMessage());
+        }
+        PyFileIO fileio = new PyFileIO(path, options);
+        fileio.name = file;
+        fileio.mode = openMode.toString();
+        return fileio;
     }
 
     @ExposedMethod
     public boolean seekable() {
+        _checkClosed();
         return fileChannel != null;
     }
 
     @ExposedMethod
     public boolean readable() {
+        _checkClosed();
         return read != null;
     }
 
     @ExposedMethod
     public boolean writable() {
+        _checkClosed();
         return write != null;
     }
 
@@ -123,11 +143,13 @@ public class PyFileIO extends PyIOBase {
 
     @ExposedMethod
     public int fileno() {
+        _checkClosed();
         return fileno;
     }
 
     @ExposedMethod(defaults = {"-1"})
     public PyObject read(int size) {
+        _checkClosed();
         if (size < 0) {
             return readall();
         }
@@ -135,6 +157,8 @@ public class PyFileIO extends PyIOBase {
         try {
             read.read(buf);
             return new PyBytes(buf);
+        } catch (NonReadableChannelException e) {
+            throw _io.UnsupportedOperation("read");
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -142,11 +166,13 @@ public class PyFileIO extends PyIOBase {
 
     @ExposedMethod(defaults = {"-1"})
     public PyObject readlines(int hint) {
+        _checkClosed();
         throw _io.UnsupportedOperation("fileio doesn't support line decoding, use a buffered reader");
     }
 
     @ExposedMethod
     public int write(PyObject buf) {
+        assertBufferProtocol(buf);
         try {
             return write.write(((BufferProtocol) buf).getBuffer(PyBUF.FULL_RO).getNIOByteBuffer());
         } catch (IOException e) {
@@ -163,6 +189,7 @@ public class PyFileIO extends PyIOBase {
 
     @ExposedMethod
     public long tell() {
+        _checkClosed();
         try {
             return fileChannel.position();
         } catch (IOException e) {
@@ -172,6 +199,7 @@ public class PyFileIO extends PyIOBase {
 
     @ExposedMethod(defaults = {"null"})
     public long truncate(PyObject size) {
+        _checkClosed();
         try {
             fileChannel.truncate(size.asLong());
             return fileChannel.position();
@@ -201,19 +229,23 @@ public class PyFileIO extends PyIOBase {
         } catch (IOException e) {
             throw Py.IOError(e);
         }
+        __closed = true;
     }
 
     @ExposedMethod
     public void flush() {
+        _checkClosed();
     }
 
     @ExposedMethod
     public boolean isatty() {
+        _checkClosed();
         return fileno < 3 && System.console() != null;
     }
 
     @ExposedMethod
     public int readinto(PyObject buf) {
+        _checkClosed();
         try {
             long size = fileChannel.size();
             InputStream in = Channels.newInputStream(fileChannel);
@@ -221,6 +253,7 @@ public class PyFileIO extends PyIOBase {
                 throw Py.OverflowError("Required array size too large");
             }
             byte[] bytes = in.readAllBytes();
+            assertBufferProtocol(buf);
             ((BufferProtocol) buf).getBuffer(PyBUF.WRITABLE).copyFrom(bytes, 0, 0, bytes.length);
             return bytes.length;
         } catch (IOException e) {
@@ -232,5 +265,11 @@ public class PyFileIO extends PyIOBase {
         ChannelFD fd = filenoUtil.registerChannel(fileChannel);
         fileno = fd.fileno;
         return fd;
+    }
+
+    private void assertBufferProtocol(PyObject buf) {
+        if (!(buf instanceof BufferProtocol)) {
+            throw Py.TypeError(String.format("a bytes-like object is required, not %s", buf.getType().fastGetName()));
+        }
     }
 }
