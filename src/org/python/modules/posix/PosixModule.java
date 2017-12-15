@@ -580,8 +580,9 @@ public class PosixModule {
         if (!writing) {
             if (updating) {
                 writing = true;
-            } else {
-                reading = true;
+                if (!appending) {
+                    reading = true;
+                }
             }
         }
 
@@ -1117,6 +1118,9 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_fstat_doc)
     public static final PyObject fstat(int fileno) {
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        if (fd == null) {
+            throw Py.ValueError("Invlaid fd");
+        }
         Path path = (Path) fd.getAttachment();
         try {
             if (os == OS.NT) {

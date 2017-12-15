@@ -250,6 +250,9 @@ public class PyFileIO extends PyIOBase {
     @ExposedMethod
     public int readinto(PyObject buf) {
         _checkClosed();
+        if (!(buf instanceof BufferProtocol)) {
+            throw Py.TypeError("a bytes-like object is required");
+        }
         try {
             long size = fileChannel.size();
             InputStream in = Channels.newInputStream(fileChannel);
