@@ -158,13 +158,6 @@ public class _io {
          * checking.
          */
         Path path = Paths.get(file.toString());
-        Set<OpenOption> options = new HashSet<>();
-        if (mode.reading) {
-            options.add(StandardOpenOption.READ);
-        }
-        if (mode.writing) {
-            options.add(StandardOpenOption.WRITE);
-        }
 //        FileChannel ch;
 //        try {
 //            ch = FileChannel.open(path, options);
@@ -172,7 +165,7 @@ public class _io {
 //            throw Py.IOError(e);
 //        }
 
-        PyFileIO raw = new PyFileIO(path, options);
+        PyFileIO raw = new PyFileIO(path, mode.toOptions());
         /*
          * From the Python documentation for io.open() buffering = 0 to switch buffering off (only
          * allowed in binary mode), 1 to select line buffering (only usable in text mode), and an

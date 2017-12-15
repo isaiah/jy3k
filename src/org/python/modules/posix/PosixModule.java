@@ -20,6 +20,7 @@ import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
+import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -636,6 +637,7 @@ public class PosixModule {
         } catch (IOException e) {
             throw Py.IOError(e);
         }
+        buf.flip();
         return new PyBytes(buf);
     }
 
@@ -907,10 +909,13 @@ public class PosixModule {
             throw Py.TypeError("bytes-like object required");
         }
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
+        PyBuffer buffer = ((BufferProtocol) bytes).getBuffer(FULL_RO);
         try {
-            return ((FileChannel) fd.ch).write(((BufferProtocol) bytes).getBuffer(FULL_RO).getNIOByteBuffer());
+            return ((FileChannel) fd.ch).write(buffer.getNIOByteBuffer());
         } catch (IOException e) {
             throw Py.IOError(e);
+        } finally {
+            buffer.release();
         }
     }
 

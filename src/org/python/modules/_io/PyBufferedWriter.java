@@ -48,7 +48,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
             throw Py.TypeError("bytes-like object expected");
         }
         try {
-            output.write(((BufferProtocol) b).getBuffer(PyBUF.FULL_RO).getNIOByteBuffer().array());
+            output.write(Py.unwrapBuffer(b));
             return new PyLong(b.__len__());
         } catch (IOException e) {
             throw Py.IOError(e);
@@ -59,6 +59,15 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     public final void flush() {
         try {
             output.flush();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    public void close() {
+        try {
+            output.close();
+            __closed = true;
         } catch (IOException e) {
             throw Py.IOError(e);
         }

@@ -9,6 +9,7 @@ import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.Py;
 import org.python.core.PyBUF;
+import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyFloat;
 import org.python.core.PyLong;
@@ -173,10 +174,13 @@ public class PyFileIO extends PyIOBase {
     @ExposedMethod
     public int write(PyObject buf) {
         assertBufferProtocol(buf);
+        PyBuffer buffer = ((BufferProtocol) buf).getBuffer(PyBUF.FULL_RO);
         try {
-            return write.write(((BufferProtocol) buf).getBuffer(PyBUF.FULL_RO).getNIOByteBuffer());
+            return write.write(buffer.getNIOByteBuffer());
         } catch (IOException e) {
             throw Py.IOError(e);
+        } finally {
+            buffer.release();
         }
     }
 
@@ -252,9 +256,12 @@ public class PyFileIO extends PyIOBase {
             if (size > Integer.MAX_VALUE) {
                 throw Py.OverflowError("Required array size too large");
             }
+            PyBuffer buffer = ((BufferProtocol) buf).getBuffer(PyBUF.WRITABLE);
             byte[] bytes = in.readAllBytes();
             assertBufferProtocol(buf);
-            ((BufferProtocol) buf).getBuffer(PyBUF.WRITABLE).copyFrom(bytes, 0, 0, bytes.length);
+
+            buffer.copyFrom(bytes, 0, 0, bytes.length);
+            buffer.release();
             return bytes.length;
         } catch (IOException e) {
             throw Py.IOError(e);

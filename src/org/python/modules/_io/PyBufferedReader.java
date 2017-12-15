@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 @ExposedType(name = "_io.BufferedReader")
@@ -64,6 +65,39 @@ public class PyBufferedReader extends PyBufferedIOBase {
         }
     }
 
+    @ExposedMethod(defaults = {"-1"})
+    public PyObject readline(int size) {
+        if (size < 0) {
+            size = Integer.MAX_VALUE;
+        }
+        int initCapacity = 1024;
+        ByteBuffer bytes = ByteBuffer.allocate(Math.min(initCapacity, size));
+        try {
+            for (;;) {
+                int b = input.read();
+                if (b < 0) {
+                    break;
+                } else {
+                    if (!bytes.hasRemaining()) {
+                        ByteBuffer tmp = bytes;
+                        tmp.flip();
+                        bytes = ByteBuffer.allocate(bytes.limit() + initCapacity);
+                        bytes.put(tmp);
+                    }
+                    bytes.put((byte) b);
+                }
+
+                if (b == '\n' || bytes.position() == size) {
+                    break;
+                }
+            }
+            bytes.flip();
+            return new PyBytes(bytes);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.BufferedReader_peek_doc)
     public final PyObject peek(PyObject sizeObj) {
         int size = sizeObj.asInt();
@@ -72,6 +106,9 @@ public class PyBufferedReader extends PyBufferedIOBase {
             input.mark(size);
             int n = input.read(buf);
             input.reset();
+            if (n < 0) {
+                return Py.EmptyByte;
+            }
             return new PyBytes(buf, 0, n);
         } catch (IOException e) {
             throw Py.IOError(e);
@@ -117,6 +154,16 @@ public class PyBufferedReader extends PyBufferedIOBase {
     public void reset() {
         try {
             input.reset();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
+    public void close() {
+        try {
+            __closed = true;
+            input.close();
         } catch (IOException e) {
             throw Py.IOError(e);
         }
