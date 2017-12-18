@@ -416,6 +416,7 @@ public class PyStringIO extends PyTextIOWrapper {
         _complain_ifclosed();
         for (PyObject line : lines.asIterable()) {
             write(line.asString());
+            write(writenl);
         }
     }
 

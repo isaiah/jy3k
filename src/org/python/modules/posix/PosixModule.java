@@ -614,13 +614,19 @@ public class PosixModule {
         return fd.fileno;
     }
 
-    // XXX handle IOException
     @ExposedFunction(doc = BuiltinDocs.posix_pipe_doc)
-    public static PyObject pipe() throws IOException {
-        final Pipe pipe = Pipe.open();
-        final ReadableByteChannel readChan = pipe.source();
-        final WritableByteChannel writeChan = pipe.sink();
-        return new PyTuple(new PyFileIO(readChan), new PyFileIO(writeChan));
+    public static PyObject pipe() {
+        FilenoUtil util = Py.getThreadState().filenoUtil();
+        final Pipe pipe;
+        try {
+            pipe = Pipe.open();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+        final Channel readChan = pipe.source();
+        final Channel writeChan = pipe.sink();
+
+        return new PyTuple(new PyLong(util.registerChannel(readChan).fileno), new PyLong(util.registerChannel(writeChan).fileno));
     }
 
     @ExposedFunction(doc = BuiltinDocs.posix_putenv_doc)
@@ -631,15 +637,18 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_read_doc)
     public static PyObject read(int fileno, int buffersize) {
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
-        FileChannel ch = (FileChannel) fd.ch;
-        ByteBuffer buf = ByteBuffer.allocate(buffersize);
-        try {
-            ch.read(buf);
-        } catch (IOException e) {
-            throw Py.IOError(e);
+        if (fd.ch instanceof FileChannel) {
+            FileChannel ch = (FileChannel) fd.ch;
+            ByteBuffer buf = ByteBuffer.allocate(buffersize);
+            try {
+                ch.read(buf);
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+            buf.flip();
+            return new PyBytes(buf);
         }
-        buf.flip();
-        return new PyBytes(buf);
+        return Py.EmptyByte;
     }
 
     @Hide(OS.NT)

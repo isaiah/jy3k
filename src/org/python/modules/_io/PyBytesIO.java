@@ -1,6 +1,7 @@
 package org.python.modules._io;
 
 import org.jruby.util.ByteList;
+import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
@@ -13,6 +14,9 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +126,12 @@ public class PyBytesIO extends PyBufferedIOBase {
     }
 
     @ExposedMethod
+    public int seek(int pos) {
+        this.pos = pos;
+        return pos;
+    }
+
+    @ExposedMethod
     public boolean writable() {
         return true;
     }
@@ -175,6 +185,43 @@ public class PyBytesIO extends PyBufferedIOBase {
     private int writeBytes(byte[] bytes) {
         buf.append(bytes);
         return bytes.length;
+    }
+
+    public Reader getReader() {
+        return new Reader() {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                byte[] data = readBytes(len);
+                System.arraycopy(data, 0, cbuf, off, data.length);
+                return data.length;
+            }
+
+            @Override
+            public void close() throws IOException {
+                PyBytesIO.this.close();
+            }
+        };
+    }
+
+    public Writer getWriter() {
+        return new Writer() {
+            @Override
+            public void write(char[] cbuf, int off, int len) throws IOException {
+                for (int i = off; i < off + len; i++) {
+                    buf.append(cbuf[i]);
+                }
+            }
+
+            @Override
+            public void flush() throws IOException {
+                PyBytesIO.this.flush();
+            }
+
+            @Override
+            public void close() throws IOException {
+                PyBytesIO.this.close();
+            }
+        };
     }
 
 //    private void resize(int size) {

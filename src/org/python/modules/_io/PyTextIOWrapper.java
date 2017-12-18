@@ -9,36 +9,47 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 @ExposedType(name = "_io.TextIOWrapper")
 public class PyTextIOWrapper extends PyTextIOBase {
     public static final PyType TYPE = PyType.fromClass(PyTextIOWrapper.class);
-    private InputStreamReader reader;
-    private OutputStreamWriter writer;
+    private BufferedReader reader;
+    private BufferedWriter writer;
 
     public PyTextIOWrapper(PyType type) {
         super(type);
     }
 
-    public PyTextIOWrapper(OutputStreamWriter outputStreamWriter, int bufferSize, int fileno) {
+    public PyTextIOWrapper(InputStream input, OutputStream output, int bufferSize, int fileno) {
         super(TYPE);
-        this.writer = outputStreamWriter;
-        this.fileno = fileno;
-    }
-
-    public PyTextIOWrapper(InputStreamReader inputStreamReader, int bufferSize, int fileno) {
-        super(TYPE);
-        this.reader = inputStreamReader;
+        if (input != null) {
+            this.reader = new BufferedReader(new InputStreamReader(input), bufferSize);
+        }
+        if (output != null) {
+            this.writer = new BufferedWriter(new OutputStreamWriter(output), bufferSize);
+        }
         this.fileno = fileno;
     }
 
     @ExposedNew
     public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("__init__", args, keywords);
-        return new PyTextIOWrapper(TYPE);
+        ArgParser ap = new ArgParser("__init__", args, keywords, "init_value", "line_buffering");
+        PyObject initValue = ap.getPyObject(0);
+        PyTextIOWrapper ret =new PyTextIOWrapper(TYPE);
+        if (initValue instanceof PyBytesIO) {
+            ret.reader = new BufferedReader(((PyBytesIO) initValue).getReader());
+            ret.writer = new BufferedWriter(((PyBytesIO) initValue).getWriter());
+        }
+        return ret;
     }
 
     @ExposedMethod
@@ -46,7 +57,7 @@ public class PyTextIOWrapper extends PyTextIOBase {
         try {
             for (PyObject line: lines.asIterable()) {
                 writer.write(line.asString());
-                writer.write('\n');
+                writer.newLine();
             }
         } catch (IOException e) {
             throw Py.IOError(e);

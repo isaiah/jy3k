@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -223,45 +224,25 @@ public class _io {
             return raw;
 
         } else {
-            PyObject buffer;
-            if (mode.updating) {
-                buffer = new PyBufferedRandom();
-            } else if (mode.writing || mode.appending || mode.creating) {
-                FileOutputStream outputStream = null;
-                try {
-                    outputStream = new FileOutputStream(file.toString(), mode.appending);
-                } catch (IOException e) {
-                    throw Py.IOError(e);
-                }
-                FileChannel ch = outputStream.getChannel();
-                ChannelFD fd = new ChannelFD(ch, filenoUtil);
-                fd.attach(path);
-                filenoUtil.registerWrapper(fd);
-                buffer = new PyBufferedWriter(outputStream, buffering);
-                if (mode.binary) {
-                    // If binary, return the just the buffered file
-                    return buffer;
-                }
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, buffering);
-                return new PyTextIOWrapper(new OutputStreamWriter(bufferedOutputStream), buffering, fd.fileno);
-            }
-            FileInputStream inputStream = null;
+            FileChannel ch;
             try {
-                inputStream = new FileInputStream(path.toString());
+                ch = FileChannel.open(path, mode.toOptions());
             } catch (IOException e) {
                 throw Py.IOError(e);
             }
-            FileChannel ch = inputStream.getChannel();
-            ChannelFD fd = new ChannelFD(ch, filenoUtil);
+            ChannelFD fd = filenoUtil.registerChannel(ch);
             fd.attach(path);
-            filenoUtil.registerWrapper(fd);
-            buffer = new PyBufferedReader(inputStream, buffering);
+            // If binary, return the just the buffered file
             if (mode.binary) {
-                // If binary, return the just the buffered file
-                return buffer;
+                if (mode.updating) {
+                    return new PyBufferedRandom(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering);
+                } else if (mode.writing || mode.appending || mode.creating) {
+                    return new PyBufferedWriter(Channels.newOutputStream(ch), buffering);
+                } else if (mode.reading) {
+                    return new PyBufferedReader(Channels.newInputStream(ch), buffering);
+                }
             }
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffering);
-            return new PyTextIOWrapper(new InputStreamReader(bufferedInputStream), buffering, fd.fileno);
+            return new PyTextIOWrapper(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering, fd.fileno);
         }
     }
 
