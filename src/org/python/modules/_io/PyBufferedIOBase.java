@@ -11,6 +11,9 @@ public class PyBufferedIOBase extends PyIOBase {
 
     protected int blksize;
 
+    @ExposedGet
+    protected PyIOBase raw;
+
     public PyBufferedIOBase(PyType type) {
         super(type);
     }

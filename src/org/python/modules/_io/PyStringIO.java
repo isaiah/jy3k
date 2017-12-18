@@ -13,7 +13,7 @@ import org.python.core.PyUnicode;
 import org.python.modules.array.PyArrayArray;
 
 @ExposedType(name = "_io.StringIO")
-public class PyStringIO extends PyTextIOBase {
+public class PyStringIO extends PyTextIOWrapper {
     public static final PyType TYPE = PyType.fromClass(PyStringIO.class);
 
     public boolean softspace = false;
@@ -191,7 +191,7 @@ public class PyStringIO extends PyTextIOBase {
      * @return     the position in the file.
      */
     @ExposedMethod
-    public synchronized long tell() {
+    public synchronized int tell() {
         _complain_ifclosed();
         return pos;
     }

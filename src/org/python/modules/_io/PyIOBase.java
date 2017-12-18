@@ -150,7 +150,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
     }
 
     @ExposedMethod(defaults = "0")
-    public final long _IOBase_seek(long pos, int whence) {
+    public final int _IOBase_seek(long pos, int whence) {
         throw unsupported("seek");
     }
 
@@ -160,7 +160,7 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
      * @return stream position
      */
     @ExposedMethod
-    public long tell() {
+    public int tell() {
         return 0;
     }
 

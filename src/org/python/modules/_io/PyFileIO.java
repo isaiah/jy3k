@@ -37,7 +37,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
 @ExposedType(name = "_io.FileIO")
-public class PyFileIO extends PyIOBase {
+public class PyFileIO extends PyRawIOBase {
     public static final PyType TYPE = PyType.fromClass(PyFileIO.class);
     private static final int INITIAL_CAPACITY = 1024;
 
@@ -192,10 +192,10 @@ public class PyFileIO extends PyIOBase {
     }
 
     @ExposedMethod
-    public long tell() {
+    public int tell() {
         _checkClosed();
         try {
-            return fileChannel.position();
+            return (int) fileChannel.position();
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -248,7 +248,7 @@ public class PyFileIO extends PyIOBase {
     }
 
     @ExposedMethod
-    public int readinto(PyObject buf) {
+    public long readinto(PyObject buf) {
         _checkClosed();
         if (!(buf instanceof BufferProtocol)) {
             throw Py.TypeError("a bytes-like object is required");

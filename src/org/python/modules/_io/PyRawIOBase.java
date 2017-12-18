@@ -173,12 +173,12 @@ public class PyRawIOBase extends PyIOBase {
      * @return number of bytes actually read or <code>Py.None</code> (when a non-blocking source is
      *         not ready with further data)
      */
-    public PyObject readinto(PyObject b) {
+    public long readinto(PyObject b) {
         return _RawIOBase_readinto(b);
     }
 
     @ExposedMethod(doc = readinto_doc)
-    public final synchronized PyLong _RawIOBase_readinto(PyObject b) {
+    public final synchronized long _RawIOBase_readinto(PyObject b) {
         throw unsupported("readinto");
     }
 
@@ -189,12 +189,12 @@ public class PyRawIOBase extends PyIOBase {
      * @param b buffer of bytes to be written
      * @return the number of bytes written
      */
-    public PyObject write(PyObject b) {
+    public int write(PyObject b) {
         return _RawIOBase_write(b);
     }
 
     @ExposedMethod(doc = write_doc)
-    public final PyLong _RawIOBase_write(PyObject b) {
+    public final int _RawIOBase_write(PyObject b) {
         throw unsupported("write");
     }
 

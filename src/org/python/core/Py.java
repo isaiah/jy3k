@@ -2231,8 +2231,10 @@ public final class Py {
             return ((PyBytes) str).getString();
         } else if (str instanceof BaseBytes) {
             return ((BaseBytes) str).getString();
+        } else if (str instanceof PyUnicode) {
+            return ((PyUnicode) str).getString();
         }
-        return ((PyUnicode) str).getString();
+        throw Py.TypeError("String required");
     }
 
     public static PyObject[] unpackIterator(PyObject obj, int argcount, int argcountAfter) {

@@ -1,7 +1,6 @@
 package org.python.modules._io;
 
 import org.jruby.util.ByteList;
-import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
@@ -9,6 +8,7 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExposedType(name = "_io.BytesIO")
-public class PyBytesIO extends PyObject {
+public class PyBytesIO extends PyBufferedIOBase {
     public static final PyType TYPE = PyType.fromClass(PyBytesIO.class);
 
-    private ByteList buf;
+    private final ByteList buf;
     private int pos;
     private int stringSize;
     private PyObject dict;
@@ -28,22 +28,27 @@ public class PyBytesIO extends PyObject {
 
 
     public PyBytesIO() {
-        this(TYPE);
+        super(TYPE);
+        buf = new ByteList();
     }
 
     public PyBytesIO(PyType type) {
         super(type);
+        buf = new ByteList();
     }
 
     public PyBytesIO(PyType subtype, PyObject initvalue) {
-        this(subtype);
+        super(subtype);
         buf = new ByteList(Py.unwrapBuffer(initvalue));
     }
 
     @ExposedNew
-    @ExposedMethod
-    public void __init__(PyObject[] args, String[] keywords) {
-        buf = new ByteList(Py.unwrapBuffer(args[0]));
+    public static PyObject _new(PyNewWrapper _new, boolean init, PyType subType, PyObject[] args, String[] keywords) {
+        if (args.length > 0) {
+            return new PyBytesIO(subType, args[0]);
+        } else {
+            return new PyBytesIO(subType);
+        }
     }
 
     @ExposedMethod
@@ -106,20 +111,14 @@ public class PyBytesIO extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject writelines(PyObject lines) {
+    public void writelines(PyObject lines) {
         if (lines == Py.None) {
-            return lines;
+            return;
         }
         Iterable<PyObject> iter = lines.asIterable();
         for (PyObject item: iter) {
             write(item);
         }
-        return Py.None;
-    }
-
-    @ExposedGet
-    public boolean closed() {
-        return buf == null;
     }
 
     @ExposedMethod
@@ -138,8 +137,7 @@ public class PyBytesIO extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject flush() {
-        return Py.None;
+    public void flush() {
     }
 
     @ExposedMethod(names = {"__getstate__"})
@@ -166,8 +164,9 @@ public class PyBytesIO extends PyObject {
     }
 
     private byte[] readBytes(int size) {
-        byte[] output = new byte[size];
         byte[] data = buf.getUnsafeBytes();
+        size = Math.min(data.length - pos, size);
+        byte[] output = new byte[size];
         System.arraycopy(data, pos, output, 0, size);
         pos += size;
         return output;

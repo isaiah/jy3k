@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -157,7 +158,12 @@ public class _io {
          * Create the Raw file stream. Let the constructor deal with the variants and argument
          * checking.
          */
-        Path path = Paths.get(file.toString());
+        Path path;
+        try {
+            path = Paths.get(file.toString());
+        } catch (InvalidPathException e) {
+            throw Py.ValueError(e.getMessage());
+        }
 //        FileChannel ch;
 //        try {
 //            ch = FileChannel.open(path, options);
