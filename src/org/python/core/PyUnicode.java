@@ -1008,12 +1008,11 @@ public class PyUnicode extends PySequence implements Iterable {
         PyUnicode otherUnicode;
         if (other instanceof PyUnicode) {
             otherUnicode = (PyUnicode)other;
+            return new PyUnicode(getString().concat(otherUnicode.getString()));
         } else if (other instanceof PyBytes) {
             throw Py.TypeError("cannot convert 'bytes' object to str implicitly");
-        } else {
-            return null;
         }
-        return new PyUnicode(getString().concat(otherUnicode.getString()));
+        throw Py.TypeError(String.format("must be str, not %s", other.getType().fastGetName()));
     }
 
     @ExposedMethod(doc = BuiltinDocs.str_lower_doc)

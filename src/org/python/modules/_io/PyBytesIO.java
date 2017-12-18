@@ -15,8 +15,12 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,12 +191,39 @@ public class PyBytesIO extends PyBufferedIOBase {
         return bytes.length;
     }
 
+    public InputStream inputStream() {
+        return new InputStream() {
+            @Override
+            public int read() throws IOException {
+                if (pos >= buf.length()) {
+                    return -1;
+                }
+                return buf.get(pos++);
+            }
+        };
+    }
+
+    public OutputStream outputStream() {
+        return new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                buf.append(b);
+                pos++;
+            }
+        };
+    }
+
     public Reader getReader() {
         return new Reader() {
             @Override
             public int read(char[] cbuf, int off, int len) throws IOException {
                 byte[] data = readBytes(len);
-                System.arraycopy(data, 0, cbuf, off, data.length);
+                if (data.length == 0) {
+                    return -1;
+                }
+                for (int i = 0; i < data.length; i++) {
+                    cbuf[i + off] = (char) (data[i] & 0xFF);
+                }
                 return data.length;
             }
 

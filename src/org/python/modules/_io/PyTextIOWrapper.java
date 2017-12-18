@@ -1,5 +1,6 @@
 package org.python.modules._io;
 
+import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
@@ -8,6 +9,7 @@ import org.python.core.Py;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -18,12 +20,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 @ExposedType(name = "_io.TextIOWrapper")
 public class PyTextIOWrapper extends PyTextIOBase {
     public static final PyType TYPE = PyType.fromClass(PyTextIOWrapper.class);
     private BufferedReader reader;
     private BufferedWriter writer;
+
+    @ExposedGet
+    public String encoding;
 
     public PyTextIOWrapper(PyType type) {
         super(type);
@@ -42,13 +51,24 @@ public class PyTextIOWrapper extends PyTextIOBase {
 
     @ExposedNew
     public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
-        ArgParser ap = new ArgParser("__init__", args, keywords, "init_value", "line_buffering");
+        // def open(file, mode="r", buffering=-1, encoding=None, errors=None,
+        //newline=None, closefd=True, opener=None):
+        ArgParser ap = new ArgParser("__init__", args, keywords, "file", "mode", "buffering", "encoding", "errors", "newline", "closefd", "opener");
+        Charset charset;
+        charset = Charset.forName(ap.getString(2, "UTF-8"));
         PyObject initValue = ap.getPyObject(0);
         PyTextIOWrapper ret =new PyTextIOWrapper(TYPE);
+        ret.encoding = charset.displayName();
         if (initValue instanceof PyBytesIO) {
-            ret.reader = new BufferedReader(((PyBytesIO) initValue).getReader());
-            ret.writer = new BufferedWriter(((PyBytesIO) initValue).getWriter());
+            ret.reader = new BufferedReader(new InputStreamReader(((PyBytesIO) initValue).inputStream(), charset));
+            ret.writer = new BufferedWriter(new OutputStreamWriter(((PyBytesIO) initValue).outputStream(), charset));
+        } else if (initValue instanceof PyRawIOBase) {
+            ret.reader = new BufferedReader(new InputStreamReader(((PyRawIOBase) initValue).inputStream(), charset));
+            ret.writer = new BufferedWriter(new OutputStreamWriter(((PyRawIOBase) initValue).outputStream(), charset));
+        } else {
+            throw Py.TypeError("file should be a raw io class");
         }
+
         return ret;
     }
 
@@ -69,6 +89,49 @@ public class PyTextIOWrapper extends PyTextIOBase {
         try {
             writer.write(line);
             return line.length();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod(defaults = {"-1"})
+    public PyObject read(int size) {
+        if (size < 0) {
+            String all = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            return new PyUnicode(all);
+        }
+        char[] cbuf = new char[size];
+        try {
+            int n = reader.read(cbuf);
+            if (n < 0) {
+                return Py.EmptyUnicode;
+            }
+            return new PyUnicode(CharBuffer.wrap(cbuf, 0, n));
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
+    public PyObject readline() {
+        try {
+            String line = reader.readLine();
+            if (line == null) {
+                return Py.EmptyUnicode;
+            }
+            if (reader.ready()) {
+                return new PyUnicode(line + System.lineSeparator());
+            }
+            return new PyUnicode(line);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
+    public void flush() {
+        try {
+            writer.flush();
         } catch (IOException e) {
             throw Py.IOError(e);
         }

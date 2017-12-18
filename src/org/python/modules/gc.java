@@ -478,8 +478,8 @@ public class gc {
     private static boolean monitorNonTraversable = false;
     private static boolean waitingForFinalizers = false;
     private static AtomicBoolean gcRunning = new AtomicBoolean(false);
-    private static HashSet<WeakReferenceGC> monitoredObjects;
-    private static HashSet<Class<? extends PyObject>> reflectionWarnedClasses;
+    private static final HashSet<WeakReferenceGC> monitoredObjects = new HashSet<>();
+    private static final HashSet<Class<? extends PyObject>> reflectionWarnedClasses = new HashSet<>();
     private static ReferenceQueue<Object> gcTrash;
     private static int finalizeWaitCount = 0;
     private static int initWaitTime = 10, defaultWaitFactor = 2;
@@ -1289,23 +1289,19 @@ public class gc {
             gcTrash = new ReferenceQueue<>();
         }
         while (true) {
-            try {
-                synchronized(monitoredObjects) {
-                    if (!isMonitored(ob)) {
-                        CycleMarkAttr cm = new CycleMarkAttr();
-                        JyAttribute.setAttr(ob, JyAttribute.GC_CYCLE_MARK_ATTR, cm);
-                        WeakReferenceGC refPut = new WeakReferenceGC(ob, gcTrash);
-                        if (initString) {
-                            refPut.initStr(ob);
-                        }
-                        monitoredObjects.add(refPut);
-                        cm.monitored = true;
+            synchronized(monitoredObjects) {
+                if (!isMonitored(ob)) {
+                    CycleMarkAttr cm = new CycleMarkAttr();
+                    JyAttribute.setAttr(ob, JyAttribute.GC_CYCLE_MARK_ATTR, cm);
+                    WeakReferenceGC refPut = new WeakReferenceGC(ob, gcTrash);
+                    if (initString) {
+                        refPut.initStr(ob);
                     }
+                    monitoredObjects.add(refPut);
+                    cm.monitored = true;
                 }
-                return;
-            } catch (NullPointerException npe) {
-                monitoredObjects = new HashSet<WeakReferenceGC>();
             }
+            return;
         }
     }
 
@@ -1399,9 +1395,9 @@ public class gc {
 
     public static void stopMonitoring() {
         setMonitorGlobal(false);
-        if (monitoredObjects != null) {
+        if (!monitoredObjects.isEmpty()){
             unmonitorAll();
-            monitoredObjects = null;
+            monitoredObjects.clear();
         }
     }
 
@@ -2718,9 +2714,6 @@ public class gc {
                         reflectionWarnedClasses == null ||
                         !reflectionWarnedClasses.contains(ob.getClass())) {
                     if ((gcFlags & INSTANCE_TRAVERSE_BY_REFLECTION_WARNING) == 0) {
-                        if (reflectionWarnedClasses == null) {
-                            reflectionWarnedClasses = new HashSet<>();
-                        }
                         reflectionWarnedClasses.add(ob.getClass());
                         justAddedWarning = true;
                     }
@@ -2746,9 +2739,6 @@ public class gc {
                     !reflectionWarnedClasses.contains(ob.getClass())) {
                 if ((gcFlags & INSTANCE_TRAVERSE_BY_REFLECTION_WARNING) == 0 &&
                         !justAddedWarning) {
-                    if (reflectionWarnedClasses == null) {
-                        reflectionWarnedClasses = new HashSet<>();
-                    }
                     reflectionWarnedClasses.add(ob.getClass());
                 }
                 Py.writeWarning("gc", "Traverse by reflection: "+ob.getClass().getName()+"\n" +

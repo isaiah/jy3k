@@ -1,25 +1,29 @@
 /* Copyright (c)2012 Jython Developers */
 package org.python.modules._io;
 
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 import org.python.core.Py;
 import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
 import org.python.core.PyByteArray;
+import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
-import org.python.core.PyBytes;
 import org.python.core.PyType;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * An implementation of Python <code>_io._RawIOBase</code> mirroring the arrangement of methods in
  * the CPython version.
  */
-@ExposedType(name = "_io._RawIOBase", doc = PyRawIOBase.doc, base = PyIOBase.class)
+@ExposedType(name = "_io._RawIOBase", base = PyIOBase.class)
 public class PyRawIOBase extends PyIOBase {
 
     public static final PyType TYPE = PyType.fromClass(PyRawIOBase.class);
@@ -62,7 +66,7 @@ public class PyRawIOBase extends PyIOBase {
      * terms of read(), in case the latter is a more suitable primitive operation, but that would
      * lead to nasty recursion in case a subclass doesn't implement either.)
      */
-    @ExposedMethod(defaults = "null", doc = read_doc)
+    @ExposedMethod(defaults = "null")
     public final PyObject _RawIOBase_read(PyObject n) {
         if (n == null || n == Py.None) {
             return _read(-1);
@@ -127,7 +131,7 @@ public class PyRawIOBase extends PyIOBase {
         return _RawIOBase_readall();
     }
 
-    @ExposedMethod(doc = readall_doc)
+    @ExposedMethod
     public final synchronized PyObject _RawIOBase_readall() {
 
         // Get reference to the (possibly overridden) read() method
@@ -177,7 +181,7 @@ public class PyRawIOBase extends PyIOBase {
         return _RawIOBase_readinto(b);
     }
 
-    @ExposedMethod(doc = readinto_doc)
+    @ExposedMethod
     public final synchronized long _RawIOBase_readinto(PyObject b) {
         throw unsupported("readinto");
     }
@@ -193,30 +197,26 @@ public class PyRawIOBase extends PyIOBase {
         return _RawIOBase_write(b);
     }
 
-    @ExposedMethod(doc = write_doc)
+    @ExposedMethod
     public final int _RawIOBase_write(PyObject b) {
         throw unsupported("write");
     }
 
-    /*
-     * Documentation strings: public where they might be useful to a subclass.
-     */
-    public static final String read_doc = "Read up to n bytes from the object and return them.\n"
-            + "As a convenience, if n is unspecified or -1, readall() is called.";
+    public InputStream inputStream() {
+        return new InputStream() {
+            @Override
+            public int read() throws IOException {
+                return PyRawIOBase.this.read(1).asInt();
+            }
+        };
+    }
 
-    public static final String readall_doc =
-            "Read and return all the bytes from the stream until EOF, using multiple\n"
-                    + "calls to the stream if necessary.";
-
-    public static final String readinto_doc =
-            "Read up to len(b) bytes into bytearray b and return the number of bytes read.\n"
-                    + "If the object is in non-blocking mode and no bytes are available,\n"
-                    + "None is returned.";
-
-    public static final String write_doc =
-            "Write the given bytes or bytearray object, b, to the underlying raw\n"
-                    + "stream and return the number of bytes written.";
-
-    static final String doc = "Base class for raw binary I/O.";
-
+    public OutputStream outputStream() {
+        return new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                PyRawIOBase.this.write(new PyBytes(new int[]{b}));
+            }
+        };
+    }
 }

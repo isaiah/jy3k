@@ -229,7 +229,9 @@ public class PyFileIO extends PyRawIOBase {
     @ExposedMethod
     public void close() {
         try {
-            fileChannel.close();
+            if (fileChannel != null) {
+                fileChannel.close();
+            }
         } catch (IOException e) {
             throw Py.IOError(e);
         }
