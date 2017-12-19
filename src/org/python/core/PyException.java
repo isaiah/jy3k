@@ -1,5 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
+import org.python.modules._io.PyTextIOWrapper;
+
 import java.io.*;
 
 /**
@@ -102,7 +104,7 @@ public class PyException extends RuntimeException implements Traverseproc
         } else {
             try {
                 printingStackTrace = true;
-                Py.displayException(type, value, traceback, new PyFile(s));
+                Py.displayException(type, value, traceback, new PyTextIOWrapper(s));
             } finally {
                 printingStackTrace = false;
             }

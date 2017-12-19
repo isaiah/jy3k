@@ -153,7 +153,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         java.util.List<stmt> body = new LinkedList<>();
         if (ctx.compound_stmt() != null) {
             body.add((stmt) visit(ctx.compound_stmt()));
-        } else {
+        } else if (ctx.simple_stmt() != null){
             body = visit_Simple_stmt(ctx.simple_stmt());
         }
         return new Interactive(ctx.getStart(), body);

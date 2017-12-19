@@ -14,6 +14,7 @@ import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.core.generator.PyCoroutine;
 import org.python.core.generator.PyGenerator;
+import org.python.modules._io.PyTextIOWrapper;
 import org.python.modules.posix.PosixModule;
 import org.python.modules.sys.SysModule;
 
@@ -1667,12 +1668,6 @@ public final class Py {
             } else if (o instanceof PyUnicode) {
                 flags |= CompilerFlags.PyCF_SOURCE_IS_UTF8;
                 contents = o.toString();
-            } else if (o instanceof PyFile) {
-                PyFile fp = (PyFile) o;
-                if (fp.getClosed()) {
-                    return;
-                }
-                contents = fp.read().toString();
             } else {
                 throw Py.TypeError(
                         "exec: argument 1 must be string, code or file object");
@@ -1831,7 +1826,8 @@ public final class Py {
         if (file == None) {
             file = SysModule.getObject("stdout");
         }
-        new FixedFileWrapper(file).print(o);
+        file.invoke("write", o);
+        file.invoke("flush");
     }
 
     public static void printComma(PyObject file, PyObject o) {
@@ -2641,7 +2637,7 @@ class FixedFileWrapper extends StdoutWrapper {
         if (file.getJavaProxy() != null) {
             Object tojava = file.__tojava__(OutputStream.class);
             if (tojava != null && tojava != Py.NoConversion) {
-                this.file = new PyFile((OutputStream) tojava);
+                this.file = new PyTextIOWrapper((OutputStream) tojava);
             }
         }
     }

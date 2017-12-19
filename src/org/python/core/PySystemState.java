@@ -13,6 +13,7 @@ import org.python.io.util.SelectorPool;
 import org.python.modules.PyNamespace;
 import org.python.modules.Setup;
 import org.python.modules._imp;
+import org.python.modules._io.PyTextIOWrapper;
 import org.python.modules.sys.SysModule;
 import org.python.modules.sys.VersionInfo;
 
@@ -274,9 +275,9 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             encoding = Py.getConsole().getEncoding();
         }
 
-        ((PyFile)getStdin()).setEncoding(encoding, errors);
-        ((PyFile)getStdout()).setEncoding(encoding, errors);
-        ((PyFile)getStderr()).setEncoding(encoding, "backslashreplace");
+//        ((PyFile)getStdin()).setEncoding(encoding, errors);
+//        ((PyFile)getStdout()).setEncoding(encoding, errors);
+//        ((PyFile)getStderr()).setEncoding(encoding, "backslashreplace");
     }
 
     private void initImplementation() {
@@ -1580,11 +1581,12 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     public void close() { cleanup(); }
 
     private void initstdio() {
-        String mode = Options.unbuffered ? "b" : "";
-        int buffering = Options.unbuffered ? 0 : 1;
-        PyObject stdin = new PyFile(System.in, "<stdin>", "r" + mode, buffering, false);
-        PyObject stdout = new PyFile(System.out, "<stdout>", "w" + mode, buffering, false);
-        PyObject stderr = new PyFile(System.err, "<stderr>", "w" + mode, 0, false);
+        String binary = Options.unbuffered ? "b" : "";
+        int buffering = 1024;
+        // FIXME use BufferedIO when binary mode is specified
+        PyObject stdin = new PyTextIOWrapper(System.in, null, buffering, 0);
+        PyObject stdout = new PyTextIOWrapper(null, System.out, buffering, 1);
+        PyObject stderr = new PyTextIOWrapper(null, System.err, buffering, 2);
 
         SysModule.setObject("stdin", stdin);
         SysModule.setObject("__stdin__", stdin);

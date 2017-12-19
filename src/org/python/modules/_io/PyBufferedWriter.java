@@ -74,7 +74,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_tell_doc)
-    public final long tell() {
+    public final int tell() {
         throw unsupported("tell");
     }
 }

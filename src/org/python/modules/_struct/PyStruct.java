@@ -15,6 +15,7 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.modules.array.PyArrayArray;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -190,7 +191,7 @@ public class PyStruct extends PyObject {
     
     @ExposedMethod
     final void pack_into(PyObject[] args, String[] kwds) {
-        PyArray buffer = (PyArray)args[0];
+        PyArrayArray buffer = (PyArrayArray)args[0];
         int n = buffer.__len__();
         if (n < size) {
             throw StructError(String.format("pack_into requires a buffer of at least %d bytes", size));
@@ -198,9 +199,7 @@ public class PyStruct extends PyObject {
         int offset = args[1].asInt();
         ByteBuffer buf = pack(Arrays.copyOfRange(args, 2, args.length));
         int i = 0;
-        for (byte b: buf.array()) {
-            buffer.set(offset + i++, b);
-        }
+        buffer.write(buf);
 //        if (args.length - argstart < 2)
 //            Py.TypeError("illegal argument type for built-in operation");
 //        if (!(args[argstart] instanceof PyArray)) {

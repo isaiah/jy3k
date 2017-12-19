@@ -26,6 +26,7 @@ import org.python.core.PyUnicode;
 import org.python.core.buffer.SimpleBuffer;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
+import org.python.modules.array.PyArrayArray;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -365,8 +366,8 @@ public class PySocket extends PyObject {
         }
         if (buffer instanceof PyByteArray) {
             ((PyByteArray) buffer).setStorage(ret.data, ret.size);
-        } else if (buffer instanceof PyArray) {
-            ((PyArray) buffer).frombytes(ret.data, ret.size);
+        } else if (buffer instanceof PyArrayArray) {
+            ((PyArrayArray) buffer).write(ByteBuffer.wrap(ret.data));
         } else if (buffer instanceof PyMemoryView) {
             ((PyMemoryView) buffer).setBuf(new SimpleBuffer(ret.data, 0, ret.size));
         }

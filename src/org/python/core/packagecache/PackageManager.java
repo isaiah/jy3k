@@ -11,10 +11,8 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
-import org.python.core.util.FileUtil;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Abstract package manager.

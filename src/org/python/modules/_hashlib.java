@@ -18,6 +18,7 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ModuleInit;
+import org.python.modules.array.PyArrayArray;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -174,8 +175,8 @@ public class _hashlib {
                 string = ((PyUnicode)obj).encode();
             } else if (obj instanceof PyBytes) {
                 string = obj.toString();
-            } else if (obj instanceof PyArray) {
-                string = ((PyArray)obj).tostring();
+            } else if (obj instanceof PyArrayArray) {
+                string = obj.asString();
             } else {
                 throw Py.TypeError("update() argument 1 must be string or read-only buffer, not "
                                    + obj.getType().fastGetName());

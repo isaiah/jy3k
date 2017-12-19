@@ -2,7 +2,6 @@ package org.python.util;
 
 import javax.servlet.ServletException;
 
-import org.python.core.PyFile;
 import com.mockrunner.base.NestedApplicationException;
 import com.mockrunner.mock.web.MockServletConfig;
 import com.mockrunner.mock.web.MockServletContext;

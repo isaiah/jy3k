@@ -28,6 +28,7 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.modules.array.PyArrayArray;
 import org.python.util.FilenoUtil;
 
 /**
@@ -774,8 +775,8 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
             String s;
             if (obj instanceof PyUnicode) {
                 s = ((PyUnicode)obj).encode();
-            } else if (obj instanceof PyArray) {
-                s = ((PyArray)obj).tostring();
+            } else if (obj instanceof PyArrayArray) {
+                s = obj.asString();
             } else {
                 // None of the above: complain
                 throw tailoredTypeError("read-write buffer", obj);

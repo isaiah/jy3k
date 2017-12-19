@@ -5,7 +5,6 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyDictionary;
-import org.python.core.PyFile;
 import org.python.core.PyFloat;
 import org.python.core.PyFrozenSet;
 import org.python.core.PyList;
@@ -21,9 +20,11 @@ import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
 import org.python.modules._io.PyBytesIO;
-import org.python.modules._io.PyStringIO;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 
 @ExposedModule
@@ -60,9 +61,9 @@ public class marshal {
     @ModuleInit
     public static void init(PyObject dict) {}
 
-    public static class Marshaller extends PyObject implements Traverseproc {
+    public static class Marshaller extends PyObject {
 
-        private final PyIOFile file;
+        private final OutputStream outputStream;
         private final int version;
 
         public Marshaller(PyObject file) {
@@ -70,7 +71,7 @@ public class marshal {
         }
 
         public Marshaller(PyObject file, int version) {
-            this.file = PyIOFileFactory.createIOFile(file);
+            this.outputStream = ((PyBytesIO) file).outputStream();
             this.version = version;
         }
         private boolean debug = false;
@@ -87,11 +88,19 @@ public class marshal {
             if (debug) {
                 System.err.print("[" + (int) c + "]");
             }
-            file.write(c);
+            try {
+                outputStream.write(c);
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
         }
 
-        private void write_string(String s) {
-            file.write(s);
+        private void writeString(String s) {
+            try {
+                outputStream.write(s.getBytes());
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
         }
 
         private void write_strings(String[] some_strings, int depth) {
@@ -136,7 +145,7 @@ public class marshal {
         }
 
         private void write_float(PyFloat f) {
-            write_string(f.__repr__().toString());
+            writeString(f.__repr__().toString());
         }
 
         private void write_binary_float(PyFloat f) {
@@ -184,12 +193,12 @@ public class marshal {
                 write_byte(TYPE_UNICODE);
                 String buffer = ((PyUnicode) v).encode("utf-8").toString();
                 write_int(buffer.length());
-                write_string(buffer);
+                writeString(buffer);
             } else if (v instanceof PyBytes) {
                 // ignore interning
                 write_byte(TYPE_STRING);
                 write_int(v.__len__());
-                write_string(v.toString());
+                writeString(v.toString());
             } else if (v instanceof PyTuple) {
                 write_byte(TYPE_TUPLE);
                 PyTuple t = (PyTuple) v;
@@ -233,25 +242,11 @@ public class marshal {
 
             depth--;
         }
-
-
-        /* Traverseproc implementation */
-        @Override
-        public int traverse(Visitproc visit, Object arg) {
-            return file != null && file instanceof Traverseproc ?
-                ((Traverseproc) file).traverse(visit, arg) : 0;
-        }
-
-        @Override
-        public boolean refersDirectlyTo(PyObject ob) {
-            return file != null && file instanceof Traverseproc ?
-                    ((Traverseproc) file).refersDirectlyTo(ob) : false;
-        }
     }
 
     public static class Unmarshaller extends PyObject implements Traverseproc {
 
-        private final PyIOFile file;
+        private final InputStream inputStream;
         private final PyList strings = new PyList();
         private final int version;
         int depth = 0;
@@ -260,10 +255,17 @@ public class marshal {
             this(file, CURRENT_VERSION);
         }
 
+        public Unmarshaller(InputStream file) {
+            version = CURRENT_VERSION;
+            inputStream = file;
+        }
+
+
         public Unmarshaller(PyObject file, int version) {
-            this.file = PyIOFileFactory.createIOFile(file);
+            inputStream = ((PyBytesIO) file).inputStream();
             this.version = version;
         }
+
         private boolean debug = false;
 
         public void _debug() {
@@ -285,15 +287,24 @@ public class marshal {
         }
 
         private int read_byte() {
-            int b = file.read(1).charAt(0);
-            if (debug) {
-                System.err.print("[" + b + "]");
+            int b = 0;
+            try {
+                b = inputStream.read();
+            } catch (IOException e) {
+                throw Py.TypeError(e);
             }
             return b;
         }
 
-        private String read_string(int n) {
-            return file.read(n);
+        private String readString(int n) {
+            byte[] buf = new byte[n];
+            int size;
+            try {
+                size = inputStream.read(buf);
+            } catch (IOException e) {
+                throw Py.IOError(e);
+            }
+            return new String(buf, 0, size);
         }
 
         private int read_short() {
@@ -337,7 +348,7 @@ public class marshal {
 
         private double read_float() {
             int size = read_byte();
-            return Py.newString(read_string(size)).atof();
+            return Py.newString(readString(size)).atof();
         }
 
         private double read_binary_float() {
@@ -418,7 +429,7 @@ public class marshal {
                 case TYPE_INTERNED:
                 case TYPE_STRING: {
                     int size = read_int();
-                    String s = read_string(size);
+                    String s = readString(size);
                     if (type == TYPE_INTERNED) {
                         PyUnicode pys = PyUnicode.fromInterned(s.intern());
                         strings.append(pys);
@@ -435,7 +446,7 @@ public class marshal {
 
                 case TYPE_UNICODE: {
                     int n = read_int();
-                    PyBytes buffer = Py.newString(read_string(n));
+                    PyBytes buffer = Py.newString(readString(n));
                     return buffer.decode("utf-8");
                 }
 
@@ -501,12 +512,6 @@ public class marshal {
         /* Traverseproc implementation */
         @Override
         public int traverse(Visitproc visit, Object arg) {
-            if (file instanceof Traverseproc) {
-                int retVal = ((Traverseproc) file).traverse(visit, arg);
-                if (retVal != 0) {
-                    return retVal;
-                }
-            }
             return visit.visit(strings,  arg);
         }
 
@@ -514,9 +519,6 @@ public class marshal {
         public boolean refersDirectlyTo(PyObject ob) {
             if (ob == null) {
                 return false;
-            } else if (file != null && file instanceof Traverseproc
-                && ((Traverseproc) file).refersDirectlyTo(ob)) {
-                return true;
             } else {
                 return ob == strings;
             }
@@ -543,7 +545,6 @@ public class marshal {
     @ExposedFunction
     public static PyObject loads(PyObject bytes) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(((PyBytes) bytes).getString().getBytes());
-        PyObject f = new PyFile(inputStream);
-        return new Unmarshaller(f).load();
+        return new Unmarshaller(inputStream).load();
     }
 }

@@ -8,13 +8,14 @@ import org.python.core.Options;
 import org.python.core.Py;
 import org.python.core.PyCode;
 import org.python.core.PyException;
-import org.python.core.PyFile;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyUnicode;
 import org.python.core.util.RelativeFile;
+import org.python.io.util.FilenoUtil;
+import org.python.modules._io.PyTextIOWrapper;
 import org.python.modules.posix.PosixModule;
 import org.python.modules.thread._thread;
 
@@ -338,7 +339,8 @@ public class jython {
                         } catch (SecurityException ex) {}
                         if (isInteractive) {
                             opts.interactive = true;
-                            interp.interact(null, new PyFile(file));
+                            FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
+                            interp.interact(null, new PyTextIOWrapper(file, null, 1024, filenoUtil.registerChannel(file.getChannel()).fileno));
                             return;
                         } else {
                             interp.execfile(file, opts.filename);

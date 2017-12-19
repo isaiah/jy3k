@@ -37,6 +37,11 @@ public class PyTextIOWrapper extends PyTextIOBase {
     public PyTextIOWrapper(PyType type) {
         super(type);
     }
+    public PyTextIOWrapper(OutputStream output) {
+        super(TYPE);
+        this.writer = new BufferedWriter(new OutputStreamWriter(output));
+        fileno = -1;
+    }
 
     public PyTextIOWrapper(InputStream input, OutputStream output, int bufferSize, int fileno) {
         super(TYPE);
@@ -77,7 +82,6 @@ public class PyTextIOWrapper extends PyTextIOBase {
         try {
             for (PyObject line: lines.asIterable()) {
                 writer.write(line.asString());
-                writer.newLine();
             }
         } catch (IOException e) {
             throw Py.IOError(e);
@@ -119,7 +123,7 @@ public class PyTextIOWrapper extends PyTextIOBase {
             if (line == null) {
                 return Py.EmptyUnicode;
             }
-            if (reader.ready()) {
+            if (reader.ready() || line.equals("")) { // empty string to differenciate from EOF (Ctrl+D)
                 return new PyUnicode(line + System.lineSeparator());
             }
             return new PyUnicode(line);
@@ -131,7 +135,9 @@ public class PyTextIOWrapper extends PyTextIOBase {
     @ExposedMethod
     public void flush() {
         try {
-            writer.flush();
+            if (writer != null) {
+                writer.flush();
+            }
         } catch (IOException e) {
             throw Py.IOError(e);
         }

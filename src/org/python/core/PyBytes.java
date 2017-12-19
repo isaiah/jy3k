@@ -307,6 +307,16 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return pybuf;
     }
 
+    @Override
+    public ByteBuffer getBuffer() {
+        return readBuf();
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        throw Py.NotImplementedError("bytes object is immutable");
+    }
+
     /**
      * Helper for {@link #getBuffer(int)} that tries to re-use an existing exported buffer, or
      * returns null if can't.

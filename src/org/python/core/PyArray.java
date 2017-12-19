@@ -34,7 +34,7 @@ import org.python.modules.gc;
  */
 
 @ExposedType(name = "array.array", base = PyObject.class)
-public class PyArray extends PySequence implements Cloneable, BufferProtocol, Traverseproc {
+public class PyArray extends PySequence implements Cloneable, Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyArray.class);
 
@@ -1755,11 +1755,6 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
      * @param f Python builtin file object to write data
      */
     public void tofile(PyObject f) {
-        if (!(f instanceof PyFile)) {
-            throw Py.TypeError("arg must be open file");
-        }
-        PyFile file = (PyFile)f;
-        file.write(tostring());
     }
 
     @ExposedMethod
@@ -2023,7 +2018,6 @@ public class PyArray extends PySequence implements Cloneable, BufferProtocol, Tr
      * resizing</b> the byte array. This prohibition is not only on the consumer of the view but
      * extends to any other operations, such as any kind or insertion or deletion.
      */
-    @Override
     public synchronized PyBuffer getBuffer(int flags) {
 
         // If we have already exported a buffer it may still be available for re-use

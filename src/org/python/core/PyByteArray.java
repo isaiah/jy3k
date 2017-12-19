@@ -1,6 +1,7 @@
 package org.python.core;
 
 import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.python.core.buffer.BaseBuffer;
@@ -235,6 +236,24 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         }
 
         return pybuf;
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return ByteBuffer.wrap(storage, offset, size).asReadOnlyBuffer();
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        if (storage.length - offset < buf.remaining() + size) {
+            byte[] tmp = storage;
+            storage = new byte[buf.remaining() + size + 1024];
+            System.arraycopy(tmp, offset, storage, 0, size);
+            offset = 0;
+        }
+        buf.get(storage, size, buf.remaining());
+        size += buf.remaining();
+        return 0;
     }
 
     /**

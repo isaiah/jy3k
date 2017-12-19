@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyFile;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;

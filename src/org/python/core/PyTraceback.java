@@ -5,6 +5,14 @@ import org.python.core.util.RelativeFile;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedType;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 /**
  * A python traceback object.
  */
@@ -60,11 +68,11 @@ public class PyTraceback extends PyObject implements Traverseproc {
             return null;  // If we don't have read access to the file, return null
         }
 
-        PyFile pyFile;
+        BufferedReader reader;
         try {
-            pyFile = new PyFile(tb_frame.f_code.co_filename, "U", -1);
-        } catch (PyException pye) {
-            return null;
+            reader = Files.newBufferedReader(Paths.get(tb_frame.f_code.co_filename));
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
 
 
@@ -72,18 +80,17 @@ public class PyTraceback extends PyObject implements Traverseproc {
         int i = 0;
         try {
             for (i = 0; i < tb_lineno; i++) {
-                line = pyFile.readline().asString();
-                if (line.equals("")) {
+                line = reader.readLine();
+                if (line == null) {
                     break;
                 }
             }
-        } catch (PyException pye) {
+        } catch (IOException e) {
             // Proceed to closing the file
         }
         try {
-            pyFile.close();
-        } catch (PyException pye) {
-            // Continue, we may have the line
+            reader.close();
+        } catch (IOException e) {
         }
 
         if (line != null && i == tb_lineno) {

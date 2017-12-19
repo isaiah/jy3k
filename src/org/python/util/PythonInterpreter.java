@@ -9,7 +9,6 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyCode;
 import org.python.core.PyException;
-import org.python.core.PyFile;
 import org.python.core.PyFileReader;
 import org.python.core.PyFileWriter;
 import org.python.core.PyModule;
@@ -159,15 +158,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     }
 
     /**
-     * Sets a {@link java.io.InputStream} to use for the standard input stream.
-     *
-     * @param inStream InputStream to use as input stream
-     */
-    public void setIn(java.io.InputStream inStream) {
-        setIn(new PyFile(inStream));
-    }
-
-    /**
      * Sets a Python object to use for the standard output stream, <code>sys.stdout</code>. This
      * stream is used in a byte-oriented way (mostly) that depends on the type of file-like object.
      * The behaviour as implemented is:
@@ -183,9 +173,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      * <th>Any other type</th>
      * </tr>
      * <tr align=left>
-     * <th>{@link PyFile}</th>
      * <td>as bytes directly</td>
-     * <td>respect {@link PyFile#encoding}</td>
      * <td>call <code>str(o)</code> first</td>
      * </tr>
      * <tr align=left>
@@ -220,15 +208,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     }
 
     /**
-     * Sets a {@link java.io.OutputStream} to use for the standard output stream.
-     *
-     * @param outStream OutputStream to use as output stream
-     */
-    public void setOut(java.io.OutputStream outStream) {
-        setOut(new PyFile(outStream));
-    }
-
-    /**
      * Sets a Python object to use for the standard output stream, <code>sys.stderr</code>. This
      * stream is used in a byte-oriented way (mostly) that depends on the type of file-like object,
      * in the same way as {@link #setOut(PyObject)}.
@@ -249,11 +228,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     public void setErr(java.io.Writer outStream) {
         setErr(new PyFileWriter(outStream));
     }
-
-    public void setErr(java.io.OutputStream outStream) {
-        setErr(new PyFile(outStream));
-    }
-
 
     /**
      * Evaluates a Python code object and returns the result.
