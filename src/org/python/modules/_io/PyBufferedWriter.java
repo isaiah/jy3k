@@ -1,12 +1,15 @@
 package org.python.modules._io;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBUF;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
@@ -25,6 +28,10 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     private BufferedOutputStream output;
     private FileChannel fileChannel;
 
+    public PyBufferedWriter(PyType type) {
+        super(type);
+    }
+
     public PyBufferedWriter(OutputStream out, int bufferSize) {
         super(TYPE);
         output = new BufferedOutputStream(out, bufferSize);
@@ -40,6 +47,16 @@ public class PyBufferedWriter extends PyBufferedIOBase {
         } catch (FileNotFoundException e) {
             throw Py.IOError(e);
         }
+    }
+
+    @ExposedNew
+    public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("__init__", args, keywords, "raw");
+        PyObject raw = ap.getPyObject(0);
+        if (raw instanceof PyRawIOBase) {
+            return new PyBufferedWriter(((PyRawIOBase) raw).outputStream(), 1024);
+        }
+        return new PyBufferedWriter(TYPE);
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_write_doc)

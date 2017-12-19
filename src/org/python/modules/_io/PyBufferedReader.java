@@ -1,10 +1,13 @@
 package org.python.modules._io;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
@@ -24,6 +27,10 @@ public class PyBufferedReader extends PyBufferedIOBase {
     private BufferedInputStream input;
     private FileChannel fileChannel;
 
+    public PyBufferedReader(PyType subtype) {
+        super(subtype);
+    }
+
     public PyBufferedReader(InputStream in, int bufferSize) {
         super(TYPE);
         this.input = new BufferedInputStream(in, bufferSize);
@@ -39,6 +46,16 @@ public class PyBufferedReader extends PyBufferedIOBase {
         } catch (FileNotFoundException e) {
             throw Py.IOError(e);
         }
+    }
+
+    @ExposedNew
+    public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("__init__", args, keywords, "raw");
+        PyObject raw = ap.getPyObject(0);
+        if (raw instanceof PyRawIOBase) {
+            return new PyBufferedReader(((PyRawIOBase) raw).inputStream(), 1024);
+        }
+        return new PyBufferedReader(TYPE);
     }
 
     @ExposedMethod(names = {"read", "read1"}, defaults = {"-1"}, doc = BuiltinDocs.BufferedReader_read_doc)
