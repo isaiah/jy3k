@@ -6,11 +6,8 @@ import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
-import org.python.core.PyBytes;
 import org.python.core.PyCode;
 import org.python.core.PyException;
-import org.python.core.PyFileReader;
-import org.python.core.PyFileWriter;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
@@ -146,18 +143,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     }
 
     /**
-     * Sets a {@link Reader} to use for the standard input stream, <code>sys.stdin</code>. This
-     * stream is wrapped such that characters will be narrowed to bytes. A character greater than
-     * <code>U+00FF</code> will raise a Java <code>IllegalArgumentException</code> from within
-     * {@link PyBytes}.
-     *
-     * @param inStream to use as the input stream
-     */
-    public void setIn(java.io.Reader inStream) {
-        setIn(new PyFileReader(inStream));
-    }
-
-    /**
      * Sets a Python object to use for the standard output stream, <code>sys.stdout</code>. This
      * stream is used in a byte-oriented way (mostly) that depends on the type of file-like object.
      * The behaviour as implemented is:
@@ -177,12 +162,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      * <td>call <code>str(o)</code> first</td>
      * </tr>
      * <tr align=left>
-     * <th>{@link PyFileWriter}</th>
-     * <td>each byte value as a <code>char</code></td>
-     * <td>write as Java <code>char</code>s</td>
-     * <td>call <code>o.toString()</code> first</td>
-     * </tr>
-     * <tr align=left>
      * <th>Other {@link PyObject} <code>f</code></th>
      * <td>invoke <code>f.write(str(o))</code></td>
      * <td>invoke <code>f.write(o)</code></td>
@@ -197,17 +176,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
     }
 
     /**
-     * Sets a {@link Writer} to use for the standard output stream, <code>sys.stdout</code>. The
-     * behaviour as implemented is to output each object <code>o</code> by calling
-     * <code>o.toString()</code> and writing this as UTF-16.
-     *
-     * @param outStream to use as the output stream
-     */
-    public void setOut(java.io.Writer outStream) {
-        setOut(new PyFileWriter(outStream));
-    }
-
-    /**
      * Sets a Python object to use for the standard output stream, <code>sys.stderr</code>. This
      * stream is used in a byte-oriented way (mostly) that depends on the type of file-like object,
      * in the same way as {@link #setOut(PyObject)}.
@@ -216,17 +184,6 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
      */
     public void setErr(PyObject outStream) {
         SysModule.setObject("stderr", outStream);
-    }
-
-    /**
-     * Sets a {@link Writer} to use for the standard output stream, <code>sys.stdout</code>. The
-     * behaviour as implemented is to output each object <code>o</code> by calling
-     * <code>o.toString()</code> and writing this as UTF-16.
-     *
-     * @param outStream to use as the error output stream
-     */
-    public void setErr(java.io.Writer outStream) {
-        setErr(new PyFileWriter(outStream));
     }
 
     /**
