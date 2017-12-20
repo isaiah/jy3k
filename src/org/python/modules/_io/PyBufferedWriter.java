@@ -95,4 +95,8 @@ public class PyBufferedWriter extends PyBufferedIOBase {
     public final int tell() {
         throw unsupported("tell");
     }
+
+    public OutputStream outputStream() {
+        return output;
+    }
 }

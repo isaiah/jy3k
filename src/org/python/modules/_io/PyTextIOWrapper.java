@@ -59,7 +59,9 @@ public class PyTextIOWrapper extends PyTextIOBase {
     public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
         // def open(file, mode="r", buffering=-1, encoding=None, errors=None,
         //newline=None, closefd=True, opener=None):
-        ArgParser ap = new ArgParser("__init__", args, keywords, "file", "mode", "buffering", "encoding", "errors", "newline", "closefd", "opener");
+        ArgParser ap = new ArgParser("__init__", args, keywords,
+                "file", "mode", "buffering", "encoding", "errors", "newline",
+                "closefd", "opener", "line_buffering");
         Charset charset;
         charset = Charset.forName(ap.getString(2, "UTF-8"));
         PyObject initValue = ap.getPyObject(0);
@@ -71,6 +73,10 @@ public class PyTextIOWrapper extends PyTextIOBase {
         } else if (initValue instanceof PyRawIOBase) {
             ret.reader = new BufferedReader(new InputStreamReader(((PyRawIOBase) initValue).inputStream(), charset));
             ret.writer = new BufferedWriter(new OutputStreamWriter(((PyRawIOBase) initValue).outputStream(), charset));
+        } else if (initValue instanceof PyBufferedReader) {
+            ret.reader = new BufferedReader(new InputStreamReader(((PyBufferedReader) initValue).inputStream(), charset));
+        } else if (initValue instanceof PyBufferedWriter) {
+            ret.writer = new BufferedWriter(new OutputStreamWriter(((PyBufferedWriter) initValue).outputStream(), charset));
         } else {
             throw Py.TypeError("file should be a raw io class");
         }

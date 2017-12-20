@@ -139,7 +139,7 @@ public class PyBufferedReader extends PyBufferedIOBase {
     }
 
     @ExposedMethod(defaults = {"0"}, doc = BuiltinDocs.BufferedReader_seek_doc)
-    public final PyObject seek(PyObject pos, PyObject whence) {
+    public final PyObject seek(int pos, int whence) {
         throw unsupported("seek");
     }
 
@@ -185,5 +185,9 @@ public class PyBufferedReader extends PyBufferedIOBase {
         } catch (IOException e) {
             throw Py.IOError(e);
         }
+    }
+
+    public InputStream inputStream() {
+        return input;
     }
 }

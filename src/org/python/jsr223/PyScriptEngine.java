@@ -1,10 +1,13 @@
 package org.python.jsr223;
 
-import java.lang.reflect.Method;
-import org.python.core.*;
-import java.io.Reader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
+import org.python.core.Py;
+import org.python.core.PyCode;
+import org.python.core.PyException;
+import org.python.core.PyModule;
+import org.python.core.PyObject;
+import org.python.core.PyTraceback;
+import org.python.util.PythonInterpreter;
+
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -15,7 +18,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import org.python.util.PythonInterpreter;
+import java.io.Reader;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 public class PyScriptEngine extends AbstractScriptEngine implements Compilable, Invocable, AutoCloseable {
 
@@ -33,9 +39,9 @@ public class PyScriptEngine extends AbstractScriptEngine implements Compilable, 
 
     private Object eval(PyCode code, ScriptContext context) throws ScriptException {
         try {
-            interp.setIn(context.getReader());
-            interp.setOut(context.getWriter());
-            interp.setErr(context.getErrorWriter());
+//            interp.setIn(context.getReader());
+//            interp.setOut(context.getWriter());
+//            interp.setErr(context.getErrorWriter());
             interp.setLocals(new PyScriptEngineScope(this, context));
             return interp.eval(code).__tojava__(Object.class);
         } catch (PyException pye) {
