@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.CharBuffer;
+import java.nio.channels.NonReadableChannelException;
 import java.nio.charset.Charset;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -101,8 +102,12 @@ public class PyTextIOWrapper extends PyTextIOBase {
     @ExposedMethod(defaults = {"-1"})
     public PyObject read(int size) {
         if (size < 0) {
-            String all = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-            return new PyUnicode(all);
+            try {
+                String all = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+                return new PyUnicode(all);
+            } catch (NonReadableChannelException e) {
+                throw unsupported("read");
+            }
         }
         char[] cbuf = new char[size];
         try {
@@ -111,6 +116,8 @@ public class PyTextIOWrapper extends PyTextIOBase {
                 return Py.EmptyUnicode;
             }
             return new PyUnicode(CharBuffer.wrap(cbuf, 0, n));
+        } catch (NonReadableChannelException e) {
+            throw unsupported("read");
         } catch (IOException e) {
             throw Py.IOError(e);
         }
@@ -127,6 +134,8 @@ public class PyTextIOWrapper extends PyTextIOBase {
                 return new PyUnicode(line + System.lineSeparator());
             }
             return new PyUnicode(line);
+        } catch (NonReadableChannelException e) {
+            throw unsupported("read");
         } catch (IOException e) {
             throw Py.IOError(e);
         }

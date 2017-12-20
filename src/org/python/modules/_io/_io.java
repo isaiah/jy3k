@@ -159,9 +159,13 @@ public class _io {
          * Create the Raw file stream. Let the constructor deal with the variants and argument
          * checking.
          */
+        PyObject pathMethod = file.__findattr__("__path__");
+        if (pathMethod != null) {
+            file = pathMethod.__call__();
+        }
         Path path;
         try {
-            path = Paths.get(file.toString());
+            path = Paths.get(file.asString());
         } catch (InvalidPathException e) {
             throw Py.ValueError(e.getMessage());
         }
@@ -171,38 +175,22 @@ public class _io {
 //        } catch (IOException e) {
 //            throw Py.IOError(e);
 //        }
-
-        PyFileIO raw = new PyFileIO(path, mode.toOptions());
-        /*
-         * From the Python documentation for io.open() buffering = 0 to switch buffering off (only
-         * allowed in binary mode), 1 to select line buffering (only usable in text mode), and an
-         * integer > 1 to indicate the size of a fixed-size buffer.
-         *
-         * When no buffering argument is given, the default buffering policy works as follows:
-         * Binary files are buffered in fixed-size chunks; "Interactive" text files (files for which
-         * isatty() returns True) use line buffering. Other text files use the policy described
-         * above for binary files.
-         *
-         * In Java, it seems a stream never is *known* to be interactive, but we ask anyway, and
-         * maybe one day we shall know.
-         */
         boolean line_buffering = false;
 
         if (buffering == 0) {
             if (!mode.binary) {
                 throw Py.ValueError("can't have unbuffered text I/O");
             }
-            return raw;
+            if (file instanceof PyLong) {
+                return new PyFileIO(file.asInt(), mode.toOptions());
+            }
+            return new PyFileIO(path, mode.toOptions());
 
         } else if (buffering == 1) {
             // The stream is to be read line-by-line.
             line_buffering = true;
             // Force default size for actual buffer
             buffering = -1;
-
-        } else if (buffering < 0 && raw.isatty()) {
-            // No buffering argument given but stream is inteeractive.
-            line_buffering = true;
         }
 
         if (buffering < 0) {
@@ -215,16 +203,12 @@ public class _io {
             buffering = DEFAULT_BUFFER_SIZE;
         }
 
-        /*
-         * We now know just what particular class of file we are opening, and therefore what stack
-         * (buffering and text encoding) we should build.
-         */
-        if (buffering == 0) {
-            // Not buffering, return the raw file object
-            return raw;
-
+        FileChannel ch;
+        int fileno;
+        if (file instanceof PyLong) {
+            fileno = file.asInt();
+            ch = (FileChannel) filenoUtil.getWrapperFromFileno(fileno).ch;
         } else {
-            FileChannel ch;
             try {
                 ch = FileChannel.open(path, mode.toOptions());
             } catch (IOException e) {
@@ -232,18 +216,19 @@ public class _io {
             }
             ChannelFD fd = filenoUtil.registerChannel(ch);
             fd.attach(path);
-            // If binary, return the just the buffered file
-            if (mode.binary) {
-                if (mode.updating) {
-                    return new PyBufferedRandom(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering);
-                } else if (mode.writing || mode.appending || mode.creating) {
-                    return new PyBufferedWriter(Channels.newOutputStream(ch), buffering);
-                } else if (mode.reading) {
-                    return new PyBufferedReader(Channels.newInputStream(ch), buffering);
-                }
-            }
-            return new PyTextIOWrapper(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering, fd.fileno);
+            fileno = fd.fileno;
         }
+        // If binary, return the just the buffered file
+        if (mode.binary) {
+            if (mode.updating) {
+                return new PyBufferedRandom(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering);
+            } else if (mode.writing || mode.appending || mode.creating) {
+                return new PyBufferedWriter(Channels.newOutputStream(ch), buffering);
+            } else if (mode.reading) {
+                return new PyBufferedReader(Channels.newInputStream(ch), buffering);
+            }
+        }
+        return new PyTextIOWrapper(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering, fileno);
     }
 
     private static final String[] openKwds = {"file", "mode", "buffering", "encoding", "errors",

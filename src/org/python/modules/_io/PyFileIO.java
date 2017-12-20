@@ -61,14 +61,25 @@ public class PyFileIO extends PyRawIOBase {
 
     public PyFileIO(int fileno, Set<OpenOption> options) {
         this.fileno = fileno;
-        FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
-        ChannelFD fd = filenoUtil.getWrapperFromFileno(fileno);
-        if (fd == null) {
-            throw Py.IOError(Errno.EBADF);
+        switch(fileno) {
+            case 0:
+                read = Channels.newChannel(System.in);
+                break;
+            case 1:
+                write = Channels.newChannel(System.out);
+                break;
+            case 2:
+                write = Channels.newChannel(System.err);
+            default:
+                FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();
+                ChannelFD fd = filenoUtil.getWrapperFromFileno(fileno);
+                if (fd == null) {
+                    throw Py.IOError(Errno.EBADF);
+                }
+                fileChannel = (SeekableByteChannel) fd.ch;
+                read = fileChannel;
+                write = fileChannel;
         }
-        fileChannel = (SeekableByteChannel) fd.ch;
-        read = fileChannel;
-        write = fileChannel;
     }
 
     public PyFileIO(Path path, Set<OpenOption> options) {
@@ -102,9 +113,16 @@ public class PyFileIO extends PyRawIOBase {
             fileno = file.asInt();
             return new PyFileIO(fileno, options);
         }
+        PyObject pathMethod = file.__findattr__("__path__");
+        String filePath;
+        if (pathMethod != null) {
+            filePath = pathMethod.__call__().asString();
+        } else {
+            filePath = file.asString();
+        }
         Path path;
         try {
-            path = Paths.get(file.asString());
+            path = Paths.get(filePath);
         } catch (InvalidPathException e) {
             throw Py.ValueError(e.getMessage());
         }

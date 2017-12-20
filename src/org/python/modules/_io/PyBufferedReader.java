@@ -24,11 +24,12 @@ import java.nio.channels.FileChannel;
 public class PyBufferedReader extends PyBufferedIOBase {
     public static final PyType TYPE = PyType.fromClass(PyBufferedReader.class);
 
-    private BufferedInputStream input;
+    private final BufferedInputStream input;
     private FileChannel fileChannel;
 
     public PyBufferedReader(PyType subtype) {
         super(subtype);
+        input = null;
     }
 
     public PyBufferedReader(InputStream in, int bufferSize) {
@@ -55,7 +56,7 @@ public class PyBufferedReader extends PyBufferedIOBase {
         if (raw instanceof PyRawIOBase) {
             return new PyBufferedReader(((PyRawIOBase) raw).inputStream(), 1024);
         }
-        return new PyBufferedReader(TYPE);
+        return new PyBufferedReader(((PyBytesIO) raw).inputStream(), 1024);
     }
 
     @ExposedMethod(names = {"read", "read1"}, defaults = {"-1"}, doc = BuiltinDocs.BufferedReader_read_doc)

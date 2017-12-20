@@ -25,11 +25,12 @@ import java.nio.channels.FileChannel;
 public class PyBufferedWriter extends PyBufferedIOBase {
     public static final PyType TYPE = PyType.fromClass(PyBufferedWriter.class);
 
-    private BufferedOutputStream output;
+    private final BufferedOutputStream output;
     private FileChannel fileChannel;
 
     public PyBufferedWriter(PyType type) {
         super(type);
+        output = null;
     }
 
     public PyBufferedWriter(OutputStream out, int bufferSize) {
@@ -56,7 +57,7 @@ public class PyBufferedWriter extends PyBufferedIOBase {
         if (raw instanceof PyRawIOBase) {
             return new PyBufferedWriter(((PyRawIOBase) raw).outputStream(), 1024);
         }
-        return new PyBufferedWriter(TYPE);
+        return new PyBufferedWriter(((PyBytesIO) raw).outputStream(), 1024);
     }
 
     @ExposedMethod(doc = BuiltinDocs.BufferedWriter_write_doc)
