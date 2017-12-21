@@ -444,22 +444,27 @@ def detect_encoding(readline):
 
     return default, [first, second]
 
-
 def open(filename):
     """Open a file in read only mode using the encoding detected by
     detect_encoding().
     """
+    import sys
+    is_jython = sys.platform == 'java9'
     buffer = _builtin_open(filename, 'rb')
     try:
+        if is_jython:
+            buffer.mark(1024)
         encoding, lines = detect_encoding(buffer.readline)
-        buffer.seek(0)
+        if is_jython:
+            buffer.reset()
+        else:
+            buffer.seek(0)
         text = TextIOWrapper(buffer, encoding, line_buffering=True)
         text.mode = 'r'
         return text
     except:
         buffer.close()
         raise
-
 
 def tokenize(readline):
     """

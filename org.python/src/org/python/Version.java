@@ -73,18 +73,18 @@ public class Version {
                 Properties properties = new Properties();
                 properties.load(in);
                 loaded = true;
-                PY_VERSION = properties.getProperty("jython.version");
-                PY_MAJOR_VERSION = Integer.valueOf(properties.getProperty("jython.major_version"));
-                PY_MINOR_VERSION = Integer.valueOf(properties.getProperty("jython.minor_version"));
-                PY_MICRO_VERSION = Integer.valueOf(properties.getProperty("jython.micro_version"));
-                PY_RELEASE_LEVEL = Integer.valueOf(properties.getProperty("jython.release_level"));
-                PY_RELEASE_SERIAL = Integer.valueOf(properties.getProperty("jython.release_serial"));
-                PY_CACHE_TAG = "_jython_" + PY_MAJOR_VERSION + PY_MINOR_VERSION;
-                DATE = properties.getProperty("jython.build.date");
-                TIME = properties.getProperty("jython.build.time");
-                HG_BRANCH = properties.getProperty("jython.build.hg_branch");
-                HG_TAG = properties.getProperty("jython.build.hg_tag");
-                HG_VERSION = properties.getProperty("jython.build.hg_version");
+                PY_VERSION = properties.getProperty("jylang.version");
+                PY_MAJOR_VERSION = Integer.valueOf(properties.getProperty("jylang.major_version"));
+                PY_MINOR_VERSION = Integer.valueOf(properties.getProperty("jylang.minor_version"));
+                PY_MICRO_VERSION = Integer.valueOf(properties.getProperty("jylang.micro_version"));
+                PY_RELEASE_LEVEL = Integer.valueOf(properties.getProperty("jylang.release_level"));
+                PY_RELEASE_SERIAL = Integer.valueOf(properties.getProperty("jylang.release_serial"));
+                PY_CACHE_TAG = "_jylang_" + PY_MAJOR_VERSION + PY_MINOR_VERSION;
+                DATE = properties.getProperty("jylang.build.date");
+                TIME = properties.getProperty("jylang.build.time");
+                HG_BRANCH = properties.getProperty("jylang.build.hg_branch");
+                HG_TAG = properties.getProperty("jylang.build.hg_tag");
+                HG_VERSION = properties.getProperty("jylang.build.hg_version");
             } catch (IOException ioe) {
                 System.err.println("There was a problem loading ".concat(versionProperties)
                         .concat(":"));

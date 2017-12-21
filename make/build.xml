@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2000 Dj Walker-Morgan -->
 <project xmlns:ivy="antlib:org.apache.ivy.ant"
-         name="jython" default="developer-build" basedir="..">
+         name="jylang" default="developer-build" basedir="..">
     <import file="build-codegen.xml"/>
     <target name="deps">
         <ivy:retrieve type="jar,bundle" file="make/ivy.xml"/>
@@ -34,8 +34,8 @@
             <isset property="snapshot.revision"/>
         </condition>
         <!-- Switch to a snapshot release_level when appropriate -->
-        <condition property="jython.real_release_level" value="${PY_RELEASE_LEVEL_SNAPSHOT}"
-                   else="${jython.release.level}">
+        <condition property="jylang.real_release_level" value="${PY_RELEASE_LEVEL_SNAPSHOT}"
+                   else="${jylang.release.level}">
             <isset property="do.snapshot.build"/>
         </condition>
         <condition property="os.family.unix">
@@ -73,7 +73,7 @@
         </delete>
         <!-- delete the installation .jar file from ${work.dir}, but no other files -->
         <delete failonerror="false">
-            <fileset dir="${work.dir}" includes="jython*.jar"/>
+            <fileset dir="${work.dir}" includes="jylang*.jar"/>
         </delete>
     </target>
 
@@ -89,7 +89,7 @@
         </delete>
         <!-- delete the installation .jar file from ${work.dir}, but no other files -->
         <delete failonerror="false">
-            <fileset dir="${work.dir}" includes="jython*.jar"/>
+            <fileset dir="${work.dir}" includes="jylang*.jar"/>
         </delete>
     </target>
 
@@ -130,14 +130,14 @@
         </tstamp>
         <mkdir dir="${compile.dir}/org/python"/>
         <echo file="${compile.dir}/org/python/version.properties"># Jython version information
-            jython.version=${jython.version}
-            jython.major_version=${jython.version.major}
-            jython.minor_version=${jython.version.minor}
-            jython.micro_version=${jython.version.micro}
-            jython.release_level=${jython.release.level}
-            jython.release_serial=${jython.release.serial}
-            jython.build.date=${build.date}
-            jython.build.time=${build.time}
+            jylang.version=${jylang.version}
+            jylang.major_version=${jylang.version.major}
+            jylang.minor_version=${jylang.version.minor}
+            jylang.micro_version=${jylang.version.micro}
+            jylang.release_level=${jylang.release.level}
+            jylang.release_serial=${jylang.release.serial}
+            jylang.build.date=${build.date}
+            jylang.build.time=${build.time}
         </echo>
     </target>
 
@@ -158,11 +158,11 @@
     </target>
 
     <target name="antlr_gen" depends="prepare-output" unless="antlr.notneeded">
-        <java classname="org.antlr.v4.Tool" failonerror="true" fork="true" dir="${jython.base.dir}">
+        <java classname="org.antlr.v4.Tool" failonerror="true" fork="true" dir="${jylang.base.dir}">
             <jvmarg value="-Xmx512m"/>
             <arg value="-o"/>
             <arg path="${work.dir}/build/gensrc/org/python/antlr"/>
-            <arg file="${jython.base.dir}/grammar/Python.g4"/>
+            <arg file="${jylang.base.dir}/grammar/Python.g4"/>
             <arg value="-visitor"/>
             <classpath refid="default.classpath"/>
         </java>
@@ -180,14 +180,30 @@
                includeantruntime="true"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
-            <src path="${source.dir}"/>
+            <src path="${jylang.module.src.dir}"/>
             <src path="${gensrc.dir}"/>
             <exclude name="**/handler/InformixDataHandler.java" unless="informix.present"/>
             <exclude name="**/handler/OracleDataHandler.java" unless="oracle.present"/>
             <classpath refid="main.classpath"/>
         </javac>
 
-        <javac srcdir="${jython.base.dir}/Lib"
+        <javac destdir="${compile.dir}"
+               target="${jdk.target.version}"
+               source="${jdk.source.version}"
+               debug="${debug}"
+               deprecation="${deprecation}"
+               nowarn="${nowarn}"
+               memoryMaximumSize="1024m"
+               fork="true"
+               includeantruntime="true"
+               encoding="UTF-8">
+            <compilerarg line="${javac.Xlint}"/>
+            <src path="${jylang.shell.module.src.dir}" />
+            <classpath refid="main.classpath"/>
+        </javac>
+
+
+        <javac srcdir="${jylang.base.dir}/Lib"
                includes="jxxload_help/**"
                destdir="${compile.dir}"
                target="${jdk.target.version}"
@@ -261,8 +277,8 @@
 
     <target name="jar-complete" depends="jar, pycompile">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
-        <jarjar destfile="${dist.dir}/${jython.deploy.jar}">
-            <zipfileset src="${dist.dir}/${jython.dev.jar}"/>
+        <jarjar destfile="${dist.dir}/${jylang.deploy.jar}">
+            <zipfileset src="${dist.dir}/${jylang.dev.jar}"/>
             <zipfileset dir="lib/">
                 <include name="*.jar"/>
             </zipfileset>
@@ -279,7 +295,7 @@
             <attribute name="Built-By" value="n\a"/>
             <!-- info section. ATTN: no blanks, no '.' in the names -->
             <section name="Build-Info">
-                <attribute name="version" value="${jython.version}"/>
+                <attribute name="version" value="${jylang.version}"/>
                 <attribute name="build-compiler" value="${build.compiler}"/>
                 <attribute name="jdk-target-version" value="${jdk.target.version}"/>
                 <attribute name="debug" value="${debug}"/>
@@ -287,8 +303,8 @@
         </manifest>
     </target>
     <target name="jar-standalone" depends="jar-complete">
-        <jar destfile="${dist.dir}/${jython.standalone.jar}" filesetmanifest="merge">
-            <zipfileset src="${dist.dir}/${jython.deploy.jar}"/>
+        <jar destfile="${dist.dir}/${jylang.standalone.jar}" filesetmanifest="merge">
+            <zipfileset src="${dist.dir}/${jylang.deploy.jar}"/>
             <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**"/>
         </jar>
     </target>
@@ -303,7 +319,7 @@
         <jar destfile="${dist.dir}/callbacker_test.jar">
             <fileset dir="${compile.dir}" includes="org/python/tests/Callbacker*"/>
         </jar>
-        <jar destfile="${dist.dir}/${jython.dev.jar}" duplicate="fail" manifest="${meta.inf.dir}/MANIFEST.MF">
+        <jar destfile="${dist.dir}/${jylang.dev.jar}" duplicate="fail" manifest="${meta.inf.dir}/MANIFEST.MF">
             <!-- If only nameunion is used, ant issues a spurious warning about no files being
                      included.  Use a fileset for version.properties just to shut that up. -->
             <fileset dir="${compile.dir}" includes="org/python/version.properties"/>
@@ -337,11 +353,11 @@
     </target>
 
     <target name="all-jars" depends="prepare, jar-standalone, javadoc, installer">
-        <jar destfile="dist/${jython.javadoc.jar}">
+        <jar destfile="dist/${jylang.javadoc.jar}">
             <fileset dir="${apidoc.dir}" includes="**"/>
         </jar>
-        <jar destfile="dist/${jython.sources.jar}">
-            <fileset dir="${jython.base.dir}">
+        <jar destfile="dist/${jylang.sources.jar}">
+            <fileset dir="${jylang.base.dir}">
                 <exclude name="build/**"/>
                 <exclude name="dist/**"/>
                 <exclude name="extlibs/**"/>
@@ -351,17 +367,17 @@
     </target>
 
     <target name="copy-full" depends="copy-lib" if="full-build">
-        <echo>copy misc files from ${jython.base.dir}</echo>
+        <echo>copy misc files from ${jylang.base.dir}</echo>
         <copy todir="${dist.dir}" preservelastmodified="true" overwrite="true">
-            <fileset dir="${jython.base.dir}"
+            <fileset dir="${jylang.base.dir}"
                      includes="ACKNOWLEDGMENTS, build.xml, build.Lib.include.properties, NEWS, LICENSE.txt, README.txt, registry"
             />
         </copy>
 
         <!-- sources: todir has to correspond with installer/**/JarInstaller.java -->
-        <echo>copy sources from ${jython.base.dir}</echo>
+        <echo>copy sources from ${jylang.base.dir}</echo>
         <copy todir="${dist.dir}" preservelastmodified="true">
-            <fileset dir="${jython.base.dir}">
+            <fileset dir="${jylang.base.dir}">
                 <include name="src/**/*.java"/>
                 <include name="src/com/**/*.properties"/>
                 <include name="src/shell/*"/>
@@ -375,9 +391,9 @@
             </fileset>
         </copy>
 
-        <echo>copy the demo files from ${jython.base.dir}/Demo</echo>
+        <echo>copy the demo files from ${jylang.base.dir}/Demo</echo>
         <copy todir="${dist.dir}/Demo" preservelastmodified="true">
-            <fileset dir="${jython.base.dir}/Demo">
+            <fileset dir="${jylang.base.dir}/Demo">
                 <include name="**/*.java"/>
                 <include name="**/*.html"/>
                 <include name="**/*.py"/>
@@ -393,7 +409,7 @@
     <target name="pycompile" depends="jar,copy-lib">
         <taskdef name="jycompile" classname="org.python.util.JycompileAntTask">
             <classpath path="${dist.dir}/Lib"/>
-            <classpath path="${dist.dir}/${jython.dev.jar}"/>
+            <classpath path="${dist.dir}/${jylang.dev.jar}"/>
             <classpath refid="main.classpath"/>
         </taskdef>
         <jycompile srcdir="${dist.dir}/Lib" destdir="${dist.dir}/Lib" excludes="test/**"/>
@@ -401,7 +417,7 @@
 
     <target name="copy-lib" depends="init, copy-javalib, copy-cpythonlib">
         <copy todir="${dist.dir}/Lib">
-            <fileset dir="${jython.base.dir}/Lib">
+            <fileset dir="${jylang.base.dir}/Lib">
                 <exclude name="**/*.class"/>
             </fileset>
         </copy>
@@ -415,15 +431,15 @@
         </chmod>
 
         <!-- copy the registry -->
-        <copy todir="${dist.dir}" file="${jython.base.dir}/registry" preservelastmodified="true"/>
+        <copy todir="${dist.dir}" file="${jylang.base.dir}/registry" preservelastmodified="true"/>
     </target>
 
     <target name="copy-cpythonlib">
         <copy todir="${dist.dir}/Lib">
             <fileset dir="${python.lib}" excludes="**/*.pyc, **/*.pyo"
-                     includesfile="${jython.base.dir}/CPythonLib.includes">
+                     includesfile="${jylang.base.dir}/CPythonLib.includes">
                 <!-- The include file gets all of lib-python/3.5's test directory, but we only want the ones from Jython's Lib.   -->
-                <present present="srconly" targetdir="${jython.base.dir}/Lib"/>
+                <present present="srconly" targetdir="${jylang.base.dir}/Lib"/>
             </fileset>
         </copy>
     </target>
@@ -449,7 +465,7 @@
 
     <!-- wrap the build into the installer -->
     <target name="installer" depends="installer-init, jar-standalone, javadoc, copy-full">
-        <property name="installer.src.dir" value="${jython.base.dir}/installer/src/java"/>
+        <property name="installer.src.dir" value="${jylang.base.dir}/installer/src/java"/>
         <echo>compiling installer from ${installer.src.dir}</echo>
         <javac srcdir="${installer.src.dir}"
                includes="org/**"
@@ -479,12 +495,12 @@
             </fileset>
         </copy>
         <echo>building installer .jar file</echo>
-        <jar destfile="${dist.dir}/jython-installer.jar" update="true">
+        <jar destfile="${dist.dir}/jylang-installer.jar" update="true">
             <fileset dir="${dist.dir}">
-                <exclude name="${jython.dev.jar}"/>
-                <exclude name="${jython.standalone.jar}"/>
-                <exclude name="${jython.javadoc.jar}"/>
-                <exclude name="${jython.sources.jar}"/>
+                <exclude name="${jylang.dev.jar}"/>
+                <exclude name="${jylang.standalone.jar}"/>
+                <exclude name="${jylang.javadoc.jar}"/>
+                <exclude name="${jylang.sources.jar}"/>
                 <exclude name="callbacker_test.jar"/>
                 <exclude name="lib/antlr4-runtime-4.6.jar"/>
                 <exclude name="lib/asm*.jar"/>
@@ -499,7 +515,7 @@
                 <attribute name="Built-By" value="${user.name}"/>
                 <!-- section for the installer program -->
                 <section name="Jython">
-                    <attribute name="version" value="${jython.version}"/>
+                    <attribute name="version" value="${jylang.version}"/>
                     <attribute name="exclude-dirs" value="org;META-INF"/>
                 </section>
                 <!-- info section. ATTN: no blanks, no '.' in the names -->
@@ -565,7 +581,7 @@
             <classpath refid="test.classpath"/>
             <classpath refid="test.classpath"/>
             <classpath>
-                <pathelement location="${jython.base.dir}/tests/python"/>
+                <pathelement location="${jylang.base.dir}/tests/python"/>
             </classpath>
             <batchtest todir="${junit.reports}">
                 <fileset dir="${test.source.dir}" includes="org/python/tests/imp/*Test*.java">
@@ -666,7 +682,7 @@
     <target name="bugtest" depends="create-bugtest-config">
         <java classname="org.python.util.jython" fork="true" dir="${bugtests.dir}">
             <classpath>
-                <pathelement location="${dist.dir}/${jython.dev.jar}"/>
+                <pathelement location="${dist.dir}/${jylang.dev.jar}"/>
                 <fileset dir="${dist.dir}/javalib"/>
             </classpath>
             <jvmarg value="-Dpython.home=${dist.dir}"/>
@@ -692,7 +708,7 @@
             # safe to edit by hand (won't be overwritten)
             java_home="${jdk.home}"
             jython_home="${dist.dir}"
-            classpath="${dist.dir}/${jython.dev.jar}${path.separator}classes"
+            classpath="${dist.dir}/${jylang.dev.jar}${path.separator}classes"
         </echo>
     </target>
 
