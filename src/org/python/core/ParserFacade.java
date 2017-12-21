@@ -82,7 +82,7 @@ public class ParserFacade {
                 msg = "invalid syntax";
             }
 
-            int line = tok.getLine();
+            int line = tok.getLine() - 1;
             int col = tok.getCharPositionInLine();
             if (indentationError) {
                 return new PyIndentationError(msg, line, col, text, filename);
@@ -230,6 +230,7 @@ public class ParserFacade {
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             PythonParser parser = new PythonParser(tokens);
             parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+            parser.removeErrorListeners();
             parser.setErrorHandler(new BailErrorStrategy());
             switch (kind) {
             case single:
@@ -241,8 +242,16 @@ public class ParserFacade {
             default:
                 return false;
             }
-        } catch (Exception e) {
-            return !lexer.indents.isEmpty() || lexer._input.LA(1) == PythonParser.EOF;
+        } catch (ParseCancellationException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InputMismatchException) {
+                return true;
+            } else if (cause instanceof NoViableAltException) {
+                return ((NoViableAltException) cause).getOffendingToken().getType() == Lexer.EOF;
+            }
+            return false;
+        } catch (IOException e) {
+            throw Py.IOError(e);
         }
         return true;
     }
