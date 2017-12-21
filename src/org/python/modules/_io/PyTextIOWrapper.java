@@ -57,8 +57,6 @@ public class PyTextIOWrapper extends PyTextIOBase {
 
     @ExposedNew
     public static PyObject _new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
-        // def open(file, mode="r", buffering=-1, encoding=None, errors=None,
-        //newline=None, closefd=True, opener=None):
         ArgParser ap = new ArgParser("__init__", args, keywords,
                 "file", "mode", "buffering", "encoding", "errors", "newline",
                 "closefd", "opener", "line_buffering");
