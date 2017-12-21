@@ -3,6 +3,8 @@ package org.python.core.buffer;
 import org.python.core.PyBuffer;
 import org.python.core.PyException;
 
+import java.nio.ByteBuffer;
+
 /**
  * Read-only buffer API over a one-dimensional array of one-byte items, that are evenly-spaced in a
  * storage array. The buffer has <code>storage</code>, <code>index0</code> and <code>length</code>
@@ -243,6 +245,16 @@ public class Strided1DBuffer extends BaseBuffer {
             strides[0] = stride;
         }
         return strides;
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return ByteBuffer.wrap(storage);
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        return 0;
     }
 
     /**

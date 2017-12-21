@@ -52,7 +52,7 @@
  * <http://www.apache.org/>.
  */
 //package org.apache.tools.ant.taskdefs.optional.python;
-package org.python.util;
+package org.python.ant;
 
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.BuildException;

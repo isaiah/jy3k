@@ -9,10 +9,8 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.python.antlr.*;
 import org.python.antlr.base.mod;
-import org.python.core.io.StreamIO;
-import org.python.core.io.TextIOInputStream;
-import org.python.core.io.UniversalIOWrapper;
 import org.python.core.util.StringUtil;
+import org.python.modules._io.PyTextIOWrapper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -27,6 +25,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -319,20 +318,11 @@ public class ParserFacade {
         }
         cflags.encoding = encoding;
 
-        if (universalNewlines) {
-            // Enable universal newlines mode on the input
-            StreamIO rawIO = new StreamIO(input, true);
-            org.python.core.io.BufferedReader bufferedIO =
-                    new org.python.core.io.BufferedReader(rawIO, 0);
-            UniversalIOWrapper textIO = new UniversalIOWrapper(bufferedIO);
-            input = new TextIOInputStream(textIO);
-        }
-
         Charset cs;
         try {
             // Use UTF-8 for the raw bytes when no encoding was specified
             if (encoding == null) {
-                cs = Charset.forName("UTF-8");
+                cs = StandardCharsets.UTF_8;
             } else {
                 cs = Charset.forName(encoding);
             }

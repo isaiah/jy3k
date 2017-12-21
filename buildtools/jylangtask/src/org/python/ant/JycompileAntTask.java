@@ -1,4 +1,4 @@
-package org.python.util;
+package org.python.ant;
 
 import org.apache.tools.ant.BuildException;
 import org.python.Version;

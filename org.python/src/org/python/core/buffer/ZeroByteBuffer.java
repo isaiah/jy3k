@@ -3,6 +3,8 @@ package org.python.core.buffer;
 import org.python.core.PyBuffer;
 import org.python.core.PyException;
 
+import java.nio.ByteBuffer;
+
 /**
  * Buffer API over a zero length, one-dimensional array of one-byte items. The buffer is nominally
  * writable, but since there is nowhere to write to, any attempt to write or read throws an
@@ -147,6 +149,16 @@ public class ZeroByteBuffer extends BaseBuffer {
     @Override
     public String toString() {
         return "";
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return ByteBuffer.allocate(0);
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        return 0;
     }
 
     /**

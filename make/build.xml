@@ -177,6 +177,7 @@
                nowarn="${nowarn}"
                memoryMaximumSize="1024m"
                fork="true"
+               modulepath="${jylang.base.dir}/lib"
                includeantruntime="true"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
@@ -196,6 +197,7 @@
                memoryMaximumSize="1024m"
                fork="true"
                includeantruntime="true"
+               modulepath="${jylang.base.dir}/lib"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.shell.module.src.dir}" />

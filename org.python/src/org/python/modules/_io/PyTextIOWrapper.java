@@ -38,6 +38,12 @@ public class PyTextIOWrapper extends PyTextIOBase {
     public PyTextIOWrapper(PyType type) {
         super(type);
     }
+
+    public PyTextIOWrapper(InputStream inputStream) {
+        super(TYPE);
+        this.reader = new BufferedReader(new InputStreamReader(inputStream));
+        fileno = -1;
+    }
     public PyTextIOWrapper(OutputStream output) {
         super(TYPE);
         this.writer = new BufferedWriter(new OutputStreamWriter(output));
