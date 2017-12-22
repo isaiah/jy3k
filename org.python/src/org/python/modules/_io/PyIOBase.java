@@ -1,35 +1,30 @@
 /* Copyright (c)2012 Jython Developers */
 package org.python.modules._io;
 
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
 import org.python.core.BufferProtocol;
 import org.python.core.Py;
-import org.python.core.PyArray;
 import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
 import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
 import org.python.core.PyList;
-import org.python.core.PyLong;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.core.Traverseproc;
+import org.python.core.Visitproc;
 import org.python.core.buffer.SimpleStringBuffer;
 import org.python.core.finalization.FinalizableBuiltin;
 import org.python.core.finalization.FinalizeTrigger;
-import org.python.core.io.FileIO;
-import org.python.core.Traverseproc;
-import org.python.core.Visitproc;
-import org.python.core.io.RawIOBase;
-import org.python.annotations.ExposedGet;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedSet;
-import org.python.annotations.ExposedType;
 import org.python.modules.array.PyArrayArray;
-import org.python.util.FilenoUtil;
 
 /**
  * The Python module <code>_io._IOBase</code>, on which the <code>io</code> module depends directly.

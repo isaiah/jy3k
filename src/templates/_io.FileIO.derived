@@ -1,5 +1,5 @@
 base_class: PyFileIO
 want_dict: false
-ctr: PyObject file, OpenMode mode, boolean closefd
+ctr:
 no_toString: true
 incl: _io._RawIOBase

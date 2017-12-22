@@ -1,6 +1,7 @@
 package org.python.ant;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.python.Version;
 import org.python.bootstrap.Import;
 
@@ -10,13 +11,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Compiles all python files in a directory to bytecode, and writes them to another directory,
  * possibly the same one.
  */
-public class JycompileAntTask extends GlobMatchingTask {
+public class JycompileAntTask extends MatchingTask {
+    protected org.apache.tools.ant.types.Path src;
+    protected File destDir;
+    protected Set<File> toExpose = new HashSet<>();
+
     @Override
     public void execute() throws BuildException {
         checkParameters();
@@ -137,5 +143,55 @@ public class JycompileAntTask extends GlobMatchingTask {
             dir = dir.getParentFile();
         }
         return name;
+    }
+
+    /**
+     * Set the source directories to find the class files to be exposed.
+     */
+    public void setSrcdir(org.apache.tools.ant.types.Path srcDir) {
+        if (src == null) {
+            src = srcDir;
+        } else {
+            src.append(srcDir);
+        }
+    }
+
+    /**
+     * Gets the source dirs to find the class files to be exposed.
+     */
+    public org.apache.tools.ant.types.Path getSrcdir() {
+        return src;
+    }
+
+    /**
+     * Set the destination directory into which the Java source files should be compiled.
+     *
+     * @param destDir
+     *            the destination director
+     */
+    public void setDestdir(File destDir) {
+        this.destDir = destDir;
+    }
+
+    /**
+     * Gets the destination directory into which the java source files should be compiled.
+     *
+     * @return the destination directory
+     */
+    public File getDestdir() {
+        return destDir;
+    }
+
+    /**
+     * Check that all required attributes have been set and nothing silly has been entered.
+     */
+    protected void checkParameters() throws BuildException {
+        if (src == null || src.size() == 0) {
+            throw new BuildException("srcdir attribute must be set!", getLocation());
+        }
+        if (destDir != null && !destDir.isDirectory()) {
+            throw new BuildException("destination directory '" + destDir + "' does not exist "
+                    + "or is not a directory", getLocation());
+        }
     }
 }

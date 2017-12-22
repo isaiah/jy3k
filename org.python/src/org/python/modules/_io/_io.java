@@ -1,8 +1,10 @@
 /* Copyright (c)2012 Jython Developers */
 package org.python.modules._io;
 
-import com.ibm.icu.util.Output;
-import org.python.bootstrap.Import;
+import org.python.annotations.ExposedConst;
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
@@ -11,36 +13,15 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
-import org.python.core.PyUnicode;
-import org.python.core.io.IOBase;
-import org.python.annotations.ExposedConst;
-import org.python.annotations.ExposedFunction;
-import org.python.annotations.ExposedModule;
-import org.python.annotations.ModuleInit;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The Python _io module implemented in Java.
@@ -117,7 +98,7 @@ public class _io {
 
     /** Default buffer size for export. */
     @ExposedConst
-    public static final int DEFAULT_BUFFER_SIZE = IOBase.DEFAULT_BUFFER_SIZE;
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
      * Open file and return a stream. Raise IOError upon failure. This is a port to Java of the

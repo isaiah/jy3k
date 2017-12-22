@@ -47,6 +47,10 @@ public class PyFileIO extends PyRawIOBase {
     private Path path;
     private int fileno;
 
+    public PyFileIO(PyType type) {
+        super(type);
+    }
+
     public PyFileIO(ReadableByteChannel ch) {
         read = ch;
         FilenoUtil filenoUtil = Py.getThreadState().filenoUtil();

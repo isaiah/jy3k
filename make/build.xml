@@ -3,6 +3,7 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant"
          name="jylang" default="developer-build" basedir="..">
     <import file="build-codegen.xml"/>
+    <import file="build-jylangtask.xml"/>
     <target name="deps">
         <ivy:retrieve type="jar,bundle" file="make/ivy.xml"/>
     </target>
@@ -312,24 +313,12 @@
     </target>
 
     <target name="jar" depends="compile,expose,create-manifest">
-        <typedef name="nameunion" classname="org.python.util.NameUnionAntType">
-            <classpath>
-                <path refid="main.classpath"/>
-                <pathelement path="${compile.dir}"/>
-            </classpath>
-        </typedef>
         <jar destfile="${dist.dir}/callbacker_test.jar">
             <fileset dir="${compile.dir}" includes="org/python/tests/Callbacker*"/>
         </jar>
-        <jar destfile="${dist.dir}/${jylang.dev.jar}" duplicate="fail" manifest="${meta.inf.dir}/MANIFEST.MF">
-            <!-- If only nameunion is used, ant issues a spurious warning about no files being
-                     included.  Use a fileset for version.properties just to shut that up. -->
-            <fileset dir="${compile.dir}" includes="org/python/version.properties"/>
-            <nameunion>
-                <fileset dir="${exposed.dir}"/>
-                <fileset dir="${compile.dir}"
-                         excludes="org/python/expose/generate/**,org/python/version.properties"/>
-            </nameunion>
+        <jar destfile="${dist.dir}/${jylang.dev.jar}" duplicate="preserve" manifest="${meta.inf.dir}/MANIFEST.MF">
+            <fileset dir="${exposed.dir}"/>
+            <fileset dir="${compile.dir}"/>
         </jar>
     </target>
 
@@ -406,15 +395,6 @@
                 <exclude name="**/jpywork/**"/>
             </fileset>
         </copy>
-    </target>
-
-    <target name="pycompile" depends="jar,copy-lib">
-        <taskdef name="jycompile" classname="org.python.util.JycompileAntTask">
-            <classpath path="${dist.dir}/Lib"/>
-            <classpath path="${dist.dir}/${jylang.dev.jar}"/>
-            <classpath refid="main.classpath"/>
-        </taskdef>
-        <jycompile srcdir="${dist.dir}/Lib" destdir="${dist.dir}/Lib" excludes="test/**"/>
     </target>
 
     <target name="copy-lib" depends="init, copy-javalib, copy-cpythonlib">

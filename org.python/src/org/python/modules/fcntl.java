@@ -26,7 +26,7 @@ public class fcntl {
         ArgParser ap = new ArgParser("fcntl", args, keywords, "fd", "cmd", "arg");
         PyObject fileDescriptor = ap.getPyObject(0);
         int cmd = ap.getInt(1);
-        int fd = PosixModule.getFD(fileDescriptor).getIntFD();
+        int fd = fileDescriptor.asInt();
         return posix.fcntl(fd, Fcntl.valueOf(cmd));
     }
 }

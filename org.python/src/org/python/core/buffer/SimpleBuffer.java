@@ -257,6 +257,16 @@ public class SimpleBuffer extends BaseBuffer {
         return StringUtil.fromBytes(storage, index0, shape[0]);
     }
 
+    @Override
+    public ByteBuffer getBuffer() {
+        return ByteBuffer.wrap(storage);
+    }
+
+    @Override
+    public int write(ByteBuffer buf) throws PyException {
+        return 0;
+    }
+
     /**
      * A <code>SimpleBuffer.SimpleView</code> represents a contiguous subsequence of another
      * <code>SimpleBuffer</code>.

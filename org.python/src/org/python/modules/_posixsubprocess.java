@@ -79,7 +79,11 @@ public class _posixsubprocess {
             Process process = pb.start();
             return Py.java2py(process);
         } catch (IOException e) {
-            ((PyFileIO) errpipeWrite).getRawIO().write(ByteBuffer.wrap(e.getMessage().getBytes()));
+            try {
+                ((PyFileIO) errpipeWrite).outputStream().write(e.getMessage().getBytes());
+            } catch (IOException e1) {
+                throw Py.IOError(e);
+            }
             return Py.None;
         }
 //        PyList argv = new PyList(process_args);

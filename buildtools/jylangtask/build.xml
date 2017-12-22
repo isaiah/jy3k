@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jylangtask" default="jar" basedir=".">
+    <target name="init">
+        <property file="project.properties"/>
+    </target>
+
+    <target name="prepare" depends="init">
+        <mkdir dir="${build.class.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.dir}/lib"/>
+    </target>
+
+    <target name="compile" depends="prepare" description="compile jylangtask source">
+        <javac srcdir="${src.dir}"
+               destdir="${build.class.dir}"
+               target="${javac.source}"
+               source="${javac.target}"
+               includeantruntime="true" fork="true">
+            <classpath>
+                <path refid="main.classpath"/>
+                <pathelement path="${jylang.compile.dir}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile" description="create jylangtask.jar">
+        <jar jarfile="${dist.jar}" basedir="${build.class.dir}"/>
+    </target>
+
+    <target name="clean" depends="init" description="clean jylangtask project">
+        <delete includeemptydirs="true" failonerror="false">
+            <fileset dir="${build.dir}" includes="**/*"/>
+            <fileset dir="${dist.dir}" includes="**/*"/>
+        </delete>
+    </target>
+</project>

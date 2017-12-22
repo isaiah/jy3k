@@ -2,7 +2,6 @@
 package org.python.modules.posix;
 
 import com.kenai.jffi.Library;
-import com.sun.security.auth.module.UnixSystem;
 import jnr.constants.Constant;
 import jnr.constants.platform.Errno;
 import jnr.constants.platform.Signal;
@@ -32,12 +31,8 @@ import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
-import org.python.core.io.RawIOBase;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
-import org.python.modules._io.OpenMode;
-import org.python.modules._io.PyFileIO;
-import org.python.modules.thread.PyLock;
 import org.python.util.PosixShim;
 
 import java.io.File;
@@ -45,11 +40,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.Pipe;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -288,26 +280,6 @@ public class PosixModule {
         }
     }
 
-    /**
-     * Internal fsync implementation.
-     */
-    private static void fsync(RawIOBase rawIO, boolean metadata) {
-        rawIO.checkClosed();
-        Channel channel = rawIO.getChannel();
-        if (!(channel instanceof FileChannel)) {
-            throw Py.OSError(Errno.EINVAL);
-        }
-
-        try {
-            ((FileChannel)channel).force(metadata);
-        } catch (ClosedChannelException cce) {
-            // In the rare case it's closed but the rawIO wasn't
-            throw Py.ValueError("I/O operation on closed file");
-        } catch (IOException ioe) {
-            throw Py.OSError(ioe);
-        }
-    }
-
     @ExposedFunction(doc = BuiltinDocs.posix_ftruncate_doc)
     public static void ftruncate(int fileno, long length) {
         ChannelFD fd = Py.getThreadState().filenoUtil().getWrapperFromFileno(fileno);
@@ -349,7 +321,7 @@ public class PosixModule {
     @ExposedFunction(doc = BuiltinDocs.posix_getgroups_doc)
     @Hide(value=OS.NT, posixImpl = PosixImpl.JAVA)
     public static PyObject getgroups() {
-        long[] groups = new UnixSystem().getGroups();
+        long[] groups = posix.getgroups();
         PyObject[] list = new PyObject[groups.length];
         for (int i = 0; i < groups.length; i++) {
             list[i] = new PyLong(groups[i]);
