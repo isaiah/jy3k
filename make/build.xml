@@ -123,8 +123,20 @@
         <mkdir dir="${dist.dir}/Doc"/>
         <mkdir dir="${apidoc.dir}"/>
     </target>
+    <target name="git-revision" description="Store git revision in ${repository.version}">
+      <exec executable="git" outputproperty="git.branch" failifexecutionfails="false" errorproperty="">
+        <arg value="rev-parse"/>
+        <arg value="--abbrev-ref"/>
+        <arg value="HEAD"/>
+      </exec>
+      <exec executable="git" outputproperty="git.revision" failifexecutionfails="true" errorproperty="">
+        <arg value="rev-parse"/>
+        <arg value="--short"/>
+        <arg value="HEAD"/>
+      </exec>
+    </target>
 
-    <target name="brand-version" depends="init" unless="skip-brand">
+    <target name="brand-version" depends="init,git-revision" unless="skip-brand">
         <tstamp>
             <format property="build.date" pattern="MMM d yyyy" offset="0"/>
             <format property="build.time" pattern="HH:mm:ss" offset="0"/>
@@ -139,6 +151,8 @@
             jylang.release_serial=${jylang.release.serial}
             jylang.build.date=${build.date}
             jylang.build.time=${build.time}
+            jylang.build.git_branch=${git.branch}
+            jylang.build.git_revision=${git.revision}
         </echo>
     </target>
 
@@ -178,8 +192,8 @@
                nowarn="${nowarn}"
                memoryMaximumSize="1024m"
                fork="true"
-               modulepath="${jylang.base.dir}/lib"
-               includeantruntime="true"
+               modulepath="${extlibs.dir}"
+               includeantruntime="false"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.module.src.dir}"/>
@@ -197,8 +211,8 @@
                nowarn="${nowarn}"
                memoryMaximumSize="1024m"
                fork="true"
-               includeantruntime="true"
-               modulepath="${jylang.base.dir}/lib"
+               includeantruntime="false"
+               modulepath="${jylang.base.dir}"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.shell.module.src.dir}" />

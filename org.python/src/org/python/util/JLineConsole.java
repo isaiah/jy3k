@@ -103,8 +103,7 @@ public class JLineConsole extends PlainConsole {
         // Configure a ConsoleReader (the object that does most of the line editing).
         try {
             // Create the reader as unbuffered as possible
-            InputStream in = new FileInputStream(FileDescriptor.in);
-            reader = new ConsoleReader("jython", in, System.out, null, encoding);
+            reader = new ConsoleReader("jython", System.in, System.out, null, encoding);
             reader.setKeyMap("jython");
             reader.setHandleUserInterrupt(true);
             reader.setCopyPasteDetection(true);
@@ -130,11 +129,15 @@ public class JLineConsole extends PlainConsole {
         // Access and load (if possible) the line history.
         try {
             File historyFile = new File(userHomeSpec, ".jline-jython.history");
-            FileHistory history = new FileHistory(historyFile);
-            Runtime.getRuntime().addShutdownHook(new Thread(new HistoryCloser(history)));
+            final FileHistory history = new FileHistory(historyFile);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    history.flush();
+                } catch (IOException e) {
+                }
+            }));
             reader.setHistory(history);
         } catch (IOException e) {
-            // oh well, no history from file
         }
 
         // Check for OS type

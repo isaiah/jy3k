@@ -1,8 +1,6 @@
 /* Copyright (c) Jython Developers */
 package org.python;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -37,14 +35,9 @@ public class Version {
     public static String DATE;
     public static String TIME;
 
-    /** Current hg branch (hg id -b). */
-    public static String HG_BRANCH;
-
-    /** Current hg tag (hg id -t), e.g. 'tip'. */
-    public static String HG_TAG;
-
-    /** Current hg global revision id (hg id -i). */
-    public static String HG_VERSION;
+    public static String GIT_BRANCH;
+    public static String GIT_TAG;
+    public static String GIT_REVISION;
 
     /** The flags that are set by default in a code object. */
     private static final Collection<CodeFlag> defaultCodeFlags = Arrays.asList(
@@ -82,9 +75,9 @@ public class Version {
                 PY_CACHE_TAG = "_jylang_" + PY_MAJOR_VERSION + PY_MINOR_VERSION;
                 DATE = properties.getProperty("jylang.build.date");
                 TIME = properties.getProperty("jylang.build.time");
-                HG_BRANCH = properties.getProperty("jylang.build.hg_branch");
-                HG_TAG = properties.getProperty("jylang.build.hg_tag");
-                HG_VERSION = properties.getProperty("jylang.build.hg_version");
+                GIT_BRANCH = properties.getProperty("jylang.build.git_branch");
+                GIT_TAG = properties.getProperty("jylang.build.git_tag");
+                GIT_REVISION = properties.getProperty("jylang.build.git_revision");
             } catch (IOException ioe) {
                 System.err.println("There was a problem loading ".concat(versionProperties)
                         .concat(":"));
@@ -108,14 +101,14 @@ public class Version {
      * can't determine it.
      */
     public static String getHGVersion() {
-        return HG_VERSION;
+        return GIT_REVISION;
     }
 
     /**
      * Return the current hg identifier name, either the current branch or tag.
      */
     public static String getHGIdentifier() {
-        return "".equals(HG_TAG) || "tip".equals(HG_TAG) ? HG_BRANCH : HG_TAG;
+        return "".equals(GIT_TAG) || "tip".equals(GIT_TAG) ? GIT_BRANCH : GIT_TAG;
     }
 
     /**
