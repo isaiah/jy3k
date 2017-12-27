@@ -206,11 +206,13 @@
                fork="true"
                includeantruntime="false"
                modulepath="${jylang.base.dir}/lib"
+               classpathref="main.classpath"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
+            <!--
             <exclude name="**/handler/InformixDataHandler.java" unless="informix.present"/>
             <exclude name="**/handler/OracleDataHandler.java" unless="oracle.present"/>
-            <classpath refid="main.classpath"/>
+            -->
         </javac>
 
         <javac destdir="${compile.dir}"
@@ -223,12 +225,13 @@
                fork="true"
                includeantruntime="false"
                modulepath="${jylang.base.dir}/lib:${compile.dir}"
+               classpathref="main.classpath"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.shell.module.src.dir}" />
-            <classpath refid="main.classpath"/>
         </javac>
 
+        <!--
         <javac srcdir="${jylang.base.dir}/Lib"
                includes="jxxload_help/**"
                destdir="${compile.dir}"
@@ -240,6 +243,7 @@
                nowarn="${nowarn}">
             <compilerarg line="${javac.Xlint}"/>
         </javac>
+        -->
 
         <!-- java files used by tests -->
         <!--
@@ -339,7 +343,10 @@
         <jar destfile="${dist.dir}/callbacker_test.jar">
             <fileset dir="${compile.dir}" includes="org/python/tests/Callbacker*"/>
         </jar>
-        <jar destfile="${dist.dir}/${jylang.dev.jar}" duplicate="preserve" manifest="${meta.inf.dir}/MANIFEST.MF">
+        <jar destfile="${dist.dir}/${jylang.dev.jar}"
+          update="true"
+          duplicate="preserve"
+          manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
         </jar>
