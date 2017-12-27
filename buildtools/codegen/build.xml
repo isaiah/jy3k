@@ -15,7 +15,7 @@
                destdir="${build.class.dir}"
                target="${javac.source}"
                source="${javac.target}"
-               includeantruntime="true" fork="true">
+               includeantruntime="false" fork="true">
             <classpath>
                 <path refid="main.classpath"/>
                 <pathelement path="${jylang.compile.dir}"/>

@@ -29,6 +29,17 @@
         </uptodate>
     </target>
 
+    <!--
+    <target name="pycompile" depends="jar, copy-lib">
+        <taskdef name="jycompile" classname="org.python.ant.JycompileAntTask">
+            <classpath path="${dist.dir}/${jylang.dev.jar}"/>
+            <classpath path="${dist.dir}/Lib"/>
+            <classpath refid="main.classpath"/>
+        </taskdef>
+        <jycompile srcdir="${dist.dir}/Lib" destdir="${dist.dir}/Lib" excludes="test/**"/>
+    </target>
+    -->
+
     <target name="init" depends="resolve">
         <property file="make/build.properties"/>
         <condition property="do.snapshot.build">
@@ -193,7 +204,7 @@
                memoryMaximumSize="1024m"
                fork="true"
                modulepath="${extlibs.dir}"
-               includeantruntime="false"
+               includeantruntime="true"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.module.src.dir}"/>
@@ -292,7 +303,7 @@
         </cc>
     </target>
 
-    <target name="jar-complete" depends="jar, pycompile">
+    <target name="jar-complete" depends="jar,pycompile">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-1.4.jar"/>
         <jarjar destfile="${dist.dir}/${jylang.deploy.jar}">
             <zipfileset src="${dist.dir}/${jylang.dev.jar}"/>
