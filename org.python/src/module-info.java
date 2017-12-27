@@ -1,5 +1,7 @@
 module org.python {
-//    requires asm;
+    requires org.objectweb.asm;
+    requires org.objectweb.asm.commons;
+    requires org.objectweb.asm.util;
     requires antlr4;
     requires commons.compress;
     requires jffi;

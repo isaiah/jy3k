@@ -9,7 +9,7 @@
     </target>
     <target name="resolve">
         <property name="ivy.dep.file" value="make/ivy.xml"/>
-        <ivy:cachepath pathid="main.classpath" conf="compile"/>
+        <ivy:cachepath pathid="main.classpath" conf="runtime"/>
         <ivy:cachepath pathid="default.classpath" conf="default"/>
         <ivy:cachepath pathid="test.classpath" conf="test"/>
     </target>
@@ -196,6 +196,7 @@
 
     <target name="compile" depends="init,antlr_gen,brand-version">
         <javac destdir="${compile.dir}"
+               srcdir="${jylang.module.src.dir}:${gensrc.dir}"
                target="${jdk.target.version}"
                source="${jdk.source.version}"
                debug="${debug}"
@@ -203,12 +204,10 @@
                nowarn="${nowarn}"
                memoryMaximumSize="1024m"
                fork="true"
-               modulepath="${extlibs.dir}"
-               includeantruntime="true"
+               includeantruntime="false"
+               modulepath="${jylang.base.dir}/lib"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
-            <src path="${jylang.module.src.dir}"/>
-            <src path="${gensrc.dir}"/>
             <exclude name="**/handler/InformixDataHandler.java" unless="informix.present"/>
             <exclude name="**/handler/OracleDataHandler.java" unless="oracle.present"/>
             <classpath refid="main.classpath"/>
@@ -223,13 +222,12 @@
                memoryMaximumSize="1024m"
                fork="true"
                includeantruntime="false"
-               modulepath="${jylang.base.dir}"
+               modulepath="${jylang.base.dir}/lib:${compile.dir}"
                encoding="UTF-8">
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.shell.module.src.dir}" />
             <classpath refid="main.classpath"/>
         </javac>
-
 
         <javac srcdir="${jylang.base.dir}/Lib"
                includes="jxxload_help/**"

@@ -108,7 +108,7 @@ public class Version {
      * Return the current hg identifier name, either the current branch or tag.
      */
     public static String getHGIdentifier() {
-        return "".equals(GIT_TAG) || "tip".equals(GIT_TAG) ? GIT_BRANCH : GIT_TAG;
+        return GIT_BRANCH;
     }
 
     /**

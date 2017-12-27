@@ -1,4 +1,4 @@
-package org.python.tools.codegen;
+package org.python.ant;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -7,6 +7,11 @@ import org.apache.tools.ant.util.SourceFileScanner;
 import org.objectweb.asm.ClassWriter;
 import org.python.core.Options;
 import org.python.core.Py;
+import org.python.tools.codegen.DescriptorExposer;
+import org.python.tools.codegen.ExposedTypeProcessor;
+import org.python.tools.codegen.Exposer;
+import org.python.tools.codegen.InvalidExposingException;
+import org.python.tools.codegen.MethodExposer;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -19,6 +19,7 @@
             <classpath>
                 <path refid="main.classpath"/>
                 <pathelement path="${jylang.compile.dir}"/>
+                <pathelement path="${codegen.dist.jar}"/>
             </classpath>
         </javac>
     </target>

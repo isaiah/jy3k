@@ -8,19 +8,21 @@
         </ant>
     </target>
 
-    <target name="expose" depends="build-codegen">
-        <taskdef name="expose" classname="org.python.tools.codegen.ExposeTask">
+    <target name="expose" depends="build-codegen,build-jylangtask">
+        <taskdef name="expose" classname="org.python.ant.ExposeTask">
             <classpath>
                 <path refid="main.classpath" />
                 <pathelement path="${compile.dir}" />
                 <pathelement location="${basedir}/buildtools/codegen/dist/codegen.jar"/>
+                <pathelement location="${basedir}/buildtools/jylangtask/dist/jylangtask.jar"/>
             </classpath>
         </taskdef>
-        <taskdef name="expose_module" classname="org.python.tools.codegen.ModuleExposeTask">
+        <taskdef name="expose_module" classname="org.python.ant.ModuleExposeTask">
             <classpath>
                 <path refid="main.classpath" />
                 <pathelement path="${compile.dir}" />
                 <pathelement location="${basedir}/buildtools/codegen/dist/codegen.jar"/>
+                <pathelement location="${basedir}/buildtools/jylangtask/dist/jylangtask.jar"/>
             </classpath>
         </taskdef>
 

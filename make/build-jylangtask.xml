@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="build-jylangtask" default="pycompile" basedir="..">
-    <target name="build-jylangtask" depends="jar">
+<project name="build-jylangtask" default="build-jylangtask" basedir="..">
+    <target name="build-jylangtask" depends="build-codegen">
         <ant antfile="build.xml" inheritAll="false"
              dir="${basedir}/buildtools/jylangtask" target="jar">
             <reference refid="main.classpath"/>
             <property name="jylang.compile.dir" value="${compile.dir}"/>
+            <property name="codegen.dist.jar" value="${basedir}/buildtools/codegen/dist/codegen.jar"/>
         </ant>
     </target>
 
-    <target name="pycompile" depends="build-jylangtask,copy-lib">
+    <target name="pycompile" depends="build-jylangtask,jar,copy-lib">
         <taskdef name="jycompile" classname="org.python.ant.JycompileAntTask">
             <classpath path="${basedir}/buildtools/jylangtask/dist/jylangtask.jar"/>
+            <classpath path="${basedir}/buildtools/codegen/dist/codegen.jar"/>
             <classpath path="${dist.dir}/${jylang.dev.jar}"/>
             <classpath path="${dist.dir}/Lib"/>
             <classpath refid="main.classpath"/>
         </taskdef>
         <jycompile srcdir="${dist.dir}/Lib" destdir="${dist.dir}/Lib" excludes="test/**"/>
     </target>
+
 </project>

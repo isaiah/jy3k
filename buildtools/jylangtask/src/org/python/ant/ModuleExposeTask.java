@@ -1,9 +1,12 @@
-package org.python.tools.codegen;
+package org.python.ant;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.objectweb.asm.ClassWriter;
 import org.python.modules.Setup;
+import org.python.tools.codegen.ExposedModuleProcessor;
+import org.python.tools.codegen.Exposer;
+import org.python.tools.codegen.MethodExposer;
 
 import java.io.File;
 import java.io.FileOutputStream;
