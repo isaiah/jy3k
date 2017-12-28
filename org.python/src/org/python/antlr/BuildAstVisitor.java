@@ -1,6 +1,5 @@
 package org.python.antlr;
 
-import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
@@ -96,9 +95,6 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * Created by isaiah on 3/10/17.
- */
 public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     private String filename;
     private GrammarActions actions = new GrammarActions();
@@ -1265,8 +1261,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     }
 
     public static void main(String[] args) throws Exception {
-        TestRig rig = new TestRig(new String[]{"org.python.antlr.Python", "file_input", "/tmp/foo.py", "-tree"});
-        rig.process();
+//        TestRig rig = new TestRig(new String[]{"org.python.antlr.Python", "file_input", "/tmp/foo.py", "-tree"});
+//        rig.process();
         String module = "encodings";
         File src = new File("/tmp/foo.py");
 //        byte[] bytes = org.python.core.imp.compileSource(module, src);

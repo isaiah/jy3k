@@ -1,7 +1,6 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
-import com.google.common.collect.MapMaker;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedDelete;
 import org.python.annotations.ExposedGet;
@@ -19,12 +18,14 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -1410,7 +1411,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
     public static synchronized PyType fromClass(Class<?> c, boolean hardRef) {
         if (class_to_type == null) {
-            class_to_type = new MapMaker().weakKeys().weakValues().makeMap();
+            class_to_type = Collections.synchronizedMap(new WeakHashMap<>());
             addFromClass(PyType.class, null);
         }
         PyType type = class_to_type.get(c);

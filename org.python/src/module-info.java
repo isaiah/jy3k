@@ -2,17 +2,23 @@ module org.python {
     requires org.objectweb.asm;
     requires org.objectweb.asm.commons;
     requires org.objectweb.asm.util;
-    requires antlr4;
+    requires antlr4.runtime;
     requires commons.compress;
     requires jffi;
     requires jnr.ffi;
     requires jnr.posix;
     requires jnr.constants;
+    requires jnr.netdb;
     requires icu4j;
     requires jline;
+    requires jzlib;
+    requires bytelist;
 
     requires java.prefs;
     requires jdk.dynalink;
     requires java.scripting;
     requires java.management;
+
+    exports org.python;
+    exports org.python.core;
 }

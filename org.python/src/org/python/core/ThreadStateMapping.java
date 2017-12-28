@@ -1,12 +1,11 @@
 package org.python.core;
 
-import com.google.common.collect.MapMaker;
-
+import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 class ThreadStateMapping {
-    private static final Map<Thread, ThreadState> cachedThreadState =
-        new MapMaker().weakKeys().weakValues().makeMap();
+    private static final Map<Thread, ThreadState> cachedThreadState = Collections.synchronizedMap(new WeakHashMap<>());
 
     private static ThreadLocal<Object[]> scopedThreadState= ThreadLocal.withInitial(() -> new Object[1]);
 

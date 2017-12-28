@@ -12,8 +12,8 @@
     <dependency org="junit" name="junit" rev="4.12" conf="test->default"/>
     <dependency org="pl.pragmatists" name="JUnitParams" rev="1.0.6" conf="test->default"/>
 
-    <dependency org="org.antlr" name="antlr4-runtime" rev="4.6"/>
     <dependency org="org.antlr" name="antlr4" rev="4.6"/>
+    <dependency org="org.antlr" name="stringtemplate" rev="3.2.1" conf="runtime->default"/>
     <dependency org="org.jruby.jcodings" name="jcodings" rev="1.0.18"/>
     <dependency org="org.jruby.extras" name="bytelist" rev="1.0.15"/>
     <dependency org="org.ow2.asm" name="asm" rev="6.0"/>
@@ -22,8 +22,10 @@
     <dependency org="org.ow2.asm" name="asm-util" rev="6.0"/>
     <dependency org="org.ow2.asm" name="asm-analysis" rev="6.0"/>
     <dependency org="com.ibm.icu" name="icu4j" rev="59.1"/>
+    <!--
     <dependency org="com.google.guava" name="guava" rev="19.0"/>
-    <dependency org="jline" name="jline" rev="2.12.1"/>
+    -->
+    <dependency org="jline" name="jline" rev="2.14.6"/>
     <dependency org="com.github.jnr" name="jnr-posix" rev="3.0.41"/>
     <dependency org="com.github.jnr" name="jnr-netdb" rev="1.1.5"/>
     <dependency org="com.github.jnr" name="jnr-enxio" rev="0.12"/>

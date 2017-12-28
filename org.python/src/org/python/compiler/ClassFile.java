@@ -40,7 +40,6 @@ public class ClassFile
         }
         return new String(c);
     }
-    
 
     public static void visitAnnotations(AnnotationVisitor av, Map<String, Object> fields) {
         for (Entry<String, Object>field: fields.entrySet()) {
@@ -183,7 +182,7 @@ public class ClassFile
     }
 
     public void write(OutputStream stream) throws IOException {
-        cw.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
+        cw.visit(Opcodes.V9, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
         // XXX: should imp.java really house this value or should imp.java point into
         // org.python.compiler?
@@ -200,6 +199,7 @@ public class ClassFile
             av.visitEnd();
             cw.visitSource(sfilename, null);
         }
+//        cw.visitModule("org.python", Opcodes.ACC_OPEN, "1.0");
         endClassAnnotations();
         endFields();
         endMethods();

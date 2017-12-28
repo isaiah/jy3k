@@ -16,6 +16,8 @@ import org.python.modules._imp;
 import org.python.modules._io.PyTextIOWrapper;
 import org.python.modules.sys.SysModule;
 import org.python.modules.sys.VersionInfo;
+import org.python.util.Console;
+import org.python.util.PlainConsole;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -29,7 +31,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -1241,7 +1242,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
      * Wrap standard input with a customised console handler specified in the property
      * <code>python.console</code> in the supplied property set, which in practice is the
      * fully-initialised Jython {@link #registry}. The value of <code>python.console</code> is the
-     * name of a class that implements {@link org.python.core.Console}. An instance is constructed
+     * name of a class that implements {@link Console}. An instance is constructed
      * with the value of <code>python.console.encoding</code>, and the console
      * <code>System.in</code> returns characters in that encoding. After the call, the console
      * object may be accessed via {@link Py#getConsole()}.

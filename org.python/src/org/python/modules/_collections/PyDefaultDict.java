@@ -1,12 +1,13 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._collections;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import org.python.annotations.ExposedDelete;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedType;
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
@@ -14,14 +15,10 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
-import org.python.annotations.ExposedDelete;
-import org.python.annotations.ExposedGet;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedSet;
-import org.python.annotations.ExposedType;
 
-import org.python.core.BuiltinDocs;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * PyDefaultDict - This is a subclass of the builtin dict(PyDictionary) class. It supports
@@ -42,10 +39,10 @@ public class PyDefaultDict extends PyDictionary implements Traverseproc {
      * argument to the constructor, if present, or to None, if absent.
      */
     private PyObject defaultFactory = Py.None;
-    private final LoadingCache<PyObject, PyObject> backingMap;
+    private final ConcurrentMap<PyObject, PyObject> backingMap;
 
     public ConcurrentMap<PyObject, PyObject> getMap() {
-        return backingMap.asMap();
+        return backingMap;
     }
 
     public PyDefaultDict() {
@@ -54,12 +51,7 @@ public class PyDefaultDict extends PyDictionary implements Traverseproc {
 
     public PyDefaultDict(PyType subtype) {
         super(subtype, false);
-        backingMap = CacheBuilder.newBuilder().build(
-                new CacheLoader<PyObject, PyObject>() {
-                    public PyObject load(PyObject key) {
-                        return __missing__(key);
-                    }
-                });
+        backingMap = new ConcurrentHashMap<>();
     }
 
     public PyDefaultDict(PyType subtype, Map<PyObject, PyObject> map) {
@@ -189,7 +181,7 @@ public class PyDefaultDict extends PyDictionary implements Traverseproc {
             return retVal;
         }
         if (backingMap != null) {
-            for (Map.Entry<PyObject, PyObject> ent: backingMap.asMap().entrySet()) {
+            for (Map.Entry<PyObject, PyObject> ent: backingMap.entrySet()) {
                 retVal = visit.visit(ent.getKey(), arg);
                 if (retVal != 0) {
                     return retVal;
@@ -215,6 +207,6 @@ public class PyDefaultDict extends PyDictionary implements Traverseproc {
         if (backingMap == null) {
             return false;
         }
-        return backingMap.asMap().containsKey(ob) || backingMap.asMap().containsValue(ob);
+        return backingMap.containsKey(ob) || backingMap.containsValue(ob);
     }
 }

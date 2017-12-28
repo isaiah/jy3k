@@ -314,12 +314,20 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return code;
     }
 
+    /**
+     * Add (<clinit>) method
+     */
+    public void addClinit() {
+        Code c = classfile.addMethod("<clinit>", sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_STATIC);
+        addConstants(c);
+        c.areturn();;
+    }
+
     /** This block of code writes out the various standard methods */
     public void addInit() {
         Code c = classfile.addMethod("<init>", sig(Void.TYPE, String.class), ACC_PUBLIC);
         c.aload(0);
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
-        addConstants(c);
         codes.stream().forEach(this::addCodeInit);
 //        addCodeInit(mainCode);
         c.return_();

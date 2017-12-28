@@ -12,6 +12,7 @@
         <ivy:cachepath pathid="main.classpath" conf="runtime"/>
         <ivy:cachepath pathid="default.classpath" conf="default"/>
         <ivy:cachepath pathid="test.classpath" conf="test"/>
+        <ivy:dependencytree/>
     </target>
 
     <target name="jarless" depends="compile, pycompile"/>
@@ -215,6 +216,7 @@
             -->
         </javac>
 
+        <!--
         <javac destdir="${compile.dir}"
                target="${jdk.target.version}"
                source="${jdk.source.version}"
@@ -230,8 +232,6 @@
             <compilerarg line="${javac.Xlint}"/>
             <src path="${jylang.shell.module.src.dir}" />
         </javac>
-
-        <!--
         <javac srcdir="${jylang.base.dir}/Lib"
                includes="jxxload_help/**"
                destdir="${compile.dir}"
@@ -350,6 +350,36 @@
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
         </jar>
+    </target>
+
+    <target name="update-automodules" depends="init">
+      <foreach target="patch-jar" param="module.name">
+        <fileset dir="${extlibs.dir}">
+          <include name="**/antlr*.jar"/>
+          <exclude name="**/asm*.jar"/>
+        </fileset>
+      </foreach>
+    </target>
+
+    <target name="patch-jar" depends="init">
+      <exec executable="jdeps">
+        <arg line="--generate-module-info ${gensrc.dir}/mlib"/>
+        <arg line="--module-path ${extlibs.dir}"/>
+        <arg line="--add-modules=ALL-MODULE-PATH"/>
+        <arg value="${module.name}"/>
+      </exec>
+      <javac modulepath="${extlibs.dir}"
+        destdir="${dist.dir}/mlib"
+        srcdir="${gensrc.dir}/mlib}"/>
+    </target>
+
+    <target name="link" depends="jar">
+      <exec executable="jlink">
+        <arg line="--module-path ${java.home}/jmods:${extlibs.dir}:${dist.dir}"/>
+        <arg line="--add-modules ${jylang.module}"/>
+        <arg line="--launcher jjy=${jylang.launcher}"/>
+        <arg line="--output ${dist.dir}/app"/>
+      </exec>
     </target>
 
     <target name="javadoc" depends="compile">

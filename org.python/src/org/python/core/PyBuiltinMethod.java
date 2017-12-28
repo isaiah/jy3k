@@ -20,7 +20,8 @@ import java.util.function.Supplier;
  * i.e. str.split
  */
 public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperclass, Cloneable, Traverseproc {
-    static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+    static final MethodHandles.Lookup LOOKUP_P = MethodHandles.publicLookup();
+    static final MethodHandles.Lookup LOOKUP = LOOKUP_P.in(Py.class);
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle W_INTEGER = MH.findStatic(LOOKUP, Py.class, "newInteger", MethodType.methodType(PyLong.class, int.class));
     static final MethodHandle W_LONG = MH.findStatic(LOOKUP, Py.class, "newLong", MethodType.methodType(PyLong.class, long.class));

@@ -96,8 +96,7 @@ public class InteractiveConsole extends InteractiveInterpreter {
 
     public void _interact(String banner, PyObject file) {
         if (banner != null) {
-            write(banner);
-            write("\n");
+            write(banner + "\n");
         }
         // Dummy exec in order to speed up response on first command
         exec("2");

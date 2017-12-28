@@ -1,5 +1,5 @@
 // Copyright (c) 2013 Jython Developers
-package org.python.core;
+package org.python.util;
 
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;

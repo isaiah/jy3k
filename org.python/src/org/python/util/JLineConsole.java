@@ -3,11 +3,8 @@ package org.python.util;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +14,6 @@ import jline.WindowsTerminal;
 import jline.console.history.FileHistory;
 import jnr.constants.platform.Errno;
 
-import org.python.core.PlainConsole;
 import org.python.core.PyObject;
 import org.python.core.Py;
 
