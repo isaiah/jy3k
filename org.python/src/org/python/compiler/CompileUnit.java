@@ -25,7 +25,7 @@ class CompileUnit {
     private final Map<?, ?> consts;
     int yieldCount;
     Module module;
-    static int access = ACC_STATIC | ACC_FINAL;
+    static int access = ACC_STATIC;
     String name;
 
     String co_name;

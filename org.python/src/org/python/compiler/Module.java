@@ -321,22 +321,13 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
         addConstants(c);
         codes.stream().forEach(this::addCodeInit);
-//        addCodeInit(mainCode);
         c.return_();
     }
 
     public void addRunnable() {
+        classfile.addInterface(p(PyRunnable.class));
         Code c = classfile.addMethod("getMain", sig(PyTableCode.class), ACC_PUBLIC);
         mainCode.get(c);
-        c.areturn();
-    }
-
-    public void addBootstrap() {
-        Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME, //
-                sig(CodeBootstrap.class), ACC_PUBLIC | ACC_STATIC);
-        c.ldc(Type.getType("L" + classfile.name + ";"));
-        c.invokestatic(p(PyRunnableBootstrap.class), PyRunnableBootstrap.REFLECTION_METHOD_NAME,
-                sig(CodeBootstrap.class, Class.class));
         c.areturn();
     }
 
@@ -367,45 +358,11 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 //        c.invokevirtual(classfile.name, "init" + mainCode.fname, sig(Void.TYPE, String.class));
     }
 
-    public void addFunctions() {
-        Code code = classfile.addMethod("call_function", //
-                sig(PyObject.class, Integer.TYPE, ThreadState.class, PyFrame.class), ACC_PUBLIC);
-
-        code.aload(0); // this
-        code.aload(2); // thread state
-        code.aload(3); // frame
-        Label def = new Label();
-        Label[] labels = new Label[codes.size()];
-        int i;
-        for (i = 0; i < labels.length; i++) {
-            labels[i] = new Label();
-        }
-
-        // Get index for function to call
-        code.iload(1);
-        code.tableswitch(0, labels.length - 1, def, labels);
-        for (i = 0; i < labels.length; i++) {
-            code.label(labels[i]);
-            code.invokevirtual(classfile.name, (codes.get(i)).fname,
-                    sig(PyObject.class, ThreadState.class, PyFrame.class));
-            code.areturn();
-        }
-        code.label(def);
-
-        // Should probably throw internal exception here
-        code.aconst_null();
-        code.areturn();
-    }
 
     public void write(OutputStream stream) throws IOException {
         addInit();
         addRunnable();
-//        addMain();
-//        addBootstrap();
 
-//        addFunctions();
-
-        classfile.addInterface(p(PyRunnable.class));
         if (sfilename != null) {
             classfile.setSource(sfilename);
         }
