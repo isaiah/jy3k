@@ -13,7 +13,7 @@ abstract class Constant implements Opcodes{
     }
 
     Module module;
-    static int access = ACC_STATIC | ACC_FINAL;
+    static int access = ACC_STATIC;
     String name;
 
     void get(Code mv) {

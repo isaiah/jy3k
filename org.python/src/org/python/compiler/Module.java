@@ -314,20 +314,12 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         return code;
     }
 
-    /**
-     * Add (<clinit>) method
-     */
-    public void addClinit() {
-        Code c = classfile.addMethod("<clinit>", sig(Void.TYPE, String.class), ACC_PUBLIC|ACC_STATIC);
-        addConstants(c);
-        c.areturn();;
-    }
-
     /** This block of code writes out the various standard methods */
     public void addInit() {
         Code c = classfile.addMethod("<init>", sig(Void.TYPE, String.class), ACC_PUBLIC);
         c.aload(0);
         c.invokespecial(p(PyFunctionTable.class), "<init>", sig(Void.TYPE));
+        addConstants(c);
         codes.stream().forEach(this::addCodeInit);
 //        addCodeInit(mainCode);
         c.return_();
@@ -338,21 +330,6 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         mainCode.get(c);
         c.areturn();
     }
-
-//    public void addMain() {
-//        Code c = classfile.addMethod("main", //
-//                sig(Void.TYPE, String[].class), ACC_PUBLIC | ACC_STATIC);
-//        c.new_(classfile.name);
-//        c.dup();
-//        c.ldc(classfile.name);
-//        c.invokespecial(classfile.name, "<init>", sig(Void.TYPE, String.class));
-//        c.invokevirtual(classfile.name, "getMain", sig(PyCode.class));
-//        c.invokestatic(p(CodeLoader.class), CodeLoader.SIMPLE_FACTORY_METHOD_NAME,
-//                sig(CodeBootstrap.class, PyCode.class));
-//        c.aload(0);
-//        c.invokestatic(p(Py.class), "runMain", sig(Void.TYPE, CodeBootstrap.class, String[].class));
-//        c.return_();
-//    }
 
     public void addBootstrap() {
         Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME, //
