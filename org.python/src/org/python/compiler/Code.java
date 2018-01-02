@@ -19,10 +19,8 @@ public class Code extends MethodVisitor implements Opcodes {
     BitSet finallyLocals = new java.util.BitSet();
     private InstructionAdapter inst;
 
-    //XXX: I'd really like to get sig and access out of here since MethodVistitor
-    //     should already have this information.
     public Code(MethodVisitor mv, String sig, int access) {
-        super(ASM5, mv);
+        super(ASM6, mv);
         inst = new InstructionAdapter(mv);
         this.sig = sig;
         nlocals = -sigSize(sig, false);

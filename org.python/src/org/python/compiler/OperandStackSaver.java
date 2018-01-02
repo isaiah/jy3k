@@ -2,6 +2,7 @@ package org.python.compiler;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AnalyzerAdapter;
 import org.objectweb.asm.commons.InstructionAdapter;
@@ -23,7 +24,7 @@ public class OperandStackSaver extends InstructionAdapter {
     private List<Label> yields;
 
     public OperandStackSaver(MethodVisitor visitor) {
-        super(ASM5, visitor);
+        super(Opcodes.ASM6, visitor);
         this.yields = new ArrayList<>();
     }
 

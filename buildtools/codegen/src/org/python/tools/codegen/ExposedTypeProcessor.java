@@ -8,7 +8,6 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.python.annotations.ExposedType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -115,7 +114,7 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
         private boolean generatedStaticBlock;
 
         private TypeProcessor(ClassVisitor cv) {
-            super(Opcodes.ASM5, cv);
+            super(Opcodes.ASM6, cv);
         }
 
         @Override
@@ -229,7 +228,7 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                                                                            desc,
                                                                            signature,
                                                                            exceptions);
-                return new MethodVisitor(Opcodes.ASM5, passthroughVisitor) {
+                return new MethodVisitor(Opcodes.ASM6, passthroughVisitor) {
 
                     @Override
                     public void visitCode() {

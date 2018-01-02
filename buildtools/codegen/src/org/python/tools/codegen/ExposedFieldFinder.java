@@ -15,7 +15,7 @@ public abstract class ExposedFieldFinder extends FieldVisitor implements PyTypes
     private FieldVisitor delegate;
 
     public ExposedFieldFinder(int access, String name, FieldVisitor delegate) {
-        super(Opcodes.ASM5);
+        super(Opcodes.ASM6);
         this.access = access;
         this.fieldName = name;
         this.delegate = delegate;

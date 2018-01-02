@@ -1627,7 +1627,7 @@ public final class Py {
         try {
             // XXX start from here: the class should be generated in the org.python module in order to get access
             // error: Exception in thread "main" java.lang.IllegalAccessException: symbolic reference class is not accessible: class org.python.core._bootstrap_jylang_36, from org.python.core._bootstrap_jylang_36/noaccess (unnamed module @1184ab05)
-            main = MethodHandles.lookup().in(code.funcs.getClass()).findVirtual(code.funcs.getClass(), code.funcname,
+            main = MethodHandles.privateLookupIn(code.funcs.getClass(), MethodHandles.lookup()).findVirtual(code.funcs.getClass(), code.funcname,
                     MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class)).bindTo(code.funcs);
         } catch (Throwable e) {
             throw Py.JavaError(e);
@@ -2109,7 +2109,7 @@ public final class Py {
     private static int nameindex = 0;
 
     public static synchronized String getName() {
-        String name = "org.python.pycode._pyx" + nameindex;
+        String name = "_jjy" + nameindex;
         nameindex += 1;
         return name;
     }

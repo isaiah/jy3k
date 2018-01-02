@@ -29,7 +29,7 @@ import java.lang.invoke.SwitchPoint;
  * The dynamic linker implementation for Python objects
  */
 public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
-    static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+    static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
 
     @Override

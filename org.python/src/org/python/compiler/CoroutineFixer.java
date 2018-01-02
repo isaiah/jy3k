@@ -4,10 +4,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AnalyzerAdapter;
-import org.objectweb.asm.commons.LocalVariablesSorter;
-
-import static org.objectweb.asm.Opcodes.ASM5;
 
 /**
  * Insert saveStack and restoreStack instructions when there is a yield expr
@@ -26,7 +24,7 @@ public class CoroutineFixer extends ClassVisitor {
     }
 
     private CoroutineFixer(ClassVisitor cv) {
-        super(ASM5, cv);
+        super(Opcodes.ASM6, cv);
     }
 
     @Override

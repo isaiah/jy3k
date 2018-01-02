@@ -349,28 +349,8 @@
           manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
+            <fileset dir="${dist.dir}/Lib" excludes="test/**"/>
         </jar>
-    </target>
-
-    <target name="update-automodules" depends="init">
-      <foreach target="patch-jar" param="module.name">
-        <fileset dir="${extlibs.dir}">
-          <include name="**/antlr*.jar"/>
-          <exclude name="**/asm*.jar"/>
-        </fileset>
-      </foreach>
-    </target>
-
-    <target name="patch-jar" depends="init">
-      <exec executable="jdeps">
-        <arg line="--generate-module-info ${gensrc.dir}/mlib"/>
-        <arg line="--module-path ${extlibs.dir}"/>
-        <arg line="--add-modules=ALL-MODULE-PATH"/>
-        <arg value="${module.name}"/>
-      </exec>
-      <javac modulepath="${extlibs.dir}"
-        destdir="${dist.dir}/mlib"
-        srcdir="${gensrc.dir}/mlib}"/>
     </target>
 
     <target name="link" depends="jar">

@@ -4,6 +4,7 @@ package org.python.core;
 import org.objectweb.asm.ClassReader;
 import org.python.Version;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -67,7 +68,9 @@ public class BytecodeLoader {
      */
     public static PyTableCode makeCode(String name, byte[] data, String filename) {
         try {
-            Class<?> c = makeClass(name, data);
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+//            Class<?> c = makeClass(name, data);
+            Class<?> c = lookup.defineClass(data);
             Object o = c.getConstructor(new Class[] {String.class})
                     .newInstance(new Object[] {filename});
             return ((PyRunnable)o).getMain();

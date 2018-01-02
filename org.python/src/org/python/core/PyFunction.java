@@ -30,7 +30,7 @@ import java.lang.reflect.Proxy;
  */
 @ExposedType(name = "function", isBaseType = false, doc = BuiltinDocs.function_doc)
 public class PyFunction extends PyObject implements InvocationHandler, Traverseproc {
-    static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+    static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
             MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class));

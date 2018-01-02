@@ -48,7 +48,7 @@ public class Import {
     private static final String UNKNOWN_SOURCEFILE = "<unknown>";
 
     public static final int NO_MTIME = -1;
-    public static final int API_VERSION = 37;
+    public static final int API_VERSION = 38;
 
     public static final int DEFAULT_LEVEL = 0;
 

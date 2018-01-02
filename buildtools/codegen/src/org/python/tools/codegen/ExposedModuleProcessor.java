@@ -65,7 +65,7 @@ public class ExposedModuleProcessor implements Opcodes, PyTypes {
         private String doc;
 
         public ModuleProcessor(ClassVisitor cv) {
-            super(ASM5, cv);
+            super(Opcodes.ASM6, cv);
         }
 
         @Override

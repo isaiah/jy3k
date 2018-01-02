@@ -5,6 +5,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.python.bootstrap.Import;
@@ -77,7 +78,8 @@ public class ClassFile
         this(name, superclass, access, -1);
     }
     public ClassFile(String name, String superclass, int access, long mtime) {
-        this.name = fixName(name);
+        name = fixName(name);
+        this.name = "org/python/core/" + name.substring(name.indexOf('/') + 1);
         this.superclass = fixName(superclass);
         this.interfaces = new String[0];
         this.access = access;
@@ -182,7 +184,7 @@ public class ClassFile
     }
 
     public void write(OutputStream stream) throws IOException {
-        cw.visit(Opcodes.V9, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
+        cw.visit(Opcodes.V9, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
         // XXX: should imp.java really house this value or should imp.java point into
         // org.python.compiler?
@@ -199,7 +201,6 @@ public class ClassFile
             av.visitEnd();
             cw.visitSource(sfilename, null);
         }
-//        cw.visitModule("org.python", Opcodes.ACC_OPEN, "1.0");
         endClassAnnotations();
         endFields();
         endMethods();

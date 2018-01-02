@@ -172,7 +172,7 @@ public abstract class PackageManager {
         private int class_access;
 
         public AccessVisitor() throws IOException {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM6);
         }
 
         @Override
