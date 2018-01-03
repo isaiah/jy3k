@@ -15,7 +15,8 @@ org/python/core/PyCell.class
 org/python/core/PyClass.class
 org/python/core/PyClassMethod.class
 org/python/core/PyClassMethodDescr.class
-org/python/core/PyClasspathImporter.class
+org/python/core/PyClasspathLoader.class
+org/python/core/PyClasspathFinder.class
 org/python/core/PyComplex.class
 org/python/core/PyDataDescr.class
 org/python/core/PyDictionary.class

@@ -1,6 +1,7 @@
 package org.python.modules.zipimport;
 
 import org.python.Version;
+import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
@@ -11,23 +12,19 @@ import org.python.core.BytecodeLoader;
 import org.python.core.Py;
 import org.python.core.PyCode;
 import org.python.core.PyException;
-import org.python.core.PyList;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
 import org.python.core.PyType;
-import org.python.modules._imp;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.StringJoiner;
 
 @ExposedType(name = "zipimport.zipimporter")
 public class PyZipImporter extends PyObject {
@@ -132,10 +129,11 @@ public class PyZipImporter extends PyObject {
         throw Py.ImportError(pyPath.toString() + "not found");
     }
 
-    @ExposedMethod(defaults = {"null"})
-    public PyObject find_spec(PyObject fullname, PyObject target) {
+    @ExposedClassMethod(defaults = {"null"})
+    public static PyObject find_spec(PyType subtype, PyObject fullname, PyObject path, PyObject target) {
         PySystemState interp = Py.getSystemState();
-        return interp.importlib.invoke("spec_from_loader", fullname, this);
+        // FIXME get the archive and prefix from the path, the origin of the spec have to include the whole url
+        return interp.importlib.invoke("spec_from_loader", fullname, new PyZipImporter(subtype,"", ""));
     }
 
     @ExposedMethod

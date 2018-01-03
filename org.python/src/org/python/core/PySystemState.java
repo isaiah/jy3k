@@ -207,14 +207,14 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         argv = (PyList)defaultArgv.repeat(1);
         path = (PyList)defaultPath.repeat(1);
         path.append(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY));
-        path.append(Py.newUnicode(PyClasspathImporter.IMPORT_PATH_ENTRY));
+        path.append(Py.newUnicode(PyClasspathLoader.IMPORT_PATH_ENTRY));
         executable = defaultExecutable;
         builtins = getDefaultBuiltins();
         platform = defaultPlatform;
 
         path_importer_cache = new PyDictionary();
         path_importer_cache.__setitem__(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY), new JavaImporter());
-        path_importer_cache.__setitem__(Py.newUnicode(PyClasspathImporter.IMPORT_PATH_ENTRY), new PyClasspathImporter());
+        path_importer_cache.__setitem__(Py.newUnicode(PyClasspathLoader.IMPORT_PATH_ENTRY), new PyClasspathLoader());
 
         dont_write_bytecode = Options.dont_write_bytecode;
         // Set up the initial standard ins and outs
@@ -756,7 +756,8 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             }
         }
         if (root == null) {
-            return null;
+            // when jylang is linked by jlink, use the image path
+            return System.getProperty("java.home");
         }
         File rootFile = new File(root);
         try {
@@ -1052,18 +1053,14 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         }
         initialized = true;
         Py.setAdapter(adapter);
-        boolean standalone = false;
+        boolean standalone = true;
         String jarFileName = getJarFileName();
-        if (jarFileName != null) {
-            standalone = isStandalone(jarFileName);
-        }
 
         // initialize the Jython registry
         initRegistry(preProperties, postProperties, standalone, jarFileName);
 
         // other initializations
         initBuiltins(registry);
-//        initStaticFields();
 
         // Initialize the path (and add system defaults)
         defaultPath = initPath(registry, standalone, jarFileName);
@@ -1091,6 +1088,8 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         Py.defaultSystemState.sysdict = ((PyModule) sysmod).__dict__;
         Py.defaultSystemState.sysdict.__setitem__("modules", Py.defaultSystemState.modules);
         Py.setSystemState(Py.defaultSystemState);
+        PyList metaPath = new PyList();
+        metaPath.append(PyClasspathFinder.TYPE);
 
         // init sys
         SysModule.setObject("builtin_module_names", PySystemState.builtin_module_names);
@@ -1102,7 +1101,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("exec_prefix", Py.defaultSystemState.exec_prefix);
         SysModule.setObject("implementation", Py.defaultSystemState.implementation);
         SysModule.setObject("maxsize", new PyLong(Py.defaultSystemState.maxsize));
-        SysModule.setObject("meta_path", new PyList());
+        SysModule.setObject("meta_path", metaPath);
         SysModule.setObject("path", Py.defaultSystemState.path);
         SysModule.setObject("path_hooks", new PyList());
         SysModule.setObject("path_importer_cache", Py.defaultSystemState.path_importer_cache);
@@ -1149,7 +1148,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         PyObject _frozen_importlib = Import.addModule("_frozen_importlib");
         interp.importlib = _frozen_importlib;
         _frozen_importlib.invoke("_install", sysmod, _impMod);
-        Import.initZipImport();
+//        Import.initZipImport();
     }
 
     private static PyTuple getVersionInfo() {
@@ -1384,11 +1383,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
             String libpath = new File(prefix.toString(), "Lib").toString();
             path.append(new PyUnicode(libpath));
         }
-        if (standalone) {
-            // standalone jython: add the /Lib directory inside JYTHON_JAR to the path
-            addPaths(path, jarFileName + "/Lib");
-        }
-
         return path;
     }
 

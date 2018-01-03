@@ -943,7 +943,8 @@ public class PosixModule {
         if (fspath != null) {
             return fspath.__call__();
         }
-        throw Py.TypeError(String.format("expected str, bytes or os.PathLike object, not %s", path.getType().fastGetName()));
+        throw new RuntimeException();
+//        throw Py.TypeError(String.format("expected str, bytes or os.PathLike object, not %s", path.getType().fastGetName()));
     }
 
     /**
