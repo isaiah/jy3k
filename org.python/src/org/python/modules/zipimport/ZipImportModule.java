@@ -30,8 +30,10 @@ public class ZipImportModule {
 
     @ModuleInit
     public static void init(PyObject dict) {
+        initClassExceptions(Py.getSystemState().builtins);
         dict.__setitem__("_zip_directory_cache", _zip_directory_cache);
         dict.__setitem__("ZipImportError", ZipImportError);
+        dict.__setitem__("zipimporter", PyZipImporter.TYPE);
     }
 
     /**

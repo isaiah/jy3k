@@ -24,6 +24,7 @@ import org.python.core.PyTraceback;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
+import org.python.modules.sys.SysModule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -236,6 +237,20 @@ public class Import {
             removeModule(name);
             throw t;
         }
+    }
+
+    // import.c: _PyImportZip_Init
+    public static void initZipImport() {
+        PyObject pathHooks = SysModule.getObject("path_hooks");
+        PyObject zipimport = importModule("zipimport");
+        if (zipimport == null) {
+            return; /* No zip import module -- okay */
+        }
+        PyObject zipimporter = zipimport.__findattr__("zipimporter");
+        if (zipimporter == null) {
+            return; /* No zip importer object -- okay */
+        }
+        ((PyList) pathHooks).insert(0, zipimporter);
     }
 
     /**

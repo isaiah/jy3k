@@ -79,7 +79,9 @@ public class ClassFile
     }
     public ClassFile(String name, String superclass, int access, long mtime) {
         name = fixName(name);
-        this.name = "org/python/core/" + name.substring(name.indexOf('/') + 1);
+        // cannot turn python package name to java package, because the class have to be in org.python.core to be
+        // accessible by Py.java
+        this.name = "org/python/core/" + name.replaceAll("/", "__");
         this.superclass = fixName(superclass);
         this.interfaces = new String[0];
         this.access = access;
@@ -186,8 +188,6 @@ public class ClassFile
     public void write(OutputStream stream) throws IOException {
         cw.visit(Opcodes.V9, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
-        // XXX: should imp.java really house this value or should imp.java point into
-        // org.python.compiler?
         av.visit("value", Integer.valueOf(Import.API_VERSION));
         av.visitEnd();
 

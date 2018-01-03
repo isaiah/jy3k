@@ -69,7 +69,6 @@ public class BytecodeLoader {
     public static PyTableCode makeCode(String name, byte[] data, String filename) {
         try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-//            Class<?> c = makeClass(name, data);
             Class<?> c = lookup.defineClass(data);
             Object o = c.getConstructor(new Class[] {String.class})
                     .newInstance(new Object[] {filename});

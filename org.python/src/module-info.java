@@ -23,4 +23,5 @@ module org.python {
     exports org.python.core;
     exports org.python.core.generator to org.python;
     exports org.python.modules to org.python;
+    opens Lib;
 }

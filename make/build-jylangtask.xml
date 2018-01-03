@@ -9,7 +9,7 @@
         </ant>
     </target>
 
-    <target name="pycompile" depends="build-jylangtask,jar,copy-lib">
+    <target name="pycompile" depends="build-jylangtask,jar">
         <taskdef name="jycompile" classname="org.python.ant.JycompileAntTask">
             <classpath path="${basedir}/buildtools/jylangtask/dist/jylangtask.jar"/>
             <classpath path="${basedir}/buildtools/codegen/dist/codegen.jar"/>

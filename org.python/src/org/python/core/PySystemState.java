@@ -146,8 +146,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
 
     // _frozen_importlib
     public PyObject importlib;
-    public PyList meta_path;
-    public PyList path_hooks;
     public PyObject path_importer_cache;
 
     // Only defined if interactive, see https://docs.python.org/2/library/sys.html#sys.ps1
@@ -209,15 +207,14 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         argv = (PyList)defaultArgv.repeat(1);
         path = (PyList)defaultPath.repeat(1);
         path.append(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY));
+        path.append(Py.newUnicode(PyClasspathImporter.IMPORT_PATH_ENTRY));
         executable = defaultExecutable;
         builtins = getDefaultBuiltins();
         platform = defaultPlatform;
 
-        meta_path = new PyList();
-        path_hooks = new PyList();
-
         path_importer_cache = new PyDictionary();
         path_importer_cache.__setitem__(Py.newUnicode(JavaImporter.JAVA_IMPORT_PATH_ENTRY), new JavaImporter());
+        path_importer_cache.__setitem__(Py.newUnicode(PyClasspathImporter.IMPORT_PATH_ENTRY), new PyClasspathImporter());
 
         dont_write_bytecode = Options.dont_write_bytecode;
         // Set up the initial standard ins and outs
@@ -1105,9 +1102,9 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("exec_prefix", Py.defaultSystemState.exec_prefix);
         SysModule.setObject("implementation", Py.defaultSystemState.implementation);
         SysModule.setObject("maxsize", new PyLong(Py.defaultSystemState.maxsize));
-        SysModule.setObject("meta_path", Py.defaultSystemState.meta_path);
+        SysModule.setObject("meta_path", new PyList());
         SysModule.setObject("path", Py.defaultSystemState.path);
-        SysModule.setObject("path_hooks", Py.defaultSystemState.path_hooks);
+        SysModule.setObject("path_hooks", new PyList());
         SysModule.setObject("path_importer_cache", Py.defaultSystemState.path_importer_cache);
         SysModule.setObject("platform", Py.defaultSystemState.platform);
         SysModule.setObject("prefix", Py.defaultSystemState.prefix);
@@ -1137,18 +1134,22 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("_jy_console", Py.java2py(Py.getConsole()));
 
         Py.defaultSystemState.initstdio();
+        initimport(Py.defaultSystemState, sysmod);
+        Py.defaultSystemState.initEncoding();
+        return Py.defaultSystemState;
+    }
+
+    private static void initimport(PySystemState interp, PyObject sysmod) {
         Import.importFrozenModuleObject("_frozen_importlib");
         Import.importFrozenModuleObject("_frozen_importlib_external");
-        spec = new PyModuleDef("_imp");
+        PyObject spec = new PyModuleDef("_imp");
         PyObject _impMod = _imp.create_builtin(spec);
         _imp.exec_builtin(_impMod);
 
         PyObject _frozen_importlib = Import.addModule("_frozen_importlib");
-        Py.defaultSystemState.importlib = _frozen_importlib;
+        interp.importlib = _frozen_importlib;
         _frozen_importlib.invoke("_install", sysmod, _impMod);
-
-        Py.defaultSystemState.initEncoding();
-        return Py.defaultSystemState;
+        Import.initZipImport();
     }
 
     private static PyTuple getVersionInfo() {
@@ -1785,24 +1786,7 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
                 return retVal;
             }
         }
-        if (meta_path != null) {
-            retVal = visit.visit(meta_path, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (path_hooks != null) {
-            retVal = visit.visit(path_hooks, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
-        if (path_importer_cache != null) {
-            retVal = visit.visit(path_importer_cache, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-        }
+
         if (ps1 != null) {
             retVal = visit.visit(ps1, arg);
             if (retVal != 0) {
@@ -1847,7 +1831,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && (ob == argv || ob ==  modules || ob == path
             || ob == warnoptions || ob == builtins || ob == platform
-            || ob == meta_path || ob == path_hooks || ob == path_importer_cache
             || ob == ps1 || ob == ps2 || ob == executable
             || ob == __displayhook__ || ob == __excepthook__
             || ob ==__name__ || ob == __dict__);

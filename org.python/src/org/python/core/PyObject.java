@@ -3510,7 +3510,7 @@ public class PyObject implements Serializable {
      * @param keywords the keywords to use in the call.
      * @return the result of calling the method name with args and keywords.
      **/
-    public PyObject invoke(String name, PyObject[] args, String[] keywords) {
+    public PyObject invoke(String name, PyObject[] args, String... keywords) {
         PyObject f = __getattr__(name);
         return f.__call__(args, keywords);
     }

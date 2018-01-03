@@ -339,7 +339,7 @@
         </jar>
     </target>
 
-    <target name="jar" depends="compile,expose,create-manifest">
+    <target name="jar" depends="compile,expose,create-manifest,copy-lib">
         <jar destfile="${dist.dir}/callbacker_test.jar">
             <fileset dir="${compile.dir}" includes="org/python/tests/Callbacker*"/>
         </jar>
@@ -349,7 +349,7 @@
           manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
-            <fileset dir="${dist.dir}/Lib" excludes="test/**"/>
+            <fileset dir="${dist.dir}" includes="Lib/**"/>
         </jar>
     </target>
 
