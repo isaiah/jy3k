@@ -115,7 +115,8 @@ public class PyClasspathLoader extends PyObject {
             module.__setattr__("__cached__", new PyUnicode(spec.cached));
         }
         if (spec.isPackage) {
-            module.__setattr__("__path__", new PyUnicode(IMPORT_PATH_ENTRY + "/" + spec.path));
+            // This is the hint for the import machinery to use this loader for submodules
+            module.__setattr__("__path__", new PyUnicode(IMPORT_PATH_ENTRY));
         }
         Py.runCode(code, module.__dict__, module.__dict__);
         return module;
