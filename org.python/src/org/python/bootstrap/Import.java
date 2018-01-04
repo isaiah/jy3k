@@ -287,7 +287,6 @@ public class Import {
      * PyModule is created for the name and added to sys.modules
      */
     public static PyModule addModule(String name) {
-        name = name.intern();
         PyObject modules = Py.getSystemState().modules;
         PyModule module = (PyModule)modules.__finditem__(name);
         if (module != null) {

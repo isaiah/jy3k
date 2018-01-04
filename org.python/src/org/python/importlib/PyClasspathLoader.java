@@ -1,9 +1,16 @@
-package org.python.core;
+package org.python.importlib;
 
 import org.python.Version;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 import org.python.bootstrap.Import;
+import org.python.core.BytecodeLoader;
+import org.python.core.Py;
+import org.python.core.PyCode;
+import org.python.core.PyModule;
+import org.python.core.PyObject;
+import org.python.core.PyType;
+import org.python.core.PyUnicode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,6 +115,9 @@ public class PyClasspathLoader extends PyObject {
     @ExposedMethod
     public PyObject load_module(String fullname) {
         ModuleSpec spec = getSpec(fullname);
+        if (spec == null) {
+            throw Py.ImportError("not found", fullname);
+        }
         PyCode code = getCode(fullname, spec);
         PyModule module = Import.addModule(fullname);
         module.__setattr__("__file__", new PyUnicode(spec.origin));

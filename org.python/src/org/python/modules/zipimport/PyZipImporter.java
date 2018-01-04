@@ -130,7 +130,7 @@ public class PyZipImporter extends PyObject {
     }
 
     @ExposedClassMethod(defaults = {"null"})
-    public static PyObject find_spec(PyType subtype, PyObject fullname, PyObject path, PyObject target) {
+    public static PyObject find_spec(PyType subtype, PyObject fullname, PyObject target) {
         PySystemState interp = Py.getSystemState();
         // FIXME get the archive and prefix from the path, the origin of the spec have to include the whole url
         return interp.importlib.invoke("spec_from_loader", fullname, new PyZipImporter(subtype,"", ""));

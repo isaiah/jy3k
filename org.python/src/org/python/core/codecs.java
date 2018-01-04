@@ -1906,6 +1906,9 @@ public class codecs {
             if (handlerName == null) {
                 handlerName = "strict";
             }
+            if (errorHandlers == null) {
+                init();
+            }
             PyObject handler = errorHandlers.__finditem__(handlerName.intern());
             if (handler == null) {
                 throw new PyException(Py.LookupError,

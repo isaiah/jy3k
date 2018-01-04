@@ -349,7 +349,7 @@
           manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
-            <fileset dir="${dist.dir}" includes="Lib/**"/>
+            <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**"/>
         </jar>
     </target>
 

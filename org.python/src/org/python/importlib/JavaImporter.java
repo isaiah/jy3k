@@ -1,9 +1,17 @@
-package org.python.core;
+package org.python.importlib;
 
 import jnr.posix.util.Platform;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.ArgParser;
+import org.python.core.Py;
+import org.python.core.PyJavaPackage;
+import org.python.core.PyObject;
+import org.python.core.PySystemState;
+import org.python.core.PyType;
+import org.python.core.PyUnicode;
+import org.python.core.Untraversable;
 
 /**
  * Load Java classes.
@@ -27,14 +35,18 @@ public class JavaImporter extends PyObject {
         super(TYPE);
     }
 
-    @ExposedNew
     @ExposedMethod
-    final void JavaImporter___init__(PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("__init__", args, kwds, new String[]{"path"});
-        String path = ap.getString(0);
-        if(!path.endsWith(JAVA_IMPORT_PATH_ENTRY)){
-            throw Py.ImportError("unable to handle");
+    public boolean is_package(String fullname) {
+        PyObject ret = lookupName(fullname);
+        return ret != null && ret instanceof PyJavaPackage;
+    }
+
+    @ExposedMethod
+    public String get_filename(String fullname) {
+        if (lookupName(fullname) != null) {
+            return JAVA_IMPORT_PATH_ENTRY;
         }
+        throw Py.ImportError("java package not found", fullname);
     }
 
     /**
@@ -58,29 +70,6 @@ public class JavaImporter extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject JavaImporter_find_spec(String name, PyObject path) {
-        PyObject ret = lookupName(name);
-        if (ret != null) {
-            Py.writeComment("import", "'" + name + "' as java package");
-            PyObject moduleSpec = Py.getSystemState().importlib.__findattr__("ModuleSpec");
-            PyObject spec = moduleSpec.__call__(new PyUnicode(name), this);
-            spec.__setattr__("__loader__", this);
-            return spec;
-        }
-        return Py.None;
-    }
-
-    @ExposedMethod
-    public PyObject JavaImporter_create_module(PyObject spec) {
-        return lookupName(spec.__findattr__("name").asString());
-    }
-
-    @ExposedMethod
-    public PyObject JavaImporter_exec_module(PyObject module) {
-        return module;
-    }
-
-    @ExposedMethod
     public PyObject JavaImporter_load_module(String name) {
         return lookupName(name);
     }
@@ -89,6 +78,12 @@ public class JavaImporter extends PyObject {
         PyObject ret = PySystemState.packageManager.lookupName(name.intern());
         if (ret == null && name.startsWith("java.")) {
             ret = PySystemState.packageManager.lookupName(name.replace("java.", "").intern());
+        }
+        if (ret != null && ret instanceof PyJavaPackage) {
+            ret.__setattr__("__path__", new PyUnicode(JAVA_IMPORT_PATH_ENTRY));
+        }
+        if (ret != null) {
+            Py.getSystemState().modules.__setitem__(name, ret);
         }
         return ret;
     }

@@ -5,6 +5,7 @@ package org.python.core;
 
 import org.python.annotations.ExposedType;
 import org.python.core.packagecache.PackageManager;
+import org.python.importlib.JavaImporter;
 
 import java.util.StringTokenizer;
 

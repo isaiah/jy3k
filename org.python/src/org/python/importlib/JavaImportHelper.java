@@ -1,4 +1,11 @@
-package org.python.core;
+package org.python.importlib;
+
+import org.python.core.Py;
+import org.python.core.PyBytes;
+import org.python.core.PyJavaPackage;
+import org.python.core.PyObject;
+import org.python.core.PySystemState;
+import org.python.core.PyTuple;
 
 import java.util.ArrayList;
 import java.util.Iterator;

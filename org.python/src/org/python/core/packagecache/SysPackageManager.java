@@ -38,6 +38,8 @@ public class SysPackageManager extends PathPackageManager {
             initCache();
             findAllPackages(registry);
             saveCache();
+        } else {
+            findAllPackages(registry);
         }
     }
 
