@@ -331,26 +331,17 @@ public class Import {
 
     public static byte[] compileSource(String name, InputStream fp, String filename, long mtime) {
         ByteArrayOutputStream ofp = new ByteArrayOutputStream();
-        ParserFacade.ExpectedEncodingBufferedReader bufReader = null;
-        try {
-            if (filename == null) {
-                filename = UNKNOWN_SOURCEFILE;
-            }
-            org.python.antlr.base.mod node;
-            CompilerFlags cflags = new CompilerFlags();
-            bufReader = ParserFacade.prepBufReader(fp, cflags, filename, false);
-            node = ParserFacade.parseOnly(bufReader, CompileMode.exec, filename, cflags);
-            org.python.compiler.Module.compile(node, ofp, name + Version.PY_CACHE_TAG, filename, true, null, mtime);
-            return ofp.toByteArray();
-        } catch (Throwable t) {
-            throw ParserFacade.fixParseError(t, filename);
-        } finally {
-            try {
-                bufReader.close();
-            } catch (IOException e) {
-                // ignore
-            }
+        if (filename == null) {
+            filename = UNKNOWN_SOURCEFILE;
         }
+        org.python.antlr.base.mod node;
+        CompilerFlags cflags = new CompilerFlags();
+        node = ParserFacade.parse(fp, CompileMode.exec, filename, cflags);
+        try {
+            org.python.compiler.Module.compile(node, ofp, name + Version.PY_CACHE_TAG, filename, true, null, mtime);
+        } catch (IOException e) {
+        }
+        return ofp.toByteArray();
     }
         /**
      * Selects the parent class loader for Jython, to be used for dynamically loaded classes and
