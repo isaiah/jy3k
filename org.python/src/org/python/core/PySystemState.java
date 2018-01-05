@@ -1129,9 +1129,6 @@ public class PySystemState extends PyObject implements AutoCloseable, Closeable,
         SysModule.setObject("flags", SysModule.makeFlags());
         // end init sys
 
-        // Make sure that Exception classes have been loaded
-        new PySyntaxError("", 1, 1, "", "");
-
         // Cause sys to export the console handler that was installed
         SysModule.setObject("_jy_console", Py.java2py(Py.getConsole()));
 
