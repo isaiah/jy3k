@@ -42,18 +42,6 @@ __del__
 ,__abs__ 
 ,__invert__
  
-,__mul__ o
-,__rmul__ o
-,__imul__ o
-,__div__ o
-,__rdiv__ o
-,__idiv__ o
-,__floordiv__ o
-,__rfloordiv__ o
-,__ifloordiv__ o
-,__truediv__ o
-,__rtruediv__ o
-,__itruediv__ o
 ,__mod__ o
 ,__rmod__ o
 ,__imod__ o

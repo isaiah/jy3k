@@ -450,22 +450,12 @@ public class PyComplex extends PyObject {
         }
     }
 
-    @Override
-    public PyObject __floordiv__(PyObject right) {
-        return complex___floordiv__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___floordiv___doc)
     final PyObject complex___floordiv__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
         return _divmod(this, coerce(right)).__finditem__(0);
-    }
-
-    @Override
-    public PyObject __rfloordiv__(PyObject left) {
-        return complex___rfloordiv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rfloordiv___doc)
@@ -486,7 +476,6 @@ public class PyComplex extends PyObject {
         return Py.NoConversion;
     }
 
-    @Override
     public PyObject __truediv__(PyObject right) {
         return complex___truediv__(right);
     }
@@ -497,11 +486,6 @@ public class PyComplex extends PyObject {
             return null;
         }
         return _div(this, coerce(right));
-    }
-
-    @Override
-    public PyObject __rtruediv__(PyObject left) {
-        return complex___rtruediv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rtruediv___doc)

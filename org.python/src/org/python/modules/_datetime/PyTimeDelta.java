@@ -94,11 +94,6 @@ public class PyTimeDelta extends PyObject {
         return !delta.isZero();
     }
 
-    @Override
-    public PyObject __idiv__(PyObject other) {
-        return timedelta___idiv__(other);
-    }
-
     final PyObject timedelta___idiv__(PyObject other) {
         if (other instanceof PyTimeDelta) {
             return new PyTimeDelta(delta.dividedBy(((PyTimeDelta) other).delta.getSeconds()));
@@ -106,11 +101,6 @@ public class PyTimeDelta extends PyObject {
             return new PyTimeDelta(delta.dividedBy(other.asLong()));
         }
         return null;
-    }
-
-    @Override
-    public PyObject __floordiv__(PyObject other) {
-        return timedelta___floordiv__(other);
     }
 
     final PyObject timedelta___floordiv__(PyObject other) {

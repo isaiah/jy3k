@@ -668,22 +668,12 @@ public class PyLong extends PyObject {
         return x.divide(y);
     }
 
-    @Override
-    public PyObject __floordiv__(PyObject right) {
-        return int___floordiv__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___floordiv___doc)
     public final PyObject int___floordiv__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
         return Py.newLong(divide(getValue(), coerce(right)));
-    }
-
-    @Override
-    public PyObject __rfloordiv__(PyObject left) {
-        return int___rfloordiv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rfloordiv___doc)
@@ -694,22 +684,12 @@ public class PyLong extends PyObject {
         return Py.newLong(divide(coerce(left), getValue()));
     }
 
-    @Override
-    public PyObject __truediv__(PyObject right) {
-        return int___truediv__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___truediv___doc)
     public final PyObject int___truediv__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
         return true_divide(this.getValue(), coerce(right));
-    }
-
-    @Override
-    public PyObject __rtruediv__(PyObject left) {
-        return int___rtruediv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rtruediv___doc)

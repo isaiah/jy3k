@@ -39,9 +39,9 @@ public class PyObject implements Serializable {
     private static final InvokeByName matmul = new InvokeByName("__matmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName rmatmul = new InvokeByName("__rmatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName imatmul = new InvokeByName("__imatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName div = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rdiv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName idiv = new InvokeByName("__itruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName truediv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName rtruediv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName itruediv = new InvokeByName("__itruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName floordiv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName rfloordiv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName ifloordiv = new InvokeByName("__ifloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
@@ -1945,8 +1945,6 @@ public class PyObject implements Serializable {
         return inplaceBinOp(isub, sub, rsub, o2);
     }
 
-    /////////////////////////////////////////////////
-
     /**
      * Implements the Python expression <code>this * o2</code>.
      *
@@ -1973,42 +1971,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __matmul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the matmul, or null if this operation
-     * is not defined
-     **/
-    public PyObject __matmul__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rmatmul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the matmul, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rmatmul__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __imatmul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the imatmul, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __imatmul__(PyObject other) {
-        return null;
-    }
-
-    /**
      * Implements the Python expression <code>this * o2</code>.
      *
      * @param o2 the object to perform this binary operation with.
@@ -2017,33 +1979,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _matmul(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_matmul(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__matmul__", "__rmatmul__", "@");
-    }
-
-    /**
-     * Implements the Python expression <code>this @ o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the matmul.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_matmul(PyObject o2) {
-        PyObject x = __matmul__(o2);
-        if (x != null) {
-            return x;
-        }
-        x = o2.__rmatmul__(this);
-        if (x != null) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("@", o2));
+        return binOp(matmul, rmatmul, o2);
     }
 
     /**
@@ -2056,170 +1992,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _imatmul(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_imatmul(o2);
-        }
-        PyObject impl = t1.lookup("__imatmul__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__matmul__", "__rmatmul__", "@");
-    }
-
-    /**
-     * Implements the Python expression <code>this @= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the imatmul.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_imatmul(PyObject o2) {
-        PyObject x = __imatmul__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_matmul(o2);
-    }
-
-    /**
-     * Equivalent to the standard Python __idiv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the idiv, or null if this operation
-     * is not defined
-     **/
-    public PyObject __idiv__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Implements the Python expression <code>this / o2</code>
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the div.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    public final PyObject _div(PyObject o2) {
-        if (Options.Qnew)
-            return _truediv(o2);
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_div(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__truediv__", "__rtruediv__", "/");
-    }
-
-    /**
-     * Implements the Python expression <code>this / o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the div.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_div(PyObject o2) {
-        PyObject x = __truediv__(o2);
-        if (x != null && x != Py.NotImplemented) {
-            return x;
-        }
-        x = o2.__rtruediv__(this);
-        if (x != null && x != Py.NotImplemented) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("/", o2));
-    }
-
-    /**
-     * Implements the Python expression <code>this /= o2</code>
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the idiv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    public final PyObject _idiv(PyObject o2) {
-        if (Options.Qnew)
-            return _itruediv(o2);
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_idiv(o2);
-        }
-        PyObject impl = t1.lookup("__idiv__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__truediv__", "__rtruediv__", "/");
-    }
-
-    /**
-     * Implements the Python expression <code>this /= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the idiv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_idiv(PyObject o2) {
-        PyObject x = __idiv__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_div(o2);
-    }
-
-    /**
-     * Equivalent to the standard Python __floordiv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the floordiv, or null if this operation
-     * is not defined
-     **/
-    public PyObject __floordiv__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rfloordiv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the floordiv, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rfloordiv__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __ifloordiv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the ifloordiv, or null if this operation
-     * is not defined
-     **/
-    public PyObject __ifloordiv__(PyObject other) {
-        return null;
+        return inplaceBinOp(imatmul, matmul, rmatmul, o2);
     }
 
     /**
@@ -2231,33 +2004,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _floordiv(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_floordiv(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__floordiv__", "__rfloordiv__", "//");
-    }
-
-    /**
-     * Implements the Python expression <code>this // o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the floordiv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_floordiv(PyObject o2) {
-        PyObject x = __floordiv__(o2);
-        if (x != null) {
-            return x;
-        }
-        x = o2.__rfloordiv__(this);
-        if (x != null) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("//", o2));
+        return binOp(floordiv, rfloordiv, o2);
     }
 
     /**
@@ -2270,73 +2017,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _ifloordiv(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_ifloordiv(o2);
-        }
-        PyObject impl = t1.lookup("__ifloordiv__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__floordiv__", "__rfloordiv__", "//");
-    }
-
-    /**
-     * Implements the Python expression <code>this //= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the ifloordiv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_ifloordiv(PyObject o2) {
-        PyObject x = __ifloordiv__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_floordiv(o2);
-    }
-
-    /**
-     * Equivalent to the standard Python __truediv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the truediv, or null if this operation
-     * is not defined
-     **/
-    public PyObject __truediv__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rtruediv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the truediv, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rtruediv__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __itruediv__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the itruediv, or null if this operation
-     * is not defined
-     **/
-    public PyObject __itruediv__(PyObject other) {
-        return null;
+        return inplaceBinOp(ifloordiv, floordiv, rfloordiv, o2);
     }
 
     /**
@@ -2348,33 +2029,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _truediv(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_truediv(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__truediv__", "__rtruediv__", "/");
-    }
-
-    /**
-     * Implements the Python expression <code>this / o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the truediv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_truediv(PyObject o2) {
-        PyObject x = __truediv__(o2);
-        if (x != null) {
-            return x;
-        }
-        x = o2.__rtruediv__(this);
-        if (x != null) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("/", o2));
+        return binOp(truediv, rtruediv, o2);
     }
 
     /**
@@ -2387,37 +2042,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _itruediv(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_itruediv(o2);
-        }
-        PyObject impl = t1.lookup("__itruediv__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__truediv__", "__rtruediv__", "/");
-    }
-
-    /**
-     * Implements the Python expression <code>this /= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the itruediv.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_itruediv(PyObject o2) {
-        PyObject x = __itruediv__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_truediv(o2);
+        return inplaceBinOp(itruediv, truediv, rtruediv, o2);
     }
 
     /**

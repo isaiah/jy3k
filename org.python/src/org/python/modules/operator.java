@@ -37,11 +37,6 @@ public class operator
     }
 
     @ExposedFunction
-    public static PyObject div(PyObject arg1, PyObject arg2) {
-        return arg1._div(arg2);
-    }
-
-    @ExposedFunction
     public static PyObject lshift(PyObject arg1, PyObject arg2) {
         return arg1._lshift(arg2);
     }
@@ -189,11 +184,6 @@ public class operator
     @ExposedFunction
     public static PyObject iand(PyObject arg1, PyObject arg2) {
         return arg1._iand(arg2);
-    }
-
-    @ExposedFunction
-    public static PyObject idiv(PyObject arg1, PyObject arg2) {
-        return arg1._idiv(arg2);
     }
 
     @ExposedFunction

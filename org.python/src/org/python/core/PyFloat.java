@@ -486,11 +486,6 @@ public class PyFloat extends PyObject {
         return __mul__(left);
     }
 
-    @Override
-    public PyObject __floordiv__(PyObject right) {
-        return float___floordiv__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___floordiv___doc)
     final PyObject float___floordiv__(PyObject right) {
         if (!canCoerce(right)) {
@@ -501,11 +496,6 @@ public class PyFloat extends PyObject {
             throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(Math.floor(getValue() / rightv));
-    }
-
-    @Override
-    public PyObject __rfloordiv__(PyObject left) {
-        return float___rfloordiv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rfloordiv___doc)
@@ -520,11 +510,6 @@ public class PyFloat extends PyObject {
         return new PyFloat(Math.floor(leftv / getValue()));
     }
 
-    @Override
-    public PyObject __truediv__(PyObject right) {
-        return float___truediv__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___truediv___doc)
     final PyObject float___truediv__(PyObject right) {
         if (!canCoerce(right)) {
@@ -535,11 +520,6 @@ public class PyFloat extends PyObject {
             throw Py.ZeroDivisionError("float division by zero");
         }
         return new PyFloat(getValue() / rightv);
-    }
-
-    @Override
-    public PyObject __rtruediv__(PyObject left) {
-        return float___rtruediv__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rtruediv___doc)
