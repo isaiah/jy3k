@@ -49,9 +49,6 @@ public class PyWeakProxy extends AbstractReference {
     public boolean __contains__(PyObject o) { return py().__contains__(o); }
     public PyObject __index__() { return py().__index__(); }
 
-    public PyObject __mul__(PyObject o) { return py().__mul__(o); }
-    public PyObject __rmul__(PyObject o) { return py().__rmul__(o); }
-    public PyObject __imul__(PyObject o) { return py().__imul__(o); }
     public PyObject __truediv__(PyObject o) { return py().__truediv__(o); }
     public PyObject __floordiv__(PyObject o) { return py().__floordiv__(o); }
     public PyObject __rtruediv__(PyObject o) { return py().__rtruediv__(o); }

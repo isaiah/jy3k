@@ -10,7 +10,6 @@ import java.util.ListIterator;
 import java.lang.reflect.Array;
 
 import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedModule;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
@@ -222,22 +221,12 @@ public class PyTuple extends PySequenceList implements List {
         return sum;
     }
 
-    @Override
-    public PyObject __mul__(PyObject o) {
-        return tuple___mul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___mul___doc)
     final PyObject tuple___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
         return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject o) {
-        return tuple___rmul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___rmul___doc)

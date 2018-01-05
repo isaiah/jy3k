@@ -13,8 +13,7 @@ unary1: __abs__
 unary1: __invert__
 unary1: __reduce__
 unary1: __dir__
-binary: __mul__ __rmul__ \
-  __matmul__ __rmatmul__ \
+binary: __matmul__ __rmatmul__ \
   __floordiv__ __rfloordiv__ \
   __truediv__ __rtruediv__ \
   __mod__ __rmod__ \
@@ -26,8 +25,7 @@ binary: __mul__ __rmul__ \
   __or__ __ror__  \
   __xor__ __rxor__ \
   __format__
-ibinary: __imul__ \
-  __imatmul__ \
+ibinary: __imatmul__ \
   __idiv__ \
   __ifloordiv__ \
   __itruediv__ \

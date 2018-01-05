@@ -450,16 +450,6 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @Override
-    public PyObject __mul__(PyObject o) {
-        return str___mul__(o);
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject o) {
-        return str___rmul__(o);
-    }
-
-    @Override
     public PyObject __mod__(PyObject other) {
         return str___mod__(other);
     }

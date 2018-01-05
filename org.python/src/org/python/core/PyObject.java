@@ -1945,42 +1945,7 @@ public class PyObject implements Serializable {
         return inplaceBinOp(isub, sub, rsub, o2);
     }
 
-    /**
-     * Equivalent to the standard Python __mul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the mul, or null if this operation
-     * is not defined
-     **/
-    public PyObject __mul__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rmul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the mul, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rmul__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __imul__ method.
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the imul, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __imul__(PyObject other) {
-        return null;
-    }
-/////////////////////////////////////////////////
+    /////////////////////////////////////////////////
 
     /**
      * Implements the Python expression <code>this * o2</code>.
@@ -1991,33 +1956,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _mul(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_mul(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__mul__", "__rmul__", "*");
-    }
-
-    /**
-     * Implements the Python expression <code>this * o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the mul.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_mul(PyObject o2) {
-        PyObject x = __mul__(o2);
-        if (x != null && x != Py.NotImplemented) {
-            return x;
-        }
-        x = o2.__rmul__(this);
-        if (x != null && x != Py.NotImplemented) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("*", o2));
+        return binOp(mul, rmul, o2);
     }
 
     /**
@@ -2030,37 +1969,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _imul(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_imul(o2);
-        }
-        PyObject impl = t1.lookup("__imul__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__mul__", "__rmul__", "*");
-    }
-
-    /**
-     * Implements the Python expression <code>this *= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the imul.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_imul(PyObject o2) {
-        PyObject x = __imul__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_mul(o2);
+        return inplaceBinOp(imul, mul, rmul, o2);
     }
 
     /**

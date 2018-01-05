@@ -625,11 +625,6 @@ public class PyLong extends PyObject {
         return Py.newLong(coerce(left).subtract(getValue()));
     }
 
-    @Override
-    public PyObject __mul__(PyObject right) {
-        return int___mul__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___mul___doc)
     public final PyObject int___mul__(PyObject right) {
         if (right instanceof PySequence) {
@@ -640,11 +635,6 @@ public class PyLong extends PyObject {
             return Py.NotImplemented;
         }
         return Py.newLong(getValue().multiply(coerce(right)));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject left) {
-        return int___rmul__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rmul___doc)

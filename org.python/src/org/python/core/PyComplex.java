@@ -409,7 +409,6 @@ public class PyComplex extends PyObject {
                 * o2.real);
     }
 
-    @Override
     public PyObject __mul__(PyObject right) {
         return complex___mul__(right);
     }
@@ -420,11 +419,6 @@ public class PyComplex extends PyObject {
             return null;
         }
         return _mul(this, coerce(right));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject left) {
-        return complex___rmul__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rmul___doc)

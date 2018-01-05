@@ -268,11 +268,6 @@ public class PyList extends PySequenceList implements List {
         return new PyList(newList);
     }
 
-    @Override
-    public PyObject __imul__(PyObject o) {
-        return list___imul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___imul___doc)
     public final synchronized PyObject list___imul__(PyObject o) {
         if (!o.isIndex()) {
@@ -306,22 +301,12 @@ public class PyList extends PySequenceList implements List {
         return this;
     }
 
-    @Override
-    public PyObject __mul__(PyObject o) {
-        return list___mul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___mul___doc)
     public final synchronized PyObject list___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
         return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject o) {
-        return list___rmul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___rmul___doc)

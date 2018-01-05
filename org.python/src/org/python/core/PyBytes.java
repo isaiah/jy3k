@@ -2,7 +2,6 @@
 package org.python.core;
 
 import org.python.core.buffer.BaseBuffer;
-import org.python.core.buffer.SimpleBuffer;
 import org.python.core.buffer.SimpleStringBuffer;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FieldNameIterator;
@@ -18,7 +17,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.python.core.PyBUF.FULL_RO;
 import static org.python.core.stringlib.Encoding.asUTF16StringOrError;
@@ -538,22 +534,12 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(new String(new_chars));
     }
 
-    @Override
-    public PyObject __mul__(PyObject o) {
-        return bytes___mul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___mul___doc)
     public final PyObject bytes___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
         return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject o) {
-        return bytes___rmul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___rmul___doc)

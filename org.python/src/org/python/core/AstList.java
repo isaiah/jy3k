@@ -90,10 +90,6 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
         return seq___iter__();
     }
 
-    public PyObject __imul__(PyObject o) {
-        return astlist___imul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
     final PyObject astlist___imul__(PyObject o) {
         if (!o.isIndex()) {
@@ -122,20 +118,12 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
         return this;
     }
 
-    public PyObject __mul__(PyObject o) {
-        return astlist___mul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
     final PyObject astlist___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
         return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    public PyObject __rmul__(PyObject o) {
-        return astlist___rmul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY)

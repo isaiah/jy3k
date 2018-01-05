@@ -897,15 +897,6 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return storage.length + 1;
     }
 
-    /**
-     * Equivalent to the standard Python <code>__imul__</code> method, that for a byte array returns
-     * a new byte array containing the same thing n times.
-     */
-    @Override
-    public PyObject __imul__(PyObject n) {
-        return bytearray___imul__(n);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___imul___doc)
     public final PyObject bytearray___imul__(PyObject n) {
         if (!n.isIndex()) {
@@ -915,30 +906,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return this;
     }
 
-    /**
-     * Equivalent to the standard Python <code>__mul__</code> method, that for a byte array returns
-     * a new byte array containing the same thing n times.
-     */
-    @Override
-    public PyObject __mul__(PyObject n) {
-        return bytearray___mul__(n);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___mul___doc)
     public final PyObject bytearray___mul__(PyObject n) {
         if (!n.isIndex()) {
             return null;
         }
         return repeat(n.asIndex(Py.OverflowError));
-    }
-
-    /**
-     * Equivalent to the standard Python <code>__rmul__</code> method, that for a byte array returns
-     * a new byte array containing the same thing n times.
-     */
-    @Override
-    public PyObject __rmul__(PyObject n) {
-        return bytearray___rmul__(n);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___rmul___doc)

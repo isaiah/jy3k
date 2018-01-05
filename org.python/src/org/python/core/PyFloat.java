@@ -468,7 +468,6 @@ public class PyFloat extends PyObject {
         return new PyFloat(leftv - getValue());
     }
 
-    @Override
     public PyObject __mul__(PyObject right) {
         return float___mul__(right);
     }
@@ -480,11 +479,6 @@ public class PyFloat extends PyObject {
         }
         double rightv = coerce(right);
         return new PyFloat(getValue() * rightv);
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject left) {
-        return float___rmul__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rmul___doc)

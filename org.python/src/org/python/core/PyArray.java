@@ -229,11 +229,6 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
         return seq___iter__();
     }
 
-    @Override
-    public PyObject __imul__(PyObject o) {
-        return array___imul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
     final PyObject array___imul__(PyObject o) {
 
@@ -258,22 +253,12 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
         return this;
     }
 
-    @Override
-    public PyObject __mul__(PyObject o) {
-        return array___mul__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
     final PyObject array___mul__(PyObject o) {
         if (!o.isIndex()) {
             throw Py.TypeError(String.format("can't multiply sequence by non-int of type '%s'", o.getType().getName()));
         }
         return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject o) {
-        return array___rmul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY)

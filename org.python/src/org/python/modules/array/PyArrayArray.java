@@ -295,14 +295,7 @@ public class PyArrayArray extends PyObject implements BufferProtocol {
         return new PyArrayIter(this);
     }
 
-    @Override
-    @ExposedMethod
-    public PyObject __rmul__(PyObject n) {
-        return __mul__(n);
-    }
-
-    @Override
-    @ExposedMethod
+    @ExposedMethod(names = {"__mul__", "__rmul__"})
     public PyObject __mul__(PyObject n) {
         checkNumber(n);
         int x = n.asInt();
@@ -323,7 +316,6 @@ public class PyArrayArray extends PyObject implements BufferProtocol {
         return ret;
     }
 
-    @Override
     @ExposedMethod
     public PyObject __imul__(PyObject n) {
         checkNumber(n);

@@ -117,22 +117,12 @@ public class PyTimeDelta extends PyObject {
         return timedelta___idiv__(other);
     }
 
-    @Override
-    public PyObject __mul__(PyObject other) {
-        return timedelta___mul__(other);
-    }
-
     @ExposedMethod
     public PyObject timedelta___mul__(PyObject other) {
         if (other instanceof PyLong) {
             return new PyTimeDelta(delta.multipliedBy(other.asLong()));
         }
         return null;
-    }
-
-    @Override
-    public PyObject __rmul__(PyObject other) {
-        return timedelta___rmul__(other);
     }
 
     @ExposedMethod
