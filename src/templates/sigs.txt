@@ -42,9 +42,6 @@ __del__
 ,__abs__ 
 ,__invert__
  
-,__sub__ o
-,__rsub__ o
-,__isub__ o
 ,__mul__ o
 ,__rmul__ o
 ,__imul__ o

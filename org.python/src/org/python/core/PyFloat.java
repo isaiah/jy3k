@@ -450,11 +450,6 @@ public class PyFloat extends PyObject {
         return new PyFloat(getValue() + rightv);
     }
 
-    @Override
-    public PyObject __sub__(PyObject right) {
-        return float___sub__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___sub___doc)
     final PyObject float___sub__(PyObject right) {
         if (!canCoerce(right)) {
@@ -462,11 +457,6 @@ public class PyFloat extends PyObject {
         }
         double rightv = coerce(right);
         return new PyFloat(getValue() - rightv);
-    }
-
-    @Override
-    public PyObject __rsub__(PyObject left) {
-        return float___rsub__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rsub___doc)

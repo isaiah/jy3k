@@ -375,7 +375,6 @@ public class PyComplex extends PyObject {
         return new PyComplex(o1.real - o2.real, o1.imag - o2.imag);
     }
 
-    @Override
     public PyObject __sub__(PyObject right) {
         return complex___sub__(right);
     }
@@ -386,11 +385,6 @@ public class PyComplex extends PyObject {
             return null;
         }
         return _sub(this, coerce(right));
-    }
-
-    @Override
-    public PyObject __rsub__(PyObject left) {
-        return complex___rsub__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rsub___doc)

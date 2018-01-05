@@ -776,11 +776,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return result;
         }
 
-        @Override
-        public PyObject __sub__(PyObject otherObj) {
-            return dict_keys___sub__(otherObj);
-        }
-
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___sub___doc)
         public final PyObject dict_keys___sub__(PyObject otherObj) {
             PySet result = new PySet(dvDict);
@@ -886,11 +881,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             PySet result = new PySet(dvDict.dict_iteritems());
             result.set_symmetric_difference_update(otherObj);
             return result;
-        }
-
-        @Override
-        public PyObject __sub__(PyObject otherObj) {
-            return dict_items___sub__(otherObj);
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___sub___doc)

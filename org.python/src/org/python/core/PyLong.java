@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 /**
  * A builtin python int. This is implemented as a java.math.BigInteger.
@@ -609,22 +608,12 @@ public class PyLong extends PyObject {
         return __add__(left);
     }
 
-    @Override
-    public PyObject __sub__(PyObject right) {
-        return int___sub__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___sub___doc)
     public final PyObject int___sub__(PyObject right) {
         if (!canCoerce(right)) {
             return Py.NotImplemented;
         }
         return Py.newLong(getValue().subtract(coerce(right)));
-    }
-
-    @Override
-    public PyObject __rsub__(PyObject left) {
-        return int___rsub__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rsub___doc)

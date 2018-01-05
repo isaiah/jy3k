@@ -126,11 +126,6 @@ public class PyDate extends PyObject {
         return new PyDate(type, LocalDateTime.ofEpochSecond(ts.asLong(), 0, ZoneOffset.UTC).toLocalDate());
     }
 
-    @Override
-    public PyObject __sub__(PyObject other) {
-        return date___sub__(other);
-    }
-
     final PyObject date___sub__(PyObject other) {
         if (other instanceof PyDate) {
             return new PyTimeDelta(date.until(((PyDate) other).date));

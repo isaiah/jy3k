@@ -101,19 +101,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         return baseset_intersection(other);
     }
 
-    /**
-     * The difference of the <code>this</code> with <code>other</code>.
-     * <p/>
-     * <br/>
-     * (I.e. all elements that are in this set and not in the other)
-     *
-     * @param other A <code>BaseSet</code> instance.
-     * @return The difference of the two sets as a new set.
-     */
-    public PyObject __sub__(PyObject other) {
-        return baseset___sub__(other);
-    }
-
     final PyObject baseset___sub__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
