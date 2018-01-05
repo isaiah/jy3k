@@ -284,13 +284,8 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
         return repeat(o.asIndex(Py.OverflowError));
     }
 
-    @Override
-    public PyObject __iadd__(PyObject other) {
-        return array___iadd__(other);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
-    final PyObject array___iadd__(PyObject other) {
+    public final PyObject __iadd__(PyObject other) {
 
         if (!(other instanceof PyArray)) {
             throw Py.TypeError(String.format("can only append array (not \"%s\") to array",
@@ -309,11 +304,6 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
         return this;
     }
 
-    @Override
-    public PyObject __add__(PyObject other) {
-        return array___add__(other);
-    }
-
     /**
      * Adds (appends) two PyArrays together
      *
@@ -321,7 +311,7 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
      * @return the result of the addition as a new PyArray instance
      */
     @ExposedMethod(type = MethodType.BINARY)
-    final PyObject array___add__(PyObject other) {
+    public final PyObject __add__(PyObject other) {
         if (!(other instanceof PyArray)) {
             throw Py.TypeError(String.format("can only append array (not \"%s\") to array",
                     other.getType().fastGetName()));

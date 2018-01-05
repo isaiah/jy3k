@@ -2335,7 +2335,7 @@ public class gc {
                     if (src instanceof Traverseproc) {
                         try {
                             if (((Traverseproc) src).refersDirectlyTo(ob)) {
-                                result.__add__(src);
+                                result._add(src);
                             }
                         } catch (UnsupportedOperationException uoe) {
                             coll[0] = ob;

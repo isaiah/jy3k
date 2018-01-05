@@ -852,13 +852,8 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
  * ============================================================================================
  */
 
-    @Override
-    public PyObject __add__(PyObject o) {
-        return bytearray___add__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___add___doc)
-    public final synchronized PyObject bytearray___add__(PyObject o) {
+    public final synchronized PyObject __add__(PyObject o) {
         PyByteArray sum = null;
 
         // XXX re-write using buffer API
@@ -1309,13 +1304,8 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return delegator.checkIdxAndGetItem(index);
     }
 
-    @Override
-    public PyObject __iadd__(PyObject o) {
-        return bytearray___iadd__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___iadd___doc)
-    public final synchronized PyObject bytearray___iadd__(PyObject o) {
+    public final synchronized PyObject __iadd__(PyObject o) {
         PyType oType = o.getType();
         if (oType == TYPE) {
             // Use the general method, specifying the crack at the end of the array.

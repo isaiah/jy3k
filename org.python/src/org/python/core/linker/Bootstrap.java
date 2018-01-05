@@ -15,9 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import static jdk.dynalink.StandardNamespace.ELEMENT;
-import static jdk.dynalink.StandardNamespace.METHOD;
-import static jdk.dynalink.StandardNamespace.PROPERTY;
+import static jdk.dynalink.StandardNamespace.*;
 import static jdk.dynalink.StandardOperation.GET;
 import static jdk.dynalink.StandardOperation.SET;
 import static org.python.util.CodegenUtils.p;
@@ -28,44 +26,64 @@ import static org.python.util.CodegenUtils.sig;
  */
 public class Bootstrap {
     public static final Call BOOTSTRAP = staticCallNoLookup(Bootstrap.class, "bootstrap", CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, int.class);
+    /**
+     * Property getter operation {@code obj.prop}
+     */
+    public static final int GET_PROPERTY = 0;
+    /**
+     * Element getter operation {@code obj[index]}
+     */
+    public static final int GET_ELEMENT = 1;
+    /**
+     * Property getter operation, subsequently invoked {@code obj.prop()}
+     */
+    public static final int GET_METHOD_PROPERTY = 2;
+    /**
+     * Element getter operation, subsequently invoked {@code obj[index]()}
+     */
+    public static final int GET_METHOD_ELEMENT = 3;
+    /**
+     * Property setter operation {@code obj.prop = value}
+     */
+    public static final int SET_PROPERTY = 4;
+    /**
+     * Element setter operation {@code obj[index] = value}
+     */
+    public static final int SET_ELEMENT = 5;
+    /**
+     * Call operation {@code fn(args...)}
+     */
+    public static final int CALL = 6;
     private static final GuardingDynamicLinker DYNA_PYTHON_LINKER = new DynaPythonLinker();
     private static final GuardingDynamicLinker PYOBJ_LINKER = new PyObjectLinker();
-
     private static final DynamicLinker dynamicLinker = createDynamicLinker();
-
-    /** Property getter operation {@code obj.prop} */
-    public static final int GET_PROPERTY        = 0;
-    /** Element getter operation {@code obj[index]} */
-    public static final int GET_ELEMENT         = 1;
-    /** Property getter operation, subsequently invoked {@code obj.prop()} */
-    public static final int GET_METHOD_PROPERTY = 2;
-    /** Element getter operation, subsequently invoked {@code obj[index]()} */
-    public static final int GET_METHOD_ELEMENT  = 3;
-    /** Property setter operation {@code obj.prop = value} */
-    public static final int SET_PROPERTY        = 4;
-    /** Element setter operation {@code obj[index] = value} */
-    public static final int SET_ELEMENT         = 5;
-    /** Call operation {@code fn(args...)} */
-    public static final int CALL                = 6;
     private static final int OPERATION_MASK = 6;
 
     // Correspond to the operation indices above.
-    private static final Operation[] OPERATIONS = new Operation[] {
-        GET.withNamespace(PROPERTY),
-        GET.withNamespace(ELEMENT),
-        GET.withNamespaces(METHOD, PROPERTY, ELEMENT),
-        GET.withNamespaces(METHOD, ELEMENT, PROPERTY),
-        SET.withNamespaces(PROPERTY, ELEMENT),
-        SET.withNamespaces(ELEMENT, PROPERTY),
-        StandardOperation.CALL,
+    private static final Operation[] OPERATIONS = new Operation[]{
+            GET.withNamespace(PROPERTY),
+            GET.withNamespace(ELEMENT),
+            GET.withNamespaces(METHOD, PROPERTY, ELEMENT),
+            GET.withNamespaces(METHOD, ELEMENT, PROPERTY),
+            SET.withNamespaces(PROPERTY, ELEMENT),
+            SET.withNamespaces(ELEMENT, PROPERTY),
+            StandardOperation.CALL,
     };
 
 
     private static DynamicLinker createDynamicLinker() {
-         final DynamicLinkerFactory factory = new DynamicLinkerFactory();
-         factory.setPrioritizedLinkers(DYNA_PYTHON_LINKER, PYOBJ_LINKER);
-         return factory.createLinker();
-     }
+        final DynamicLinkerFactory factory = new DynamicLinkerFactory();
+        factory.setPrioritizedLinkers(DYNA_PYTHON_LINKER, PYOBJ_LINKER);
+        return factory.createLinker();
+    }
+
+    public static MethodHandle createDynamicInvoker(String name, int flags, final Class<?> rtype, final Class<?>... ptypes) {
+        return bootstrap(MethodHandles.publicLookup(), name, MethodType.methodType(rtype, ptypes), flags).dynamicInvoker();
+    }
+
+    public static MethodHandle createDynamicCallInvoker(final Class<?> rtype, final Class<?>... ptypes) {
+        return createDynamicInvoker("", CALL, rtype, ptypes);
+    }
 
     public static CallSite bootstrap(MethodHandles.Lookup lookup, String name, MethodType type, int flags) {
         return dynamicLinker.link(
@@ -79,7 +97,7 @@ public class Bootstrap {
         return OPERATIONS[flags].named(name);
     }
 
-    public static Call staticCallNoLookup(final Class<?> clazz, final String name, final Class<?> rtype, final Class<?> ...ptypes) {
+    public static Call staticCallNoLookup(final Class<?> clazz, final String name, final Class<?> rtype, final Class<?>... ptypes) {
         return staticCallNoLookup(p(clazz), name, sig(rtype, ptypes));
     }
 
@@ -131,6 +149,7 @@ public class Bootstrap {
         }
 
         protected abstract MethodVisitor get(Code code);
+
         protected abstract void put(Code code);
     }
 

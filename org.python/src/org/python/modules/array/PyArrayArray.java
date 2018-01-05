@@ -342,7 +342,6 @@ public class PyArrayArray extends PyObject implements BufferProtocol {
         return this;
     }
 
-    @Override
     @ExposedMethod
     public PyObject __add__(PyObject other) {
         if (!(other instanceof PyArrayArray)) {
@@ -356,7 +355,6 @@ public class PyArrayArray extends PyObject implements BufferProtocol {
         return ret;
     }
 
-    @Override
     @ExposedMethod
     public PyObject __iadd__(PyObject other) {
         if (!(other instanceof PyArrayArray)) {

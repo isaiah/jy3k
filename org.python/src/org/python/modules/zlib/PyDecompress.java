@@ -96,7 +96,7 @@ public class PyDecompress extends PyObject {
                         unconsumed_tail = new PyBytes(input, input.length - remaining, input.length);
                     }
                 } else {
-                    unused_data = unused_data.__add__(new PyBytes(input, input.length - remaining, input.length));
+                    unused_data = unused_data._add(new PyBytes(input, input.length - remaining, input.length));
                 }
             }
             if (totalLen == 0) {
@@ -149,7 +149,7 @@ public class PyDecompress extends PyObject {
             }
             int remaining = inflater.getRemaining();
             if (input.length > 0 && remaining > 0) {
-                unused_data = unused_data.__add__(new PyBytes(input, input.length - remaining, input.length));
+                unused_data = unused_data._add(new PyBytes(input, input.length - remaining, input.length));
             }
             return new PyBytes(buf, 0, totalLen);
         } catch (DataFormatException e) {

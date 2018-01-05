@@ -357,13 +357,8 @@ public class PyComplex extends PyObject {
         throw Py.TypeError("xxx");
     }
 
-    @Override
-    public PyObject __add__(PyObject right) {
-        return complex___add__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___add___doc)
-    final PyObject complex___add__(PyObject right) {
+    public final PyObject __add__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
@@ -371,13 +366,8 @@ public class PyComplex extends PyObject {
         return new PyComplex(real + c.real, imag + c.imag);
     }
 
-    @Override
-    public PyObject __radd__(PyObject left) {
-        return complex___radd__(left);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___radd___doc)
-    final PyObject complex___radd__(PyObject left) {
+    public final PyObject __radd__(PyObject left) {
         return __add__(left);
     }
 

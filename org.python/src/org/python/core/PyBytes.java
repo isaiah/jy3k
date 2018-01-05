@@ -564,7 +564,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return repeat(o.asIndex(Py.OverflowError));
     }
 
-    @Override
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytes___add___doc)
     public PyObject __add__(PyObject other) {
         String otherStr = Encoding.asStringOrNull(other);

@@ -441,28 +441,13 @@ public class PyFloat extends PyObject {
         }
     }
 
-    @Override
-    public PyObject __add__(PyObject right) {
-        return float___add__(right);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___add___doc)
-    final PyObject float___add__(PyObject right) {
+    @ExposedMethod(names = {"__add__", "__radd__"}, type = MethodType.BINARY, doc = BuiltinDocs.float___add___doc)
+    public final PyObject __add__(PyObject right) {
         if (!canCoerce(right)) {
             return Py.NotImplemented;
         }
         double rightv = coerce(right);
         return new PyFloat(getValue() + rightv);
-    }
-
-    @Override
-    public PyObject __radd__(PyObject left) {
-        return float___radd__(left);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___radd___doc)
-    final PyObject float___radd__(PyObject left) {
-        return __add__(left);
     }
 
     @Override

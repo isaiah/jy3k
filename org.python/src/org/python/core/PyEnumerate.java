@@ -73,7 +73,7 @@ public class PyEnumerate extends PyIterator {
         }
 
         PyObject next = new PyTuple(index, nextItem);
-        index = index.__radd__(Py.newInteger(1));
+        index = index._add(Py.newInteger(1));
 
         return next;
     }

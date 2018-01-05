@@ -209,13 +209,8 @@ public class PyTuple extends PySequenceList implements List {
         return super.__le__(o);
     }
 
-    @Override
-    public PyObject __add__(PyObject generic_other) {
-        return tuple___add__(generic_other);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___add___doc)
-    final PyObject tuple___add__(PyObject generic_other) {
+    public final PyObject __add__(PyObject generic_other) {
         PyTuple sum = null;
         if (generic_other instanceof PyTuple) {
             PyTuple other = (PyTuple) generic_other;

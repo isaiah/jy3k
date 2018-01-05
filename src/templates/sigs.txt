@@ -42,9 +42,6 @@ __del__
 ,__abs__ 
 ,__invert__
  
-,__add__ o
-,__radd__ o
-,__iadd__ o
 ,__sub__ o
 ,__rsub__ o
 ,__isub__ o

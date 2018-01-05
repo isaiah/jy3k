@@ -568,13 +568,8 @@ public class PyDeque extends PyObject implements Traverseproc {
         return __finditem__(i).richCompare(o.__finditem__(i), CompareOp.GE);
     }
 
-    @Override
-    public synchronized PyObject __iadd__(PyObject o) {
-        return deque___iadd__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___iadd__(PyObject o) {
+    public final synchronized PyObject __iadd__(PyObject o) {
         deque_extend(o);
         return this;
     }

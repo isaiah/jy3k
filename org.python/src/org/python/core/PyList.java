@@ -332,11 +332,6 @@ public class PyList extends PySequenceList implements List {
         return repeat(o.asIndex(Py.OverflowError));
     }
 
-    @Override
-    public PyObject __add__(PyObject o) {
-        return list___add__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___add___doc)
     public final synchronized PyObject list___add__(PyObject o) {
         PyList sum = null;
@@ -363,12 +358,6 @@ public class PyList extends PySequenceList implements List {
         return sum;
     }
 
-    @Override
-    public PyObject __radd__(PyObject o) {
-        return list___radd__(o);
-    }
-
-    //XXX: needs __doc__
     @ExposedMethod(type = MethodType.BINARY)
     public final synchronized PyObject list___radd__(PyObject o) {
         // Support adding java.util.List, but prevent adding PyTuple.
@@ -675,11 +664,6 @@ public class PyList extends PySequenceList implements List {
             }
         }
         gListAllocatedStatus = list.size();
-    }
-
-    @Override
-    public PyObject __iadd__(PyObject o) {
-        return list___iadd__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___iadd___doc)

@@ -596,26 +596,16 @@ public class PyLong extends PyObject {
         }
     }
 
-    @Override
-    public PyObject __add__(PyObject right) {
-        return int___add__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___add___doc)
-    public final PyObject int___add__(PyObject right) {
+    public final PyObject __add__(PyObject right) {
         if (!canCoerce(right)) {
             return Py.NotImplemented;
         }
         return Py.newLong(getValue().add(coerce(right)));
     }
 
-    @Override
-    public PyObject __radd__(PyObject left) {
-        return int___radd__(left);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___radd___doc)
-    public final PyObject int___radd__(PyObject left) {
+    public final PyObject __radd__(PyObject left) {
         return __add__(left);
     }
 
