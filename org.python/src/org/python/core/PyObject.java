@@ -42,8 +42,8 @@ public class PyObject implements Serializable {
     private static final InvokeByName truediv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName rtruediv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName itruediv = new InvokeByName("__itruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName floordiv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rfloordiv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName floordiv = new InvokeByName("__floordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName rfloordiv = new InvokeByName("__rfloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName ifloordiv = new InvokeByName("__ifloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName mod = new InvokeByName("__mod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName pow = new InvokeByName("__pow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
