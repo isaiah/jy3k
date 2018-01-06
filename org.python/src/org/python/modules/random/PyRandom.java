@@ -48,7 +48,7 @@ public class PyRandom extends PyObject {
         }
         if (seed instanceof PyLong) {
             PyLong max = new PyLong(Long.MAX_VALUE);
-            n = seed.__mod__(max).asLong();
+            n = seed._mod(max).asLong();
         } else {
             n = seed.hashCode();
         }

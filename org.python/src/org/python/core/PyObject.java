@@ -46,6 +46,10 @@ public class PyObject implements Serializable {
     private static final InvokeByName rfloordiv = new InvokeByName("__rfloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName ifloordiv = new InvokeByName("__ifloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName mod = new InvokeByName("__mod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName rmod = new InvokeByName("__rmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName imod = new InvokeByName("__imod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName pow = new InvokeByName("__pow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     /**
      * Primitives classes their wrapper classes.
@@ -2046,42 +2050,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __mod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the mod, or null if this operation
-     * is not defined
-     **/
-    public PyObject __mod__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rmod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the mod, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rmod__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __imod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the imod, or null if this operation
-     * is not defined
-     **/
-    public PyObject __imod__(PyObject other) {
-        return null;
-    }
-
-    /**
      * Implements the Python expression <code>this % o2</code>
      *
      * @param o2 the object to perform this binary operation with.
@@ -2090,33 +2058,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _mod(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_mod(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__mod__", "__rmod__", "%");
-    }
-
-    /**
-     * Implements the Python expression <code>this % o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the mod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_mod(PyObject o2) {
-        PyObject x = __mod__(o2);
-        if (x != null) {
-            return x;
-        }
-        x = o2.__rmod__(this);
-        if (x != null) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("%", o2));
+        return binOp(mod, rmod, o2);
     }
 
     /**
@@ -2129,73 +2071,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _imod(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_imod(o2);
-        }
-        PyObject impl = t1.lookup("__imod__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__mod__", "__rmod__", "%");
-    }
-
-    /**
-     * Implements the Python expression <code>this %= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the imod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_imod(PyObject o2) {
-        PyObject x = __imod__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_mod(o2);
-    }
-
-    /**
-     * Equivalent to the standard Python __divmod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the divmod, or null if this operation
-     * is not defined
-     **/
-    public PyObject __divmod__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __rdivmod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the left-hand operand).
-     * @return the result of the divmod, or null if this operation
-     * is not defined.
-     **/
-    public PyObject __rdivmod__(PyObject other) {
-        return null;
-    }
-
-    /**
-     * Equivalent to the standard Python __idivmod__ method
-     *
-     * @param other the object to perform this binary operation with
-     *              (the right-hand operand).
-     * @return the result of the idivmod, or null if this operation
-     * is not defined
-     **/
-    public PyObject __idivmod__(PyObject other) {
-        return null;
+        return inplaceBinOp(imod, mod, rmod, o2);
     }
 
     /**
@@ -2207,76 +2083,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _divmod(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_divmod(o2);
-        }
-        return _binop_rule(t1, o2, t2, "__divmod__", "__rdivmod__", "divmod");
-    }
-
-    /**
-     * Implements the Python expression <code>this divmod o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the divmod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_divmod(PyObject o2) {
-        PyObject x = __divmod__(o2);
-        if (x != null) {
-            return x;
-        }
-        x = o2.__rdivmod__(this);
-        if (x != null) {
-            return x;
-        }
-        throw Py.TypeError(_unsupportedop("divmod", o2));
-    }
-
-    /**
-     * Implements the Python expression <code>this divmod= o2</code>
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the idivmod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    public final PyObject _idivmod(PyObject o2) {
-        PyType t1 = this.getType();
-        PyType t2 = o2.getType();
-        if (t1 == t2 || t1.builtin && t2.builtin) {
-            return this._basic_idivmod(o2);
-        }
-        PyObject impl = t1.lookup("__idivmod__");
-        if (impl != null) {
-            PyObject res = impl.__get__(this, t1).__call__(o2);
-            if (res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        return _binop_rule(t1, o2, t2, "__divmod__", "__rdivmod__", "divmod");
-    }
-
-    /**
-     * Implements the Python expression <code>this divmod= o2</code>
-     * when this and o2 have the same type or are builtin types.
-     *
-     * @param o2 the object to perform this inplace binary
-     *           operation with.
-     * @return the result of the idivmod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    final PyObject _basic_idivmod(PyObject o2) {
-        PyObject x = __idivmod__(o2);
-        if (x != null) {
-            return x;
-        }
-        return this._basic_divmod(o2);
+        return binOp(divmod, rdivmod, o2);
     }
 
     /**

@@ -496,22 +496,12 @@ public class PyComplex extends PyObject {
         return _div(coerce(left), this);
     }
 
-    @Override
-    public PyObject __mod__(PyObject right) {
-        return complex___mod__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___mod___doc)
     final PyObject complex___mod__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
         return _mod(this, coerce(right));
-    }
-
-    @Override
-    public PyObject __rmod__(PyObject left) {
-        return complex___rmod__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rmod___doc)
@@ -532,22 +522,12 @@ public class PyComplex extends PyObject {
         return value.__sub__(z.__mul__(right));
     }
 
-    @Override
-    public PyObject __divmod__(PyObject right) {
-        return complex___divmod__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___divmod___doc)
     final PyObject complex___divmod__(PyObject right) {
         if (!canCoerce(right)) {
             return null;
         }
         return _divmod(this, coerce(right));
-    }
-
-    @Override
-    public PyObject __rdivmod__(PyObject left) {
-        return complex___rdivmod__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rdivmod___doc)

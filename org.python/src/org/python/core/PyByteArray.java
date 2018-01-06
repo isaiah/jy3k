@@ -922,27 +922,21 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return repeat(n.asIndex(Py.OverflowError));
     }
 
-    @Override
-    public PyObject __mod__(PyObject other) {
-        return bytearray___mod__(other);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___mod___doc)
-    public final PyObject bytearray___mod__(PyObject other) {
+    public final PyObject __mod__(PyObject other) {
         StringFormatter fmt = new StringFormatter(asString(), false);
         return new PyByteArray(fmt.format(other));
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bytearray___rmod___doc)
-    public final PyObject bytearray___rmod__(PyObject other) {
+    public final PyObject __rmod__(PyObject other) {
         if (other instanceof PyByteArray) {
-            return other.__mod__(this);
+            return ((PyByteArray) other).__mod__(this);
         } else if (other instanceof PyUnicode) {
             return Py.NotImplemented;
         }
         throw Py.TypeError(String.format("unsupported operand type(s) for %%: '%s' and 'bytes'", other.getType().fastGetName()));
     }
-
 
     @ExposedClassMethod(doc = BuiltinDocs.bytearray_maketrans_doc)
     public final static PyObject bytearray_maketrans(PyType type, PyObject from, PyObject to) {

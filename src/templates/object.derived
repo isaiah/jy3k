@@ -13,16 +13,14 @@ unary1: __abs__
 unary1: __invert__
 unary1: __reduce__
 unary1: __dir__
-binary: __mod__ __rmod__ \
-  __divmod__ __rdivmod__ \
-  __rpow__ \
+binary: __rpow__ \
   __lshift__ __rlshift__ \
   __rshift__ __rrshift__ \
   __and__ __rand__ \
   __or__ __ror__  \
   __xor__ __rxor__ \
   __format__
-ibinary: __imod__ \
+ibinary:
   __ipow__ \
   __ilshift__ \
   __irshift__ \

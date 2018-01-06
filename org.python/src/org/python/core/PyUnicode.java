@@ -449,7 +449,6 @@ public class PyUnicode extends PySequence implements Iterable {
         return Encoding.atocx(encodeDecimal());
     }
 
-    @Override
     public PyObject __mod__(PyObject other) {
         return str___mod__(other);
     }

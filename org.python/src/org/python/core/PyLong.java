@@ -704,11 +704,6 @@ public class PyLong extends PyObject {
         return x.subtract(xdivy.multiply(y));
     }
 
-    @Override
-    public PyObject __mod__(PyObject right) {
-        return int___mod__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___mod___doc)
     public final PyObject int___mod__(PyObject right) {
         if (!canCoerce(right)) {
@@ -716,11 +711,6 @@ public class PyLong extends PyObject {
         }
         BigInteger rightv = coerce(right);
         return Py.newLong(modulo(getValue(), rightv, divide(getValue(), rightv)));
-    }
-
-    @Override
-    public PyObject __rmod__(PyObject left) {
-        return int___rmod__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rmod___doc)
@@ -732,11 +722,6 @@ public class PyLong extends PyObject {
         return Py.newLong(modulo(leftv, getValue(), divide(leftv, getValue())));
     }
 
-    @Override
-    public PyObject __divmod__(PyObject right) {
-        return int___divmod__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___divmod___doc)
     public final PyObject int___divmod__(PyObject right) {
         if (!canCoerce(right)) {
@@ -746,11 +731,6 @@ public class PyLong extends PyObject {
 
         BigInteger xdivy = divide(getValue(), rightv);
         return new PyTuple(Py.newLong(xdivy), Py.newLong(modulo(getValue(), rightv, xdivy)));
-    }
-
-    @Override
-    public PyObject __rdivmod__(PyObject left) {
-        return int___rdivmod__(left);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rdivmod___doc)

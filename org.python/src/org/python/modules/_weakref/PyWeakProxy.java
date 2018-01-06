@@ -48,28 +48,4 @@ public class PyWeakProxy extends AbstractReference {
 
     public boolean __contains__(PyObject o) { return py().__contains__(o); }
     public PyObject __index__() { return py().__index__(); }
-
-    public PyObject __mod__(PyObject o) { return py().__mod__(o); }
-    public PyObject __rmod__(PyObject o) { return py().__rmod__(o); }
-    public PyObject __imod__(PyObject o) { return py().__imod__(o); }
-    public PyObject __divmod__(PyObject o) { return py().__divmod__(o); }
-    public PyObject __rdivmod__(PyObject o) { return py().__rdivmod__(o);}
-    public PyObject __pow__(PyObject o) { return py().__pow__(o); }
-    public PyObject __rpow__(PyObject o) { return py().__rpow__(o); }
-    public PyObject __ipow__(PyObject o) { return py().__ipow__(o); }
-    public PyObject __lshift__(PyObject o) { return py().__lshift__(o); }
-    public PyObject __rlshift__(PyObject o) { return py().__rlshift__(o);}
-    public PyObject __ilshift__(PyObject o) { return py().__ilshift__(o);}
-    public PyObject __rshift__(PyObject o) { return py().__rshift__(o); }
-    public PyObject __rrshift__(PyObject o) { return py().__rrshift__(o);}
-    public PyObject __irshift__(PyObject o) { return py().__irshift__(o);}
-    public PyObject __and__(PyObject o) { return py().__and__(o); }
-    public PyObject __rand__(PyObject o) { return py().__rand__(o); }
-    public PyObject __iand__(PyObject o) { return py().__iand__(o); }
-    public PyObject __or__(PyObject o) { return py().__or__(o); }
-    public PyObject __ror__(PyObject o) { return py().__ror__(o); }
-    public PyObject __ior__(PyObject o) { return py().__ior__(o); }
-    public PyObject __xor__(PyObject o) { return py().__xor__(o); }
-    public PyObject __rxor__(PyObject o) { return py().__rxor__(o); }
-    public PyObject __ixor__(PyObject o) { return py().__ixor__(o); }
 }

@@ -560,11 +560,6 @@ public class PyFloat extends PyObject {
         }
     }
 
-    @Override
-    public PyObject __mod__(PyObject right) {
-        return float___mod__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___mod___doc)
     final PyObject float___mod__(PyObject right) {
         if (!canCoerce(right)) {
@@ -574,11 +569,6 @@ public class PyFloat extends PyObject {
         return new PyFloat(modulo(getValue(), rightv));
     }
 
-    @Override
-    public PyObject __rmod__(PyObject left) {
-        return float___rmod__(left);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rmod___doc)
     final PyObject float___rmod__(PyObject left) {
         if (!canCoerce(left)) {
@@ -586,11 +576,6 @@ public class PyFloat extends PyObject {
         }
         double leftv = coerce(left);
         return new PyFloat(modulo(leftv, getValue()));
-    }
-
-    @Override
-    public PyObject __divmod__(PyObject right) {
-        return float___divmod__(right);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___divmod___doc)
@@ -608,7 +593,6 @@ public class PyFloat extends PyObject {
         return new PyTuple(new PyFloat(z), new PyFloat(getValue() - z * rightv));
     }
 
-    @Override
     public PyObject __rdivmod__(PyObject left) {
         if (!canCoerce(left)) {
             return null;
