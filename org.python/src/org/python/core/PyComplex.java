@@ -601,11 +601,6 @@ public class PyComplex extends PyObject {
         return _pow(this, coerce(right));
     }
 
-    @Override
-    public PyObject __rpow__(PyObject left) {
-        return complex___rpow__(left);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.complex___rpow___doc)
     final PyObject complex___rpow__(PyObject left) {
         if (!canCoerce(left)) {

@@ -637,7 +637,6 @@ public class PyFloat extends PyObject {
         return __rpow__(left);
     }
 
-    @Override
     public PyObject __rpow__(PyObject left) {
         if (!canCoerce(left)) {
             return null;

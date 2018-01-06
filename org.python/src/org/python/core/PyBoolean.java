@@ -99,11 +99,6 @@ public class PyBoolean extends PyLong {
         return super.__tojava__(c);
     }
 
-    @Override
-    public PyObject __and__(PyObject right) {
-        return bool___and__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bool___and___doc)
     final PyObject bool___and__(PyObject right) {
     	if (right instanceof PyBoolean) {
@@ -115,11 +110,6 @@ public class PyBoolean extends PyLong {
 	    }
     }
 
-    @Override
-    public PyObject __xor__(PyObject right) {
-        return bool___xor__(right);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bool___xor___doc)
     final PyObject bool___xor__(PyObject right) {
     	if (right instanceof PyBoolean) {
@@ -129,11 +119,6 @@ public class PyBoolean extends PyLong {
         } else {
 	    	return null;
 	    }
-    }
-
-    @Override
-    public PyObject __or__(PyObject right) {
-        return bool___or__(right);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.bool___or___doc)

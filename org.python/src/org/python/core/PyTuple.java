@@ -173,41 +173,6 @@ public class PyTuple extends PySequenceList implements List {
         return size();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.tuple___contains___doc)
-    final boolean tuple___contains__(PyObject o) {
-        return super.__contains__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___ne___doc)
-    final PyObject tuple___ne__(PyObject o) {
-        return super.__ne__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___eq___doc)
-    final PyObject tuple___eq__(PyObject o) {
-        return super.__eq__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___gt___doc)
-    final PyObject tuple___gt__(PyObject o) {
-        return super.__gt__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___ge___doc)
-    final PyObject tuple___ge__(PyObject o) {
-        return super.__ge__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___lt___doc)
-    final PyObject tuple___lt__(PyObject o) {
-        return super.__lt__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___le___doc)
-    final PyObject tuple___le__(PyObject o) {
-        return super.__le__(o);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___add___doc)
     public final PyObject __add__(PyObject generic_other) {
         PyTuple sum = null;

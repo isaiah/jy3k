@@ -144,10 +144,6 @@ public class PySet extends BaseSet {
         return baseset___reduce__();
     }
 
-    public PyObject __ior__(PyObject other) {
-        return set___ior__(other);
-    }
-
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ior___doc)
     public final PyObject set___ior__(PyObject other) {
         if (!(other instanceof BaseSet)) {
@@ -155,10 +151,6 @@ public class PySet extends BaseSet {
         }
         _set.addAll(((BaseSet)other)._set);
         return this;
-    }
-
-    public PyObject __ixor__(PyObject other) {
-        return set___ixor__(other);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ixor___doc)

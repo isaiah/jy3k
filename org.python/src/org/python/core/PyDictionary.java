@@ -752,21 +752,11 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return dict_view___le__(otherObj);
         }
 
-        @Override
-        public PyObject __or__(PyObject otherObj) {
-            return dict_keys___or__(otherObj);
-        }
-
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___or___doc)
         final PyObject dict_keys___or__(PyObject otherObj) {
             PySet result = new PySet(dvDict);
             result.set_update(new PyObject[]{otherObj}, new String[]{});
             return result;
-        }
-
-        @Override
-        public PyObject __xor__(PyObject otherObj) {
-            return dict_keys___xor__(otherObj);
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___xor___doc)
@@ -781,11 +771,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             PySet result = new PySet(dvDict);
             result.set_difference_update(new PyObject[]{otherObj}, new String[]{});
             return result;
-        }
-
-        @Override
-        public PyObject __and__(PyObject otherObj) {
-            return dict_keys___and__(otherObj);
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___and___doc)
@@ -859,21 +844,11 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return dict_view___le__(otherObj);
         }
 
-        @Override
-        public PyObject __or__(PyObject otherObj) {
-            return dict_items___or__(otherObj);
-        }
-
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___or___doc)
         public final PyObject dict_items___or__(PyObject otherObj) {
             PySet result = new PySet(dvDict.dict_iteritems());
             result.set_update(new PyObject[]{otherObj}, new String[]{});
             return result;
-        }
-
-        @Override
-        public PyObject __xor__(PyObject otherObj) {
-            return dict_items___xor__(otherObj);
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___xor___doc)
@@ -888,11 +863,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             PySet result = new PySet(dvDict.dict_iteritems());
             result.set_difference_update(new PyObject[]{otherObj}, new String[]{});
             return result;
-        }
-
-        @Override
-        public PyObject __and__(PyObject otherObj) {
-            return dict_items___and__(otherObj);
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___and___doc)

@@ -63,17 +63,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         return set;
     }
 
-    /**
-     * The union of <code>this</code> with <code>other</code>. <p/> <br/> (I.e. all elements
-     * that are in either set)
-     *
-     * @param other A <code>BaseSet</code> instance.
-     * @return The union of the two sets as a new set.
-     */
-    public PyObject __or__(PyObject other) {
-        return baseset___or__(other);
-    }
-
     final PyObject baseset___or__(PyObject other) {
         if (!(other instanceof BaseSet)) {
             return null;
@@ -133,19 +122,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             }
         }
         return o;
-    }
-
-    /**
-     * The symmetric difference of the <code>this</code> with <code>other</code>.
-     * <p/>
-     * <br/>
-     * (I.e. all elements that are in exactly one of the sets)
-     *
-     * @param other A <code>BaseSet</code> instance.
-     * @return The symmetric difference of the two sets as a new set.
-     */
-    public PyObject __xor__(PyObject other) {
-        return baseset___xor__(other);
     }
 
     final PyObject baseset___xor__(PyObject other) {
