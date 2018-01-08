@@ -154,7 +154,7 @@ public class PyUnicode extends PySequence implements Iterable {
      * @param string  UTF-16 string encoding the characters (as Java).
      * @param isBasic true if it is known that only BMP characters are present.
      */
-    private PyUnicode(PyType subtype, String string, boolean isBasic) {
+    public PyUnicode(PyType subtype, String string, boolean isBasic) {
         super(subtype);
         this.string = string;
         translator = isBasic ? BASIC : this.chooseIndexTranslator();

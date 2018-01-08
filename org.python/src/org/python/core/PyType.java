@@ -79,6 +79,9 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     /** Whether this type allows subclassing. */
     private boolean isBaseType = true;
 
+    /** To be used as the key to access the strings in BuiltinDocs.java */
+    protected String docKey;
+
     /** Whether this type has a __dict__. */
     protected boolean needs_userdict;
 
@@ -551,22 +554,16 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         TypeBuilder builder = classToBuilder.get(underlying_class);
         name = builder.getName();
         dict = builder.getDict(this);
-        String doc = builder.getDoc();
-        // XXX: Can't create a __doc__ str until the PyUnicode types are
-        // created
+        docKey = builder.getDoc();
         if (dict.__finditem__("__doc__") == null) {
             PyObject docObj;
-            if (doc != null) {
-                docObj = new PyUnicode(doc, true);
-                // PyUnicode.TYPE is initializing, cannot use PyObject.setType,
-                // as this is not yet fully initialized
-                if (underlying_class == PyUnicode.class) docObj.objtype = this;
-            } else {
-                // XXX: Hack: Py.None may be null during bootstrapping. Most types
-                // encountered then should have docstrings anyway
-                docObj = Py.None == null ? new PyBytes() : Py.None;
+            if (docKey != null) {
+                docObj = new PyUnicode(this, docKey, true);
+                dict.__setitem__("__doc__", docObj);
             }
-            dict.__setitem__("__doc__", docObj);
+            if (Py.None != null) {
+                dict.__setitem__("__doc__", Py.None);
+            }
         }
         setIsBaseType(builder.getIsBaseType());
         needs_userdict = dict.__finditem__("__dict__") != null;
