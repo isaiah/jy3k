@@ -11,7 +11,6 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyArray;
 import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
@@ -666,10 +665,10 @@ public class PySocket extends PyObject {
         try {
             switch (opt) {
                 case SO_REUSEADDR:
-                    ch.setOption(SO_REUSEADDR, value.__bool__());
+                    ch.setOption(SO_REUSEADDR, value.isTrue());
                     break;
                 case SO_REUSEPORT:
-                    ch.setOption(SO_REUSEPORT, value.__bool__());
+                    ch.setOption(SO_REUSEPORT, value.isTrue());
                     break;
                 default:
                     break;

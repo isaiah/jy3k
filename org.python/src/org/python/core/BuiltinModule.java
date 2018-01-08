@@ -12,8 +12,6 @@ import org.python.core.stringlib.IntegerFormatter;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
 
-import java.util.Arrays;
-
 /**
  * The builtin module. All builtin functions are defined here
  */
@@ -145,7 +143,7 @@ public class BuiltinModule {
             throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
         }
         for (PyObject item : iter.asIterable()) {
-            if (!item.__bool__()) {
+            if (!item.isTrue()) {
                 return Py.False;
             }
         }
@@ -158,7 +156,7 @@ public class BuiltinModule {
             throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
         }
         for (PyObject item : iter.asIterable()) {
-            if (item.__bool__()) {
+            if (item.isTrue()) {
                 return Py.True;
             }
         }
@@ -197,7 +195,7 @@ public class BuiltinModule {
         String filename = ap.getString(1);
         String mode = ap.getString(2);
         int flags = ap.getInt(3, 0);
-        boolean dont_inherit = ap.getPyObject(4, Py.False).__bool__();
+        boolean dont_inherit = ap.getPyObject(4, Py.False).isTrue();
         int optimize= ap.getInt(5, -1);
         return compile(source, filename, mode, flags, dont_inherit);
     }
@@ -359,10 +357,10 @@ public class BuiltinModule {
         PyList list = new PyList();
         for (PyObject item : seq.asIterable()) {
             if (func == PyBoolean.TYPE || func == Py.None) {
-                if (!item.__bool__()) {
+                if (!item.isTrue()) {
                     continue;
                 }
-            } else if (!func.__call__(item).__bool__()) {
+            } else if (!func.__call__(item).isTrue()) {
                 continue;
             }
             list.append(item);
@@ -381,10 +379,10 @@ public class BuiltinModule {
         StringBuilder builder = new StringBuilder();
         for (PyObject item : seq.asIterable()) {
             if (func == Py.None) {
-                if (!item.__bool__()) {
+                if (!item.isTrue()) {
                     continue;
                 }
-            } else if (!func.__call__(item).__bool__()) {
+            } else if (!func.__call__(item).isTrue()) {
                 continue;
             }
             if (!Py.isInstance(item, stringType)) {
@@ -413,10 +411,10 @@ public class BuiltinModule {
         for (int i = 0; i < len; i++) {
             item = seq.__finditem__(i);
             if (func == Py.None) {
-                if (!item.__bool__()) {
+                if (!item.isTrue()) {
                     continue;
                 }
-            } else if (!func.__call__(item).__bool__()) {
+            } else if (!func.__call__(item).isTrue()) {
                 continue;
             }
             list.append(item);
@@ -1048,7 +1046,7 @@ public class BuiltinModule {
             } else {
                 itemKey = key.__call__(item);
             }
-            if (maxKey == null || itemKey.richCompare(maxKey, op).__bool__()) {
+            if (maxKey == null || itemKey.richCompare(maxKey, op).isTrue()) {
                 maxKey = itemKey;
                 max = item;
             }

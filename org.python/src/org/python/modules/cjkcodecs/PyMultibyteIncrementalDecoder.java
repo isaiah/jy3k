@@ -15,7 +15,7 @@ public class PyMultibyteIncrementalDecoder extends PyObject {
     public final PyObject MultibyteIncrementalDecoder_decode(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("decode", args, keywords, "input", "final");
         PyObject input = ap.getPyObject(0);
-        boolean final_ = ap.getPyObject(1, Py.False).__bool__();
+        boolean final_ = ap.getPyObject(1, Py.False).isTrue();
         return Py.None;
     }
 }

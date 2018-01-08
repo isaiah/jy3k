@@ -7,8 +7,6 @@ import org.python.modules.zipimport.ZipImportModule;
 import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 
 /**
  * The builtin Exceptions module. The entire module should be imported from
@@ -358,9 +356,9 @@ public class Exceptions {
         PyObject strerror = self.__findattr__("strerror");
         PyObject filename = self.__findattr__("filename");
         String result;
-        if (filename != null && filename.__bool__()) {
+        if (filename != null && filename.isTrue()) {
             result = String.format("[Errno %s] %s: %s", errno, strerror, filename.__repr__());
-        } else if (errno != null && strerror != null && errno.__bool__() && strerror.__bool__()) {
+        } else if (errno != null && strerror != null && errno.isTrue() && strerror.isTrue()) {
             result = String.format("[Errno %s] %s", errno, strerror);
         } else {
             return ((PyBaseException) self).BaseException_toString();

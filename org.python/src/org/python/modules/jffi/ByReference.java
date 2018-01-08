@@ -23,7 +23,7 @@ public final class ByReference extends PyObject implements Pointer {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return !getMemory().isNull();
     }
 }

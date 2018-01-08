@@ -417,7 +417,7 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
         } else if (obj instanceof PyBytes) {
             PyBytes s = (PyBytes)obj;
             return s.toString().charAt(0);
-        } else if (obj.__bool__()) {
+        } else if (obj.isTrue()) {
             return obj.asInt();
         } else {
             return -1;

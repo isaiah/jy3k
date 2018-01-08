@@ -36,7 +36,7 @@ public class PyIncrementalNewlineDecoder extends PyObject {
     public void __init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("__init__", args, keywords, "decoder", "translate", "errors");
         decoder = ap.getPyObject(0);
-        translate = ap.getPyObject(1).__bool__();
+        translate = ap.getPyObject(1).isTrue();
         errors = ap.getPyObject(2, null);
         if (errors == null) {
             errors = new PyUnicode("strict");

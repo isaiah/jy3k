@@ -140,14 +140,14 @@ public class PyRawIOBase extends PyIOBase {
         // Quite often, a single read operation will do the trick
         PyObject prev = readMethod.__call__(new PyLong(_io.DEFAULT_BUFFER_SIZE));
 
-        if (!prev.__bool__()) {
+        if (!prev.isTrue()) {
             // Nothing on the first read: that means we're done
             return prev;
 
         } else {
             // Try a second read
             PyObject curr = readMethod.__call__(new PyLong(_io.DEFAULT_BUFFER_SIZE));
-            if (!curr.__bool__()) {
+            if (!curr.isTrue()) {
                 // Nothing on the second read: the result is just the first one
                 return prev;
 
@@ -160,7 +160,7 @@ public class PyRawIOBase extends PyIOBase {
                 do {
                     list.add(curr);
                     curr = readMethod.__call__(new PyLong(_io.DEFAULT_BUFFER_SIZE));
-                } while (curr.__bool__());
+                } while (curr.isTrue());
 
                 // Stitch it all together
                 return Py.EmptyByte.bytes_join(list);

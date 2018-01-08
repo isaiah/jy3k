@@ -42,10 +42,10 @@ public class PyFilter extends PyObject {
         while(seq.hasNext()) {
             PyObject item = seq.next();
             if (func == PyBoolean.TYPE || func == Py.None) {
-                if (!item.__bool__()) {
+                if (!item.isTrue()) {
                     continue;
                 }
-            } else if (!func.__call__(item).__bool__()) {
+            } else if (!func.__call__(item).isTrue()) {
                 continue;
             }
             return item;

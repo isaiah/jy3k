@@ -1,6 +1,13 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.modules;
 
+import org.python.annotations.ExposedFunction;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
+import org.python.annotations.ModuleInit;
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.CompareOp;
 import org.python.core.Py;
@@ -16,17 +23,10 @@ import org.python.core.ThreadState;
 import org.python.core.Traverseproc;
 import org.python.core.Untraversable;
 import org.python.core.Visitproc;
-import org.python.annotations.ExposedFunction;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedModule;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
-import org.python.annotations.ModuleInit;
 
 @Untraversable
 @ExposedModule(name = "_operator")
-public class operator
-{
+public class operator {
     @ExposedFunction(names = {"add", "concat"})
     public static PyObject add(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1._add(ts, arg2);
@@ -79,27 +79,27 @@ public class operator
 
     @ExposedFunction(names = {"inv", "invert"})
     public static PyObject inv(ThreadState ts, PyObject arg) {
-        return arg.__invert__();
+        return Abstract.PyNumber_Invert(ts, arg);
     }
 
     @ExposedFunction
     public static PyObject neg(ThreadState ts, PyObject arg) {
-        return arg.__neg__();
+        return Abstract.PyNumber_Negative(ts, arg);
     }
 
     @ExposedFunction
     public static PyObject not_(ThreadState ts, PyObject arg) {
-        return arg.__not__();
+        return Abstract.PyObject_Not(ts, arg);
     }
 
     @ExposedFunction
     public static PyObject pos(ThreadState ts, PyObject arg) {
-        return arg.__pos__();
+        return Abstract.PyNumber_Positive(ts, arg);
     }
 
     @ExposedFunction
     public static boolean truth(ThreadState ts, PyObject arg) {
-        return arg.__bool__();
+        return Abstract.PyObject_IsTrue(ts, arg);
     }
 
     @ExposedFunction
@@ -286,7 +286,7 @@ public class operator
         int count = 0;
 
         for (PyObject tmp : seq.asIterable()) {
-            if (item.richCompare(tmp, CompareOp.EQ).__bool__()) {
+            if (item.richCompare(tmp, CompareOp.EQ).isTrue()) {
                 count++;
             }
         }
@@ -298,11 +298,24 @@ public class operator
         int i = 0;
         PyObject iter = seq.__iter__();
         for (PyObject tmp = null; (tmp = iter.__next__()) != null; i++) {
-            if (item.richCompare(tmp, CompareOp.EQ).__bool__()) {
+            if (item.richCompare(tmp, CompareOp.EQ).isTrue()) {
                 return i;
             }
         }
         throw Py.ValueError("sequence.index(x): x not in list");
+    }
+
+    private static String ensureStringAttribute(PyObject name) {
+        String nameStr;
+        if (name instanceof PyUnicode) {
+            nameStr = ((PyUnicode) name).encode();
+        } else if (name instanceof PyBytes) {
+            nameStr = name.asString();
+        } else {
+            throw Py.TypeError(String.format("attribute name must be string, not '%.200s'",
+                    name.getType().fastGetName()));
+        }
+        return nameStr;
     }
 
     /**
@@ -368,7 +381,7 @@ public class operator
         public int traverse(Visitproc visit, Object arg) {
             if (attrs != null) {
                 int retVal;
-                for (PyObject ob: attrs) {
+                for (PyObject ob : attrs) {
                     if (ob != null) {
                         retVal = visit.visit(ob, arg);
                         if (retVal != 0) {
@@ -385,7 +398,7 @@ public class operator
             if (ob == null || attrs == null) {
                 return false;
             }
-            for (PyObject obj: attrs) {
+            for (PyObject obj : attrs) {
                 if (obj == ob) {
                     return true;
                 }
@@ -417,11 +430,6 @@ public class operator
             return new PyItemGetter(args);
         }
 
-        @Override
-        public PyObject __call__(PyObject[] args, String[] keywords) {
-            return itemgetter___call__(args, keywords);
-        }
-
         @ExposedMethod
         final PyObject itemgetter___call__(PyObject[] args, String[] keywords) {
             ArgParser ap = new ArgParser("itemgetter", args, Py.NoKeywords, "obj");
@@ -437,7 +445,12 @@ public class operator
                 result[i++] = obj.__getitem__(item);
             }
             return new PyTuple(result);
+        }        @Override
+        public PyObject __call__(PyObject[] args, String[] keywords) {
+            return itemgetter___call__(args, keywords);
         }
+
+
 
 
         /* Traverseproc implementation */
@@ -445,7 +458,7 @@ public class operator
         public int traverse(Visitproc visit, Object arg) {
             if (items != null) {
                 int retVal;
-                for (PyObject ob: items) {
+                for (PyObject ob : items) {
                     if (ob != null) {
                         retVal = visit.visit(ob, arg);
                         if (retVal != 0) {
@@ -462,7 +475,7 @@ public class operator
             if (ob == null || items == null) {
                 return false;
             }
-            for (PyObject obj: items) {
+            for (PyObject obj : items) {
                 if (obj == ob) {
                     return true;
                 }
@@ -491,21 +504,16 @@ public class operator
 
         @ExposedNew
         final static PyObject methodcaller___new__(PyNewWrapper new_, boolean init,
-                                                  PyType subtype, PyObject[] args,
-                                                  String[] keywords) {
+                                                   PyType subtype, PyObject[] args,
+                                                   String[] keywords) {
 
             if (args.length == 0) {
                 throw Py.TypeError("methodcaller needs at least one argument, the method name");
             }
             String nameStr = ensureStringAttribute(args[0]);
-            PyObject[] newArgs = new PyObject[args.length-1];
-            System.arraycopy(args, 1, newArgs, 0, args.length-1);
+            PyObject[] newArgs = new PyObject[args.length - 1];
+            System.arraycopy(args, 1, newArgs, 0, args.length - 1);
             return new PyMethodCaller(nameStr, newArgs, keywords);
-        }
-
-        @Override
-        public PyObject __call__(PyObject[] args, String[] keywords) {
-            return methodcaller___call__(args, keywords);
         }
 
         @ExposedMethod
@@ -516,7 +524,12 @@ public class operator
             ArgParser ap = new ArgParser("methodcaller", args, Py.NoKeywords, "obj");
             PyObject obj = ap.getPyObject(0);
             return obj.invoke(name, this.args, this.keywords);
+        }        @Override
+        public PyObject __call__(PyObject[] args, String[] keywords) {
+            return methodcaller___call__(args, keywords);
         }
+
+
 
 
         /* Traverseproc implementation */
@@ -524,7 +537,7 @@ public class operator
         public int traverse(Visitproc visit, Object arg) {
             if (args != null) {
                 int retVal;
-                for (PyObject ob: args) {
+                for (PyObject ob : args) {
                     if (ob != null) {
                         retVal = visit.visit(ob, arg);
                         if (retVal != 0) {
@@ -541,25 +554,12 @@ public class operator
             if (ob == null || args == null) {
                 return false;
             }
-            for (PyObject obj: args) {
+            for (PyObject obj : args) {
                 if (obj == ob) {
                     return true;
                 }
             }
             return false;
         }
-    }
-
-    private static String ensureStringAttribute(PyObject name) {
-        String nameStr;
-        if (name instanceof PyUnicode) {
-            nameStr = ((PyUnicode)name).encode();
-        } else if (name instanceof PyBytes) {
-            nameStr = name.asString();
-        } else {
-            throw Py.TypeError(String.format("attribute name must be string, not '%.200s'",
-                    name.getType().fastGetName()));
-        }
-        return nameStr;
     }
 }

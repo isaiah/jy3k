@@ -1858,7 +1858,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         // so this function doesn't do anything special to update subclasses
         dict.__setitem__("__abstractmethods__", value);
         postSetattr("__abstractmethods__");
-        tp_flags = value.__bool__()
+        tp_flags = value.isTrue()
                 ? tp_flags | Py.TPFLAGS_IS_ABSTRACT
                 : tp_flags & ~Py.TPFLAGS_IS_ABSTRACT;
     }

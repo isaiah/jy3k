@@ -3054,7 +3054,7 @@ public class gc {
          * where the referrers will be inserted) at {@code arg[1]}.
          */
         public int visit(PyObject object, Object arg) {
-            if (((PyObject[]) arg)[0].__eq__(object).__bool__()) {
+            if (((PyObject[]) arg)[0].__eq__(object).isTrue()) {
                 ((org.python.core.PySequenceList) ((PyObject[]) arg)[1]).pyadd(object);
             }
             return 0;

@@ -178,7 +178,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
      *
      * @return <code>true</code> if the set is not empty, <code>false</code> otherwise
      */
-    public boolean __bool__() {
+    public boolean isTrue() {
         return !_set.isEmpty();
     }
 

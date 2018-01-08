@@ -192,7 +192,7 @@ public class ArgParser {
         if (value == null) {
             return def;
         }
-        return value.__bool__();
+        return value.isTrue();
     }
 
     /**

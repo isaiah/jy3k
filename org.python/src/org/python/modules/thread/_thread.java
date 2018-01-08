@@ -46,7 +46,7 @@ public class _thread {
             PyObject isDaemon = currentThread.__findattr__("isDaemon");
             if (isDaemon != null && isDaemon.isCallable()) {
                 PyObject po = isDaemon.__call__();
-                pt.setDaemon(po.__bool__());
+                pt.setDaemon(po.isTrue());
             }
             PyObject getName = currentThread.__findattr__("getName");
             if (getName != null && getName.isCallable()) {

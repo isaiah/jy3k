@@ -13,7 +13,6 @@ import org.python.core.linker.InvokeByName;
 import org.python.modules.gc;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -415,7 +414,7 @@ public class PyObject implements Serializable {
         if (res == Py.NotImplemented) {
             return false;
         }
-        return res.__bool__();
+        return res.isTrue();
     }
 
     @Override
@@ -462,8 +461,9 @@ public class PyObject implements Serializable {
     /**
      * Equivalent to the standard Python __bool__ method. Returns whether of
      * not a given <code>PyObject</code> is considered true.
+     * https://docs.python.org/3/library/stdtypes.html#truth-value-testing
      */
-    public boolean __bool__() {
+    public boolean isTrue() {
         return true;
     }
 
@@ -1356,12 +1356,12 @@ public class PyObject implements Serializable {
      **/
     public final int _cmp(PyObject o) {
         PyObject res = richCompare(o, CompareOp.EQ);
-        if (res != Py.NotImplemented && res.__bool__()) {
+        if (res != Py.NotImplemented && res.isTrue()) {
             return 0;
         }
         res = do_richCompare(o, CompareOp.LT);
         if (res != Py.NotImplemented) {
-            if (res.__bool__()) {
+            if (res.isTrue()) {
                 return -1;
             }
             return 1;
@@ -1444,7 +1444,7 @@ public class PyObject implements Serializable {
         if (res instanceof PyBoolean) {
             return res == Py.True;
         }
-        return res.__bool__();
+        return res.isTrue();
     }
 
     // Rich comparison entry for bytecode
@@ -1571,15 +1571,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Implements boolean not
-     *
-     * @return not this.
-     **/
-    public PyObject __not__() {
-        return __bool__() ? Py.False : Py.True;
-    }
-
-    /**
      * Equivalent to the standard Python __int__ method.
      * Should only be overridden by numeric objects that can be
      * reasonably coerced into a python long.
@@ -1646,42 +1637,12 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __pos__ method.
-     *
-     * @return +this.
-     **/
-    public PyObject __pos__() {
-        throw Py.TypeError(String.format("bad operand type for unary +: '%.200s'",
-                getType().fastGetName()));
-    }
-
-    /**
-     * Equivalent to the standard Python __neg__ method.
-     *
-     * @return -this.
-     **/
-    public PyObject __neg__() {
-        throw Py.TypeError(String.format("bad operand type for unary -: '%.200s'",
-                getType().fastGetName()));
-    }
-
-    /**
      * Equivalent to the standard Python __abs__ method.
      *
      * @return abs(this).
      **/
     public PyObject __abs__() {
         throw Py.TypeError(String.format("bad operand type for abs(): '%.200s'",
-                getType().fastGetName()));
-    }
-
-    /**
-     * Equivalent to the standard Python __invert__ method.
-     *
-     * @return ~this.
-     **/
-    public PyObject __invert__() {
-        throw Py.TypeError(String.format("bad operand type for unary ~: '%.200s'",
                 getType().fastGetName()));
     }
 
@@ -1694,22 +1655,6 @@ public class PyObject implements Serializable {
     public PyObject __index__() {
         throw Py.TypeError(String.format("'%.200s' object cannot be interpreted as an index",
                 getType().fastGetName()));
-    }
-
-    /**
-     * @param op the String form of the op (e.g. "+")
-     * @param o2 the right operand
-     */
-    protected final String _unsupportedop(String op, PyObject o2) {
-        Object[] args = {op, getType().fastGetName(), o2.getType().fastGetName()};
-        String msg = unsupportedopMessage(op, o2);
-        if (msg == null) {
-            msg = o2.runsupportedopMessage(op, o2);
-        }
-        if (msg == null) {
-            msg = "unsupported operand type(s) for {0}: ''{1}'' and ''{2}''";
-        }
-        return MessageFormat.format(msg, args);
     }
 
     /**

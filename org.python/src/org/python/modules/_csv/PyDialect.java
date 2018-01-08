@@ -145,7 +145,7 @@ public class PyDialect extends PyObject {
     }
 
     private static boolean toBool(String name, PyObject src, boolean dflt) {
-        return src == null ? dflt : src.__bool__();
+        return src == null ? dflt : src.isTrue();
     }
 
     private static char toChar(String name, PyObject src, char dflt) {

@@ -927,7 +927,7 @@ public class PyUnicode extends PySequence implements Iterable {
     @ExposedMethod(doc = BuiltinDocs.str_splitlines_doc)
     public final PyList str_splitlines(PyObject[] args, String[] keywords) {
         ArgParser arg = new ArgParser("splitlines", args, keywords, "keepends");
-        boolean keepends = arg.getPyObject(0, Py.False).__bool__();
+        boolean keepends = arg.getPyObject(0, Py.False).isTrue();
         if (isBasicPlane()) {
             List<CharSequence> list = Encoding.splitlines(getString(), keepends);
             PyList l = new PyList();

@@ -7,8 +7,6 @@ import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
 import org.python.core.Py;
-import org.python.core.BaseCode;
-import org.python.core.PyCode;
 import org.python.core.PyDict;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -29,9 +27,6 @@ import org.python.modules.sys.SysModule;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -146,7 +141,7 @@ public class Import {
                 value = spec.__findattr__("initializing");
             }
             if (value != null) {
-                boolean initializing = value.__bool__();
+                boolean initializing = value.isTrue();
                 if (initializing) {
 //                    aquireLock(interp);
                     try {
@@ -175,7 +170,7 @@ public class Import {
         }
         boolean hasFrom = false;
         if (fromList != null && fromList != Py.None) {
-            hasFrom = fromList.__bool__();
+            hasFrom = fromList.isTrue();
         }
         if (!hasFrom) {
             int len = name.__len__();

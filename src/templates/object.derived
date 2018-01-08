@@ -7,13 +7,9 @@ unary1: __str__ unicode
 unary1: __repr__ unicode
 unary1: __float__ float
 unary1: __complex__ complex
-unary1: __pos__
-unary1: __neg__
 unary1: __abs__
-unary1: __invert__
 unary1: __reduce__
 unary1: __dir__
-binary: __format__
 rest:
 
   public PyObject __int__() {
@@ -44,29 +40,12 @@ rest:
         return super.hashCode();
   }
 
-  public boolean __bool__() {
-    PyType self_type = getType();
-    PyObject impl = self_type.lookup("__bool__");
-    if (impl == null) {
-      impl = self_type.lookup("__len__");
-      if (impl == null)
-         return super.__bool__();
-    }
-    PyObject o = impl.__get__(this,self_type).__call__();
-    Class c = o.getClass();
-    if (c != PyLong.class && c != PyBoolean.class) {
-      throw Py.TypeError(String.format("__bool__ should return bool or int, returned %s",
-        self_type.getName()));
-    }
-    return o.__bool__();
-  }
-
   public boolean __contains__(PyObject o) {
     PyType self_type = getType();
     PyObject impl = self_type.lookup("__contains__");
     if (impl == null)
       return super.__contains__(o);
-    return impl.__get__(this,self_type).__call__(o).__bool__();
+    return impl.__get__(this,self_type).__call__(o).isTrue();
   }
 
   public int __len__() {
@@ -250,23 +229,6 @@ rest:
           return;
       }
       super.__delete__(obj);
-  }
-
-  public PyObject __pow__(PyObject other, PyObject modulo) {
-      PyType self_type=getType();
-      PyObject impl=self_type.lookup("__pow__");
-      if (impl!=null) {
-          PyObject res;
-          if (modulo == null) {
-              res=impl.__get__(this,self_type).__call__(other);
-          } else {
-              res=impl.__get__(this,self_type).__call__(other, modulo);
-          }
-          if (res==Py.NotImplemented)
-              return null;
-          return res;
-      }
-      return super.__pow__(other, modulo);
   }
 
   public void dispatch__init__(PyObject[] args, String[] keywords) {

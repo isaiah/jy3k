@@ -24,7 +24,7 @@ public class PyWeakProxy extends AbstractReference {
         this(TYPE, ref, callback);
     }
 
-    public boolean __bool__() { return py().__bool__(); }
+    public boolean isTrue() { return py().isTrue(); }
     public int __len__() { return py().__len__(); }
 
     public PyObject __finditem__(PyObject key) { return py().__finditem__(key); }
@@ -40,10 +40,8 @@ public class PyWeakProxy extends AbstractReference {
     public PyFloat __float__() { return py().__float__(); }
     public PyObject __int__() { return py().__int__(); }
     public PyComplex __complex__() { return py().__complex__(); }
-    public PyObject __pos__() { return py().__pos__(); }
-    public PyObject __neg__() { return py().__neg__(); }
+
     public PyObject __abs__() { return py().__abs__(); }
-    public PyObject __invert__() { return py().__invert__(); }
 
 
     public boolean __contains__(PyObject o) { return py().__contains__(o); }

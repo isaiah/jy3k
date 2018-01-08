@@ -598,21 +598,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @Override
-    public PyObject __pos__() {
-        throw Py.TypeError("bad operand type for unary +");
-    }
-
-    @Override
-    public PyObject __neg__() {
-        throw Py.TypeError("bad operand type for unary -");
-    }
-
-    @Override
-    public PyObject __invert__() {
-        throw Py.TypeError("bad operand type for unary ~");
-    }
-
-    @Override
     public PyComplex __complex__() {
         return Encoding.atocx(getString());
     }
@@ -747,7 +732,7 @@ public class PyBytes extends PySequence implements BufferProtocol {
     @ExposedMethod(doc = BuiltinDocs.bytes_splitlines_doc)
     public final PyList bytes_splitlines(PyObject[] args, String[] keywords) {
         ArgParser arg = new ArgParser("splitlines", args, keywords, "keepends");
-        boolean keepends = arg.getPyObject(0, Py.False).__bool__();
+        boolean keepends = arg.getPyObject(0, Py.False).isTrue();
 
         return toPyList(Encoding.splitlines(getString(), keepends));
     }

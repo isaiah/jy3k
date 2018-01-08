@@ -170,7 +170,7 @@ public class StructLayout extends CType.Custom {
             fields[i] = (Field) pyField;
         }
 
-        return StructUtil.newStructLayout(fields, ap.getPyObject(1, Py.False).__bool__());
+        return StructUtil.newStructLayout(fields, ap.getBoolean(1, false));
     }
     
     @ExposedType(name = "jffi.StructLayout.ScalarField", base = Field.class)

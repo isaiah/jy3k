@@ -10,7 +10,6 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.PyUnicode;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedNew;
@@ -28,7 +27,7 @@ public class PyScanner extends PyObject implements Traverseproc {
 
     public PyScanner(PyObject context) {
         super(TYPE);
-        strict = context.__getattr__("strict").__bool__();
+        strict = context.__getattr__("strict").isTrue();
         object_hook = context.__getattr__("object_hook");
         pairs_hook = context.__getattr__("object_pairs_hook");
         parse_float = context.__getattr__("parse_float");

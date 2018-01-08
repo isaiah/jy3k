@@ -268,7 +268,7 @@ public class _warnings {
         if (obj == Py.None) {
             return true;
         }
-        return obj.invoke("match", arg).__bool__();
+        return obj.invoke("match", arg).isTrue();
     }
 
     // CPython: get_warnings_attr

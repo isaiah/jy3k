@@ -519,7 +519,7 @@ public class FormatDef implements Packer, Unpacker {
     }
 
     private static void np_bool(ByteBuffer buf, PyObject v) {
-        buf.put(v.__bool__() ? (byte) 1 : 0);
+        buf.put(v.isTrue() ? (byte) 1 : 0);
     }
 
 

@@ -1,6 +1,5 @@
 package org.python.modules._json;
 
-import org.python.annotations.ExposedMethod;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -13,7 +12,6 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.PyUnicode;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedNew;
@@ -46,8 +44,8 @@ public class PyEncoder extends PyObject implements Traverseproc {
         key_separator = ap.getPyObject(4);
         item_separator = ap.getPyObject(5);
         sort_keys = ap.getPyObject(6);
-        skipkeys = ap.getPyObject(7).__bool__();
-        allow_nan = ap.getPyObject(8).__bool__();
+        skipkeys = ap.getPyObject(7).isTrue();
+        allow_nan = ap.getPyObject(8).isTrue();
     }
 
     @ExposedNew

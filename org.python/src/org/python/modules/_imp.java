@@ -223,6 +223,9 @@ public class _imp {
     public static final PyObject _compile_bytecode(PyObject name, PyObject data, PyObject filename) {
         if (data instanceof PyBytes) {
             byte[] bytes = ((PyBytes) data).toBytes();
+            if (bytes.length == 0) {
+                throw Py.ImportError("no data", name.toString());
+            }
             /**
              * The class name don't have to be the same as the file name, such as __init__.jython_36, appending the
              * cache tag here is just to easier identify the file on debug

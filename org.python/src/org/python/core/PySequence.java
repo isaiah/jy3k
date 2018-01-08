@@ -153,7 +153,7 @@ public abstract class PySequence extends PyObject {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return seq___bool__();
     }
 

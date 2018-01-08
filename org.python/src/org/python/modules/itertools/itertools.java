@@ -104,8 +104,8 @@ public class itertools {
                     // the boolean value of calling predicate with the element
                     // or if predicate is null/None of the element itself
                     boolean booleanValue = predicate != null ? predicate
-                            .__call__(element).__bool__() : element
-                            .__bool__();
+                            .__call__(element).isTrue() : element
+                            .isTrue();
                     if (booleanValue == filterTrue) {
                         // if the boolean value is the same as filterTrue return
                         // the element
@@ -171,7 +171,7 @@ public class itertools {
                     if (!predicateSatisfied) {
                         // the predicate is not satisfied yet (or still satisfied in the case of drop beeing 
                         // false), so we need to check it
-                        if (predicate.__call__(element).__bool__() != drop) {
+                        if (predicate.__call__(element).isTrue() != drop) {
                             predicateSatisfied = drop;
                             return element;
                         }

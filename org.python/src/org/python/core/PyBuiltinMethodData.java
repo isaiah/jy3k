@@ -204,7 +204,7 @@ public class PyBuiltinMethodData {
         if (argType == int.class) {
             return pyObj.__int__();
         } else if (argType == boolean.class) {
-            return pyObj.__bool__();
+            return pyObj.isTrue();
         } else if (argType == String.class) {
             return Py.getString(pyObj);
         } else if (argType == double.class) {

@@ -338,7 +338,7 @@ public class PyFloat extends PyObject {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return float___bool__();
     }
 
@@ -696,29 +696,14 @@ public class PyFloat extends PyObject {
 
     }
 
-    @Override
-    public PyObject __neg__() {
-        return float___neg__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.float___neg___doc)
     final PyObject float___neg__() {
         return new PyFloat(-getValue());
     }
 
-    @Override
-    public PyObject __pos__() {
-        return float___pos__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.float___pos___doc)
     final PyObject float___pos__() {
         return float___float__();
-    }
-
-    @Override
-    public PyObject __invert__() {
-        throw Py.TypeError("bad operand type for unary ~");
     }
 
     @Override

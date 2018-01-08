@@ -17,7 +17,7 @@ public abstract class BasePointer extends PyObject implements Pointer {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return !getMemory().isNull();
     }
 

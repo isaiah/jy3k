@@ -1325,7 +1325,7 @@ public final class Py {
                     printExceptionRecursive(f, (PyBaseException) cause, seen);
                     stderr.print(CAUSE_MESSAGE);
                 }
-            } else if (context != null && context != Py.None && !value.__suppress_context__.__bool__()) {
+            } else if (context != null && context != Py.None && !value.__suppress_context__.isTrue()) {
                 if (!seen.contains(context)) {
                     printExceptionRecursive(f, (PyBaseException) context, seen);
                     stderr.print(CONTEXT_MESSAGE);
@@ -1545,7 +1545,7 @@ public final class Py {
 
     /* Equivalent to Python's assert statement */
     public static void assert_(PyObject test, PyObject message) {
-        if (!test.__bool__()) {
+        if (!test.isTrue()) {
             throw new PyException(Py.AssertionError, message);
         }
     }
@@ -1880,7 +1880,7 @@ public final class Py {
      * A collection of convenience functions for converting PyObjects to Java primitives
      */
     public static boolean py2boolean(PyObject o) {
-        return o.__bool__();
+        return o.isTrue();
     }
 
     public static byte py2byte(PyObject o) {
@@ -2409,7 +2409,7 @@ public final class Py {
 
         PyObject checkerResult;
         if ((checkerResult = dispatchToChecker(inst, cls, "__instancecheck__")) != null) {
-            return checkerResult.__bool__();
+            return checkerResult.isTrue();
         }
 
         return recursiveIsInstance(inst, cls);
@@ -2459,7 +2459,7 @@ public final class Py {
 
         PyObject checkerResult;
         if ((checkerResult = dispatchToChecker(derived, cls, "__subclasscheck__")) != null) {
-            return checkerResult.__bool__();
+            return checkerResult.isTrue();
         }
 
         return recursiveIsSubClass(derived, cls);

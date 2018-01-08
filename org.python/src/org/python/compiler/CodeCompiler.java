@@ -69,6 +69,7 @@ import org.python.antlr.ast.keyword;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.antlr.base.stmt;
+import org.python.core.Abstract;
 import org.python.core.BaseCode;
 import org.python.core.CompareOp;
 import org.python.core.CompilerFlags;
@@ -243,6 +244,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public void loadThreadState() {
         code.aload(1);
+    }
+
+    public void getBool() {
+        code.invokestatic(p(Abstract.class), "PyObject_IsTrue", sig(Boolean.TYPE, PyObject.class));
     }
 
     public void setLastI(int idx) {
@@ -617,7 +622,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             code.goto_(start_loop);
         } else {
             visit(test);
-            code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+            getBool();
             code.ifne(start_loop);
         }
         code.mark(exit_loop);
@@ -740,8 +745,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         /* First do an if __debug__: */
         loadFrame();
         emitGetGlobal("__debug__");
-
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+        getBool();
 
         code.ifeq(end_of_assert);
 
@@ -751,7 +755,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          * processed.
          */
         visit(node.getInternalTest());
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+        getBool();
 
         /* If evaluation is false, then branch to end of method */
         code.ifne(end_of_assert);
@@ -917,7 +921,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         visit(node.getInternalValues().get(0));
         for (int i = 1; i < node.getInternalValues().size(); i++) {
             code.dup();
-            code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+            getBool();
             switch (node.getInternalOp()) {
                 case Or:
                     code.ifne(end);
@@ -991,23 +995,26 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitUnaryOp(UnaryOp node) {
+        loadThreadState();
         visit(node.getInternalOperand());
         String name = null;
         switch (node.getInternalOp()) {
             case Invert:
-                name = "__invert__";
+                name = "PyNumber_Invert";
                 break;
             case Not:
-                name = "__not__";
+                name = "PyObject_Not";
                 break;
             case UAdd:
-                name = "__pos__";
+                name = "PyNumber_Positive";
                 break;
             case USub:
-                name = "__neg__";
+                name = "PyNumber_Negative";
                 break;
+            default:
+                assert false: "wont happen";
         }
-        code.invokevirtual(p(PyObject.class), name, sig(PyObject.class));
+        code.invokestatic(p(Abstract.class), name, sig(PyObject.class, ThreadState.class, PyObject.class));
         return null;
     }
 
@@ -1022,7 +1029,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         Label end_of_else = new Label();
 
         visit(node.getInternalTest());
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+        getBool();
 
         code.ifeq(end_of_else);
         visit(node.getInternalBody());
@@ -1198,7 +1205,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 visit(node.getInternalComparators().get(i));
                 code.dup_x1();
                 visitCmpop(node.getInternalOps().get(i));
-                code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+                getBool();
                 code.ifeq(end);
             }
             code.pop();
@@ -1887,7 +1894,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     public Object doTest(Label end_of_if, If node, int index) {
         Label end_of_suite = new Label();
         visit(node.getInternalTest());
-        code.invokevirtual(p(PyObject.class), "__bool__", sig(Boolean.TYPE));
+        getBool();
 
         code.ifeq(end_of_suite);
 

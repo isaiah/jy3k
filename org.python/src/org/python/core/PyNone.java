@@ -39,7 +39,7 @@ public class PyNone extends PyObject implements Serializable {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return false;
     }
 

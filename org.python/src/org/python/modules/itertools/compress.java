@@ -53,7 +53,7 @@ public class compress extends PyIterator {
                     if (datum == null) { return null; }
                     PyObject selector = nextElement(selectors);
                     if (selector == null) { return null; }
-                    if (selector.__bool__()) {
+                    if (selector.isTrue()) {
                         return datum;
                     }
                 }

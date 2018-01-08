@@ -375,7 +375,7 @@ public class PyDeque extends PyObject implements Traverseproc {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return deque___bool__();
     }
 

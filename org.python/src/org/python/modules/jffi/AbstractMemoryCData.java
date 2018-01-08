@@ -11,7 +11,7 @@ public abstract class AbstractMemoryCData extends CData implements Pointer {
         this.memory = memory;
     }
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return !getMemory().isNull();
     }
 

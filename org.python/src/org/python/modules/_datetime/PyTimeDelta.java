@@ -75,18 +75,13 @@ public class PyTimeDelta extends PyObject {
         return String.format("%s(%d)", getType().fastGetName(), getDays());
     }
 
-    @Override
-    public PyObject __neg__() {
-        return timedelta___neg__();
-    }
-
     @ExposedMethod
     final PyObject timedelta___neg__() {
         return new PyTimeDelta(delta.negated());
     }
 
     @ExposedMethod
-    public boolean __bool__() {
+    public boolean isTrue() {
         return timedelta___bool__();
     }
 

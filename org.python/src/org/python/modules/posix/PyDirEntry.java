@@ -93,7 +93,7 @@ public class PyDirEntry extends PyObject {
 
     private LinkOption[] follow_symlinks(String methodName, PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser(methodName, args, keywords, "*", "follow_symlinks");
-        if (ap.getPyObject(1, Py.True).__bool__()) {
+        if (ap.getBoolean(1, true)) {
             return new LinkOption[] {LinkOption.NOFOLLOW_LINKS};
         }
         return new LinkOption[0];

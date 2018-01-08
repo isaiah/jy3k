@@ -489,7 +489,7 @@ public class PyLong extends PyObject {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return int___bool__();
     }
 
@@ -871,19 +871,9 @@ public class PyLong extends PyObject {
         return Py.newLong(coerce(left).or(getValue()));
     }
 
-    @Override
-    public PyObject __neg__() {
-        return int___neg__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___neg___doc)
     public final PyObject int___neg__() {
         return Py.newLong(getValue().negate());
-    }
-
-    @Override
-    public PyObject __pos__() {
-        return int___pos__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.int___pos___doc)
@@ -907,11 +897,6 @@ public class PyLong extends PyObject {
             return int___neg__();
         }
         return int___int__();
-    }
-
-    @Override
-    public PyObject __invert__() {
-        return int___invert__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.int___invert___doc)

@@ -166,7 +166,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return getMap().size() != 0;
     }
 
@@ -288,7 +288,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
                 return -1;
             }
             PyObject avalue = __finditem__(akey);
-            if (!avalue.richCompare(bvalue, EQ).__bool__()) {
+            if (!avalue.richCompare(bvalue, EQ).isTrue()) {
                 return -1;
             }
         }

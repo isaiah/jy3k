@@ -104,7 +104,7 @@ public class PyStringIO extends PyTextIOWrapper {
 
     public void __setattr__(String name, PyObject value) {
         if (name == "softspace") {
-            softspace = value.__bool__();
+            softspace = value.isTrue();
             return;
         }
         super.__setattr__(name, value);

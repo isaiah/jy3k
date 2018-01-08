@@ -215,7 +215,7 @@ public class PyComplex extends PyObject {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return complex___bool__();
     }
 
@@ -252,7 +252,7 @@ public class PyComplex extends PyObject {
                     PyFloat f = new PyFloat(r);
                     PyObject ret = f.richCompare(other, CompareOp.EQ);
                     if (ret != null) {
-                        equal = ret.__bool__();
+                        equal = ret.isTrue();
                     } else {
                         equal = false;
                     }
@@ -643,29 +643,14 @@ public class PyComplex extends PyObject {
         return new PyComplex(len * Math.cos(phase), len * Math.sin(phase));
     }
 
-    @Override
-    public PyObject __neg__() {
-        return complex___neg__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.complex___neg___doc)
     final PyObject complex___neg__() {
         return new PyComplex(-real, -imag);
     }
 
-    @Override
-    public PyObject __pos__() {
-        return complex___pos__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.complex___pos___doc)
     final PyObject complex___pos__() {
         return getType() == TYPE ? this : new PyComplex(real, imag);
-    }
-
-    @Override
-    public PyObject __invert__() {
-        throw Py.TypeError("bad operand type for unary ~");
     }
 
     @Override

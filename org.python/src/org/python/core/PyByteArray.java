@@ -1840,7 +1840,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
     @ExposedMethod(doc = BuiltinDocs.bytearray_splitlines_doc)
     public final PyList bytearray_splitlines(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("splitlines", args, keywords, 0, "keepends");
-        boolean keepends = ap.getPyObject(0, Py.False).__bool__();
+        boolean keepends = ap.getPyObject(0, Py.False).isTrue();
         return basebytes_splitlines(keepends);
     }
 

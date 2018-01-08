@@ -35,7 +35,7 @@ public class PyBoolean extends PyLong {
         if (obj == null) {
             return Py.False;
         }
-        return obj.__bool__() ? Py.True : Py.False;
+        return Abstract.PyObject_IsTrue(Py.getThreadState(), obj) ? Py.True : Py.False;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class PyBoolean extends PyLong {
     }
 
     @Override
-    public boolean __bool__() {
+    public boolean isTrue() {
         return bool___bool__();
     }
 
@@ -132,19 +132,9 @@ public class PyBoolean extends PyLong {
 	    }
     }
 
-    @Override
-    public PyObject __neg__() {
-        return bool___neg__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bool___neg___doc)
     final PyObject bool___neg__() {
         return Py.newInteger(getBooleanValue() ? -1 : 0);
-    }
-
-    @Override
-    public PyObject __pos__() {
-        return bool___pos__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.bool___pos___doc)
