@@ -11,6 +11,7 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.ThreadState;
 
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -52,7 +53,7 @@ public class PyDecompress extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject Decompress_decompress(PyObject[] args, String[] keywords) {
+    public PyObject Decompress_decompress(ThreadState ts, PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("decompress", args, keywords, "data", "max_length");
         PyObject data = ap.getPyObject(0);
         PyObject maxLenObj = ap.getPyObject(1, Py.None);
@@ -96,7 +97,7 @@ public class PyDecompress extends PyObject {
                         unconsumed_tail = new PyBytes(input, input.length - remaining, input.length);
                     }
                 } else {
-                    unused_data = unused_data._add(new PyBytes(input, input.length - remaining, input.length));
+                    unused_data = unused_data._add(ts, new PyBytes(input, input.length - remaining, input.length));
                 }
             }
             if (totalLen == 0) {
@@ -149,7 +150,7 @@ public class PyDecompress extends PyObject {
             }
             int remaining = inflater.getRemaining();
             if (input.length > 0 && remaining > 0) {
-                unused_data = unused_data._add(new PyBytes(input, input.length - remaining, input.length));
+                unused_data = unused_data._add(Py.getThreadState(), new PyBytes(input, input.length - remaining, input.length));
             }
             return new PyBytes(buf, 0, totalLen);
         } catch (DataFormatException e) {

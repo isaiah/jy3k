@@ -1034,11 +1034,6 @@ public class PyLong extends PyObject {
         return v.bitLength();
     }
 
-    @Override
-    public PyObject __format__(PyObject formatSpec) {
-        return int___format__(formatSpec);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___format___doc)
     public final PyObject int___format__(PyObject formatSpec) {
 

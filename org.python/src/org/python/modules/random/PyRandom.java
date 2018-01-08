@@ -14,6 +14,7 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
+import org.python.core.ThreadState;
 import org.python.core.Untraversable;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
@@ -41,14 +42,14 @@ public class PyRandom extends PyObject {
      * uses the value, else it uses the hash function of PyObject
      */
     @ExposedMethod(defaults = "null")
-    public final void Random_seed(PyObject seed) {
+    public final void Random_seed(ThreadState ts, PyObject seed) {
         long n;
         if (seed == null) {
             seed = new PyLong(System.currentTimeMillis());
         }
         if (seed instanceof PyLong) {
             PyLong max = new PyLong(Long.MAX_VALUE);
-            n = seed._mod(max).asLong();
+            n = seed._mod(ts, max).asLong();
         } else {
             n = seed.hashCode();
         }

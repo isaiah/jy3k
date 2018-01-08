@@ -69,6 +69,7 @@ public class PyObject implements Serializable {
     private static final InvokeByName rxor = new InvokeByName("__rxor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName ixor = new InvokeByName("__ixor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
 
+    private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     /**
      * Primitives classes their wrapper classes.
      */
@@ -1561,10 +1562,6 @@ public class PyObject implements Serializable {
         return false;
     }
 
-    public PyObject __format__(PyObject formatSpec) {
-        return object___format__(formatSpec);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.object___format___doc)
     final PyObject object___format__(PyObject formatSpec) {
         if (formatSpec != null && formatSpec instanceof PyUnicode && !((PyUnicode) formatSpec).getString().isEmpty()) {
@@ -1774,55 +1771,6 @@ public class PyObject implements Serializable {
                 (t2.isSubType(PyBytes.TYPE) || t2.isSubType(PyUnicode.TYPE));
     }
 
-    private PyObject _binop_rule(PyType t1, PyObject o2, PyType t2,
-                                 String left, String right, String op) {
-        /*
-         * this is the general rule for binary operation dispatching try first
-         * __xxx__ with this and then __rxxx__ with o2 unless o2 is an instance
-         * of subclass of the type of this, and further __xxx__ and __rxxx__ are
-         * unrelated ( checked here by looking at where in the hierarchy they
-         * are defined), in that case try them in the reverse order. This is the
-         * same formulation as used by PyPy, see also
-         * test_descr.subclass_right_op.
-         */
-        PyObject o1 = this;
-        PyObject[] where = new PyObject[1];
-        PyObject where1 = null, where2 = null;
-        PyObject impl1 = t1.lookup_where(left, where);
-        where1 = where[0];
-        PyObject impl2 = t2.lookup_where(right, where);
-        where2 = where[0];
-        if (impl2 != null && impl1 != null && where1 != where2 &&
-                (t2.isSubType(t1) && !Py.isSubClass(where1, where2)
-                        && !Py.isSubClass(t1, where2) ||
-                        isStrUnicodeSpecialCase(t1, t2, op))) {
-            PyObject tmp = o1;
-            o1 = o2;
-            o2 = tmp;
-            tmp = impl1;
-            impl1 = impl2;
-            impl2 = tmp;
-            PyType ttmp;
-            ttmp = t1;
-            t1 = t2;
-            t2 = ttmp;
-        }
-        PyObject res;
-        if (impl1 != null) {
-            res = impl1.__get__(o1, t1).__call__(o2);
-            if (res != null && res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        if (impl2 != null) {
-            res = impl2.__get__(o2, t2).__call__(o1);
-            if (res != null && res != Py.NotImplemented) {
-                return res;
-            }
-        }
-        throw Py.TypeError(_unsupportedop(op, o2));
-    }
-
     /**
      * Implements the Python expression <code>this + o2</code>.
      *
@@ -1831,8 +1779,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _add(PyObject o2) {
-        return binOp(add, radd, o2);
+    public final PyObject _add(ThreadState ts, PyObject o2) {
+        return binOp(ts, add, radd, o2);
     }
 
     /**
@@ -1844,14 +1792,14 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _iadd(PyObject o2) {
-        return inplaceBinOp(iadd, add, radd, o2);
+    public final PyObject _iadd(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, iadd, add, radd, o2);
     }
 
-    private final PyObject inplaceBinOp(InvokeByName inplaceOp, InvokeByName op, InvokeByName rop, PyObject value) {
+    private final PyObject inplaceBinOp(ThreadState ts, InvokeByName inplaceOp, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
             Object func = inplaceOp.getGetter().invokeExact(this);
-            PyObject ret = (PyObject) inplaceOp.getInvoker().invokeExact(func, Py.getThreadState(), value);
+            PyObject ret = (PyObject) inplaceOp.getInvoker().invokeExact(func, ts, value);
             if (ret != Py.NotImplemented) {
                 return ret;
             }
@@ -1862,18 +1810,18 @@ public class PyObject implements Serializable {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
-        return binOp(op, rop, value);
+        return binOp(ts, op, rop, value);
     }
 
-    private final PyObject binOp(InvokeByName op, InvokeByName rop, PyObject value) {
+    private final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
             Object func = op.getGetter().invokeExact(this);
-            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, Py.getThreadState(), value);
+            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
             if (ret != null && ret != Py.NotImplemented) {
                 return ret;
             }
             func = rop.getGetter().invokeExact(value);
-            return (PyObject) rop.getInvoker().invokeExact(func, Py.getThreadState(), this);
+            return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -1889,8 +1837,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _sub(PyObject o2) {
-        return binOp(sub, rsub, o2);
+    public final PyObject _sub(ThreadState ts, PyObject o2) {
+        return binOp(ts, sub, rsub, o2);
     }
 
     /**
@@ -1902,8 +1850,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _isub(PyObject o2) {
-        return inplaceBinOp(isub, sub, rsub, o2);
+    public final PyObject _isub(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, isub, sub, rsub, o2);
     }
 
     /**
@@ -1914,8 +1862,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _mul(PyObject o2) {
-        return binOp(mul, rmul, o2);
+    public final PyObject _mul(ThreadState ts, PyObject o2) {
+        return binOp(ts, mul, rmul, o2);
     }
 
     /**
@@ -1927,8 +1875,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _imul(PyObject o2) {
-        return inplaceBinOp(imul, mul, rmul, o2);
+    public final PyObject _imul(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, imul, mul, rmul, o2);
     }
 
     /**
@@ -1939,8 +1887,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _matmul(PyObject o2) {
-        return binOp(matmul, rmatmul, o2);
+    public final PyObject _matmul(ThreadState ts, PyObject o2) {
+        return binOp(ts, matmul, rmatmul, o2);
     }
 
     /**
@@ -1952,8 +1900,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _imatmul(PyObject o2) {
-        return inplaceBinOp(imatmul, matmul, rmatmul, o2);
+    public final PyObject _imatmul(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, imatmul, matmul, rmatmul, o2);
     }
 
     /**
@@ -1964,8 +1912,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _floordiv(PyObject o2) {
-        return binOp(floordiv, rfloordiv, o2);
+    public final PyObject _floordiv(ThreadState ts, PyObject o2) {
+        return binOp(ts, floordiv, rfloordiv, o2);
     }
 
     /**
@@ -1977,8 +1925,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _ifloordiv(PyObject o2) {
-        return inplaceBinOp(ifloordiv, floordiv, rfloordiv, o2);
+    public final PyObject _ifloordiv(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, ifloordiv, floordiv, rfloordiv, o2);
     }
 
     /**
@@ -1989,8 +1937,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _truediv(PyObject o2) {
-        return binOp(truediv, rtruediv, o2);
+    public final PyObject _truediv(ThreadState ts, PyObject o2) {
+        return binOp(ts, truediv, rtruediv, o2);
     }
 
     /**
@@ -2002,8 +1950,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _itruediv(PyObject o2) {
-        return inplaceBinOp(itruediv, truediv, rtruediv, o2);
+    public final PyObject _itruediv(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, itruediv, truediv, rtruediv, o2);
     }
 
     /**
@@ -2014,8 +1962,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _mod(PyObject o2) {
-        return binOp(mod, rmod, o2);
+    public final PyObject _mod(ThreadState ts, PyObject o2) {
+        return binOp(ts, mod, rmod, o2);
     }
 
     /**
@@ -2027,8 +1975,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _imod(PyObject o2) {
-        return inplaceBinOp(imod, mod, rmod, o2);
+    public final PyObject _imod(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, imod, mod, rmod, o2);
     }
 
     /**
@@ -2039,8 +1987,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _divmod(PyObject o2) {
-        return binOp(divmod, rdivmod, o2);
+    public final PyObject _divmod(ThreadState ts, PyObject o2) {
+        return binOp(ts, divmod, rdivmod, o2);
     }
 
     /**
@@ -2051,8 +1999,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _pow(PyObject o2) {
-        return binOp(pow, rpow, o2);
+    public final PyObject _pow(ThreadState ts, PyObject o2) {
+        return binOp(ts, pow, rpow, o2);
     }
 
     /**
@@ -2064,8 +2012,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _ipow(PyObject o2) {
-        return inplaceBinOp(ipow, pow, rpow, o2);
+    public final PyObject _ipow(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, ipow, pow, rpow, o2);
     }
 
     /**
@@ -2076,8 +2024,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _lshift(PyObject o2) {
-        return binOp(lshift, rlshift, o2);
+    public final PyObject _lshift(ThreadState ts, PyObject o2) {
+        return binOp(ts, lshift, rlshift, o2);
     }
 
     /**
@@ -2089,8 +2037,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _ilshift(PyObject o2) {
-        return inplaceBinOp(ilshift, lshift, rlshift, o2);
+    public final PyObject _ilshift(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, ilshift, lshift, rlshift, o2);
     }
 
     /**
@@ -2101,8 +2049,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _rshift(PyObject o2) {
-        return binOp(rshift, rrshift, o2);
+    public final PyObject _rshift(ThreadState ts, PyObject o2) {
+        return binOp(ts, rshift, rrshift, o2);
     }
 
     /**
@@ -2114,8 +2062,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _irshift(PyObject o2) {
-        return inplaceBinOp(irshift, rshift, rrshift, o2);
+    public final PyObject _irshift(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, irshift, rshift, rrshift, o2);
     }
 
     /**
@@ -2126,8 +2074,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _and(PyObject o2) {
-        return binOp(and, rand, o2);
+    public final PyObject _and(ThreadState ts, PyObject o2) {
+        return binOp(ts, and, rand, o2);
     }
 
     /**
@@ -2139,8 +2087,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _iand(PyObject o2) {
-        return inplaceBinOp(iand, and, rand, o2);
+    public final PyObject _iand(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, iand, and, rand, o2);
     }
 
     /**
@@ -2151,8 +2099,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _or(PyObject o2) {
-        return binOp(or, ror, o2);
+    public final PyObject _or(ThreadState ts, PyObject o2) {
+        return binOp(ts, or, ror, o2);
     }
 
     /**
@@ -2164,8 +2112,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _ior(PyObject o2) {
-        return inplaceBinOp(ior, or, ror, o2);
+    public final PyObject _ior(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, ior, or, ror, o2);
     }
 
     /**
@@ -2176,8 +2124,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _xor(PyObject o2) {
-        return binOp(xor, rxor, o2);
+    public final PyObject _xor(ThreadState ts, PyObject o2) {
+        return binOp(ts, xor, rxor, o2);
     }
 
 
@@ -2190,8 +2138,8 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _ixor(PyObject o2) {
-        return inplaceBinOp(ixor, xor, rxor, o2);
+    public final PyObject _ixor(ThreadState ts, PyObject o2) {
+        return inplaceBinOp(ts, ixor, xor, rxor, o2);
     }
 
     /**

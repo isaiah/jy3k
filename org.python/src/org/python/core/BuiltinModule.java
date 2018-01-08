@@ -6,6 +6,7 @@ package org.python.core;
 
 import org.python.antlr.base.mod;
 import org.python.bootstrap.Import;
+import org.python.core.linker.InvokeByName;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.IntegerFormatter;
 import org.python.modules._io._io;
@@ -17,6 +18,9 @@ import java.util.Arrays;
  * The builtin module. All builtin functions are defined here
  */
 public class BuiltinModule {
+    private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
 
     public static void fillWithBuiltins(PyObject dict) {
         /* newstyle */
@@ -284,7 +288,7 @@ public class BuiltinModule {
     }
 
     public static PyObject divmod(PyObject x, PyObject y) {
-        return x._divmod(y);
+        return x._divmod(Py.getThreadState(), y);
     }
 
     private static boolean isMappingType(PyObject o) {
@@ -424,12 +428,19 @@ public class BuiltinModule {
         return format2(arg1, Py.EmptyUnicode);
     }
 
-    public static PyObject format2(PyObject arg1, PyObject arg2) {
-        PyObject formatted = arg1.__format__(arg2);
-        if (!Py.isInstance(formatted, PyBytes.TYPE) && !Py.isInstance(formatted, PyUnicode.TYPE)  ) {
-            throw Py.TypeError("instance.__format__ must return string or unicode, not " + formatted.getType().fastGetName());
+    public static PyObject format2(PyObject value, PyObject formatSpec) {
+        try {
+            Object func = format.getGetter().invokeExact(value);
+            PyObject formatted = (PyObject) format.getInvoker().invokeExact(func, Py.getThreadState(), formatSpec);
+            if (!Py.isInstance(formatted, PyBytes.TYPE) && !Py.isInstance(formatted, PyUnicode.TYPE)) {
+                throw Py.TypeError("instance.__format__ must return string or unicode, not " + formatted.getType().fastGetName());
+            }
+            return formatted;
+        } catch (PyException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
         }
-        return formatted;
     }
 
     public static PyObject getattr2(PyObject obj, PyObject name) {
@@ -639,7 +650,7 @@ public class BuiltinModule {
     }
 
     public static PyObject pow2(PyObject x, PyObject y) {
-        return x._pow(y);
+        return x._pow(Py.getThreadState(), y);
     }
 
     private static boolean coerce(PyObject[] objs) {
@@ -887,7 +898,7 @@ public class BuiltinModule {
             throw Py.TypeError("sum() can't sum bytearray [use b''.join(seq) instead]");
         }
         for (PyObject item : seq.asIterable()) {
-            result = result._add(item);
+            result = result._add(Py.getThreadState(), item);
         }
         return result;
     }

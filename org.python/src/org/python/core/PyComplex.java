@@ -728,11 +728,6 @@ public class PyComplex extends PyObject {
         return complex___getnewargs__();
     }
 
-    @Override
-    public PyObject __format__(PyObject formatSpec) {
-        return complex___format__(formatSpec);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.complex___format___doc)
     final PyObject complex___format__(PyObject formatSpec) {
 

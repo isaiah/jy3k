@@ -828,11 +828,6 @@ public class PyFloat extends PyObject {
         return float___getnewargs__();
     }
 
-    @Override
-    public PyObject __format__(PyObject formatSpec) {
-        return float___format__(formatSpec);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.float___format___doc)
     final PyObject float___format__(PyObject formatSpec) {
 

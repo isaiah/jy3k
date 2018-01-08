@@ -1153,12 +1153,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyTuple(iterator.pyHead(), iterator);
     }
 
-    @Override
-    @ExposedMethod(doc = BuiltinDocs.bytes___format___doc)
-    public PyObject __format__(PyObject formatSpec) {
-        return Encoding.format(getString(), formatSpec, true);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytearray_hex_doc)
     public final PyObject hex() {
         ByteBuffer readonly = readBuf();

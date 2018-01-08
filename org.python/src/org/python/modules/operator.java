@@ -12,6 +12,7 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
+import org.python.core.ThreadState;
 import org.python.core.Traverseproc;
 import org.python.core.Untraversable;
 import org.python.core.Visitproc;
@@ -27,217 +28,217 @@ import org.python.annotations.ModuleInit;
 public class operator
 {
     @ExposedFunction(names = {"add", "concat"})
-    public static PyObject add(PyObject arg1, PyObject arg2) {
-        return arg1._add(arg2);
+    public static PyObject add(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._add(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject and_(PyObject arg1, PyObject arg2) {
-        return arg1._and(arg2);
+    public static PyObject and_(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._and(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject lshift(PyObject arg1, PyObject arg2) {
-        return arg1._lshift(arg2);
+    public static PyObject lshift(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._lshift(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject mod(PyObject arg1, PyObject arg2) {
-        return arg1._mod(arg2);
+    public static PyObject mod(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._mod(ts, arg2);
     }
 
     @ExposedFunction(names = {"mul", "repeat"})
-    public static PyObject mul(PyObject arg1, PyObject arg2) {
-        return arg1._mul(arg2);
+    public static PyObject mul(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._mul(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject or(PyObject arg1, PyObject arg2) {
-        return arg1._or(arg2);
+    public static PyObject or(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._or(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject rshift(PyObject arg1, PyObject arg2) {
-        return arg1._rshift(arg2);
+    public static PyObject rshift(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._rshift(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject sub(PyObject arg1, PyObject arg2) {
-        return arg1._sub(arg2);
+    public static PyObject sub(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._sub(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject xor(PyObject arg1, PyObject arg2) {
-        return arg1._xor(arg2);
+    public static PyObject xor(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._xor(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject abs(PyObject arg) {
+    public static PyObject abs(ThreadState ts, PyObject arg) {
         return arg.__abs__();
     }
 
     @ExposedFunction(names = {"inv", "invert"})
-    public static PyObject inv(PyObject arg) {
+    public static PyObject inv(ThreadState ts, PyObject arg) {
         return arg.__invert__();
     }
 
     @ExposedFunction
-    public static PyObject neg(PyObject arg) {
+    public static PyObject neg(ThreadState ts, PyObject arg) {
         return arg.__neg__();
     }
 
     @ExposedFunction
-    public static PyObject not_(PyObject arg) {
+    public static PyObject not_(ThreadState ts, PyObject arg) {
         return arg.__not__();
     }
 
     @ExposedFunction
-    public static PyObject pos(PyObject arg) {
+    public static PyObject pos(ThreadState ts, PyObject arg) {
         return arg.__pos__();
     }
 
     @ExposedFunction
-    public static boolean truth(PyObject arg) {
+    public static boolean truth(ThreadState ts, PyObject arg) {
         return arg.__bool__();
     }
 
     @ExposedFunction
-    public static boolean contains(PyObject arg1, PyObject arg2) {
+    public static boolean contains(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.__contains__(arg2);
     }
 
     @ExposedFunction
-    public static void delitem(PyObject arg1, PyObject arg2) {
+    public static void delitem(ThreadState ts, PyObject arg1, PyObject arg2) {
         arg1.__delitem__(arg2);
     }
 
     @ExposedFunction
-    public static PyObject getitem(PyObject arg1, PyObject arg2) {
+    public static PyObject getitem(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.__getitem__(arg2);
     }
 
     @ExposedFunction
-    public static void setitem(PyObject arg1, PyObject arg2, PyObject arg3) {
+    public static void setitem(ThreadState ts, PyObject arg1, PyObject arg2, PyObject arg3) {
         arg1.__setitem__(arg2, arg3);
     }
 
     @ExposedFunction
-    public static PyObject ge(PyObject arg1, PyObject arg2) {
+    public static PyObject ge(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.GE);
     }
 
     @ExposedFunction
-    public static PyObject gt(PyObject arg1, PyObject arg2) {
+    public static PyObject gt(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.GT);
     }
 
     @ExposedFunction
-    public static PyObject le(PyObject arg1, PyObject arg2) {
+    public static PyObject le(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.LE);
     }
 
     @ExposedFunction
-    public static PyObject lt(PyObject arg1, PyObject arg2) {
+    public static PyObject lt(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.LT);
     }
 
     @ExposedFunction
-    public static PyObject eq(PyObject arg1, PyObject arg2) {
+    public static PyObject eq(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.EQ);
     }
 
     @ExposedFunction
-    public static PyObject ne(PyObject arg1, PyObject arg2) {
+    public static PyObject ne(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1.richCompare(arg2, CompareOp.NE);
     }
 
     @ExposedFunction
-    public static PyObject floordiv(PyObject arg1, PyObject arg2) {
-        return arg1._floordiv(arg2);
+    public static PyObject floordiv(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._floordiv(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject truediv(PyObject arg1, PyObject arg2) {
-        return arg1._truediv(arg2);
+    public static PyObject truediv(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._truediv(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject pow(PyObject arg1, PyObject arg2) {
-        return arg1._pow(arg2);
+    public static PyObject pow(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._pow(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject is_(PyObject arg1, PyObject arg2) {
+    public static PyObject is_(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1._is(arg2);
     }
 
     @ExposedFunction
-    public static PyObject is_not(PyObject arg1, PyObject arg2) {
+    public static PyObject is_not(ThreadState ts, PyObject arg1, PyObject arg2) {
         return arg1._isnot(arg2);
     }
 
     @ExposedFunction(names = {"iadd", "iconcat"})
-    public static PyObject iadd(PyObject arg1, PyObject arg2) {
-        return arg1._iadd(arg2);
+    public static PyObject iadd(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._iadd(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject iand(PyObject arg1, PyObject arg2) {
-        return arg1._iand(arg2);
+    public static PyObject iand(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._iand(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject ifloordiv(PyObject arg1, PyObject arg2) {
-        return arg1._ifloordiv(arg2);
+    public static PyObject ifloordiv(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ifloordiv(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject ilshift(PyObject arg1, PyObject arg2) {
-        return arg1._ilshift(arg2);
+    public static PyObject ilshift(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ilshift(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject rlshift(PyObject arg1, PyObject arg2) {
-        return arg1._ilshift(arg2);
+    public static PyObject rlshift(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ilshift(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject imod(PyObject arg1, PyObject arg2) {
-        return arg1._imod(arg2);
+    public static PyObject imod(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._imod(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject imul(PyObject arg1, PyObject arg2) {
-        return arg1._imul(arg2);
+    public static PyObject imul(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._imul(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject ior(PyObject arg1, PyObject arg2) {
-        return arg1._ior(arg2);
+    public static PyObject ior(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ior(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject ipow(PyObject arg1, PyObject arg2) {
-        return arg1._ipow(arg2);
+    public static PyObject ipow(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ipow(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject isub(PyObject arg1, PyObject arg2) {
-        return arg1._isub(arg2);
+    public static PyObject isub(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._isub(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject itruediv(PyObject arg1, PyObject arg2) {
-        return arg1._itruediv(arg2);
+    public static PyObject itruediv(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._itruediv(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject ixor(PyObject arg1, PyObject arg2) {
-        return arg1._ixor(arg2);
+    public static PyObject ixor(ThreadState ts, PyObject arg1, PyObject arg2) {
+        return arg1._ixor(ts, arg2);
     }
 
     @ExposedFunction
-    public static PyObject index(PyObject arg1) {
+    public static PyObject index(ThreadState ts, PyObject arg1) {
         return arg1.__index__();
     }
 

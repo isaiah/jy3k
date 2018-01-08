@@ -2335,7 +2335,7 @@ public class gc {
                     if (src instanceof Traverseproc) {
                         try {
                             if (((Traverseproc) src).refersDirectlyTo(ob)) {
-                                result._add(src);
+                                result._add(Py.getThreadState(), src);
                             }
                         } catch (UnsupportedOperationException uoe) {
                             coll[0] = ob;

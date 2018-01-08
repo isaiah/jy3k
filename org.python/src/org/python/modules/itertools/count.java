@@ -69,7 +69,7 @@ public class count extends PyObject {
         iter = new PyIterator() {
             public PyObject __next__() {
                 PyObject result = counter;
-                counter = counter._add(stepper);
+                counter = counter._add(Py.getThreadState(), stepper);
                 return result;
             }
         };

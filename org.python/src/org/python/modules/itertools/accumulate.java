@@ -53,7 +53,7 @@ public class accumulate extends PyObject {
             return total;
         }
         if (binop == null) {
-            newtotal = total._add(val);
+            newtotal = total._add(Py.getThreadState(), val);
         } else {
             newtotal = binop.__call__(total, val);
         }

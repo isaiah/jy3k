@@ -936,6 +936,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitBinOp(BinOp node) {
         visit(node.getInternalLeft());
+        loadThreadState();
         visit(node.getInternalRight());
         String name = null;
         switch (node.getInternalOp()) {
@@ -984,7 +985,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 //            name = "_truediv";
 //        }
         name = node.isInplace() ? "_i" + name : "_" + name;
-        code.invokevirtual(p(PyObject.class), name, sig(PyObject.class, PyObject.class));
+        code.invokevirtual(p(PyObject.class), name, sig(PyObject.class, ThreadState.class, PyObject.class));
         return null;
     }
 

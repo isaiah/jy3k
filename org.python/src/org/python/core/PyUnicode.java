@@ -429,7 +429,6 @@ public class PyUnicode extends PySequence implements Iterable {
         return str___contains__(o);
     }
 
-    @Override
     public PyObject __format__(PyObject formatSpec) {
         return str___format__(formatSpec);
     }
@@ -1664,7 +1663,7 @@ public class PyUnicode extends PySequence implements Iterable {
      */
     private void renderField(PyObject fieldObj, CharSequence formatSpec, StringBuilder result) {
         PyUnicode formatSpecStr = formatSpec == null ? Py.EmptyUnicode : new PyUnicode(formatSpec);
-        result.append(fieldObj.__format__(formatSpecStr).asString());
+        result.append(BuiltinModule.format2(fieldObj, formatSpecStr).asString());
     }
 
     public String internedString() {
