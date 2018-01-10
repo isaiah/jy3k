@@ -13,12 +13,21 @@ public class PyStaticMethod extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyStaticMethod.class);
 
+    private final PyDictionary dict;
+
     @ExposedGet(name = "__func__")
     protected PyObject callable;
+
+    @Override
+    @ExposedGet(name = "__dict__")
+    public PyObject fastGetDict() {
+        return dict;
+    }
 
     public PyStaticMethod(PyObject callable) {
         super(TYPE);
         this.callable = callable;
+        this.dict = new PyDictionary();
     }
 
     @ExposedNew
@@ -42,6 +51,10 @@ public class PyStaticMethod extends PyObject implements Traverseproc {
         return callable;
     }
 
+    @ExposedMethod
+    public void __setattribute__(PyObject name, PyObject value) {
+        dict.put(name, value);
+    }
 
     /* Traverseproc implementation */
     @Override
