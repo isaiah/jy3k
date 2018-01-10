@@ -31,6 +31,14 @@ import java.lang.invoke.SwitchPoint;
 public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
+    static final MethodHandle GETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__getattr__",
+                    MethodType.methodType(PyObject.class, String.class));
+    static final MethodHandle GETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__getitem__",
+                            MethodType.methodType(PyObject.class, PyObject.class));
+    static final MethodHandle SETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__setattr__",
+            MethodType.methodType(void.class, String.class, PyObject.class));
+    static final MethodHandle SETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__setitem__",
+            MethodType.methodType(void.class, PyObject.class, PyObject.class));
 
     @Override
     public GuardedInvocation getGuardedInvocation(LinkRequest linkRequest, LinkerServices linkerServices) throws Exception {
@@ -44,24 +52,19 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
         switch (baseOperation) {
             case GET:
                 if (namespace == StandardNamespace.PROPERTY) {
-                    Class<?> receiverClass = self.getClass();
-                    mh = LOOKUP.findVirtual(receiverClass, "__getattr__",
-                            MethodType.methodType(PyObject.class, String.class));
+                    mh = GETATTR;
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
-                    mh = LOOKUP.findVirtual(self.getClass(), "__getitem__",
-                            MethodType.methodType(PyObject.class, PyObject.class));
+                    mh = GETITEM;
                 }
                 guard = Guards.getIdentityGuard(self);
                 break;
             case SET:
                 if (namespace == StandardNamespace.PROPERTY) {
-                    mh = LOOKUP.findVirtual(self.getClass(), "__setattr__",
-                            MethodType.methodType(void.class, String.class, PyObject.class));
+                    mh = SETATTR;
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
-                     mh = LOOKUP.findVirtual(self.getClass(), "__setitem__",
-                            MethodType.methodType(void.class, PyObject.class, PyObject.class));
+                     mh = SETITEM;
                 }
                 guard = Guards.getIdentityGuard(self);
                 break;
