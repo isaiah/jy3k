@@ -13,12 +13,16 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 import org.python.io.ChannelFD;
 import org.python.io.util.FilenoUtil;
 
 import java.io.IOException;
+import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -144,18 +148,15 @@ public class _io {
         if (pathMethod != null) {
             file = pathMethod.__call__();
         }
-        Path path;
-        try {
-            path = Paths.get(file.asString());
-        } catch (InvalidPathException e) {
-            throw Py.ValueError(e.getMessage());
+        Path path = null;
+        if (file instanceof PyUnicode) {
+            try {
+                path = Paths.get(file.asString());
+            } catch (InvalidPathException e) {
+                throw Py.ValueError(e.getMessage());
+            }
         }
-//        FileChannel ch;
-//        try {
-//            ch = FileChannel.open(path, options);
-//        } catch (IOException e) {
-//            throw Py.IOError(e);
-//        }
+
         boolean line_buffering = false;
 
         if (buffering == 0) {
@@ -184,11 +185,11 @@ public class _io {
             buffering = DEFAULT_BUFFER_SIZE;
         }
 
-        FileChannel ch;
+        Channel ch;
         int fileno;
         if (file instanceof PyLong) {
             fileno = file.asInt();
-            ch = (FileChannel) filenoUtil.getWrapperFromFileno(fileno).ch;
+            ch = filenoUtil.getWrapperFromFileno(fileno).ch;
         } else {
             try {
                 ch = FileChannel.open(path, mode.toOptions());
@@ -202,14 +203,14 @@ public class _io {
         // If binary, return the just the buffered file
         if (mode.binary) {
             if (mode.updating) {
-                return new PyBufferedRandom(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering);
+                return new PyBufferedRandom(Channels.newInputStream((ReadableByteChannel) ch), Channels.newOutputStream((WritableByteChannel) ch), buffering);
             } else if (mode.writing || mode.appending || mode.creating) {
-                return new PyBufferedWriter(Channels.newOutputStream(ch), buffering);
+                return new PyBufferedWriter(Channels.newOutputStream((WritableByteChannel) ch), buffering);
             } else if (mode.reading) {
-                return new PyBufferedReader(Channels.newInputStream(ch), buffering);
+                return new PyBufferedReader(Channels.newInputStream((ReadableByteChannel) ch), buffering);
             }
         }
-        return new PyTextIOWrapper(Channels.newInputStream(ch), Channels.newOutputStream(ch), buffering, fileno);
+        return new PyTextIOWrapper(Channels.newInputStream((ReadableByteChannel) ch), Channels.newOutputStream((WritableByteChannel) ch), buffering, fileno);
     }
 
     private static final String[] openKwds = {"file", "mode", "buffering", "encoding", "errors",
