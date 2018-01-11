@@ -43,10 +43,11 @@ public class JycompileAntTask extends MatchingTask {
     private void filter(File[] files) {
         for (File src : files) {
             if (src.isDirectory()) {
-                if (!src.toPath().endsWith(Import.CACHEDIR) && !src.toPath().endsWith("test") && !src.toPath().endsWith("tests")) {
-                    filter(src.listFiles());
+                Path p = src.toPath();
+                if (p.endsWith(Import.CACHEDIR) || p.getFileName().startsWith("test")) {
+                    continue;
                 }
-                continue;
+                filter(src.listFiles());
             }
             if (!src.getName().endsWith(".py")) {
                 continue;
