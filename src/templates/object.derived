@@ -9,7 +9,6 @@ unary1: __float__ float
 unary1: __complex__ complex
 unary1: __abs__
 unary1: __reduce__
-unary1: __dir__
 rest:
 
   public PyObject __int__() {

@@ -17,8 +17,9 @@ import org.python.modules.sys.SysModule;
  */
 public class BuiltinModule {
     private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName dir = new InvokeByName("__dir__", PyObject.class, PyObject.class, ThreadState.class);
 
     public static void fillWithBuiltins(PyObject dict) {
         /* newstyle */
@@ -264,7 +265,7 @@ public class BuiltinModule {
     }
 
     public static PyObject dir1(PyObject o) {
-        PyObject ret = o.__dir__();
+        PyObject ret = o.unaryOp(Py.getThreadState(), dir);
         if (!Py.isInstance(ret, PyList.TYPE)) {
             ret = new PyList(ret);
         }

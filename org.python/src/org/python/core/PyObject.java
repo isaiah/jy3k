@@ -1205,7 +1205,8 @@ public class PyObject implements Serializable {
      *
      * @return a list of names defined by this object.
      **/
-    public PyObject __dir__() {
+    @ExposedMethod
+    public PyObject object___dir__() {
         PyDictionary accum = new PyDictionary();
         __rawdir__(accum);
         PyList ret = accum.keys_as_list();
@@ -1741,7 +1742,7 @@ public class PyObject implements Serializable {
         return inplaceBinOp(ts, iadd, add, radd, o2);
     }
 
-    private final PyObject inplaceBinOp(ThreadState ts, InvokeByName inplaceOp, InvokeByName op, InvokeByName rop, PyObject value) {
+    public final PyObject inplaceBinOp(ThreadState ts, InvokeByName inplaceOp, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
             Object func = inplaceOp.getGetter().invokeExact(this);
             PyObject ret = (PyObject) inplaceOp.getInvoker().invokeExact(func, ts, value);
@@ -1758,7 +1759,7 @@ public class PyObject implements Serializable {
         return binOp(ts, op, rop, value);
     }
 
-    private final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value) {
+    public final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
             Object func = op.getGetter().invokeExact(this);
             PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
@@ -1767,6 +1768,17 @@ public class PyObject implements Serializable {
             }
             func = rop.getGetter().invokeExact(value);
             return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        }
+    }
+
+    public final PyObject unaryOp(ThreadState ts, InvokeByName op) {
+        try {
+            Object func = op.getGetter().invokeExact(this);
+            return (PyObject) op.getInvoker().invokeExact(func, ts);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {

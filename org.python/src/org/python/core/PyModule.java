@@ -120,29 +120,6 @@ public class PyModule extends PyObject implements Traverseproc {
         return Py.getSystemState().importlib.invoke("_module_repr", this);
     }
 
-    public PyObject __dir__() {
-        // Some special casing to ensure that classes deriving from PyModule
-        // can use their own __dict__. Although it would be nice to do this in
-        // PyModuleDerived, current templating in gderived.py does not support
-        // including from object, then overriding a specific method.
-        PyObject d;
-        if (this instanceof PyModuleDerived) {
-            d = __findattr_ex__("__dict__");
-        } else {
-            d = __dict__;
-        }
-        if (d == null || d.__finditem__("__name__") == null) {
-            throw Py.SystemError("nameless module");
-        }
-        if (!(d instanceof PyDictionary ||
-                  d instanceof PyStringMap ||
-                  d instanceof PyDictProxy)) {
-            throw Py.TypeError(String.format("%.200s.__dict__ is not a dictionary",
-                    getType().fastGetName().toLowerCase()));
-        }
-        return d.invoke("keys");
-    }
-
     private void ensureDict() {
         if (__dict__ == null) {
             __dict__ = new PyStringMap();
