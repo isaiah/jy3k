@@ -154,10 +154,10 @@ public class PyTextIOWrapper extends PyTextIOBase {
             if (line == null) {
                 return Py.EmptyUnicode;
             }
-            if (reader.ready() || line.equals("")) { // empty string to differenciate from EOF (Ctrl+D)
+//            if (reader.ready() || line.equals("")) { // empty string to differenciate from EOF (Ctrl+D)
                 return new PyUnicode(line + System.lineSeparator());
-            }
-            return new PyUnicode(line);
+//            }
+//            return new PyUnicode(line);
         } catch (NonReadableChannelException e) {
             throw unsupported("read");
         } catch (IOException e) {
