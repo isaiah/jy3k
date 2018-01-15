@@ -134,6 +134,20 @@ public class PyTextIOWrapper extends PyTextIOBase {
     }
 
     @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod(names = "__next__")
+    public PyObject TextIOWrapper___next__() {
+        PyObject line = readline();
+        if (line == Py.EmptyUnicode) {
+            throw Py.StopIteration();
+        }
+        return line;
+    }
+
+    @ExposedMethod
     public PyObject readline() {
         try {
             String line = reader.readLine();

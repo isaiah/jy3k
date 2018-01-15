@@ -931,7 +931,14 @@ public class PyObject implements Serializable {
     }
 
     public static PyObject getIter(PyObject o) {
-        return o.unaryOp(Py.getThreadState(), iter);
+        try {
+            return o.unaryOp(Py.getThreadState(), iter);
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                throw Py.TypeError(String.format("%s object is not iterable", o.getType().fastGetName()));
+            }
+            throw e;
+        }
     }
 
     public static PyObject iterNext(PyObject iterator) {
