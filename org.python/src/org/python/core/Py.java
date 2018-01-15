@@ -2216,7 +2216,7 @@ public final class Py {
      */
     public static PyObject PyIter_Next(PyObject iter) {
         try {
-            return iter.__next__();
+            return PyObject.iterNext(iter);
         } catch (PyException e) {
             if (e.match(Py.StopIteration)) {
                 return null;

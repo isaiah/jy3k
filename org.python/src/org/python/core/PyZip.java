@@ -42,17 +42,12 @@ public class PyZip extends PyObject {
         PyObject[] next = new PyObject[iters.length];
         int j = 0;
         for (PyObject iter: iters) {
-            next[j] = iter.__next__();
+            next[j] = PyObject.iterNext(iter);
             if (next[j++] == null) {
                 throw Py.StopIteration();
             }
         }
         return new PyTuple(next);
-    }
-
-    @Override
-    public PyObject __next__() {
-        return zip___next__();
     }
 
     @ExposedMethod

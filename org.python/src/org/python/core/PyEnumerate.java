@@ -64,7 +64,7 @@ public class PyEnumerate extends PyIterator {
     public final PyObject enumerate___next__() {
         PyObject nextItem;
 
-        nextItem = sit.__next__();
+        nextItem = PyObject.iterNext(sit);
         if (nextItem == null) {
             if (sit instanceof PyIterator && ((PyIterator)sit).stopException != null) {
                 throw ((PyIterator)sit).stopException;
