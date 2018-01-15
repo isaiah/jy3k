@@ -118,12 +118,6 @@ public class repeat extends PyIterator {
         throw Py.TypeError("len() of unsized object");
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = "__next__")
     @Override
     public PyObject __next__() {

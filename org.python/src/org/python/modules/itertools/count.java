@@ -113,9 +113,4 @@ public class count extends PyObject {
         return iter.__next__();
     }
 
-    @Override
-    @ExposedMethod(names = {"__iter__"})
-    public PyObject __iter__() {
-        return this;
-    }
 }

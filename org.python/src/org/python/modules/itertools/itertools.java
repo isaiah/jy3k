@@ -92,7 +92,7 @@ public class itertools {
             } else {
                 this.predicate = predicate;
             }
-            this.iterator = iterable.__iter__();
+            this.iterator = getIter(iterable);
             this.filterTrue = filterTrue;
         }
 
@@ -159,7 +159,7 @@ public class itertools {
 
         WhileIterator(PyObject predicate, PyObject iterable, boolean drop) {
             this.predicate = predicate;
-            iterator = iterable.__iter__();
+            iterator = getIter(iterable);
             this.drop = drop;
         }
 

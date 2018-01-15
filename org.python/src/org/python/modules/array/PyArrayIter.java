@@ -9,8 +9,6 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
-import java.nio.ByteBuffer;
-
 @ExposedType(name = "arrayiterator")
 public class PyArrayIter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyArrayIter.class);
@@ -24,11 +22,6 @@ public class PyArrayIter extends PyObject {
         this.array = array;
         this.pos = 0;
         this.exhausted = false;
-    }
-
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod

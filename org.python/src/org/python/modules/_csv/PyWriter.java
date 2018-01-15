@@ -69,7 +69,7 @@ public class PyWriter extends PyObject implements Traverseproc {
         PyObject row_obj;
         boolean result;
 
-        row_iter = seqseq.__iter__();
+        row_iter = PyObject.getIter(seqseq);
         if (row_iter == null) {
             throw _csv.Error("writerows() argument must be iterable");
         }

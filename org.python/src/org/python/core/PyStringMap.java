@@ -150,11 +150,6 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         }
     }
 
-    @Override
-    public PyObject __iter__() {
-        return stringmap___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.dict___iter___doc)
     public final PyObject stringmap___iter__() {
         return stringmap_keys();
@@ -383,7 +378,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
      * @param other another PyObject
      */
     private void mergeFromSeq(PyObject other) {
-        PyObject pairs = other.__iter__();
+        PyObject pairs = PyObject.getIter(other);
         PyObject pair;
 
         for (int i = 0; (pair = pairs.__next__()) != null; i++) {
@@ -585,8 +580,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             size = c.size();
         }
 
-        @Override
-        @ExposedMethod(names = "__iter__")
+        @ExposedMethod
         public PyObject __iter__() {
             return this;
         }
@@ -620,8 +614,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             size = s.size();
         }
 
-        @Override
-        @ExposedMethod(names = "__iter__")
+        @ExposedMethod
         public PyObject __iter__() {
             return this;
         }
@@ -655,8 +648,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             size = s.size();
         }
 
-        @Override
-        @ExposedMethod(names = "__iter__")
+        @ExposedMethod
         public PyObject __iter__() {
             return this;
         }

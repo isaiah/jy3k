@@ -20,6 +20,7 @@ public class BuiltinModule {
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName dir = new InvokeByName("__dir__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
     public static void fillWithBuiltins(PyObject dict) {
         /* newstyle */
@@ -139,7 +140,7 @@ public class BuiltinModule {
     }
 
     public static PyObject all(PyObject arg) {
-        PyObject iter = arg.__iter__();
+        PyObject iter = PyObject.getIter(arg);
         if (iter == null) {
             throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
         }
@@ -152,7 +153,7 @@ public class BuiltinModule {
     }
 
     public static PyObject any(PyObject arg) {
-        PyObject iter = arg.__iter__();
+        PyObject iter = PyObject.getIter(arg);
         if (iter == null) {
             throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
         }
@@ -265,7 +266,8 @@ public class BuiltinModule {
     }
 
     public static PyObject dir1(PyObject o) {
-        PyObject ret = o.unaryOp(Py.getThreadState(), dir);
+        PyObject func = PyType.lookupSpecial(o, "__dir__");
+        PyObject ret = func.__call__();
         if (!Py.isInstance(ret, PyList.TYPE)) {
             ret = new PyList(ret);
         }
@@ -528,7 +530,7 @@ public class BuiltinModule {
     }
 
     public static PyObject iter1(PyObject obj) {
-        return obj.__iter__();
+        return PyObject.getIter(obj);
     }
 
     public static PyObject iter2(PyObject callable, PyObject sentinel) {
@@ -870,7 +872,7 @@ public class BuiltinModule {
             throw Py.TypeError(String.format("sorted() takes at most 3 arguments (%d given)",
                                              args.length));
         } else {
-            PyObject iter = args[0].__iter__();
+            PyObject iter = PyObject.getIter(args[0]);
             if (iter == null) {
                 throw Py.TypeError(String.format("'%s' object is not iterable",
                                                  args[0].getType().fastGetName()));

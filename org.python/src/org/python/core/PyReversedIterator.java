@@ -23,15 +23,16 @@ public class PyReversedIterator extends PyIterator {
     }
 
     @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod
     public PyObject reversed_iterator___next__() {
         if(idx >= 0) {
             return seq.__finditem__(idx--);
         }
         throw Py.StopIteration();
-    }
-
-    public PyObject __next__() {
-        return reversed_iterator___next__();
     }
 
     private PyObject seq;

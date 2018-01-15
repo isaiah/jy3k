@@ -296,7 +296,7 @@ public class operator {
     @ExposedFunction
     public static int indexOf(PyObject seq, PyObject item) {
         int i = 0;
-        PyObject iter = seq.__iter__();
+        PyObject iter = PyObject.getIter(seq);
         for (PyObject tmp = null; (tmp = iter.__next__()) != null; i++) {
             if (item.richCompare(tmp, CompareOp.EQ).isTrue()) {
                 return i;

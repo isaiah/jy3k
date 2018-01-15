@@ -1144,7 +1144,7 @@ public final class Py {
         } else if (iter instanceof PyGenerator) {
             frame.f_yieldfrom = iter;
         } else {
-            frame.f_yieldfrom = iter.__iter__();
+            frame.f_yieldfrom = PyObject.getIter(iter);
         }
     }
 
@@ -2245,7 +2245,7 @@ public final class Py {
         }
 
         PyObject[] ret = new PyObject[argcount + argcountAfter + 1];
-        PyObject iter = obj.__iter__();
+        PyObject iter = PyObject.getIter(obj);
         int i = 0;
         for (; i < argcount; i++) {
             PyObject tmp = PyIter_Next(iter);
@@ -2287,7 +2287,7 @@ public final class Py {
 
     /** helper method for code generator */
     public static boolean addAll(List<PyObject> list, PyObject seq) {
-        PyObject iter = seq.__iter__();
+        PyObject iter = PyObject.getIter(seq);
         for (PyObject cur; ((cur = iter.__next__()) != null); ) {
             list.add(cur);
         }
@@ -2296,7 +2296,7 @@ public final class Py {
 
     public static PyObject iter(PyObject seq, String message) {
         try {
-            return seq.__iter__();
+            return PyObject.getIter(seq);
         } catch (PyException exc) {
             if (exc.match(Py.TypeError)) {
                 throw Py.TypeError(message);

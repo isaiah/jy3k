@@ -19,12 +19,6 @@ public class PyDequeIter extends PyObject {
     }
 
     @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
-    @Override
     @ExposedMethod(names = "__next__")
     public PyObject __next__() {
         synchronized (pyDeque) {

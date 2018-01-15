@@ -53,11 +53,6 @@ public class PyFilter extends PyObject {
         throw Py.StopIteration();
     }
 
-    @Override
-    public PyObject __iter__() {
-        return filter___iter__();
-    }
-
     @ExposedMethod
     public PyObject filter___iter__() {
         return this;

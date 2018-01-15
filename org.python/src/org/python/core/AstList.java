@@ -82,7 +82,7 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
 
     @ExposedMethod
     final boolean astlist___bool__() {
-        return seq___bool__();
+        return isTrue();
     }
 
     @ExposedMethod
@@ -148,7 +148,7 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
 
         PyObject it;
         try {
-            it = o.__iter__();
+            it = PyObject.getIter(o);
         } catch (PyException pye) {
             if (!pye.match(Py.TypeError)) {
                 throw pye;
@@ -157,10 +157,6 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
         }
         extend(it);
         return this;
-    }
-
-    public PyObject __add__(PyObject other) {
-        return astlist___add__(other);
     }
 
     @ExposedMethod(type = MethodType.BINARY)
@@ -414,7 +410,7 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
         if (step != 0) {
             if(value == this) {
                 PyList newseq = new PyList();
-                PyObject iter = value.__iter__();
+                PyObject iter = PyObject.getIter(value);
                 for(PyObject item = null; (item = iter.__next__()) != null;) {
                     newseq.append(item);
                 }

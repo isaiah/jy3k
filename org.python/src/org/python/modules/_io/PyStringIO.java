@@ -111,11 +111,6 @@ public class PyStringIO extends PyTextIOWrapper {
     }
 
     @ExposedMethod
-    public PyObject __iter__() {
-        return this;
-    }
-
-    @ExposedMethod
     public PyObject __next__() {
         _complain_ifclosed();
         String r = readline(-1L);

@@ -35,7 +35,6 @@ public class PyWeakProxy extends AbstractReference {
     public void __setattr__(String name, PyObject value) { py().__setattr__(name, value); }
     public void __delattr__(String name) { py().__delattr__(name); }
 
-    public PyObject __iter__() { return py().__iter__(); }
     public PyUnicode __str__() { return py().__str__(); }
     public PyFloat __float__() { return py().__float__(); }
     public PyObject __int__() { return py().__int__(); }

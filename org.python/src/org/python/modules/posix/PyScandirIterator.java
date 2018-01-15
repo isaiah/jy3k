@@ -31,12 +31,6 @@ public class PyScandirIterator extends PyObject {
         return new PyDirEntry(iter.next(), bytes);
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = {"close", "__exit__"})
     public PyObject close(PyObject[] args, String[] kwds) {
         try {

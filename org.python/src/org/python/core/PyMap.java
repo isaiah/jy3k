@@ -55,11 +55,6 @@ public class PyMap extends PyObject {
         return f.__call__(args);
     }
 
-    @Override
-    public PyObject __iter__() {
-        return map___iter__();
-    }
-
     @ExposedMethod
     public PyObject map___iter__() {
         return this;

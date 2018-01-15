@@ -624,17 +624,6 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
 
     }
 
-    /**
-     * Return an iterator on which <code>next</code> may be repeatedly called to produce (usually)
-     * lines from this stream or file.
-     */
-    @Override
-    public PyObject __iter__() {
-        _checkClosed();
-        // The object *is* an iterator so return itself
-        return this;
-    }
-
     // _IOBase___iter__ = _IOBase___enter__
 
     @Override

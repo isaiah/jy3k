@@ -69,6 +69,8 @@ public class PyObject implements Serializable {
     private static final InvokeByName ixor = new InvokeByName("__ixor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
 
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName iter = new InvokeByName("__iter__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class);
     /**
      * Primitives classes their wrapper classes.
      */
@@ -928,32 +930,12 @@ public class PyObject implements Serializable {
         __delitem__(new PyUnicode(key));
     }
 
-    /**
-     * Return an iterator that is used to iterate the element of this sequence. From version 2.2,
-     * this method is the primary protocol for looping over sequences.
-     * <p>
-     * If a PyObject subclass should support iteration based in the __finditem__() method, it must
-     * supply an implementation of __iter__() like this:
-     * <p>
-     * <pre>
-     * public PyObject __iter__() {
-     *     return new PySequenceIter(this);
-     * }
-     * </pre>
-     * <p>
-     * When iterating over a python sequence from java code, it should be done with code like this:
-     * <p>
-     * <pre>
-     * for (PyObject item : seq.asIterable()) {
-     *     // Do somting with item
-     * }
-     * </pre>
-     *
-     * @since 2.2
-     */
-    public PyObject __iter__() {
-        throw Py.TypeError(String.format("'%.200s' object is not iterable",
-                getType().fastGetName()));
+    public static PyObject getIter(PyObject o) {
+        return o.unaryOp(Py.getThreadState(), iter);
+    }
+
+    public static PyObject iterNext(PyObject iterator) {
+        return iterator.unaryOp(Py.getThreadState(), next);
     }
 
     /**
@@ -962,7 +944,7 @@ public class PyObject implements Serializable {
      * the returned Iterable.
      */
     public Iterable<PyObject> asIterable() {
-        return () -> new WrappedIterIterator<PyObject>(__iter__()) {
+        return () -> new WrappedIterIterator<PyObject>(getIter(this)) {
             public PyObject next() {
                 return getNext();
             }
@@ -2560,7 +2542,7 @@ public class PyObject implements Serializable {
         if (!(this instanceof PyList)) {
             listitems = Py.None;
         } else {
-            listitems = ((PyList) this).__iter__();
+            listitems = PyObject.getIter(this);
         }
         if (!(this instanceof PyDictionary)) {
             dictitems = Py.None;

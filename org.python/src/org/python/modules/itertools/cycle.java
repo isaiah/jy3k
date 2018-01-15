@@ -50,7 +50,7 @@ public class cycle extends PyIterator {
         iter = new itertools.ItertoolsIterator() {
             List<PyObject> saved = new ArrayList<PyObject>();
             int counter = 0;
-            PyObject iterator = sequence.__iter__();
+            PyObject iterator = getIter(sequence);
 
             boolean save = true;
 
@@ -83,12 +83,6 @@ public class cycle extends PyIterator {
             }
 
         };
-    }
-
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod(names = "__next__")

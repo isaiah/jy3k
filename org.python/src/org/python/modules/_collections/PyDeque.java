@@ -452,11 +452,6 @@ public class PyDeque extends PyObject implements Traverseproc {
         return tmp;
     }
 
-    @Override
-    public PyObject __iter__() {
-        return deque___iter__();
-    }
-
     @ExposedMethod
     final PyObject deque___iter__() {
         return new PyDequeIter(this);
@@ -617,7 +612,7 @@ public class PyDeque extends PyObject implements Traverseproc {
         if (dict == null) {
             dict = Py.None;
         }
-        return new PyTuple(getType(), Py.EmptyTuple, dict, __iter__());
+        return new PyTuple(getType(), Py.EmptyTuple, dict, PyObject.getIter(this));
     }
 
     @ExposedMethod

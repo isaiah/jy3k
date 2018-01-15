@@ -27,7 +27,7 @@ public class PyEnumerate extends PyIterator {
     public PyEnumerate(PyType subType, PyObject seq, PyObject start) {
         super(subType);
         index = start;
-        sit = seq.__iter__();
+        sit = PyObject.getIter(seq);
     }
 
     public PyEnumerate(PyObject seq, PyObject start) {
@@ -36,7 +36,7 @@ public class PyEnumerate extends PyIterator {
 
     @ExposedMethod(doc = BuiltinDocs.enumerate___iter___doc)
     public final PyObject enumerate___iter__() {
-        return super.__iter__();
+        return this;
     }
 
     @ExposedNew

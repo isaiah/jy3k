@@ -202,11 +202,6 @@ public class PyTuple extends PySequenceList implements List {
         return repeat(o.asIndex(Py.OverflowError));
     }
 
-    @Override
-    public PyObject __iter__() {
-        return tuple___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.tuple___iter___doc)
     public PyObject tuple___iter__() {
         return new PyTupleIterator(this);

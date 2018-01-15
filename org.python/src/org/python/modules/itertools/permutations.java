@@ -12,15 +12,10 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 
-@ExposedType(name = "itertools.permutations", base = PyObject.class, doc = permutations.permutations_doc)
+@ExposedType(name = "itertools.permutations", base = PyObject.class)
 public class permutations extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(permutations.class);
     private PyIterator iter;
-
-    public static final String permutations_doc =
-        "permutations(iterable[, r]) --> permutations object\n\n" +
-        "Return successive r-length permutations of elements in the iterable.\n\n" +
-        "permutations(range(3), 2) --> (0,1), (0,2), (1,0), (1,2), (2,0), (2,1)";
 
     public permutations() {
         super();
@@ -103,16 +98,14 @@ public class permutations extends PyIterator {
         };
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
+    @ExposedMethod(names = "__next__")
+    public PyObject permutations___next__() {
+        return doNext(iter.__next__());
     }
 
-    @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
     }
 
     /* Traverseproc implementation */

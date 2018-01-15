@@ -1,6 +1,8 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import org.python.annotations.ExposedMethod;
+
 import static org.python.core.CompareOp.*;
 
 /**
@@ -154,19 +156,10 @@ public abstract class PySequence extends PyObject {
 
     @Override
     public boolean isTrue() {
-        return seq___bool__();
-    }
-
-    final boolean seq___bool__() {
         return __len__() != 0;
     }
 
-    @Override
-    public PyObject __iter__() {
-        return seq___iter__();
-    }
-
-    final PyObject seq___iter__() {
+    public PyObject seq___iter__() {
         return new PySequenceIter(this);
     }
 

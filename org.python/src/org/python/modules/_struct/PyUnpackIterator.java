@@ -49,12 +49,6 @@ public class PyUnpackIterator extends PyObject {
         return new PyTuple(res);
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = "__length_hint__")
     public PyObject __length_hint__() {
         return new PyLong(buffer.remaining() / struct.size);

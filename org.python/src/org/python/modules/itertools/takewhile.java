@@ -47,12 +47,6 @@ public class takewhile extends PyIterator {
         iter = new itertools.WhileIterator(predicate, iterable, false);
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = "__next__")
     @Override
     public PyObject __next__() {

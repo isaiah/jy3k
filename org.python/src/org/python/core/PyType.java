@@ -9,6 +9,7 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 import org.python.bootstrap.Import;
+import org.python.core.linker.InvokeByName;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.expose.TypeBuilder;
 import org.python.modules._weakref.WeakrefModule;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class PyType extends PyObject implements Serializable, Traverseproc {
 
     public static final PyType TYPE = fromClass(PyType.class);
+    private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:
@@ -1210,6 +1212,19 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
      */
     public PyObject lookup(String name) {
         return lookup_where(name, null);
+    }
+
+    public static PyObject lookupSpecial(PyObject obj, String name) {
+        PyType type = obj.getType();
+        PyObject ret = type.lookup(name);
+        Object descrgetfunc;
+        try {
+            descrgetfunc = get.getGetter().invokeExact(ret);
+            ret = (PyObject) get.getInvoker().invokeExact(descrgetfunc, Py.getThreadState(), obj, (PyObject) type);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
+        return ret;
     }
 
     /**

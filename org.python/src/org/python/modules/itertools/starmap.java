@@ -46,7 +46,7 @@ public class starmap extends PyIterator {
                     + starargs.length);
         }
         final PyObject callable = starargs[0];
-        final PyObject iterator = starargs[1].__iter__();
+        final PyObject iterator = getIter(starargs[1]);
 
         starmap___init__(callable, iterator);
     }
@@ -67,12 +67,6 @@ public class starmap extends PyIterator {
             }
 
         };
-    }
-
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod(names = "__next__")

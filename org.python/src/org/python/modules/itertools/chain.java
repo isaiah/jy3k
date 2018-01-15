@@ -31,12 +31,12 @@ public class chain extends PyObject {
 
     public chain(PyObject iterable) {
         super(TYPE);
-        source = iterable;
+        source = PyObject.getIter(iterable);
     }
 
     @ExposedClassMethod
     public static final PyObject from_iterable(PyType type, PyObject iterable) {
-        return new chain(iterable.__iter__());
+        return new chain(iterable);
     }
 
     /**
@@ -46,12 +46,6 @@ public class chain extends PyObject {
     @ExposedMethod
     final void chain___init__(final PyObject[] args, String[] kwds) {
         source = new PyIter(Arrays.asList(args));
-    }
-
-    @Override
-    @ExposedMethod(names = "__iter__", doc = BuiltinDocs.chain___iter___doc)
-    public PyObject __iter__() {
-        return this;
     }
 
     @Override
@@ -70,7 +64,7 @@ public class chain extends PyObject {
                 source = null;
                 throw Py.StopIteration();
             }
-            active = iterable.__iter__();
+            active = PyObject.getIter(iterable);
             if (active == null) {
                 source = null;
                 throw Py.StopIteration();

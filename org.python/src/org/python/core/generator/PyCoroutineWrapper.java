@@ -44,10 +44,6 @@ public class PyCoroutineWrapper extends PyObject {
         return cw_coroutine.throw$(type, value, tb);
     }
 
-    public PyObject __iter__() {
-        return coroutine_wrapper___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.coroutine_wrapper___iter___doc)
     final PyObject coroutine_wrapper___iter__() {
         return this;

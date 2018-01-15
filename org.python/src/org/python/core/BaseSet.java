@@ -182,15 +182,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         return !_set.isEmpty();
     }
 
-    /**
-     * Produce an iterable object.
-     *
-     * @return An iteration of the set.
-     */
-    public PyObject __iter__() {
-        return baseset___iter__();
-    }
-
     public final PyObject baseset___iter__() {
         return new PyIter(_set);
     }

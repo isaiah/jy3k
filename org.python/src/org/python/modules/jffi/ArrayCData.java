@@ -102,11 +102,6 @@ public class ArrayCData extends CData implements Pointer {
     }
 
 
-    @Override
-    public PyObject __iter__() {
-        return new ArrayIter();
-    }
-
     protected final SequenceIndexDelegate delegator = new SequenceIndexDelegate() {
 
         @Override

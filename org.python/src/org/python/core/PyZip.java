@@ -24,7 +24,7 @@ public class PyZip extends PyObject {
         zip.iters = new PyObject[itemsize];
 
         for (int j = 0; j < itemsize; j++) {
-            PyObject iter = args[j].__iter__();
+            PyObject iter = PyObject.getIter(args[j]);
             if (iter == null) {
                 throw Py.TypeError("zip argument #" + (j + 1) + " must support iteration");
             }
@@ -53,11 +53,6 @@ public class PyZip extends PyObject {
     @Override
     public PyObject __next__() {
         return zip___next__();
-    }
-
-    @Override
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod

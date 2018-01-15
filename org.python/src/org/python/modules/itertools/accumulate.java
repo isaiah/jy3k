@@ -23,7 +23,7 @@ public class accumulate extends PyObject {
 
     public accumulate(PyObject iter, PyObject binop) {
         super(TYPE);
-        this.iter = iter;
+        this.iter = PyObject.getIter(iter);
         this.binop = binop;
         this.total = null;
     }
@@ -37,7 +37,7 @@ public class accumulate extends PyObject {
         ArgParser ap = new ArgParser("accumulate", args, keywords, "iterable", "func");
         PyObject iterable = ap.getPyObject(0);
         PyObject func = ap.getPyObject(1, null);
-        return new accumulate(iterable.__iter__(), func);
+        return new accumulate(iterable, func);
     }
 
     @Override
@@ -60,12 +60,6 @@ public class accumulate extends PyObject {
 
         total = newtotal;
         return newtotal;
-    }
-
-    @Override
-    @ExposedMethod(names = {"__iter__"})
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod

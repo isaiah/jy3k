@@ -119,7 +119,7 @@ public class PyTeeIterator extends PyIterator {
         if (iterable instanceof PyTeeIterator) {
             return ((PyTeeIterator) iterable).tee___copy__();
         }
-        PyObject iterator = (PyObject)iterable.__iter__();
+        PyObject iterator = getIter(iterable);
         PyTeeData teeData = new PyTeeData(iterator);
         return new PyTeeIterator(teeData);
     }

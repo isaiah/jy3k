@@ -21,7 +21,7 @@ public abstract class WrappedIterIterator<E> implements Iterator<E> {
     public boolean hasNext() {
         if (!checkedForNext) {
             try {
-                next = iter.__next__();
+                next = PyObject.iterNext(iter);
             } catch (PyException e) {
                 if (e.match(Py.StopIteration)) {
                     next = null;

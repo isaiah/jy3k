@@ -384,11 +384,6 @@ public class PyList extends PySequenceList implements List {
         return ret;
     }
 
-    @Override
-    public PyObject __iter__() {
-        return list___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.list___iter___doc)
     public synchronized PyObject list___iter__() {
         return new PyFastSequenceIter(this);
@@ -659,7 +654,7 @@ public class PyList extends PySequenceList implements List {
             return this;
         }
 
-        extend(o.__iter__());
+        extend(PyObject.getIter(o));
         return this;
     }
 

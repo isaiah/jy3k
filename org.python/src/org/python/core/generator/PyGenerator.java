@@ -11,7 +11,6 @@ import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyTableCode;
 import org.python.core.PyTraceback;
-import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
@@ -203,11 +202,6 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             e.tracebackHere(state.frame);
             throw e;
         }
-    }
-
-    @Override
-    public PyObject __iter__() {
-        return generator___iter__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.generator___iter___doc)

@@ -97,7 +97,7 @@ public class islice extends PyIterator {
 
             int lastCount = 0;
 
-            PyObject iter = iterable.__iter__();
+            PyObject iter = getIter(iterable);
 
             public PyObject __next__() {
                 PyObject result = null;
@@ -119,14 +119,12 @@ public class islice extends PyIterator {
         };
     }
 
-    @Override
     @ExposedMethod(names = {"__next__"})
-    public PyObject __next__() {
+    public PyObject islice___next__() {
         return doNext(iter.__next__());
     }
 
-    @Override
-    @ExposedMethod(names = {"__iter__"})
+    @ExposedMethod
     public PyObject __iter__() {
         return this;
     }

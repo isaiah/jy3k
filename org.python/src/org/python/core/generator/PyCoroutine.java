@@ -50,11 +50,6 @@ public class PyCoroutine extends PyGenerator {
         return generator_throw$(type, value, tb);
     }
 
-    @Override
-    public PyObject __iter__() {
-        return coroutine___iter__();
-    }
-
     @ExposedMethod()
     final PyObject coroutine___iter__() {
         throw Py.TypeError("'coroutine' object is not iterable");

@@ -71,13 +71,6 @@ public final class PyScriptEngineScope extends PyObject {
         return __finditem__(key);
     }
 
-    // satisfy iterable
-    @ExposedMethod
-    @Override
-    public PyObject __iter__() {
-        return new ScopeIterator(this);
-    }
-
     @ExposedMethod(defaults = "Py.None")
     final PyObject scope_get(PyObject keyObj, PyObject defaultObj) {
         String key = keyObj.asString();

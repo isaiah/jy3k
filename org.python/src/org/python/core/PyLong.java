@@ -196,7 +196,7 @@ public class PyLong extends PyObject {
         }
         PyObject iter;
         try {
-            iter = bytes.__iter__();
+            iter = PyObject.getIter(bytes);
         } catch(PyException e) {
             throw Py.TypeError(String.format("cannot convert '%s' object to bytes", bytes.getType().fastGetName()));
         }

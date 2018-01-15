@@ -11,7 +11,6 @@ import org.python.core.BufferProtocol;
 import org.python.core.BuiltinDocs;
 import org.python.core.CompareOp;
 import org.python.core.Py;
-import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
 import org.python.core.PyBytes;
 import org.python.core.PyException;
@@ -24,7 +23,6 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.buffer.SimpleBuffer;
-import org.python.core.buffer.SimpleWritableBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -287,12 +285,6 @@ public class PyArrayArray extends PyObject implements BufferProtocol {
 
     private int byteLength() {
         return readBuf().remaining();
-    }
-
-    @Override
-    @ExposedMethod
-    public PyObject __iter__() {
-        return new PyArrayIter(this);
     }
 
     @ExposedMethod(names = {"__mul__", "__rmul__"})

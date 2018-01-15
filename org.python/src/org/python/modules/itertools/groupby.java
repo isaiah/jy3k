@@ -59,7 +59,7 @@ public class groupby extends PyIterator {
         iter = new itertools.ItertoolsIterator() {
             PyObject currentKey;
             PyObject currentValue;
-            PyObject iterator = iterable.__iter__();
+            PyObject iterator = getIter(iterable);
             PyObject targetKey = currentKey = currentValue = new PyRange(0);
 
             public PyObject __next__() {

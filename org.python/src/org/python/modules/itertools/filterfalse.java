@@ -49,12 +49,6 @@ public class filterfalse extends PyIterator {
         iter = new itertools.FilterIterator(predicate, iterable, false);
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = "__next__")
     @Override
     public PyObject __next__() {

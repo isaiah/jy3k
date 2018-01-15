@@ -28,12 +28,6 @@ public abstract class PyIterator extends PyObject implements Iterable<Object>, T
         super(subType);
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     /**
      * The exposed next method.
      *

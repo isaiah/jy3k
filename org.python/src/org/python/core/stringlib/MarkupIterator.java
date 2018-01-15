@@ -39,11 +39,6 @@ public class MarkupIterator extends PyObject {
         numbering = enclosingIterator.numbering;
     }
 
-    @Override
-    public PyObject __iter__() {
-        return formatteriterator___iter__();
-    }
-
     @ExposedMethod
     final PyObject formatteriterator___iter__() {
         return this;

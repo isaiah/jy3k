@@ -221,11 +221,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         }
     }
 
-    @Override
-    public PyObject __iter__() {
-        return dict___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.dict___iter___doc)
     public final PyObject dict___iter__() {
         return new ValuesIter(getMap().keySet());
@@ -431,7 +426,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
      * @param other another PyObject
      */
     private void mergeFromSeq(PyObject other) {
-        PyObject pairs = other.__iter__();
+        PyObject pairs = PyObject.getIter(other);
         PyObject pair;
 
         for (int i = 0; (pair = pairs.__next__()) != null; i++) {
@@ -619,24 +614,21 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             size = values.size();
         }
 
-        @Override
         @ExposedMethod(names = "__iter__")
-        public PyObject __iter__() {
+        public PyObject dict_valueiterator___iter__() {
             return this;
         }
 
-        @Override
         @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
+        public PyObject dict_valueiterator___next__() {
             if (!iterator.hasNext()) {
                 throw Py.StopIteration();
             }
             return iterator.next();
         }
 
-        @Override
         @ExposedMethod(names = "__length_hint__")
-        public int __len__() {
+        public int __length_hint__() {
             return size;
         }
     }
@@ -653,6 +645,11 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             size = items.size();
         }
 
+        @ExposedMethod
+        public PyObject __iter__() {
+            return this;
+        }
+
         @Override
         @ExposedMethod(names = "__next__")
         public PyObject __next__() {
@@ -661,12 +658,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             }
             Entry<PyObject, PyObject> entry = iterator.next();
             return new PyTuple(entry.getKey(), entry.getValue());
-        }
-
-        @Override
-        @ExposedMethod(names = "__iter__")
-        public PyObject __iter__() {
-            return this;
         }
 
         @Override
@@ -681,11 +672,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
         public PyDictionaryViewValues(PyDictionary dvDict) {
             super(dvDict);
-        }
-
-        @Override
-        public PyObject __iter__() {
-            return dict_values___iter__();
         }
 
         @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
@@ -710,11 +696,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
         public PyDictionaryViewKeys(PyDictionary dvDict) {
             super(dvDict);
-        }
-
-        @Override
-        public PyObject __iter__() {
-            return dict_keys___iter__();
         }
 
         @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
@@ -802,11 +783,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
         public PyDictionaryViewItems(PyDictionary dvDict) {
             super(dvDict);
-        }
-
-        @Override
-        public PyObject __iter__() {
-            return dict_items___iter__();
         }
 
         @ExposedMethod(doc = BuiltinDocs.set___iter___doc)

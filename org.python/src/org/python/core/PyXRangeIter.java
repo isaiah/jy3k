@@ -24,20 +24,18 @@ public class PyXRangeIter extends PyObject {
         this.len = len;
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
-    @Override
     @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
-    public PyObject __next__() {
+    public PyObject range_iterator___next__() {
         if (index < len) {
             return new PyLong(start + index++ * step);
         }
 
         throw Py.StopIteration();
+    }
+
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
     }
 
     @Override

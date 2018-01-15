@@ -27,7 +27,7 @@ public class compress extends PyIterator {
 
     public compress(PyObject dataIterable, PyObject selectorsIterable) {
         super(TYPE);
-        compress___init__(dataIterable.__iter__(), selectorsIterable.__iter__());
+        compress___init__(getIter(dataIterable), getIter(selectorsIterable));
     }
 
     @ExposedNew
@@ -37,10 +37,10 @@ public class compress extends PyIterator {
         if (args.length > 2) {
             throw Py.TypeError(String.format("compress() takes at most 2 arguments (%s given)", args.length));
         }
-        PyObject data = ap.getPyObject(0).__iter__();
-        PyObject selectors = ap.getPyObject(1).__iter__();
+        PyObject data = ap.getPyObject(0);
+        PyObject selectors = ap.getPyObject(1);
 
-        compress___init__(data, selectors);
+        compress___init__(getIter(data), getIter(selectors));
     }
 
     private void compress___init__(final PyObject data, final PyObject selectors) {
@@ -60,12 +60,6 @@ public class compress extends PyIterator {
             }
 
         };
-    }
-
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod(names = "__next__")

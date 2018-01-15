@@ -150,11 +150,6 @@ public class PyRange extends PySequence {
         return ret;
     }
 
-    @Override
-    public PyObject __iter__() {
-        return range___iter__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.range___iter___doc)
     public PyObject range___iter__() {
         return range_iter();

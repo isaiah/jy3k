@@ -1157,7 +1157,7 @@ public class PyUnicode extends PySequence implements Iterable {
         StringJoiner joiner = new StringJoiner(getString());
         PyObject item;
         long totalSize = 0;
-        PyObject iter = obj.__iter__();
+        PyObject iter = PyObject.getIter(obj);
         try {
             for (int i = 0; (item = iter.__next__()) != null; i++) {
                 if (!(item instanceof PyUnicode)) {

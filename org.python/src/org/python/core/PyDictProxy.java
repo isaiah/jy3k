@@ -29,10 +29,9 @@ public class PyDictProxy extends PyObject implements Traverseproc {
         return new PyDictProxy(d);
     }
 
-    @Override
     @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return dict.__iter__();
+    public PyObject mappingproxy___iter__() {
+        return PyObject.getIter(dict);
     }
 
     @Override

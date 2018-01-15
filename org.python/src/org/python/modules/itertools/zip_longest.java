@@ -60,7 +60,7 @@ public class zip_longest extends PyIterator {
         final PyObject iterators[] = new PyObject[iterables.length];
         final boolean exhausted[] = new boolean[iterables.length];
         for (int i = 0; i < iterables.length; i++) {
-            iterators[i] = iterables[i].__iter__();
+            iterators[i] = getIter(iterables[i]);
             exhausted[i] = false;
         }
 
@@ -91,12 +91,6 @@ public class zip_longest extends PyIterator {
                 }
             }
         };
-    }
-
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod(names = "__next__")

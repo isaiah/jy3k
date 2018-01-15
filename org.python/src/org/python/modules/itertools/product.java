@@ -111,16 +111,14 @@ public class product extends PyIterator {
         };
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
+    @ExposedMethod(names = "__next__")
+    public PyObject product___next__() {
+        return doNext(iter.__next__());
     }
 
-    @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
     }
 
     /* Traverseproc implementation */

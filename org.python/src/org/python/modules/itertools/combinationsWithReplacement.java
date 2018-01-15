@@ -79,12 +79,6 @@ public class combinationsWithReplacement extends PyIterator {
         };
     }
 
-    @Override
-    @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
-        return this;
-    }
-
     @ExposedMethod(names = "__next__")
     @Override
     public PyObject __next__() {

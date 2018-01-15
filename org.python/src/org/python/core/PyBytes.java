@@ -360,9 +360,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return bytes___len__();
     }
 
-    @Override
     @ExposedMethod(names = "__iter__")
-    public PyObject __iter__() {
+    public PyObject bytes___iter__() {
         return seq___iter__();
     }
 

@@ -15,6 +15,11 @@ public class PyTupleIterator extends PyObject {
         array = tuple.getArray();
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @Override
     public PyObject __next__() {
         if (index >= array.length) {
@@ -29,11 +34,6 @@ public class PyTupleIterator extends PyObject {
             throw Py.StopIteration();
         }
         return array[index++];
-    }
-
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
     }
 
     @ExposedMethod
