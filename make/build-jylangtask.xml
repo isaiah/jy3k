@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="build-jylangtask" default="build-jylangtask" basedir="..">
-    <target name="build-jylangtask" depends="build-codegen">
+    <target name="build-jylangtask" depends="compile">
         <ant antfile="build.xml" inheritAll="false"
              dir="${basedir}/buildtools/jylangtask" target="jar">
             <reference refid="main.classpath"/>

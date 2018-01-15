@@ -221,7 +221,7 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
 
     @ExposedMethod
     final boolean array___bool__() {
-        return seq___bool__();
+        return isTrue();
     }
 
     @ExposedMethod

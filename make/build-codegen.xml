@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="build-codegen" default="expose" basedir="..">
-    <target name="build-codegen">
+    <target name="build-codegen" depends="compile">
         <ant antfile="build.xml" inheritAll="false"
              dir="${basedir}/buildtools/codegen" target="jar">
             <reference refid="main.classpath"/>
