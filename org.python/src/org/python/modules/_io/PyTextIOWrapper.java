@@ -148,6 +148,29 @@ public class PyTextIOWrapper extends PyTextIOBase {
     }
 
     @ExposedMethod
+    public boolean mark_supported() {
+        return reader.markSupported();
+    }
+
+    @ExposedMethod
+    public void mark(int limit) {
+        try {
+            reader.mark(limit);
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
+    public void reset() {
+        try {
+            reader.reset();
+        } catch (IOException e) {
+            throw Py.IOError(e);
+        }
+    }
+
+    @ExposedMethod
     public PyObject readline() {
         try {
             String line = reader.readLine();

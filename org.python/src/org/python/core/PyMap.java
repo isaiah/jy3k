@@ -38,19 +38,11 @@ public class PyMap extends PyObject {
         return map;
     }
 
-    @Override
-    public PyObject __next__() {
-        return map___next__();
-    }
-
     @ExposedMethod
     public PyObject map___next__() {
         PyObject[] args = new PyObject[n];
         for (int j = 0; j < n; j++) {
-            args[j] = iters[j].__next__();
-            if (args[j] == null) {
-                throw Py.StopIteration();
-            }
+            args[j] = PyObject.iterNext(iters[j]);
         }
         return f.__call__(args);
     }

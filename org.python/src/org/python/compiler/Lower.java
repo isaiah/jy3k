@@ -152,8 +152,8 @@ public class Lower extends Visitor {
         Call callIter = new Call(node, iter, Arrays.asList(node.getInternalIter()), null);
         Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
         Name loadTmp = new Name(node, tmp, expr_contextType.Load);
-        Attribute next = new Attribute(node, loadTmp, "__next__", expr_contextType.Load);
-        Call callNext = new Call(node, next, null, null);
+        Name next = new Name(node, "next", expr_contextType.Load);
+        Call callNext = new Call(node, next, Arrays.asList(loadTmp), null);
         Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
         stmt _breakFor = new ExitFor(node);
         excepthandler handler = new ExceptHandler(node, new Name(node, "StopIteration", expr_contextType.Load),

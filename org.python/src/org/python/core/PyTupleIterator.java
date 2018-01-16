@@ -2,17 +2,19 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
+import org.python.antlr.ast.Tuple;
+import org.python.bootstrap.Import;
 
 @ExposedType(name = "tuple_iterator")
 public class PyTupleIterator extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyTupleIterator.class);
     private int index;
-    private PyObject[] array;
+    private PyTuple tuple;
 
     public PyTupleIterator(PyTuple tuple) {
         super(TYPE);
         index = 0;
-        array = tuple.getArray();
+        this.tuple = tuple;
     }
 
     @ExposedMethod
@@ -20,24 +22,31 @@ public class PyTupleIterator extends PyObject {
         return this;
     }
 
-    @Override
-    public PyObject __next__() {
-        if (index >= array.length) {
-            return null;
-        }
-        return array[index++];
-    }
-
     @ExposedMethod
     public PyObject tuple_iterator___next__() {
-        if (index >= array.length) {
+        if (tuple == null) {
             throw Py.StopIteration();
         }
-        return array[index++];
+        if (index >= tuple.__len__()) {
+            tuple = null;
+            throw Py.StopIteration();
+        }
+        PyObject ret = tuple.pyget(index++);
+        if (ret == null) {
+            tuple = null;
+            throw Py.StopIteration();
+        }
+        return ret;
     }
 
     @ExposedMethod
     public int __length_hint__() {
         return index;
+    }
+
+    @ExposedMethod
+    public PyObject __reduce__() {
+        PyObject builtins = Import.importModule("builtins");
+        return new PyTuple(builtins.__findattr__("iter"), tuple, new PyLong(index));
     }
 }

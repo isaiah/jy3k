@@ -2288,8 +2288,15 @@ public final class Py {
     /** helper method for code generator */
     public static boolean addAll(List<PyObject> list, PyObject seq) {
         PyObject iter = PyObject.getIter(seq);
-        for (PyObject cur; ((cur = iter.__next__()) != null); ) {
-            list.add(cur);
+        for(;;) {
+            try {
+                list.add(PyObject.iterNext(iter));
+            } catch (PyException e) {
+                if (e.match(Py.StopIteration)) {
+                    break;
+                }
+                throw e;
+            }
         }
         return true;
     }
@@ -2495,20 +2502,7 @@ public final class Py {
             if (base instanceof PyType) {
                 expandBases.add(base);
             } else {
-                PyObject iter = Py.iter(base, name + "argument after * must be a sequence");
-                PyObject cur;
-                for (;;) {
-                    try {
-                        cur = iter.__next__();
-                        if (cur == null) break;
-                    } catch (PyException e) {
-                        if (e.match(Py.StopIteration)) {
-                            break;
-                        }
-                        throw e;
-                    }
-                    expandBases.add(cur);
-                }
+                Py.addAll(expandBases, base);
             }
         }
 

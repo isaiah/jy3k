@@ -204,7 +204,8 @@ public class PyLong extends PyObject {
         long ret = 0L;
         int i = 0;
         try {
-            while ((next = iter.__next__()) != null) {
+            while (true) {
+                next = PyObject.iterNext(iter);
                 int v = next.asIndex() & 0xFF;
                 if (order == ByteOrder.BIG_ENDIAN) {
                     ret = (ret << 8) | v;

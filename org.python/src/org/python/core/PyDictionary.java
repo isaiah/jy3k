@@ -8,6 +8,7 @@ import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.bootstrap.Import;
 import org.python.expose.MethodType;
 
 import java.util.AbstractSet;
@@ -630,6 +631,12 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         @ExposedMethod(names = "__length_hint__")
         public int __length_hint__() {
             return size;
+        }
+
+        @ExposedMethod
+        public PyObject __reduce__() {
+            PyObject builtins = Import.importModule("builtins");
+            return new PyTuple(builtins.__findattr__("iter"), new PyTuple(new PyList(iterator)));
         }
     }
 
