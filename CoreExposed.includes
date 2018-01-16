@@ -35,7 +35,7 @@ org/python/core/PyFunction.class
 org/python/core/PyInstance.class
 org/python/core/PyInteger.class
 org/python/core/PyIter.class
-org/python/core/PyIterator.class
+org/python/core/PySeqIterator.class
 org/python/core/PyJava.class
 org/python/core/PyJavaPackage.class
 org/python/core/PyList.class

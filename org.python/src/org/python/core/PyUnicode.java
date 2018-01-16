@@ -1159,7 +1159,7 @@ public class PyUnicode extends PySequence implements Iterable {
         long totalSize = 0;
         PyObject iter = PyObject.getIter(obj);
         try {
-            for (int i = 0; (item = iter.__next__()) != null; i++) {
+            for (int i = 0; (item = PyObject.iterNext(iter)) != null; i++) {
                 if (!(item instanceof PyUnicode)) {
                     throw Py.TypeError(String.format("sequence item %d: expected str instance, %s found",
                             i, item.getType().fastGetName()));

@@ -3,6 +3,7 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
+import org.python.bootstrap.Import;
 
 /**
  * Specially optimized xrange iterator.
@@ -42,5 +43,17 @@ public class PyXRangeIter extends PyObject {
     @ExposedMethod(names = "__length_hint__")
     public int __len__() {
         return (int) len;
+    }
+
+    @ExposedMethod
+    public PyObject __reduce__() {
+        PyObject builtins = Import.importModule("builtins");
+        PyObject range = new PyRange(start, start + len, (int) step);
+        return new PyTuple(builtins.__findattr__("iter"), new PyTuple(range), new PyLong(index));
+    }
+
+    @ExposedMethod
+    public void __setstate__(int index) {
+        this.index = index;
     }
 }

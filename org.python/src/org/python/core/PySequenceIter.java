@@ -19,27 +19,21 @@ public class PySequenceIter extends PyIterator {
     }
 
     @ExposedMethod
-    public PyObject sequence_iter___next__() {
-        return super.next();
+    public PyObject __iter__(){
+        return this;
     }
 
-    public PyObject __next__() {
+    @ExposedMethod
+    public PyObject sequence_iter___next__() {
         if (seq == null) {
-            return null;
+            throw Py.StopIteration();
         }
 
         PyObject result;
-        try {
-            result = seq.__finditem__(index++);
-        } catch (PyException exc) {
-            if (exc.match(Py.StopIteration)) {
-                seq = null;
-                return null;
-            }
-            throw exc;
-        }
+        result = seq.__finditem__(index++);
         if (result == null) {
             seq = null;
+            throw Py.StopIteration();
         }
         return result;
     }

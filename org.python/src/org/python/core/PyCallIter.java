@@ -1,5 +1,6 @@
 package org.python.core;
 
+import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "callable_iterator")
@@ -18,7 +19,13 @@ public class PyCallIter extends PyIterator {
         this.sentinel = sentinel;
     }
 
-    public PyObject __next__() {
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod
+    public PyObject callable_iterator___next__() {
         if (callable == null) {
             throw Py.StopIteration();
         }

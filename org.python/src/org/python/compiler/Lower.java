@@ -148,8 +148,8 @@ public class Lower extends Visitor {
         traverse(node);
         String tmp = "(tmp)" + counter++;
         Name storeTmp = new Name(node, tmp, expr_contextType.Store);
-        Attribute iter = new Attribute(node, node.getInternalIter(), "__iter__", expr_contextType.Load);
-        Call callIter = new Call(node, iter, null, null);
+        Name iter = new Name(node, "iter", expr_contextType.Load);
+        Call callIter = new Call(node, iter, Arrays.asList(node.getInternalIter()), null);
         Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
         Name loadTmp = new Name(node, tmp, expr_contextType.Load);
         Attribute next = new Attribute(node, loadTmp, "__next__", expr_contextType.Load);

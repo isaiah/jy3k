@@ -9,6 +9,7 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyLong;
+import org.python.core.PyMemoryView;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -66,7 +67,12 @@ public class PyBytesIO extends PyBufferedIOBase {
 
     @ExposedMethod
     public int tell() {
-        return buf.begin();
+        return buf.length();
+    }
+
+    @ExposedMethod
+    public PyObject getbuffer() {
+        return new PyMemoryView((PyBytes) getvalue());
     }
 
     @ExposedMethod
@@ -133,6 +139,12 @@ public class PyBytesIO extends PyBufferedIOBase {
     public int seek(int pos) {
         this.pos = pos;
         return pos;
+    }
+
+    @ExposedMethod
+    public long truncate() {
+        buf.length(pos);
+        return this.pos;
     }
 
     @ExposedMethod

@@ -587,17 +587,8 @@ public class BuiltinModule {
         PyObject it = ap.getPyObject(0);
         PyObject def = ap.getPyObject(1, null);
 
-        PyObject next;
-        if ((next = it.__findattr__("__next__")) == null) {
-            System.out.println("doesn't have new __next__ attr: " + it);
-            if ((next = it.__findattr__("next")) == null) {
-                throw Py.TypeError(String.format("'%.200s' object is not an iterator",
-                    it.getType().fastGetName()));
-            }
-        }
-
         try {
-            return next.__call__();
+            return PyObject.iterNext(it);
         } catch (PyException e) {
             if (e.match(Py.StopIteration) && def != null) {
                 return def;
