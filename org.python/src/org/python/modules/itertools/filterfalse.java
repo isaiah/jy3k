@@ -13,9 +13,9 @@ import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.filterfalse", base = PyObject.class,
     doc = BuiltinDocs.itertools_filterfalse_doc)
-public class filterfalse extends PyIterator {
+public class filterfalse extends PyObject {
     public static final PyType TYPE = PyType.fromClass(filterfalse.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public filterfalse() {
         super(TYPE);
@@ -49,24 +49,13 @@ public class filterfalse extends PyIterator {
         iter = new itertools.FilterIterator(predicate, iterable, false);
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject filterfalse___next__() {
+        return iter.next();
     }
 }

@@ -1,25 +1,29 @@
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedType;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyIterator;
+import org.python.core.PyList;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.Visitproc;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ExposedType(name = "itertools.cycle", base = PyObject.class, doc = BuiltinDocs.itertools_cycle_doc)
-public class cycle extends PyIterator {
+public class cycle extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(cycle.class);
-    private PyIterator iter;
+    private List<PyObject> saved = new ArrayList<>();
+    private int index = 0;
+    PyObject iter;
+
 
     public cycle() {
         super(TYPE);
@@ -41,69 +45,63 @@ public class cycle extends PyIterator {
     @ExposedNew
     @ExposedMethod
     final void cycle___init__(final PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("cycle", args, kwds, new String[] {"iterable"}, 1);
+        ArgParser ap = new ArgParser("cycle", args, kwds, new String[]{"iterable"}, 1);
         ap.noKeywords();
         cycle___init__(ap.getPyObject(0));
     }
 
     private void cycle___init__(final PyObject sequence) {
-        iter = new itertools.ItertoolsIterator() {
-            List<PyObject> saved = new ArrayList<PyObject>();
-            int counter = 0;
-            PyObject iterator = getIter(sequence);
+        if (sequence != Py.None) {
+            iter = getIter(sequence);
+        }
+    }
 
-            boolean save = true;
-
-            public PyObject __next__() {
-                if (save) {
-                    try {
-                    PyObject obj = iterator.__next__();
-                        if (obj != null) {
-                            saved.add(obj);
-                            return obj;
-                        }
-                        save = false;
-                    } catch (PyException e) {
-                        if (!e.match(Py.StopIteration)) {
-                            throw e;
-                        }
-                        save = false;
-                    }
-                }
-                if (saved.size() == 0) {
-                    return null;
-                }
-
-                // pick element from saved List
-                if (counter >= saved.size()) {
-                    // start over again
-                    counter = 0;
-                }
-                return saved.get(counter++);
-            }
-
-        };
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
     }
 
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
+    public PyObject cycle___next__() {
+        if (iter != null) {
+            try {
+                PyObject obj = iterNext(iter);
+                saved.add(obj);
+                return obj;
+            } catch (PyException e) {
+                if (!e.match(Py.StopIteration)) {
+                    throw e;
+                }
+                iter = null;
+            }
         }
-        return iter != null ? visit.visit(iter, arg) : 0;
+        if (saved.size() == 0) {
+            throw Py.StopIteration();
+        }
+
+        // pick element from saved List
+        if (index >= saved.size()) {
+            // start over again
+            index = 0;
+        }
+        return saved.get(index++);
     }
 
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    @ExposedMethod(names = {"__reduce__"})
+    public PyObject reduce() {
+        if (iter == null) {
+            return new PyTuple(TYPE, Py.None, new PyTuple(new PyList(saved), new PyLong(index)));
+        }
+        return new PyTuple(TYPE, new PyTuple(iter), new PyTuple(new PyList(saved), new PyLong(index)));
+    }
+
+    @ExposedMethod(names = {"__setstate__"})
+    public void setstate(PyObject state) {
+        PyTuple data = (PyTuple) state;
+        for (PyObject el: data.pyget(0).asIterable()) {
+            saved.add(el);
+        }
+        index = data.pyget(1).asInt();
     }
 }
 

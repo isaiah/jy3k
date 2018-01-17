@@ -2,13 +2,15 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.bootstrap.Import;
 
 /**
  * Sequence iterator specialized for accessing the underlying sequence directly.
  */
 @ExposedType(name = "fastsequenceiterator", base = PyObject.class, isBaseType = false)
-public class PyFastSequenceIter extends PyIterator {
+public class PyFastSequenceIter extends PyObject {
     //note: Already implements Traverseproc, inheriting it from PyIterator
 
     public static final PyType TYPE = PyType.fromClass(PyFastSequenceIter.class);
@@ -16,15 +18,25 @@ public class PyFastSequenceIter extends PyIterator {
     private PySequence seq;
     public int index;
 
+    public PyFastSequenceIter(PyType subtype, PyObject seq) {
+        super(subtype);
+        this.seq = (PySequence) seq;
+        index = 0;
+    }
+
     public PyFastSequenceIter(PySequence seq) {
         super(TYPE);
         this.seq = seq;
         index = 0;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.list_iterator___next___doc)
-    public final PyObject fastsequenceiterator___next__() {
-        return super.next();
+    @ExposedNew
+    public void __init__(PyObject seq) {
+        if (seq == Py.None) {
+            this.seq = null;
+        } else {
+            this.seq = (PySequence) seq;
+        }
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_iterator___iter___doc)
@@ -32,36 +44,33 @@ public class PyFastSequenceIter extends PyIterator {
         return this;
     }
 
-    @Override
-    public PyObject __next__() {
+    @ExposedMethod(doc = BuiltinDocs.list_iterator___next___doc)
+    public final PyObject fastsequenceiterator___next__() {
         if (seq == null) {
-            return null;
+            throw Py.StopIteration();
         }
 
         PyObject result = seq.seq___finditem__(index++);
         if (result == null) {
             seq = null;
+            throw Py.StopIteration();
         }
         return result;
     }
 
-    @Override
+    @ExposedMethod
     public int __len__() {
         return seq.__len__();
     }
 
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retValue = super.traverse(visit, arg);
-        if (retValue != 0) {
-            return retValue;
-        }
-        return seq == null ? 0 : visit.visit(seq, arg);
+    @ExposedMethod
+    public PyObject __reduce__() {
+        PyObject builtins = Import.importModule("builtins");
+        return new PyTuple(builtins.__findattr__("iter"), new PyTuple(seq), new PyLong(index));
     }
 
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (ob == seq || super.refersDirectlyTo(ob));
+    @ExposedMethod
+    public void __setstate__(PyObject index) {
+        this.index = index.asInt();
     }
 }

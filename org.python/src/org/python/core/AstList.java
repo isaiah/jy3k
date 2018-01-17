@@ -409,12 +409,9 @@ public class AstList extends PySequence implements Cloneable, List, Traverseproc
     protected void setslicePySequence(int start, int stop, int step, PySequence value) {
         if (step != 0) {
             if(value == this) {
-                PyList newseq = new PyList();
-                PyObject iter = PyObject.getIter(value);
-                for(PyObject item = null; (item = iter.__next__()) != null;) {
-                    newseq.append(item);
-                }
-                value = newseq;
+                List<PyObject> seq = new ArrayList<>();
+                Py.addAll(seq, value);
+                value = new PyList(seq);
             }
             int n = value.__len__();
             for (int i = 0, j = start; i < n; i++, j += step) {

@@ -284,6 +284,9 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
                 return -1;
             }
             PyObject avalue = __finditem__(akey);
+            if (avalue == null) {
+                return -1;
+            }
             if (!avalue.richCompare(bvalue, EQ).isTrue()) {
                 return -1;
             }
@@ -429,24 +432,28 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     private void mergeFromSeq(PyObject other) {
         PyObject pairs = PyObject.getIter(other);
         PyObject pair;
-
-        for (int i = 0; (pair = pairs.__next__()) != null; i++) {
-            try {
-                pair = PySequence.fastSequence(pair, "");
-            } catch (PyException pye) {
-                if (pye.match(Py.TypeError)) {
-                    throw Py.TypeError(String.format("cannot convert dictionary update sequence "
-                            + "element #%d to a sequence", i));
+        int i = 0;
+        try {
+            for (; ; ) {
+                pair = PyObject.getIter(PyObject.iterNext(pairs));
+                dict___setitem__(PyObject.iterNext(pair), PyObject.iterNext(pair));
+                try {
+                    PyObject.iterNext(pair);
+                    throw Py.ValueError(String.format("dictionary update sequence element #%d "
+                            + "should have exactly 2 elements", i));
+                } catch (PyException e) {
+                    // expected
                 }
-                throw pye;
+                i++;
             }
-            int n;
-            if ((n = pair.__len__()) != 2) {
-                throw Py.ValueError(String.format("dictionary update sequence element #%d "
-                        + "has length %d; 2 is required", i, n));
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
             }
-            dict___setitem__(pair.__getitem__(0), pair.__getitem__(1));
         }
+
+//        throw Py.TypeError(String.format("cannot convert dictionary update sequence "
+//                + "element #%d to a sequence", i));
     }
 
     /**

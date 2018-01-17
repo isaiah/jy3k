@@ -3,6 +3,7 @@ package org.python.modules._functools;
 
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
@@ -23,12 +24,19 @@ public class _functools {
     public static PyObject reduce(PyObject f, PyObject l, PyObject z) {
         PyObject result = z;
         PyObject iter = Py.iter(l, "reduce() arg 2 must support iteration");
-
-        for (PyObject item; (item = iter.__next__()) != null;) {
-            if (result == null) {
-                result = item;
-            } else {
-                result = f.__call__(result, item);
+        PyObject item;
+        try {
+            for (; ; ) {
+                item = PyObject.iterNext(iter);
+                if (result == null) {
+                    result = item;
+                } else {
+                    result = f.__call__(result, item);
+                }
+            }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
             }
         }
         if (result == null) {

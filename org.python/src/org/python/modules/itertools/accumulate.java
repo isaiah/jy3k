@@ -40,14 +40,16 @@ public class accumulate extends PyObject {
         return new accumulate(iterable, func);
     }
 
-    @Override
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = {"__next__"})
-    public PyObject __next__() {
+    public PyObject accumulate___next__() {
         PyObject val, newtotal;
-        val = iter.__next__();
-        if (val == null) {
-            throw Py.StopIteration();
-        }
+        val = PyObject.iterNext(iter);
+
         if (total == null) {
             total = val;
             return total;

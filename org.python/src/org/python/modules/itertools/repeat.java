@@ -19,7 +19,7 @@ import org.python.annotations.ExposedType;
 public class repeat extends PyIterator {
 
     public static final PyType TYPE = PyType.fromClass(repeat.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
     private PyObject object;
     private int counter;
 
@@ -44,13 +44,12 @@ public class repeat extends PyIterator {
     @ExposedNew
     @ExposedMethod
     final void repeat___init__(final PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("repeat", args, kwds, new String[] {"object", "times"}, 1);
+        ArgParser ap = new ArgParser("repeat", args, kwds, new String[]{"object", "times"}, 1);
 
         PyObject object = ap.getPyObject(0);
         if (args.length == 1) {
             repeat___init__(object);
-        }
-        else {
+        } else {
             int times = ap.getInt(1);
             repeat___init__(object, times);
         }
@@ -67,9 +66,9 @@ public class repeat extends PyIterator {
         } else {
             counter = times;
         }
-        iter = new PyIterator() {
+        iter = new ItertoolsIterator() {
 
-            public PyObject __next__() {
+            public PyObject next() {
                 if (counter > 0) {
                     counter--;
                     return object;
@@ -86,8 +85,8 @@ public class repeat extends PyIterator {
     private void repeat___init__(final PyObject object) {
         this.object = object;
         counter = -1;
-        iter = new PyIterator() {
-            public PyObject __next__() {
+        iter = new ItertoolsIterator() {
+            public PyObject next() {
                 return object;
             }
         };
@@ -103,9 +102,8 @@ public class repeat extends PyIterator {
         if (counter >= 0) {
             return (PyUnicode) (Py.newUnicode("repeat(%r, %d)").
                     __mod__(new PyTuple(object, Py.newInteger(counter))));
-        }
-        else {
-            return (PyUnicode)(Py.newUnicode("repeat(%r)").
+        } else {
+            return (PyUnicode) (Py.newUnicode("repeat(%r)").
                     __mod__(new PyTuple(object)));
         }
     }
@@ -118,30 +116,13 @@ public class repeat extends PyIterator {
         throw Py.TypeError("len() of unsized object");
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        if (object != null) {
-	        retVal = visit.visit(object, arg);
-	        if (retVal != 0) {
-	            return retVal;
-	        }
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || object == ob || super.refersDirectlyTo(ob));
+    public PyObject repeat___next__() {
+        return iter.next();
     }
 }

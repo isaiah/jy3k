@@ -15,20 +15,20 @@ import org.python.annotations.ExposedType;
 public class product extends PyIterator {
 
     public static final PyType TYPE = PyType.fromClass(product.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public static final String product_doc =
-        "product(*iterables) --> product object\n\n" +
-        "Cartesian product of input iterables.  Equivalent to nested for-loops.\n\n" +
-        "For example, product(A, B) returns the same as:  ((x,y) for x in A for y in B).\n" +
-        "The leftmost iterators are in the outermost for-loop, so the output tuples\n" +
-        "cycle in a manner similar to an odometer (with the rightmost element changing\n" +
-        "on every iteration).\n\n" +
-        "To compute the product of an iterable with itself, specify the number\n" +
-        "of repetitions with the optional repeat keyword argument. For example,\n" +
-        "product(A, repeat=4) means the same as product(A, A, A, A).\n\n" +
-        "product('ab', range(3)) --> ('a',0) ('a',1) ('a',2) ('b',0) ('b',1) ('b',2)\n" +
-        "product((0,1), (0,1), (0,1)) --> (0,0,0) (0,0,1) (0,1,0) (0,1,1) (1,0,0) ...";
+            "product(*iterables) --> product object\n\n" +
+                    "Cartesian product of input iterables.  Equivalent to nested for-loops.\n\n" +
+                    "For example, product(A, B) returns the same as:  ((x,y) for x in A for y in B).\n" +
+                    "The leftmost iterators are in the outermost for-loop, so the output tuples\n" +
+                    "cycle in a manner similar to an odometer (with the rightmost element changing\n" +
+                    "on every iteration).\n\n" +
+                    "To compute the product of an iterable with itself, specify the number\n" +
+                    "of repetitions with the optional repeat keyword argument. For example,\n" +
+                    "product(A, repeat=4) means the same as product(A, A, A, A).\n\n" +
+                    "product('ab', range(3)) --> ('a',0) ('a',1) ('a',2) ('b',0) ('b',1) ('b',2)\n" +
+                    "product((0,1), (0,1), (0,1)) --> (0,0,0) (0,0,1) (0,1,0) (0,1,1) (1,0,0) ...";
 
     public product() {
         super();
@@ -49,7 +49,7 @@ public class product extends PyIterator {
         final int repeat;
         final int num_iterables;
         if (kws.length == 1 && kws[0] == "repeat") {
-            repeat = args[args.length -1].asInt();
+            repeat = args[args.length - 1].asInt();
             if (repeat < 0) {
                 throw Py.ValueError("repeat argument cannot be negative");
             }
@@ -74,15 +74,15 @@ public class product extends PyIterator {
         }
         final int indices[] = new int[num_pools];
 
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
             boolean firstthru = true;
 
             @Override
-            public PyObject __next__() {
+            public PyObject next() {
                 if (firstthru) {
                     for (PyTuple pool : pools) {
                         if (pool.__len__() == 0) {
-                            return null;
+                            throw Py.StopIteration();
                         }
                     }
                     firstthru = false;
@@ -97,7 +97,7 @@ public class product extends PyIterator {
                         return makeTuple();
                     }
                 }
-                return null;
+                throw Py.StopIteration();
             }
 
             private PyTuple makeTuple() {
@@ -113,26 +113,12 @@ public class product extends PyIterator {
 
     @ExposedMethod(names = "__next__")
     public PyObject product___next__() {
-        return doNext(iter.__next__());
+        return iter.next();
     }
 
     @ExposedMethod
     public PyObject __iter__() {
         return this;
     }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
-    }
 }
+

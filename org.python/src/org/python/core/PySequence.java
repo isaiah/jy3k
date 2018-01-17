@@ -3,6 +3,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.python.core.CompareOp.*;
 
 /**
@@ -229,12 +232,9 @@ public abstract class PySequence extends PyObject {
         if (seq instanceof PySequence) {
             return (PySequence)seq;
         }
-        PyList list = new PyList();
-        PyObject iter = Py.iter(seq, msg);
-        for (PyObject item = null; (item = iter.__next__()) != null;) {
-            list.append(item);
-        }
-        return list;
+        List<PyObject> list = new ArrayList<>();
+        Py.addAll(list, seq);
+        return new PyList(list);
     }
 
     /**

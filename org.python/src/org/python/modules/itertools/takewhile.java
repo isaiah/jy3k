@@ -14,7 +14,7 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "itertools.takewhile", base = PyObject.class, doc = BuiltinDocs.itertools_takewhile_doc)
 public class takewhile extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(takewhile.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public takewhile() {
         super(TYPE);
@@ -36,7 +36,7 @@ public class takewhile extends PyIterator {
     @ExposedNew
     @ExposedMethod
     final void takewhile___init__(PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("takewhile", args, kwds, new String[] {"predicate", "iterable"}, 2);
+        ArgParser ap = new ArgParser("takewhile", args, kwds, new String[]{"predicate", "iterable"}, 2);
         ap.noKeywords();
         PyObject predicate = ap.getPyObject(0);
         PyObject iterable = ap.getPyObject(1);
@@ -47,24 +47,14 @@ public class takewhile extends PyIterator {
         iter = new itertools.WhileIterator(predicate, iterable, false);
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject takewhile___next__() {
+        return iter.next();
     }
 }
+

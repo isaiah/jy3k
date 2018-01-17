@@ -15,7 +15,7 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "itertools.combinations", base = PyObject.class, doc = BuiltinDocs.itertools_combinations_doc)
 public class combinations extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(combinations.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public combinations() {
         super(TYPE);
@@ -55,19 +55,23 @@ public class combinations extends PyIterator {
             indices[i] = i;
         }
 
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
             boolean firstthru = true;
 
             @Override
-            public PyObject __next__() {
-                if (r > n) { return null; }
+            public PyObject next() {
+                if (r > n) {
+                    throw Py.StopIteration();
+                }
                 if (firstthru) {
                     firstthru = false;
                     return itertools.makeIndexedTuple(pool, indices);
                 }
                 int i;
                 for (i = r-1; i >= 0 && indices[i] == i+n-r ; i--);
-                if (i < 0) return null;
+                if (i < 0) {
+                    throw Py.StopIteration();
+                }
                 indices[i]++;
                 for (int j = i+1; j < r; j++) {
                     indices[j] = indices[j-1] + 1;
@@ -77,24 +81,13 @@ public class combinations extends PyIterator {
         };
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject combinations___next__() {
+        return iter.next();
     }
 }

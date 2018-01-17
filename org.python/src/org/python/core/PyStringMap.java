@@ -55,7 +55,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     public PyStringMap(PyObject elements[]) {
         this(elements.length);
         for (int i = 0; i < elements.length; i += 2) {
-            __setitem__(elements[i], elements[i + 1]);
+            stringmap___setitem__(elements[i], elements[i + 1]);
         }
     }
 
@@ -380,23 +380,24 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     private void mergeFromSeq(PyObject other) {
         PyObject pairs = PyObject.getIter(other);
         PyObject pair;
-
-        for (int i = 0; (pair = pairs.__next__()) != null; i++) {
-            try {
-                pair = PySequence.fastSequence(pair, "");
-            } catch(PyException pye) {
-                if (pye.match(Py.TypeError)) {
-                    throw Py.TypeError(String.format("cannot convert dictionary update sequence "
-                                                     + "element #%d to a sequence", i));
+        int i = 0;
+        try {
+            for (; ; ) {
+                pair = PyObject.getIter(PyObject.iterNext(pairs));
+                stringmap___setitem__(PyObject.iterNext(pair), PyObject.iterNext(pair));
+                try {
+                    PyObject.iterNext(pair);
+                    throw Py.ValueError(String.format("dictionary update sequence element #%d "
+                            + "should have exactly 2 elements", i));
+                } catch (PyException e) {
+                    // expected
                 }
-                throw pye;
+                i++;
             }
-            int n;
-            if ((n = pair.__len__()) != 2) {
-                throw Py.ValueError(String.format("dictionary update sequence element #%d "
-                                                  + "has length %d; 2 is required", i, n));
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
             }
-            __setitem__(pair.__getitem__(0), pair.__getitem__(1));
         }
     }
 

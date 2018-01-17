@@ -17,7 +17,7 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "itertools.groupby", base = PyObject.class, doc = BuiltinDocs.itertools_groupby_doc)
 public class groupby extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(groupby.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public groupby() {
         super(TYPE);
@@ -56,18 +56,15 @@ public class groupby extends PyIterator {
     }
 
     private void groupby___init__(final PyObject iterable, final PyObject keyfunc) {
-        iter = new itertools.ItertoolsIterator() {
-            PyObject currentKey;
-            PyObject currentValue;
+        iter = new ItertoolsIterator() {
+            PyObject currentKey = new PyRange(0);
+            PyObject currentValue = currentKey;
+            PyObject targetKey = currentKey;
             PyObject iterator = getIter(iterable);
-            PyObject targetKey = currentKey = currentValue = new PyRange(0);
 
-            public PyObject __next__() {
+            public PyObject next() {
                 while (currentKey.equals(targetKey)) {
                     currentValue = nextElement(iterator);
-                    if (currentValue == null) {
-                        return null;
-                    }
                     if (keyfunc == Py.None) {
                         currentKey = currentValue;
                     } else {
@@ -75,55 +72,18 @@ public class groupby extends PyIterator {
                     }
                 }
                 targetKey = currentKey;
-                return new PyTuple(currentKey, new GroupByIterator());
-            }
-
-            class GroupByIterator extends itertools.ItertoolsIterator {
-
-                private boolean completed = false;
-
-                public PyObject __next__() {
-                    final PyObject item = currentValue;
-                    if (completed) {
-                        return null;
-                    }
-                    currentValue = nextElement(iterator);
-                    if (currentValue == null) {
-                        completed = true;
-                    } else {
-                        if (keyfunc == Py.None) {
-                            currentKey = currentValue;
-                        } else {
-                            currentKey = keyfunc.__call__(currentValue);
-                        }
-                    }
-                    if (!currentKey.equals(targetKey)) {
-                        completed = true;
-                    }
-                    return item;
-                }
+                return new PyTuple(currentKey, new PyGrouper(currentValue, currentKey, keyfunc, iterator));
             }
         };
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = {"__next__"})
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject groupby___next__() {
+        return iter.next();
     }
 }

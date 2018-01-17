@@ -12,9 +12,9 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.dropwhile", base = PyObject.class, doc = BuiltinDocs.itertools_dropwhile_doc)
-public class dropwhile extends PyIterator {
+public class dropwhile extends PyObject {
     public static final PyType TYPE = PyType.fromClass(dropwhile.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public dropwhile() {
         super(TYPE);
@@ -36,7 +36,7 @@ public class dropwhile extends PyIterator {
     @ExposedNew
     @ExposedMethod
     final void dropwhile___init__(PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("dropwhile", args, kwds, new String[] {"predicate", "iterable"}, 2);
+        ArgParser ap = new ArgParser("dropwhile", args, kwds, new String[]{"predicate", "iterable"}, 2);
         ap.noKeywords();
         PyObject predicate = ap.getPyObject(0);
         PyObject iterable = ap.getPyObject(1);
@@ -47,24 +47,13 @@ public class dropwhile extends PyIterator {
         iter = new itertools.WhileIterator(predicate, iterable, true);
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject dropwhile__next__() {
+        return iter.next();
     }
 }

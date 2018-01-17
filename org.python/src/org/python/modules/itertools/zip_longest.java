@@ -14,10 +14,10 @@ import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.zip_longest", base = PyObject.class,
     doc = BuiltinDocs.itertools_zip_longest_doc)
-public class zip_longest extends PyIterator {
+public class zip_longest extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(zip_longest.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public zip_longest() {
         super(TYPE);
@@ -64,17 +64,17 @@ public class zip_longest extends PyIterator {
             exhausted[i] = false;
         }
 
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
             int unexhausted = iterables.length;
 
             @Override
-            public PyObject __next__() {
+            public PyObject next() {
                 PyObject item[] = new PyObject[iterables.length];
                 for (int i = 0; i < iterables.length; i++) {
                     if (exhausted[i]) {
                         item[i] = fillvalue;
                     } else {
-                        PyObject elem = iterators[i].__next__();
+                        PyObject elem = iterNext(iterators[i]);
                         if (elem == null) {
                             unexhausted--;
                             exhausted[i] = true;
@@ -85,7 +85,7 @@ public class zip_longest extends PyIterator {
                     }
                 }
                 if (unexhausted == 0) {
-                    return null;
+                    throw Py.StopIteration();
                 } else {
                     return new PyTuple(item);
                 }
@@ -93,24 +93,13 @@ public class zip_longest extends PyIterator {
         };
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject zip_longest___next__() {
+        return iter.next();
     }
 }

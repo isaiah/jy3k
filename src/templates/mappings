@@ -38,6 +38,7 @@ deque.derived:org.python.modules._collections.PyDequeDerived
 dialect.derived:org.python.modules._csv.PyDialectDerived
 dict.derived:org.python.core.PyDictionaryDerived
 enumerate.derived:org.python.core.PyEnumerateDerived
+fastsequenceiter.derived:org.python.core.PyFastSequenceIterDerived
 float.derived:org.python.core.PyFloatDerived
 frozenset.derived:org.python.core.PyFrozenSetDerived
 int.derived:org.python.core.PyLongDerived

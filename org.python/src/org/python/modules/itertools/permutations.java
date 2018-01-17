@@ -13,9 +13,9 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.permutations", base = PyObject.class)
-public class permutations extends PyIterator {
+public class permutations extends PyObject {
     public static final PyType TYPE = PyType.fromClass(permutations.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public permutations() {
         super();
@@ -43,8 +43,7 @@ public class permutations extends PyIterator {
         int perm_length;
         if (r == Py.None) {
             perm_length = iterable.__len__();
-        }
-        else {
+        } else {
             perm_length = r.asInt();
             if (perm_length < 0) {
                 throw Py.ValueError("r must be non-negative");
@@ -65,12 +64,14 @@ public class permutations extends PyIterator {
         for (int i = 0; i < r; i++) {
             cycles[i] = n - i;
         }
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
             boolean firstthru = true;
 
             @Override
-            public PyObject __next__() {
-                if (r > n) return null;
+            public PyObject next() {
+                if (r > n) {
+                    throw Py.StopIteration();
+                }
                 if (firstthru) {
                     firstthru = false;
                     return itertools.makeIndexedTuple(pool, indices, r);
@@ -93,33 +94,18 @@ public class permutations extends PyIterator {
                         return itertools.makeIndexedTuple(pool, indices, r);
                     }
                 }
-                return null;
+                throw Py.StopIteration();
             }
         };
     }
 
     @ExposedMethod(names = "__next__")
     public PyObject permutations___next__() {
-        return doNext(iter.__next__());
+        return iter.next();
     }
 
     @ExposedMethod
     public PyObject __iter__() {
         return this;
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
     }
 }

@@ -184,13 +184,19 @@ public class PyBuiltinMethodData {
                 return wrap(target.invokeExact(args, Py.NoKeywords));
             }
             MethodType type = target.type();
+            boolean needThreadState = type.parameterType(0) == ThreadState.class;
             int paramCount = type.parameterCount();
             Object[] callArgs = new Object[paramCount];
             if (defaults != null) {
                 System.arraycopy(defaults, 0, callArgs, paramCount - defaults.length, defaults.length);
             }
-            for (int i = 0; i < args.length; i++) {
-                callArgs[i] = unwrap(args[i], type.parameterType(i));
+            int i = 0;
+            if (needThreadState) {
+                callArgs[i++] = Py.getThreadState();
+            }
+            for (PyObject arg : args) {
+                callArgs[i] = unwrap(arg, type.parameterType(i));
+                i++;
             }
             return wrap(target.asSpreader(Object[].class, paramCount).invoke(callArgs));
         } catch (PyException e) {

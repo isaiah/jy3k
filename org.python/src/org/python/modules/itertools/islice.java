@@ -17,7 +17,7 @@ import org.python.annotations.ExposedType;
 public class islice extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(islice.class);
 
-    private itertools.ItertoolsIterator iter;
+    private ItertoolsIterator iter;
     public islice() {
         super(TYPE);
     }
@@ -92,14 +92,14 @@ public class islice extends PyIterator {
             throw Py.ValueError("Step must be one or larger for islice()");
         }
 
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
             int counter = start;
 
             int lastCount = 0;
 
             PyObject iter = getIter(iterable);
 
-            public PyObject __next__() {
+            public PyObject next() {
                 PyObject result = null;
 
                 // ensure we never move the underlying iterator past 'stop'
@@ -113,7 +113,7 @@ public class islice extends PyIterator {
                     return result;
                 }
 
-                return null;
+                throw Py.StopIteration();
             }
 
         };
@@ -121,26 +121,11 @@ public class islice extends PyIterator {
 
     @ExposedMethod(names = {"__next__"})
     public PyObject islice___next__() {
-        return doNext(iter.__next__());
+        return iter.next();
     }
 
     @ExposedMethod
     public PyObject __iter__() {
         return this;
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
     }
 }

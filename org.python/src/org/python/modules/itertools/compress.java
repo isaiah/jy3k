@@ -13,9 +13,11 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.compress", base = PyObject.class, doc = BuiltinDocs.itertools_compress_doc)
-public class compress extends PyIterator {
+public class compress extends PyObject {
     public static final PyType TYPE = PyType.fromClass(compress.class);
-    private itertools.ItertoolsIterator iter;
+
+    private PyObject data;
+    private PyObject selectors;
 
     public compress() {
         super(TYPE);
@@ -27,7 +29,8 @@ public class compress extends PyIterator {
 
     public compress(PyObject dataIterable, PyObject selectorsIterable) {
         super(TYPE);
-        compress___init__(getIter(dataIterable), getIter(selectorsIterable));
+        data = getIter(dataIterable);
+        selectors = getIter(selectorsIterable);
     }
 
     @ExposedNew
@@ -37,49 +40,23 @@ public class compress extends PyIterator {
         if (args.length > 2) {
             throw Py.TypeError(String.format("compress() takes at most 2 arguments (%s given)", args.length));
         }
-        PyObject data = ap.getPyObject(0);
-        PyObject selectors = ap.getPyObject(1);
-
-        compress___init__(getIter(data), getIter(selectors));
+        data = getIter(ap.getPyObject(0));
+        selectors = getIter(ap.getPyObject(1));
     }
 
-    private void compress___init__(final PyObject data, final PyObject selectors) {
-
-        iter = new itertools.ItertoolsIterator() {
-            @Override
-            public PyObject __next__() {
-                while (true) {
-                    PyObject datum = nextElement(data);
-                    if (datum == null) { return null; }
-                    PyObject selector = nextElement(selectors);
-                    if (selector == null) { return null; }
-                    if (selector.isTrue()) {
-                        return datum;
-                    }
-                }
-            }
-
-        };
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
     }
 
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
+    public PyObject compress___next__() {
+        while (true) {
+            PyObject datum = iterNext(data);
+            PyObject selector = iterNext(selectors);
+            if (selector.isTrue()) {
+                return datum;
+            }
         }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
     }
 }

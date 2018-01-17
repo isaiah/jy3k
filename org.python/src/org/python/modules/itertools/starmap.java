@@ -15,7 +15,7 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "itertools.starmap", base = PyObject.class, doc = BuiltinDocs.itertools_starmap_doc)
 public class starmap extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(starmap.class);
-    private PyIterator iter;
+    private ItertoolsIterator iter;
 
     public starmap() {
         super(TYPE);
@@ -52,9 +52,9 @@ public class starmap extends PyIterator {
     }
 
     private void starmap___init__(final PyObject callable, final PyObject iterator) {
-        iter = new itertools.ItertoolsIterator() {
+        iter = new ItertoolsIterator() {
 
-            public PyObject __next__() {
+            public PyObject next() {
                 PyObject args = nextElement(iterator);
                 PyObject result = null;
 
@@ -69,24 +69,13 @@ public class starmap extends PyIterator {
         };
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    @Override
-    public PyObject __next__() {
-        return doNext(iter.__next__());
-    }
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        return iter != null ? visit.visit(iter, arg) : 0;
-    }
-
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) {
-        return ob != null && (iter == ob || super.refersDirectlyTo(ob));
+    public PyObject starmap___next__() {
+        return iter.next();
     }
 }

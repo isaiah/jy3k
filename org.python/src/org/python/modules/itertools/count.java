@@ -18,7 +18,7 @@ import org.python.annotations.ExposedType;
 public class count extends PyObject {
     public static final PyType TYPE = PyType.fromClass(count.class);
 
-    private PyIterator iter;
+    private ItertoolsIterator iter;
     private PyObject counter;
     private PyObject stepper;
 
@@ -30,7 +30,7 @@ public class count extends PyObject {
      * Creates an iterator that returns consecutive numbers starting at 0.
      */
     public count() {
-        super();
+        super(TYPE);
         count___init__(Py.Zero, Py.One);
     }
 
@@ -38,7 +38,7 @@ public class count extends PyObject {
      * Creates an iterator that returns consecutive numbers starting at <code>start</code>.
      */
     public count(final PyObject start) {
-        super();
+        super(TYPE);
         count___init__(start, Py.One);
     }
 
@@ -46,7 +46,7 @@ public class count extends PyObject {
      * Creates an iterator that returns consecutive numbers starting at <code>start</code> with <code>step</code> step.
      */
     public count(final PyObject start, final PyObject step) {
-        super();
+        super(TYPE);
         count___init__(start, step);
     }
 
@@ -66,8 +66,8 @@ public class count extends PyObject {
         counter = start;
         stepper = step;
 
-        iter = new PyIterator() {
-            public PyObject __next__() {
+        iter = new ItertoolsIterator() {
+            public PyObject next() {
                 PyObject result = counter;
                 counter = counter._add(Py.getThreadState(), stepper);
                 return result;
@@ -107,10 +107,14 @@ public class count extends PyObject {
         return Py.newUnicode(String.format("count(%s, %s)", counter, stepper));
     }
 
-    @Override
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
     @ExposedMethod(names = "__next__")
-    public PyObject __next__() {
-        return iter.__next__();
+    public PyObject count___next__() {
+        return iter.next();
     }
 
 }

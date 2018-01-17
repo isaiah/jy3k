@@ -48,22 +48,13 @@ public class chain extends PyObject {
         source = new PyIter(Arrays.asList(args));
     }
 
-    @Override
-    public PyObject __next__() {
-        return chain___next__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.chain___next___doc)
     final PyObject chain___next__() {
         if (source == null) {
             throw Py.StopIteration();
         }
         if (active == null) {
-            PyObject iterable = source.__next__();
-            if (iterable == null) {
-                source = null;
-                throw Py.StopIteration();
-            }
+            PyObject iterable = iterNext(source);
             active = PyObject.getIter(iterable);
             if (active == null) {
                 source = null;
@@ -71,7 +62,7 @@ public class chain extends PyObject {
             }
         }
         try {
-            PyObject item = active.__next__();
+            PyObject item = iterNext(active);
             if (item != null) {
                 return item;
             }

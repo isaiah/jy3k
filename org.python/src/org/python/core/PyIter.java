@@ -31,18 +31,6 @@ public class PyIter extends PyObject {
         this.length = -1;
     }
 
-    @Override
-    public PyObject __next__() {
-        try {
-            return iterator___next__();
-        } catch (PyException e) {
-            if (e.match(Py.StopIteration)) {
-                return null;
-            }
-            throw e;
-        }
-    }
-
     @ExposedMethod
     public PyObject iterator___iter__() {
         return this;
@@ -64,5 +52,4 @@ public class PyIter extends PyObject {
     public PyObject iterator___length_hint__() {
         return new PyLong(length);
     }
-
 }

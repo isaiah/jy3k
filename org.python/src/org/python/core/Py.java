@@ -1196,7 +1196,7 @@ public final class Py {
                 }
                 retval = sendImp.__call__((PyObject) input);
             } else {
-                return iter.__next__();
+                return PyObject.iterNext(iter);
             }
         } catch (PyException e) {
             if (e.match(Py.StopIteration)) {

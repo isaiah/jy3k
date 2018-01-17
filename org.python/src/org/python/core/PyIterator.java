@@ -28,19 +28,6 @@ public abstract class PyIterator extends PyObject implements Iterable<Object>, T
         super(subType);
     }
 
-    /**
-     * The exposed next method.
-     *
-     * Note that exposed derivable subclasses of PyIterator should override next to call
-     * doNext(custom___next__), as __next__ is overridden by the Derived classes.
-     *
-     * @return a PyObject result
-     */
-    @ExposedMethod(names = "__next__")
-    public PyObject next() {
-        return doNext(__next__());
-    }
-
     protected final PyObject doNext(PyObject ret) {
         if (ret == null) {
             if (stopException != null) {

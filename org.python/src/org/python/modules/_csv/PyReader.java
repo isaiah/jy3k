@@ -1,6 +1,8 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._csv;
 
+import org.python.annotations.ExposedMethod;
+import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -16,7 +18,7 @@ import org.python.annotations.ExposedType;
  * Analogous to CPython's _csv.c::ReaderObj struct.
  */
 @ExposedType(name = "_csv.reader", doc = PyReader.reader_doc)
-public class PyReader extends PyIterator {
+public class PyReader extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(PyReader.class);
 
@@ -57,7 +59,8 @@ public class PyReader extends PyIterator {
         this.dialect = dialect;
     }
 
-    public PyObject __next__() {
+    @ExposedMethod
+    public PyObject reader___next__() {
         PyObject lineobj;
         PyObject fields;
         String line;
@@ -66,7 +69,7 @@ public class PyReader extends PyIterator {
 
         parse_reset();
         do {
-            lineobj = input_iter.__next__();
+            lineobj = PyObject.iterNext(input_iter);
             if (lineobj == null) {
                 // End of input OR exception
                 if (field.length() != 0 || state == ParserState.IN_QUOTED_FIELD) {
@@ -77,7 +80,7 @@ public class PyReader extends PyIterator {
                         break;
                     }
                 }
-                return null;
+                throw Py.StopIteration();
             }
 
             line_num++;
@@ -276,12 +279,8 @@ public class PyReader extends PyIterator {
 
 
     /* Traverseproc implementation */
-    @Override
     public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
+        int retVal;
         if (dialect != null) {
             retVal = visit.visit(dialect, arg);
             if (retVal != 0) {
@@ -297,9 +296,8 @@ public class PyReader extends PyIterator {
         return fields != null ? visit.visit(fields, arg) : 0;
     }
 
-    @Override
     public boolean refersDirectlyTo(PyObject ob) {
         return ob == null && (ob == fields || ob == dialect
-            || ob == input_iter || super.refersDirectlyTo(ob));
+            || ob == input_iter);
     }
 }

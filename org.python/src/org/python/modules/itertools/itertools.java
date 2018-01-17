@@ -4,7 +4,6 @@ package org.python.modules.itertools;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyIterator;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -21,19 +20,6 @@ import org.python.annotations.ModuleInit;
  */
 @ExposedModule(doc = BuiltinDocs.itertools_doc)
 public class itertools {
-    /**
-     * Iterator base class used by most methods.
-     */
-    static abstract class ItertoolsIterator extends PyIterator {
-
-        /**
-         * Returns the next element from an iterator. If it raises/throws StopIteration just store
-         * the Exception and return null according to PyIterator practice.
-         */
-        protected PyObject nextElement(PyObject pyIter) {
-            return pyIter.__next__();
-        }
-    }
 
     @ModuleInit
     public static void init(PyObject dict) {
@@ -92,54 +78,27 @@ public class itertools {
             } else {
                 this.predicate = predicate;
             }
-            this.iterator = getIter(iterable);
+            this.iterator = PyObject.getIter(iterable);
             this.filterTrue = filterTrue;
         }
 
-        public PyObject __next__() {
+        public PyObject next() {
 
             while (true) {
                 PyObject element = nextElement(iterator);
-                if (element != null) {
-                    // the boolean value of calling predicate with the element
-                    // or if predicate is null/None of the element itself
-                    boolean booleanValue = predicate != null ? predicate
-                            .__call__(element).isTrue() : element
-                            .isTrue();
-                    if (booleanValue == filterTrue) {
-                        // if the boolean value is the same as filterTrue return
-                        // the element
-                        // for ifilter filterTrue is always true, for
-                        // filterfalse always false
-                        return element;
-                    }
-                } else {
-                    return null;
+                // the boolean value of calling predicate with the element
+                // or if predicate is null/None of the element itself
+                boolean booleanValue = predicate != null ? predicate
+                        .__call__(element).isTrue() : element
+                        .isTrue();
+                if (booleanValue == filterTrue) {
+                    // if the boolean value is the same as filterTrue return
+                    // the element
+                    // for ifilter filterTrue is always true, for
+                    // filterfalse always false
+                    return element;
                 }
             }
-        }
-
-
-        /* Traverseproc implementation */
-        @Override
-        public int traverse(Visitproc visit, Object arg) {
-            int retVal = super.traverse(visit, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-            if (iterator != null) {
-                retVal = visit.visit(iterator, arg);
-                if (retVal != 0) {
-                    return retVal;
-                }
-            }
-            return predicate != null ? visit.visit(predicate, arg) : 0;
-        }
-
-        @Override
-        public boolean refersDirectlyTo(PyObject ob) {
-            return ob != null && (ob == iterator || ob == predicate ||
-                    super.refersDirectlyTo(ob));
         }
     }
 
@@ -159,60 +118,29 @@ public class itertools {
 
         WhileIterator(PyObject predicate, PyObject iterable, boolean drop) {
             this.predicate = predicate;
-            iterator = getIter(iterable);
+            iterator = PyObject.getIter(iterable);
             this.drop = drop;
         }
 
-        public PyObject __next__() {
+        public PyObject next() {
 
             while (true) {
                 PyObject element = nextElement(iterator);
-                if (element != null) {
-                    if (!predicateSatisfied) {
-                        // the predicate is not satisfied yet (or still satisfied in the case of drop beeing 
-                        // false), so we need to check it
-                        if (predicate.__call__(element).isTrue() != drop) {
-                            predicateSatisfied = drop;
-                            return element;
-                        }
-                        predicateSatisfied = !drop;
-                    } else {
-                        if (drop) {
-                            return element;
-                        } else {
-                            // end iteration if predicate is false and drop is false
-                            return null;
-                        }
+                if (!predicateSatisfied) {
+                    // the predicate is not satisfied yet (or still satisfied in the case of drop beeing
+                    // false), so we need to check it
+                    if (predicate.__call__(element).isTrue() != drop) {
+                        predicateSatisfied = drop;
+                        return element;
                     }
+                    predicateSatisfied = !drop;
                 } else {
-                    // end iteration
-                    return null;
-                }
-
-            }
-        }
-
-
-        /* Traverseproc implementation */
-        @Override
-        public int traverse(Visitproc visit, Object arg) {
-            int retVal = super.traverse(visit, arg);
-            if (retVal != 0) {
-                return retVal;
-            }
-            if (iterator != null) {
-                retVal = visit.visit(iterator, arg);
-                if (retVal != 0) {
-                    return retVal;
+                    if (drop) {
+                        return element;
+                    }
+                    throw Py.StopIteration();
                 }
             }
-            return predicate != null ? visit.visit(predicate, arg) : 0;
-        }
-
-        @Override
-        public boolean refersDirectlyTo(PyObject ob) {
-            return ob != null && (ob == iterator || ob == predicate ||
-                    super.refersDirectlyTo(ob));
         }
     }
 
