@@ -37,6 +37,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    public final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class);
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:

@@ -42,6 +42,8 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     static final MethodHandle VARARG_LEN = findOwnMH("varargLen", boolean.class, PyObject.class, ThreadState.class,
             PyObject[].class, String[].class, int.class, PyObject.class);
 
+    static final MethodHandle TYPE_GUARD = findOwnMH("isType", boolean.class, PyObject.class, PyType.class);
+
     protected PyObject self;
 
     public PyBuiltinMethod(PyObject self, PyBuiltinMethodData info) {
@@ -182,7 +184,15 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
             mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         }
         mh = asTypesafeReturn(mh, methodType);
-        return new GuardedInvocation(mh, Guards.getIdentityGuard(request.getReceiver()));
+//        return new GuardedInvocation(mh, Guards.getInstanceOfGuard(request.getReceiver().getClass()));
+        PyObject receiver = (PyObject) request.getReceiver();
+//        MethodHandle guard = MethodHandles.insertArguments(TYPE_GUARD, 1, receiver.getType());
+//        return new GuardedInvocation(mh, null, new SwitchPoint[0], ClassCastException.class);
+        return new GuardedInvocation(mh, Guards.getIdentityGuard(receiver), new SwitchPoint[0], ClassCastException.class);
+    }
+
+    public static boolean isType(PyObject obj, PyType type) {
+        return obj.getType() == type;
     }
 
     private MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {

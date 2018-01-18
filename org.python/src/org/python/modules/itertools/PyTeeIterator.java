@@ -1,81 +1,32 @@
 package org.python.modules.itertools;
 
-import org.python.core.Py;
-import org.python.core.PyException;
-import org.python.core.PyIterator;
-import org.python.core.PyNewWrapper;
-import org.python.core.PyObject;
-import org.python.core.PyType;
-import org.python.core.Visitproc;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.BuiltinDocs;
+import org.python.core.Py;
+import org.python.core.PyException;
+import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+import org.python.core.PyType;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-@ExposedType(name = "itertools.tee", base = PyObject.class,
-    isBaseType = false, doc = PyTeeIterator.tee_doc)
-public class PyTeeIterator extends PyIterator {
-
-    public static final String tee_doc = "Iterator wrapped to make it copyable";
-
-    private static class PyTeeData {
-        private PyObject iterator;
-        private int total;
-        private Map<Integer, PyObject> buffer;
-        public PyException stopException;
-        private Object lock;
-
-        public PyTeeData(PyObject iterator) {
-            this.iterator = iterator;
-            buffer = new ConcurrentHashMap<>();
-            total = 0;
-            lock = new Object();
-        }
-
-        public PyObject getItem(int pos) {
-            if (pos == total) {
-                synchronized (lock) {
-                    if (pos == total) {
-                        PyObject obj = nextElement(iterator);
-                        if (obj == null) {
-                            return null;
-                        }
-                        buffer.put(total++, obj);
-                    }
-                }
-            }
-            return buffer.get(pos);
-        }
-
-        private PyObject nextElement(PyObject pyIter) {
-            PyObject element = null;
-            try {
-                element = pyIter.__next__();
-            } catch (PyException pyEx) {
-                if (pyEx.match(Py.StopIteration)) {
-                    stopException = pyEx;
-                } else {
-                    throw pyEx;
-                }
-            }
-            return element;
-        }
-    }
+@ExposedType(name = "itertools._tee", base = PyObject.class,
+    isBaseType = false, doc = BuiltinDocs.itertools_tee_doc)
+public class PyTeeIterator extends PyObject {
+    public static final PyType TYPE = PyType.fromClass(PyTeeIterator.class);
+    public PyException stopException;
 
     private int position;
     private PyTeeData teeData;
-
-    public PyTeeIterator() {
-        super();
-    }
 
     public PyTeeIterator(PyType subType) {
         super(subType);
     }
 
     public PyTeeIterator(PyTeeData teeData) {
+        super(TYPE);
         this.teeData = teeData;
     }
     
@@ -101,16 +52,15 @@ public class PyTeeIterator extends PyIterator {
             return tees;
         }
 
-        PyObject copyFunc = iterable.__findattr__("__copy__");
-        if (copyFunc == null) {
-            tees[0] = fromIterable(iterable);
-            copyFunc = tees[0].__getattr__("__copy__");
+        PyTeeIterator iter;
+        if (iterable instanceof PyTeeIterator) {
+            iter = (PyTeeIterator) iterable;
+        } else {
+            iter = fromIterable(iterable);
         }
-        else {
-            tees[0] = iterable;
-        }
+        tees[0] = iter;
         for (int i = 1; i < n; i++) {
-            tees[i] = copyFunc.__call__();
+            tees[i] = iter.tee___copy__();
         }
         return tees;
     }
@@ -125,62 +75,27 @@ public class PyTeeIterator extends PyIterator {
     }
 
     @ExposedMethod(names = "__next__")
-    public PyObject __next__() {
-        PyObject obj = teeData.getItem(position++);
-        if (obj == null) {
-            stopException = teeData.stopException;
-        }
-        return obj;
+    public PyObject tee___next__() {
+        return teeData.getItem(position++);
     }
 
     @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod(names = {"__copy__"})
     public final PyTeeIterator tee___copy__() {
         return new PyTeeIterator(teeData);
     }
 
-
-    /* Traverseproc implementation */
-    @Override
-    public int traverse(Visitproc visit, Object arg) {
-        int retVal = super.traverse(visit, arg);
-        if (retVal != 0) {
-            return retVal;
-        }
-        if (teeData != null) {
-            if (teeData.iterator != null) {
-                retVal = visit.visit(teeData.iterator, arg);
-                if (retVal != 0) {
-                    return retVal;
-                }
-            }
-            if (teeData.buffer != null) {
-                for (PyObject ob: teeData.buffer.values()) {
-                    if (ob != null) {
-                        retVal = visit.visit(ob, arg);
-                        if (retVal != 0) {
-                            return retVal;
-                        }
-                    }
-                }
-            }
-            if (teeData.stopException != null) {
-                retVal = teeData.stopException.traverse(visit, arg);
-                if (retVal != 0) {
-                    return retVal;
-                }
-            }
-        }
-        return 0;
+    @ExposedMethod(names = {"__reduce__"})
+    public PyObject reduce() {
+        return new PyTuple(TYPE, new PyTuple(teeData), new PyTuple(new PyLong(position)));
     }
 
-    @Override
-    public boolean refersDirectlyTo(PyObject ob) throws UnsupportedOperationException {
-        if (ob == null) {
-            return false;
-        } else if (super.refersDirectlyTo(ob)) {
-            return true;
-        } else {
-            throw new UnsupportedOperationException();
-        }
+    @ExposedMethod(names = {"__setstate__"})
+    public void setstate(PyObject pos) {
+        position = pos.asInt();
     }
 }

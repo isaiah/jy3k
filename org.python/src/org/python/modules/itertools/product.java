@@ -1,34 +1,24 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.Visitproc;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
 
-@ExposedType(name = "itertools.product", base = PyObject.class, doc = product.product_doc)
+@ExposedType(name = "itertools.product", base = PyObject.class, doc = BuiltinDocs.itertools_product_doc)
 public class product extends PyIterator {
 
     public static final PyType TYPE = PyType.fromClass(product.class);
-    private ItertoolsIterator iter;
-
-    public static final String product_doc =
-            "product(*iterables) --> product object\n\n" +
-                    "Cartesian product of input iterables.  Equivalent to nested for-loops.\n\n" +
-                    "For example, product(A, B) returns the same as:  ((x,y) for x in A for y in B).\n" +
-                    "The leftmost iterators are in the outermost for-loop, so the output tuples\n" +
-                    "cycle in a manner similar to an odometer (with the rightmost element changing\n" +
-                    "on every iteration).\n\n" +
-                    "To compute the product of an iterable with itself, specify the number\n" +
-                    "of repetitions with the optional repeat keyword argument. For example,\n" +
-                    "product(A, repeat=4) means the same as product(A, A, A, A).\n\n" +
-                    "product('ab', range(3)) --> ('a',0) ('a',1) ('a',2) ('b',0) ('b',1) ('b',2)\n" +
-                    "product((0,1), (0,1), (0,1)) --> (0,0,0) (0,0,1) (0,1,0) (0,1,1) (1,0,0) ...";
+    private int[] indices;
+    private boolean firstthru = true;
+    private int numPools;
+    private PyTuple[] pools;
 
     public product() {
         super();
@@ -67,58 +57,57 @@ public class product extends PyIterator {
 
     private void product___init__(PyTuple[] tuples, int repeat) {
         // Make repeat duplicates, in order
-        final int num_pools = tuples.length * repeat;
-        final PyTuple pools[] = new PyTuple[num_pools];
+        numPools = tuples.length * repeat;
+        pools = new PyTuple[numPools];
         for (int r = 0; r < repeat; r++) {
             System.arraycopy(tuples, 0, pools, r * tuples.length, tuples.length);
         }
-        final int indices[] = new int[num_pools];
-
-        iter = new ItertoolsIterator() {
-            boolean firstthru = true;
-
-            @Override
-            public PyObject next() {
-                if (firstthru) {
-                    for (PyTuple pool : pools) {
-                        if (pool.__len__() == 0) {
-                            throw Py.StopIteration();
-                        }
-                    }
-                    firstthru = false;
-                    return makeTuple();
-                }
-                for (int i = num_pools - 1; i >= 0; i--) {
-                    indices[i]++;
-
-                    if (indices[i] == pools[i].__len__()) {
-                        indices[i] = 0;
-                    } else {
-                        return makeTuple();
-                    }
-                }
-                throw Py.StopIteration();
-            }
-
-            private PyTuple makeTuple() {
-                PyObject items[] = new PyObject[num_pools];
-                for (int i = 0; i < num_pools; i++) {
-                    items[i] = pools[i].__getitem__(indices[i]);
-                }
-                return new PyTuple(items);
-            }
-
-        };
+        indices = new int[numPools];
     }
 
     @ExposedMethod(names = "__next__")
     public PyObject product___next__() {
-        return iter.next();
+        if (firstthru) {
+            for (PyTuple pool : pools) {
+                if (pool.__len__() == 0) {
+                    throw Py.StopIteration();
+                }
+            }
+            firstthru = false;
+            return makeTuple();
+        }
+        for (int i = numPools - 1; i >= 0; i--) {
+            indices[i]++;
+
+            if (indices[i] == pools[i].__len__()) {
+                indices[i] = 0;
+            } else {
+                return makeTuple();
+            }
+        }
+        throw Py.StopIteration();
     }
 
     @ExposedMethod
     public PyObject __iter__() {
         return this;
+    }
+
+    @ExposedMethod(names = {"__reduce__"})
+    public PyObject reduce() {
+        return new PyTuple(TYPE, new PyTuple(pools));
+    }
+
+    @ExposedMethod(names = {"__setstate__"})
+    public void setstate(PyObject state) {
+    }
+
+    private PyTuple makeTuple() {
+        PyObject items[] = new PyObject[numPools];
+        for (int i = 0; i < numPools; i++) {
+            items[i] = pools[i].__getitem__(indices[i]);
+        }
+        return new PyTuple(items);
     }
 }
 

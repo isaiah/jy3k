@@ -154,12 +154,16 @@ public class BuiltinModule {
 
     public static PyObject any(PyObject arg) {
         PyObject iter = PyObject.getIter(arg);
-        if (iter == null) {
-            throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
-        }
-        for (PyObject item : iter.asIterable()) {
-            if (item.isTrue()) {
-                return Py.True;
+        try {
+            for (; ; ) {
+                PyObject item = PyObject.iterNext(iter);
+                if (item.isTrue()) {
+                    return Py.True;
+                }
+            }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
             }
         }
         return Py.False;

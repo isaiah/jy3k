@@ -15,8 +15,8 @@ import org.python.annotations.ExposedType;
 @ExposedType(name = "itertools.starmap", base = PyObject.class, doc = BuiltinDocs.itertools_starmap_doc)
 public class starmap extends PyIterator {
     public static final PyType TYPE = PyType.fromClass(starmap.class);
-    private ItertoolsIterator iter;
-
+    private PyObject callable;
+    private PyObject iterator;
     public starmap() {
         super(TYPE);
     }
@@ -52,21 +52,8 @@ public class starmap extends PyIterator {
     }
 
     private void starmap___init__(final PyObject callable, final PyObject iterator) {
-        iter = new ItertoolsIterator() {
-
-            public PyObject next() {
-                PyObject args = nextElement(iterator);
-                PyObject result = null;
-
-                if (args != null) {
-                    PyTuple argTuple = PyTuple.fromIterable(args);
-                    // convert to array of PyObjects in call to function
-                    result = callable.__call__(argTuple.getArray());
-                }
-                return result;
-            }
-
-        };
+        this.callable = callable;
+        this.iterator = iterator;
     }
 
     @ExposedMethod
@@ -76,6 +63,19 @@ public class starmap extends PyIterator {
 
     @ExposedMethod(names = "__next__")
     public PyObject starmap___next__() {
-        return iter.next();
+        PyObject args = iterNext(iterator);
+        PyObject result = null;
+
+        if (args != null) {
+            PyTuple argTuple = PyTuple.fromIterable(args);
+            // convert to array of PyObjects in call to function
+            result = callable.__call__(argTuple.getArray());
+        }
+        return result;
+    }
+
+    @ExposedMethod(names = {"__reduce__"})
+    public PyObject reduce() {
+        return new PyTuple(TYPE, new PyTuple(callable, iterator));
     }
 }

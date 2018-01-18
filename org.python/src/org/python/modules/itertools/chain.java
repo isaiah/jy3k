@@ -74,4 +74,9 @@ public class chain extends PyObject {
         active = null;
         return chain___next__();
     }
+
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
 }

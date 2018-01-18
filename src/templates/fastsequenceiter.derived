@@ -1,0 +1,4 @@
+base_class: PyFastSequenceIter
+want_dict: true
+ctr: PyObject seq
+incl: object

@@ -153,6 +153,7 @@ org/python/modules/itertools/repeat.class
 org/python/modules/itertools/starmap.class
 org/python/modules/itertools/takewhile.class
 org/python/modules/itertools/PyGrouper.class
+org/python/modules/itertools/PyTeeData.class
 org/python/modules/itertools/PyTeeIterator.class
 org/python/modules/jffi/ArrayCData.class
 org/python/modules/jffi/ByReference.class

@@ -6,6 +6,7 @@ import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyObject;
+import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedMethod;
@@ -58,5 +59,10 @@ public class compress extends PyObject {
                 return datum;
             }
         }
+    }
+
+    @ExposedMethod(names = {"__reduce__"})
+    public PyObject reduce() {
+        return new PyTuple(TYPE, new PyTuple(data, selectors));
     }
 }

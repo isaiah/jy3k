@@ -1,12 +1,8 @@
-Dynpy: python with invokedynamic
+jylang: python with invokedynamic
 
 # Requirements
 
-JDK9
-
-# Build requirement
-
-Python 3.5+
+JDK9 + ant
 
 # Summary
 
@@ -27,17 +23,6 @@ into a personal experimental project.
 # May work on windows
 
 No promise
-
-# Roadmap
-
-These are the nasty things when trying to port a language hosted on C to Java.
-
-[] Rewrite IO layer, since PEP-3116 is inspired by java io, why not just wrap
-the io layer of the host platform.
-[] Rewrite socket stdlib in java, might use jnr-unixsocket?
-
-[] `invokedynamic`: JDK9 have `jdk.dynalink` builtin, maybe the most fun
-project.
 
 # Related works
 

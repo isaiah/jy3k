@@ -70,7 +70,6 @@ public class PyObject implements Serializable {
 
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName iter = new InvokeByName("__iter__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class);
     public static final InvokeByName getitem = new InvokeByName("__getitem__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     /**
      * Primitives classes their wrapper classes.
@@ -948,7 +947,7 @@ public class PyObject implements Serializable {
             throw e;
         }
         try {
-            Object nextFunc = next.getGetter().invokeExact(res);
+            Object nextFunc = o.getType().next.getGetter().invokeExact(res);
             if (nextFunc == null) {
                 throw Py.TypeError(String.format("iter() returned non-iterator of type '%s'", res.getType().fastGetName()));
             }
@@ -962,7 +961,7 @@ public class PyObject implements Serializable {
     }
 
     public static PyObject iterNext(PyObject iterator) {
-        return iterator.unaryOp(Py.getThreadState(), next);
+        return iterator.unaryOp(Py.getThreadState(), iterator.getType().next);
     }
 
     /**

@@ -84,4 +84,9 @@ public class combinationsWithReplacement extends PyObject {
     public PyObject combination_with_replacement___next__() {
         return iter.next();
     }
+
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
 }

@@ -1,9 +1,11 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
+import org.python.core.PyLong;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -40,6 +42,9 @@ public class itertools {
         dict.__setitem__("repeat", repeat.TYPE);
         dict.__setitem__("starmap", starmap.TYPE);
         dict.__setitem__("takewhile", takewhile.TYPE);
+        dict.__setitem__("_grouper", PyGrouper.TYPE);
+        dict.__setitem__("_tee_dataobject", PyTeeData.TYPE);
+        dict.__setitem__("_tee", PyTeeIterator.TYPE);
     }
 
     static int py2int(PyObject obj, int defaultValue, String msg) {
@@ -147,8 +152,23 @@ public class itertools {
     /**
      * Create a tuple of iterators, each of which is effectively a copy of iterable.
      */
-    @ExposedFunction(defaults = {"2"}, doc = BuiltinDocs.itertools_tee_doc)
-    public static PyTuple tee(PyObject iterable, final int n) {
+    @ExposedFunction(doc = BuiltinDocs.itertools_tee_doc)
+    public static PyTuple tee(PyObject[] args, String[] keywords) {
+        ArgParser ap = new ArgParser("tee", args, keywords, "iterable", "n");
+        if (args.length > 2) {
+            throw Py.TypeError(String.format("%s() takes at most %d argument (%d given)", "tee", 2, args.length));
+        }
+        PyObject iterable = ap.getPyObject(0);
+        PyObject num = ap.getPyObject(1, null);
+        int n;
+        if (num == null) {
+            n = 2;
+        } else {
+            if (!(num instanceof PyLong)) {
+                throw Py.TypeError(String.format("expected 'int', got '%s'", num.getType().fastGetName()));
+            }
+            n = num.asInt();
+        }
         return new PyTuple(PyTeeIterator.makeTees(iterable, n));
     }
 
