@@ -7,6 +7,7 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.TypeSlot;
 
 public class BaseTypeBuilder implements TypeBuilder {
 
@@ -15,6 +16,8 @@ public class BaseTypeBuilder implements TypeBuilder {
     private PyBuiltinMethod[] meths;
 
     private PyDataDescr[] descrs;
+
+    private TypeSlot[] typeSlots;
 
     private Class<?> typeClass;
 
@@ -33,7 +36,8 @@ public class BaseTypeBuilder implements TypeBuilder {
                            String doc,
                            PyBuiltinMethod[] meths,
                            PyDataDescr[] descrs,
-                           PyNewWrapper newWrapper) {
+                           PyNewWrapper newWrapper,
+                           TypeSlot[] typeSlots) {
         this.typeClass = typeClass;
         this.baseClass = baseClass;
         this.isBaseType = isBaseType;
@@ -42,6 +46,7 @@ public class BaseTypeBuilder implements TypeBuilder {
         this.descrs = descrs;
         this.meths = meths;
         this.newWrapper = newWrapper;
+        this.typeSlots = typeSlots;
     }
 
     public PyObject getDict(PyType type) {
@@ -57,6 +62,9 @@ public class BaseTypeBuilder implements TypeBuilder {
         if (newWrapper != null) {
             dict.__setitem__("__new__", newWrapper);
             newWrapper.setWrappedType(type);
+        }
+        for (TypeSlot slot: typeSlots) {
+            slot.assign(type);
         }
         return dict;
     }
