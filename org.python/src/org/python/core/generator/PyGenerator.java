@@ -263,7 +263,6 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
         }
     }
 
-    @Override
     public PyObject __next__() {
         try {
             return gen_send_ex(Py.getThreadState(), Py.None, false, false);

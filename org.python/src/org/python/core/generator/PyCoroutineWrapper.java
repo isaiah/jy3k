@@ -49,10 +49,6 @@ public class PyCoroutineWrapper extends PyObject {
         return this;
     }
 
-    public PyObject __next__() {
-        return coroutine_wrapper___next__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.coroutine_wrapper___next___doc)
     final PyObject coroutine_wrapper___next__() {
         return cw_coroutine.send(Py.None);

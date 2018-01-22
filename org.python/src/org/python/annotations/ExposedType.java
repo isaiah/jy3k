@@ -33,6 +33,12 @@ public @interface ExposedType {
     boolean isBaseType() default true;
 
     /**
+     * @return Whether this is a python iterator
+     * @return
+     */
+    boolean iter() default false;
+
+    /**
      * Returns the __doc__ String for this type.
      */
     String doc() default "";

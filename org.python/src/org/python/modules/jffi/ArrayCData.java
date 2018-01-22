@@ -1,6 +1,7 @@
 
 package org.python.modules.jffi;
 
+import org.python.annotations.ExposedMethod;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyList;
@@ -156,13 +157,15 @@ public class ArrayCData extends CData implements Pointer {
         }
     };
 
-    public class ArrayIter extends PyIterator {
+    @ExposedType
+    public class ArrayIter extends PyObject {
 
         private int index = 0;
 
-        public PyObject __next__() {
+        @ExposedMethod(names = {"__next__"})
+        public PyObject next() {
             if (index >= arrayType.length) {
-                return null;
+                throw Py.StopIteration();
             }
             return componentMemoryOp.get(getReferenceMemory(), index++ * componentType.size());
         }

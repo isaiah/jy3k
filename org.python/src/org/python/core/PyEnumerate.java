@@ -56,10 +56,6 @@ public class PyEnumerate extends PyIterator {
         }
     }
 
-    public PyObject __next__() {
-        return enumerate___next__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.enumerate___next___doc)
     public final PyObject enumerate___next__() {
         PyObject nextItem;

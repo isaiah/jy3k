@@ -14,13 +14,6 @@ public class TypeSlot {
     }
 
     public void assign(PyType pyType) {
-        SlotFunc a = SlotFunc.ITER;
-        switch (type) {
-            case ITER_NEXT:
-                pyType.iterNext = mh;
-                break;
-            default:
-                break;
-        }
+        type.assign(pyType, mh);
     }
 }

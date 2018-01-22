@@ -932,6 +932,9 @@ public class PyObject implements Serializable {
     }
 
     public static PyObject getIter(PyObject o) {
+        if (o.getType().isIterator) {
+            return o;
+        }
         PyObject res;
         try {
             res = o.unaryOp(Py.getThreadState(), iter);
@@ -947,7 +950,7 @@ public class PyObject implements Serializable {
             }
             throw e;
         }
-        if (o.getType().iterNext == null) {
+        if (o.getType().iternext == null) {
             try {
                 Object nextFunc = o.getType().next.getGetter().invokeExact(res);
             } catch (Throwable e) {
@@ -962,9 +965,9 @@ public class PyObject implements Serializable {
 
     public static PyObject iterNext(PyObject iterator) {
         PyType tp = iterator.getType();
-        if (tp.iterNext != null) {
+        if (tp.iternext != null) {
             try {
-                return (PyObject) tp.iterNext.invokeExact(iterator);
+                return (PyObject) tp.iternext.invokeExact(iterator);
             } catch (Throwable e) {
                 throw Py.JavaError(e);
             }
@@ -983,17 +986,6 @@ public class PyObject implements Serializable {
                 return getNext();
             }
         };
-    }
-
-    /**
-     * Return the next element of the sequence that this is an iterator
-     * for. Returns null when the end of the sequence is reached.
-     *
-     * @since 2.2
-     */
-    public PyObject __next__() {
-        throw Py.TypeError(String.format("iter() returned non-iterator of type '%.200s'",
-                getType().fastGetName()));
     }
 
     /**
@@ -1066,8 +1058,8 @@ public class PyObject implements Serializable {
      * @throws Py.AttributeError if the name is not found.
      * @see #__findattr_ex__(String)
      **/
-    public final PyObject __getattr__(PyUnicode name) {
-        return __getattr__(name.internedString());
+    public final PyObject __getattr__(String name) {
+        return __getattr__(new PyUnicode(name));
     }
 
     /**
@@ -1084,20 +1076,20 @@ public class PyObject implements Serializable {
      * @throws Py.AttributeError if the name is not found.
      * @see #__findattr__(java.lang.String)
      **/
-    public final PyObject __getattr__(String name) {
+    public final PyObject __getattr__(PyUnicode name) {
         PyType selfType = getType();
-        if (selfType == TYPE) {
-            return object___getattribute__(new PyUnicode(name));
+        if (selfType == TYPE || selfType.getUsesObjectGetattribute()) {
+            return object___getattribute__(name);
         }
         PyObject getattr = selfType.lookup("__getattribute__");
         if (getattr instanceof PyBuiltinMethod) {
-            return ((PyBuiltinMethod) getattr).invoke(new PyUnicode(name));
+            return ((PyBuiltinMethod) getattr).invoke(name);
         }
         PyObject func = getattr.__get__(this, selfType);
         if (func instanceof PyBuiltinMethod) {
-            return ((PyBuiltinMethod) func).invoke(new PyUnicode(name));
+            return ((PyBuiltinMethod) func).invoke(name);
         }
-        return func.__call__(new PyUnicode(name));
+        return func.__call__(name);
     }
 
     public void noAttributeError(String name) {

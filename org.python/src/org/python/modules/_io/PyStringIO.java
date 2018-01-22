@@ -110,15 +110,6 @@ public class PyStringIO extends PyTextIOWrapper {
         super.__setattr__(name, value);
     }
 
-    @ExposedMethod
-    public PyObject __next__() {
-        _complain_ifclosed();
-        String r = readline(-1L);
-        if (r.length() == 0)
-            return null;
-        return new PyUnicode(r);
-    }
-
     /**
      * Free the memory buffer.
      */

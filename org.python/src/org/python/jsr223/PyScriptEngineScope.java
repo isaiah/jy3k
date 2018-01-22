@@ -189,7 +189,6 @@ public final class PyScriptEngineScope extends PyObject {
             return _size;
         }
 
-        @Override
         public PyObject __next__() {
             PyObject result = null;
             _index++;

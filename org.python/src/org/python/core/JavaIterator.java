@@ -1,7 +1,11 @@
 package org.python.core;
 
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedType;
+
 import java.util.Iterator;
 
+@ExposedType
 public class JavaIterator extends PyIterator {
 
     final private Iterator<Object> proxy;
@@ -14,7 +18,16 @@ public class JavaIterator extends PyIterator {
         this.proxy = proxy;
     }
 
+    @ExposedMethod
+    public PyObject __iter__() {
+        return this;
+    }
+
+    @ExposedMethod
     public PyObject __next__() {
-        return proxy.hasNext() ? Py.java2py(proxy.next()) : null;
+        if (proxy.hasNext()) {
+            return Py.java2py(proxy.next());
+        }
+        throw Py.StopIteration();
     }
 }

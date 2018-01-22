@@ -544,31 +544,6 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return super.richCompare(other, op);
     }
 
-    private abstract class StringMapIter<T> extends PyIterator {
-
-        protected final Iterator<T> iterator;
-
-        private final int size;
-
-        public StringMapIter(Collection<T> c) {
-            iterator = c.iterator();
-            size = c.size();
-        }
-
-        @Override
-        public PyObject __next__() {
-            if (table.size() != size) {
-                throw Py.RuntimeError("dictionary changed size during iteration");
-            }
-            if (!iterator.hasNext()) {
-                return null;
-            }
-            return stringMapNext();
-        }
-
-        protected abstract PyObject stringMapNext();
-    }
-
     @ExposedType(name = "values_iter")
     public class ValuesIter extends PyObject {
         public final PyType TYPE = PyType.fromClass(ValuesIter.class);
@@ -586,9 +561,8 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             return this;
         }
 
-        @Override
         @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
+        public PyObject next() {
             if (iterator.hasNext()) {
                 return iterator.next();
             }
@@ -620,9 +594,8 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             return this;
         }
 
-        @Override
         @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
+        public PyObject next() {
             if (iterator.hasNext()) {
                 return keyToPy(iterator.next());
             }
@@ -660,9 +633,8 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
             return size;
         }
 
-        @Override
         @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
+        public PyObject next() {
             if (iterator.hasNext()) {
                 return itemTuple(iterator.next());
             }

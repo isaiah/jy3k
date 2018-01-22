@@ -61,15 +61,6 @@ rest:
     return super.__len__();
   }
 
-  public PyObject __next__() {
-    PyType self_type = getType();
-    PyObject impl = self_type.lookup("__next__");
-    if (impl != null) {
-      return impl.__get__(this,self_type).__call__();
-    }
-    return super.__next__(); // ???
-  }
-
   public PyObject __finditem__(PyObject key) { // ???
     PyType self_type = getType();
     PyObject impl = self_type.lookup("__getitem__");

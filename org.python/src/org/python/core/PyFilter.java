@@ -32,11 +32,6 @@ public class PyFilter extends PyObject {
         return filter;
     }
 
-    @Override
-    public PyObject __next__() {
-        return filter___next__();
-    }
-
     @ExposedMethod
     public PyObject filter___next__() {
         while(seq.hasNext()) {

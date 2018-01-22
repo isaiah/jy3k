@@ -18,7 +18,6 @@ public class PyDequeIter extends PyObject {
         startState = pyDeque.state;
     }
 
-    @Override
     @ExposedMethod(names = "__next__")
     public PyObject __next__() {
         synchronized (pyDeque) {

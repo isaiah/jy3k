@@ -44,11 +44,6 @@ public class MarkupIterator extends PyObject {
         return this;
     }
 
-    @Override
-    public PyObject __next__() {
-        return formatteriterator___next__();
-    }
-
     /**
      * Return the next "chunk" of the format (or return null if ended). A chunk is a 4-tuple
      * describing

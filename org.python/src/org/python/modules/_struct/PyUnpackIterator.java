@@ -33,7 +33,6 @@ public class PyUnpackIterator extends PyObject {
         this.struct = struct;
     }
 
-    @Override
     @ExposedFunction(names = {"__next__"})
     public PyObject __next__() {
         if (!buffer.hasRemaining()) {

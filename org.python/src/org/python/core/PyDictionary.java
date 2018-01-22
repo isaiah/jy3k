@@ -664,9 +664,8 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return this;
         }
 
-        @Override
         @ExposedMethod(names = "__next__")
-        public PyObject __next__() {
+        public PyObject next() {
             if (!iterator.hasNext()) {
                 throw Py.StopIteration();
             }

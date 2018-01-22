@@ -1,5 +1,7 @@
 package org.python.modules.posix;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.annotations.ExposedMethod;
@@ -24,11 +26,11 @@ public class PyScandirIterator extends PyObject {
         this.bytes = bytes;
     }
 
-    @Override
-    @ExposedMethod(names = "__next__")
-    public PyObject __next__() {
-        if (!iter.hasNext()) throw Py.StopIteration();
-        return new PyDirEntry(iter.next(), bytes);
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject next(PyObject scandirIter) {
+        PyScandirIterator self = (PyScandirIterator) scandirIter;
+        if (!self.iter.hasNext()) throw Py.StopIteration();
+        return new PyDirEntry(self.iter.next(), self.bytes);
     }
 
     @ExposedMethod(names = {"close", "__exit__"})

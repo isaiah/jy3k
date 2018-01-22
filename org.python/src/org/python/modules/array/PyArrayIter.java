@@ -9,7 +9,7 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
-@ExposedType(name = "arrayiterator")
+@ExposedType(name = "arrayiterator", iter = true)
 public class PyArrayIter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyArrayIter.class);
     private MachineFormatCode formatCode;

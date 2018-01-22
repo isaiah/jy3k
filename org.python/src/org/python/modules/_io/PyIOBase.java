@@ -626,12 +626,6 @@ public class PyIOBase extends PyObject implements FinalizableBuiltin, Traversepr
 
     // _IOBase___iter__ = _IOBase___enter__
 
-    @Override
-    public PyObject __next__() {
-        PyObject line = invoke("readline");
-        return (!line.isTrue()) ? null : line;
-    }
-
     /**
      * May be called repeatedly to produce (usually) lines from this stream or file.
      *
