@@ -25,6 +25,8 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
 
     private List<MethodExposer> methodExposers = new ArrayList<>();
 
+    private List<FunctionExposer> typeslots = new ArrayList<>();
+
     private Map<String, DescriptorExposer> descExposers = new HashMap<>();
 
     private Exposer newExposer;
@@ -165,10 +167,14 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                                           getName(),
                                           methodExposers,
                                           descExposers.values(),
+                                          typeslots,
                                           newExposer);
             for (MethodExposer exposer : methodExposers) {
                 addInnerClass(exposer.getGeneratedType());
             }
+//            for (FunctionExposer exposer: typeslots) {
+//                addTypeSlot(exposer);
+//            }
             for (DescriptorExposer exposer : descExposers.values()) {
                 addInnerClass(exposer.getGeneratedType());
             }
@@ -202,6 +208,9 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                     "addBuilder",
                     Type.getMethodDescriptor(VOID, new Type[]{CLASS, TYPEBUILDER}),
                     false);
+        }
+
+        private void addTypeSlot(FunctionExposer exposer) {
         }
 
         /** Adds an inner class reference to inner from the class being visited. */
@@ -265,6 +274,11 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                     }
 
                     @Override
+                    public void handleTypeSlot(FunctionExposer exposer) {
+                        typeslots.add(exposer);
+                    }
+
+                    @Override
                     public void handleInitializer(String init) {
                         throwInvalid("@ModuleInit is not allowed for type");
                     }
@@ -287,7 +301,6 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                     @Override
                     public void handleResult(ClassMethodExposer exposer) {
                         methodExposers.add(exposer);
-
                     }
 
                     @Override

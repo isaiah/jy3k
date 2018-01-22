@@ -1,9 +1,10 @@
 package org.python.tools.codegen;
 
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
+import org.python.annotations.ExposedType;
 import org.python.core.BytecodeLoader;
 import org.python.expose.BaseTypeBuilder;
-import org.python.annotations.ExposedType;
 import org.python.expose.TypeBuilder;
 
 import java.util.Collection;
@@ -36,6 +37,8 @@ public class TypeExposer extends Exposer {
 
     private Exposer ne;
 
+    private Collection<FunctionExposer> typeSlots;
+
     public TypeExposer(Type onType,
                        Type baseType,
                        boolean isBaseType,
@@ -43,6 +46,7 @@ public class TypeExposer extends Exposer {
                        String name,
                        Collection<MethodExposer> methods,
                        Collection<DescriptorExposer> descriptors,
+                       Collection<FunctionExposer> slots,
                        Exposer ne) {
         super(BaseTypeBuilder.class, makeGeneratedName(onType));
         this.baseType = baseType;
@@ -52,16 +56,17 @@ public class TypeExposer extends Exposer {
         this.name = name;
         this.methods = methods;
         this.descriptors = descriptors;
+        this.typeSlots = slots;
         Set<String> names = new HashSet<>();
-        for(DescriptorExposer exposer : descriptors) {
-            if(!names.add(exposer.getName())) {
+        for (DescriptorExposer exposer : descriptors) {
+            if (!names.add(exposer.getName())) {
                 throwDupe(exposer.getName());
             }
         }
-        for(MethodExposer method : methods) {
+        for (MethodExposer method : methods) {
             String[] methNames = method.getNames();
-            for(String methName : methNames) {
-                if(!names.add(methName)) {
+            for (String methName : methNames) {
+                if (!names.add(methName)) {
                     throwDupe(methName);
                 }
             }
@@ -70,21 +75,21 @@ public class TypeExposer extends Exposer {
         this.ne = ne;
     }
 
+    public static String makeGeneratedName(Type onType) {
+        return onType.getClassName() + "$PyExposer";
+    }
+
     private void throwDupe(String exposedName) {
         throw new InvalidExposingException("Only one item may be exposed on a type with a given name[name="
                 + exposedName + ", class=" + onType.getClassName() + "]");
     }
 
-    public static String makeGeneratedName(Type onType) {
-        return onType.getClassName() + "$PyExposer";
-    }
-
     public TypeBuilder makeBuilder() {
         BytecodeLoader.Loader l = new BytecodeLoader.Loader();
-        if(ne != null) {
+        if (ne != null) {
             ne.load(l);
         }
-        for(DescriptorExposer de : descriptors) {
+        for (DescriptorExposer de : descriptors) {
             de.load(l);
         }
 //        for(MethodExposer me : methods) {
@@ -93,7 +98,7 @@ public class TypeExposer extends Exposer {
         Class descriptor = load(l);
         try {
             return (TypeBuilder) descriptor.getDeclaredConstructor().newInstance();
-        } catch(Exception e) {
+        } catch (Exception e) {
             // If we're unable to create the generated class, the process is
             // definitely ill, but that shouldn't be the case most of the time
             // so make this a runtime exception
@@ -122,7 +127,7 @@ public class TypeExposer extends Exposer {
         mv.visitVarInsn(ASTORE, 1);
         int i = 0;
 
-        for(MethodExposer exposer : methods) {
+        for (MethodExposer exposer : methods) {
             if (exposer instanceof ClassMethodExposer) {
                 for (final String name : exposer.getNames()) {
                     mv.visitVarInsn(ALOAD, 1);
@@ -157,20 +162,36 @@ public class TypeExposer extends Exposer {
         mv.visitTypeInsn(ANEWARRAY, DATA_DESCR.getInternalName());
         mv.visitVarInsn(ASTORE, 2);
         i = 0;
-        for(DescriptorExposer desc : descriptors) {
+        for (DescriptorExposer desc : descriptors) {
             mv.visitVarInsn(ALOAD, 2);
             mv.visitLdcInsn(i++);
             instantiate(desc.getGeneratedType());
             mv.visitInsn(AASTORE);
         }
         mv.visitVarInsn(ALOAD, 2);
-        if(ne != null) {
+        if (ne != null) {
             instantiate(ne.getGeneratedType());
         } else {
             mv.visitInsn(ACONST_NULL);
         }
+        mv.visitLdcInsn(typeSlots.size());
+        mv.visitTypeInsn(ANEWARRAY, TYPE_SLOT.getInternalName());
+        mv.visitVarInsn(ASTORE, 3);
+        i = 0;
+        for (FunctionExposer exposer : typeSlots) {
+            mv.visitVarInsn(ALOAD, 3);
+            mv.visitLdcInsn(i++);
+            mv.visitTypeInsn(NEW, TYPE_SLOT.getInternalName());
+            mv.visitInsn(DUP);
+            mv.visitFieldInsn(GETSTATIC, SLOT_FUNC.getInternalName(), exposer.slot.name(), SLOT_FUNC.getDescriptor());
+            String desc = Type.getMethodDescriptor(exposer.returnType, exposer.args);
+            mv.visitLdcInsn(new Handle(H_INVOKESTATIC, onType.getInternalName(), exposer.methodName, desc, false));
+            callConstructor(TYPE_SLOT, SLOT_FUNC, METHOD_HANDLE);
+            mv.visitInsn(AASTORE);
+        }
+        mv.visitVarInsn(ALOAD, 3);
         superConstructor(STRING, CLASS, CLASS, BOOLEAN, STRING, ABUILTIN_METHOD, ADATA_DESCR,
-                         PYNEWWRAPPER);
+                PYNEWWRAPPER, ATYPE_SLOT);
         endConstructor();
     }
 }

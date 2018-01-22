@@ -4,6 +4,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
 
     private Exposer newExp;
 
-    private ExposedMethodVisitor methVisitor, classMethVisitor, functionVisitor;
+    private ExposedMethodVisitor methVisitor, classMethVisitor, functionVisitor, typeslotVisitor;
 
     private Type onType;
 
@@ -70,6 +71,8 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
      */
     public abstract void handleNewExposer(Exposer exposer);
 
+    public abstract void handleTypeSlot(FunctionExposer exposer);
+
     /**
      * initializer method for builtin module
      * @param init the name of the method
@@ -105,6 +108,9 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
         } else if(desc.equals(EXPOSED_FUNCTION.getDescriptor())) {
             functionVisitor = new ExposedMethodVisitor();
             return functionVisitor;
+        } else if(desc.equals(EXPOSED_TYPE_SLOT.getDescriptor())) {
+            typeslotVisitor = new ExposedMethodVisitor();
+            return typeslotVisitor;
         } else if (desc.equals(MODULE_INIT.getDescriptor())) {
             if ((access & ACC_STATIC) == 0) {
                 throwInvalid("@ModuleInit can't be applied to non-static methods");
@@ -163,8 +169,10 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
 
         @Override
         public void visit(String name, Object value) {
-            if (name.equals("doc")) {
-                doc = (String)value;
+            if (name.equals("name")) {
+                names = new String[] {(String) value};
+            } else if (name.equals("doc")) {
+                doc = (String) value;
             } else {
                 super.visit(name, value);
             }
@@ -174,7 +182,6 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
         public AnnotationVisitor visitArray(String name) {
             if(name.equals("names")) {
                 return new StringArrayBuilder() {
-
                     @Override
                     public void handleResult(String[] result) {
                         names = result;
@@ -197,6 +204,8 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
         public void visitEnum(String name, String desc, String value) {
             if(name.equals("type")) {
                 type = MethodType.valueOf(value);
+            } else if (name.equals("value")) {
+                slot = SlotFunc.valueOf(value);
             } else {
                 super.visitEnum(name, desc, value);
             }
@@ -209,43 +218,56 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
         private MethodType type = MethodType.DEFAULT;
 
         private String doc = "";
+
+        private SlotFunc slot = null;
     }
 
     @Override
     public void visitEnd() {
         if(methVisitor != null) {
             handleResult(new InstanceMethodExposer(onType,
-                                           access,
-                                           methodName,
-                                           methodDesc,
-                                           typeName,
-                                           methVisitor.names,
-                                           methVisitor.defaults,
-                                           methVisitor.type,
-                                           methVisitor.doc));
+                    access,
+                    methodName,
+                    methodDesc,
+                    typeName,
+                    methVisitor.names,
+                    methVisitor.defaults,
+                    methVisitor.type,
+                    methVisitor.doc));
         }
         if(newExp != null) {
             handleNewExposer(newExp);
         }
+        if (typeslotVisitor != null) {
+            handleTypeSlot(new FunctionExposer(onType,
+                    access,
+                    methodName,
+                    methodDesc,
+                    typeName,
+                    typeslotVisitor.names,
+                    typeslotVisitor.defaults,
+                    typeslotVisitor.doc,
+                    typeslotVisitor.slot));
+        }
         if (classMethVisitor != null) {
             handleResult(new ClassMethodExposer(onType,
-                                                access,
-                                                methodName,
-                                                methodDesc,
-                                                typeName,
-                                                classMethVisitor.names,
-                                                classMethVisitor.defaults,
-                                                classMethVisitor.doc));
+                    access,
+                    methodName,
+                    methodDesc,
+                    typeName,
+                    classMethVisitor.names,
+                    classMethVisitor.defaults,
+                    classMethVisitor.doc));
         }
         if (functionVisitor != null) {
-             handleResult(new FunctionExposer(onType,
-                                                access,
-                                                methodName,
-                                                methodDesc,
-                                                typeName,
-                                                functionVisitor.names,
-                                                functionVisitor.defaults,
-                                                functionVisitor.doc));
+            handleResult(new FunctionExposer(onType,
+                    access,
+                    methodName,
+                    methodDesc,
+                    typeName,
+                    functionVisitor.names,
+                    functionVisitor.defaults,
+                    functionVisitor.doc));
         }
 
         if (initializer) {

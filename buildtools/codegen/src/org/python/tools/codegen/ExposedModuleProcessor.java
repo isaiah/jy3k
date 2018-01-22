@@ -174,6 +174,11 @@ public class ExposedModuleProcessor implements Opcodes, PyTypes {
                 }
 
                 @Override
+                public void handleTypeSlot(FunctionExposer exposer) {
+                    throwInvalid("module cannot have slots");
+                }
+
+                @Override
                 public void exposeAsGetDescriptor(String descName, String doc) {
                     throwInvalid("module cannot have descriptor");
                 }

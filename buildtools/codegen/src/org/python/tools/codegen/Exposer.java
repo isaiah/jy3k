@@ -24,15 +24,15 @@ public abstract class Exposer implements Opcodes, PyTypes {
     /** The current class under construction. */
     protected ClassVisitor cv;
 
-    /** The super class of the type that will be generated. */
+    /** The super class of the slotType that will be generated. */
     private Type superType;
 
-    /** The type that will be generated. */
+    /** The slotType that will be generated. */
     protected Type thisType;
     
     protected Type[] interfacesImplemented;
 
-    /** Maps from a primitive type to its wrapper */
+    /** Maps from a primitive slotType to its wrapper */
     protected static final Map<Type, Type> PRIMITIVES = new HashMap<Type, Type>() {
         {
             put(BOOLEAN, Type.getType(Boolean.class));
@@ -163,7 +163,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
                            methodDesc(VOID, args), false);
     }
 
-    /** Calls the method on onType with the given return type and argument types. */
+    /** Calls the method on onType with the given return slotType and argument types. */
     protected void call(Type onType, String methodName, Type returnType, Type... args) {
         mv.visitMethodInsn(INVOKEVIRTUAL,
                            onType.getInternalName(),
@@ -171,7 +171,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
                            methodDesc(returnType, args), false);
     }
 
-    /** Calls the static method on onType with the given return type and argument types. */
+    /** Calls the static method on onType with the given return slotType and argument types. */
     protected void callStatic(Type onType, String methodName, Type returnType, Type... args) {
         mv.visitMethodInsn(INVOKESTATIC,
                            onType.getInternalName(),
@@ -179,7 +179,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
                            methodDesc(returnType, args), false);
     }
 
-    /** Produces a method descriptor with ret as its return type that takes args. */
+    /** Produces a method descriptor with ret as its return slotType that takes args. */
     protected String methodDesc(Type ret, Type... args) {
         return Type.getMethodDescriptor(ret, args);
     }
@@ -228,7 +228,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
     }
 
     /**
-     * Turns an object of inputType on the top of the stack into an equivalent Py type. Handles
+     * Turns an object of inputType on the top of the stack into an equivalent Py slotType. Handles
      * primitives, void, and String. If void, the top item on the stack isn't touched.
      */
     protected void toPy(Type inputType) {
@@ -260,7 +260,7 @@ public abstract class Exposer implements Opcodes, PyTypes {
         }
     }
 
-    /** Gets a static field from onType of the given type. */
+    /** Gets a static field from onType of the given slotType. */
     protected void getStatic(Type onType, String fieldName, Type ofType) {
         mv.visitFieldInsn(GETSTATIC, onType.getInternalName(), fieldName, ofType.getDescriptor());
     }

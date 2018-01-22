@@ -1,6 +1,7 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
@@ -14,6 +15,8 @@ import org.python.core.Visitproc;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+
+import static org.python.annotations.SlotFunc.ITER_NEXT;
 
 @ExposedType(name = "itertools.repeat", base = PyObject.class, doc = BuiltinDocs.itertools_repeat_doc)
 public class repeat extends PyIterator {
@@ -121,8 +124,8 @@ public class repeat extends PyIterator {
         return this;
     }
 
-    @ExposedMethod(names = "__next__")
-    public PyObject repeat___next__() {
-        return iter.next();
+    @ExposedSlot(ITER_NEXT)
+    public static PyObject repeat___next__(PyObject rept) {
+        return ((repeat) rept).iter.next();
     }
 }

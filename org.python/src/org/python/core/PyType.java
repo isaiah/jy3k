@@ -15,6 +15,7 @@ import org.python.expose.TypeBuilder;
 import org.python.modules._weakref.WeakrefModule;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -102,6 +103,10 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 
     /** The number of __slots__ defined. */
     private int numSlots;
+
+    /** type slots */
+    protected MethodHandle iter;
+    protected MethodHandle iterNext;
 
     private transient ReferenceQueue<PyType> subclasses_refq = new ReferenceQueue<PyType>();
     private Set<WeakReference<PyType>> subclasses = new HashSet<>();

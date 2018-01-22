@@ -28,18 +28,13 @@ public class PyLongRangeIter extends PyIterator {
     }
 
     @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
-    final PyObject range_iterator___next__() {
-        return super.next();
-    }
-
-    @Override
-    public PyObject __next__() {
+    public final PyObject range_iterator___next__() {
         if (index.compareTo(len) < 0) {
             curr = curr.add(step);
             index.add(BigInteger.ONE);
             return new PyLong(curr);
         }
-        return null;
+        throw Py.StopIteration();
     }
 
     @Override

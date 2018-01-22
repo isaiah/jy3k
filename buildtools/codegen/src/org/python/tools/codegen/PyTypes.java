@@ -1,6 +1,8 @@
 package org.python.tools.codegen;
 
 import org.objectweb.asm.Type;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.compiler.ClassConstants;
 import org.python.core.PyBoolean;
 import org.python.core.PyBuiltinCallable;
@@ -18,6 +20,7 @@ import org.python.core.PyBytes;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 import org.python.core.ThreadState;
+import org.python.core.TypeSlot;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedConst;
@@ -63,10 +66,13 @@ public interface PyTypes extends ClassConstants {
     public static final Type PYNEWWRAPPER = Type.getType(PyNewWrapper.class);
 
     public static final Type BUILTIN_METHOD = Type.getType(PyBuiltinMethod.class);
+    public static final Type TYPE_SLOT = Type.getType(TypeSlot.class);
+    public static final Type SLOT_FUNC = Type.getType(SlotFunc.class);
 
     public static final Type BUILTIN_CLASS_METHOD = Type.getType(PyBuiltinClassMethod.class);
 
     public static final Type ABUILTIN_METHOD = Type.getType(PyBuiltinMethod[].class);
+    public static final Type ATYPE_SLOT = Type.getType(TypeSlot[].class);
 
     public static final Type BUILTIN_FUNCTION = Type.getType(PyBuiltinCallable.class);
 
@@ -88,6 +94,7 @@ public interface PyTypes extends ClassConstants {
     public static final Type EXPOSED_METHOD = Type.getType(ExposedMethod.class);
 
     public static final Type EXPOSED_FUNCTION = Type.getType(ExposedFunction.class);
+    public static final Type EXPOSED_TYPE_SLOT = Type.getType(ExposedSlot.class);
 
     public static final Type MODULE_INIT = Type.getType(ModuleInit.class);
 

@@ -48,8 +48,8 @@ public abstract class ExposedModuleVisitor extends RestrictiveAnnotationVisitor 
     }
 
     /**
-     * @param name the name the type should be exposed as from the annotation
-     * @param doc the type's docstring
+     * @param name the name the slotType should be exposed as from the annotation
+     * @param doc the slotType's docstring
      */
     public abstract void handleResult(String name, String doc);
 }
