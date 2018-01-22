@@ -145,10 +145,6 @@ rest:
     return super.__call__(args,keywords);
   }
 
-  public PyObject __findattr_ex__(String name) {
-    return Deriveds.__findattr_ex__(this, name);
-  }
-
   public void __setattr__(String name,PyObject value) {
     PyType self_type = getType();
     PyObject impl = self_type.lookup("__setattr__");
