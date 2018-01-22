@@ -16,6 +16,8 @@ public abstract class ExposedTypeVisitor extends RestrictiveAnnotationVisitor {
 
     private boolean isBaseType = true;
 
+    private boolean isIterator = false;
+
     private String doc;
 
     private final AnnotationVisitor passthrough;
@@ -33,6 +35,8 @@ public abstract class ExposedTypeVisitor extends RestrictiveAnnotationVisitor {
             base = (Type)value;
         } else if (name.equals("isBaseType")) {
             isBaseType = (Boolean)value;
+        } else if (name.equals("iter")) {
+            isIterator = (Boolean) value;
         } else if (name.equals("doc")) {
             doc = (String)value;
         } else {
