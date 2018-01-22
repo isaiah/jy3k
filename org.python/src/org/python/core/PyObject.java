@@ -1004,7 +1004,7 @@ public class PyObject implements Serializable {
         if (name == null) {
             return null;
         }
-        return __findattr__(name.getString().intern());
+        return __findattr__(name.internedString());
     }
 
     /**

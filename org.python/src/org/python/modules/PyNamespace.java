@@ -2,7 +2,9 @@ package org.python.modules;
 
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyObject;
+import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -19,7 +21,6 @@ import java.util.Map;
 public class PyNamespace extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyNamespace.class);
 
-    @ExposedGet(name = "__dict__")
     public Map<String, PyObject> dict;
 
     public PyNamespace(PyType subtype) {
@@ -30,6 +31,12 @@ public class PyNamespace extends PyObject {
     public PyNamespace(Map<String, PyObject> dict) {
         super(TYPE);
         this.dict = dict;
+    }
+
+    @Override
+    @ExposedGet(name = "__dict__")
+    public PyObject fastGetDict() {
+        return new PyStringMap(dict);
     }
 
     @ExposedNew
@@ -62,10 +69,10 @@ public class PyNamespace extends PyObject {
         return Py.newBoolean(dict.equals(other.__getattr__("__dict__")));
     }
 
-    @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___getattribute___doc)
-    final PyObject SimpleNamespace___getattribute__(PyObject name) {
-        return dict.get(name.asString());
-    }
+//    @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___getattribute___doc)
+//    final PyObject SimpleNamespace___getattribute__(PyObject name) {
+//        return dict.get(name.asString());
+//    }
 
     @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___setattr___doc)
     final PyObject SimpleNamespace___setattr__(PyObject name, PyObject value) {

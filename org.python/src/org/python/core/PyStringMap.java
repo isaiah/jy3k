@@ -46,7 +46,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         table = new ConcurrentHashMap<>(capacity);
     }
 
-    public PyStringMap(Map<Object, PyObject> map) {
+    public PyStringMap(Map<? extends Object, PyObject> map) {
         super(getLazyType());
         table = new ConcurrentHashMap<>();
         table.putAll(map);
