@@ -7,6 +7,7 @@ import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -34,28 +35,27 @@ public class repeat extends PyIterator {
         super(subType);
     }
 
-    public repeat(PyObject object) {
-        super(TYPE);
+    public repeat(PyType subtype, PyObject object) {
+        super(subtype);
         repeat___init__(object);
     }
 
-    public repeat(PyObject object, int times) {
-        super(TYPE);
+    public repeat(PyType subtype, PyObject object, int times) {
+        super(subtype);
         repeat___init__(object, times);
     }
 
     @ExposedNew
-    @ExposedMethod
-    final void repeat___init__(final PyObject[] args, String[] kwds) {
+    public static PyObject _new(PyNewWrapper _new, boolean init, PyType subType,
+                                final PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("repeat", args, kwds, new String[]{"object", "times"}, 1);
 
         PyObject object = ap.getPyObject(0);
         if (args.length == 1) {
-            repeat___init__(object);
-        } else {
-            int times = ap.getInt(1);
-            repeat___init__(object, times);
+            new repeat(subType, object);
         }
+        int times = ap.getInt(1);
+        return new repeat(subType, object, times);
     }
 
     /**
@@ -97,7 +97,7 @@ public class repeat extends PyIterator {
 
     @ExposedMethod
     final PyObject __copy__() {
-        return new repeat(object, counter);
+        return new repeat(getType(), object, counter);
     }
 
     @ExposedMethod

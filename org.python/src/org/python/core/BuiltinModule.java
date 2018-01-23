@@ -837,8 +837,8 @@ public class BuiltinModule {
         return raw_input1(null);
     }
 
-    public static PyUnicode repr(PyObject o) {
-        return o.__repr__();
+    public static PyObject repr(PyObject o) {
+        return o.unaryOp(Py.getThreadState(), repr);
     }
 
     public static PyObject round(PyObject args[], String kwds[]) {

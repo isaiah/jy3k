@@ -39,6 +39,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     public final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class);
+    public final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:
@@ -1733,6 +1734,17 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             || !obj.getType().isSubType(this)) {
             return obj;
         }
+//        try {
+//            Object initFunc = init.getGetter().invokeExact(obj);
+//            PyObject none = (PyObject) init.getInvoker().invokeExact(initFunc, args, keywords);
+//            if (none != Py.None) {
+//                throw Py.TypeError(String.format("__init__() should return None, not '%.200s'",
+//                        none.getType().fastGetName()));
+//            }
+//        } catch (Throwable e) {
+//            throw Py.JavaError(e);
+//        }
+//        obj.proxyInit();
         obj.dispatch__init__(args, keywords);
         return obj;
     }

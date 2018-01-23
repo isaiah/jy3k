@@ -129,7 +129,6 @@ public class PyList extends PySequenceList implements List {
         } else if (PyTuple.checkExact(seq)) {
             list.addAll(((PyTuple) seq).getList());
         } else if (seq.getClass().isAssignableFrom(Collection.class)) {
-            System.err.println("Adding from collection");
             addCollection(list, (Collection)seq);
         } else {
             for (PyObject item : seq.asIterable()) {

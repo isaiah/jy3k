@@ -931,6 +931,10 @@ public class PyObject implements Serializable {
         __delitem__(new PyUnicode(key));
     }
 
+    public static PyObject getItem(PyObject o, PyObject key) {
+        return Py.None;
+    }
+
     public static PyObject getIter(PyObject o) {
         if (o.getType().isIterator) {
             return o;

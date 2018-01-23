@@ -65,14 +65,10 @@ public class PyNamespace extends PyObject {
         return items.append(")").toString();
     }
 
+    @ExposedMethod
     final PyObject SimpleNamespace___eq__(PyObject other) {
         return Py.newBoolean(dict.equals(other.__getattr__("__dict__")));
     }
-
-//    @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___getattribute___doc)
-//    final PyObject SimpleNamespace___getattribute__(PyObject name) {
-//        return dict.get(name.asString());
-//    }
 
     @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___setattr___doc)
     final PyObject SimpleNamespace___setattr__(PyObject name, PyObject value) {
