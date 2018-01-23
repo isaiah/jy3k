@@ -1610,7 +1610,7 @@ public class Encoding {
      */
     public static double atof(CharSequence s) {
         double x = 0.0;
-        Matcher m = getFloatPattern().matcher(s);
+        Matcher m = floatPattern.matcher(s);
         boolean valid = m.matches();
 
         if (valid) {
@@ -1641,19 +1641,20 @@ public class Encoding {
     }
 
     /**
-     * Return the (lazily) compiled regular expression that matches all valid a Python float()
+     * Regular expression for an unsigned Python float, accepting also any sequence of the letters
+     * that belong to "NaN" or "Infinity" in whatever case. This is used within the regular
+     * expression patterns that define a priori acceptable strings in the float and complex
+     * constructors. The expression contributes no capture groups.
+     */
+    private static final String UF_RE =
+            "(?:(?:(?:\\d+\\.?|\\.\\d)\\d*(?:[eE][+-]?\\d+)?)|[infatyINFATY]+)";
+
+    /**
+     * Return the regular expression that matches all valid a Python float()
      * arguments, in which Group 1 captures the number, stripped of white space. Various invalid
      * non-numerics are provisionally accepted (e.g. "+inanity" or "-faint").
      */
-    private static synchronized Pattern getFloatPattern() {
-        if (floatPattern == null) {
-            floatPattern = Pattern.compile("\\s*([+-]?" + UF_RE + ")\\s*");
-        }
-        return floatPattern;
-    }
-
-    /** Access only through {@link #getFloatPattern()}. */
-    private static Pattern floatPattern = null;
+    private static Pattern floatPattern = Pattern.compile("\\s*([+-]?" + UF_RE + ")\\s*");
 
     private static boolean isWhitespace(char c) {
         switch(c) {
@@ -1669,15 +1670,6 @@ public class Encoding {
         }
         return true;
     }
-
-    /**
-     * Regular expression for an unsigned Python float, accepting also any sequence of the letters
-     * that belong to "NaN" or "Infinity" in whatever case. This is used within the regular
-     * expression patterns that define a priori acceptable strings in the float and complex
-     * constructors. The expression contributes no capture groups.
-     */
-    private static final String UF_RE =
-            "(?:(?:(?:\\d+\\.?|\\.\\d)\\d*(?:[eE][+-]?\\d+)?)|[infatyINFATY]+)";
 
     /**
      * Return the (lazily) compiled regular expression for a Python complex number. This is used

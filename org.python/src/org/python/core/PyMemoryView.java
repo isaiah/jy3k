@@ -750,7 +750,7 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
      */
     @Override
     public synchronized PyBuffer getBuffer(int flags) {
-        checkNotReleased(); // Only for compatibility with CPython
+//        checkNotReleased(); // Only for compatibility with CPython
         /*
          * The PyBuffer itself does all the export counting, and since the behaviour of memoryview
          * need not change, it really is a simple as:

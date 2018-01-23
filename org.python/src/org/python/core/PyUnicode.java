@@ -1395,7 +1395,7 @@ public class PyUnicode extends PySequence implements Iterable {
      *
      * @return a valid decimal as an encoded String
      */
-    private String encodeDecimal() {
+    public String encodeDecimal() {
         if (isBasicPlane()) {
             return encodeDecimalBasic();
         }
@@ -1881,7 +1881,9 @@ public class PyUnicode extends PySequence implements Iterable {
         private int nextCodePoint() {
             int k = translator.codePointIndex(current++);
             return string.codePointAt(k);
-        }        @Override
+        }
+
+        @Override
         public Object next() {
             int codePoint = nextCodePoint();
             for (int j = 1; j < step && hasNext(); j++) {

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.python.core.linker.InvokeByName;
+import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FloatFormatter;
 import org.python.core.stringlib.InternalFormat;
 import org.python.core.stringlib.InternalFormat.Formatter;
@@ -27,6 +29,7 @@ import org.python.modules.math;
 public class PyFloat extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(PyFloat.class);
+    private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
 
     /** Format specification used by repr(). */
     static final Spec SPEC_REPR = InternalFormat.fromText(" >r");
@@ -70,26 +73,41 @@ public class PyFloat extends PyObject {
                 return new PyFloatDerived(subtype, 0.0);
             }
         } else {
-            PyFloat floatObject = null;
+            PyObject floatObject = null;
             try {
-                floatObject = x.__float__();
+                Object floatFunc = float$.getGetter().invokeExact(x);
+                floatObject = (PyObject) float$.getInvoker().invokeExact(floatFunc, Py.getThreadState());
             } catch (PyException e) {
-                if (e.match(Py.AttributeError)) {
-                    // Translate AttributeError to TypeError
-                    // XXX: We are using the same message as CPython, even if
-                    // it is not strictly correct (instances of types
-                    // that implement the __float__ method are also
-                    // valid arguments)
-                    throw Py.TypeError("float() argument must be a string or a number");
+                if (!e.match(Py.AttributeError)) {
+                    throw e;
                 }
-                throw e;
+                floatObject = floatFromString(x);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
             }
             if (new_.for_type == subtype) {
                 return floatObject;
             } else {
-                return new PyFloatDerived(subtype, floatObject.getValue());
+                return new PyFloatDerived(subtype, ((PyFloat) floatObject).getValue());
             }
         }
+    }
+
+    public static PyFloat floatFromString(PyObject v) {
+        String s = null;
+        if (v instanceof PyUnicode) {
+            s = ((PyUnicode) v).encodeDecimal();
+        } else if (v instanceof PyBytes) {
+            s = v.asString();
+        } else if (v instanceof PyByteArray) {
+            s = v.toString();
+        } else if (v instanceof BufferProtocol) {
+            s = ((BufferProtocol) v).getBuffer().asCharBuffer().toString();
+        } else {
+            throw Py.TypeError(String.format("float() argument must be a string or a number, not '%s'", v.getType().fastGetName()));
+        }
+        s = s.replaceAll("_", "");
+        return new PyFloat(Encoding.atof(s));
     }
 
     @ExposedGet(name = "real", doc = BuiltinDocs.float_real_doc)

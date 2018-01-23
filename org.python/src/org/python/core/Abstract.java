@@ -8,8 +8,8 @@ import org.python.core.linker.InvokeByName;
  * Abstract Object Interface
  */
 public class Abstract {
-    private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
 
     // called from generated code, is easier without the threadstate argument
     public static boolean PyObject_IsTrue(PyObject obj) {
@@ -28,19 +28,20 @@ public class Abstract {
             return false;
         }
         try {
-            Object boolFunc = bool.getGetter().invokeExact(obj);
-            PyObject ret = (PyObject) bool.getInvoker().invokeExact(boolFunc, ts);
+            Object boolFunc = bool.getGetter().invokeExact((PyObject) obj.getType());
+            PyObject ret = (PyObject) bool.getInvoker().invokeExact(boolFunc, ts, obj);
             return ret.isTrue();
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 try {
-                    Object lenFunc = len.getGetter().invokeExact(obj);
-                    PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts);
+                    Object lenFunc = len.getGetter().invokeExact((PyObject) obj.getType());
+                    PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts, obj);
                     return ret.do_richCompareBool(Py.Zero, CompareOp.NE);
                 } catch (PyException e1) {
                     if (e1.match(Py.AttributeError)) {
                         return obj.isTrue();
                     }
+                    throw e1;
                 } catch (Throwable t) {
                     throw Py.JavaError(t);
                 }
