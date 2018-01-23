@@ -1,6 +1,7 @@
 package org.python.modules._json;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinModule;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyUnicode;
@@ -121,7 +122,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
         } else {
             PyObject ident = checkCircularReference(obj);
             if (defaultfn == Py.None) {
-                throw Py.TypeError(String.format(".80s is not JSON serializable", obj.__repr__()));
+                throw Py.TypeError(String.format(".80s is not JSON serializable", BuiltinModule.repr(obj)));
             }
 
             PyObject newobj = defaultfn.__call__(obj);
@@ -165,7 +166,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
             } else if (skipkeys) {
                 continue;
             } else {
-                throw Py.TypeError(String.format("keys must be a string: %.80s", key.__repr__()));
+                throw Py.TypeError(String.format("keys must be a string: %.80s", BuiltinModule.repr(key)));
             }
 
             if (idx > 0) {

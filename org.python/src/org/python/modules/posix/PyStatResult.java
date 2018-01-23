@@ -283,7 +283,6 @@ public class PyStatResult extends PyTuple {
         return new PyTuple(new PyList(getArray()));
     }
 
-    @Override
     public PyUnicode __repr__() {
         return (PyUnicode) Py.newUnicode(
                 TYPE.fastGetName() + "(" +

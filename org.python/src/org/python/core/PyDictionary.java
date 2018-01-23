@@ -241,9 +241,9 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
         StringBuilder buf = new StringBuilder("{");
         for (Entry<PyObject, PyObject> entry : getMap().entrySet()) {
-            buf.append((entry.getKey()).__repr__().toString());
+            buf.append(BuiltinModule.repr(entry.getKey()).toString());
             buf.append(": ");
-            buf.append((entry.getValue()).__repr__().toString());
+            buf.append(BuiltinModule.repr(entry.getValue()).toString());
             buf.append(", ");
         }
         if (buf.length() > 1) {

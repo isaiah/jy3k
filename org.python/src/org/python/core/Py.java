@@ -820,7 +820,7 @@ public final class Py {
     public static <T> T tojava(PyObject o, Class<T> c) {
         Object obj = o.__tojava__(c);
         if (obj == Py.NoConversion) {
-            throw Py.TypeError("can't convert " + o.__repr__() + " to " +
+            throw Py.TypeError("can't convert " + BuiltinModule.repr(o) + " to " +
                     c.getName());
         }
         return (T) obj;
@@ -1523,11 +1523,11 @@ public final class Py {
             }
             buf.append(className);
         } else {
-            buf.append(useRepr ? type.__repr__() : type.__str__());
+            buf.append(useRepr ? BuiltinModule.repr(type) : type.__str__());
         }
         if (value != null && value != Py.None) {
             // only print colon if the str() of the object is not the empty string
-            PyObject s = useRepr ? value.__repr__() : value.__str__();
+            PyObject s = useRepr ? BuiltinModule.repr(value) : value.__str__();
             if (!(s instanceof PyUnicode) || s.__len__() != 0) {
                 buf.append(": ");
             }
@@ -2101,7 +2101,7 @@ public final class Py {
                 throw pye;
             }
             pye.value = Py.newUnicode(String.format("Error when calling the metaclass bases\n    "
-                    + "%s", pye.value.__repr__().toString()));
+                    + "%s", BuiltinModule.repr(pye.value).toString()));
             throw pye;
         }
     }

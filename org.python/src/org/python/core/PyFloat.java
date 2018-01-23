@@ -286,7 +286,6 @@ public class PyFloat extends PyObject {
         return richCompare(other, CompareOp.EQ);
     }
 
-    @Override
     public PyUnicode __repr__() {
         return float___repr__();
     }

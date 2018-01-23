@@ -2,6 +2,7 @@ package org.python.modules.sre;
 
 import org.python.bootstrap.Import;
 import org.python.core.ArgParser;
+import org.python.core.BuiltinModule;
 import org.python.core.Py;
 import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
@@ -255,11 +256,6 @@ public class PySRE_Pattern extends PyObject {
         return new PyDictionary(map);
     }
 
-    @Override
-    public PyUnicode __repr__() {
-        return SRE_Pattern___repr__();
-    }
-
     @ExposedMethod
     public PyUnicode SRE_Pattern___repr__() {
         int flags = this.flags.asInt();
@@ -279,9 +275,9 @@ public class PySRE_Pattern extends PyObject {
         }
         if (flagItems.size() > 0) {
             String flagsResult = flagItems.stream().collect(Collectors.joining("|"));
-            return new PyUnicode(String.format("re.compile(%.200s, %s)", pattern.__repr__(), flagsResult));
+            return new PyUnicode(String.format("re.compile(%.200s, %s)", BuiltinModule.repr(pattern), flagsResult));
         }
-        return new PyUnicode(String.format("re.compile(%.200s)", pattern.__repr__()));
+        return new PyUnicode(String.format("re.compile(%.200s)", BuiltinModule.repr(pattern)));
     }
 
 

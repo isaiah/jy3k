@@ -1,6 +1,7 @@
 package org.python.modules._collections;
 
 import org.python.core.ArgParser;
+import org.python.core.BuiltinModule;
 import org.python.core.CompareOp;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -346,7 +347,7 @@ public class PyDeque extends PyObject implements Traverseproc {
         long startState = state;
         StringBuilder buf = new StringBuilder("deque").append("([");
         for (Node tmp = header.right; tmp != header; tmp = tmp.right) {
-            buf.append(tmp.data.__repr__().toString());
+            buf.append(BuiltinModule.repr(tmp.data).toString());
             if (startState != state) {
                 throw Py.RuntimeError("deque mutated during iteration.");
             }

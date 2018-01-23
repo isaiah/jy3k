@@ -18,7 +18,7 @@ import org.python.modules.sys.SysModule;
 public class BuiltinModule {
     private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName dir = new InvokeByName("__dir__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
@@ -838,7 +838,12 @@ public class BuiltinModule {
     }
 
     public static PyObject repr(PyObject o) {
-        return o.unaryOp(Py.getThreadState(), repr);
+        try {
+            Object reprFunc = repr.getGetter().invokeExact((PyObject) o.getType());
+            return (PyObject) repr.getInvoker().invokeExact(reprFunc, Py.getThreadState(), o);
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
     }
 
     public static PyObject round(PyObject args[], String kwds[]) {
@@ -1002,7 +1007,7 @@ public class BuiltinModule {
                 throw pye;
             }
             pye.value = Py.newUnicode(String.format("Error when calling the metaclass bases\n    "
-                    + "%s", pye.value.__repr__().toString()));
+                    + "%s", BuiltinModule.repr(pye.value)));
             throw pye;
         }
         if (cls instanceof PyType && cell instanceof PyCell) {

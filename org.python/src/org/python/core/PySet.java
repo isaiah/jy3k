@@ -316,7 +316,7 @@ public class PySet extends BaseSet {
         }
         StringBuilder buf = new StringBuilder("{");
         for (Iterator<PyObject> i = _set.iterator(); i.hasNext();) {
-            buf.append((i.next()).__repr__().toString());
+            buf.append(BuiltinModule.repr(i.next()).toString());
             if (i.hasNext()) {
                 buf.append(", ");
             }

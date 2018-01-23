@@ -357,7 +357,7 @@ public class Exceptions {
         PyObject filename = self.__findattr__("filename");
         String result;
         if (filename != null && filename.isTrue()) {
-            result = String.format("[Errno %s] %s: %s", errno, strerror, filename.__repr__());
+            result = String.format("[Errno %s] %s: %s", errno, strerror, BuiltinModule.repr(filename));
         } else if (errno != null && strerror != null && errno.isTrue() && strerror.isTrue()) {
             result = String.format("[Errno %s] %s", errno, strerror);
         } else {
@@ -422,7 +422,7 @@ public class Exceptions {
         // alone.  The downside is that if KeyError is raised with an explanatory
         // string, that string will be displayed in quotes.  Too bad.
 //        if (selfBase.args.__len__() == 1) {
-        return selfBase.args.__getitem__(0).__repr__();
+        return BuiltinModule.repr(selfBase.args.__getitem__(0));
 //        }
 //        return PyBaseException.TYPE.invoke("__str__", self, args, kwargs);
     }

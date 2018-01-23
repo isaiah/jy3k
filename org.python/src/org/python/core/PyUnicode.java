@@ -394,7 +394,6 @@ public class PyUnicode extends PySequence implements Iterable {
         return getCodePointCount();
     }
 
-    @Override
     public PyUnicode __repr__() {
         return str___repr__();
     }
@@ -1537,7 +1536,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
                 // The conversion specifier is s = __str__ or r = __repr__.
                 if ("r".equals(chunk.conversion)) {
-                    fieldObj = fieldObj.__repr__();
+                    fieldObj = BuiltinModule.repr(fieldObj);
                 } else if ("s".equals(chunk.conversion)) {
                     fieldObj = fieldObj.__str__();
                 } else if ("a".equals(chunk.conversion)) {

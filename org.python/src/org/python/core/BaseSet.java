@@ -340,7 +340,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         }
         StringBuilder buf = new StringBuilder(name).append("([");
         for (Iterator<PyObject> i = _set.iterator(); i.hasNext();) {
-            buf.append((i.next()).__repr__().toString());
+            buf.append(BuiltinModule.repr(i.next()));
             if (i.hasNext()) {
                 buf.append(", ");
             }

@@ -256,7 +256,7 @@ public class PyTuple extends PySequenceList implements List {
         if (o == null) {
             return "null";
         }
-        return o.__repr__().toString();
+        return BuiltinModule.repr(o).toString();
     }
 
     @ExposedMethod(doc = BuiltinDocs.tuple___repr___doc)

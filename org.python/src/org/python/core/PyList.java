@@ -421,7 +421,7 @@ public class PyList extends PySequenceList implements List {
         int length = size();
         int i = 0;
         for (PyObject item : list) {
-            buf.append(item.__repr__().toString());
+            buf.append(BuiltinModule.repr(item).toString());
             if (i < length - 1) {
                 buf.append(", ");
             }

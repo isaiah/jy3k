@@ -411,7 +411,7 @@ final class StringFormatter {
                     if (spec.type == 's'){
                         argAsString = arg.__str__();
                     } else if (spec.type == 'r') {
-                        argAsString = arg.__repr__();
+                        argAsString = BuiltinModule.repr(arg);
                     } else {
                         argAsString  = BuiltinModule.ascii(arg);
                     }

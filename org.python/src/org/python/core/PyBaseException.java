@@ -232,7 +232,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.BaseException___repr___doc)
     public final PyUnicode BaseException_toString() {
-        PyObject reprSuffix = args.__repr__();
+        PyObject reprSuffix = BuiltinModule.repr(args);
         String name = getType().fastGetName();
         int lastDot = name.lastIndexOf('.');
         if (lastDot != -1) {

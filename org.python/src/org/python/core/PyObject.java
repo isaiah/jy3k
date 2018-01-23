@@ -355,10 +355,6 @@ public class PyObject implements Serializable {
         return new PyUnicode(toString());
     }
 
-    public PyUnicode __repr__() {
-        return object___repr__();
-    }
-
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.object___repr___doc)
     public final PyUnicode object___repr__() {
         return new PyUnicode(toString());

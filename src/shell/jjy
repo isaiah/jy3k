@@ -1,0 +1,4 @@
+#!/bin/sh
+DIR=`dirname $0`
+JLINK_VM_OPTIONS="-Dpython.executable=$0 -Dpython.home=$DIR"
+$DIR/java $JLINK_VM_OPTIONS -m org.python/org.python.util.jython $@

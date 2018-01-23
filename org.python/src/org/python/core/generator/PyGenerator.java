@@ -2,6 +2,7 @@
 package org.python.core.generator;
 
 import org.python.core.BuiltinDocs;
+import org.python.core.BuiltinModule;
 import org.python.core.CodeFlag;
 import org.python.core.Py;
 import org.python.core.PyCode;
@@ -254,8 +255,8 @@ public class PyGenerator extends PyIterator implements FinalizableBuiltin {
             if (lastDot != -1) {
                 className = className.substring(lastDot + 1);
             }
-            String msg = String.format("Exception %s: %s in %s", className, pye.value.__repr__(),
-                                       __repr__());
+            String msg = String.format("Exception %s: %s in %s", className, BuiltinModule.repr(pye.value),
+                                       object___repr__());
             Py.println(new PyUnicode(msg));
         } catch (Throwable t) {
             // but we currently ignore any Java exception completely. perhaps we

@@ -247,14 +247,12 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         for (Entry<Object, PyObject> entry : table.entrySet()) {
             Object key = entry.getKey();
             if (key instanceof String) {
-                // This is a bit complicated, but prevents us to duplicate
-                // PyString#__repr__ logic here.
-                buf.append(new PyUnicode((String)key).__repr__().toString());
+                buf.append(key);
             } else {
-                buf.append(((PyObject)key).__repr__().toString());
+                buf.append(BuiltinModule.repr((PyObject)key).toString());
             }
             buf.append(": ");
-            buf.append(entry.getValue().__repr__().toString());
+            buf.append(BuiltinModule.repr(entry.getValue()));
             buf.append(", ");
         }
         if (buf.length() > 1) {

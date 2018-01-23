@@ -1904,11 +1904,6 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         return toString();
     }
 
-    @Override
-    public PyUnicode __repr__() {
-        return new PyUnicode(type___repr__());
-    }
-
     @ExposedMethod(names = "__str__", doc = BuiltinDocs.type___str___doc)
     final String type_toString() {
         PyObject module = getModule();
