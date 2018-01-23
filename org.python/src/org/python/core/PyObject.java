@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * All objects known to the Jython runtime system are represented by an instance
@@ -1646,16 +1647,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __abs__ method.
-     *
-     * @return abs(this).
-     **/
-    public PyObject __abs__() {
-        throw Py.TypeError(String.format("bad operand type for abs(): '%.200s'",
-                getType().fastGetName()));
-    }
-
-    /**
      * Equivalent to the standard Python __index__ method.
      *
      * @return a PyLong
@@ -1783,15 +1774,22 @@ public class PyObject implements Serializable {
         }
     }
 
-    public final PyObject unaryOp(ThreadState ts, InvokeByName op) {
+    public static PyObject unaryOp(ThreadState ts, InvokeByName op, PyObject self, Consumer<PyObject> attrErrorHandle) {
         try {
-            Object func = op.getGetter().invokeExact(this);
+            Object func = op.getGetter().invokeExact(self);
             return (PyObject) op.getInvoker().invokeExact(func, ts);
-        } catch (RuntimeException e) {
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                attrErrorHandle.accept(self);
+            }
             throw e;
         } catch (Throwable t) {
             throw Py.JavaError(t);
         }
+    }
+
+    public final PyObject unaryOp(ThreadState ts, InvokeByName op) {
+        return unaryOp(ts, op, this, (self) -> {});
     }
 
     /**

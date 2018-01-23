@@ -16,6 +16,7 @@ import org.python.modules.sys.SysModule;
  * The builtin module. All builtin functions are defined here
  */
 public class BuiltinModule {
+    private static final InvokeByName abs = new InvokeByName("__abs__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
@@ -61,74 +62,74 @@ public class BuiltinModule {
         dict.__setitem__("__debug__", Py.One);
 
         // TODO: redo the builtin function stuff to possibly use enum
-        dict.__setitem__("abs", PyBuiltinFunction.named( "abs", BuiltinDocs.builtins_abs_doc).with(BuiltinModule::abs));
-        dict.__setitem__("ascii", PyBuiltinFunction.named( "ascii", BuiltinDocs.builtins_ascii_doc).with(BuiltinModule::ascii));
-        dict.__setitem__("callable", PyBuiltinFunction.named( "callable", BuiltinDocs.builtins_callable_doc).with(BuiltinModule::callable));
-        dict.__setitem__("chr", PyBuiltinFunction.named( "chr", BuiltinDocs.builtins_chr_doc).with(BuiltinModule::chr));
-        dict.__setitem__("globals", PyBuiltinFunction.named( "globals", BuiltinDocs.builtins_globals_doc).with(BuiltinModule::globals));
-        dict.__setitem__("hash", PyBuiltinFunction.named( "hash", BuiltinDocs.builtins_hash_doc).with(BuiltinModule::hash));
-        dict.__setitem__("id", PyBuiltinFunction.named( "id", BuiltinDocs.builtins_id_doc).with(BuiltinModule::id));
-        dict.__setitem__("isinstance", PyBuiltinFunction.named( "isinstance", BuiltinDocs.builtins_isinstance_doc).with(BuiltinModule::isinstance));
-        dict.__setitem__("len", PyBuiltinFunction.named( "len", BuiltinDocs.builtins_len_doc).with(BuiltinModule::len));
-        dict.__setitem__("ord", PyBuiltinFunction.named( "ord", BuiltinDocs.builtins_ord_doc).with(BuiltinModule::ord));
-        dict.__setitem__("sum", PyBuiltinFunction.named( "sum", BuiltinDocs.builtins_sum_doc)
+        dict.__setitem__("abs", PyBuiltinFunction.named("abs", BuiltinDocs.builtins_abs_doc).with(BuiltinModule::abs));
+        dict.__setitem__("ascii", PyBuiltinFunction.named("ascii", BuiltinDocs.builtins_ascii_doc).with(BuiltinModule::ascii));
+        dict.__setitem__("callable", PyBuiltinFunction.named("callable", BuiltinDocs.builtins_callable_doc).with(BuiltinModule::callable));
+        dict.__setitem__("chr", PyBuiltinFunction.named("chr", BuiltinDocs.builtins_chr_doc).with(BuiltinModule::chr));
+        dict.__setitem__("globals", PyBuiltinFunction.named("globals", BuiltinDocs.builtins_globals_doc).with(BuiltinModule::globals));
+        dict.__setitem__("hash", PyBuiltinFunction.named("hash", BuiltinDocs.builtins_hash_doc).with(BuiltinModule::hash));
+        dict.__setitem__("id", PyBuiltinFunction.named("id", BuiltinDocs.builtins_id_doc).with(BuiltinModule::id));
+        dict.__setitem__("isinstance", PyBuiltinFunction.named("isinstance", BuiltinDocs.builtins_isinstance_doc).with(BuiltinModule::isinstance));
+        dict.__setitem__("len", PyBuiltinFunction.named("len", BuiltinDocs.builtins_len_doc).with(BuiltinModule::len));
+        dict.__setitem__("ord", PyBuiltinFunction.named("ord", BuiltinDocs.builtins_ord_doc).with(BuiltinModule::ord));
+        dict.__setitem__("sum", PyBuiltinFunction.named("sum", BuiltinDocs.builtins_sum_doc)
                 .with(BuiltinModule::sum1)
                 .with(BuiltinModule::sum2));
-        dict.__setitem__("delattr", PyBuiltinFunction.named( "delattr", BuiltinDocs.builtins_delattr_doc).with(BuiltinModule::delattr));
-        dict.__setitem__("dir", PyBuiltinFunction.named( "dir", BuiltinDocs.builtins_dir_doc)
+        dict.__setitem__("delattr", PyBuiltinFunction.named("delattr", BuiltinDocs.builtins_delattr_doc).with(BuiltinModule::delattr));
+        dict.__setitem__("dir", PyBuiltinFunction.named("dir", BuiltinDocs.builtins_dir_doc)
                 .with(BuiltinModule::dir0)
                 .with(BuiltinModule::dir1));
-        dict.__setitem__("divmod", PyBuiltinFunction.named( "divmod", BuiltinDocs.builtins_divmod_doc).with(BuiltinModule::divmod));
-        dict.__setitem__("eval", PyBuiltinFunction.named( "eval", BuiltinDocs.builtins_eval_doc)
+        dict.__setitem__("divmod", PyBuiltinFunction.named("divmod", BuiltinDocs.builtins_divmod_doc).with(BuiltinModule::divmod));
+        dict.__setitem__("eval", PyBuiltinFunction.named("eval", BuiltinDocs.builtins_eval_doc)
                 .with(BuiltinModule::eval1)
                 .with(BuiltinModule::eval2)
                 .with(BuiltinModule::eval3));
-        dict.__setitem__("getattr", PyBuiltinFunction.named( "getattr", BuiltinDocs.builtins_getattr_doc)
+        dict.__setitem__("getattr", PyBuiltinFunction.named("getattr", BuiltinDocs.builtins_getattr_doc)
                 .with(BuiltinModule::getattr2)
                 .with(BuiltinModule::getattr3));
-        dict.__setitem__("hasattr", PyBuiltinFunction.named( "hasattr", BuiltinDocs.builtins_hasattr_doc).with(BuiltinModule::hasattr));
-        dict.__setitem__("hex", PyBuiltinFunction.named( "hex", BuiltinDocs.builtins_hex_doc).with(BuiltinModule::hex));
+        dict.__setitem__("hasattr", PyBuiltinFunction.named("hasattr", BuiltinDocs.builtins_hasattr_doc).with(BuiltinModule::hasattr));
+        dict.__setitem__("hex", PyBuiltinFunction.named("hex", BuiltinDocs.builtins_hex_doc).with(BuiltinModule::hex));
         dict.__setitem__("issubclass", PyBuiltinFunction.named(
                 "issubclass", BuiltinDocs.builtins_issubclass_doc).with(BuiltinModule::issubclass));
-        dict.__setitem__("iter", PyBuiltinFunction.named( "iter", BuiltinDocs.builtins_iter_doc)
+        dict.__setitem__("iter", PyBuiltinFunction.named("iter", BuiltinDocs.builtins_iter_doc)
                 .with(BuiltinModule::iter1)
                 .with(BuiltinModule::iter2));
-        dict.__setitem__("locals", PyBuiltinFunction.named( "locals", BuiltinDocs.builtins_locals_doc).with(BuiltinModule::locals));
-        dict.__setitem__("max", PyBuiltinFunction.named( "max", BuiltinDocs.builtins_max_doc).wide(BuiltinModule::max));
-        dict.__setitem__("min", PyBuiltinFunction.named( "min", BuiltinDocs.builtins_min_doc).wide(BuiltinModule::min));
-        dict.__setitem__("oct", PyBuiltinFunction.named( "oct", BuiltinDocs.builtins_oct_doc).with(BuiltinModule::oct));
-        dict.__setitem__("pow", PyBuiltinFunction.named( "pow", BuiltinDocs.builtins_pow_doc)
+        dict.__setitem__("locals", PyBuiltinFunction.named("locals", BuiltinDocs.builtins_locals_doc).with(BuiltinModule::locals));
+        dict.__setitem__("max", PyBuiltinFunction.named("max", BuiltinDocs.builtins_max_doc).wide(BuiltinModule::max));
+        dict.__setitem__("min", PyBuiltinFunction.named("min", BuiltinDocs.builtins_min_doc).wide(BuiltinModule::min));
+        dict.__setitem__("oct", PyBuiltinFunction.named("oct", BuiltinDocs.builtins_oct_doc).with(BuiltinModule::oct));
+        dict.__setitem__("pow", PyBuiltinFunction.named("pow", BuiltinDocs.builtins_pow_doc)
                 .with(BuiltinModule::pow2)
                 .with(BuiltinModule::pow3));
-        dict.__setitem__("input", PyBuiltinFunction.named( "input", BuiltinDocs.builtins_input_doc)
+        dict.__setitem__("input", PyBuiltinFunction.named("input", BuiltinDocs.builtins_input_doc)
                 .with(BuiltinModule::raw_input0)
                 .with(BuiltinModule::raw_input1)
                 .with(BuiltinModule::raw_input2));
-        dict.__setitem__("round", PyBuiltinFunction.named( "round", BuiltinDocs.builtins_round_doc).wide(BuiltinModule::round));
-        dict.__setitem__("repr", PyBuiltinFunction.named( "repr", BuiltinDocs.builtins_repr_doc).with(BuiltinModule::repr));
-        dict.__setitem__("setattr", PyBuiltinFunction.named( "setattr", BuiltinDocs.builtins_setattr_doc).with(BuiltinModule::setattr));
-        dict.__setitem__("vars", PyBuiltinFunction.named( "vars", BuiltinDocs.builtins_vars_doc)
+        dict.__setitem__("round", PyBuiltinFunction.named("round", BuiltinDocs.builtins_round_doc).wide(BuiltinModule::round));
+        dict.__setitem__("repr", PyBuiltinFunction.named("repr", BuiltinDocs.builtins_repr_doc).with(BuiltinModule::repr));
+        dict.__setitem__("setattr", PyBuiltinFunction.named("setattr", BuiltinDocs.builtins_setattr_doc).with(BuiltinModule::setattr));
+        dict.__setitem__("vars", PyBuiltinFunction.named("vars", BuiltinDocs.builtins_vars_doc)
                 .with(BuiltinModule::vars0)
                 .with(BuiltinModule::vars1));
-        dict.__setitem__("compile", PyBuiltinFunction.named( "compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::compile));
-        dict.__setitem__("open", PyBuiltinFunction.named( "open", BuiltinDocs.builtins_open_doc).wide(_io::open));
-        dict.__setitem__("reversed", PyBuiltinFunction.named( "reversed", BuiltinDocs.builtins_reversed_doc)
+        dict.__setitem__("compile", PyBuiltinFunction.named("compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::compile));
+        dict.__setitem__("open", PyBuiltinFunction.named("open", BuiltinDocs.builtins_open_doc).wide(_io::open));
+        dict.__setitem__("reversed", PyBuiltinFunction.named("reversed", BuiltinDocs.builtins_reversed_doc)
                 .with(BuiltinModule::reversed));
-        dict.__setitem__("exec", PyBuiltinFunction.named( "exec", BuiltinDocs.builtins_exec_doc)
+        dict.__setitem__("exec", PyBuiltinFunction.named("exec", BuiltinDocs.builtins_exec_doc)
                 .with(BuiltinModule::exec1)
                 .with(BuiltinModule::exec2)
                 .with(BuiltinModule::exec3));
-        dict.__setitem__("__import__", PyBuiltinFunction.named( "__import__", BuiltinDocs.builtins___import___doc).wide(BuiltinModule::import$));
-        dict.__setitem__("sorted", PyBuiltinFunction.named( "sorted", BuiltinDocs.builtins_sorted_doc).wide(BuiltinModule::sorted));
-        dict.__setitem__("all", PyBuiltinFunction.named( "all", BuiltinDocs.builtins_all_doc).with(BuiltinModule::all));
-        dict.__setitem__("any", PyBuiltinFunction.named( "any", BuiltinDocs.builtins_any_doc).with(BuiltinModule::any));
-        dict.__setitem__("format", PyBuiltinFunction.named( "format", BuiltinDocs.builtins_format_doc)
+        dict.__setitem__("__import__", PyBuiltinFunction.named("__import__", BuiltinDocs.builtins___import___doc).wide(BuiltinModule::import$));
+        dict.__setitem__("sorted", PyBuiltinFunction.named("sorted", BuiltinDocs.builtins_sorted_doc).wide(BuiltinModule::sorted));
+        dict.__setitem__("all", PyBuiltinFunction.named("all", BuiltinDocs.builtins_all_doc).with(BuiltinModule::all));
+        dict.__setitem__("any", PyBuiltinFunction.named("any", BuiltinDocs.builtins_any_doc).with(BuiltinModule::any));
+        dict.__setitem__("format", PyBuiltinFunction.named("format", BuiltinDocs.builtins_format_doc)
                 .with(BuiltinModule::format1)
                 .with(BuiltinModule::format2));
-        dict.__setitem__("print", PyBuiltinFunction.named( "print", BuiltinDocs.builtins_print_doc).wide(BuiltinModule::print));
-        dict.__setitem__("next", PyBuiltinFunction.named( "next", BuiltinDocs.builtins_next_doc).wide(BuiltinModule::next));
-        dict.__setitem__("bin", PyBuiltinFunction.named( "bin", BuiltinDocs.builtins_bin_doc).wide(BuiltinModule::bin));
-        dict.__setitem__("__build_class__", PyBuiltinFunction.named( "__build_class__", BuiltinDocs.builtins___build_class___doc).wide(BuiltinModule::buildClass));
+        dict.__setitem__("print", PyBuiltinFunction.named("print", BuiltinDocs.builtins_print_doc).wide(BuiltinModule::print));
+        dict.__setitem__("next", PyBuiltinFunction.named("next", BuiltinDocs.builtins_next_doc).wide(BuiltinModule::next));
+        dict.__setitem__("bin", PyBuiltinFunction.named("bin", BuiltinDocs.builtins_bin_doc).wide(BuiltinModule::bin));
+        dict.__setitem__("__build_class__", PyBuiltinFunction.named("__build_class__", BuiltinDocs.builtins___build_class___doc).wide(BuiltinModule::buildClass));
     }
 
     public static void fillWithBuiltinExceptions(PyObject dict) {
@@ -136,17 +137,23 @@ public class BuiltinModule {
     }
 
     public static PyObject abs(PyObject o) {
-        return o.__abs__();
+        return PyObject.unaryOp(Py.getThreadState(), abs, o, self -> {
+            throw Py.TypeError(String.format("bad operand type for abs(): '%s'", self.getType().fastGetName()));
+        });
     }
 
     public static PyObject all(PyObject arg) {
         PyObject iter = PyObject.getIter(arg);
-        if (iter == null) {
-            throw Py.TypeError("'" + arg.getType().fastGetName() + "' object is not iterable");
-        }
-        for (PyObject item : iter.asIterable()) {
-            if (!item.isTrue()) {
-                return Py.False;
+        try {
+            for (;;) {
+                PyObject item = PyObject.iterNext(iter);
+                if (!item.isTrue()) {
+                    return Py.False;
+                }
+            }
+        } catch (PyException e) {
+            if (!e.match(Py.StopIteration)) {
+                throw e;
             }
         }
         return Py.True;
@@ -175,7 +182,7 @@ public class BuiltinModule {
     }
 
     public static PyObject bin(PyObject args[], String kwds[]) {
-        ArgParser ap = new ArgParser("bin", args, kwds, new String[] {"number"}, 1);
+        ArgParser ap = new ArgParser("bin", args, kwds, new String[]{"number"}, 1);
         ap.noKeywords();
         return IntegerFormatter.bin(ap.getPyObject(0));
     }
@@ -194,15 +201,15 @@ public class BuiltinModule {
 
     public static PyObject compile(PyObject args[], String kwds[]) {
         ArgParser ap = new ArgParser("compile", args, kwds,
-                                     new String[] {"source", "filename", "mode", "flags",
-                                                   "dont_inherit", "optimize"},
-                                     3);
+                new String[]{"source", "filename", "mode", "flags",
+                        "dont_inherit", "optimize"},
+                3);
         PyObject source = ap.getPyObject(0);
         String filename = ap.getString(1);
         String mode = ap.getString(2);
         int flags = ap.getInt(3, 0);
         boolean dont_inherit = ap.getPyObject(4, Py.False).isTrue();
-        int optimize= ap.getInt(5, -1);
+        int optimize = ap.getInt(5, -1);
         return compile(source, filename, mode, flags, dont_inherit);
     }
 
@@ -251,17 +258,17 @@ public class BuiltinModule {
 
     /**
      * @returns mod if obj is a wrapper around an AST mod else returns
-     *          null
-     *
+     * null
+     * <p>
      * XXX: Reaches into implementation details -- needs to be reviewed if our
-     *      java integration changes.
+     * java integration changes.
      */
     private static mod py2node(PyObject obj) {
         Object node = obj.__tojava__(mod.class);
         if (node == Py.NoConversion) {
             return null;
         }
-        return (mod)node;
+        return (mod) node;
     }
 
     public static PyObject delattr(PyObject obj, PyObject name) {
@@ -275,7 +282,7 @@ public class BuiltinModule {
         if (!Py.isInstance(ret, PyList.TYPE)) {
             ret = new PyList(ret);
         }
-        ((PyList)ret).sort();
+        ((PyList) ret).sort();
         return ret;
     }
 
@@ -333,7 +340,7 @@ public class BuiltinModule {
             code = (PyCode) o;
         } else {
             if (o instanceof PyUnicode) {
-                code = (PyCode)compile(o, "<string>", "eval");
+                code = (PyCode) compile(o, "<string>", "eval");
             } else {
                 throw Py.TypeError("eval: argument 1 must be string or code object");
             }
@@ -354,11 +361,11 @@ public class BuiltinModule {
 
     public static PyObject filter(PyObject func, PyObject seq) {
         if (seq instanceof PyBytes) {
-            return filterBaseString(func, (PyBytes)seq,
-                                    seq instanceof PyUnicode ? PyUnicode.TYPE : PyBytes.TYPE);
+            return filterBaseString(func, (PyBytes) seq,
+                    seq instanceof PyUnicode ? PyUnicode.TYPE : PyBytes.TYPE);
         }
         if (seq instanceof PyTuple) {
-            return filterTuple(func, (PyTuple)seq);
+            return filterTuple(func, (PyTuple) seq);
         }
 
         PyList list = new PyList();
@@ -395,7 +402,7 @@ public class BuiltinModule {
             if (!Py.isInstance(item, stringType)) {
                 String name = stringType.fastGetName();
                 throw Py.TypeError(String.format("can't filter %s to %s: __getitem__ returned "
-                                                 + "different type", name, name));
+                        + "different type", name, name));
             }
             builder.append(item.toString());
         }
@@ -513,9 +520,9 @@ public class BuiltinModule {
 
     public static PyObject import$(PyObject args[], String keywords[]) {
         ArgParser ap = new ArgParser("__import__", args, keywords,
-                                     new String[] {"name", "globals", "locals", "fromlist",
-                                                   "level"},
-                                     1);
+                new String[]{"name", "globals", "locals", "fromlist",
+                        "level"},
+                1);
         PyObject name = ap.getPyObject(0);
         PyObject globals = ap.getPyObject(1, null);
         PyObject fromlist = ap.getPyObject(3, Py.EmptyTuple);
@@ -586,7 +593,7 @@ public class BuiltinModule {
     }
 
     public static PyObject next(PyObject args[], String kwds[]) {
-        ArgParser ap = new ArgParser("next", args, kwds, new String[] {"iterator", "default"}, 1);
+        ArgParser ap = new ArgParser("next", args, kwds, new String[]{"iterator", "default"}, 1);
         ap.noKeywords();
         PyObject it = ap.getPyObject(0);
         PyObject def = ap.getPyObject(1, null);
@@ -613,21 +620,21 @@ public class BuiltinModule {
         final int length;
 
         if (c instanceof PyUnicode) {
-            String cu = ((PyUnicode)c).getString();
+            String cu = ((PyUnicode) c).getString();
             length = cu.codePointCount(0, cu.length());
             if (length == 1) {
                 return new PyLong(cu.codePointAt(0));
             }
 
         } else if (c instanceof PyBytes) {
-            String cs = ((PyBytes)c).getString();
+            String cs = ((PyBytes) c).getString();
             length = cs.length();
             if (length == 1) {
                 return new PyLong(cs.charAt(0));
             }
 
         } else if (c instanceof BaseBytes) {
-            BaseBytes cb = (BaseBytes)c;
+            BaseBytes cb = (BaseBytes) c;
             length = cb.__len__();
             if (length == 1) {
                 return new PyLong(cb.intAt(0));
@@ -713,8 +720,8 @@ public class BuiltinModule {
         }
 
         throw Py.TypeError(String.format("unsupported operand type(s) for pow(): '%.100s', "
-                                         + "'%.100s', '%.100s'", x.getType().fastGetName(),
-                                         y.getType().fastGetName(), z.getType().fastGetName()));
+                        + "'%.100s', '%.100s'", x.getType().fastGetName(),
+                y.getType().fastGetName(), z.getType().fastGetName()));
     }
 
     public static PyObject print(PyObject args[], String kwds[]) {
@@ -725,8 +732,8 @@ public class BuiltinModule {
         System.arraycopy(args, 0, values, 0, argslen - kwlen);
         PyObject keyValues[] = new PyObject[kwlen];
         System.arraycopy(args, argslen - kwlen, keyValues, 0, kwlen);
-        ArgParser ap = new ArgParser("print", keyValues, kwds, new String[] {"sep", "end", "file", "flush"});
-        for (PyObject keyValue: keyValues) {
+        ArgParser ap = new ArgParser("print", keyValues, kwds, new String[]{"sep", "end", "file", "flush"});
+        for (PyObject keyValue : keyValues) {
             if (keyValue instanceof PyUnicode) {
                 //If "file" is passed in as PyUnicode, that's OK as it will error later.
                 useUnicode = true;
@@ -751,7 +758,7 @@ public class BuiltinModule {
             out.println(useUnicode);
         } else {
             if (!useUnicode) {
-                for (PyObject value: values) {
+                for (PyObject value : values) {
                     if (value instanceof PyUnicode) {
                         useUnicode = true;
                         break;
@@ -782,14 +789,14 @@ public class BuiltinModule {
     }
 
     private static PyUnicode readline(PyObject file) {
-      PyObject ret = file.invoke("readline");
-      if (!(ret instanceof PyUnicode)) {
-        throw Py.TypeError("object.readline() returned non-string");
-      }
-      if (ret.equals(Py.EmptyUnicode)) {
-          throw Py.EOFError("EOF when reading a line");
-      }
-      return (PyUnicode) ret;
+        PyObject ret = file.invoke("readline");
+        if (!(ret instanceof PyUnicode)) {
+            throw Py.TypeError("object.readline() returned non-string");
+        }
+        if (ret.equals(Py.EmptyUnicode)) {
+            throw Py.EOFError("EOF when reading a line");
+        }
+        return (PyUnicode) ret;
     }
 
     /**
@@ -797,7 +804,7 @@ public class BuiltinModule {
      * is directed to a file.
      *
      * @param prompt to issue at console before read
-     * @param file a file-like object to read from
+     * @param file   a file-like object to read from
      * @return line of text from the file (encoded as bytes values compatible with PyBytes)
      */
     public static PyObject raw_input2(PyObject prompt, PyObject file) {
@@ -847,7 +854,7 @@ public class BuiltinModule {
     }
 
     public static PyObject round(PyObject args[], String kwds[]) {
-        ArgParser ap = new ArgParser("round", args, kwds, new String[] {"number", "ndigits"}, 0);
+        ArgParser ap = new ArgParser("round", args, kwds, new String[]{"number", "ndigits"}, 0);
         PyObject number = ap.getPyObject(0);
         PyObject ndigits = ap.getPyObject(1, null);
         PyObject round = number.getType().__findattr__("__round__");
@@ -870,18 +877,18 @@ public class BuiltinModule {
             throw Py.TypeError("sorted() takes at least 1 argument (0 given)");
         } else if (args.length > 3) {
             throw Py.TypeError(String.format("sorted() takes at most 3 arguments (%d given)",
-                                             args.length));
+                    args.length));
         } else {
             PyObject iter = PyObject.getIter(args[0]);
             if (iter == null) {
                 throw Py.TypeError(String.format("'%s' object is not iterable",
-                                                 args[0].getType().fastGetName()));
+                        args[0].getType().fastGetName()));
             }
         }
 
         PyList seq = new PyList(args[0]);
         ArgParser ap = new ArgParser("sorted", args, kwds,
-                                     new String[] {"iterable", "key", "reverse"}, 0);
+                new String[]{"iterable", "key", "reverse"}, 0);
         PyObject key = ap.getPyObject(1, Py.None);
         PyObject reverse = ap.getPyObject(2, Py.Zero);
         seq.sort(key, reverse);
@@ -909,7 +916,7 @@ public class BuiltinModule {
         if (reversed != null) {
             return reversed.__call__();
         } else if (seq.__findattr__("__getitem__") != null && seq.__findattr__("__len__") != null
-            && seq.__findattr__("keys") == null) {
+                && seq.__findattr__("keys") == null) {
             reversed = new PyReversedIterator(seq);
         } else {
             throw Py.TypeError("argument to reversed() must be a sequence");
@@ -1028,13 +1035,13 @@ public class BuiltinModule {
     /**
      * Return an interned String from name, raising a TypeError when conversion fails.
      *
-     * @param name a PyObject
+     * @param name     a PyObject
      * @param function name of the python function caller
      * @return an interned String
      */
     private static String asName(PyObject name, String function) {
         if (name instanceof PyUnicode) {
-            return ((PyUnicode)name).getString().intern();
+            return ((PyUnicode) name).getString().intern();
         }
         throw Py.TypeError(function + "(): attribute name must be string");
     }

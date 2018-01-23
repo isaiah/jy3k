@@ -9,6 +9,7 @@ import org.python.annotations.ExposedType;
 import org.python.annotations.ModuleInit;
 import org.python.core.Abstract;
 import org.python.core.ArgParser;
+import org.python.core.BuiltinModule;
 import org.python.core.CompareOp;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -74,7 +75,7 @@ public class operator {
 
     @ExposedFunction
     public static PyObject abs(ThreadState ts, PyObject arg) {
-        return arg.__abs__();
+        return BuiltinModule.abs(arg);
     }
 
     @ExposedFunction(names = {"inv", "invert"})

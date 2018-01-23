@@ -142,11 +142,6 @@ public class PyBoolean extends PyLong {
         return Py.newInteger(asInt());
     }
 
-    @Override
-    public PyObject __abs__() {
-        return bool___abs__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bool___abs___doc)
     final PyObject bool___abs__() {
         return Py.newInteger(asInt());

@@ -648,11 +648,6 @@ public class PyComplex extends PyObject {
         return getType() == TYPE ? this : new PyComplex(real, imag);
     }
 
-    @Override
-    public PyObject __abs__() {
-        return complex___abs__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.complex___abs___doc)
     final PyObject complex___abs__() {
         double mag = Math.hypot(real, imag);

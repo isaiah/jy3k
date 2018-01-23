@@ -887,11 +887,6 @@ public class PyLong extends PyObject {
         return this;
     }
 
-    @Override
-    public PyObject __abs__() {
-        return int___abs__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___abs___doc)
     public final PyObject int___abs__() {
         if (getValue().signum() == -1) {

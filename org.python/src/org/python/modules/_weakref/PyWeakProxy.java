@@ -40,8 +40,6 @@ public class PyWeakProxy extends AbstractReference {
     public PyObject __int__() { return py().__int__(); }
     public PyComplex __complex__() { return py().__complex__(); }
 
-    public PyObject __abs__() { return py().__abs__(); }
-
 
     public boolean __contains__(PyObject o) { return py().__contains__(o); }
     public PyObject __index__() { return py().__index__(); }
