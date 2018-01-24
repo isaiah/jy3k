@@ -37,11 +37,7 @@ public class Invert extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Invert___int__();
-    }
-
-    final PyObject Invert___int__() {
+    public final PyObject Invert___int__() {
         return Py.newInteger(1);
     }
 

@@ -37,11 +37,7 @@ public class Store extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Store___int__();
-    }
-
-    final PyObject Store___int__() {
+    public final PyObject Store___int__() {
         return Py.newInteger(2);
     }
 

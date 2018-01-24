@@ -37,11 +37,7 @@ public class Not extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Not___int__();
-    }
-
-    final PyObject Not___int__() {
+    public final PyObject Not___int__() {
         return Py.newInteger(2);
     }
 

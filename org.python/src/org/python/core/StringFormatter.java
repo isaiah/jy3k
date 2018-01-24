@@ -5,6 +5,8 @@ import org.python.core.stringlib.IntegerFormatter;
 import org.python.core.stringlib.InternalFormat;
 import org.python.core.stringlib.TextFormatter;
 
+import javax.swing.table.AbstractTableModel;
+
 /**
  * Interpreter for %-format strings. (Note visible across the core package.)
  */
@@ -127,40 +129,10 @@ final class StringFormatter {
      */
     private PyObject asNumber(PyObject arg) {
         if (arg instanceof PyLong) {
-            // arg is already acceptable
             return arg;
-
-        } else {
-            // use __int__ or __int__to get an int (or long)
-            if (arg.getClass() == PyFloat.class) {
-                // A common case where it is safe to return arg.__int__()
-                return arg.__int__();
-
-            } else {
-                /*
-                 * In general, we can't simply call arg.__int__() because PyBytes implements it
-                 * without exposing it to python (str has no __int__). This would make str
-                 * acceptacle to integer format specifiers, which is forbidden by CPython tests
-                 * (test_format.py). PyBytes implements __int__ perhaps only to help the int
-                 * constructor. Maybe that was a bad idea?
-                 */
-                try {
-                    // Result is the result of arg.__int__() if that works
-                    return arg.__getattr__("__int__").__call__();
-                } catch (PyException e) {
-                    // Swallow the exception
-                }
-
-                // Try again with arg.__int__()
-                try {
-                    // Result is the result of arg.__int__() if that works
-                    return arg.__getattr__("__int__").__call__();
-                } catch (PyException e) {
-                    // No __int__ defined (at Python level)
-                    return arg;
-                }
-            }
         }
+
+        return Abstract.PyNumber_Long(Py.getThreadState(), arg);
     }
 
     /**

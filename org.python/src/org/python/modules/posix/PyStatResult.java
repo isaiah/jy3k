@@ -3,6 +3,7 @@ package org.python.modules.posix;
 
 import jnr.posix.FileStat;
 
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.CompareOp;
 import org.python.core.Py;
@@ -223,7 +224,7 @@ public class PyStatResult extends PyTuple {
     @Override
     public PyObject pyget(int index) {
         if (index == ST_ATIME || index == ST_MTIME || index == ST_CTIME) {
-            return super.pyget(index).__int__();
+            return Abstract.PyNumber_Long(Py.getThreadState(), super.pyget(index));
         } else {
             return super.pyget(index);
         }

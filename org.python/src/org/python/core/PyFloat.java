@@ -305,14 +305,14 @@ public class PyFloat extends PyObject {
             return 0;
         }
 
-        double intPart = Math.floor(value);
+        int intPart = (int) Math.floor(value);
         double fractPart = value - intPart;
 
         if (fractPart == 0) {
             if (intPart <= Integer.MAX_VALUE && intPart >= Integer.MIN_VALUE) {
-                return (int)value;
+                return intPart;
             } else {
-                return __int__().hashCode();
+                return new PyLong(intPart).hashCode();
             }
         } else {
             long v = Double.doubleToLongBits(getValue());
@@ -709,11 +709,6 @@ public class PyFloat extends PyObject {
         if (!Double.isInfinite(r) && ndigitsObj != null)
             return new PyFloat(r);
         return new PyLong(r);
-    }
-
-    @Override
-    public PyObject __int__() {
-        return float___int__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.float___int___doc)

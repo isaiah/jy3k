@@ -37,11 +37,7 @@ public class Or extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Or___int__();
-    }
-
-    final PyObject Or___int__() {
+    public final PyObject Or___int__() {
         return Py.newInteger(2);
     }
 

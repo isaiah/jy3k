@@ -159,7 +159,6 @@ public class ArgParser {
     private int asInt(PyObject value) {
         if (value instanceof PyFloat) {
             Py.warning(Py.DeprecationWarning, "integer argument expected, got float");
-            value = value.__int__();
         }
         return value.asInt();
     }

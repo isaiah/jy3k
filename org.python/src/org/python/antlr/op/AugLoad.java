@@ -37,11 +37,7 @@ public class AugLoad extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return AugLoad___int__();
-    }
-
-    final PyObject AugLoad___int__() {
+    public final PyObject AugLoad___int__() {
         return Py.newInteger(4);
     }
 

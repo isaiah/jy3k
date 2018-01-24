@@ -99,13 +99,12 @@ public class ScalarCData extends CData {
     }
 
     @ExposedMethod
-    @Override
-    public PyObject __int__() {
-        return getValue().__int__();
+    public PyObject ScalarCData___int__(ThreadState ts) {
+        return Abstract.PyNumber_Long(ts, getValue());
     }
 
     @ExposedMethod
-    public PyObject ScalarCData__float__(ThreadState ts) {
+    public PyObject ScalarCData___float__(ThreadState ts) {
         return Abstract.PyNumber_Float(ts, getValue());
     }
 

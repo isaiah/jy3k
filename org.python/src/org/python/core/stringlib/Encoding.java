@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Helper methods for unicode encoding shared between bytes-like object and str
@@ -1512,6 +1513,9 @@ public class Encoding {
     public static PyLong atol(CharSequence s, int base) {
         if ((base != 0 && base < 2) || (base > 36)) {
             throw Py.ValueError("invalid base for int literal:" + base);
+        }
+        if (s.chars().anyMatch(ch -> ch == '_')) {
+            s = s.chars().filter(ch -> ch != '_').collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append);
         }
 
         try {

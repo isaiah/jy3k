@@ -37,11 +37,7 @@ public class LtE extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return LtE___int__();
-    }
-
-    final PyObject LtE___int__() {
+    public final PyObject LtE___int__() {
         return Py.newInteger(4);
     }
 

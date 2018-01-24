@@ -657,11 +657,6 @@ public class PyComplex extends PyObject {
         return new PyFloat(mag);
     }
 
-    @Override
-    public PyObject __int__() {
-        return complex___int__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.complex___int___doc)
     final PyObject complex___int__() {
         throw Py.TypeError("can't convert complex to long; use e.g. long(abs(z))");

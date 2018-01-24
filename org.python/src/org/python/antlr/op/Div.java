@@ -37,11 +37,7 @@ public class Div extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Div___int__();
-    }
-
-    final PyObject Div___int__() {
+    public final PyObject Div___int__() {
         return Py.newInteger(5);
     }
 

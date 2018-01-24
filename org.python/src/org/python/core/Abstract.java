@@ -12,6 +12,8 @@ public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
 
     // called from generated code, is easier without the threadstate argument
     public static boolean PyObject_IsTrue(PyObject obj) {
@@ -66,6 +68,35 @@ public class Abstract {
         return unaryOp(ts, "__invert__", "~", obj);
     }
 
+    public static PyObject PyNumber_Long(ThreadState ts, PyObject obj) {
+        if (obj == null) {
+            return Py.Zero;
+        }
+        if (obj instanceof PyUnicode) {
+            return Encoding.atol(((PyUnicode) obj).getString(), 10);
+        } else if (obj instanceof PyBytes) {
+            return Encoding.atol(((PyBytes) obj).getString(), 10);
+        } else if (obj instanceof BufferProtocol) {
+            return Encoding.atol(new String(Py.unwrapBuffer(obj)), 10);
+        }
+        try {
+            Object intFunc = int$.getGetter().invokeExact((obj));
+            return (PyObject) int$.getInvoker().invokeExact(intFunc, ts);
+        } catch (PyException pye) {
+            if (!pye.match(Py.AttributeError)) {
+                throw pye;
+            }
+            PyObject integral = PyObject.unaryOp(ts, trunc, obj, (self) -> {
+                throw Py.TypeError(String.format(
+                        "long() argument must be a string a bytes-like object or a number, not '%.200s'", obj.getType()
+                                .fastGetName()));
+            });
+            return convertIntegralToLong(ts, integral);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
+    }
+
     public static PyObject PyNumber_Float(ThreadState ts, PyObject value) {
         PyObject floatObject;
         try {
@@ -80,6 +111,16 @@ public class Abstract {
             throw Py.JavaError(throwable);
         }
         return floatObject;
+    }
+
+    private static PyObject convertIntegralToLong(ThreadState ts, PyObject integral) {
+        if (!(integral instanceof PyLong)) {
+            return PyObject.unaryOp(ts, int$, integral, (self) -> {
+                throw Py.TypeError(String.format("__trunc__ returned non-Integral (type %.200s)",
+                        self.getType().fastGetName()));
+            });
+        }
+        return integral;
     }
 
     public static PyFloat floatFromString(PyObject v) {

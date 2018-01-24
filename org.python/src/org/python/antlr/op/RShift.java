@@ -37,11 +37,7 @@ public class RShift extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return RShift___int__();
-    }
-
-    final PyObject RShift___int__() {
+    public final PyObject RShift___int__() {
         return Py.newInteger(9);
     }
 

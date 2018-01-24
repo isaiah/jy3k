@@ -37,11 +37,7 @@ public class MatMult extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return MatMult___int__();
-    }
-
-    final PyObject MatMult___int__() {
+    public final PyObject MatMult___int__() {
         return Py.newInteger(4);
     }
 

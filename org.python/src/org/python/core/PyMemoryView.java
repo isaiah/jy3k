@@ -2,7 +2,6 @@
 package org.python.core;
 
 import org.python.core.buffer.BaseBuffer;
-import org.python.core.stringlib.Encoding;
 import org.python.core.util.StringUtil;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -1057,8 +1056,4 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         }
     }
 
-    @Override
-    public PyObject __int__() {
-        return Encoding.atol(backing.toString(), 10);
-    }
 }

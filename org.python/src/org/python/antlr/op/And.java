@@ -37,11 +37,7 @@ public class And extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return And___int__();
-    }
-
-    final PyObject And___int__() {
+    public final PyObject And___int__() {
         return Py.newInteger(1);
     }
 

@@ -1581,17 +1581,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __int__ method.
-     * Should only be overridden by numeric objects that can be
-     * reasonably coerced into a python long.
-     *
-     * @return a PyLong corresponding to the value of this object.
-     **/
-    public PyObject __int__() {
-        throw Py.AttributeError("__int__");
-    }
-
-    /**
      * Equivalent to the standard Python __complex__ method.
      * Should only be overridden by numeric objects that can be
      * reasonably coerced into a python complex number.
@@ -2617,7 +2606,7 @@ public class PyObject implements Serializable {
     public int asInt() {
         PyObject intObj;
         try {
-            intObj = __int__();
+            intObj = Abstract.PyNumber_Long(Py.getThreadState(), this);
         } catch (PyException pye) {
             if (pye.match(Py.AttributeError)) {
                 throw Py.TypeError("an integer is required");
@@ -2643,7 +2632,7 @@ public class PyObject implements Serializable {
     public long asLong() {
         PyObject longObj;
         try {
-            longObj = __int__();
+            longObj = Abstract.PyNumber_Long(Py.getThreadState(), this);
         } catch (PyException pye) {
             if (pye.match(Py.AttributeError)) {
                 throw Py.TypeError("an integer is required");

@@ -3,6 +3,7 @@ package org.python.modules.jffi;
 
 import java.math.BigInteger;
 
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
@@ -97,12 +98,9 @@ final class Util {
     }
 
     private static final long __int__value(PyObject value) {
-        PyObject l = value.__int__();
+        PyObject l = Abstract.PyNumber_Long(Py.getThreadState(), value);
         if (l instanceof PyLong) {
             return ((PyLong) l).getValue().longValue();
-
-        } else if (l instanceof PyLong) {
-            return ((PyLong) l).getValue().intValue();
         }
 
         throw Py.TypeError("invalid __int__() result");

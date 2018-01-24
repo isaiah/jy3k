@@ -37,11 +37,7 @@ public class Load extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Load___int__();
-    }
-
-    final PyObject Load___int__() {
+    public final PyObject Load___int__() {
         return Py.newInteger(1);
     }
 

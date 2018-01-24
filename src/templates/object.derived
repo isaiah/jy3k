@@ -7,18 +7,6 @@ unary1: __str__ unicode
 unary1: __complex__ complex
 rest:
 
-  public PyObject __int__() {
-      PyType self_type=getType();
-      PyObject impl=self_type.lookup("__int__");
-      if (impl!=null) {
-          PyObject res=impl.__get__(this,self_type).__call__();
-          if (res instanceof PyLong)
-              return res;
-          throw Py.TypeError("__int__"+" returned non-"+"long"+" (type "+res.getType().fastGetName()+")");
-      }
-      return super.__int__();
-  }
-
   public int hashCode() {
         PyType self_type = getType();
         PyObject impl = self_type.lookup("__hash__");

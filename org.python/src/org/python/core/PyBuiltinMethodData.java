@@ -208,7 +208,7 @@ public class PyBuiltinMethodData {
 
     private static Object unwrap(PyObject pyObj, Class<?> argType) {
         if (argType == int.class) {
-            return pyObj.__int__();
+            return pyObj.asInt();
         } else if (argType == boolean.class) {
             return pyObj.isTrue();
         } else if (argType == String.class) {

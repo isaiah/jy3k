@@ -225,12 +225,7 @@ class JavaVisitor(EmitVisitor):
             self.attributes(type, name, depth);
 
             self.emit('@ExposedMethod', depth + 1)
-            self.emit('public PyObject __int__() {', depth + 1)
-            self.emit("return %s___int__();" % type.name, depth + 2)
-            self.emit("}", depth + 1)
-            self.emit('', 0)
-
-            self.emit("final PyObject %s___int__() {" % type.name, depth + 1)
+            self.emit("public final PyObject %s___int__() {" % type.name, depth + 1)
             self.emit('return Py.newInteger(%s);' % str(i + 1), depth + 2)
             self.emit("}", depth + 1)
             self.emit('', 0)
@@ -805,7 +800,7 @@ if __name__ == "__main__":
     usage = "Usage: python %s [-o outdir] [grammar]" % sys.argv[0]
 
     scriptdir = dirname(abspath(__file__))
-    OUT_DIR = join(dirname(scriptdir), 'src', 'org', 'python', 'antlr')
+    OUT_DIR = join(dirname(scriptdir), 'org.python', 'src', 'org', 'python', 'antlr')
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'o:')
     except:

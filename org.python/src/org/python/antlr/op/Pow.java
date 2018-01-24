@@ -37,11 +37,7 @@ public class Pow extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Pow___int__();
-    }
-
-    final PyObject Pow___int__() {
+    public final PyObject Pow___int__() {
         return Py.newInteger(7);
     }
 

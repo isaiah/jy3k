@@ -37,11 +37,7 @@ public class UAdd extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return UAdd___int__();
-    }
-
-    final PyObject UAdd___int__() {
+    public final PyObject UAdd___int__() {
         return Py.newInteger(3);
     }
 

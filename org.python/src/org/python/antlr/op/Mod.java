@@ -37,11 +37,7 @@ public class Mod extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Mod___int__();
-    }
-
-    final PyObject Mod___int__() {
+    public final PyObject Mod___int__() {
         return Py.newInteger(6);
     }
 

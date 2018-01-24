@@ -37,11 +37,7 @@ public class BitXor extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return BitXor___int__();
-    }
-
-    final PyObject BitXor___int__() {
+    public final PyObject BitXor___int__() {
         return Py.newInteger(11);
     }
 

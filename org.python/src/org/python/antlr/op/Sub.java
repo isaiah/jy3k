@@ -37,11 +37,7 @@ public class Sub extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Sub___int__();
-    }
-
-    final PyObject Sub___int__() {
+    public final PyObject Sub___int__() {
         return Py.newInteger(2);
     }
 

@@ -433,11 +433,6 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @Override
-    public PyObject __int__() {
-        return Encoding.atol(getString(), 10);
-    }
-
-    @Override
     public PyComplex __complex__() {
         return Encoding.atocx(encodeDecimal());
     }

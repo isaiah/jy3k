@@ -37,11 +37,7 @@ public class In extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return In___int__();
-    }
-
-    final PyObject In___int__() {
+    public final PyObject In___int__() {
         return Py.newInteger(9);
     }
 

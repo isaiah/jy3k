@@ -21,8 +21,4 @@ public abstract class BasePointer extends PyObject implements Pointer {
         return !getMemory().isNull();
     }
 
-    @Override
-    public PyObject __int__() {
-        return address();
-    }
 }

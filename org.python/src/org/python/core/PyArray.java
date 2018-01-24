@@ -1894,11 +1894,6 @@ public class PyArray extends PySequence implements Cloneable, Traverseproc {
 
     }
 
-    @Override
-    public PyObject __int__() {
-        return Encoding.atol(tostring(), 10);
-    }
-
     @ExposedMethod
     public final PyObject array_tobytes() {
         return new PyBytes(tostring());

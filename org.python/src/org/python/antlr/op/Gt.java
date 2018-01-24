@@ -37,11 +37,7 @@ public class Gt extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Gt___int__();
-    }
-
-    final PyObject Gt___int__() {
+    public final PyObject Gt___int__() {
         return Py.newInteger(5);
     }
 

@@ -37,11 +37,7 @@ public class Mult extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Mult___int__();
-    }
-
-    final PyObject Mult___int__() {
+    public final PyObject Mult___int__() {
         return Py.newInteger(3);
     }
 

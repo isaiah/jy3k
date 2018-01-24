@@ -37,11 +37,7 @@ public class LShift extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return LShift___int__();
-    }
-
-    final PyObject LShift___int__() {
+    public final PyObject LShift___int__() {
         return Py.newInteger(8);
     }
 

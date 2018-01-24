@@ -37,11 +37,7 @@ public class NotIn extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return NotIn___int__();
-    }
-
-    final PyObject NotIn___int__() {
+    public final PyObject NotIn___int__() {
         return Py.newInteger(10);
     }
 

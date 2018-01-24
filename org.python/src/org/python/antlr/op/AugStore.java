@@ -37,11 +37,7 @@ public class AugStore extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return AugStore___int__();
-    }
-
-    final PyObject AugStore___int__() {
+    public final PyObject AugStore___int__() {
         return Py.newInteger(5);
     }
 

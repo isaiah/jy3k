@@ -37,11 +37,7 @@ public class Is extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Is___int__();
-    }
-
-    final PyObject Is___int__() {
+    public final PyObject Is___int__() {
         return Py.newInteger(7);
     }
 

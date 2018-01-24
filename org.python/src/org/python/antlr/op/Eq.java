@@ -37,11 +37,7 @@ public class Eq extends PythonTree {
     public PyUnicode[] get_attributes() { return attributes; }
 
     @ExposedMethod
-    public PyObject __int__() {
-        return Eq___int__();
-    }
-
-    final PyObject Eq___int__() {
+    public final PyObject Eq___int__() {
         return Py.newInteger(1);
     }
 
