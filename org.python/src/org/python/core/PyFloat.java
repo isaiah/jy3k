@@ -721,11 +721,6 @@ public class PyFloat extends PyObject {
         return getType() == TYPE ? this : Py.newFloat(getValue());
     }
 
-    @Override
-    public PyObject __trunc__() {
-        return float___trunc__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.float___trunc___doc)
     final PyObject float___trunc__() {
         if (Double.isNaN(value)) {

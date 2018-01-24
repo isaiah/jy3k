@@ -1577,7 +1577,7 @@ public class PyObject implements Serializable {
         if (formatSpec != null && formatSpec instanceof PyUnicode && !((PyUnicode) formatSpec).getString().isEmpty()) {
             throw Py.TypeError(String.format("unsupported format string passed to %s.__format__", getType().getName()));
         }
-        return __str__().__format__(formatSpec);
+        return __str__().str___format__(formatSpec);
     }
 
     /**
@@ -1589,17 +1589,6 @@ public class PyObject implements Serializable {
      **/
     public PyComplex __complex__() {
         throw Py.AttributeError("__complex__");
-    }
-
-    /**
-     * Equivalent to the standard Python __trunc__ method.
-     * Should only be overridden by numeric objects that can reasonably
-     * be truncated to an Integral.
-     *
-     * @return the Integral closest to x between 0 and x.
-     **/
-    public PyObject __trunc__() {
-        throw Py.AttributeError("__trunc__");
     }
 
     /**

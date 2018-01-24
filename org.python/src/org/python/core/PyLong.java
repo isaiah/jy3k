@@ -891,11 +891,6 @@ public class PyLong extends PyObject {
         return new PyComplex(doubleValue(), 0.);
     }
 
-    @Override
-    public PyObject __trunc__() {
-        return int___trunc__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___trunc___doc)
     public final PyObject int___trunc__() {
         return this;

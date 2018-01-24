@@ -428,10 +428,6 @@ public class PyUnicode extends PySequence implements Iterable {
         return str___contains__(o);
     }
 
-    public PyObject __format__(PyObject formatSpec) {
-        return str___format__(formatSpec);
-    }
-
     @Override
     public PyComplex __complex__() {
         return Encoding.atocx(encodeDecimal());
