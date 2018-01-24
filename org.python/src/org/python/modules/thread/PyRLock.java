@@ -2,11 +2,13 @@
 package org.python.modules.thread;
 
 import org.python.annotations.ExposedNew;
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.ThreadState;
 import org.python.core.Untraversable;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
@@ -37,13 +39,13 @@ public class PyRLock extends PyObject {
     }
 
     @ExposedMethod(names = "acquire")
-    public PyObject acquire(PyObject[] args, String[] kws) {
+    public PyObject acquire(ThreadState ts, PyObject[] args, String[] kws) {
         ArgParser ap = new ArgParser("acqurie", args, kws, "blocking", "timeout");
         boolean blocking = ap.getBoolean(0, true);
         PyObject timeoutObj = ap.getPyObject(1, null);
         double timeout = -1;
         if (timeoutObj != null) {
-            timeout = timeoutObj.__float__().getValue();
+            timeout = Abstract.PyNumber_Float(ts, timeoutObj).asDouble();
         }
         return Py.newBoolean(acquire(blocking, (long) (timeout * 1000)));
     }

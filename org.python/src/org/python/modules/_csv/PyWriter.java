@@ -1,6 +1,7 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._csv;
 
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -129,7 +130,7 @@ public class PyWriter extends PyObject implements Traverseproc {
             switch (dialect.quoting) {
                 case QUOTE_NONNUMERIC:
                     try {
-                        field.__float__();
+                        Abstract.PyNumber_Float(Py.getThreadState(), field);
                     } catch (PyException ex) {
                         quoted = true;
                     }

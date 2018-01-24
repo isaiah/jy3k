@@ -88,7 +88,7 @@ public class PyComplex extends PyObject {
             complexReal = (PyComplex)real;
         } else {
             try {
-                toFloat = real.__float__();
+                toFloat = (PyFloat) Abstract.PyNumber_Float(Py.getThreadState(), real);
             } catch (PyException pye) {
                 if (pye.match(Py.AttributeError)) {
                     // __float__ not supported
@@ -104,9 +104,8 @@ public class PyComplex extends PyObject {
         } else if (imag instanceof PyComplex) {
             complexImag = (PyComplex)imag;
         } else {
-            toFloat = null;
             try {
-                toFloat = imag.__float__();
+                toFloat = (PyFloat) Abstract.PyNumber_Float(Py.getThreadState(), imag);
             } catch (PyException pye) {
                 if (pye.match(Py.AttributeError)) {
                     // __float__ not supported
@@ -666,11 +665,6 @@ public class PyComplex extends PyObject {
     @ExposedMethod(doc = BuiltinDocs.complex___int___doc)
     final PyObject complex___int__() {
         throw Py.TypeError("can't convert complex to long; use e.g. long(abs(z))");
-    }
-
-    @Override
-    public PyFloat __float__() {
-        return complex___float__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.complex___float___doc)

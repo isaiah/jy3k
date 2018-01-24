@@ -36,9 +36,6 @@ public class PyWeakProxy extends AbstractReference {
     public void __delattr__(String name) { py().__delattr__(name); }
 
     public PyUnicode __str__() { return py().__str__(); }
-    public PyFloat __float__() { return py().__float__(); }
-    public PyObject __int__() { return py().__int__(); }
-    public PyComplex __complex__() { return py().__complex__(); }
 
 
     public boolean __contains__(PyObject o) { return py().__contains__(o); }

@@ -172,34 +172,7 @@ final class StringFormatter {
      * @return PyFloat if possible
      */
     private PyObject asFloat(PyObject arg) {
-
-        if (arg instanceof PyFloat) {
-            // arg is already acceptable
-            return arg;
-
-        } else {
-            // use __float__ to get a float.
-            if (arg.getClass() == PyFloat.class) {
-                // A common case where it is safe to return arg.__float__()
-                return arg.__float__();
-
-            } else {
-                /*
-                 * In general, we can't simply call arg.__float__() because PyBytes implements it
-                 * without exposing it to python (str has no __float__). This would make str
-                 * acceptacle to float format specifiers, which is forbidden by CPython tests
-                 * (test_format.py). PyBytes implements __float__ perhaps only to help the float
-                 * constructor. Maybe that was a bad idea?
-                 */
-                try {
-                    // Result is the result of arg.__float__() if that works
-                    return arg.__getattr__("__float__").__call__();
-                } catch (PyException e) {
-                    // No __float__ defined (at Python level)
-                    return arg;
-                }
-            }
-        }
+        return Abstract.PyNumber_Float(Py.getThreadState(), arg);
     }
 
     /**

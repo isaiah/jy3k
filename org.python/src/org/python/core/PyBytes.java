@@ -587,11 +587,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
     }
 
     @Override
-    public PyFloat __float__() {
-        return new PyFloat(Encoding.atof(getString()));
-    }
-
-    @Override
     public PyComplex __complex__() {
         return Encoding.atocx(getString());
     }

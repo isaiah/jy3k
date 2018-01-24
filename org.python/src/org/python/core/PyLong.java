@@ -315,11 +315,10 @@ public class PyLong extends PyObject {
     public static PyObject _pow(BigInteger value, BigInteger y, PyObject modulo, PyObject left,
                                 PyObject right) {
         if (y.compareTo(BigInteger.ZERO) < 0) {
-            if (value.compareTo(BigInteger.ZERO) != 0) {
-                return left.__float__().__pow__(right, modulo);
-            } else {
+            if (value.compareTo(BigInteger.ZERO) == 0) {
                 throw Py.ZeroDivisionError("zero to a negative power");
             }
+            return new PyFloat(Math.pow(value.intValue(), y.intValue()));
         }
         if (modulo == null) {
             return Py.newLong(value.pow(y.intValue()));
@@ -336,7 +335,7 @@ public class PyLong extends PyObject {
                 return Py.newLong(0);
             }
 
-            if (z.compareTo(BigInteger.valueOf(0)) <= 0) {
+            if (z.compareTo(BigInteger.ZERO) <= 0) {
                 // Handle negative modulo specially
                 // if (z.compareTo(BigInteger.valueOf(0)) == 0) {
                 // throw Py.ValueError("pow(x, y, z) with z == 0");
@@ -567,7 +566,7 @@ public class PyLong extends PyObject {
                 return Long.valueOf(getLong(Long.MIN_VALUE, Long.MAX_VALUE));
             }
             if (c == Float.TYPE || c == Double.TYPE || c == Float.class || c == Double.class) {
-                return __float__().__tojava__(c);
+                return Abstract.PyNumber_Float(Py.getThreadState(),this).__tojava__(c);
             }
             if (c == BigInteger.class || c == Number.class || c == Object.class
                     || c == Serializable.class) {
@@ -930,11 +929,6 @@ public class PyLong extends PyObject {
             return int_compare(complex.getReal());
         }
         return -2;
-    }
-
-    @Override
-    public PyFloat __float__() {
-        return int___float__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.int___float___doc)

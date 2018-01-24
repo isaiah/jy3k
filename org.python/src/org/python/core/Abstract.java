@@ -3,6 +3,7 @@ package org.python.core;
 // Objects/abstract.c
 
 import org.python.core.linker.InvokeByName;
+import org.python.core.stringlib.Encoding;
 
 /**
  * Abstract Object Interface
@@ -10,6 +11,7 @@ import org.python.core.linker.InvokeByName;
 public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
 
     // called from generated code, is easier without the threadstate argument
     public static boolean PyObject_IsTrue(PyObject obj) {
@@ -62,6 +64,39 @@ public class Abstract {
 
     public static PyObject PyNumber_Invert(ThreadState ts, PyObject obj) {
         return unaryOp(ts, "__invert__", "~", obj);
+    }
+
+    public static PyObject PyNumber_Float(ThreadState ts, PyObject value) {
+        PyObject floatObject;
+        try {
+            Object floatFunc = float$.getGetter().invokeExact(value);
+            floatObject = (PyObject) float$.getInvoker().invokeExact(floatFunc, Py.getThreadState());
+        } catch (PyException e) {
+            if (!e.match(Py.AttributeError)) {
+                throw e;
+            }
+            floatObject = floatFromString(value);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
+        return floatObject;
+    }
+
+    public static PyFloat floatFromString(PyObject v) {
+        String s = null;
+        if (v instanceof PyUnicode) {
+            s = ((PyUnicode) v).encodeDecimal();
+        } else if (v instanceof PyBytes) {
+            s = v.asString();
+        } else if (v instanceof PyByteArray) {
+            s = v.toString();
+        } else if (v instanceof BufferProtocol) {
+            s = ((BufferProtocol) v).getBuffer().asCharBuffer().toString();
+        } else {
+            throw Py.TypeError(String.format("float() argument must be a string or a number, not '%s'", v.getType().fastGetName()));
+        }
+        s = s.replaceAll("_", "");
+        return new PyFloat(Encoding.atof(s, BuiltinModule.repr(v).toString()));
     }
 
     public static PyObject PyObject_Not(ThreadState ts, PyObject obj) {

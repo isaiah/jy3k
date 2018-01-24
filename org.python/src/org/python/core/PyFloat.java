@@ -6,8 +6,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.python.core.linker.InvokeByName;
-import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FloatFormatter;
 import org.python.core.stringlib.InternalFormat;
 import org.python.core.stringlib.InternalFormat.Formatter;
@@ -29,7 +27,6 @@ import org.python.modules.math;
 public class PyFloat extends PyObject {
 
     public static final PyType TYPE = PyType.fromClass(PyFloat.class);
-    private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
 
     /** Format specification used by repr(). */
     static final Spec SPEC_REPR = InternalFormat.fromText(" >r");
@@ -69,45 +66,14 @@ public class PyFloat extends PyObject {
         if (x == null) {
             if (new_.for_type == subtype) {
                 return ZERO;
-            } else {
-                return new PyFloatDerived(subtype, 0.0);
             }
-        } else {
-            PyObject floatObject = null;
-            try {
-                Object floatFunc = float$.getGetter().invokeExact(x);
-                floatObject = (PyObject) float$.getInvoker().invokeExact(floatFunc, Py.getThreadState());
-            } catch (PyException e) {
-                if (!e.match(Py.AttributeError)) {
-                    throw e;
-                }
-                floatObject = floatFromString(x);
-            } catch (Throwable throwable) {
-                throw Py.JavaError(throwable);
-            }
-            if (new_.for_type == subtype) {
-                return floatObject;
-            } else {
-                return new PyFloatDerived(subtype, ((PyFloat) floatObject).getValue());
-            }
+            return new PyFloatDerived(subtype, 0.0);
         }
-    }
-
-    public static PyFloat floatFromString(PyObject v) {
-        String s = null;
-        if (v instanceof PyUnicode) {
-            s = ((PyUnicode) v).encodeDecimal();
-        } else if (v instanceof PyBytes) {
-            s = v.asString();
-        } else if (v instanceof PyByteArray) {
-            s = v.toString();
-        } else if (v instanceof BufferProtocol) {
-            s = ((BufferProtocol) v).getBuffer().asCharBuffer().toString();
-        } else {
-            throw Py.TypeError(String.format("float() argument must be a string or a number, not '%s'", v.getType().fastGetName()));
+        PyObject floatObject = Abstract.PyNumber_Float(Py.getThreadState(), x);
+        if (new_.for_type == subtype) {
+            return floatObject;
         }
-        s = s.replaceAll("_", "");
-        return new PyFloat(Encoding.atof(s, BuiltinModule.repr(v).toString()));
+        return new PyFloatDerived(subtype, ((PyFloat) floatObject).getValue());
     }
 
     @ExposedGet(name = "real", doc = BuiltinDocs.float_real_doc)
@@ -641,12 +607,10 @@ public class PyFloat extends PyObject {
             return null;
         }
 
-        modulo = (modulo == Py.None) ? null : modulo;
-        if (modulo != null) {
+        if (modulo != null && modulo != Py.None) {
             throw Py.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
-        } else {
-            return _pow(getValue(), coerce(right));
         }
+        return _pow(getValue(), coerce(right));
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.float___rpow___doc)
@@ -657,9 +621,8 @@ public class PyFloat extends PyObject {
     public PyObject __rpow__(PyObject left) {
         if (!canCoerce(left)) {
             return null;
-        } else {
-            return _pow(coerce(left), getValue());
         }
+        return _pow(coerce(left), getValue());
     }
 
     private static PyFloat _pow(double v, double w) {
@@ -756,11 +719,6 @@ public class PyFloat extends PyObject {
     @ExposedMethod(doc = BuiltinDocs.float___int___doc)
     final PyObject float___int__() {
         return new PyLong(getValue());
-    }
-
-    @Override
-    public PyFloat __float__() {
-        return float___float__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.float___float___doc)

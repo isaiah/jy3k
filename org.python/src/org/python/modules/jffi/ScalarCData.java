@@ -1,6 +1,7 @@
 
 package org.python.modules.jffi;
 
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyNewWrapper;
@@ -12,6 +13,7 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.core.ThreadState;
 
 @ExposedType(name = "jffi.ScalarCData", base = CData.class)
 public class ScalarCData extends CData {
@@ -103,9 +105,8 @@ public class ScalarCData extends CData {
     }
 
     @ExposedMethod
-    @Override
-    public PyFloat __float__() {
-        return getValue().__float__();
+    public PyObject ScalarCData__float__(ThreadState ts) {
+        return Abstract.PyNumber_Float(ts, getValue());
     }
 
     @Override

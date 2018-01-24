@@ -438,11 +438,6 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @Override
-    public PyFloat __float__() {
-        return new PyFloat(Encoding.atof(encodeDecimal()));
-    }
-
-    @Override
     public PyComplex __complex__() {
         return Encoding.atocx(encodeDecimal());
     }

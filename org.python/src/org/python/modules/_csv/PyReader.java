@@ -2,6 +2,7 @@
 package org.python.modules._csv;
 
 import org.python.annotations.ExposedMethod;
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyIterator;
 import org.python.core.PyList;
@@ -252,7 +253,7 @@ public class PyReader extends PyObject {
         field = new PyUnicode(this.field);
         if (numeric_field) {
             numeric_field = false;
-            field = field.__float__();
+            field = Abstract.PyNumber_Float(Py.getThreadState(), field);
         }
         fields.append(field);
 

@@ -498,7 +498,7 @@ public class PyObject implements Serializable {
         // (ReflectedArgs resolution)
         if (c == Double.class || c == Float.class) {
             try {
-                return __float__().asDouble();
+                return Abstract.PyNumber_Float(Py.getThreadState(), this).asDouble();
             } catch (PyException pye) {
                 if (!pye.match(Py.AttributeError)) {
                     throw pye;
@@ -1592,17 +1592,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __float__ method.
-     * Should only be overridden by numeric objects that can be
-     * reasonably coerced into a python float.
-     *
-     * @return a float corresponding to the value of this object.
-     **/
-    public PyFloat __float__() {
-        throw Py.AttributeError("__float__");
-    }
-
-    /**
      * Equivalent to the standard Python __complex__ method.
      * Should only be overridden by numeric objects that can be
      * reasonably coerced into a python complex number.
@@ -2674,16 +2663,7 @@ public class PyObject implements Serializable {
      * @return a double value
      */
     public double asDouble() {
-        PyFloat floatObj;
-        try {
-            floatObj = __float__();
-        } catch (PyException pye) {
-            if (pye.match(Py.AttributeError)) {
-                throw Py.TypeError("a float is required");
-            }
-            throw pye;
-        }
-        return floatObj.asDouble();
+        return Abstract.PyNumber_Float(Py.getThreadState(),this).asDouble();
     }
 
     /**
