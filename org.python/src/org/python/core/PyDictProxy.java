@@ -49,14 +49,9 @@ public class PyDictProxy extends PyObject implements Traverseproc {
         return dict.__getitem__(key);
     }
 
-    @ExposedMethod
+    @ExposedMethod(names = {"__contains__", "has_key"})
     public boolean mappingproxy___contains__(PyObject value) {
-        return dict.__contains__(value);
-    }
-
-    @ExposedMethod
-    public boolean mappingproxy_has_key(PyObject key) {
-        return dict.__contains__(key);
+        return Abstract.PySequence_Contains(dict, value);
     }
 
     @ExposedMethod(defaults = "null")

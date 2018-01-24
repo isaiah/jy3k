@@ -1531,36 +1531,6 @@ public class PyObject implements Serializable {
                         JyAttribute.getAttr(o, JyAttribute.JAVA_PROXY_ATTR)) ? Py.True : Py.False;
     }
 
-    /**
-     * Implements <code>in</code> operator.
-     *
-     * @param o the container to search for this element.
-     * @return the result of the search.
-     **/
-    public final PyObject _in(PyObject o) {
-        return Py.newBoolean(o.__contains__(this));
-    }
-
-    /**
-     * Implements <code>not in</code> operator.
-     *
-     * @param o the container to search for this element.
-     * @return the result of the search.
-     **/
-    public final PyObject _notin(PyObject o) {
-        return Py.newBoolean(!o.__contains__(this));
-    }
-
-    /**
-     * Equivalent to the standard Python __contains__ method.
-     *
-     * @param o the element to search for in this container.
-     * @return the result of the search.
-     **/
-    public boolean __contains__(PyObject o) {
-        return object___contains__(o);
-    }
-
     /* The basic numeric operations */
 
     final boolean object___contains__(PyObject o) {

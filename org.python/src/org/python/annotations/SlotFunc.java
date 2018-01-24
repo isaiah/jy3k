@@ -5,6 +5,12 @@ import org.python.core.PyType;
 import java.lang.invoke.MethodHandle;
 
 public enum SlotFunc {
+    CONTAINS {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.sqContains = mh;
+        }
+    },
     GETATTRO {
         @Override
         public void assign(PyType type, MethodHandle mh) {

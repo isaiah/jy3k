@@ -972,18 +972,6 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         storage[offset + size - 1] = byteCheck(element);
     }
 
-    /**
-     * Implement to the standard Python __contains__ method, which in turn implements the
-     * <code>in</code> operator.
-     *
-     * @param o the element to search for in this <code>bytearray</code>.
-     * @return the result of the search.
-     **/
-    @Override
-    public boolean __contains__(PyObject o) {
-        return basebytes___contains__(o);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytearray___contains___doc)
     public final boolean bytearray___contains__(PyObject o) {
         return basebytes___contains__(o);

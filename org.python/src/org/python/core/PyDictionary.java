@@ -294,11 +294,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         return 0;
     }
 
-    @Override
-    public boolean __contains__(PyObject o) {
-        return dict___contains__(o);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.dict___contains___doc)
     public final boolean dict___contains__(PyObject o) {
         return getMap().containsKey(o);
@@ -774,14 +769,9 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return result;
         }
 
-        @Override
-        public boolean __contains__(PyObject otherObj) {
-            return dict_keys___contains__(otherObj);
-        }
-
         @ExposedMethod(doc = BuiltinDocs.set___contains___doc)
         public final boolean dict_keys___contains__(PyObject item) {
-            return dvDict.__contains__(item);
+            return Abstract.PySequence_Contains(dvDict, item);
         }
 
         @ExposedMethod(names = "__repr__", doc = BuiltinDocs.set___repr___doc)
@@ -859,11 +849,6 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             PySet result = new PySet(dvDict.dict_iteritems());
             result.set_intersection_update(new PyObject[]{otherObj}, new String[]{});
             return result;
-        }
-
-        @Override
-        public boolean __contains__(PyObject otherObj) {
-            return dict_items___contains__(otherObj);
         }
 
         @ExposedMethod(doc = BuiltinDocs.set___contains___doc)

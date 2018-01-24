@@ -1,5 +1,6 @@
 package org.python.modules._json;
 
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinModule;
 import org.python.core.Py;
@@ -92,7 +93,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
         PyObject ident = null;
         if (markers != null) {
             ident = Py.newInteger(Py.id(obj));
-            if (markers.__contains__(ident)) {
+            if (Abstract.PySequence_Contains(markers, ident)) {
                 throw Py.ValueError("Circular reference detected");
             }
             markers.__setitem__(ident, obj);

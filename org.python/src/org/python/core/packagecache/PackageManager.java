@@ -6,6 +6,7 @@ package org.python.core.packagecache;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
@@ -94,7 +95,7 @@ public abstract class PackageManager {
             PyList dictKeys = (PyList) dict.keys();
 
             for (PyObject name : dictKeys.asIterable()) {
-                if (!cls.__contains__(name)) {
+                if (!Abstract.PySequence_Contains(cls, name)) {
                     if (exclpkgs && dict.get(name) instanceof PyJavaPackage)
                         continue;
                     ret.append(name);
@@ -105,7 +106,7 @@ public abstract class PackageManager {
         }
 
         for (PyObject pyname : cls.keys().asIterable()) {
-            if (!dict.__contains__(pyname)) {
+            if (!Abstract.PySequence_Contains(dict, pyname)) {
                 String name = pyname.toString();
                 jpkg.addClass(name, Py.findClass(jpkg.__name__ + "." + name));
             }

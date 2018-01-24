@@ -424,11 +424,6 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @Override
-    public boolean __contains__(PyObject o) {
-        return str___contains__(o);
-    }
-
-    @Override
     public PyComplex __complex__() {
         return Encoding.atocx(encodeDecimal());
     }

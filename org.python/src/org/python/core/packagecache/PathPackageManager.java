@@ -4,6 +4,7 @@
 package org.python.core.packagecache;
 
 import org.python.Version;
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyJavaPackage;
@@ -148,8 +149,8 @@ public abstract class PathPackageManager extends CachedJarsPackageManager {
                 }
 
                 // for opt maybe we should some hash-set for ret
-                if (jpkg.__dict__.__contains__(name) || jpkg.clsSet.__contains__(name)
-                        || ret.__contains__(name)) {
+                if (Abstract.PySequence_Contains(jpkg.__dict__, name) || Abstract.PySequence_Contains(jpkg.clsSet, name)
+                        || Abstract.PySequence_Contains(ret, name)) {
                     continue;
                 }
 

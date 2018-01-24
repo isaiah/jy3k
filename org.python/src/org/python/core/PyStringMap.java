@@ -263,11 +263,6 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return buf.toString();
     }
 
-    @Override
-    public boolean __contains__(PyObject o) {
-        return stringmap___contains__(o);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.dict___contains___doc)
     public final boolean stringmap___contains__(PyObject o) {
         return table.containsKey(pyToKey(o));

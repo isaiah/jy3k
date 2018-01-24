@@ -105,7 +105,7 @@ public class operator {
 
     @ExposedFunction
     public static boolean contains(ThreadState ts, PyObject arg1, PyObject arg2) {
-        return arg1.__contains__(arg2);
+        return Abstract.PySequence_Contains(arg2, arg1, ts);
     }
 
     @ExposedFunction

@@ -23,14 +23,6 @@ rest:
         return super.hashCode();
   }
 
-  public boolean __contains__(PyObject o) {
-    PyType self_type = getType();
-    PyObject impl = self_type.lookup("__contains__");
-    if (impl == null)
-      return super.__contains__(o);
-    return impl.__get__(this,self_type).__call__(o).isTrue();
-  }
-
   public int __len__() {
     PyType self_type = getType();
     PyObject impl = self_type.lookup("__len__");

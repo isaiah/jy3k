@@ -38,6 +38,5 @@ public class PyWeakProxy extends AbstractReference {
     public PyUnicode __str__() { return py().__str__(); }
 
 
-    public boolean __contains__(PyObject o) { return py().__contains__(o); }
     public PyObject __index__() { return py().__index__(); }
 }

@@ -484,9 +484,8 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return new PyBytes(s);
     }
 
-    @Override
     @ExposedMethod(doc = BuiltinDocs.bytes___contains___doc)
-    public boolean __contains__(PyObject o) {
+    public boolean bytes__contains__(PyObject o) {
         if (o instanceof PyLong) {
             int n;
             try {

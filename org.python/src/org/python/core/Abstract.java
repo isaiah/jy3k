@@ -15,35 +15,62 @@ public class Abstract {
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
 
-    // called from generated code, is easier without the threadstate argument
-    public static boolean PyObject_IsTrue(PyObject obj) {
-        if (obj == Py.True) {
-            return true;
-        } else if (obj == Py.False || obj == Py.None) {
-            return false;
-        }
-        return PyObject_IsTrue(Py.getThreadState(), obj);
+    /**
+     * Check whether ob is in sequence seq
+     * @param seq
+     * @param ob
+     * @return
+     */
+    public static boolean PySequence_Contains(PyObject seq, PyObject ob) {
+        return PySequence_Contains(ob, seq, Py.getThreadState());
     }
 
-    public static boolean PyObject_IsTrue(ThreadState ts, PyObject obj) {
-        if (obj == Py.True) {
+    /**
+     * Wether ob is in sequence seq, used by bytecode
+     * @param ob
+     * @param seq
+     * @param ts
+     * @return
+     */
+    public static boolean PySequence_Contains(PyObject ob, PyObject seq, ThreadState ts) {
+        PyType tp = seq.getType();
+        if (tp.sqContains != null) {
+            try {
+                return (boolean) tp.sqContains.invokeExact(seq, ob);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+        try {
+            Object func = contains.getGetter().invokeExact((PyObject) tp);
+            return PyObject_IsTrue((PyObject) contains.getInvoker().invoke(func, ts, seq, ob), ts);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
+    }
+
+    // called from generated code, is easier to have the threadstate in the end
+    public static boolean PyObject_IsTrue(PyObject self, ThreadState ts) {
+        if (self == Py.True) {
             return true;
-        } else if (obj == Py.False || obj == Py.None) {
+        } else if (self == Py.False || self == Py.None) {
             return false;
         }
+
         try {
-            Object boolFunc = bool.getGetter().invokeExact((PyObject) obj.getType());
-            PyObject ret = (PyObject) bool.getInvoker().invokeExact(boolFunc, ts, obj);
+            Object boolFunc = bool.getGetter().invokeExact((PyObject) self.getType());
+            PyObject ret = (PyObject) bool.getInvoker().invokeExact(boolFunc, ts, self);
             return ret.isTrue();
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 try {
-                    Object lenFunc = len.getGetter().invokeExact((PyObject) obj.getType());
-                    PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts, obj);
+                    Object lenFunc = len.getGetter().invokeExact((PyObject) self.getType());
+                    PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts, self);
                     return ret.do_richCompareBool(Py.Zero, CompareOp.NE);
                 } catch (PyException e1) {
                     if (e1.match(Py.AttributeError)) {
-                        return obj.isTrue();
+                        return self.isTrue();
                     }
                     throw e1;
                 } catch (Throwable t) {
@@ -54,6 +81,15 @@ public class Abstract {
         } catch (Throwable t) {
             throw Py.JavaError(t);
         }
+    }
+
+    public static boolean PyObject_IsTrue(ThreadState ts, PyObject self) {
+        if (self == Py.True) {
+            return true;
+        } else if (self == Py.False || self == Py.None) {
+            return false;
+        }
+        return PyObject_IsTrue(self, ts);
     }
 
     public static PyObject PyNumber_Positive(ThreadState ts, PyObject obj) {

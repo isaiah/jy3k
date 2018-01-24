@@ -17,8 +17,8 @@ public abstract class BaseDictionaryView extends PyObject implements Traversepro
     }
     
     final boolean allContainedIn(PyObject self, PyObject other) {
-        for (PyObject ob_value: self.asIterable()) {
-            if (!other.__contains__(ob_value)) {
+        for (PyObject obValue: self.asIterable()) {
+            if (!Abstract.PySequence_Contains(other, obValue)) {
                 return false;
             }
         }

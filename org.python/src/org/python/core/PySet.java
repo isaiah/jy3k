@@ -301,7 +301,7 @@ public class PySet extends BaseSet {
     			__isub__(other);
     		}
     		for (PyObject o : other.asIterable()) {
-    			if (__contains__(o)) {
+    			if (Abstract.PySequence_Contains(this, o)) {
     				_set.remove(o);
     			}
     		}

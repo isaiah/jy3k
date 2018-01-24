@@ -1,6 +1,7 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules._csv;
 
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
@@ -72,7 +73,7 @@ public class _csv {
 
     @ExposedFunction(doc = BuiltinDocs.csv_unregister_dialect_doc)
     public static void unregister_dialect(PyObject name) {
-        if (!_dialects.__contains__(name)) {
+        if (!Abstract.PySequence_Contains(_dialects, name)) {
             throw Error("unknown dialect");
         }
         _dialects.__delitem__(name);

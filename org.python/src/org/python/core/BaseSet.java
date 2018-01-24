@@ -186,10 +186,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         return new PyIter(_set);
     }
 
-    public boolean __contains__(PyObject other) {
-        return baseset___contains__(other);
-    }
-
     final boolean baseset___contains__(PyObject other) {
         try {
             return _set.contains(other);

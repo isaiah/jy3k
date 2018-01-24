@@ -247,7 +247,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public void getBool() {
-        code.invokestatic(p(Abstract.class), "PyObject_IsTrue", sig(Boolean.TYPE, PyObject.class));
+        loadThreadState();
+        code.invokestatic(p(Abstract.class), "PyObject_IsTrue", sig(Boolean.TYPE, PyObject.class, ThreadState.class));
     }
 
     public void setLastI(int idx) {
@@ -1977,15 +1978,46 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
+    private void convertBool() {
+        Label l1 = new Label();
+        Label l2 = new Label();
+        Label l3 = new Label();
+        code.ifeq(l2);
+        code.label(l1);
+        code.getstatic(p(Py.class), "True", ci(PyBoolean.class));
+        code.goto_(l3);
+        code.label(l2);
+        code.getstatic(p(Py.class), "False", ci(PyBoolean.class));
+        code.label(l3);
+    }
+
+    private void revertBool() {
+        Label l1 = new Label();
+        Label l2 = new Label();
+        Label l3 = new Label();
+        code.ifeq(l2);
+        code.label(l1);
+        code.getstatic(p(Py.class), "False", ci(PyBoolean.class));
+        code.goto_(l3);
+        code.label(l2);
+        code.getstatic(p(Py.class), "True", ci(PyBoolean.class));
+        code.label(l3);
+    }
+
+
     public void visitCmpop(cmpopType op) {
         if (op == cmpopType.In) {
-            code.invokevirtual(p(PyObject.class), "_in", sig(PyObject.class, PyObject.class));
+            loadThreadState();
+            code.invokestatic(p(Abstract.class), "PySequence_Contains", sig(Boolean.TYPE, PyObject.class, PyObject.class, ThreadState.class));
+            convertBool();
         } else if (op == cmpopType.Is) {
             code.invokevirtual(p(PyObject.class), "_is", sig(PyObject.class, PyObject.class));
         } else if (op == cmpopType.IsNot) {
             code.invokevirtual(p(PyObject.class), "_isnot", sig(PyObject.class, PyObject.class));
         } else if (op == cmpopType.NotIn) {
-            code.invokevirtual(p(PyObject.class), "_notin", sig(PyObject.class, PyObject.class));
+            loadThreadState();
+            code.invokestatic(p(Abstract.class), "PySequence_Contains", sig(Boolean.TYPE, PyObject.class, PyObject.class, ThreadState.class));
+            revertBool();
         } else {
             String name = null;
             switch (op) {

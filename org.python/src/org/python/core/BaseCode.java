@@ -244,7 +244,7 @@ public class BaseCode {
                     String name = code.co_varnames[kwonlyargIdx];
                     PyUnicode key = Py.newUnicode(name);
                     if (fastlocals[kwonlyargIdx] == null) {
-                        if (kwDefaults.__contains__(key)) {
+                        if (Abstract.PySequence_Contains(kwDefaults, key)) {
                             fastlocals[kwonlyargIdx] = kwDefaults.__getitem__(key);
                         } else {
                             missingKwArg.add(name);
