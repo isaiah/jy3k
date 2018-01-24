@@ -107,7 +107,7 @@ public class PyFloat extends PyObject {
             throw Py.TypeError(String.format("float() argument must be a string or a number, not '%s'", v.getType().fastGetName()));
         }
         s = s.replaceAll("_", "");
-        return new PyFloat(Encoding.atof(s));
+        return new PyFloat(Encoding.atof(s, BuiltinModule.repr(v).toString()));
     }
 
     @ExposedGet(name = "real", doc = BuiltinDocs.float_real_doc)

@@ -1609,6 +1609,10 @@ public class Encoding {
      * @return the value
      */
     public static double atof(CharSequence s) {
+        return atof(s, s);
+    }
+
+    public static double atof(CharSequence s, CharSequence repr) {
         double x = 0.0;
         Matcher m = floatPattern.matcher(s);
         boolean valid = m.matches();
@@ -1633,11 +1637,9 @@ public class Encoding {
         // At this point, valid will have been cleared if there was a problem.
         if (valid) {
             return x;
-        } else {
-            String fmt = "could not convert string to float: '%s'";
-            throw Py.ValueError(String.format(fmt, s));
         }
-
+        String fmt = "could not convert string to float: %s";
+        throw Py.ValueError(String.format(fmt, repr));
     }
 
     /**
