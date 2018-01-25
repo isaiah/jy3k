@@ -5,12 +5,19 @@ package org.python.core;
 import org.python.core.linker.InvokeByName;
 import org.python.core.stringlib.Encoding;
 
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 /**
  * Abstract Object Interface
  */
 public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName lenHint = new InvokeByName("__length_hint__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
@@ -46,7 +53,7 @@ public class Abstract {
             Object func = contains.getGetter().invokeExact((PyObject) tp);
             return PyObject_IsTrue((PyObject) contains.getInvoker().invoke(func, ts, seq, ob), ts);
         } catch (Throwable throwable) {
-            throw Py.JavaError(throwable);
+            return _PySequence_Stream(seq).anyMatch(ob::equals);
         }
     }
 
@@ -147,6 +154,54 @@ public class Abstract {
             throw Py.JavaError(throwable);
         }
         return floatObject;
+    }
+
+    public static Stream<PyObject> _PySequence_Stream(PyObject seq) {
+        Spliterator<PyObject> iterator = new PyObjectSpliterator(seq);
+        return StreamSupport.stream(iterator, false);
+    }
+
+    public static class PyObjectSpliterator implements Spliterator<PyObject> {
+        private PyObject iter;
+
+        public PyObjectSpliterator(PyObject iter) {
+            this.iter = PyObject.getIter(iter);
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super PyObject> action) {
+            try {
+                PyObject next = PyObject.iterNext(iter);
+                action.accept(next);
+                return true;
+            } catch (PyException e) {
+                if (!e.match(Py.StopIteration)) {
+                    throw e;
+                }
+                return false;
+            }
+        }
+
+        @Override
+        public Spliterator<PyObject> trySplit() {
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            try {
+                Object func = lenHint.getGetter().invokeExact(iter);
+                PyObject length = (PyObject) lenHint.getInvoker().invokeExact(func, Py.getThreadState());
+                return length.asLong();
+            } catch (Throwable e) {
+                return 0;
+            }
+        }
+
+        @Override
+        public int characteristics() {
+            return NONNULL;
+        }
     }
 
     private static PyObject convertIntegralToLong(ThreadState ts, PyObject integral) {

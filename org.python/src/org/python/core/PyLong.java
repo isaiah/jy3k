@@ -865,6 +865,9 @@ public class PyLong extends PyObject {
             return value.compareTo(((PyLong) other).getValue());
         }
         if (other instanceof PyFloat) {
+            if (Double.isNaN(((PyFloat) other).getValue())) {
+                return -2;
+            }
             return new BigDecimal(value).compareTo(new BigDecimal(((PyFloat) other).getValue()));
         }
         if (other instanceof PyComplex) {

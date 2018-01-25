@@ -3,7 +3,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 import java.math.BigInteger;
 
@@ -188,6 +190,31 @@ public class PyRange extends PySequence {
     public PyObject range___reduce__() {
         return new PyTuple(getType(),
                 new PyTuple(new PyLong(start), new PyLong(stop), new PyLong(step)));
+    }
+
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean contains(PyObject self, PyObject other) {
+        if (other instanceof PyLong) {
+            return containsLong((PyRange) self, (PyLong) other);
+        }
+        return Abstract._PySequence_Stream(self).anyMatch(other::equals);
+    }
+
+    private static boolean containsLong(PyRange self, PyLong value) {
+        BigInteger v = value.getValue();
+        int cmp1 = self.step.compareTo(BigInteger.ZERO);
+        int cmp2 = self.start.compareTo(v);
+        int cmp3 = self.stop.compareTo(v);
+        if (cmp1 >= 0) { /* positive steps: start <= value < stop */
+            if (cmp2 > 0 || cmp3 <= 0) {
+                return false;
+            }
+        } else {
+            if (cmp2 <= 0 || cmp3 > 0) {
+                return false;
+            }
+        }
+        return v.subtract(self.start).remainder(self.step).compareTo(BigInteger.ZERO) == 0;
     }
 
     @Override

@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 import java.lang.reflect.Array;
+import java.util.stream.Stream;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
 /**
@@ -234,6 +237,11 @@ public class PyTuple extends PySequenceList implements List {
     @Override
     public int hashCode() {
         return tuple___hash__();
+    }
+
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean contains(PyObject self, PyObject other) {
+        return Stream.of(((PyTuple) self).array).anyMatch(other::equals);
     }
 
     @ExposedMethod(doc = BuiltinDocs.tuple___hash___doc)

@@ -3,7 +3,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
 import java.lang.reflect.Array;
@@ -334,8 +336,8 @@ public class PyList extends PySequenceList implements List {
                 List otherList = (List) oList;
                 sum = new PyList();
                 sum.list_extend(this);
-                for (Iterator i = otherList.iterator(); i.hasNext();) {
-                    sum.add(i.next());
+                for (Object el : otherList) {
+                    sum.add(el);
                 }
             }
         }
@@ -359,9 +361,9 @@ public class PyList extends PySequenceList implements List {
         return sum;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.list___contains___doc)
-    public final synchronized boolean list___contains__(PyObject o) {
-        return object___contains__(o);
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean contains(PyObject list, PyObject o) {
+        return ((PyList) list).list.contains(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___delitem___doc)
