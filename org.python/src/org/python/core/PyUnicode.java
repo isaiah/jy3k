@@ -4,7 +4,9 @@ import com.ibm.icu.lang.UCharacter;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FieldNameIterator;
 import org.python.core.stringlib.MarkupIterator;
@@ -641,10 +643,13 @@ public class PyUnicode extends PySequence implements Iterable {
         }
     }
 
-    @ExposedMethod(doc = BuiltinDocs.str___contains___doc)
-    final boolean str___contains__(PyObject o) {
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean str___contains__(PyObject self, PyObject o) {
+        if (!(o instanceof PyUnicode)) {
+            throw Py.TypeError(String.format("'in <string>' requires string as left operand, not %s", o.getType().fastGetName()));
+        }
         String other = Encoding.asUTF16StringOrError(o);
-        return getString().indexOf(other) >= 0;
+        return ((PyUnicode) self).getString().indexOf(other) >= 0;
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.str___mul___doc)

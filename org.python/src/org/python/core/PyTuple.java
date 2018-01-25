@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.python.annotations.ExposedMethod;
@@ -241,7 +242,7 @@ public class PyTuple extends PySequenceList implements List {
 
     @ExposedSlot(SlotFunc.CONTAINS)
     public static boolean contains(PyObject self, PyObject other) {
-        return Stream.of(((PyTuple) self).array).anyMatch(other::equals);
+        return Stream.of(((PyTuple) self).array).anyMatch(el -> Objects.equals(el, other));
     }
 
     @ExposedMethod(doc = BuiltinDocs.tuple___hash___doc)
@@ -472,6 +473,14 @@ public class PyTuple extends PySequenceList implements List {
     @Override
     public final PyObject do_richCompare(PyObject other, CompareOp op) {
         if (!(other instanceof PyTuple)) {
+            if (op == CompareOp.EQ) {
+                return Py.False;
+            }
+
+            if (op == CompareOp.NE) {
+                return Py.True;
+            }
+
             return Py.NotImplemented;
         }
         PyTuple ot = (PyTuple) other;

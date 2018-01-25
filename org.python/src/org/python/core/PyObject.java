@@ -951,13 +951,15 @@ public class PyObject implements Serializable {
             }
             throw e;
         }
-        if (o.getType().iternext == null) {
+        if (res.getType().iternext == null) {
             try {
                 Object nextFunc = o.getType().next.getGetter().invokeExact(res);
-            } catch (Throwable e) {
-                if (e instanceof PyException && ((PyException) e).match(Py.AttributeError)) {
+            } catch (PyException e) {
+                if (e.match(Py.AttributeError)) {
                     throw Py.TypeError(String.format("iter() returned non-iterator of type '%s'", res.getType().fastGetName()));
                 }
+                throw e;
+            } catch (Throwable e) {
                 throw Py.JavaError(e);
             }
         }

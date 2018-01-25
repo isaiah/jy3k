@@ -5,6 +5,7 @@ package org.python.core;
 import org.python.core.linker.InvokeByName;
 import org.python.core.stringlib.Encoding;
 
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
@@ -21,6 +22,7 @@ public class Abstract {
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
     /**
      * Check whether ob is in sequence seq
@@ -48,12 +50,16 @@ public class Abstract {
                 throw Py.JavaError(throwable);
             }
         }
-        final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
         try {
             Object func = contains.getGetter().invokeExact((PyObject) tp);
             return PyObject_IsTrue((PyObject) contains.getInvoker().invoke(func, ts, seq, ob), ts);
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                return _PySequence_Stream(seq).anyMatch(el -> Objects.equals(el, ob));
+            }
+            throw e;
         } catch (Throwable throwable) {
-            return _PySequence_Stream(seq).anyMatch(ob::equals);
+            throw Py.JavaError(throwable);
         }
     }
 
@@ -175,10 +181,10 @@ public class Abstract {
                 action.accept(next);
                 return true;
             } catch (PyException e) {
-                if (!e.match(Py.StopIteration)) {
-                    throw e;
+                if (e.match(Py.StopIteration)) {
+                    return false;
                 }
-                return false;
+                throw e;
             }
         }
 

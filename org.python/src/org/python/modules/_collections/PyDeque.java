@@ -1,5 +1,8 @@
 package org.python.modules._collections;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinModule;
 import org.python.core.CompareOp;
@@ -18,6 +21,8 @@ import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 import org.python.expose.MethodType;
+
+import java.util.Objects;
 
 /**
  * PyDeque - This class implements the functionalities of Deque data structure. Deques are a
@@ -174,14 +179,7 @@ public class PyDeque extends PyObject implements Traverseproc {
      */
     @ExposedMethod
     public synchronized final void deque_extend(PyObject iterable) {
-        // handle case where iterable == this
-        if (this == iterable) {
-            deque_extend(new PyList(iterable));
-        } else {
-            for (PyObject item : iterable.asIterable()) {
-                deque_append(item);
-            }
-        }
+        Abstract._PySequence_Stream(iterable).forEach(this::deque_append);
     }
 
     /**
@@ -233,7 +231,27 @@ public class PyDeque extends PyObject implements Traverseproc {
         size--;
         state++;
         return obj;
-    } 
+    }
+
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean contains(PyObject iter, PyObject ob) {
+        PyDeque self = (PyDeque) iter;
+        int n = self.size;
+        Node tmp = self.header.right;
+        boolean match = false;
+        long startState = self.state;
+        for (int i = 0; i < n; i++) {
+            match = Objects.equals(tmp.data, ob);
+            if (startState != self.state) {
+                throw Py.IndexError("deque mutated during remove().");
+            }
+            if (match) {
+                break;
+            }
+            tmp = tmp.right;
+        }
+        return match;
+    }
 
     /**
      * Removed the first occurrence of value. If not found, raises a 
@@ -458,138 +476,10 @@ public class PyDeque extends PyObject implements Traverseproc {
         return new PyDequeIter(this);
     }
 
-    @Override
-    public synchronized PyObject __eq__(PyObject o) {
-        return deque___eq__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___eq__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int tl = __len__();
-        int ol = o.__len__();
-        if (tl != ol) {
-            return Py.False;
-        }
-        int i = cmp(this, tl, o, ol);
-        return (i < 0) ? Py.True : Py.False;
-    }
-
-    @Override
-    public synchronized PyObject __ne__(PyObject o) {
-        return deque___ne__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___ne__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int tl = __len__();
-        int ol = o.__len__();
-        if (tl != ol) {
-            return Py.True;
-        }
-        int i = cmp(this, tl, o, ol);
-        return (i < 0) ? Py.False : Py.True;
-    }
-
-    @Override
-    public synchronized PyObject __lt__(PyObject o) {
-        return deque___lt__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___lt__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int i = cmp(this, -1, o, -1);
-        if (i < 0) {
-            return (i == -1) ? Py.True : Py.False;
-        }
-        return __finditem__(i).richCompare(o.__finditem__(i), CompareOp.LT);
-    }
-
-    @Override
-    public synchronized PyObject __le__(PyObject o) {
-        return deque___le__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___le__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int i = cmp(this, -1, o, -1);
-        if (i < 0) {
-            return (i == -1 || i == -2) ? Py.True : Py.False;
-        }
-        return __finditem__(i).richCompare(o.__finditem__(i), CompareOp.LE);
-    }
-
-    @Override
-    public synchronized PyObject __gt__(PyObject o) {
-        return deque___gt__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___gt__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int i = cmp(this, -1, o, -1);
-        if (i < 0) {
-            return (i == -3) ? Py.True : Py.False;
-        }
-        return __finditem__(i).richCompare(o.__finditem__(i), CompareOp.GT);
-    }
-
-    @Override
-    public synchronized PyObject __ge__(PyObject o) {
-        return deque___ge__(o);
-    }
-
-    @ExposedMethod(type = MethodType.BINARY)
-    final synchronized PyObject deque___ge__(PyObject o) {
-        if (!(getType() == o.getType()) && !(getType().isSubType(o.getType()))) {
-            return null;
-        }
-        int i = cmp(this, -1, o, -1);
-        if (i < 0) {
-            return (i == -3 || i == -2) ? Py.True : Py.False;
-        }
-        return __finditem__(i).richCompare(o.__finditem__(i), CompareOp.GE);
-    }
-
     @ExposedMethod(type = MethodType.BINARY)
     public final synchronized PyObject __iadd__(PyObject o) {
         deque_extend(o);
         return this;
-    }
-
-    // Return value >= 0 is the index where the sequences differs.
-    // -1: reached the end of o1 without a difference
-    // -2: reached the end of both seqeunces without a difference
-    // -3: reached the end of o2 without a difference
-    protected static int cmp(PyObject o1, int ol1, PyObject o2, int ol2) {
-        if (ol1 < 0) {
-            ol1 = o1.__len__();
-        }
-        if (ol2 < 0) {
-            ol2 = o2.__len__();
-        }
-        for (int i = 0 ; i < ol1 && i < ol2; i++) {
-            if (!o1.__getitem__(i).equals(o2.__getitem__(i))) {
-                return i;
-            }
-        }
-        if (ol1 == ol2) {
-            return -2;
-        }
-        return (ol1 < ol2) ? -1 : -3;
     }
 
     @Override
@@ -621,6 +511,60 @@ public class PyDeque extends PyObject implements Traverseproc {
         PyDeque pd = (PyDeque)this.getType().__call__();    
         pd.deque_extend(this);
         return pd;
+    }
+
+    @Override
+    public final PyObject do_richCompare(PyObject other, CompareOp op) {
+        if (!(other instanceof PyDeque)) {
+            if (op == CompareOp.EQ) {
+                return Py.False;
+            }
+
+            if (op == CompareOp.NE) {
+                return Py.True;
+            }
+
+            return Py.NotImplemented;
+        }
+        PyDeque ot = (PyDeque) other;
+        int l = __len__();
+        int ol = ot.__len__();
+
+        int i = 0;
+        Node n1 = header.right;
+        Node n2 = ot.header.right;
+        for (; i < l && i < ol; i++) {
+            boolean k = n1.data.do_richCompareBool(n2.data, CompareOp.EQ);
+            if (!k) {
+                break;
+            }
+            n1 = n1.right;
+            n2 = n2.right;
+        }
+        int result = l - ol;
+
+        // sanitize the result, because -2 means NotImplemented
+        if (result < 0) {
+            result = -1;
+        }
+        if (result > 0) {
+            result = 1;
+        }
+
+        if (i >= l || i >= ol) {
+            // no more items to compare, compare size
+            return op.bool(result);
+        }
+        if (op == CompareOp.EQ) {
+            return Py.False;
+        }
+
+        if (op == CompareOp.NE) {
+            return Py.True;
+        }
+
+        // compare the final item again using the proper operator
+        return n1.data.do_richCompare(n2.data, op);
     }
 
     @Override
