@@ -21,6 +21,7 @@ public class Abstract {
     private static final InvokeByName lenHint = new InvokeByName("__length_hint__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName index = new InvokeByName("__index__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
@@ -115,6 +116,25 @@ public class Abstract {
 
     public static PyObject PyNumber_Invert(ThreadState ts, PyObject obj) {
         return unaryOp(ts, "__invert__", "~", obj);
+    }
+
+    /**
+     * Return a Python int from the object item.
+     * Raise TypeError if the result is not an int
+     * or if the object cannot be interpreted as an index.
+     * @param ts
+     * @param item
+     * @return
+     */
+    public static PyObject PyNumber_Index(ThreadState ts, PyObject item) {
+        PyObject ret = PyObject.unaryOp(ts, index, item, self -> {
+            throw Py.TypeErrorFmt("'%s' object cannot be interpreted as an integer", self);
+        });
+
+        if (ret instanceof PyLong) {
+            return ret;
+        }
+        throw Py.TypeErrorFmt("__index__ returned non-int (type %s)", ret);
     }
 
     public static PyObject PyNumber_Long(ThreadState ts, PyObject obj) {

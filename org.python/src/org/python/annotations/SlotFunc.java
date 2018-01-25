@@ -29,6 +29,12 @@ public enum SlotFunc {
             type.iternext = mh;
             type.isIterator = true;
         }
+    },
+    REPEAT {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.sqRepeat = mh;
+        }
     };
 
     public abstract void assign(PyType type, MethodHandle mh);

@@ -929,11 +929,6 @@ public class PyLong extends PyObject {
         return int___getnewargs__();
     }
 
-    @Override
-    public PyObject __index__() {
-        return int___index__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___index___doc)
     public final PyObject int___index__() {
         return this;
@@ -1022,7 +1017,7 @@ public class PyLong extends PyObject {
         return false;
     }
 
-    public PyLong gcd(PyObject other) {
-        return new PyLong(getValue().gcd(((PyLong) other.__index__()).getValue()));
+    public PyLong gcd(ThreadState ts, PyObject other) {
+        return new PyLong(getValue().gcd(((PyLong) Abstract.PyNumber_Index(ts, other)).getValue()));
     }
 }

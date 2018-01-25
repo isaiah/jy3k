@@ -36,7 +36,4 @@ public class PyWeakProxy extends AbstractReference {
     public void __delattr__(String name) { py().__delattr__(name); }
 
     public PyUnicode __str__() { return py().__str__(); }
-
-
-    public PyObject __index__() { return py().__index__(); }
 }

@@ -140,15 +140,22 @@ public class PyTuple extends PySequenceList implements List {
         return fromArrayNoCopy(newArray);
     }
 
+    @Override
     protected PyObject repeat(int count) {
+        return repeat(this, count);
+    }
+
+    @ExposedSlot(SlotFunc.REPEAT)
+    public static PyObject repeat(PyObject self, int count) {
+        PyTuple tuple = (PyTuple) self;
         if (count < 0) {
             count = 0;
         }
-        int size = size();
+        int size = tuple.size();
         if (size == 0 || count == 1) {
-            if (getType() == TYPE) {
+            if (tuple.getType() == TYPE) {
                 // Since tuples are immutable, we can return a shared copy in this case
-                return this;
+                return self;
             }
             if (size == 0) {
                 return EMPTY_TUPLE;
@@ -162,7 +169,7 @@ public class PyTuple extends PySequenceList implements List {
 
         PyObject[] newArray = new PyObject[newSize];
         for (int i = 0; i < count; i++) {
-            System.arraycopy(array, 0, newArray, i * size, size);
+            System.arraycopy(tuple.array, 0, newArray, i * size, size);
         }
         return fromArrayNoCopy(newArray);
     }
@@ -188,22 +195,6 @@ public class PyTuple extends PySequenceList implements List {
             sum = fromArrayNoCopy(newArray);
         }
         return sum;
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___mul___doc)
-    final PyObject tuple___mul__(PyObject o) {
-        if (!o.isIndex()) {
-            return null;
-        }
-        return repeat(o.asIndex(Py.OverflowError));
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___rmul___doc)
-    final PyObject tuple___rmul__(PyObject o) {
-        if (!o.isIndex()) {
-            return null;
-        }
-        return repeat(o.asIndex(Py.OverflowError));
     }
 
     @ExposedMethod(doc = BuiltinDocs.tuple___iter___doc)

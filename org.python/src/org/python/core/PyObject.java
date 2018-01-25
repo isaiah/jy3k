@@ -13,11 +13,13 @@ import org.python.core.linker.InvokeByName;
 import org.python.modules.gc;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * All objects known to the Jython runtime system are represented by an instance
@@ -1586,17 +1588,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __index__ method.
-     *
-     * @return a PyLong
-     * @throws a Py.TypeError if not supported
-     **/
-    public PyObject __index__() {
-        throw Py.TypeError(String.format("'%.200s' object cannot be interpreted as an index",
-                getType().fastGetName()));
-    }
-
-    /**
      * Should return an error message suitable for substitution where.
      * <p>
      * {0} is the op name.
@@ -1692,11 +1683,10 @@ public class PyObject implements Serializable {
                 throw e;
             }
         } catch (Throwable t) {
-            throw new RuntimeException(t);
+            throw Py.JavaError(t);
         }
         return binOp(ts, op, rop, value);
     }
-
     public final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
             Object func = op.getGetter().invokeExact(this);
@@ -1706,7 +1696,37 @@ public class PyObject implements Serializable {
             }
             func = rop.getGetter().invokeExact(value);
             return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
-        } catch (RuntimeException e) {
+        } catch (PyException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        }
+    }
+
+    public final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value, Function<PyObject, PyObject> fallback) {
+        Object func;
+        try {
+            func = op.getGetter().invokeExact(this);
+            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
+            if (ret != Py.NotImplemented) {
+                return ret;
+            }
+            func = rop.getGetter().invokeExact(value);
+            return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                try {
+                    func = rop.getGetter().invokeExact(value);
+                    return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+                } catch (PyException e1) {
+                    if (e.match(Py.AttributeError)) {
+                        return fallback.apply(value);
+                    }
+                    throw e1;
+                } catch (Throwable e2) {
+                    throw Py.JavaError(e2);
+                }
+            }
             throw e;
         } catch (Throwable t) {
             throw Py.JavaError(t);
@@ -1764,8 +1784,25 @@ public class PyObject implements Serializable {
      * @throws Py.TypeError if this operation can't be performed
      *                      with these operands.
      **/
-    public final PyObject _mul(ThreadState ts, PyObject o2) {
-        return binOp(ts, mul, rmul, o2);
+    public final PyObject _mul(final ThreadState ts, final PyObject o2) {
+        return binOp(ts, mul, rmul, o2, x -> {
+            if (getType().sqRepeat != null) {
+                return sequenceRepeat(ts, getType().sqRepeat, this, o2);
+            }
+            if (o2.getType().sqRepeat != null) {
+                return sequenceRepeat(ts, o2.getType().sqRepeat, o2, this);
+            }
+            throw Py.TypeError(String.format("unsupported operation '*': %s and %s", getType().fastGetName(), o2.getType().fastGetName()));
+        });
+    }
+
+    private static PyObject sequenceRepeat(ThreadState ts, MethodHandle repeatFunc, PyObject seq, PyObject n) {
+        int count = Abstract.PyNumber_Index(ts, n).asInt();
+        try {
+            return (PyObject) repeatFunc.invokeExact(seq, count);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
     }
 
     /**
@@ -2635,7 +2672,7 @@ public class PyObject implements Serializable {
      */
     public int asIndex(PyObject err) {
         // OverflowErrors are handled in PyLong.asIndex
-        return __index__().asInt();
+        return Abstract.PyNumber_Index(Py.getThreadState(), this).asInt();
     }
 
     public static class ConversionException extends Exception {

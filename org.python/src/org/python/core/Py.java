@@ -436,6 +436,10 @@ public final class Py {
         return new PyException(Py.TypeError, message);
     }
 
+    public static PyException TypeErrorFmt(String fmt, PyObject ob) {
+        return new PyException(Py.TypeError, String.format(fmt, ob.getType().fastGetName()));
+    }
+
     public static PyObject ReferenceError;
 
     public static PyException ReferenceError(String message) {

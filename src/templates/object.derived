@@ -192,20 +192,6 @@ rest:
       return meth.__call__(other);
   }
 
-  public PyObject __index__() {
-      PyType self_type=getType();
-      PyObject impl=self_type.lookup("__index__");
-      if (impl!=null) {
-          PyObject res=impl.__get__(this,self_type).__call__();
-          if (res instanceof PyLong) {
-              return res;
-          }
-          throw Py.TypeError(String.format("__index__ returned non-(int,long) (type %s)",
-                                           res.getType().fastGetName()));
-      }
-      return super.__index__();
-  }
-
   public Object __tojava__(Class c) {
       // If we are not being asked by the "default" conversion to java, then
       // we can provide this as the result, as long as it is a instance of the

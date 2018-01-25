@@ -3,6 +3,7 @@ package org.python.core.stringlib;
 
 import java.math.BigInteger;
 
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
@@ -596,7 +597,7 @@ public class IntegerFormatter extends InternalFormat.Formatter {
     /**
      * Convert the object to binary according to the conventions of Python built-in
      * <code>bin()</code>. The object's __index__ method is called, and is responsible for raising
-     * the appropriate error (which the base {@link PyObject#__index__()} does).
+     * the appropriate error.
      *
      * @param number to convert
      * @return PyBytes converted result
@@ -614,13 +615,13 @@ public class IntegerFormatter extends InternalFormat.Formatter {
     /**
      * Convert the object according to the conventions of Python built-in <code>hex()</code>, or
      * <code>oct()</code>. The object's <code>__index__</code> method is called, and is responsible
-     * for raising the appropriate error (which the base {@link PyObject#__index__()} does).
+     * for raising the appropriate error.
      *
      * @param number to convert
      * @return PyBytes converted result
      */
     public static PyUnicode formatNumber(PyObject number, Spec spec) {
-        number = number.__index__();
+        number = Abstract.PyNumber_Index(Py.getThreadState(), number);
         IntegerFormatter f = new IntegerFormatter(spec);
         f.format(((PyLong)number).getValue());
         return new PyUnicode(f.getResult());

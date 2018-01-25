@@ -240,7 +240,7 @@ public class operator {
 
     @ExposedFunction
     public static PyObject index(ThreadState ts, PyObject arg1) {
-        return arg1.__index__();
+        return Abstract.PyNumber_Index(ts, arg1);
     }
 
     @ModuleInit

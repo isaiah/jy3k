@@ -3,6 +3,7 @@ package org.python.modules;
 
 import java.math.BigInteger;
 
+import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -12,6 +13,7 @@ import org.python.core.PyTuple;
 import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
+import org.python.core.ThreadState;
 
 @ExposedModule(name = "math")
 public class math {
@@ -41,8 +43,8 @@ public class math {
             String.valueOf(Long.MIN_VALUE));
 
     @ExposedFunction
-    public static PyObject gcd(PyObject self, PyObject other) {
-        return ((PyLong) self.__index__()).gcd(other);
+    public static PyObject gcd(ThreadState ts, PyObject self, PyObject other) {
+        return ((PyLong) Abstract.PyNumber_Index(ts, self)).gcd(ts, other);
     }
     @ExposedFunction
     public static double gamma(double v) {
