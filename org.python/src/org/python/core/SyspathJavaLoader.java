@@ -117,7 +117,7 @@ public class SyspathJavaLoader extends ClassLoader {
                 buffer = getBytesFromArchive(archive, name);                
             } else {
                 if (!(entry instanceof PyUnicode)) {
-                    entry = entry.__str__();
+                    entry = Abstract.PyObject_Str(Py.getThreadState(), entry);
                 }
                 String dir = entry.toString();
             	buffer = getBytesFromDir(dir, name);
@@ -160,7 +160,7 @@ public class SyspathJavaLoader extends ClassLoader {
                 continue;
             }
             if (!(entry instanceof PyUnicode)) {
-                entry = entry.__str__();
+                entry = Abstract.PyObject_Str(Py.getThreadState(), entry);
             }
             String dir = sys.getPath(entry.toString());
             try {
@@ -209,7 +209,7 @@ public class SyspathJavaLoader extends ClassLoader {
                 continue;
             }
             if (!(entry instanceof PyUnicode)) {
-                entry = entry.__str__();
+                entry = Abstract.PyObject_Str(Py.getThreadState(), entry);
             }
             String dir = sys.getPath(entry.toString());
             try {

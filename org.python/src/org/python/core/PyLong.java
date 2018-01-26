@@ -914,11 +914,6 @@ public class PyLong extends PyObject {
         return new PyUnicode(getValue().toString());
     }
 
-    @Override
-    public PyUnicode __str__() {
-        return int___str__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.int___getnewargs___doc)
     public final PyTuple int___getnewargs__() {
         return new PyTuple(new PyLong(this.getValue()));

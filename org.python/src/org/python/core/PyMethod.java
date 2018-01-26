@@ -300,7 +300,7 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
             return String.format("<unbound method %s.%s>", className, getFuncName());
         } else {
             return String.format("<bound method %s.%s of %s>", className, getFuncName(),
-                                 __self__.__str__());
+                                 __self__);
         }
     }
 

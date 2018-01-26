@@ -147,8 +147,7 @@ public class PyWriter extends PyObject implements Traverseproc {
             } else if (field == Py.None) {
                 append_ok = join_append("", len == 1);
             } else {
-                PyObject str;
-                str = field.__str__();
+                PyObject str = Abstract.PyObject_Str(Py.getThreadState(), field);
 
                 if (str == null) {
                     return false;

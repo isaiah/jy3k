@@ -5,25 +5,25 @@ import org.python.core.PyType;
 import java.lang.invoke.MethodHandle;
 
 public enum SlotFunc {
-    CONTAINS {
+    CONTAINS("__contains__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.sqContains = mh;
         }
     },
-    GETATTRO {
+    GETATTRO("__getattribute__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.getattro = mh;
         }
     },
-    ITER {
+    ITER("__iter__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.iter = mh;
         }
     },
-    ITER_NEXT {
+    ITER_NEXT("__next__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.iternext = mh;
@@ -36,6 +36,24 @@ public enum SlotFunc {
             type.sqRepeat = mh;
         }
     };
+
+    SlotFunc() {
+        name = null;
+    }
+
+    SlotFunc(String name) {
+        this.name = name;
+    }
+
+    private final String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean hasName() {
+        return name != null;
+    }
 
     public abstract void assign(PyType type, MethodHandle mh);
 }

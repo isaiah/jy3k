@@ -1,6 +1,7 @@
 package org.python.modules;
 
 import org.python.bootstrap.Import;
+import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
@@ -120,7 +121,7 @@ public class _warnings {
                                                PyObject source) {
         PyObject text;
         if (Py.isInstance(message, Py.Warning)) {
-            text = message.__str__();
+            text = Abstract.PyObject_Str(Py.getThreadState(), message);
             category = message.getType();
         } else {
             if (!(category instanceof PyType) || !Py.isSubClass(category, Py.Warning)) {

@@ -147,12 +147,7 @@ public class PyComplex extends PyObject {
 
     @Override
     public String toString() {
-        return __str__().toString();
-    }
-
-    @Override
-    public PyUnicode __str__() {
-        return complex___str__();
+        return formatComplex(SPEC_REPR);
     }
 
     @ExposedMethod(doc = BuiltinDocs.complex___str___doc)
@@ -162,7 +157,7 @@ public class PyComplex extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.complex___repr___doc)
     final PyUnicode complex___repr__() {
-        return Py.newUnicode(formatComplex(SPEC_REPR));
+        return Py.newUnicode(formatComplex(SPEC_STR));
     }
 
     /**

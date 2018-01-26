@@ -345,11 +345,6 @@ public class PyBytes extends PySequence implements BufferProtocol {
         return getString().substring(start, end);
     }
 
-    @Override
-    public PyUnicode __str__() {
-        return bytes___str__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.bytes___str___doc)
     public final PyUnicode bytes___str__() {
         return new PyUnicode("b" + Encoding.encode_UnicodeEscape(getString(), true));

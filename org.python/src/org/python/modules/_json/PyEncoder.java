@@ -157,7 +157,7 @@ public class PyEncoder extends PyObject implements Traverseproc {
             } else if (key instanceof PyFloat) {
                 kstr = encode_float(key);
             } else if (key instanceof PyLong) {
-                kstr = key.__str__();
+                kstr = (PyUnicode) Abstract.PyObject_Str(Py.getThreadState(), key);
             } else if (key == Py.True) {
                 kstr = new PyUnicode("true");
             } else if (key == Py.False) {

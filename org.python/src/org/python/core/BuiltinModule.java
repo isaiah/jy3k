@@ -17,9 +17,7 @@ import org.python.modules.sys.SysModule;
  */
 public class BuiltinModule {
     private static final InvokeByName abs = new InvokeByName("__abs__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName dir = new InvokeByName("__dir__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
@@ -441,18 +439,7 @@ public class BuiltinModule {
     }
 
     public static PyObject format2(PyObject value, PyObject formatSpec) {
-        try {
-            Object func = format.getGetter().invokeExact((PyObject) value.getType());
-            PyObject formatted = (PyObject) format.getInvoker().invokeExact(func, Py.getThreadState(), value, formatSpec);
-            if (!Py.isInstance(formatted, PyBytes.TYPE) && !Py.isInstance(formatted, PyUnicode.TYPE)) {
-                throw Py.TypeError("instance.__format__ must return string or unicode, not " + formatted.getType().fastGetName());
-            }
-            return formatted;
-        } catch (PyException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw Py.JavaError(t);
-        }
+        return Abstract.PyObject_Format(Py.getThreadState(), value, formatSpec);
     }
 
     public static PyObject getattr2(PyObject obj, PyObject name) {
@@ -845,12 +832,7 @@ public class BuiltinModule {
     }
 
     public static PyObject repr(PyObject o) {
-        try {
-            Object reprFunc = repr.getGetter().invokeExact((PyObject) o.getType());
-            return (PyObject) repr.getInvoker().invokeExact(reprFunc, Py.getThreadState(), o);
-        } catch (Throwable e) {
-            throw Py.JavaError(e);
-        }
+        return Abstract.PyObject_Repr(Py.getThreadState(), o);
     }
 
     public static PyObject round(PyObject args[], String kwds[]) {

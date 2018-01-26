@@ -72,11 +72,6 @@ public class PyTime extends PyObject {
         return DatetimeModule.wrap_strftime(format, timetuple());
     }
 
-    @Override
-    public PyUnicode __str__() {
-        return time___str__();
-    }
-
     @ExposedMethod
     public PyUnicode time___str__() {
         return new PyUnicode(time.toString());

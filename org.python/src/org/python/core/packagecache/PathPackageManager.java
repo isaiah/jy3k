@@ -43,7 +43,7 @@ public abstract class PathPackageManager extends CachedJarsPackageManager {
         for (int i = 0; i < path.__len__(); i++) {
             PyObject entry = path.pyget(i);
             if (!(entry instanceof PyUnicode)) {
-                entry = entry.__str__();
+                entry = Abstract.PyObject_Str(Py.getThreadState(), entry);
             }
             String dir = entry.toString();
 
@@ -105,7 +105,7 @@ public abstract class PathPackageManager extends CachedJarsPackageManager {
         for (int i = 0; i < path.__len__(); i++) {
             PyObject entry = path.pyget(i);
             if (!(entry instanceof PyUnicode)) {
-                entry = entry.__str__();
+                entry = Abstract.PyObject_Str(Py.getThreadState(), entry);
             }
             String dir = entry.toString();
 

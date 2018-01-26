@@ -1965,16 +1965,6 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return basebytes_repr("bytearray(b", ")");
     }
 
-    /**
-     * An overriding of the {@link PyObject#__str__()} method, returning <code>PyBytes</code>,
-     * where in the characters are simply those with a point-codes given in this byte array. The
-     * built-in function <code>str()</code> is expected to call this method.
-     */
-    @Override
-    public PyUnicode __str__() {
-        return bytearray_str();
-    }
-
     @ExposedMethod(names = {"__str__"}, doc = BuiltinDocs.bytearray___str___doc)
     public final PyUnicode bytearray_str() {
         return new PyUnicode(toString());

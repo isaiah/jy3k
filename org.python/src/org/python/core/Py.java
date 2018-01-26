@@ -1508,6 +1508,7 @@ public final class Py {
 
     public static String formatException(PyObject type, PyObject value, boolean useRepr) {
         StringBuilder buf = new StringBuilder();
+        ThreadState ts = Py.getThreadState();
 
         if (PyException.isExceptionClass(type)) {
             String className = PyException.exceptionClassName(type);
@@ -1527,11 +1528,11 @@ public final class Py {
             }
             buf.append(className);
         } else {
-            buf.append(useRepr ? BuiltinModule.repr(type) : type.__str__());
+            buf.append(useRepr ? Abstract.PyObject_Repr(ts, type) : Abstract.PyObject_Str(ts, type));
         }
         if (value != null && value != Py.None) {
             // only print colon if the str() of the object is not the empty string
-            PyObject s = useRepr ? BuiltinModule.repr(value) : value.__str__();
+            PyObject s = useRepr ? Abstract.PyObject_Repr(ts, value) : Abstract.PyObject_Str(ts, value);
             if (!(s instanceof PyUnicode) || s.__len__() != 0) {
                 buf.append(": ");
             }

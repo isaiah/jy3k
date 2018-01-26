@@ -197,29 +197,30 @@ public class PyUnicode extends PySequence implements Iterable {
         ArgParser ap =
                 new ArgParser("str", args, keywords, new String[]{"string", "encoding",
                         "errors"}, 0);
-        PyObject S = ap.getPyObject(0, null);
+        PyObject x = ap.getPyObject(0, null);
         String encoding = ap.getString(1, null);
         String errors = ap.getString(2, null);
+        ThreadState ts = Py.getThreadState();
 
         if (new_.for_type == subtype) {
-            if (S == null) {
+            if (x == null) {
                 return Py.EmptyUnicode;
             }
 
             if (encoding == null) {
-                return S.__str__();
+                return Abstract.PyObject_Str(ts, x);
             }
             checkEncoding(errors);
             checkEncoding(encoding);
 
-            if (S instanceof PyUnicode) {
-                return new PyUnicode(((PyUnicode) S).getString());
+            if (x instanceof PyUnicode) {
+                return new PyUnicode(((PyUnicode) x).getString());
             }
-            if (S instanceof PyBytes) {
-                if (S.getType() != PyBytes.TYPE && encoding == null && errors == null) {
-                    return new PyUnicode((PyBytes) S);
+            if (x instanceof PyBytes) {
+                if (x.getType() != PyBytes.TYPE && encoding == null && errors == null) {
+                    return new PyUnicode((PyBytes) x);
                 }
-                PyObject decoded = codecs.decode((PyBytes) S, encoding, errors);
+                PyObject decoded = codecs.decode((PyBytes) x, encoding, errors);
                 if (decoded instanceof PyUnicode) {
                     return decoded;
                 } else {
@@ -227,16 +228,15 @@ public class PyUnicode extends PySequence implements Iterable {
                             + decoded.getType().fastGetName() + ")");
                 }
             }
-            return S.__str__();
+            return Abstract.PyObject_Str(ts, x);
         } else {
-            if (S == null) {
+            if (x == null) {
                 return new PyUnicodeDerived(subtype, Py.EmptyUnicode);
             }
-            if (S instanceof PyUnicode) {
-                return new PyUnicodeDerived(subtype, S);
-            } else {
-                return new PyUnicodeDerived(subtype, S.__str__());
+            if (!(x instanceof PyUnicode)) {
+                x = Abstract.PyObject_Str(ts, x);
             }
+            return new PyUnicodeDerived(subtype, x);
         }
     }
 
@@ -355,6 +355,10 @@ public class PyUnicode extends PySequence implements Iterable {
         return getString().substring(translator.codePointIndex(start), translator.codePointIndex(end));
     }
 
+    public String substring(int start) {
+        return getString().substring(translator.codePointIndex(start));
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -403,11 +407,6 @@ public class PyUnicode extends PySequence implements Iterable {
     @Override
     public String toString() {
         return getString();
-    }
-
-    @Override
-    public PyUnicode __str__() {
-        return str___str__();
     }
 
     @Override
@@ -464,7 +463,10 @@ public class PyUnicode extends PySequence implements Iterable {
         if (idx >= string.length()) {
             throw Py.IndexError(String.format("string index out of range"));
         }
-        int codepoint = string.codePointAt(string.offsetByCodePoints(0, index.asIndex()));
+        if (idx < 0) {
+            idx += string.length();
+        }
+        int codepoint = string.codePointAt(string.offsetByCodePoints(0, idx));
         return new PyUnicode(new String(Character.toChars(codepoint)));
     }
 
@@ -824,18 +826,14 @@ public class PyUnicode extends PySequence implements Iterable {
                 newSubsequenceIterator()))));
     }
 
-    public PyTuple partition(PyObject sep) {
-        return str_partition(sep);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.str_partition_doc)
-    public final PyTuple str_partition(PyObject sepObj) {
+    public final PyTuple str_partition(ThreadState ts, PyObject sepObj) {
         PyUnicode strObj = this;
         String str = strObj.getString();
 
         // Will throw a TypeError if not a basestring
         String sep = sepObj.asString();
-        sepObj = sepObj.__str__();
+        sepObj = Abstract.PyObject_Str(ts, sepObj);
 
         if (sep.length() == 0) {
             throw Py.ValueError("empty separator");
@@ -844,7 +842,7 @@ public class PyUnicode extends PySequence implements Iterable {
         int index = str.indexOf(sep);
         if (index != -1) {
             return new PyTuple(new PyUnicode(strObj.substring(0, index)), sepObj, new PyUnicode(strObj.substring(index
-                    + sep.length(), str.length())));
+                    + sep.length())));
         } else {
             return new PyTuple(this, Py.EmptyUnicode, Py.EmptyUnicode);
         }
@@ -860,22 +858,14 @@ public class PyUnicode extends PySequence implements Iterable {
         }
     }
 
-    public PyTuple rpartition(PyObject sep) {
-        return str_rpartition(sep);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.str_rpartition_doc)
-    public final PyTuple str_rpartition(PyObject sep) {
-        return unicodeRpartition(coerceToUnicode(sep));
-    }
-
-    final PyTuple unicodeRpartition(PyObject sepObj) {
+    public final PyTuple str_rpartition(ThreadState ts, PyObject sepObj) {
         PyUnicode strObj = this;
         String str = strObj.getString();
 
         // Will throw a TypeError if not a basestring
         String sep = sepObj.asString();
-        sepObj = sepObj.__str__();
+        sepObj = Abstract.PyObject_Str(ts, sepObj);
 
         if (sep.length() == 0) {
             throw Py.ValueError("empty separator");
@@ -883,8 +873,8 @@ public class PyUnicode extends PySequence implements Iterable {
 
         int index = str.lastIndexOf(sep);
         if (index != -1) {
-            return new PyTuple(strObj.fromSubstring(0, index), sepObj, strObj.fromSubstring(index
-                    + sep.length(), str.length()));
+            return new PyTuple(new PyUnicode(strObj.substring(0, index)), sepObj, new PyUnicode(strObj.substring(index
+                    + sep.length())));
         } else {
             PyUnicode emptyUnicode = Py.newUnicode("");
             return new PyTuple(emptyUnicode, emptyUnicode, this);
@@ -1524,7 +1514,7 @@ public class PyUnicode extends PySequence implements Iterable {
                 if ("r".equals(chunk.conversion)) {
                     fieldObj = BuiltinModule.repr(fieldObj);
                 } else if ("s".equals(chunk.conversion)) {
-                    fieldObj = fieldObj.__str__();
+                    fieldObj = Abstract.PyObject_Str(Py.getThreadState(), fieldObj);
                 } else if ("a".equals(chunk.conversion)) {
                     // a = ascii
                     fieldObj = BuiltinModule.ascii(fieldObj);
@@ -1535,7 +1525,7 @@ public class PyUnicode extends PySequence implements Iterable {
                 // Check for "{}".format(u"abc")
                 if (fieldObj instanceof PyUnicode && !(this instanceof PyUnicode)) {
                     // Down-convert to PyBytes, at the risk of raising UnicodeEncodingError
-                    fieldObj = ((PyUnicode) fieldObj).__str__();
+                    fieldObj = Abstract.PyObject_Str(Py.getThreadState(), fieldObj);
                 }
 
                 // The format_spec may be simple, or contained nested replacement fields.

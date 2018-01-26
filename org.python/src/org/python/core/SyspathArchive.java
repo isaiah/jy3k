@@ -63,7 +63,7 @@ public class SyspathArchive extends PyBytes {
     }
 
     public String asUriCompatibleString() {
-    	String result = __str__().toString();
+    	String result = bytes___str__().toString();
         if (File.separatorChar == '\\') {
             return result.replace(File.separatorChar, '/');
         }

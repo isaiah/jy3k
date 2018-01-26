@@ -95,8 +95,8 @@ public class PyFloat extends PyObject {
         String message = "invalid hexadecimal floating-point string";
         boolean negative = false;
 
-        PyUnicode s = o.__str__();
-        String value = s.getString().trim().toLowerCase();
+        PyObject s = Abstract.PyObject_Str(Py.getThreadState(), o);
+        String value = s.toString().trim().toLowerCase();
 
         if (value.length() == 0) {
             throw Py.ValueError(message);
@@ -209,17 +209,12 @@ public class PyFloat extends PyObject {
 
     @Override
     public String toString() {
-        return __str__().toString();
-    }
-
-    @Override
-    public PyUnicode __str__() {
-        return float___str__();
+        return formatDouble(SPEC_STR);
     }
 
     @ExposedMethod(doc = BuiltinDocs.float___str___doc)
-    final PyUnicode float___str__() {
-        return Py.newUnicode(formatDouble(SPEC_STR));
+    final PyObject float___str__() {
+        return Py.newUnicode(toString());
     }
 
     @Override

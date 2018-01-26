@@ -75,7 +75,7 @@ public class StdoutWrapper extends OutputStream {
     }
 
     private void printToFileObject(PyObject file, PyObject o) {
-        file.invoke("write", o.__str__());
+        file.invoke("write", Abstract.PyObject_Str(Py.getThreadState(), o));
     }
 
     /**

@@ -51,8 +51,8 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
         this.self = self;
     }
 
-    public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
-        super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide, null));
+    public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, boolean needsSelf) {
+        super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide, needsSelf, null));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
         MethodType methodType = info.target.type();
         int argOffset = 0;
         Class<?> selfType = null;
-        if (this instanceof PyBuiltinClassMethod || !info.isStatic) {
+        if (info.needSelf) {
             selfType = methodType.parameterType(0);
             argOffset = 1;
         }

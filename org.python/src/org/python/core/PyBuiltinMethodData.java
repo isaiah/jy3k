@@ -15,12 +15,15 @@ public class PyBuiltinMethodData {
     // if this is a module functin
     boolean isFunction;
 
+    final boolean needSelf;
+
     private int maxargs, minargs;
 
     public PyBuiltinMethodData(String name, int minargs, int maxargs) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
+        needSelf = false;
     }
 
     /**
@@ -34,6 +37,7 @@ public class PyBuiltinMethodData {
         this.doc = "";
         this.isWide = true;
         this.isStatic = true;
+        needSelf = false;
     }
 
     /**
@@ -45,11 +49,11 @@ public class PyBuiltinMethodData {
      * @param isStatic
      * @param isWide
      */
-    public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
-        this(name, defaultVals, mh, doc, isStatic, isWide, null);
+    public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, boolean needSelf) {
+        this(name, defaultVals, mh, doc, isStatic, isWide, needSelf, null);
     }
 
-    public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, String module) {
+    public PyBuiltinMethodData(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, boolean needSelf, String module) {
         this.name = name;
         this.defaultVals = defaultVals;
         this.target = mh;
@@ -57,6 +61,7 @@ public class PyBuiltinMethodData {
         this.module = module;
         this.isStatic = isStatic;
         this.isWide = isWide;
+        this.needSelf = needSelf;
         getDefaults();
     }
 

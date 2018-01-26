@@ -170,7 +170,7 @@ public class PyJavaPackage extends PyObject implements Traverseproc {
             return;
         }
         if (attr == "__file__") {
-            __file__ = value.__str__().toString();
+            __file__ = Abstract.PyObject_Str(Py.getThreadState(), value).toString();
             return;
         }
 

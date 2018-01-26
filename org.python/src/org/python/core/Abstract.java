@@ -20,8 +20,11 @@ public class Abstract {
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName lenHint = new InvokeByName("__length_hint__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName index = new InvokeByName("__index__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName str = new InvokeByName("__str__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
@@ -259,6 +262,43 @@ public class Abstract {
 
     public static PyObject PyObject_Not(ThreadState ts, PyObject obj) {
         return PyObject_IsTrue(ts, obj) ? Py.False : Py.True;
+    }
+
+    public static PyObject PyObject_Repr(ThreadState ts, PyObject o) {
+        try {
+            Object reprFunc = repr.getGetter().invokeExact((PyObject) o.getType());
+            return (PyObject) repr.getInvoker().invokeExact(reprFunc, ts, o);
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
+    }
+
+    public static PyObject PyObject_Str(ThreadState ts, PyObject v) {
+        if (v instanceof PyUnicode) {
+            return v;
+        }
+
+        PyObject res = PyObject.unaryOpType(ts, str, v, self ->  PyObject_Repr(ts, v));
+        if (res instanceof PyUnicode) {
+            return res;
+        }
+        throw Py.TypeErrorFmt("__str__ returned non-string (type %s)", res);
+    }
+
+    public static PyObject PyObject_Format(ThreadState ts, PyObject obj, PyObject formatSpec) {
+        try {
+            Object func = format.getGetter().invokeExact((PyObject) obj.getType());
+            PyObject formatted = (PyObject) format.getInvoker().invokeExact(func, Py.getThreadState(), obj, formatSpec);
+            if (!Py.isInstance(formatted, PyBytes.TYPE) && !Py.isInstance(formatted, PyUnicode.TYPE)) {
+                throw Py.TypeError("instance.__format__ must return string or unicode, not " + formatted.getType().fastGetName());
+            }
+            return formatted;
+        } catch (PyException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        }
+
     }
 
     public static PyObject unaryOp(ThreadState ts, String name, String sign, PyObject arg) {

@@ -36,7 +36,7 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
     }
 
     public PyNewWrapper(PyType type, String name, int minargs, int maxargs) {
-        super(type, new PyBuiltinMethodData(name, "", null, BuiltinDocs.type___new___doc, true, true));
+        super(type, new PyBuiltinMethodData(name, "", null, BuiltinDocs.type___new___doc, true, true, false));
         for_type = (PyType)getSelf();
     }
 

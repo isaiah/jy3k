@@ -201,9 +201,9 @@ public class Exceptions {
         self.__setattr__("path", ap.getPyObject(2, Py.None));
     }
 
-    public static PyUnicode ImportError__str__(PyObject self, PyObject[] arg, String[] kwargs) {
+    public static PyObject ImportError__str__(PyObject self) {
         PyObject msg = self.__getattr__("msg");
-        PyUnicode str = msg.__str__();
+        PyUnicode str = (PyUnicode) Abstract.PyObject_Str(Py.getThreadState(), msg);
 
         PyObject name = self.__findattr__("name");
         PyObject path = self.__findattr__("path");
@@ -253,10 +253,10 @@ public class Exceptions {
 //        return new PyUnicode("StopIteration()");
 //    }
 
-    public static PyUnicode StopIteration__str__(PyObject self, PyObject[] args, String[] kwargs) {
+    public static PyObject StopIteration__str__(PyObject self) {
         PyObject value = ((PyBaseException) self).args.__finditem__(0);
         if (value != null) {
-            return value.__str__();
+            return Abstract.PyObject_Str(Py.getThreadState(), value);
         }
         return Py.EmptyUnicode;
     }
@@ -290,9 +290,9 @@ public class Exceptions {
         }
     }
 
-    public static PyUnicode SyntaxError__str__(PyObject self, PyObject[] arg, String[] kwargs) {
+    public static PyObject SyntaxError__str__(PyObject self) {
         PyObject msg = self.__getattr__("msg");
-        PyUnicode str = msg.__str__();
+        PyUnicode str = (PyUnicode) Abstract.PyObject_Str(Py.getThreadState(), msg);
 
         PyObject filename = self.__findattr__("filename");
         PyObject lineno = self.__findattr__("lineno");
@@ -350,8 +350,7 @@ public class Exceptions {
         self.__setattr__("args", new PyTuple(errno, strerror));
     }
 
-    public static PyUnicode OSError__str__(PyObject self, PyObject[] args,
-                                                   String[] kwargs) {
+    public static PyObject OSError__str__(PyObject self) {
         PyObject errno = self.__findattr__("errno");
         PyObject strerror = self.__findattr__("strerror");
         PyObject filename = self.__findattr__("filename");
@@ -412,7 +411,7 @@ public class Exceptions {
         return dict;
     }
 
-    public static PyObject KeyError__str__(PyObject self, PyObject[] args, String[] kwargs) {
+    public static PyObject KeyError__str__(PyObject self) {
         PyBaseException selfBase = (PyBaseException)self;
         // If args is a tuple of exactly one item, apply repr to args[0].
         // This is done so that e.g. the exception raised by {}[''] prints
@@ -474,14 +473,13 @@ public class Exceptions {
         }
     }
 
-    public static PyUnicode UnicodeDecodeError__str__(PyObject self, PyObject[] args,
-                                                     String[] kwargs) {
+    public static PyObject UnicodeDecodeError__str__(PyObject self) {
         int start = self.__getattr__("start").asInt();
         int end = self.__getattr__("end").asInt();
         // Get reason and encoding as strings, which they might not be if they've been
         // modified after we were contructed
-        PyObject reason = self.__getattr__("reason").__str__();
-        PyObject encoding = self.__getattr__("encoding").__str__();
+        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("reason"));
+        PyObject encoding = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("encoding"));
         PyObject object = getString(self.__getattr__("object"), "object");
 
         String result;
@@ -509,14 +507,14 @@ public class Exceptions {
         UnicodeError__init__(self, args, kwargs, PyUnicode.TYPE);
     }
 
-    public static PyUnicode UnicodeEncodeError__str__(PyObject self, PyObject[] args,
-                                                     String[] kwargs) {
+    public static PyObject UnicodeEncodeError__str__(PyObject self) {
         int start = self.__getattr__("start").asInt();
         int end = self.__getattr__("end").asInt();
         // Get reason and encoding as strings, which they might not be if they've been
         // modified after we were contructed
-        PyObject reason = self.__getattr__("reason").__str__();
-        PyObject encoding = self.__getattr__("encoding").__str__();
+        ThreadState ts = Py.getThreadState();
+        PyObject reason = Abstract.PyObject_Str(ts, self.__getattr__("reason"));
+        PyObject encoding = Abstract.PyObject_Str(ts, self.__getattr__("encoding"));
         PyObject object = getUnicode(self.__getattr__("object"), "object");
 
         String result;
@@ -560,13 +558,12 @@ public class Exceptions {
         self.__setattr__("reason", ap.getPyObjectByType(3, PyUnicode.TYPE));
     }
 
-    public static PyUnicode UnicodeTranslateError__str__(PyObject self, PyObject[] args,
-                                                        String[] kwargs) {
+    public static PyObject UnicodeTranslateError__str__(PyObject self) {
         int start = self.__getattr__("start").asInt();
         int end = self.__getattr__("end").asInt();
         // Get reason as a string, which it might not be if it's been modified after we
         // were contructed
-        PyObject reason = self.__getattr__("reason").__str__();
+        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("reason"));
         PyObject object = getUnicode(self.__getattr__("object"), "object");
 
         String result;
@@ -660,7 +657,7 @@ public class Exceptions {
      * @param name of the attribute
      * @return an PyUnicode
      */
-    public static PyUnicode getUnicode(PyObject attr, String name) {
+    public static PyObject getUnicode(PyObject attr, String name) {
         if (!(attr instanceof PyUnicode)) {
             throw Py.TypeError(String.format("%.200s attribute must be str", name));
         }
@@ -727,14 +724,18 @@ public class Exceptions {
         Class returnType;
         if (name.equals("__init__")) {
             returnType = void.class;
-        } else if (name.equals("__str__")) {
-            returnType = PyUnicode.class;
         } else {
             returnType = PyObject.class;
         }
-        MethodHandle mh = LOOKUP.findOwnStatic(methodName, returnType, PyObject.class, PyObject[].class, String[].class);
-        // isStatic is false because all method accept a first argument self
-        PyBuiltinMethodData info = new PyBuiltinMethodData(name, "", mh, "", false,true);
+        MethodHandle mh;
+        boolean isWide = true;
+        if (name.equals("__str__")) {
+            mh = LOOKUP.findOwnStatic(methodName, returnType, PyObject.class);
+            isWide = false;
+        } else {
+            mh = LOOKUP.findOwnStatic(methodName, returnType, PyObject.class, PyObject[].class, String[].class);
+        }
+        PyBuiltinMethodData info = new PyBuiltinMethodData(name, "", mh, "", true, isWide, false);
         return new PyBuiltinExceptionMethod(null, info);
     }
 }

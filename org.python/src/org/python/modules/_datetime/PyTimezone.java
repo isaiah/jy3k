@@ -6,7 +6,6 @@ import org.python.core.Py;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.core.PyUnicode;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
@@ -65,10 +64,6 @@ public class PyTimezone extends PyTZInfo {
                     "tzname(dt) argument must be a datetime instance or None, not %s", datetime.getType().getName()));
         }
         return name;
-    }
-
-    public PyUnicode __str__() {
-        return new PyUnicode(name);
     }
 
     @Override

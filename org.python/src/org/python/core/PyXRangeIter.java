@@ -2,7 +2,9 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.bootstrap.Import;
 
 /**
@@ -25,10 +27,11 @@ public class PyXRangeIter extends PyObject {
         this.len = len;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
-    public PyObject range_iterator___next__() {
-        if (index < len) {
-            return new PyLong(start + index++ * step);
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject range_iterator___next__(PyObject iter) {
+        PyXRangeIter self = (PyXRangeIter) iter;
+        if (self.index < self.len) {
+            return new PyLong(self.start + self.index++ * self.step);
         }
 
         throw Py.StopIteration();

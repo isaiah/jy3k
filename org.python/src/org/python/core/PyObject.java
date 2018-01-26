@@ -364,17 +364,6 @@ public class PyObject implements Serializable {
     }
 
     /**
-     * Equivalent to the standard Python __str__ method.  This method
-     * should not typically need to be overridden.  The easiest way to
-     * configure the string representation of a <code>PyObject</code> is to
-     * override the standard Java <code>toString</code> method.
-     **/
-    public PyUnicode __str__() {
-//        return (PyUnicode) invoke("__repr__");
-        return object__str__();
-    }
-
-    /**
      * PyObjects that implement
      * <code>org.python.core.finalization.HasFinalizeTrigger</code>
      * shall implement this method via:<br>
@@ -1547,11 +1536,11 @@ public class PyObject implements Serializable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.object___format___doc)
-    final PyObject object___format__(PyObject formatSpec) {
+    final PyObject object___format__(ThreadState ts, PyObject formatSpec) {
         if (formatSpec != null && formatSpec instanceof PyUnicode && !((PyUnicode) formatSpec).getString().isEmpty()) {
             throw Py.TypeError(String.format("unsupported format string passed to %s.__format__", getType().getName()));
         }
-        return __str__().str___format__(formatSpec);
+        return Abstract.PyObject_Format(ts, Abstract.PyObject_Str(ts, this), formatSpec);
     }
 
     /**
@@ -1733,6 +1722,35 @@ public class PyObject implements Serializable {
         }
     }
 
+    /**
+     * Get the unary method from the type and invoke it with the instance
+     * @param ts
+     * @param op
+     * @param self
+     * @return
+     */
+    public static PyObject unaryOpType(ThreadState ts, InvokeByName op, PyObject self, Function<PyObject, PyObject> attrErrorHandle) {
+        try {
+            Object func = op.getGetter().invokeExact((PyObject) self.getType());
+            return (PyObject) op.getInvoker().invokeExact(func, ts, self);
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                return attrErrorHandle.apply(self);
+            }
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        }
+    }
+
+    /**
+     * Get the unary method from the instance and invoke it
+     * @param ts
+     * @param op
+     * @param self
+     * @param attrErrorHandle
+     * @return
+     */
     public static PyObject unaryOp(ThreadState ts, InvokeByName op, PyObject self, Consumer<PyObject> attrErrorHandle) {
         try {
             Object func = op.getGetter().invokeExact(self);

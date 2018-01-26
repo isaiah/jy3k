@@ -8,7 +8,7 @@ public class PyBuiltinExceptionMethod extends PyBuiltinMethod {
     }
 
     public PyBuiltinExceptionMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide) {
-        super(name, defaultVals, mh, doc, isStatic, isWide);
+        super(name, defaultVals, mh, doc, isStatic, isWide, false);
     }
 
     @Override

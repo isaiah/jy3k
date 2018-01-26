@@ -354,7 +354,7 @@ final class StringFormatter {
                     // Get hold of the actual object to display (may set needUnicode)
                     PyObject argAsString;
                     if (spec.type == 's'){
-                        argAsString = arg.__str__();
+                        argAsString = Abstract.PyObject_Str(Py.getThreadState(), arg);
                     } else if (spec.type == 'r') {
                         argAsString = BuiltinModule.repr(arg);
                     } else {

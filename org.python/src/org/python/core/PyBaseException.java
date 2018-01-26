@@ -196,13 +196,8 @@ public class PyBaseException extends PyObject implements Traverseproc {
         }
     }
 
-    @Override
-    public PyUnicode __str__() {
-        return BaseException___str__();
-    }
-
     @ExposedMethod(doc = BuiltinDocs.BaseException___str___doc)
-    public final PyUnicode BaseException___str__() {
+    public final PyObject BaseException___str__(ThreadState ts) {
         // CPython issue6108: if __str__ has been overridden in the subclass, unicode()
         // should return the message returned by __str__ as used to happen before this
         // method was implemented
@@ -212,16 +207,16 @@ public class PyBaseException extends PyObject implements Traverseproc {
         if (str != null && where[0] != TYPE) {
             // Unlike str(), __str__ can return unicode (i.e. return the equivalent
             // of unicode(e.__str__()) instead of unicode(str(e)))
-            return str.__get__(this, type).__call__().__str__();
+            return Abstract.PyObject_Str(ts, str.__get__(this, type).__call__());
         }
         
         switch (args.__len__()) {
         case 0:
             return new PyUnicode("");
         case 1:
-            return args.__getitem__(0).__str__();
+            return Abstract.PyObject_Str(ts, args.__getitem__(0));
         default:
-            return args.__str__();
+            return Abstract.PyObject_Str(ts, args);
         }
     }
 
