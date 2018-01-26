@@ -95,6 +95,10 @@ public class MethodExposer extends Exposer {
         return asNames;
     }
 
+    public boolean needsSelf() {
+        return !isStatic;
+    }
+
     public void generateNamedConstructor(MethodVisitor mv) {
         // defaultVals
         mv.visitLdcInsn(String.join(",", defaults));
@@ -111,6 +115,8 @@ public class MethodExposer extends Exposer {
         mv.visitLdcInsn(isStatic);
         // wide
         mv.visitLdcInsn(isWide(args));
+        // self
+        mv.visitLdcInsn(needsSelf());
     }
 
     protected static boolean needsThreadState(Type[] args) {

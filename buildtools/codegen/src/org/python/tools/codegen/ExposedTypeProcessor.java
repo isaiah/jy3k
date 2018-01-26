@@ -276,6 +276,7 @@ public class ExposedTypeProcessor implements Opcodes, PyTypes {
                     @Override
                     public void handleTypeSlot(FunctionExposer exposer) {
                         typeslots.add(exposer);
+                        methodExposers.add(exposer);
                     }
 
                     @Override

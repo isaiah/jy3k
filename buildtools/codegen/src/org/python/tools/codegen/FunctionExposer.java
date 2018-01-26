@@ -48,4 +48,17 @@ public class FunctionExposer extends MethodExposer {
         this(onType, access, methodName, desc, typeName, asNames, defaults, doc);
         this.slot = slot;
     }
+
+    @Override
+    public String[] getNames() {
+        if (slot != null && slot.hasName()) {
+            return new String[]{slot.getName()};
+        }
+        return super.getNames();
+    }
+
+    @Override
+    public boolean needsSelf() {
+        return slot != null;
+    }
 }

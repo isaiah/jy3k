@@ -80,7 +80,7 @@ public class ModuleExposer extends Exposer {
                 mv.visitLdcInsn(methodName);
                 exposer.generateNamedConstructor(mv);
                 mv.visitLdcInsn(name);
-                callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN, STRING);
+                callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN, BOOLEAN, STRING);
                 callConstructor(BUILTIN_METHOD, PYOBJ, BUILTIN_METHOD_DATA);
                 call(PYOBJ, "__setitem__", VOID, STRING, PYOBJ);
             }

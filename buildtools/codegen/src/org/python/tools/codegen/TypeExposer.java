@@ -139,7 +139,7 @@ public class TypeExposer extends Exposer {
                     mv.visitInsn(DUP);
                     mv.visitLdcInsn(name);
                     exposer.generateNamedConstructor(mv);
-                    callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                    callConstructor(BUILTIN_METHOD_DATA, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN, BOOLEAN);
                     callConstructor(BUILTIN_CLASS_METHOD, PYOBJ, BUILTIN_METHOD_DATA);
                     mv.visitInsn(AASTORE);
                 }
@@ -151,7 +151,7 @@ public class TypeExposer extends Exposer {
                     mv.visitInsn(DUP);
                     mv.visitLdcInsn(name);
                     exposer.generateNamedConstructor(mv);
-                    callConstructor(BUILTIN_METHOD, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN);
+                    callConstructor(BUILTIN_METHOD, STRING, STRING, METHOD_HANDLE, STRING, BOOLEAN, BOOLEAN, BOOLEAN);
                     mv.visitInsn(AASTORE);
                 }
             }

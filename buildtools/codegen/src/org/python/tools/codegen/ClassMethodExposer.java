@@ -53,4 +53,9 @@ public class ClassMethodExposer extends MethodExposer {
         }
         return filledInArgs;
     }
+
+    @Override
+    public boolean needsSelf() {
+        return true;
+    }
 }
