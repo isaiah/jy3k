@@ -1,10 +1,13 @@
 package org.python.core.linker;
 
 import java.lang.invoke.MethodHandle;
+import java.util.function.Supplier;
 
 public final class InvokeByName {
     private MethodHandle getter;
     private MethodHandle invoker;
+    private Supplier<MethodHandle> get;
+    private Supplier<MethodHandle> inv;
     private String name;
 
     public InvokeByName(String name, Class<?> targetClass) {
@@ -13,7 +16,7 @@ public final class InvokeByName {
 
     public InvokeByName(String name, Class<?> targetClass, Class<?> rtype, Class<?>... ptypes) {
         this.name = name;
-        this.getter = Bootstrap.createDynamicInvoker(name, Bootstrap.GET_PROPERTY, Object.class, targetClass);
+        this.get = () -> Bootstrap.createDynamicInvoker(name, Bootstrap.GET_PROPERTY, Object.class, targetClass);
         Class<?>[] finalPtypes;
         int plen = ptypes.length;
         if (plen == 0) {
@@ -23,7 +26,7 @@ public final class InvokeByName {
             finalPtypes[0] = Object.class;
             System.arraycopy(ptypes, 0, finalPtypes, 1, plen);
         }
-        this.invoker = Bootstrap.createDynamicCallInvoker(rtype, finalPtypes);
+        this.inv = () -> Bootstrap.createDynamicCallInvoker(rtype, finalPtypes);
     }
 
     public String getName() {
@@ -31,10 +34,16 @@ public final class InvokeByName {
     }
 
     public MethodHandle getGetter() {
+        if (getter == null) {
+            getter = this.get.get();
+        }
         return getter;
     }
 
     public MethodHandle getInvoker() {
+        if (invoker == null) {
+            invoker = this.inv.get();
+        }
         return invoker;
     }
 }
