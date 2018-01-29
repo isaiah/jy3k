@@ -46,6 +46,9 @@ import org.python.antlr.base.excepthandler;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
 import org.python.core.Py;
+import org.python.core.PyFloat;
+import org.python.core.PyLong;
+import org.python.core.PyObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -416,6 +419,41 @@ public class Lower extends Visitor {
         expr anonymousFunction = new AnonymousFunction(node, "<lambda>", node.getInternalArgs(), bod);
         node.replaceSelf(anonymousFunction);
         return node;
+    }
+
+    /**
+     * Constant folding, construct negative numbers in one go
+     * @param node
+     * @return
+     */
+    @Override
+    public Object visitUnaryOp(UnaryOp node) {
+        expr operand = node.getInternalOperand();
+        if (operand instanceof Num) {
+            switch(node.getInternalOp()) {
+                case USub:
+                    PyObject value = (PyObject) ((Num) operand).getInternalN();
+                    if (value instanceof PyLong) {
+                        long lval = - value.asLong();
+                        ((Num) operand).setInternalN(new PyLong(lval));
+                        node.replaceSelf(operand);
+                        return operand;
+                    } else if (value instanceof PyFloat) {
+                        double dval = - value.asDouble();
+                        ((Num) operand).setInternalN(new PyFloat(dval));
+                        node.replaceSelf(operand);
+                        return operand;
+                    }
+                    break;
+
+                case UAdd:
+                    node.replaceSelf(operand);
+                    return operand;
+                default:
+                    break;
+            }
+        }
+        return super.visitUnaryOp(node);
     }
 
     /**
