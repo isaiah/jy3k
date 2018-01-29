@@ -68,6 +68,7 @@ org/python/core/PyTuple.class
 org/python/core/PyTupleIterator.class
 org/python/core/PyType.class
 org/python/core/PyUnicode.class
+org/python/core/PyUnicodeIterator.class
 org/python/core/PyRange.class
 org/python/core/PyXRangeIter.class
 org/python/core/PyZip.class

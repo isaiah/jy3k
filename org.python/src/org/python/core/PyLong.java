@@ -3,6 +3,8 @@
 
 package org.python.core;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.FloatFormatter;
 import org.python.core.stringlib.IntegerFormatter;
@@ -441,12 +443,13 @@ public class PyLong extends PyObject {
 
     @Override
     public boolean isTrue() {
-        return int___bool__();
+        return bool(this);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.int___bool___doc)
-    public boolean int___bool__() {
-        return !getValue().equals(BigInteger.ZERO);
+    @ExposedSlot(SlotFunc.BOOL)
+    public static boolean bool(PyObject val) {
+        PyLong self = (PyLong) val;
+        return !self.getValue().equals(BigInteger.ZERO);
     }
 
     public double doubleValue() {

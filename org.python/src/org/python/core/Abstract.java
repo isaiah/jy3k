@@ -74,9 +74,19 @@ public class Abstract {
         } else if (self == Py.False || self == Py.None) {
             return false;
         }
+        PyType tp = self.getType();
+        try {
+            if (tp.nbBool != null) {
+                return (boolean) tp.nbBool.invokeExact(self);
+            } else if (tp.sqLen != null) {
+                return ((int) tp.sqLen.invokeExact(self)) > 0;
+            }
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
 
         try {
-            Object boolFunc = bool.getGetter().invokeExact((PyObject) self.getType());
+            Object boolFunc = bool.getGetter().invokeExact((PyObject) tp);
             PyObject ret = (PyObject) bool.getInvoker().invokeExact(boolFunc, ts, self);
             return ret.isTrue();
         } catch (PyException e) {
@@ -84,7 +94,7 @@ public class Abstract {
                 try {
                     Object lenFunc = len.getGetter().invokeExact((PyObject) self.getType());
                     PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts, self);
-                    return ret.do_richCompareBool(Py.Zero, CompareOp.NE);
+                    return ret.do_richCompareBool(Py.Zero, CompareOp.GT);
                 } catch (PyException e1) {
                     if (e1.match(Py.AttributeError)) {
                         return self.isTrue();
@@ -278,6 +288,14 @@ public class Abstract {
             return v;
         }
 
+        PyType tp = v.getType();
+        if (tp.str != null) {
+            try {
+                return (PyObject) tp.str.invokeExact(v);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
         PyObject res = PyObject.unaryOpType(ts, str, v, self ->  PyObject_Repr(ts, v));
         if (res instanceof PyUnicode) {
             return res;

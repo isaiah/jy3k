@@ -12,8 +12,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SwitchPoint;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * PyBuiltinMethod is native implemented methods
@@ -258,7 +256,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyObject invoke(PyObject[] args, String[] keywords) {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             if (self instanceof PyType) {
                 return info.invoke((PyType) self, args, keywords);
             }
@@ -268,35 +266,35 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
     }
 
     public PyObject invoke() {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             return info.invoke(self);
         }
         return info.invoke();
     }
 
     public PyObject invoke(PyObject arg) {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             return info.invoke(self, arg);
         }
         return info.invoke(arg);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2) {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             return info.invoke(self, arg1, arg2);
         }
         return info.invoke(arg1, arg2);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3) {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             return info.invoke(self, arg1, arg2, arg3);
         }
         return info.invoke(arg1, arg2, arg3);
     }
 
     public PyObject invoke(PyObject arg1, PyObject arg2, PyObject arg3, PyObject arg4) {
-        if (!isFunction() && self != null) {
+        if (needSelf() && self != null) {
             return info.invoke(self, arg1, arg2, arg3, arg4);
         }
         return info.invoke(arg1, arg2, arg3, arg4);
@@ -326,7 +324,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperc
         return invoke(args, keywords);
     }
 
-    private boolean isFunction() {
-        return info.isStatic && !(this instanceof PyBuiltinClassMethod);
+    private boolean needSelf() {
+        return info.needSelf;
     }
 }

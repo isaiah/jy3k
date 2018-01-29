@@ -390,14 +390,16 @@ public class PyUnicode extends PySequence implements Iterable {
         return fmt.format(other);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.str___str___doc)
-    final PyUnicode str___str__() {
-        return new PyUnicode(getString());
+    @ExposedSlot(SlotFunc.STR)
+    public static PyObject tostr(PyObject str) {
+        PyUnicode self = (PyUnicode) str;
+        return new PyUnicode(self.getString());
     }
 
-    @ExposedMethod(doc = BuiltinDocs.str___len___doc)
-    final int str___len__() {
-        return getCodePointCount();
+    @ExposedSlot(SlotFunc.LENGTH)
+    public static int length(PyObject unicode) {
+        PyUnicode self = (PyUnicode) unicode;
+        return self.getCodePointCount();
     }
 
     public PyUnicode __repr__() {
@@ -416,7 +418,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
     @Override
     public int __len__() {
-        return str___len__();
+        return length(this);
     }
 
     @Override
@@ -472,7 +474,7 @@ public class PyUnicode extends PySequence implements Iterable {
 
     @ExposedMethod(doc = BuiltinDocs.str___iter___doc)
     public final PyObject str___iter__() {
-        return seq___iter__();
+        return new PyUnicodeIterator(getString());
     }
 
     @ExposedMethod(doc = BuiltinDocs.str___hash___doc)
@@ -502,13 +504,18 @@ public class PyUnicode extends PySequence implements Iterable {
         }
         return createInstance(buffer.toString());
     }
-
     @Override
     protected PyObject repeat(int count) {
+        return repeat(this, count);
+    }
+
+    @ExposedSlot(SlotFunc.REPEAT)
+    public static PyObject repeat(PyObject str, int count) {
+        PyUnicode self = (PyUnicode) str;
         if (count < 0) {
             count = 0;
         }
-        String s = getString();
+        String s = self.getString();
         int len = s.length();
         if ((long) len * count > Integer.MAX_VALUE) {
             // Since Strings store their data in an array, we can't make one
@@ -517,7 +524,7 @@ public class PyUnicode extends PySequence implements Iterable {
             // line with a wrapped int.
             throw Py.OverflowError("max str len is " + Integer.MAX_VALUE);
         }
-        StringBuilder ret = new StringBuilder();
+        StringBuilder ret = new StringBuilder(len * count);
         for (int i = 0; i < count; i++) {
             ret.append(s);
         }
@@ -1119,37 +1126,29 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     // end utf-16 aware
-    public PyObject join(PyObject seq) {
-        return str_join(seq);
-    }
-
     @ExposedMethod(doc = BuiltinDocs.str_join_doc)
-    public final PyUnicode str_join(PyObject seq) {
+    public final PyUnicode join(PyObject seq) {
         return unicodeJoin(seq);
     }
 
     final PyUnicode unicodeJoin(PyObject obj) {
         StringJoiner joiner = new StringJoiner(getString());
-        PyObject item;
         long totalSize = 0;
-        PyObject iter = PyObject.getIter(obj);
-        try {
-            for (int i = 0; (item = PyObject.iterNext(iter)) != null; i++) {
-                if (!(item instanceof PyUnicode)) {
-                    throw Py.TypeError(String.format("sequence item %d: expected str instance, %s found",
-                            i, item.getType().fastGetName()));
-                }
-                String s = ((PyUnicode) item).getString();
-                totalSize += s.length();
-                // A string cannot be longer than the maximum array length
-                if (totalSize > Integer.MAX_VALUE) {
-                    throw Py.OverflowError("max str len is " + Integer.MAX_VALUE);
-                }
-                joiner.add(s);
+        Abstract._PySequence_Stream(obj).reduce(totalSize, (size, item) -> {
+            if (!(item instanceof PyUnicode)) {
+                throw Py.TypeError(String.format("sequence item: expected str instance, %s found",
+                        item.getType().fastGetName()));
             }
-        } catch (PyException e) {
-            if (!e.match(Py.StopIteration)) throw e;
-        }
+            String s = ((PyUnicode) item).getString();
+            long newSize = size + s.length();
+            // A string cannot be longer than the maximum array length
+            if (newSize > Integer.MAX_VALUE) {
+                throw Py.OverflowError("max str len is " + Integer.MAX_VALUE);
+            }
+            joiner.add(s);
+            return newSize;
+        }, Long::sum);
+
         return new PyUnicode(joiner.toString());
     }
 

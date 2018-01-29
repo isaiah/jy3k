@@ -7,7 +7,6 @@ package org.python.core;
  */
 
 import java.util.Iterator;
-import org.python.core.PyObject;
 
 public abstract class BaseDictionaryView extends PyObject implements Traverseproc {
     protected final PyDictionary dvDict;

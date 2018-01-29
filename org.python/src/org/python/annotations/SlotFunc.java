@@ -5,6 +5,12 @@ import org.python.core.PyType;
 import java.lang.invoke.MethodHandle;
 
 public enum SlotFunc {
+    BOOL("__bool__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.nbBool = mh;
+        }
+    },
     CONTAINS("__contains__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
@@ -30,10 +36,22 @@ public enum SlotFunc {
             type.isIterator = true;
         }
     },
+    LENGTH("__len__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.sqLen = mh;
+        }
+    },
     REPEAT {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.sqRepeat = mh;
+        }
+    },
+    STR("__str__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.str = mh;
         }
     };
 
