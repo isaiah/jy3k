@@ -8,6 +8,7 @@ import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
 import org.python.core.PyModule;
+import org.python.core.PyModuleDef;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
@@ -33,8 +34,13 @@ public class _imp {
 
     @ExposedFunction
     public static PyObject create_builtin(PyObject spec) {
-        PyObject name = spec.__getattr__("name");
-        String modName = PyObject.asName(name);
+        String modName;
+        if (spec instanceof PyModuleDef) {
+            modName = ((PyModuleDef) spec).name;
+        } else {
+            PyObject name = spec.__getattr__("name");
+            modName = PyObject.asName(name);
+        }
         for (String newmodule : Setup.builtinModules) {
             if (modName.equals(newmodule.split(":")[0])) {
                 return new PyModule(modName, new PyStringMap());

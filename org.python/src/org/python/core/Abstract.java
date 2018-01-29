@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
  */
 public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName call = new InvokeByName("__call__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
+    private static final InvokeByName call = new InvokeByName("__call__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
     private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
@@ -343,8 +343,8 @@ public class Abstract {
             }
         }
         try {
-            Object func = call.getGetter().invokeExact(tp);
-            return (PyObject) call.getInvoker().invokeExact(func, ts, callable, args, Py.NoKeywords);
+            Object func = call.getGetter().invokeExact(callable);
+            return (PyObject) call.getInvoker().invokeExact(func, ts, args, Py.NoKeywords);
         } catch (Throwable throwable) {
             throw Py.JavaError(throwable);
         }

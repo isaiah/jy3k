@@ -921,23 +921,32 @@ public class PyObject implements Serializable {
     }
 
     public static PyObject getIter(PyObject o) {
-        if (o.getType().isIterator) {
+        PyType tp = o.getType();
+        if (tp.isIterator) {
             return o;
         }
         PyObject res;
-        try {
-            res = o.unaryOp(Py.getThreadState(), iter);
-        } catch (PyException e) {
-            if (e.match(Py.AttributeError)) {
-                Object getitemFunc = null;
-                try {
-                    getitemFunc = getitem.getGetter().invokeExact(o);
-                    return new PySeqIterator(o, getitemFunc);
-                } catch (Throwable throwable) {
-                    throw Py.TypeError(String.format("%s object is not iterable", o.getType().fastGetName()));
-                }
+        if (tp.iter != null) {
+            try {
+                res = (PyObject) tp.iter.invokeExact(o);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
             }
-            throw e;
+        } else {
+            try {
+                res = o.unaryOp(Py.getThreadState(), iter);
+            } catch (PyException e) {
+                if (e.match(Py.AttributeError)) {
+                    Object getitemFunc = null;
+                    try {
+                        getitemFunc = getitem.getGetter().invokeExact(o);
+                        return new PySeqIterator(o, getitemFunc);
+                    } catch (Throwable throwable) {
+                        throw Py.TypeError(String.format("%s object is not iterable", o.getType().fastGetName()));
+                    }
+                }
+                throw e;
+            }
         }
         if (res.getType().iternext == null) {
             try {
@@ -1050,6 +1059,13 @@ public class PyObject implements Serializable {
      * @see #__findattr_ex__(String)
      **/
     public final PyObject __getattr__(String name) {
+        if (getType().getattro != null) {
+            try {
+                getType().getattro.invokeExact(name.intern());
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
         return __getattr__(new PyUnicode(name));
     }
 
