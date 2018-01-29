@@ -50,8 +50,6 @@ public class PyObject implements Serializable {
     private static final InvokeByName mod = new InvokeByName("__mod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName rmod = new InvokeByName("__rmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName imod = new InvokeByName("__imod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName pow = new InvokeByName("__pow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName rpow = new InvokeByName("__rpow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName ipow = new InvokeByName("__ipow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
@@ -1692,21 +1690,21 @@ public class PyObject implements Serializable {
         }
     }
 
-    public final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value, Function<PyObject, PyObject> fallback) {
+    public static final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject self, PyObject value, Function<PyObject, PyObject> fallback) {
         Object func;
         try {
-            func = op.getGetter().invokeExact(this);
+            func = op.getGetter().invokeExact(self);
             PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
             if (ret != Py.NotImplemented) {
                 return ret;
             }
             func = rop.getGetter().invokeExact(value);
-            return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+            return (PyObject) rop.getInvoker().invokeExact(func, ts, self);
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 try {
                     func = rop.getGetter().invokeExact(value);
-                    return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+                    return (PyObject) rop.getInvoker().invokeExact(func, ts, self);
                 } catch (PyException e1) {
                     if (e.match(Py.AttributeError)) {
                         return fallback.apply(value);
@@ -1803,7 +1801,7 @@ public class PyObject implements Serializable {
      *                      with these operands.
      **/
     public final PyObject _mul(final ThreadState ts, final PyObject o2) {
-        return binOp(ts, mul, rmul, o2, x -> {
+        return binOp(ts, mul, rmul, this, o2, x -> {
             if (getType().sqRepeat != null) {
                 return sequenceRepeat(ts, getType().sqRepeat, this, o2);
             }
@@ -1934,18 +1932,6 @@ public class PyObject implements Serializable {
      **/
     public final PyObject _imod(ThreadState ts, PyObject o2) {
         return inplaceBinOp(ts, imod, mod, rmod, o2);
-    }
-
-    /**
-     * Implements the Python expression <code>this divmod o2</code>
-     *
-     * @param o2 the object to perform this binary operation with.
-     * @return the result of the divmod.
-     * @throws Py.TypeError if this operation can't be performed
-     *                      with these operands.
-     **/
-    public final PyObject _divmod(ThreadState ts, PyObject o2) {
-        return binOp(ts, divmod, rdivmod, o2);
     }
 
     /**

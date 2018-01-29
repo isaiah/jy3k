@@ -676,15 +676,16 @@ public class PyLong extends PyObject {
         return Py.newLong(modulo(leftv, getValue(), divide(leftv, getValue())));
     }
 
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___divmod___doc)
-    public final PyObject int___divmod__(PyObject right) {
+    @ExposedSlot(SlotFunc.DIVMOD)
+    public static PyObject divmod(PyObject left, PyObject right) {
+        PyLong self = (PyLong) left;
         if (!canCoerce(right)) {
             return null;
         }
         BigInteger rightv = coerce(right);
 
-        BigInteger xdivy = divide(getValue(), rightv);
-        return new PyTuple(Py.newLong(xdivy), Py.newLong(modulo(getValue(), rightv, xdivy)));
+        BigInteger xdivy = self.divide(self.getValue(), rightv);
+        return new PyTuple(Py.newLong(xdivy), Py.newLong(self.modulo(self.getValue(), rightv, xdivy)));
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___rdivmod___doc)

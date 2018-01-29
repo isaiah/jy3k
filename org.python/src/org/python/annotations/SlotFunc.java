@@ -17,6 +17,12 @@ public enum SlotFunc {
             type.sqContains = mh;
         }
     },
+    DIVMOD("__divmod__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.nbDivmod = mh;
+        }
+    },
     GETATTRO("__getattribute__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {

@@ -298,7 +298,7 @@ public class BuiltinModule {
     }
 
     public static PyObject divmod(PyObject x, PyObject y) {
-        return x._divmod(Py.getThreadState(), y);
+        return Abstract.PyNumber_Divmod(Py.getThreadState(), x, y);
     }
 
     private static boolean isMappingType(PyObject o) {
