@@ -39,6 +39,7 @@ org/python/core/PySeqIterator.class
 org/python/core/PyJava.class
 org/python/core/PyJavaPackage.class
 org/python/core/PyList.class
+org/python/core/PyListIterator.class
 org/python/core/PyLong.class
 org/python/core/PyLongRangeIter.class
 org/python/core/PyMap.class

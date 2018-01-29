@@ -197,9 +197,9 @@ public class PyTuple extends PySequenceList implements List {
         return sum;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.tuple___iter___doc)
-    public PyObject tuple___iter__() {
-        return new PyTupleIterator(this);
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject iter(PyObject iter) {
+        return new PyTupleIterator((PyTuple) iter);
     }
 
     @Override
