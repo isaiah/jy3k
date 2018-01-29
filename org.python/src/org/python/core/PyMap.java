@@ -39,12 +39,12 @@ public class PyMap extends PyObject {
     }
 
     @ExposedMethod
-    public PyObject map___next__(ThreadState ts) {
+    public PyObject map___next__() {
         PyObject[] args = new PyObject[n];
         for (int j = 0; j < n; j++) {
             args[j] = PyObject.iterNext(iters[j]);
         }
-        return f.__call__(ts, args);
+        return f.__call__(Py.getThreadState(), args);
     }
 
     @ExposedMethod

@@ -17,17 +17,17 @@ import java.util.stream.StreamSupport;
  */
 public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
-    private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName index = new InvokeByName("__index__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName index = new InvokeByName("__index__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName lenHint = new InvokeByName("__length_hint__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName repr = new InvokeByName("__repr__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName str = new InvokeByName("__str__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
     /**
@@ -164,8 +164,8 @@ public class Abstract {
             return Encoding.atol(new String(Py.unwrapBuffer(obj)), 10);
         }
         try {
-            Object intFunc = int$.getGetter().invokeExact((obj));
-            return (PyObject) int$.getInvoker().invokeExact(intFunc, ts);
+            Object intFunc = int$.getGetter().invokeExact((PyObject) obj.getType());
+            return (PyObject) int$.getInvoker().invokeExact(intFunc, ts, obj);
         } catch (PyException pye) {
             if (!pye.match(Py.AttributeError)) {
                 throw pye;

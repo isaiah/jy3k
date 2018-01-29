@@ -16,10 +16,7 @@ import org.python.modules.sys.SysModule;
  * The builtin module. All builtin functions are defined here
  */
 public class BuiltinModule {
-    private static final InvokeByName abs = new InvokeByName("__abs__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName dir = new InvokeByName("__dir__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName abs = new InvokeByName("__abs__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
 
     public static void fillWithBuiltins(PyObject dict) {
         /* newstyle */

@@ -29,49 +29,48 @@ import java.util.function.Function;
 public class PyObject implements Serializable {
     public static final PyType TYPE = PyType.fromClass(PyObject.class);
     private static final String UNORDERABLE_ERROR_MSG = "unorderable types: %s() %s %s()";
-    private static final InvokeByName add = new InvokeByName("__add__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName radd = new InvokeByName("__radd__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName iadd = new InvokeByName("__iadd__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName sub = new InvokeByName("__sub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rsub = new InvokeByName("__rsub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName isub = new InvokeByName("__isub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName mul = new InvokeByName("__mul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rmul = new InvokeByName("__rmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName imul = new InvokeByName("__imul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName matmul = new InvokeByName("__matmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rmatmul = new InvokeByName("__rmatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName imatmul = new InvokeByName("__imatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName truediv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rtruediv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName itruediv = new InvokeByName("__itruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName floordiv = new InvokeByName("__floordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rfloordiv = new InvokeByName("__rfloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ifloordiv = new InvokeByName("__ifloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName mod = new InvokeByName("__mod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rmod = new InvokeByName("__rmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName imod = new InvokeByName("__imod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName pow = new InvokeByName("__pow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rpow = new InvokeByName("__rpow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ipow = new InvokeByName("__ipow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rshift = new InvokeByName("__rshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rrshift = new InvokeByName("__rrshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName irshift = new InvokeByName("__irshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName lshift = new InvokeByName("__lshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rlshift = new InvokeByName("__rlshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ilshift = new InvokeByName("__ilshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName and = new InvokeByName("__and__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rand = new InvokeByName("__rand__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName iand = new InvokeByName("__iand__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName or = new InvokeByName("__or__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ror = new InvokeByName("__ror__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ior = new InvokeByName("__ior__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName xor = new InvokeByName("__xor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName rxor = new InvokeByName("__rxor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName ixor = new InvokeByName("__ixor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName add = new InvokeByName("__add__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName radd = new InvokeByName("__radd__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName iadd = new InvokeByName("__iadd__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName sub = new InvokeByName("__sub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rsub = new InvokeByName("__rsub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName isub = new InvokeByName("__isub__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName mul = new InvokeByName("__mul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rmul = new InvokeByName("__rmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName imul = new InvokeByName("__imul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName matmul = new InvokeByName("__matmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rmatmul = new InvokeByName("__rmatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName imatmul = new InvokeByName("__imatmul__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName truediv = new InvokeByName("__truediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rtruediv = new InvokeByName("__rtruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName itruediv = new InvokeByName("__itruediv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName floordiv = new InvokeByName("__floordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rfloordiv = new InvokeByName("__rfloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ifloordiv = new InvokeByName("__ifloordiv__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName mod = new InvokeByName("__mod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rmod = new InvokeByName("__rmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName imod = new InvokeByName("__imod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName pow = new InvokeByName("__pow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rpow = new InvokeByName("__rpow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ipow = new InvokeByName("__ipow__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rshift = new InvokeByName("__rshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rrshift = new InvokeByName("__rrshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName irshift = new InvokeByName("__irshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName lshift = new InvokeByName("__lshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rlshift = new InvokeByName("__rlshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ilshift = new InvokeByName("__ilshift__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName and = new InvokeByName("__and__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rand = new InvokeByName("__rand__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName iand = new InvokeByName("__iand__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName or = new InvokeByName("__or__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ror = new InvokeByName("__ror__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ior = new InvokeByName("__ior__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName xor = new InvokeByName("__xor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName rxor = new InvokeByName("__rxor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName ixor = new InvokeByName("__ixor__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
-    private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
-    private static final InvokeByName iter = new InvokeByName("__iter__", PyObject.class, PyObject.class, ThreadState.class);
-    private static final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName iter = new InvokeByName("__iter__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName next = new InvokeByName("__next__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     public static final InvokeByName getitem = new InvokeByName("__getitem__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     /**
      * Primitives classes their wrapper classes.
@@ -942,7 +941,7 @@ public class PyObject implements Serializable {
         }
         if (res.getType().iternext == null) {
             try {
-                Object nextFunc = o.getType().next.getGetter().invokeExact(res);
+                Object nextFunc = next.getGetter().invokeExact(res);
             } catch (PyException e) {
                 if (e.match(Py.AttributeError)) {
                     throw Py.TypeError(String.format("iter() returned non-iterator of type '%s'", res.getType().fastGetName()));
@@ -1660,8 +1659,8 @@ public class PyObject implements Serializable {
 
     public final PyObject inplaceBinOp(ThreadState ts, InvokeByName inplaceOp, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
-            Object func = inplaceOp.getGetter().invokeExact(this);
-            PyObject ret = (PyObject) inplaceOp.getInvoker().invokeExact(func, ts, value);
+            Object func = inplaceOp.getGetter().invokeExact((PyObject) getType());
+            PyObject ret = (PyObject) inplaceOp.getInvoker().invokeExact(func, ts, this, value);
             if (ret != Py.NotImplemented) {
                 return ret;
             }
@@ -1676,13 +1675,13 @@ public class PyObject implements Serializable {
     }
     public final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject value) {
         try {
-            Object func = op.getGetter().invokeExact(this);
-            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
+            Object func = op.getGetter().invokeExact((PyObject) getType());
+            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, this, value);
             if (ret != null && ret != Py.NotImplemented) {
                 return ret;
             }
-            func = rop.getGetter().invokeExact(value);
-            return (PyObject) rop.getInvoker().invokeExact(func, ts, this);
+            func = rop.getGetter().invokeExact((PyObject) value.getType());
+            return (PyObject) rop.getInvoker().invokeExact(func, ts, value, this);
         } catch (PyException e) {
             throw e;
         } catch (Throwable t) {
@@ -1693,18 +1692,18 @@ public class PyObject implements Serializable {
     public static final PyObject binOp(ThreadState ts, InvokeByName op, InvokeByName rop, PyObject self, PyObject value, Function<PyObject, PyObject> fallback) {
         Object func;
         try {
-            func = op.getGetter().invokeExact(self);
-            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, value);
+            func = op.getGetter().invokeExact((PyObject) self.getType());
+            PyObject ret = (PyObject) op.getInvoker().invokeExact(func, ts, self, value);
             if (ret != Py.NotImplemented) {
                 return ret;
             }
-            func = rop.getGetter().invokeExact(value);
-            return (PyObject) rop.getInvoker().invokeExact(func, ts, self);
+            func = rop.getGetter().invokeExact((PyObject) value.getType());
+            return (PyObject) rop.getInvoker().invokeExact(func, ts, value, self);
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 try {
-                    func = rop.getGetter().invokeExact(value);
-                    return (PyObject) rop.getInvoker().invokeExact(func, ts, self);
+                    func = rop.getGetter().invokeExact((PyObject) value.getType());
+                    return (PyObject) rop.getInvoker().invokeExact(func, ts, value, self);
                 } catch (PyException e1) {
                     if (e.match(Py.AttributeError)) {
                         return fallback.apply(value);
@@ -1751,8 +1750,8 @@ public class PyObject implements Serializable {
      */
     public static PyObject unaryOp(ThreadState ts, InvokeByName op, PyObject self, Consumer<PyObject> attrErrorHandle) {
         try {
-            Object func = op.getGetter().invokeExact(self);
-            return (PyObject) op.getInvoker().invokeExact(func, ts);
+            Object func = op.getGetter().invokeExact((PyObject) self.getType());
+            return (PyObject) op.getInvoker().invokeExact(func, ts, self);
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 attrErrorHandle.accept(self);
