@@ -14,6 +14,7 @@ import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFunction;
 import org.python.core.PyMethod;
+import org.python.core.PyMethodDescr;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
@@ -79,6 +80,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     return ((PyMethod) self).findCallMethod(desc, linkRequest);
 //                } else if (self instanceof PyType) {
 //                    return ((PyType) self).findCallMethod(desc, linkRequest);
+//                } else if (self instanceof PyMethodDescr) {
+//                    return ((PyMethodDescr) self).getMeth().findCallMethod(desc, linkRequest);
                 }
                 /** PyBuiltinFuction from builtins module */
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));

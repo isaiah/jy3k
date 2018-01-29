@@ -2,7 +2,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 /**
  * The type behind builtins.map
@@ -38,13 +40,15 @@ public class PyMap extends PyObject {
         return map;
     }
 
-    @ExposedMethod
-    public PyObject map___next__() {
-        PyObject[] args = new PyObject[n];
-        for (int j = 0; j < n; j++) {
-            args[j] = PyObject.iterNext(iters[j]);
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject next(PyObject map) {
+        PyMap self = (PyMap) map;
+        PyObject[] args = new PyObject[self.n];
+        for (int j = 0; j < self.n; j++) {
+            args[j] = PyObject.iterNext(self.iters[j]);
         }
-        return f.__call__(Py.getThreadState(), args);
+//        return Abstract.PyObject_Call(Py.getThreadState(), self.f, args);
+        return self.f.__call__(Py.getThreadState(), args);
     }
 
     @ExposedMethod

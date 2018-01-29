@@ -112,6 +112,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     public MethodHandle sqRepeat;
     public MethodHandle sqLen; // J(Lorg.python.PyObject;)
     public MethodHandle str;
+    public MethodHandle call;
     public MethodHandle nbBool; // Z(Lorg.python.PyObject;)
     public MethodHandle nbDivmod;
     public boolean isIterator;
@@ -1688,23 +1689,17 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             }
         } else if (name == "__delete__") {
             if (hasDelete && lookup("__delete__") == null) {
-                traverse_hierarchy(false, new OnType() {
-                    public boolean onType(PyType type) {
-                        boolean absent = type.getDict().__finditem__("__delete__") == null;
-                        if (absent) {
-                            type.hasDelete = false;
-                            return false;
-                        }
-                        return true;
+                traverse_hierarchy(false, type -> {
+                    boolean absent = type.getDict().__finditem__("__delete__") == null;
+                    if (absent) {
+                        type.hasDelete = false;
+                        return false;
                     }
+                    return true;
                 });
             }
         } else if (name == "__getattribute__") {
-            traverse_hierarchy(false, new OnType() {
-                    public boolean onType(PyType type) {
-                        return (type.usesObjectGetattribute = false);
-                    }
-                });
+            traverse_hierarchy(false, type -> type.usesObjectGetattribute = false);
         }
     }
 

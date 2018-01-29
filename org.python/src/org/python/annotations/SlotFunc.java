@@ -11,6 +11,12 @@ public enum SlotFunc {
             type.nbBool = mh;
         }
     },
+    CALL("__call__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.call = mh;
+        }
+    },
     CONTAINS("__contains__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {

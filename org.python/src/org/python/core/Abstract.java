@@ -17,6 +17,7 @@ import java.util.stream.StreamSupport;
  */
 public class Abstract {
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName call = new InvokeByName("__call__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
     private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
@@ -330,7 +331,23 @@ public class Abstract {
         } catch (Throwable t) {
             throw Py.JavaError(t);
         }
+    }
 
+    public static PyObject PyObject_Call(ThreadState ts, PyObject callable, PyObject... args) {
+        PyType tp = callable.getType();
+        if (tp.call != null) {
+            try {
+                return (PyObject) tp.call.invokeExact(callable, args, Py.NoKeywords);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        try {
+            Object func = call.getGetter().invokeExact(tp);
+            return (PyObject) call.getInvoker().invokeExact(func, ts, callable, args, Py.NoKeywords);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
     }
 
     public static PyObject unaryOp(ThreadState ts, String name, String sign, PyObject arg) {

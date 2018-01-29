@@ -8,7 +8,6 @@ import org.python.annotations.ExposedType;
 public class PyMethodDescr extends PyDescriptor implements Traverseproc {
 
     protected int minargs, maxargs;
-
     protected PyBuiltinMethod meth;
 
     public PyMethodDescr(PyType t, PyBuiltinMethod func) {
@@ -18,6 +17,10 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
         maxargs = func.info.getMaxargs();
         meth = func;
 //        meth.setInfo(this);
+    }
+
+    public PyBuiltinMethod getMeth() {
+        return meth;
     }
 
     @ExposedGet(name = "__doc__")
@@ -51,6 +54,16 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
         return method_descriptor___call__(args, kwargs);
     }
 
+    @Override
+    @ExposedMethod(defaults = "null")
+    public PyObject __get__(PyObject obj, PyObject type) {
+        if (obj != null) {
+            checkGetterType(obj.getType());
+            return meth.bind(obj);
+        }
+        return this;
+    }
+
     @ExposedMethod
     final PyObject method_descriptor___call__(PyObject[] args, String[] kwargs) {
         checkReceiver(args);
@@ -62,17 +75,7 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
 
     public PyException unexpectedCall(int nargs, boolean keywords) {
         return PyBuiltinMethodData.unexpectedCall(nargs, keywords, name, minargs,
-                                                            maxargs);
-    }
-
-    @Override
-    @ExposedMethod(defaults = "null")
-    public PyObject __get__(PyObject obj, PyObject type) {
-        if(obj != null) {
-            checkGetterType(obj.getType());
-            return meth.bind(obj);
-        }
-        return this;
+                maxargs);
     }
 
     /**
