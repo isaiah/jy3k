@@ -10,6 +10,8 @@ import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import jdk.dynalink.linker.support.Guards;
+import org.python.core.Abstract;
+import org.python.core.Py;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
 import org.python.core.PyFunction;
@@ -18,6 +20,7 @@ import org.python.core.PyMethodDescr;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.ThreadState;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -34,8 +37,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle GETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__getattr__",
                     MethodType.methodType(PyObject.class, String.class));
-    static final MethodHandle GETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__getitem__",
-                            MethodType.methodType(PyObject.class, PyObject.class));
+    static final MethodHandle GETITEM = MH.findStatic(LOOKUP, Abstract.class, "PyObject_GetItem",
+                            MethodType.methodType(PyObject.class, ThreadState.class, PyObject.class, PyObject.class));
     static final MethodHandle SETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__setattr__",
             MethodType.methodType(void.class, String.class, PyObject.class));
     static final MethodHandle SETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__setitem__",
@@ -56,7 +59,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     mh = GETATTR;
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
-                    mh = GETITEM;
+
+                    mh = MethodHandles.insertArguments(GETITEM, 0, Py.getThreadState());
                 }
                 guard = Guards.getIdentityGuard(self);
                 break;

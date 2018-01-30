@@ -35,6 +35,12 @@ public enum SlotFunc {
             type.getattro = mh;
         }
     },
+    GETITEM("__getitem__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.mqSubscript = mh;
+        }
+    },
     ITER("__iter__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
@@ -48,6 +54,7 @@ public enum SlotFunc {
             type.isIterator = true;
         }
     },
+
     LENGTH("__len__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
@@ -58,6 +65,12 @@ public enum SlotFunc {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.sqRepeat = mh;
+        }
+    },
+    SQ_ITEM() {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.sqItem = mh;
         }
     },
     STR("__str__") {

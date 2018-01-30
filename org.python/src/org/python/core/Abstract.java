@@ -31,6 +31,7 @@ public class Abstract {
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
+    private static final InvokeByName getitem = new InvokeByName("__getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     /**
      * Check whether ob is in sequence seq
      * @param seq
@@ -39,6 +40,19 @@ public class Abstract {
      */
     public static boolean PySequence_Contains(PyObject seq, PyObject ob) {
         return PySequence_Contains(ob, seq, Py.getThreadState());
+    }
+
+    public static PyObject PySequence_GetItem(PyObject o, int keyValue) {
+        PyType tp = o.getType();
+        try {
+            if (keyValue < 0) {
+                int len = (int) tp.sqLen.invokeExact(o);
+                keyValue += len;
+            }
+            return (PyObject) tp.sqItem.invokeExact(o, keyValue);
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
     }
 
     /**
@@ -330,6 +344,27 @@ public class Abstract {
             throw e;
         } catch (Throwable t) {
             throw Py.JavaError(t);
+        }
+    }
+
+    public static PyObject PyObject_GetItem(ThreadState ts, PyObject o, PyObject key) {
+        PyType tp = o.getType();
+        if (tp.mqSubscript != null) {
+            try {
+                return (PyObject) tp.mqSubscript.invokeExact(o, key);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        if (tp.sqItem != null) {
+            int keyval = key.asIndex();
+            return PySequence_GetItem(o, keyval);
+        }
+        try {
+            Object func = getitem.getGetter().invokeExact(tp);
+            return (PyObject) getitem.getInvoker().invokeExact(func, ts, o, key);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
         }
     }
 

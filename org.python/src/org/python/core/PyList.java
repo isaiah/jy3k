@@ -376,14 +376,32 @@ public class PyList extends PySequenceList implements List {
         seq___setitem__(o, def);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.list___getitem___doc)
-    public final synchronized PyObject list___getitem__(PyObject o) {
-        PyObject ret = seq___finditem__(o);
-        if (ret == null) {
-            throw Py.IndexError("index out of range: " + o);
+    @ExposedSlot(SlotFunc.SQ_ITEM)
+    public static PyObject getitem(PyObject list, int keyval) {
+        PyList self = (PyList) list;
+        if (keyval < 0) {
+            keyval += self.size();
         }
-        return ret;
+        return self.list.get(keyval);
     }
+
+    @ExposedSlot(SlotFunc.GETITEM)
+    public static PyObject getitem(PyObject list, PyObject key) {
+        PyList self = (PyList) list;
+        if (key instanceof PyLong) {
+            return getitem(self, key.asIndex());
+        }
+        return self.seq___getitem__(key);
+    }
+
+//    @ExposedMethod(doc = BuiltinDocs.list___getitem___doc)
+//    public final synchronized PyObject list___getitem__(PyObject o) {
+//        PyObject ret = seq___finditem__(o);
+//        if (ret == null) {
+//            throw Py.IndexError("index out of range: " + o);
+//        }
+//        return ret;
+//    }
 
     @ExposedSlot(SlotFunc.ITER)
     public static PyObject iter(PyObject iter) {

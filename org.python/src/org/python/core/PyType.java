@@ -105,16 +105,18 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     private int numSlots;
 
     /** type slots */
+    public MethodHandle call;
     public MethodHandle iter;
     public MethodHandle iternext;
     public MethodHandle getattro;
+    public MethodHandle mqSubscript;
+    public MethodHandle nbBool; // Z(Lorg.python.PyObject;)
+    public MethodHandle nbDivmod;
     public MethodHandle sqContains;
     public MethodHandle sqRepeat;
     public MethodHandle sqLen; // J(Lorg.python.PyObject;)
+    public MethodHandle sqItem;
     public MethodHandle str;
-    public MethodHandle call;
-    public MethodHandle nbBool; // Z(Lorg.python.PyObject;)
-    public MethodHandle nbDivmod;
     public boolean isIterator;
 
     private transient ReferenceQueue<PyType> subclasses_refq = new ReferenceQueue<PyType>();

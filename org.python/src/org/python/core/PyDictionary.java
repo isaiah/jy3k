@@ -7,7 +7,9 @@ package org.python.core;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.bootstrap.Import;
 import org.python.expose.MethodType;
 
@@ -181,19 +183,20 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         return getMap().get(key);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___getitem___doc)
-    public final PyObject dict___getitem__(PyObject key) {
-        PyObject result = getMap().get(key);
+    @ExposedSlot(SlotFunc.GETITEM)
+    public static PyObject getitem(PyObject map, PyObject key) {
+        PyDictionary self = (PyDictionary) map;
+        PyObject result = self.getMap().get(key);
         if (result != null) {
             return result;
         }
 
         // Look up __missing__ method if we're a subclass.
-        PyType type = getType();
+        PyType type = self.getType();
         if (type != TYPE) {
             PyObject missing = type.lookup("__missing__");
             if (missing != null) {
-                return missing.__get__(this, type).__call__(key);
+                return missing.__get__(self, type).__call__(key);
             }
         }
         throw Py.KeyError(key);
