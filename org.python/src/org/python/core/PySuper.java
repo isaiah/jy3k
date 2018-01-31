@@ -4,7 +4,9 @@ package org.python.core;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 /**
  * The Python super type.
@@ -126,11 +128,12 @@ public class PySuper extends PyObject implements Traverseproc {
         return super.__findattr_ex__(name);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.super___getattribute___doc)
-    final PyObject super___getattribute__(PyObject name) {
-        PyObject ret = super___findattr_ex__(asName(name));
+    @ExposedSlot(SlotFunc.GETATTRO)
+    public static PyObject getattro(PyObject super$, String name) {
+        PySuper self = (PySuper) super$;
+        PyObject ret = self.super___findattr_ex__(name);
         if (ret == null) {
-            noAttributeError(asName(name));
+            self.noAttributeError(name);
         }
         return ret;
     }

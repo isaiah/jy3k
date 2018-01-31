@@ -7,7 +7,9 @@ import jdk.dynalink.linker.LinkRequest;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -83,12 +85,12 @@ public class PyMethod extends PyObject implements InvocationHandler, Traversepro
         return __func__.__findattr_ex__(name);
     }
     
-    @ExposedMethod(doc = BuiltinDocs.method___getattribute___doc)
-    final PyObject method___getattribute__(PyObject arg0) {
-        String name = asName(arg0);
-        PyObject ret = method___findattr_ex__(name);
+    @ExposedSlot(SlotFunc.GETATTRO)
+    public static PyObject getattro(PyObject method, String name) {
+        PyMethod self = (PyMethod) method;
+        PyObject ret = self.method___findattr_ex__(name);
         if (ret == null) {
-            noAttributeError(name);
+            self.noAttributeError(name);
         }
         return ret;
     }
