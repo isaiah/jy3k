@@ -14,6 +14,7 @@ import org.python.expose.MethodType;
 import org.python.modules._codecs;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,6 +54,21 @@ public class PyUnicode extends PySequence implements Iterable {
      */
     private final IndexTranslator translator;
     protected String string; // cannot make final because of Python intern support
+    private static final WeakHashMap<String, WeakReference<PyUnicode>> internCache =
+            new WeakHashMap<>( 100000 );
+
+    private static PyUnicode manualIntern( final String str )
+    {
+        final WeakReference<PyUnicode> cached = internCache.get( str );
+        if ( cached != null ) {
+            final PyUnicode value = cached.get();
+            if ( value != null )
+                return value;
+        }
+        PyUnicode unicode = PyUnicode.noIntern(str);
+        internCache.put( str, new WeakReference<>(unicode) );
+        return unicode;
+    }
     /**
      * A singleton provides the translation service (which is a pass-through) for all BMP strings.
      */
@@ -178,10 +195,15 @@ public class PyUnicode extends PySequence implements Iterable {
      * Creates a PyUnicode from an already interned String. Just means it won't be reinterned if
      * used in a place that requires interned Strings.
      */
-    public static PyUnicode fromInterned(String interned) {
-        PyUnicode uni = new PyUnicode(TYPE, interned);
-        uni.interned = true;
-        return uni;
+    public static PyUnicode fromInterned(String string) {
+        return manualIntern(string);
+    }
+
+    private static PyUnicode noIntern(String string) {
+        PyUnicode u = new PyUnicode(TYPE, null, false);
+        u.string = string;
+        u.interned = true;
+        return u;
     }
 
     public static String checkEncoding(String s) {

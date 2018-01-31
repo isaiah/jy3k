@@ -914,7 +914,7 @@ public final class Py {
     }
 
     public static PyUnicode newUnicode(String s) {
-        return new PyUnicode(s);
+        return PyUnicode.fromInterned(s);
     }
 
     public static PyUnicode newUnicode(String s, boolean isBasic) {
