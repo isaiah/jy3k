@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -337,7 +338,6 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
                     }
                 }
 
-                slotName = mangleName(name, slotName);
                 if (dict.__finditem__(slotName) == null) {
                     dict.__setitem__(slotName, new PySlot(this, slotName, numSlots++));
                 }
@@ -2013,20 +2013,6 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         return identifier;
     }
 
-    //XXX: copied from CodeCompiler.java and changed variable names.
-    //       Maybe this should go someplace for all classes to use.
-    private static String mangleName(String classname, String methodname) {
-        if (classname != null && methodname.startsWith("__") && !methodname.endsWith("__")) {
-            //remove leading '_' from classname
-            int i = 0;
-            while (classname.charAt(i) == '_') {
-                i++;
-            }
-            return ("_" + classname.substring(i) + methodname).intern();
-        }
-        return methodname;
-    }
-
     /** Used when serializing this type. */
     protected Object writeReplace() {
         return new TypeResolver(underlying_class, getModule().toString(), getName());
@@ -2060,7 +2046,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
                 return PyType.fromClass(underlying_class, false);
             }
             PyObject mod = Import.importModule(module);
-            PyObject pytyp = mod.__getattr__(name.intern());
+            PyObject pytyp = Abstract._PyObject_GetAttrId(mod, name);
             if (!(pytyp instanceof PyType)) {
                 throw Py.TypeError(module + "." + name + " must be a type for deserialization");
             }
@@ -2140,7 +2126,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         public static final int SIZE_EXP = 11;
 
         public MethodCache() {
-            table = new AtomicReferenceArray<MethodCacheEntry>(1 << SIZE_EXP);
+            table = new AtomicReferenceArray<>(1 << SIZE_EXP);
             clear();
         }
 
@@ -2180,7 +2166,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
          * Return the table index for type version/name.
          */
         private static int indexFor(Object version, String name) {
-            return (version.hashCode() * name.hashCode()) >>> (Integer.SIZE - SIZE_EXP);
+            return (version.hashCode() * Objects.hash(name)) >>> (Integer.SIZE - SIZE_EXP);
         }
 
         /**
@@ -2218,7 +2204,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             }
 
             public boolean isValid(Object version, String name) {
-                return this.version == version && this.name == name;
+                return this.version == version && this.name.equals(name);
             }
 
             public PyObject get(PyObject[] where) {

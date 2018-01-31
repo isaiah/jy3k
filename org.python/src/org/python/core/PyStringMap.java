@@ -419,7 +419,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return stringmap_setdefault(key, failobj);
     }
 
-    @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_setdefault_doc)
+    @ExposedMethod(defaults = "null", doc = BuiltinDocs.dict_setdefault_doc)
     public final PyObject stringmap_setdefault(PyObject key, PyObject failobj) {
         Object internedKey = (key instanceof PyUnicode) ? ((PyUnicode)key).internedString() : key;
         PyObject oldValue = table.putIfAbsent(internedKey, failobj);
