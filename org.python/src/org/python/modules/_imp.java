@@ -46,7 +46,7 @@ public class _imp {
                 return new PyModule(modName, new PyStringMap());
             }
         }
-        throw Py.RuntimeError("builtin module not found");
+        throw Py.RuntimeError(String.format("builtin module (%s) not found", modName));
     }
 
     @ExposedFunction

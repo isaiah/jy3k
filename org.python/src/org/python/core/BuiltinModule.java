@@ -445,29 +445,14 @@ public class BuiltinModule {
 
     public static PyObject getattr3(PyObject obj, PyObject nameObj, PyObject def) {
         String name = asName(nameObj, "getattr");
-        PyObject result = null;
-        PyException attributeError = null;
-
         try {
-            result = obj.__findattr_ex__(name);
-        } catch (PyException pye) {
-            if (!pye.match(Py.AttributeError)) {
-                throw pye;
+            return Abstract._PyObject_GetAttrId(obj, name);
+        } catch (PyException e) {
+            if (def != null && e.match(Py.AttributeError)) {
+                return def;
             }
-            attributeError = pye;
+            throw e;
         }
-        if (result != null) {
-            return result;
-        }
-        if (def != null) {
-            return def;
-        }
-
-        if (attributeError == null) {
-            // throws AttributeError
-            obj.noAttributeError(name);
-        }
-        throw attributeError;
     }
 
     public static PyObject globals() {

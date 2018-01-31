@@ -7,7 +7,9 @@ package org.python.core;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -263,9 +265,9 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return buf.toString();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___contains___doc)
-    public final boolean stringmap___contains__(PyObject o) {
-        return table.containsKey(pyToKey(o));
+    @ExposedSlot(SlotFunc.CONTAINS)
+    public static boolean contains(PyObject map, PyObject key) {
+        return ((PyStringMap) map).table.containsKey(pyToKey(key));
     }
 
     /**

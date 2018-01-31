@@ -65,6 +65,7 @@ public class BaseTypeBuilder implements TypeBuilder {
         }
         for (TypeSlot slot: typeSlots) {
             slot.assign(type);
+            // XXX the slot wrapper could be constructed and insert to the dict here
         }
         return dict;
     }

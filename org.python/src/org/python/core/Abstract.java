@@ -32,6 +32,8 @@ public class Abstract {
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 
     private static final InvokeByName getitem = new InvokeByName("__getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+//    private static final InvokeByName getattribute = new InvokeByName("__getattribute__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+//    private static final InvokeByName getattr = new InvokeByName("__getattr__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     /**
      * Check whether ob is in sequence seq
      * @param seq
@@ -53,6 +55,19 @@ public class Abstract {
         } catch (Throwable e) {
             throw Py.JavaError(e);
         }
+    }
+
+    public static PyObject _PyObject_GetAttrId(PyObject o, String attr) {
+        PyType tp = o.getType();
+        if (tp.getattro != null) {
+            try {
+                return (PyObject) tp.getattro.invokeExact(o, attr);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        return PyObject.PyObject_GenericGetAttr(o, attr);
+//        throw Py.AttributeError(String.format("%s has no attribute %s", tp.fastGetName(), attr));
     }
 
     /**

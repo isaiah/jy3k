@@ -813,7 +813,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                         attrName = name.substring(dot);
                     }
                     code.ldc(attrName);
-                    code.invokevirtual(p(PyObject.class), "__getattr__", sig(PyObject.class, String.class));
+                    code.invokestatic(p(Abstract.class), "_PyObject_GetAttrId", sig(PyObject.class, PyObject.class, String.class));
+//                    code.invokevirtual(p(PyObject.class), "__getattr__", sig(PyObject.class, String.class));
                     dot = nextDot;
                 }
             }
@@ -1436,7 +1437,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.invokevirtual(p(PyObject.class), "__delattr__", sig(Void.TYPE, String.class));
                 return null;
             case Load:
-                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
+                code.ldc(node.getInternalAttr());
+                code.invokestatic(p(Abstract.class), "_PyObject_GetAttrId", sig(PyObject.class, PyObject.class, String.class));
+//                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
                 return null;
             case Param:
             case Store:

@@ -53,6 +53,7 @@ class BootstrapTypesSingleton {
         BOOTSTRAP_TYPES.add(PyType.class);
         BOOTSTRAP_TYPES.add(PyBuiltinCallable.class);
         BOOTSTRAP_TYPES.add(PyDataDescr.class);
+        BOOTSTRAP_TYPES.add(PyMethodDescr.class);
         BOOTSTRAP_TYPES.add(PyStringMap.class);
     }
 

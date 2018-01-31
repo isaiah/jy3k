@@ -7,15 +7,21 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.bootstrap.Import;
 import org.python.core.linker.InvokeByName;
 import org.python.expose.ExposeAsSuperclass;
 import org.python.expose.TypeBuilder;
+import org.python.internal.lookup.MethodHandleFactory;
+import org.python.internal.lookup.MethodHandleFunctionality;
 import org.python.modules._weakref.WeakrefModule;
 
 import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -39,6 +45,9 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     public final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
+    static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
+    public static final MethodHandle GEN_GETATTR = MH.findStatic(LOOKUP, PyObject.class, "PyObject_GenericGetAttr", MethodType.methodType(PyObject.class, PyObject.class, String.class));
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:
@@ -260,6 +269,9 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         for (PyObject cur : type.bases) {
             if (cur instanceof PyType)
                 ((PyType)cur).attachSubclass(type);
+        }
+        if (type.getattro == null) {
+            type.getattro = GEN_GETATTR;
         }
 
         PyObject cell = dict.__finditem__("__classcell__");
@@ -573,15 +585,19 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         TypeBuilder builder = classToBuilder.get(underlying_class);
         name = builder.getName();
         dict = builder.getDict(this);
+        if (getattro == null) {
+            getattro = GEN_GETATTR;
+        }
         docKey = builder.getDoc();
         if (dict.__finditem__("__doc__") == null) {
             PyObject docObj;
             if (docKey != null) {
                 docObj = new PyUnicode(this, docKey, true);
                 dict.__setitem__("__doc__", docObj);
-            }
-            if (Py.None != null) {
-                dict.__setitem__("__doc__", Py.None);
+            } else {
+                if (Py.None != null) {
+                    dict.__setitem__("__doc__", Py.None);
+                }
             }
         }
         setIsBaseType(builder.getIsBaseType());
@@ -1491,15 +1507,15 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         return addFromClass(c, needsInners);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.type___getattribute___doc)
-    public final PyObject type___getattribute__(PyObject name) {
-        String n = asName(name);
-        PyObject ret = type___findattr_ex__(n);
-        if (ret == null) {
-            noAttributeError(n);
-        }
-        return ret;
-    }
+//    @ExposedMethod(doc = BuiltinDocs.type___getattribute___doc)
+//    public final PyObject type___getattribute__(PyObject name) {
+//        String n = asName(name);
+//        PyObject ret = type___findattr_ex__(n);
+//        if (ret == null) {
+//            noAttributeError(n);
+//        }
+//        return ret;
+//    }
 
     @ExposedClassMethod(doc = BuiltinDocs.type___prepare___doc)
     public static PyObject type___prepare__(PyType type, PyObject[] args, String[] keywords) {
@@ -1749,6 +1765,48 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
 //        obj.proxyInit();
         obj.dispatch__init__(args, keywords);
         return obj;
+    }
+
+
+    /* This is similar to PyObject_GenericGetAttr(),
+       but uses _PyType_Lookup() instead of just looking in type->tp_dict. */
+    @ExposedSlot(SlotFunc.GETATTRO)
+    public static PyObject getattr(PyObject tp, String name) {
+        PyType self = (PyType) tp;
+        PyType metaType = self.getType();
+        if (self.getDict() == null) {
+            return null;
+        }
+        PyObject metaAttribute = metaType.lookup(name);
+        boolean metaGet = false;
+        if (metaAttribute != null) {
+            metaGet = metaAttribute.implementsDescrGet();
+            if (metaGet && metaAttribute.isDataDescr()) {
+                return metaAttribute.__get__(self, metaType);
+            }
+        }
+        /* No data descriptor found on metatype. Look in tp_dict of this
+         * type and its bases */
+        PyObject attribute = self.lookup(name);
+
+        if (attribute != null) {
+            boolean localGet = attribute.implementsDescrGet();
+            if (localGet) {
+                return attribute.__get__(null, self);
+            }
+            return attribute;
+        }
+
+        /* No attribute found in local __dict__ (or bases): use the
+         * descriptor from the metatype, if any */
+        if (metaGet) {
+            return metaAttribute.__get__(self, metaType);
+        }
+        if (metaAttribute != null) {
+            return metaAttribute;
+        }
+        /* Give up */
+        throw Py.AttributeError(String.format("type object '%s' has no attribute '%s'", self.fastGetName(), name));
     }
 
     protected void __rawdir__(PyDictionary accum) {

@@ -7,7 +7,9 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.bootstrap.Import;
 import org.python.core.linker.InvokeByName;
 import org.python.modules.gc;
@@ -1059,13 +1061,6 @@ public class PyObject implements Serializable {
      * @see #__findattr_ex__(String)
      **/
     public final PyObject __getattr__(String name) {
-        if (getType().getattro != null) {
-            try {
-                getType().getattro.invokeExact(name.intern());
-            } catch (Throwable throwable) {
-                throw Py.JavaError(throwable);
-            }
-        }
         return __getattr__(new PyUnicode(name));
     }
 
@@ -1089,14 +1084,14 @@ public class PyObject implements Serializable {
             return object___getattribute__(name);
         }
         PyObject getattr = selfType.lookup("__getattribute__");
+
+        if (getattr.implementsDescrGet()) {
+            getattr = getattr.__get__(this, selfType);
+        }
         if (getattr instanceof PyBuiltinMethod) {
             return ((PyBuiltinMethod) getattr).invoke(name);
         }
-        PyObject func = getattr.__get__(this, selfType);
-        if (func instanceof PyBuiltinMethod) {
-            return ((PyBuiltinMethod) func).invoke(name);
-        }
-        return func.__call__(name);
+        return getattr.__call__(name);
     }
 
     public void noAttributeError(String name) {
@@ -2292,21 +2287,24 @@ public class PyObject implements Serializable {
         throw Py.AttributeError("object internal __delete__ impl is abstract");
     }
 
-    @ExposedMethod(doc = BuiltinDocs.object___getattribute___doc)
     final PyObject object___getattribute__(PyObject arg0) {
-        String name = asName(arg0);
-        PyObject ret = object___findattr__(name);
+        return PyObject_GenericGetAttr(this, asName(arg0));
+    }
+
+    @ExposedSlot(SlotFunc.GETATTRO)
+    public static PyObject PyObject_GenericGetAttr(PyObject obj, String name) {
+        PyObject ret = obj.object___findattr__(name);
         if (ret == null) {
-            PyObject __getattr = object___findattr__("__getattr__");
+            PyObject __getattr = obj.object___findattr__("__getattr__");
             if (__getattr != null) {
-                return __getattr.__call__(arg0);
+                return __getattr.__call__(PyUnicode.fromInterned(name));
             }
-            ret = __findattr_ex__(name);
+            ret = obj.__findattr_ex__(name);
             if (ret == null) {
                 if (name.equals("__cause__") || name.equals("__context__") || name.equals("__suppress_context__")) {
                     return Py.None;
                 }
-                noAttributeError(name);
+                obj.noAttributeError(name);
             }
         }
         return ret;
