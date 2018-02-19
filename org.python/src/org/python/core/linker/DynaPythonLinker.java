@@ -14,6 +14,7 @@ import org.python.core.Abstract;
 import org.python.core.Py;
 import org.python.core.PyBuiltinCallable;
 import org.python.core.PyBuiltinMethod;
+import org.python.core.PyClassMethod;
 import org.python.core.PyFunction;
 import org.python.core.PyMethod;
 import org.python.core.PyMethodDescr;
@@ -35,8 +36,8 @@ import java.lang.invoke.SwitchPoint;
 public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
-    static final MethodHandle GETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__getattr__",
-                    MethodType.methodType(PyObject.class, String.class));
+    static final MethodHandle GETATTR = MH.findStatic(LOOKUP, Abstract.class, "_PyObject_GetAttrId",
+                    MethodType.methodType(PyObject.class, PyObject.class, String.class));
     static final MethodHandle GETITEM = MH.findStatic(LOOKUP, Abstract.class, "PyObject_GetItem",
                             MethodType.methodType(PyObject.class, ThreadState.class, PyObject.class, PyObject.class));
     static final MethodHandle SETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__setattr__",
@@ -59,7 +60,6 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     mh = GETATTR;
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
-
                     mh = MethodHandles.insertArguments(GETITEM, 0, Py.getThreadState());
                 }
                 guard = Guards.getIdentityGuard(self);

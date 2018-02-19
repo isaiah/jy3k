@@ -246,6 +246,9 @@ public class PyException extends RuntimeException implements Traverseproc
      * @return true if a match
      */
     public boolean match(PyObject exc) {
+        if (type == exc) {
+            return true;
+        }
         if (exc instanceof PyTuple) {
             for (PyObject item : ((PyTuple)exc).getArray()) {
                 if (match(item)) {

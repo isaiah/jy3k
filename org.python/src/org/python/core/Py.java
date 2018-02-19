@@ -1330,7 +1330,7 @@ public final class Py {
                     printExceptionRecursive(f, (PyBaseException) cause, seen);
                     stderr.print(CAUSE_MESSAGE);
                 }
-            } else if (context != null && context != Py.None && !value.__suppress_context__.isTrue()) {
+            } else if (context != null && context != Py.None && !value.__suppress_context__) {
                 if (!seen.contains(context)) {
                     printExceptionRecursive(f, (PyBaseException) context, seen);
                     stderr.print(CONTEXT_MESSAGE);
@@ -2461,6 +2461,9 @@ public final class Py {
     }
 
     public static boolean isSubClass(PyObject derived, PyObject cls) {
+        if (derived == cls) {
+            return true;
+        }
         if (cls instanceof PyTuple) {
             for (PyObject item : cls.asIterable()) {
                 if (isSubClass(derived, item)) {
@@ -2579,13 +2582,14 @@ public final class Py {
     private static PyObject dispatchToChecker(PyObject checkerArg, PyObject cls,
                                               String checkerName) {
         // _PyObject_LookupSpecial
-        PyObject checker = cls.getType().lookup(checkerName);
-        if (checker == null) {
-            return null;
-        }
-        if (checker.implementsDescrGet()) {
-            checker = checker.__get__(cls, cls.getType());
-        }
+        PyObject checker = Abstract._PyObject_GetAttrId(cls, checkerName);
+//        PyObject checker = cls.getType().lookup(checkerName);
+//        if (checker == null) {
+//            return null;
+//        }
+//        if (checker.implementsDescrGet()) {
+//            checker = checker.__get__(cls, cls.getType());
+//        }
 
         return checker.__call__(checkerArg);
     }

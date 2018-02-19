@@ -57,7 +57,7 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
     @Override
     @ExposedMethod(defaults = "null")
     public PyObject __get__(PyObject obj, PyObject type) {
-        if (obj != null) {
+        if (obj != Py.None && obj != null) {
             checkGetterType(obj.getType());
             return meth.bind(obj);
         }

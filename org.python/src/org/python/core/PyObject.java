@@ -1019,6 +1019,7 @@ public class PyObject implements Serializable {
      *             <b> must be an interned string </b>.
      * @return the value corresponding to name or null if name is not found
      **/
+    // XXX start from here: have to deprecate this method and use Abstract._PyObject_GetAttrId universally
     public final PyObject __findattr__(String name) {
         try {
             return __findattr_ex__(name);
@@ -2213,7 +2214,7 @@ public class PyObject implements Serializable {
      * and keywords
      **/
     public PyObject invoke(String name, PyObject arg1, PyObject[] args, String[] keywords) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__(arg1, args, keywords);
     }
 
@@ -2258,7 +2259,7 @@ public class PyObject implements Serializable {
     }
 
     public boolean isDataDescr() {
-        return objtype.hasSet || objtype.hasDelete;
+        return objtype.hasSet;
     }
 
     /**

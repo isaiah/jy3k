@@ -16,7 +16,8 @@ public class PyClassMethod extends PyObject implements Traverseproc {
     @ExposedGet(name = "__func__")
     protected PyObject callable;
 
-    public PyClassMethod(PyObject callable) {
+    public PyClassMethod(PyType subtype, PyObject callable) {
+        super(subtype);
         if (!callable.isCallable()) {
             throw Py.TypeError("'" + callable.getType().fastGetName() + "' object is not callable");
         }
@@ -32,7 +33,7 @@ public class PyClassMethod extends PyObject implements Traverseproc {
         if (args.length != 1) {
             throw Py.TypeError("classmethod expected 1 argument, got " + args.length);
         }
-        return new PyClassMethod(args[0]);
+        return new PyClassMethod(subtype, args[0]);
     }
 
     public PyObject __get__(PyObject obj) {
@@ -44,8 +45,8 @@ public class PyClassMethod extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.classmethod___get___doc)
-    final PyObject classmethod___get__(PyObject obj, PyObject type) {
-        if(type == null) {
+    public final PyObject classmethod___get__(PyObject obj, PyObject type) {
+        if(type == Py.None || type == null) {
             type = obj.getType();
         }
         return new PyMethod(callable, type, type.getType());

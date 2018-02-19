@@ -1416,7 +1416,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 code.invokevirtual(p(PyObject.class), "__delattr__", sig(Void.TYPE, String.class));
                 break;
             case Load:
-                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
+                code.ldc(node.getInternalAttr());
+                code.invokestatic(p(Abstract.class), "_PyObject_GetAttrId", sig(PyObject.class, PyObject.class, String.class));
+//                code.visitInvokeDynamicInsn(node.getInternalAttr(), sig(PyObject.class, PyObject.class), LINKERBOOTSTRAP, Bootstrap.GET_PROPERTY);
                 break;
             case Param:
             case Store:

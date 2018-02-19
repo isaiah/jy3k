@@ -34,7 +34,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
 
     @ExposedGet(doc = BuiltinDocs.BaseException___suppress_context___doc)
     @ExposedSet
-    public PyObject __suppress_context__;
+    public boolean __suppress_context__;
 
     @ExposedGet(doc = BuiltinDocs.BaseException___context___doc)
     public PyObject __context__;
@@ -43,7 +43,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     public PyObject __traceback__;
 
     public PyBaseException() {
-        super();
+        super(TYPE);
     }
 
     public PyBaseException(PyType subType) {
@@ -64,7 +64,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
             message = args[0];
         }
         __context__ = Py.None;
-        __suppress_context__ = Py.False;
+        __suppress_context__ = false;
     }
 
     public PyObject with_traceback(PyObject tb) {
@@ -179,7 +179,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
             __cause__ = val;
         }
         if (val != null) {
-            __suppress_context__ = Py.True;
+            __suppress_context__ = true;
         }
     }
 

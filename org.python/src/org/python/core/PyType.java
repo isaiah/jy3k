@@ -49,6 +49,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     public static final MethodHandle GEN_GETATTR = MH.findStatic(LOOKUP, PyObject.class, "PyObject_GenericGetAttr", MethodType.methodType(PyObject.class, PyObject.class, String.class));
+    public static final MethodHandle TP_GETATTR = MH.findStatic(LOOKUP, PyType.class, "getattr", MethodType.methodType(PyObject.class, PyObject.class, String.class));
 
     /**
      * The type's name. builtin types include their fully qualified name, e.g.:
@@ -222,12 +223,13 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         }
 
         PyType type;
-        if (new_.for_type == metatype) {
-            // XXX: set metatype
-            type = new PyType();
-        } else {
-            type = new PyTypeDerived(metatype);
-        }
+        type = new PyType(metatype);
+//        if (new_.for_type == metatype) {
+//            // XXX: set metatype
+//            type = new PyType();
+//        } else {
+//            type = new PyTypeDerived(metatype);
+//        }
 
         if (dict instanceof PyStringMap) {
             dict = ((PyStringMap)dict).copy();
@@ -262,6 +264,7 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             throw Py.TypeError(String.format("type '%.100s' is not an acceptable base type",
                                              base.name));
         }
+        type.getattro = base.getattro;
 
         type.createAllSlots(!(base.needs_userdict || type.needs_userdict), !base.needs_weakref);
         type.ensureAttributes();
@@ -1782,7 +1785,12 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         if (metaAttribute != null) {
             metaGet = metaAttribute.implementsDescrGet();
             if (metaGet && metaAttribute.isDataDescr()) {
-                return metaAttribute.__get__(self, metaType);
+                try {
+                    Object func = get.getGetter().invokeExact(metaAttribute);
+                    return (PyObject) get.getInvoker().invokeExact(func, Py.getThreadState(), (PyObject) self, (PyObject) metaType);
+                } catch (Throwable throwable) {
+                    throw Py.JavaError(throwable);
+                }
             }
         }
         /* No data descriptor found on metatype. Look in tp_dict of this
@@ -1792,7 +1800,12 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         if (attribute != null) {
             boolean localGet = attribute.implementsDescrGet();
             if (localGet) {
-                return attribute.__get__(null, self);
+                try {
+                    Object func = get.getGetter().invokeExact(attribute);
+                    return (PyObject) get.getInvoker().invokeExact(func, Py.getThreadState(), Py.None, (PyObject) self);
+                } catch (Throwable throwable) {
+                    throw Py.JavaError(throwable);
+                }
             }
             return attribute;
         }
@@ -1800,7 +1813,12 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         /* No attribute found in local __dict__ (or bases): use the
          * descriptor from the metatype, if any */
         if (metaGet) {
-            return metaAttribute.__get__(self, metaType);
+            try {
+                Object func = get.getGetter().invokeExact(metaAttribute);
+                return (PyObject) get.getInvoker().invokeExact(func, Py.getThreadState(), (PyObject) self, (PyObject) metaType);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
         }
         if (metaAttribute != null) {
             return metaAttribute;
