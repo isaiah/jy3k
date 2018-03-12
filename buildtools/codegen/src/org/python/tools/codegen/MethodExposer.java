@@ -124,9 +124,8 @@ public class MethodExposer extends Exposer {
     }
 
     protected static boolean isWide(Type[] args) {
-        int offset = needsThreadState(args) ? 1 : 0;
-        return args.length == 2 + offset
-                && args[offset].equals(APYOBJ) && args[offset + 1].equals(ASTRING);
+        int len = args.length - 1;
+        return len >= 1 && args[len--].equals(ASTRING) && args[len--].equals(APYOBJ);
     }
 
     protected static boolean isWide(String methDescriptor) {
