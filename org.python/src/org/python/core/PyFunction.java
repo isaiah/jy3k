@@ -5,15 +5,15 @@ import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.support.Guards;
-import org.python.core.generator.PyAsyncGenerator;
-import org.python.core.generator.PyCoroutine;
-import org.python.core.generator.PyGenerator;
 import org.python.annotations.ExposedDelete;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.core.generator.PyAsyncGenerator;
+import org.python.core.generator.PyCoroutine;
+import org.python.core.generator.PyGenerator;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -29,7 +29,7 @@ import java.lang.reflect.Proxy;
  * A Python function.
  */
 @ExposedType(name = "function", isBaseType = false, doc = BuiltinDocs.function_doc)
-public class PyFunction extends PyObject implements InvocationHandler, Traverseproc {
+public class PyFunction extends PyObject implements DynLinkable, InvocationHandler, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
@@ -644,7 +644,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
 //            } else {
                 guard = Guards.getIdentityGuard(this);
 //            }
-            return new GuardedInvocation(mh, guard);
+            return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
 
         mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
@@ -724,7 +724,7 @@ public class PyFunction extends PyObject implements InvocationHandler, Traversep
         } else {
             guard = Guards.getIdentityGuard(this);
         }
-        return new GuardedInvocation(mh, guard);
+        return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
 
     private static boolean isSameReceiver(PyObject boundMethod, PyObject self) {

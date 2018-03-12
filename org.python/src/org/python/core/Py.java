@@ -2582,15 +2582,10 @@ public final class Py {
     private static PyObject dispatchToChecker(PyObject checkerArg, PyObject cls,
                                               String checkerName) {
         // _PyObject_LookupSpecial
-        PyObject checker = Abstract._PyObject_GetAttrId(cls, checkerName);
-//        PyObject checker = cls.getType().lookup(checkerName);
-//        if (checker == null) {
-//            return null;
-//        }
-//        if (checker.implementsDescrGet()) {
-//            checker = checker.__get__(cls, cls.getType());
-//        }
-
+        PyObject checker = PyType._PyObject_LookupSpecial(cls, checkerName);
+        if (checker == null) {
+            return null;
+        }
         return checker.__call__(checkerArg);
     }
 
@@ -2607,7 +2602,12 @@ public final class Py {
      * class.
      */
     private static void checkClass(PyObject cls, String message) {
-        if (abstractGetBases(cls) == null) {
+        if (cls == null) {
+            throw Py.TypeError(message);
+        }
+        try {
+            Abstract._PyObject_GetAttrId(cls, "__bases__");
+        } catch (PyException e) {
             throw Py.TypeError(message);
         }
     }

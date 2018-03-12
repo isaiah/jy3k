@@ -17,7 +17,7 @@ import java.lang.invoke.SwitchPoint;
  * PyBuiltinMethod is native implemented methods
  * i.e. str.split
  */
-public class PyBuiltinMethod extends PyBuiltinCallable implements ExposeAsSuperclass, Cloneable, Traverseproc {
+public class PyBuiltinMethod extends PyBuiltinCallable implements DynLinkable, ExposeAsSuperclass, Cloneable, Traverseproc {
     static final MethodHandles.Lookup LOOKUP_P = MethodHandles.publicLookup();
     static final MethodHandles.Lookup LOOKUP = LOOKUP_P.in(Py.class);
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();

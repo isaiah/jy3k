@@ -1,6 +1,9 @@
 /* Copyright (c) Jython Developers */
 package org.python.core;
 
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedDelete;
 import org.python.annotations.ExposedGet;
@@ -41,10 +44,11 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * The Python Type object implementation.
  */
 @ExposedType(name = "type", doc = BuiltinDocs.type_doc)
-public class PyType extends PyObject implements Serializable, Traverseproc {
+public class PyType extends PyObject implements DynLinkable, Serializable, Traverseproc {
 
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName _call = new InvokeByName("__call__", PyObject.class, PyObject.class, PyObject[].class, String[].class);
     public final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
@@ -379,6 +383,27 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         needs_finalizer = needsFinalizer();
     }
 
+    private static PyObject invokeNew(PyObject new_, PyType type, boolean init, PyObject[] args,
+                                      String[] keywords) {
+        PyObject obj;
+        if (new_ instanceof PyNewWrapper) {
+            obj = ((PyNewWrapper) new_).new_impl(init, type, args, keywords);
+        } else {
+            int n = args.length;
+            PyObject[] typePrepended = new PyObject[n + 1];
+            System.arraycopy(args, 0, typePrepended, 1, n);
+            typePrepended[0] = type;
+            try {
+                Object descrgetfunc = get.getGetter().invokeExact(new_);
+                new_ = (PyObject) get.getInvoker().invokeExact(descrgetfunc, Py.getThreadState(), Py.None, (PyObject) type);
+                obj = new_.__call__(typePrepended, keywords);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        return obj;
+    }
+
     public static class PyTypeDictDescr extends PyDataDescr {
         public PyTypeDictDescr(PyType onType, String name, Class ofType, String doc) {
             super(onType, name, ofType, doc);
@@ -545,19 +570,16 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         }
     }
 
-    private static PyObject invokeNew(PyObject new_, PyType type, boolean init, PyObject[] args,
-                                      String[] keywords) {
-        PyObject obj;
-        if (new_ instanceof PyNewWrapper) {
-            obj = ((PyNewWrapper)new_).new_impl(init, type, args, keywords);
-        } else {
-            int n = args.length;
-            PyObject[] typePrepended = new PyObject[n + 1];
-            System.arraycopy(args, 0, typePrepended, 1, n);
-            typePrepended[0] = type;
-            obj = new_.__get__(null, type).__call__(typePrepended, keywords);
+    public static PyObject lookupSpecial(PyObject obj, String name) {
+        PyType type = obj.getType();
+        PyObject ret = type.lookup(name);
+        try {
+            Object descrgetfunc = get.getGetter().invokeExact(ret);
+            ret = (PyObject) get.getInvoker().invokeExact(descrgetfunc, Py.getThreadState(), obj, (PyObject) type);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
         }
-        return obj;
+        return ret;
     }
 
     /**
@@ -1250,17 +1272,34 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
         return lookup_where(name, null);
     }
 
-    public static PyObject lookupSpecial(PyObject obj, String name) {
-        PyType type = obj.getType();
-        PyObject ret = type.lookup(name);
-        Object descrgetfunc;
-        try {
-            descrgetfunc = get.getGetter().invokeExact(ret);
-            ret = (PyObject) get.getInvoker().invokeExact(descrgetfunc, Py.getThreadState(), obj, (PyObject) type);
-        } catch (Throwable throwable) {
-            throw Py.JavaError(throwable);
+    @ExposedSlot(SlotFunc.CALL)
+    public static PyObject type___call__(PyObject tp, PyObject[] args, String[] keywords) {
+        PyType self = (PyType) tp;
+        PyObject new_ = self.lookup("__new__");
+        if (!self.instantiable || new_ == null) {
+            throw Py.TypeError(String.format("cannot create '%.100s' instances", self.name));
         }
-        return ret;
+
+        PyObject obj = invokeNew(new_, self, true, args, keywords);
+        // When the call was type(something) or the returned object is not an instance of
+        // type, it won't be initialized
+        if ((self == TYPE && args.length == 1 && keywords.length == 0)
+                || !obj.getType().isSubType(self)) {
+            return obj;
+        }
+//        try {
+//            Object initFunc = init.getGetter().invokeExact(obj);
+//            PyObject none = (PyObject) init.getInvoker().invokeExact(initFunc, args, keywords);
+//            if (none != Py.None) {
+//                throw Py.TypeError(String.format("__init__() should return None, not '%.200s'",
+//                        none.getType().fastGetName()));
+//            }
+//        } catch (Throwable e) {
+//            throw Py.JavaError(e);
+//        }
+//        obj.proxyInit();
+        obj.dispatch__init__(args, keywords);
+        return obj;
     }
 
     /**
@@ -1737,39 +1776,62 @@ public class PyType extends PyObject implements Serializable, Traverseproc {
             });
     }
 
-    public PyObject __call__(PyObject[] args, String[] keywords) {
-        return type___call__(args, keywords);
+    /* Routines to do a method lookup in the type without looking in the
+       instance dictionary (so we can't use PyObject_GetAttr) but still
+       binding it to the instance.
+
+       Variants:
+
+       - _PyObject_LookupSpecial() returns NULL without raising an exception
+         when the _PyType_Lookup() call fails;
+
+       - lookup_maybe_method() and lookup_method() are internal routines similar
+         to _PyObject_LookupSpecial(), but can return unbound PyFunction
+         to avoid temporary method object. Pass self as first argument when
+         unbound == 1.
+    */
+    public static PyObject _PyObject_LookupSpecial(PyObject self, String attr) {
+        PyType tp = self.getType();
+        PyObject res = tp.lookup(attr);
+        if (res != null) {
+            if (res.implementsDescrGet()) {
+                try {
+                    Object func = get.getGetter().invokeExact(res);
+                    return (PyObject) get.getInvoker().invokeExact(func, Py.getThreadState(), (PyObject) self, (PyObject) tp);
+                } catch (Throwable throwable) {
+                    throw Py.JavaError(throwable);
+                }
+            }
+        }
+        return res;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.type___call___doc)
-    public final PyObject type___call__(PyObject[] args, String[] keywords) {
-        PyObject new_ = lookup("__new__");
-        if (!instantiable || new_ == null) {
-            throw Py.TypeError(String.format("cannot create '%.100s' instances", name));
-        }
-
-        PyObject obj = invokeNew(new_, this, true, args, keywords);
-        // When the call was type(something) or the returned object is not an instance of
-        // type, it won't be initialized
-        if ((this == TYPE && args.length == 1 && keywords.length == 0)
-            || !obj.getType().isSubType(this)) {
-            return obj;
-        }
-//        try {
-//            Object initFunc = init.getGetter().invokeExact(obj);
-//            PyObject none = (PyObject) init.getInvoker().invokeExact(initFunc, args, keywords);
-//            if (none != Py.None) {
-//                throw Py.TypeError(String.format("__init__() should return None, not '%.200s'",
-//                        none.getType().fastGetName()));
+    public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest linkRequest) {
+        try {
+            Object callfunc = _call.getGetter().invokeExact((PyObject) this);
+            if (callfunc != null && callfunc instanceof DynLinkable) {
+                return ((DynLinkable) callfunc).findCallMethod(desc, linkRequest);
+            }
+//            if (callfunc instanceof PyMethodDescr) {
+//                return ((PyMethodDescr) callfunc).getMeth().findCallMethod(desc, linkRequest);
 //            }
-//        } catch (Throwable e) {
-//            throw Py.JavaError(e);
-//        }
-//        obj.proxyInit();
-        obj.dispatch__init__(args, keywords);
-        return obj;
+            return new GuardedInvocation(call);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
     }
 
+    public PyObject __call__(PyObject[] args, String[] keywords) {
+//        try {
+//            Object callfunc = _call.getGetter().invokeExact((PyObject) this);
+//            if (callfunc != null) {
+//                return (PyObject) _call.getInvoker().invokeExact(callfunc, args, keywords);
+//            }
+//        } catch (Throwable throwable) {
+//            throw Py.JavaError(throwable);
+//        }
+        return type___call__(this, args, keywords);
+    }
 
     /* This is similar to PyObject_GenericGetAttr(),
        but uses _PyType_Lookup() instead of just looking in type->tp_dict. */

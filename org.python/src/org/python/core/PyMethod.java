@@ -24,7 +24,7 @@ import java.lang.reflect.Proxy;
  * A Python method.
  */
 @ExposedType(name = "method", isBaseType = false, doc = BuiltinDocs.method_doc)
-public class PyMethod extends PyObject implements InvocationHandler, Traverseproc {
+public class PyMethod extends PyObject implements DynLinkable, InvocationHandler, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
 

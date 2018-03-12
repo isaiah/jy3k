@@ -1,11 +1,14 @@
 package org.python.core;
 
+import jdk.dynalink.CallSiteDescriptor;
+import jdk.dynalink.linker.GuardedInvocation;
+import jdk.dynalink.linker.LinkRequest;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 
 @ExposedType(name = "method_descriptor", base = PyObject.class, isBaseType = false)
-public class PyMethodDescr extends PyDescriptor implements Traverseproc {
+public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverseproc {
 
     protected int minargs, maxargs;
     protected PyBuiltinMethod meth;
@@ -73,11 +76,6 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
         return meth.bind(args[0]).invoke(actualArgs, kwargs);
     }
 
-    public PyException unexpectedCall(int nargs, boolean keywords) {
-        return PyBuiltinMethodData.unexpectedCall(nargs, keywords, name, minargs,
-                maxargs);
-    }
-
     /**
      * Return the name this descriptor is exposed as.
      *
@@ -108,5 +106,10 @@ public class PyMethodDescr extends PyDescriptor implements Traverseproc {
     @Override
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && ob == meth;
+    }
+
+    @Override
+    public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest linkRequest) {
+        return meth.findCallMethod(desc, linkRequest);
     }
 }

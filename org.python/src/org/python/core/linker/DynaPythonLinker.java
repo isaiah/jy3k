@@ -11,16 +11,10 @@ import jdk.dynalink.linker.LinkerServices;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import jdk.dynalink.linker.support.Guards;
 import org.python.core.Abstract;
+import org.python.core.DynLinkable;
 import org.python.core.Py;
 import org.python.core.PyBuiltinCallable;
-import org.python.core.PyBuiltinMethod;
-import org.python.core.PyClassMethod;
-import org.python.core.PyFunction;
-import org.python.core.PyMethod;
-import org.python.core.PyMethodDescr;
-import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
-import org.python.core.PyType;
 import org.python.core.ThreadState;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
@@ -74,18 +68,8 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                 guard = Guards.getIdentityGuard(self);
                 break;
             case CALL:
-                if (self instanceof PyNewWrapper) {
-                    return ((PyNewWrapper) self).findCallMethod(desc, linkRequest);
-                } else if (self instanceof PyBuiltinMethod) {
-                    return ((PyBuiltinMethod) self).findCallMethod(desc, linkRequest);
-                } else if (self instanceof PyFunction) {
-                    return ((PyFunction) self).findCallMethod(desc, linkRequest);
-                } else if (self instanceof PyMethod) {
-                    return ((PyMethod) self).findCallMethod(desc, linkRequest);
-//                } else if (self instanceof PyType) {
-//                    return ((PyType) self).findCallMethod(desc, linkRequest);
-//                } else if (self instanceof PyMethodDescr) {
-//                    return ((PyMethodDescr) self).getMeth().findCallMethod(desc, linkRequest);
+                if (self instanceof DynLinkable) {
+                    return ((DynLinkable) self).findCallMethod(desc, linkRequest);
                 }
                 /** PyBuiltinFuction from builtins module */
                 mh = MH.findVirtual(LOOKUP, self.getClass(), "__call__", desc.getMethodType().dropParameterTypes(0, 1));

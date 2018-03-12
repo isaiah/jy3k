@@ -65,7 +65,7 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
         MethodHandle mh = MethodHandles.insertArguments(WIDE_CALL, 2, (Object) Py.NoKeywords);
         mh = mh.asCollector(1, PyObject[].class, argType.parameterCount() - 2);
         mh = MethodHandles.dropArguments(mh,1, ThreadState.class);
-        return new GuardedInvocation(mh, Guards.getClassGuard(PyNewWrapper.class));
+        return new GuardedInvocation(mh, Guards.getClassGuard(PyNewWrapper.class), new SwitchPoint[0], ClassCastException.class);
     }
 
     public void setWrappedType(PyType type) {
