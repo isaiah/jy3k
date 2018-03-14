@@ -20,12 +20,14 @@ public abstract class PyDescriptor extends PyObject implements Traverseproc {
         }
     }
 
-    protected void checkCallerType(PyType type) {
+    protected static PyObject checkCallerType(PyType dtype, PyObject caller) {
+        PyType type = caller.getType();
         if (type == dtype || type.isSubType(dtype)) {
-            return;
+            return caller;
         }
-        String msg = String.format("descriptor '%s' requires a '%s' object but received a '%s'",
-                                   name, dtype.fastGetName(), type.fastGetName());
+        String msg = String.format("descriptor 'requires a '%s' object but received a '%s'",
+                                   dtype.fastGetName(), type.fastGetName());
+//        name, dtype.fastGetName(), type.fastGetName());
         throw Py.TypeError(msg);
     }
     

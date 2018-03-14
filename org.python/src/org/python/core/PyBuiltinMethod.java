@@ -212,7 +212,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements DynLinkable, E
         return mh;
     }
 
-    private MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {
+    static MethodHandle asTypesafeReturn(MethodHandle mh, MethodType methodType) {
         Class<?> returnType = methodType.returnType();
         if (returnType == int.class) {
             mh = MethodHandles.filterReturnValue(mh, W_INTEGER);

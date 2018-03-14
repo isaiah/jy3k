@@ -18,8 +18,8 @@ public class BaseCode {
                 && argType.parameterType(3) == String[].class;
     }
 
-    public static PyFrame createFrame(PyObject funcObj, ThreadState ts) {
-        return createFrame(funcObj, ts, Py.EmptyObjects, Py.NoKeywords);
+    public static PyFrame createFrame(PyFunction function, ThreadState ts) {
+        return createFrame(function, ts, Py.EmptyObjects, Py.NoKeywords);
     }
 
     /**
@@ -70,24 +70,16 @@ public class BaseCode {
     /**
      * Create a frame with bound receiver and arguments
      */
-    public static PyFrame createFrame(PyObject funcObj, PyObject self, PyObject[] args) {
+    public static PyFrame createFrame(PyFunction function, PyObject self, PyObject[] args) {
         PyObject[] newArgs = new PyObject[args.length + 1];
         newArgs[0] = self;
         System.arraycopy(args, 0, newArgs, 1, args.length);
-        return createFrame(funcObj, newArgs);
+        return createFrame(function, newArgs);
     }
     /**
      * Create a frame with arguments only
      */
-    public static PyFrame createFrame(PyObject funcObj, PyObject[] args) {
-        PyFunction function;
-        if (funcObj instanceof PyFunction) {
-            function = (PyFunction) funcObj;
-        } else if (funcObj instanceof PyMethod){
-            function = (PyFunction) ((PyMethod) funcObj).__func__;
-        } else {
-            function = null;
-        }
+    public static PyFrame createFrame(PyFunction function, PyObject[] args) {
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, Py.NoKeywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__, function.__closure__);
         return frame;
@@ -95,54 +87,42 @@ public class BaseCode {
 
     /**
      * Create a frame with arguments, keywords and bound receiver, but without threadstate, use by generator functions
-     * @param funcObj
+     * @param function
      * @param args
      * @param keywords
      * @return
      */
-    public static PyFrame createFrame(PyObject funcObj, PyObject self, PyObject[] args, String[] keywords) {
+    public static PyFrame createFrame(PyFunction function, PyObject self, PyObject[] args, String[] keywords) {
         PyObject[] newArgs = new PyObject[args.length + 1];
         newArgs[0] = self;
         System.arraycopy(args, 0, newArgs, 1, args.length);
-        return createFrame(funcObj, newArgs, keywords);
+        return createFrame(function, newArgs, keywords);
     }
 
     /**
      * Create a frame with arguments and keywords, but without threadstate, use by generator functions
-     * @param funcObj
+     * @param function
      * @param args
      * @param keywords
      * @return
      */
-    public static PyFrame createFrame(PyObject funcObj, PyObject[] args, String[] keywords) {
-        PyFunction function;
-        if (funcObj instanceof PyFunction) {
-            function = (PyFunction) funcObj;
-        } else {
-            function = (PyFunction) ((PyMethod) funcObj).__func__;
-        }
+    public static PyFrame createFrame(PyFunction function, PyObject[] args, String[] keywords) {
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__, function.__closure__);
         return frame;
     }
 
-    public static PyFrame createFrameWithSelf(PyObject funcObj, ThreadState ts, PyObject self, PyObject[] args, String[] keywords) {
+    public static PyFrame createFrameWithSelf(PyFunction function, ThreadState ts, PyObject self, PyObject[] args, String[] keywords) {
         PyObject[] newArgs = new PyObject[args.length + 1];
         newArgs[0] = self;
         System.arraycopy(args, 0, newArgs, 1, args.length);
-        return createFrame(funcObj, ts, newArgs, keywords);
+        return createFrame(function, ts, newArgs, keywords);
     }
 
     /**
      * create a frame with arguments
      */
-    public static PyFrame createFrame(PyObject funcObj, ThreadState ts, PyObject[] args, String[] keywords) {
-        PyFunction function;
-        if (funcObj instanceof PyFunction) {
-            function = (PyFunction) funcObj;
-        } else {
-            function = (PyFunction) ((PyMethod) funcObj).__func__;
-        }
+    public static PyFrame createFrame(PyFunction function, ThreadState ts, PyObject[] args, String[] keywords) {
         PyFrame frame = createFrame((PyTableCode) function.__code__, args, keywords, function.__globals__,
                 function.__defaults__, function.__kwdefaults__, function.__closure__);
         frame.f_back = ts.frame;

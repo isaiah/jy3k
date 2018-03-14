@@ -45,10 +45,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  */
 @ExposedType(name = "type", doc = BuiltinDocs.type_doc)
 public class PyType extends PyObject implements DynLinkable, Serializable, Traverseproc {
-
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
-    private static final InvokeByName _call = new InvokeByName("__call__", PyObject.class, PyObject.class, PyObject[].class, String[].class);
     public final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
@@ -1808,13 +1806,12 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest linkRequest) {
         try {
-            Object callfunc = _call.getGetter().invokeExact((PyObject) this);
+            // this is wrong, because it's a class method, not an instance method, the receiver must be bound to the method
+            // Object callfunc = _call.getGetter().invokeExact((PyObject) this);
+            PyObject callfunc = _PyObject_LookupSpecial(this, "__call__");
             if (callfunc != null && callfunc instanceof DynLinkable) {
                 return ((DynLinkable) callfunc).findCallMethod(desc, linkRequest);
             }
-//            if (callfunc instanceof PyMethodDescr) {
-//                return ((PyMethodDescr) callfunc).getMeth().findCallMethod(desc, linkRequest);
-//            }
             return new GuardedInvocation(call);
         } catch (Throwable throwable) {
             throw Py.JavaError(throwable);
@@ -1822,14 +1819,6 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     public PyObject __call__(PyObject[] args, String[] keywords) {
-//        try {
-//            Object callfunc = _call.getGetter().invokeExact((PyObject) this);
-//            if (callfunc != null) {
-//                return (PyObject) _call.getInvoker().invokeExact(callfunc, args, keywords);
-//            }
-//        } catch (Throwable throwable) {
-//            throw Py.JavaError(throwable);
-//        }
         return type___call__(this, args, keywords);
     }
 

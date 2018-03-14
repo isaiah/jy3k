@@ -239,6 +239,7 @@ public class PyMethod extends PyObject implements DynLinkable, InvocationHandler
     }
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {
+
         if (__func__ instanceof PyFunction) {
             return ((PyFunction) __func__).findCallMethod(desc, request, __self__);
         }

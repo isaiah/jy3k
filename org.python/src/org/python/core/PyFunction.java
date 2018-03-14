@@ -33,23 +33,22 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     static final MethodHandle CREATE_FRAME = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class));
+            MethodType.methodType(PyFrame.class, PyFunction.class, ThreadState.class, PyObject[].class, String[].class));
 
     static final MethodHandle CREATE_FRAME_WITH_SELF = MH.findStatic(LOOKUP, BaseCode.class, "createFrameWithSelf",
-            MethodType.methodType(PyFrame.class, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class));
+            MethodType.methodType(PyFrame.class, PyFunction.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class));
 
     static final MethodHandle CREATE_FRAME_NO_KEYWORDS = MethodHandles.insertArguments(CREATE_FRAME, 3, (Object) Py.NoKeywords);
 
     static final MethodHandle CREATE_FRAME_WITHOUT_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, PyObject.class, PyObject[].class));
+            MethodType.methodType(PyFrame.class, PyFunction.class, PyObject[].class));
 
     static final MethodHandle CREATE_FRAME_WITH_KW_NO_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, PyObject.class, PyObject[].class, String[].class));
+            MethodType.methodType(PyFrame.class, PyFunction.class, PyObject[].class, String[].class));
 
     static final MethodHandle CREATE_FRAME_WITH_KW_SELF_NO_TS = MH.findStatic(LOOKUP, BaseCode.class, "createFrame",
-            MethodType.methodType(PyFrame.class, PyObject.class, PyObject.class, PyObject[].class, String[].class));
+            MethodType.methodType(PyFrame.class, PyFunction.class, PyObject.class, PyObject[].class, String[].class));
 
-    static final MethodHandle GET_FUNC_TBL = findOwnMH("getFuncTable", PyFunctionTable.class, PyObject.class);
     static final MethodHandle GET_CLOSURE = findOwnMH("getClosure", PyObject.class, PyObject.class);
     static final MethodHandle RESTORE_FRAME = findOwnMH("restoreFrame", PyObject.class, Throwable.class,
             PyObject.class, PyObject.class, ThreadState.class);
@@ -552,6 +551,7 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
         String funcName = code.funcname;
         MethodHandle mh;
 
+        MethodHandle filter = MethodHandles.dropArguments(MethodHandles.constant(PyFunction.class, this), 0, PyObject.class);
         Class<?> genCls;
         if (code.co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             mh = NEW_GENERATOR;
@@ -566,29 +566,29 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
             mh = MH.findVirtual(LOOKUP, klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
             if (BaseCode.isWideCall(argType)){
                 if (self == null) {
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject[].class, String[].class);
                     mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
                 } else {
-                    mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
                     mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_WITH_SELF);
                     mh = MethodHandles.insertArguments(mh, 4, self);
                 }
             } else {
                 switch (argCount) {
                     case 0:
-                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class);
+                        mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class);
                         break;
                     case 1:
-                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class);
+                        mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class);
                         break;
                     case 2:
-                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+                        mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class, PyObject.class);
                         break;
                     case 3:
-                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
+                        mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
                         break;
                     case 4:
-                        mh = MethodHandles.dropArguments(mh, 3, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
+                        mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
                         break;
                 }
 
@@ -601,7 +601,11 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
                 }
             }
 
-            mh = MethodHandles.filterArguments(mh, 0, MethodHandles.explicitCastArguments(GET_FUNC_TBL, MethodType.methodType(klazz, PyObject.class)));
+            mh = MethodHandles.filterArguments(mh, 2, filter);
+            MethodHandle funcTable = MethodHandles.constant(PyFunctionTable.class, code.funcs);
+            funcTable = MethodHandles.explicitCastArguments(funcTable, MethodType.methodType(klazz));
+            funcTable = MethodHandles.dropArguments(funcTable, 0, PyObject.class);
+            mh = MethodHandles.filterArguments(mh, 0, funcTable);
 
             switch (argCount) {
                 case 0:
@@ -642,7 +646,7 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
 //            if (self != null) {
 //                guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
 //            } else {
-                guard = Guards.getIdentityGuard(this);
+                guard = Guards.getIdentityGuard(request.getReceiver());
 //            }
             return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
@@ -651,23 +655,23 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
 
         switch (argCount) {
             case 0:
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class);
+                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class);
                 break;
             case 1:
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class, PyObject.class);
+                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class);
                 break;
             case 2:
                 if (BaseCode.isWideCall(argType)) {
-                    mh = MethodHandles.dropArguments(mh, 1, PyObject.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject[].class, String[].class);
                 } else {
-                    mh = MethodHandles.dropArguments(mh, 1, PyObject.class, PyObject.class, PyObject.class);
+                    mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class);
                 }
                 break;
             case 3:
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
+                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class);
                 break;
             case 4:
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
+                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
                 break;
         }
 
@@ -688,6 +692,7 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
                 mh = MethodHandles.insertArguments(mh, 1, self);
             }
         }
+        mh = MethodHandles.filterArguments(mh, 0, filter);
 
         switch (argCount) {
             case 0:
@@ -722,29 +727,13 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
         if (self != null) {
             guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);
         } else {
-            guard = Guards.getIdentityGuard(this);
+            guard = Guards.getIdentityGuard(request.getReceiver());
         }
         return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
     }
 
     private static boolean isSameReceiver(PyObject boundMethod, PyObject self) {
         return boundMethod instanceof PyMethod && ((PyMethod) boundMethod).__self__ == self;
-    }
-
-    /**
-     * Get the real java object that hosts the linked method handle from the function object
-     *
-     * it's func.__code__.funcs
-     */
-    private static PyFunctionTable getFuncTable(PyObject funcObj) {
-        PyTableCode code;
-        if (funcObj instanceof PyFunction) {
-            code = (PyTableCode) ((PyFunction) funcObj).__code__;
-        } else {
-            PyFunction func = (PyFunction) ((PyMethod) funcObj).__func__;
-            code = (PyTableCode) func.__code__;
-        }
-        return code.funcs;
     }
 
     private static PyObject getClosure(PyObject funcObj) {
