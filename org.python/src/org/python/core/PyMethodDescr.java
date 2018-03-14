@@ -3,9 +3,13 @@ package org.python.core;
 import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
+import jdk.dynalink.linker.support.Guards;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 
 @ExposedType(name = "method_descriptor", base = PyObject.class, isBaseType = false)
 public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverseproc {
@@ -110,6 +114,14 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
 
     @Override
     public GuardedInvocation findCallMethod(CallSiteDescriptor desc, LinkRequest linkRequest) {
-        return meth.findCallMethod(desc, linkRequest);
+        PyBuiltinMethodData info = meth.info;
+        MethodHandle mh = info.target;
+        if (info.isWide) {
+
+        }
+        mh = MethodHandles.dropArguments(mh, 0, Object.class);
+        mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+        // the guard guards the instance of the method, relink when the dtype is different
+        return new GuardedInvocation(mh, Guards.getIdentityGuard(linkRequest.getReceiver()));
     }
 }
