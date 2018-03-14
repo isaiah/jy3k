@@ -133,7 +133,26 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
                 mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
                 mh = mh.asCollector(argOffset, PyObject[].class, argCount);
             }
+        } else {
+            int paramCount = methodType.parameterCount() - argOffset;
+            Class<?>[] paramArray = methodType.parameterArray();
+            int defaultLength = info.defaults.length;
+            int missingArg = paramCount - argCount;
+            int startIndex = defaultLength - missingArg;
+            if (missingArg > 0) {
+                if (startIndex < 0) {
+                    throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
+                }
+
+                for (int i = argCount; i < paramCount; i++) {
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults[defaultLength + i - paramCount]);
+                }
+            }
+            if (argCount > paramCount) {
+                throw Py.TypeError(String.format("%s() takes at most %d argument%s (%d given)", info.getName(), paramCount, paramCount > 1 ? "s" : "", argCount));
+            }
         }
+
 //        MethodHandle filter = MethodHandles.insertArguments(CHECK_CALLER_TYPE, 0, dtype);
 //        filter = MethodHandles.explicitCastArguments(filter, MethodType.methodType(methodType.parameterType(0), PyObject.class));
 //        mh = MethodHandles.filterArguments(mh, 0, filter);
