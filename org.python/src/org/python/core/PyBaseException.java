@@ -197,7 +197,8 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedMethod(doc = BuiltinDocs.BaseException___str___doc)
-    public final PyObject BaseException___str__(ThreadState ts) {
+    public final PyObject BaseException___str__() {
+        ThreadState ts = Py.getThreadState();
         // CPython issue6108: if __str__ has been overridden in the subclass, unicode()
         // should return the message returned by __str__ as used to happen before this
         // method was implemented

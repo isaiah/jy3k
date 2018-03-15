@@ -126,6 +126,10 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
         int argOffset = 1;
         int argCount = argType.parameterCount() - 3;
         MethodType methodType = info.target.type();
+        boolean needThreadState  = methodType.parameterCount() > argOffset && methodType.parameterType(argOffset) == ThreadState.class;
+        if (needThreadState) {
+            argOffset++;
+        }
         if (info.isWide) {
             if (argCount == 0) {
                 mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
@@ -157,7 +161,9 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
 //        filter = MethodHandles.explicitCastArguments(filter, MethodType.methodType(methodType.parameterType(0), PyObject.class));
 //        mh = MethodHandles.filterArguments(mh, 0, filter);
         mh = MethodHandles.dropArguments(mh, 0, Object.class);
-        mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+        if (!needThreadState) {
+            mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+        }
         mh = PyBuiltinMethod.asTypesafeReturn(mh, methodType);
         // the guard guards the instance of the method, relink when the dtype is different
         return new GuardedInvocation(mh, Guards.getIdentityGuard(linkRequest.getReceiver()));
