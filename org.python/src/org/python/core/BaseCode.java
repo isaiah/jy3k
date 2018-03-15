@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 public class BaseCode {
     public static boolean isWideCall(MethodType argType) {
         // ThreadState;PyFrame;PyObject[];String[];
-        return argType.parameterCount() == 4 && argType.parameterType(2) == PyObject[].class
-                && argType.parameterType(3) == String[].class;
+        int pos = argType.parameterCount();
+        return argType.parameterType(--pos) == String[].class && argType.parameterType(--pos) == PyObject[].class;
     }
 
     public static PyFrame createFrame(PyFunction function, ThreadState ts) {

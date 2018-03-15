@@ -565,13 +565,15 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
         } else {
             mh = MH.findVirtual(LOOKUP, klazz, funcName, MethodType.methodType(PyObject.class, ThreadState.class, PyFrame.class));
             if (BaseCode.isWideCall(argType)){
-                if (self == null) {
-                    mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject[].class, String[].class);
-                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
-                } else {
+                if (self != null || argCount == 3) {
                     mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
                     mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME_WITH_SELF);
-                    mh = MethodHandles.insertArguments(mh, 4, self);
+                    if (self != null) { // self is on the stack
+                        mh = MethodHandles.insertArguments(mh, 4, self);
+                    }
+                } else {
+                    mh = MethodHandles.dropArguments(mh, 3, PyFunction.class, ThreadState.class, PyObject[].class, String[].class);
+                    mh = MethodHandles.foldArguments(mh, 2, CREATE_FRAME);
                 }
             } else {
                 switch (argCount) {
@@ -632,9 +634,21 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
                     mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, args));
                     break;
                 case 3:
-                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
-                            ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 1, 0, 1, 2, 3, 4);
-                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class));
+                    // wide method could have two or three parameters
+                    if (BaseCode.isWideCall(argType)) {
+                        sig = MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class,
+                                PyObject[].class, String[].class);
+                        args = new Class<?>[]{PyObject.class, PyObject[].class, String[].class};
+                    } else {
+                        sig = MethodType.methodType(PyObject.class, PyObject.class, ThreadState.class, PyObject.class,
+                                PyObject.class, PyObject.class);
+                        args = new Class<?>[]{PyObject.class, PyObject.class, PyObject.class};
+                    }
+                    mh = MethodHandles.permuteArguments(mh, sig, 0, 1, 0, 1, 2, 3, 4);
+                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, args));
+//                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,
+//                            ThreadState.class, PyObject.class, PyObject.class, PyObject.class), 0, 1, 0, 1, 2, 3, 4);
+//                    mh = MethodHandles.tryFinally(mh, MethodHandles.dropArguments(RESTORE_FRAME, 4, PyObject.class, PyObject.class, PyObject.class));
                     break;
                 case 4:
                     mh = MethodHandles.permuteArguments(mh, MethodType.methodType(PyObject.class, PyObject.class,

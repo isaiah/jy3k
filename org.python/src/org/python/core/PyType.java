@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class PyType extends PyObject implements DynLinkable, Serializable, Traverseproc {
     public static final PyType TYPE = fromClass(PyType.class);
     private static final InvokeByName get = new InvokeByName("__get__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
-    public final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
+    private static final InvokeByName init = new InvokeByName("__init__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject[].class, String[].class);
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     public static final MethodHandle GEN_GETATTR = MH.findStatic(LOOKUP, PyObject.class, "PyObject_GenericGetAttr", MethodType.methodType(PyObject.class, PyObject.class, String.class));
@@ -1285,18 +1285,20 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 || !obj.getType().isSubType(self)) {
             return obj;
         }
-//        try {
-//            Object initFunc = init.getGetter().invokeExact(obj);
-//            PyObject none = (PyObject) init.getInvoker().invokeExact(initFunc, args, keywords);
-//            if (none != Py.None) {
-//                throw Py.TypeError(String.format("__init__() should return None, not '%.200s'",
-//                        none.getType().fastGetName()));
-//            }
-//        } catch (Throwable e) {
-//            throw Py.JavaError(e);
-//        }
-//        obj.proxyInit();
-        obj.dispatch__init__(args, keywords);
+        try {
+            Object initFunc = init.getGetter().invokeExact((PyObject) obj.getType());
+            if (initFunc != null) {
+                PyObject none = (PyObject) init.getInvoker().invokeExact(initFunc, Py.getThreadState(), obj, args, keywords);
+                if (none != Py.None) {
+                    throw Py.TypeError(String.format("__init__() should return None, not '%.200s'",
+                            none.getType().fastGetName()));
+                }
+            }
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
+        obj.proxyInit();
+//        obj.dispatch__init__(args, keywords);
         return obj;
     }
 
