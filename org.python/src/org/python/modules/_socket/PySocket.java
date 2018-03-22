@@ -63,6 +63,10 @@ public class PySocket extends PyObject {
     private boolean nonblocking;
     private int timeout;
 
+    public PySocket(PyType subtype) {
+        super(subtype);
+    }
+
     public PySocket(PyType subtype, AddressFamily family, Sock socket, ProtocolFamily proto, boolean nonblocking) {
         super(subtype);
         domain = family;
@@ -82,8 +86,8 @@ public class PySocket extends PyObject {
     }
 
     @ExposedNew
-    public static final PyObject socket___new__(PyNewWrapper new_, boolean init, PyType subtype,
-                                                PyObject[] args, String[] keywords) {
+    @ExposedMethod
+    public void socket___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("socket", args, keywords, "family", "type", "proto", "fileno");
         long af = ap.getInt(0, AddressFamily.AF_INET.intValue());
         long st = ap.getInt(1, Sock.SOCK_STREAM.intValue());
@@ -93,14 +97,27 @@ public class PySocket extends PyObject {
         if (nonblocking) {
             st &= ~SOCK_NONBLOCK;
         }
-        if (subtype == TYPE) {
-            return new PySocket(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
-        } else {
-            if (fileno >= 0) {
-                return new PySocketDerived(subtype, fileno);
+        if (fileno >= 0) {
+            ChannelFD fd = FilenoUtil.getInstance().getWrapperFromFileno(fileno);
+            if (fd != null) {
+                initFromFD(fd);
             }
-            return new PySocketDerived(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
+        } else {
+            domain = AddressFamily.valueOf(af);
+            sockType = Sock.valueOf(st);
+            protocolFamily = ProtocolFamily.valueOf(p);
+            this.nonblocking = nonblocking;
+            fd = initChannelFD();
+            timeout = -1;
         }
+//        if (subtype == TYPE) {
+//            return new PySocket(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
+//        } else {
+//            if (fileno >= 0) {
+//                return new PySocketDerived(subtype, fileno);
+//            }
+//            return new PySocketDerived(subtype, AddressFamily.valueOf(af), Sock.valueOf(st), ProtocolFamily.valueOf(p), nonblocking);
+//        }
     }
 
     private void initFromFD(ChannelFD fd) {

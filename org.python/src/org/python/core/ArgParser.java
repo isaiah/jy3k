@@ -144,7 +144,7 @@ public class ArgParser {
      */
     public int getInt(int pos, int def) {
         PyObject value = getOptionalArg(pos);
-        if (value == null) {
+        if (value == null || value == Py.None) {
             return def;
         }
         return asInt(value);

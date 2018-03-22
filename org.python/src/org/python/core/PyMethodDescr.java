@@ -14,11 +14,20 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+/**
+ * A Method descriptor represents a builtin instance method that's detached from instance, e.g. str.split
+ */
 @ExposedType(name = "method_descriptor", base = PyObject.class, isBaseType = false)
 public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     public static final MethodHandle CHECK_CALLER_TYPE = MH.findStatic(LOOKUP, PyMethodDescr.class, "checkCallerType", MethodType.methodType(PyObject.class, PyType.class, PyObject.class));
+    public static final MethodHandle REMOVE_SELF = MH.findStatic(LOOKUP, PyMethodDescr.class, "removeSelf", MethodType.methodType(PyObject[].class, PyObject[].class));
+
+    static MethodHandle SELF_GETTER = MethodHandles.arrayElementGetter(PyObject[].class);
+    static {
+        SELF_GETTER = MethodHandles.insertArguments(SELF_GETTER, 1, 0);
+    }
     protected int minargs, maxargs;
     protected PyBuiltinMethod meth;
 
@@ -131,11 +140,21 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
             argOffset++;
         }
         if (info.isWide) {
-            if (argCount == 0) {
-                mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
-            } else if (!BaseCode.isWideCall(argType)) {
-                mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
-                mh = mh.asCollector(argOffset, PyObject[].class, argCount);
+            if (BaseCode.isWideCall(argType)) {
+                if (argType.parameterType(2) != PyObject.class) {
+                    MethodHandle filter = MethodHandles.explicitCastArguments(SELF_GETTER, MethodType.methodType(methodType.parameterType(0), PyObject[].class));
+                    // if need a self, and self is in the vararg, take it out
+                    mh = MethodHandles.filterArguments(mh, 0, filter);
+                    mh = MethodHandles.filterArguments(mh, 1, REMOVE_SELF);
+                    mh = MethodHandles.permuteArguments(mh, MethodType.methodType(methodType.returnType(), PyObject[].class, String[].class), 0, 0, 1);
+                }
+            } else {
+                if (argCount == 0) {
+                    mh = MethodHandles.insertArguments(mh, argOffset, Py.EmptyObjects, Py.NoKeywords);
+                } else {
+                    mh = MethodHandles.insertArguments(mh, 1 + argOffset, (Object) Py.NoKeywords);
+                    mh = mh.asCollector(argOffset, PyObject[].class, argCount);
+                }
             }
         } else {
             int paramCount = methodType.parameterCount() - argOffset;
@@ -157,15 +176,21 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
             }
         }
 
-//        MethodHandle filter = MethodHandles.insertArguments(CHECK_CALLER_TYPE, 0, dtype);
-//        filter = MethodHandles.explicitCastArguments(filter, MethodType.methodType(methodType.parameterType(0), PyObject.class));
-//        mh = MethodHandles.filterArguments(mh, 0, filter);
-        mh = MethodHandles.dropArguments(mh, 0, Object.class);
+
+        mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
         if (!needThreadState) {
             mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
         }
         mh = PyBuiltinMethod.asTypesafeReturn(mh, methodType);
         // the guard guards the instance of the method, relink when the dtype is different
         return new GuardedInvocation(mh, Guards.getIdentityGuard(linkRequest.getReceiver()));
+    }
+
+    static PyObject[] removeSelf(PyObject[] args) {
+        int len = args.length;
+        assert len > 0: "need at least one argument";
+        PyObject[] newArgs = new PyObject[len - 1];
+        System.arraycopy(args, 1, newArgs, 0, len - 1);
+        return newArgs;
     }
 }

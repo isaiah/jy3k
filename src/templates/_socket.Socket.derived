@@ -10,3 +10,11 @@ noinherit:
             FinalizeTrigger.ensureFinalizer(this);
         }
     }
+
+    public PySocketDerived(PyType subtype) {
+        super(subtype);
+        slots=new PyObject[subtype.getNumSlots()];
+        if (subtype.needsFinalizer()) {
+            FinalizeTrigger.ensureFinalizer(this);
+        }
+    }

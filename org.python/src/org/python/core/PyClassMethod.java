@@ -16,6 +16,10 @@ public class PyClassMethod extends PyObject implements Traverseproc {
     @ExposedGet(name = "__func__")
     protected PyObject callable;
 
+    public PyClassMethod(PyType subtype) {
+        super(subtype);
+    }
+
     public PyClassMethod(PyType subtype, PyObject callable) {
         super(subtype);
         if (!callable.isCallable()) {
