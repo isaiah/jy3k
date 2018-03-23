@@ -665,8 +665,10 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
             return new GuardedInvocation(mh, guard, new SwitchPoint[0], ClassCastException.class);
         }
 
-        mh = MethodHandles.filterArguments(mh, 1, GET_CLOSURE);
-
+        mh = MethodHandles.insertArguments(mh, 1, __closure__);
+        if (self != null) {
+            argCount++;
+        }
         switch (argCount) {
             case 0:
                 mh = MethodHandles.dropArguments(mh, 1, PyFunction.class);
@@ -698,45 +700,15 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
                 mh = MethodHandles.insertArguments(mh, 1, self);
             }
         } else {
-            if (self == null) {
-                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount));
-            } else {
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class);
-                mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount + 1));
-                mh = MethodHandles.insertArguments(mh, 1, self);
-            }
+            mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount));
         }
         mh = MethodHandles.filterArguments(mh, 0, filter);
 
-        switch (argCount) {
-            case 0:
-                mh = MethodHandles.permuteArguments(mh,
-                        MethodType.methodType(genCls, PyObject.class), 0, 0);
-                break;
-            case 1:
-                mh = MethodHandles.permuteArguments(mh,
-                        MethodType.methodType(genCls, PyObject.class, PyObject.class), 0, 1, 0);
-                break;
-            case 2:
-                MethodType sig;
-                if (BaseCode.isWideCall(argType)) {
-                    sig = MethodType.methodType(genCls, PyObject.class, PyObject[].class, String[].class);
-                } else {
-                    sig = MethodType.methodType(genCls, PyObject.class, PyObject.class, PyObject.class);
-                }
-
-                mh = MethodHandles.permuteArguments(mh, sig, 0, 1, 2, 0);
-                break;
-            case 3:
-                mh = MethodHandles.permuteArguments(mh,
-                        MethodType.methodType(genCls, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 1, 2, 3, 0);
-                break;
-            case 4:
-                mh = MethodHandles.permuteArguments(mh,
-                        MethodType.methodType(genCls, PyObject.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class), 0, 1, 2, 3, 4, 0);
-                break;
+        if (self != null) {
+            mh = MethodHandles.insertArguments(mh, 1, self);
         }
         mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
+
         MethodHandle guard = null;
         if (self != null) {
             guard = MethodHandles.insertArguments(IS_SAME_RECEIVER, 1, self);

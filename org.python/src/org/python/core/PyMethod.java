@@ -20,9 +20,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-/**
- * A Python method.
- */
+/* Method objects are used for bound instance methods returned by
+  instancename.methodname. ClassName.methodname returns an ordinary
+  function.
+*/
 @ExposedType(name = "method", isBaseType = false, doc = BuiltinDocs.method_doc)
 public class PyMethod extends PyObject implements DynLinkable, InvocationHandler, Traverseproc {
     static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
@@ -299,12 +300,8 @@ public class PyMethod extends PyObject implements DynLinkable, InvocationHandler
         if (im_class != null) {
             className = getClassName(im_class);
         }
-        if (__self__ == null) {
-            return String.format("<unbound method %s.%s>", className, getFuncName());
-        } else {
-            return String.format("<bound method %s.%s of %s>", className, getFuncName(),
-                                 __self__);
-        }
+        return String.format("<bound method %s.%s of %s>", className, getFuncName(),
+                __self__);
     }
 
     private String getClassName(PyObject cls) {
