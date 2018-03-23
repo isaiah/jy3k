@@ -21,9 +21,9 @@ public class PySeqIterator extends PyObject {
         this.getitemFunc = getitemFunc;
     }
 
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject __iter__(PyObject self) {
+        return self;
     }
 
     @ExposedSlot(SlotFunc.ITER_NEXT)
