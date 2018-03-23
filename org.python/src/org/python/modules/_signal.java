@@ -5,6 +5,7 @@ import org.python.annotations.ExposedConst;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.annotations.ModuleInit;
+import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.modules.posix.PosixModule;
@@ -42,5 +43,10 @@ public class _signal {
             return mapping.get(sig);
         }
         return new PyLong(SIG_DFL);
+    }
+
+    @ExposedFunction
+    public static PyObject default_int_handler() {
+        throw Py.KeyboardInterrupt("");
     }
 }
