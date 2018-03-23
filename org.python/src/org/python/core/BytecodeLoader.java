@@ -67,13 +67,27 @@ public class BytecodeLoader {
      *            the java byte code.
      */
     public static PyTableCode makeCode(String name, byte[] data, String filename) {
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            Class<?> c = lookup.defineClass(data);
-            Object o = c.getConstructor(new Class[] {String.class})
-                    .newInstance(new Object[] {filename});
-            return ((PyRunnable)o).getMain();
-        } catch (Exception e) {
+            Class<?> c;
+            try {
+                c = lookup.defineClass(data);
+            } catch (LinkageError e) {
+                try {
+                    ClassReader reader = new ClassReader(data);
+                    name = reader.getClassName();
+                } catch (RuntimeException re) {
+                    ClassFormatError cfe = new ClassFormatError();
+                    cfe.initCause(re);
+                    throw cfe;
+                }
+                // the passed in name is workable, but needs effort
+                c = lookup.findClass(name.replace('/', '.'));
+            }
+            Object o = c.getConstructor(new Class[]{String.class})
+                    .newInstance(new Object[]{filename});
+            return ((PyRunnable) o).getMain();
+        } catch (Throwable e) {
             throw Py.JavaError(e);
         }
     }
