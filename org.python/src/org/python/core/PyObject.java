@@ -1548,10 +1548,11 @@ public class PyObject implements Serializable {
     }
 
     @ExposedMethod(doc = BuiltinDocs.object___format___doc)
-    final PyObject object___format__(ThreadState ts, PyObject formatSpec) {
+    final PyObject object___format__(PyObject formatSpec) {
         if (formatSpec != null && formatSpec instanceof PyUnicode && !((PyUnicode) formatSpec).getString().isEmpty()) {
             throw Py.TypeError(String.format("unsupported format string passed to %s.__format__", getType().getName()));
         }
+        ThreadState ts = Py.getThreadState();
         return Abstract.PyObject_Format(ts, Abstract.PyObject_Str(ts, this), formatSpec);
     }
 

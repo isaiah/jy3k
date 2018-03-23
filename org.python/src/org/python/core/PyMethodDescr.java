@@ -219,6 +219,10 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
         }
 
 
+        /*
+         * FIXME: it has difficulty linking instance native method that take ThreadState as first argument
+         * e.g. object.__format__(object(), ""), since ts is always in the second position, the order is wrong with the receiver
+         */
         mh = MethodHandles.dropArguments(mh, 0, PyObject.class);
         if (!needThreadState) {
             mh = MethodHandles.dropArguments(mh, 1, ThreadState.class);
