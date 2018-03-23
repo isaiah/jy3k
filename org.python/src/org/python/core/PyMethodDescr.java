@@ -174,6 +174,9 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
             if (argCount > paramCount) {
                 throw Py.TypeError(String.format("%s() takes at most %d argument%s (%d given)", info.getName(), paramCount, paramCount > 1 ? "s" : "", argCount));
             }
+            for (int i = argOffset; i < argCount + argOffset; i++) {
+                mh = PyBuiltinMethod.convert(mh, i, paramArray[i]);
+            }
         }
 
 

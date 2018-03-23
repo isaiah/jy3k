@@ -193,7 +193,7 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements DynLinkable, E
         return obj.getType() == type;
     }
 
-    private MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {
+    public static MethodHandle convert(MethodHandle mh, int idx, Class<?> argType) {
         MethodHandle filter = null;
         if (argType == int.class) {
             filter = U_INTEGER;

@@ -684,10 +684,17 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
                 }
                 break;
             case 3:
-                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class);
+                if (BaseCode.isWideCall(argType)) {
+                    mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject[].class, String[].class);
+                } else {
+                    mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class);
+                }
                 break;
             case 4:
                 mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
+                break;
+            case 5:
+                mh = MethodHandles.dropArguments(mh, 1, PyFunction.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class, PyObject.class);
                 break;
         }
 
@@ -695,9 +702,7 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
             if (self == null) {
                 mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITH_KW_NO_TS);
             } else {
-                mh = MethodHandles.dropArguments(mh, 1, PyObject.class);
                 mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITH_KW_SELF_NO_TS);
-                mh = MethodHandles.insertArguments(mh, 1, self);
             }
         } else {
             mh = MethodHandles.foldArguments(mh, 0, CREATE_FRAME_WITHOUT_TS.asCollector(1, PyObject[].class, argCount));
