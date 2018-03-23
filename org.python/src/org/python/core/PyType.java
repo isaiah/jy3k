@@ -615,7 +615,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (dict.__finditem__("__doc__") == null) {
             PyObject docObj;
             if (docKey != null) {
-                docObj = new PyUnicode(this, docKey, true);
+                docObj = new PyUnicode(docKey, true);
                 dict.__setitem__("__doc__", docObj);
             } else {
                 if (Py.None != null) {

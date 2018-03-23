@@ -112,7 +112,7 @@ public abstract class PyDataDescr extends PyDescriptor {
 
     @Override
     public boolean isDataDescr() {
-        return true;
+        return implementsDescrGet();
     }
 
     @Override
