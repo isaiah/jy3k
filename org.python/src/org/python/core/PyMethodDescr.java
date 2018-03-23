@@ -143,6 +143,11 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
         MethodHandle checker = MethodHandles.insertArguments(CHECK_CALLER_TYPE, 0, dtype);
         checker = MethodHandles.explicitCastArguments(checker, MethodType.methodType(methodType.parameterType(0), PyObject.class));
         mh = MethodHandles.filterArguments(mh, 0, checker);
+        int paramCount = methodType.parameterCount() - argOffset;
+        Class<?>[] paramArray = methodType.parameterArray();
+        int defaultLength = info.defaults.length;
+        int missingArg = paramCount - argCount;
+        int startIndex = defaultLength - missingArg;
         if (info.isWide) {
             if (BaseCode.isWideCall(argType)) {
                 if (argType.parameterType(2) != PyObject.class) {
@@ -159,12 +164,43 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
                     mh = mh.asCollector(argOffset, PyObject[].class, argCount);
                 }
             }
+        } else if(BaseCode.isWideCall(argType)) {
+            /** it's a wide call, but not a wide method */
+            String[] keywords = (String[]) linkRequest.getArguments()[3];
+            if (keywords.length != 0) {
+                throw Py.TypeError(String.format("%s() takes no keyword arguments", info.getName()));
+            }
+            // it's a stararg call, spread the args
+            PyObject[] args = (PyObject[]) linkRequest.getArguments()[2];
+            paramCount++;
+            argCount = args.length; // without self
+            if (paramCount < argCount) {
+                if (paramCount == 0) {
+                    throw Py.TypeError(String.format("%s() takes no arguments, (%d given)", info.getName(), args.length));
+                } else {
+                    throw Py.TypeError(String.format("%s() takes at most %d arguments, (%d given)",
+                            info.getName(), paramCount - defaultLength, args.length));
+                }
+            }
+
+            for (int i = argOffset; i < argCount; i++) {
+                mh = PyBuiltinMethod.convert(mh, i, paramArray[i]);
+            }
+
+            missingArg = paramCount - argCount;
+            startIndex = defaultLength - missingArg;
+            if (startIndex < 0) {
+                throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
+            }
+            if (missingArg > 0) {
+                for (int i = argCount; i < paramCount; i++) {
+                    mh = MethodHandles.insertArguments(mh, argCount + argOffset, info.defaults[defaultLength + i - paramCount]);
+                }
+            }
+            mh = mh.asSpreader(0, PyObject[].class, argCount);
+
+            mh = MethodHandles.dropArguments(mh, 1, String[].class);
         } else {
-            int paramCount = methodType.parameterCount() - argOffset;
-            Class<?>[] paramArray = methodType.parameterArray();
-            int defaultLength = info.defaults.length;
-            int missingArg = paramCount - argCount;
-            int startIndex = defaultLength - missingArg;
             if (missingArg > 0) {
                 if (startIndex < 0) {
                     throw Py.TypeError(String.format("%s() takes exactly %d arguments (%d given)", info.getName(), methodType.parameterCount(), argCount));
