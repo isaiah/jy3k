@@ -969,6 +969,9 @@ public class PyObject implements Serializable {
         PyType tp = iterator.getType();
         if (tp.iternext != null) {
             try {
+                if (tp.iternext.type().parameterCount() > 1) {
+                    return (PyObject) tp.iternext.invokeExact(iterator, Py.getThreadState());
+                }
                 return (PyObject) tp.iternext.invokeExact(iterator);
             } catch (Throwable e) {
                 throw Py.JavaError(e);
