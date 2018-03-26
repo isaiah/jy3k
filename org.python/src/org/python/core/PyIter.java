@@ -1,7 +1,9 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -31,16 +33,17 @@ public class PyIter extends PyObject {
         this.length = -1;
     }
 
-    @ExposedMethod
-    public PyObject iterator___iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject iterator___iter__(PyObject self) {
+        return self;
     }
 
-    @ExposedMethod
-    public PyObject iterator___next__() {
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject iterator___next__(PyObject obj) {
+        PyIter self = (PyIter) obj;
         try {
-            if (iter.hasNext()) {
-                return iter.next();
+            if (self.iter.hasNext()) {
+                return self.iter.next();
             }
         } catch (ConcurrentModificationException e) {
             throw Py.RuntimeError("set changed duration iteration");

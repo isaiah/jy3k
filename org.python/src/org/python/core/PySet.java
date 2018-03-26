@@ -2,7 +2,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
 import java.util.Collections;
@@ -75,9 +77,9 @@ public class PySet extends BaseSet {
         return baseset___and__(o);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
-    public final PyObject set___iter__() {
-        return baseset___iter__();
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject set___iter__(PyObject set) {
+        return ((PySet) set).baseset___iter__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.set___contains___doc)

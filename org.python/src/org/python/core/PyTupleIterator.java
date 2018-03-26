@@ -1,7 +1,9 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.antlr.ast.Tuple;
 import org.python.bootstrap.Import;
 
@@ -17,23 +19,24 @@ public class PyTupleIterator extends PyObject {
         this.tuple = tuple;
     }
 
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject __iter__(PyObject self) {
+        return self;
     }
 
-    @ExposedMethod
-    public PyObject tuple_iterator___next__() {
-        if (tuple == null) {
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject tuple_iterator___next__(PyObject iter) {
+        PyTupleIterator self = (PyTupleIterator) iter;
+        if (self.tuple == null) {
             throw Py.StopIteration();
         }
-        if (index >= tuple.__len__()) {
-            tuple = null;
+        if (self.index >= self.tuple.__len__()) {
+            self.tuple = null;
             throw Py.StopIteration();
         }
-        PyObject ret = tuple.pyget(index++);
+        PyObject ret = self.tuple.pyget(self.index++);
         if (ret == null) {
-            tuple = null;
+            self.tuple = null;
             throw Py.StopIteration();
         }
         return ret;
