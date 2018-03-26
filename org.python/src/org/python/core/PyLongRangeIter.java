@@ -1,7 +1,9 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 import java.math.BigInteger;
 
@@ -9,7 +11,7 @@ import java.math.BigInteger;
  * range iterator for number big than Long.MAX_VALUE
  */
 @ExposedType(name = "longrange_iterator", base = PyObject.class, isBaseType = false)
-public class PyLongRangeIter extends PyIterator {
+public class PyLongRangeIter extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyLongRangeIter.class);
 
     private BigInteger index;
@@ -27,17 +29,23 @@ public class PyLongRangeIter extends PyIterator {
         this.curr = start;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.range_iterator___next___doc)
-    public final PyObject range_iterator___next__() {
-        if (index.compareTo(len) < 0) {
-            curr = curr.add(step);
-            index.add(BigInteger.ONE);
-            return new PyLong(curr);
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject iter(PyObject self) {
+        return self;
+    }
+
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject range_iterator___next__(PyObject obj) {
+        PyLongRangeIter self = (PyLongRangeIter) obj;
+        if (self.index.compareTo(self.len) < 0) {
+            self.curr = self.curr.add(self.step);
+            self.index.add(BigInteger.ONE);
+            return new PyLong(self.curr);
         }
         throw Py.StopIteration();
     }
 
-    @Override
+    @ExposedMethod
     public int __len__() {
         return len.intValue();
     }
