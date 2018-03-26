@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class PythonTree extends AST implements Traverseproc {
-
-    public boolean from_future_checked = false;
     private Token node;
 
     private List<stmt> block;

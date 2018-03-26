@@ -15,6 +15,8 @@ import org.python.core.CodeFlag;
 import org.python.core.FutureFeature;
 import org.python.core.Pragma;
 import org.python.core.PragmaReceiver;
+import org.python.core.PyObject;
+import org.python.core.PySyntaxError;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -33,12 +35,12 @@ public class Future {
 
     };
 
-    private boolean check(ImportFrom cand) {
+    private boolean check(ImportFrom cand, String filename) {
         if (!cand.getInternalModule().equals(FutureFeature.MODULE_NAME))
             return false;
         if (cand.getInternalNames().isEmpty()) {
-            throw new ParseException(
-                    "future statement does not support import *", cand);
+            throw new PySyntaxError("future statement does not support import *",
+                    cand.getLine(), cand.getCol_offset() - 1, cand.getText(), filename);
         }
         try {
             for (alias feature : cand.getInternalNames()) {
@@ -46,12 +48,12 @@ public class Future {
                 FutureFeature.addFeature(feature.getInternalName(), features);
             }
         } catch (ParseException pe) {
-            throw new ParseException(pe.getMessage(), cand);
+            throw new PySyntaxError(pe.getMessage(), cand.getLine(), cand.getCol_offset() - 1, cand.getText(), filename);
         }
         return true;
     }
 
-    public void preprocessFutures(mod node, org.python.core.CompilerFlags cflags) {
+    public void preprocessFutures(mod node, org.python.core.CompilerFlags cflags, String filename) {
         if (cflags != null) {
 //            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION))
 //                FutureFeature.division.addTo(features);
@@ -78,11 +80,20 @@ public class Future {
             return;
         }
 
+        boolean done = false;
         for (int i = beg; i < suite.size(); i++) {
             stmt s = suite.get(i);
-            if (!(s instanceof ImportFrom)) break;
-            s.from_future_checked = true;
-            if (!check((ImportFrom) s)) break;
+            if (!(s instanceof ImportFrom)) {
+                done = true;
+                continue;
+            };
+            if (((ImportFrom) s).getInternalModule().equals(FutureFeature.MODULE_NAME)) {
+                if (done) {
+                    throw new PySyntaxError("from __future__ imports must occur "
+                            + "at the beginning of the file", s.getLine(), s.getCol_offset() - 1, s.getText(), filename);
+                }
+                if (!check((ImportFrom) s, filename)) break;
+            }
         }
 
         if (cflags != null) {
@@ -90,16 +101,6 @@ public class Future {
                 feature.setFlag(cflags);
             }
         }
-    }
-
-    public static void checkFromFuture(ImportFrom node) {
-        if (node.from_future_checked) return;
-        String module = node.getInternalModule();
-        if (module != null && module.equals(FutureFeature.MODULE_NAME)) {
-            throw new ParseException("from __future__ imports must occur "
-                    + "at the beginning of the file", node);
-        }
-        node.from_future_checked = true;
     }
 
 //    public boolean areDivisionOn() {

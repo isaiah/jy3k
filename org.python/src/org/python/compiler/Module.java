@@ -444,7 +444,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         /** split long functions into small SplitNode fragments */
 //        new Splitter().visit(node);
 
-        module.futures.preprocessFutures(node, cflags);
+        module.futures.preprocessFutures(node, cflags, filename);
         /** create symbol table */
         module.st = Symtable.buildObject(node, filename, 0);
         /** convert SplitNode to function definitions */

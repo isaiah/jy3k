@@ -6,27 +6,27 @@ public enum FutureFeature implements Pragma {
     /**
      * Enables nested scopes.
      */
-//    nested_scopes(CodeFlag.CO_NESTED),
+    nested_scopes(CodeFlag.CO_NESTED),
     /**
      * Makes integer / integer division return float.
      */
-//    division(CodeFlag.CO_FUTURE_DIVISION),
+    division(CodeFlag.CO_FUTURE_DIVISION),
     /**
      * Enables generators.
      */
-//    generators(CodeFlag.CO_GENERATOR_ALLOWED),
+    generators(CodeFlag.CO_GENERATOR_ALLOWED),
     /**
      * Enables absolute imports.
      */
-//    absolute_import(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT),
+    absolute_import(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT),
     /**
      * Enables the with statement.
      */
-//    with_statement(CodeFlag.CO_FUTURE_WITH_STATEMENT),
+    with_statement(CodeFlag.CO_FUTURE_WITH_STATEMENT),
     /**
      * Enables the print function.
      */
-//    print_function(CodeFlag.CO_FUTURE_PRINT_FUNCTION),
+    print_function(CodeFlag.CO_FUTURE_PRINT_FUNCTION),
     /**
      * Enables unicode literals.
      */
@@ -35,34 +35,7 @@ public enum FutureFeature implements Pragma {
     /**
      * PEP-479 Change StopIteration handling in inside generators
      */
-    generator_stop(CodeFlag.CO_FUTURE_GENERATOR_STOP),
-    /**
-     * Use braces for block delimiters instead of indentation.
-     */
-    braces {
-        @Override
-        public void addTo(PragmaReceiver features) {
-            throw new ParseException("not a chance");
-        }
-    },
-    /**
-     * Enable the Global Interpreter Lock in Jython.
-     */
-    GIL {
-        @Override
-        public void addTo(PragmaReceiver features) {
-            throw new ParseException("Never going to happen!");
-        }
-    },
-    /**
-     * Enable the Global Interpreter Lock in Jython.
-     */
-    global_interpreter_lock {
-        @Override
-        public void addTo(PragmaReceiver features) {
-            GIL.addTo(features);
-        }
-    };
+    generator_stop(CodeFlag.CO_FUTURE_GENERATOR_STOP);
 
     public static final String MODULE_NAME = "__future__";
     public static final PragmaModule PRAGMA_MODULE = new PragmaModule(

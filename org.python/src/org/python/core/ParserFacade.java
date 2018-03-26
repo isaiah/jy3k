@@ -168,7 +168,7 @@ public class ParserFacade {
             // prepBufReader takes care of encoding detection and universal
             // newlines:
             bufReader = prepBufReader(stream, cflags, filename, false);
-            return parseOnly(bufReader, kind, filename, cflags );
+            return parseOnly(bufReader, kind, filename, cflags);
         } catch (Throwable t) {
             throw fixParseError(t, filename);
         } finally {
