@@ -382,6 +382,9 @@ public class PyList extends PySequenceList implements List {
         if (keyval < 0) {
             keyval += self.size();
         }
+        if (keyval >= self.list.size() || keyval < 0) {
+            throw Py.IndexError("list index out of range");
+        }
         return self.list.get(keyval);
     }
 

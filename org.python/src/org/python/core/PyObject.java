@@ -944,7 +944,7 @@ public class PyObject implements Serializable {
                         getitemFunc = getitem.getGetter().invokeExact(o);
                         return new PySeqIterator(o, getitemFunc);
                     } catch (Throwable throwable) {
-                        throw Py.TypeError(String.format("%s object is not iterable", o.getType().fastGetName()));
+                        throw Py.TypeErrorFmt("'%s' object is not iterable", o);
                     }
                 }
                 throw e;
