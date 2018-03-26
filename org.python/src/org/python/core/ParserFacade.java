@@ -139,7 +139,7 @@ public class ParserFacade {
         reader.mark(MARK_LIMIT); // We need the ability to move back on the
                                  // reader, for the benefit of fixParseError and
                                  // validPartialSentence
-        CharStream cs = new ANTLRInputStream(reader);
+        CharStream cs = CharStreams.fromReader(reader);
         BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
         return kind.dispatch(parser);
     }
@@ -422,7 +422,7 @@ public class ParserFacade {
         return encoding;
     }
 
-    private static final Pattern pep263EncodingPattern = Pattern.compile("#.*coding[:=]\\s*([-\\w.]+)");
+    private static final Pattern pep263EncodingPattern = Pattern.compile("^[ \\t\\v]*#.*?coding[:=][ \\t]*([-_.a-zA-Z0-9]+)");
 
     private static String matchEncoding(String inputStr) {
         Matcher matcher = pep263EncodingPattern.matcher(inputStr);
