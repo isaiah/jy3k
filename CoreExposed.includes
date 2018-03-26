@@ -137,6 +137,7 @@ org/python/modules/array/PyArrayIter.class
 org/python/modules/bz2/PyBZ2File.class
 org/python/modules/bz2/PyBZ2Compressor.class
 org/python/modules/bz2/PyBZ2Decompressor.class
+org/python/modules/expat/PyXMLParser.class
 org/python/modules/itertools/accumulate.class
 org/python/modules/itertools/chain.class
 org/python/modules/itertools/compress.class

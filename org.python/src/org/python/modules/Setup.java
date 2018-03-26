@@ -78,6 +78,7 @@ public class Setup {
             "math",
             (Platform.IS_WINDOWS ? "nt" : "posix") + ":org.python.modules.posix.PosixModule",
             "parser:org.python.modules.parser.ParserModule",
+            "pyexpat:org.python.modules.expat.ExpatModule",
             "select:org.python.modules.select.SelectModule",
             //"subprocess:org.python.modules.subprocess.SubprocessModule",
             "synchronize",

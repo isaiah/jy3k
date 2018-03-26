@@ -66,6 +66,7 @@ class FinalizationTest(unittest.TestCase):
         del frame
         support.gc_collect()
 
+    @unittest.skipUnless(hasattr(sys, 'getrefcount'), 'needs sys.getrefcount')
     def test_refcycle(self):
         # A generator caught in a refcycle gets finalized anyway.
         old_garbage = gc.garbage[:]

@@ -99,7 +99,7 @@ public class ArgParser {
      * @param pos The position of the .. First argument is numbered 0.
      */
     public String getString(int pos) {
-        return (String) getArg(pos, String.class, "string");
+        return (String) getArg(pos, String.class, "str");
     }
 
     /**
@@ -108,7 +108,7 @@ public class ArgParser {
      * @param pos The position of the argument. First argument is numbered 0.
      */
     public String getString(int pos, String def) {
-        return (String) getArg(pos, String.class, "string", def);
+        return (String) getArg(pos, String.class, "str", def);
     }
 
     /**
@@ -391,8 +391,8 @@ public class ArgParser {
 
         Object ret = value.__tojava__(clss);
         if (ret == Py.NoConversion) {
-            throw Py.TypeError("argument " + (pos + 1) + ": expected "
-                    + classname + ", " + value.getType().fastGetName() + " found");
+            throw Py.TypeError(funcname + "() argument " + (pos + 1) + " must be "
+                    + classname + (def == required ? "" : " or None") + ", not " + value.getType().fastGetName());
         }
         return ret;
     }
