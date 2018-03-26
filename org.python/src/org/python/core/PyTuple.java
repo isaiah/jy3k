@@ -1,6 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -195,6 +196,23 @@ public class PyTuple extends PySequenceList implements List {
             sum = fromArrayNoCopy(newArray);
         }
         return sum;
+    }
+
+    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.tuple___mul___doc)
+    public final PyObject __mul_(PyObject other) {
+        if (other instanceof PyLong) {
+            throw Py.TypeErrorFmt("can't multiply sequence by non-int of type '%s'", other);
+        }
+        int count = other.asInt();
+        if (count <= 0) {
+            return EMPTY_TUPLE;
+        }
+        int len = array.length;
+        PyObject[] ret = new PyObject[len * count];
+        for (int i = 0; i < count; i++) {
+            System.arraycopy(array, 0, ret, i * len, len);
+        }
+        return new PyTuple(ret);
     }
 
     @ExposedSlot(SlotFunc.ITER)
