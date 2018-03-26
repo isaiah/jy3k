@@ -141,7 +141,7 @@ public class PySRE_Pattern extends PyObject {
                 default:
                     PyObject[] objs = new PyObject[matcher.groupCount()];
                     for (int i = 1; i <= objs.length; i++) {
-                        objs[i] = wrap(matcher.group(i), isByte);
+                        objs[i - 1] = wrap(matcher.group(i), isByte);
                     }
                     list.add(new PyTuple(objs));
             }

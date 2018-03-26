@@ -175,7 +175,7 @@ public class PyUnicode extends PySequence implements Iterable {
      */
     public PyUnicode(PyType subtype, String string, boolean isBasic) {
         super(subtype);
-        this.string = string;
+        this.string = string == null ? "" : string;
         translator = isBasic ? BASIC : this.chooseIndexTranslator();
     }
 

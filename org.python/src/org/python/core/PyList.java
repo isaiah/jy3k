@@ -1132,10 +1132,16 @@ public class PyList extends PySequenceList implements List {
         int n = sliceLength(start, stop, step);
         List<PyObject> newList;
         if (step == 1) {
-            newList = new ArrayList<PyObject>(list.subList(start, stop));
+            if (stop > list.size()) {
+                throw Py.IndexError("list index out of range");
+            }
+            newList = new ArrayList<>(list.subList(start, stop));
         } else {
-            newList = new ArrayList<PyObject>(n);
+            newList = new ArrayList<>(n);
             for (int i = start, j = 0; j < n; i += step, j++) {
+                if (i > list.size()) {
+                    throw Py.IndexError("list index out of range");
+                }
                 newList.add(list.get(i));
             }
         }

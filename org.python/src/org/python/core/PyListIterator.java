@@ -25,7 +25,7 @@ public class PyListIterator extends PyObject {
         if (self.index >= self.length) {
             throw Py.StopIteration();
         }
-        return self.list.pyget(self.index++);
+        return PyList.getitem(self.list, self.index++);
     }
 
     @ExposedMethod(names = {"__length_hint__"})
