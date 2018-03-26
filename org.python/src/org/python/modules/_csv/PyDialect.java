@@ -129,7 +129,7 @@ public class PyDialect extends PyObject {
             throw Py.TypeError("bad \"quoting\" value");
         }
         if (self.delimiter == '\0') {
-            throw Py.TypeError("delimiter must be set");
+            throw Py.TypeError("\"delimiter\" must be a 1-character string");
         }
         if (quotechar == Py.None && quoting == null) {
             self.quoting = QuoteStyle.QUOTE_NONE;
@@ -155,7 +155,9 @@ public class PyDialect extends PyObject {
         boolean isStr = Py.isInstance(src, PyUnicode.TYPE);
         if (src == Py.None || isStr && src.__len__() == 0) {
             return '\0';
-        } else if (!isStr || src.__len__() != 1) {
+        } else if (!isStr) {
+            throw Py.TypeError(String.format("\"%s\" must be string, not %s", name, src.getType().fastGetName()));
+        } else if (src.__len__() != 1) {
             throw Py.TypeError(String.format("\"%s\" must be a 1-character string", name));
         }
         return src.toString().charAt(0);
@@ -179,7 +181,7 @@ public class PyDialect extends PyObject {
             return null;
         }
         if (!(src instanceof PyUnicode)) {
-            throw Py.TypeError(String.format("\"%s\" must be an string", name));
+            throw Py.TypeError(String.format("\"%s\" must be a string", name));
         }
         return src.toString();
     }

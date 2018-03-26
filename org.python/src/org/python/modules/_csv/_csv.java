@@ -103,7 +103,7 @@ public class _csv {
         PyObject outputFile = ap.getPyObject(0);
         PyObject dialect = ap.getPyObject(1, null);
 
-        PyObject writeline = outputFile.__findattr__("write");
+        PyObject writeline = Abstract._PyObject_GetAttrId(outputFile, "write");
         if (writeline == null || !writeline.isCallable()) {
             throw Py.TypeError("argument 1 must have a \"write\" method");
         }
