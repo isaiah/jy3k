@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -528,14 +529,14 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
     @ExposedMethod(doc = BuiltinDocs.dict_popitem_doc)
     public final PyObject dict_popitem() {
-        Iterator<Entry<PyObject, PyObject>> it = getMap().entrySet().iterator();
-        if (!it.hasNext()) {
-            throw Py.KeyError("popitem(): dictionary is empty");
+        Optional<Entry<PyObject, PyObject>> ret = getMap().entrySet().stream().findFirst();
+        if (ret.isPresent()) {
+            Entry<PyObject, PyObject> entry = ret.get();
+            PyObject key = entry.getKey();
+            getMap().remove(key);
+            return new PyTuple(key, entry.getValue());
         }
-        Entry<PyObject, PyObject> entry = it.next();
-        PyTuple tuple = new PyTuple(entry.getKey(), entry.getValue());
-        it.remove();
-        return tuple;
+        throw Py.KeyError("popitem(): dictionary is empty");
     }
 
     public final PyList keys_as_list() {
@@ -620,17 +621,18 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             size = values.size();
         }
 
-        @ExposedMethod(names = "__iter__")
-        public PyObject dict_valueiterator___iter__() {
-            return this;
+        @ExposedSlot(SlotFunc.ITER)
+        public static PyObject dict_valueiterator___iter__(PyObject self) {
+            return self;
         }
 
-        @ExposedMethod(names = "__next__")
-        public PyObject dict_valueiterator___next__() {
-            if (!iterator.hasNext()) {
+        @ExposedSlot(SlotFunc.ITER_NEXT)
+        public static PyObject dict_valueiterator___next__(PyObject iter) {
+            ValuesIter self = (ValuesIter) iter;
+            if (!self.iterator.hasNext()) {
                 throw Py.StopIteration();
             }
-            return iterator.next();
+            return self.iterator.next();
         }
 
         @ExposedMethod(names = "__length_hint__")
@@ -657,17 +659,18 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             size = items.size();
         }
 
-        @ExposedMethod
-        public PyObject __iter__() {
-            return this;
+        @ExposedSlot(SlotFunc.ITER)
+        public static PyObject __iter__(PyObject self) {
+            return self;
         }
 
-        @ExposedMethod(names = "__next__")
-        public PyObject next() {
-            if (!iterator.hasNext()) {
+        @ExposedSlot(SlotFunc.ITER_NEXT)
+        public static PyObject next(PyObject iter) {
+            ItemsIter self = (ItemsIter) iter;
+            if (!self.iterator.hasNext()) {
                 throw Py.StopIteration();
             }
-            Entry<PyObject, PyObject> entry = iterator.next();
+            Entry<PyObject, PyObject> entry = self.iterator.next();
             return new PyTuple(entry.getKey(), entry.getValue());
         }
 
@@ -702,16 +705,16 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_keys", base = PyObject.class)
-    public class PyDictionaryViewKeys extends BaseDictionaryView {
+    public static class PyDictionaryViewKeys extends BaseDictionaryView {
         public final PyType TYPE = PyType.fromClass(PyDictionaryViewKeys.class);
 
         public PyDictionaryViewKeys(PyDictionary dvDict) {
             super(dvDict);
         }
 
-        @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
-        public final PyObject dict_keys___iter__() {
-            return new ValuesIter(dvDict.getMap().keySet());
+        @ExposedSlot(SlotFunc.ITER)
+        public static PyObject dict_keys___iter__(PyObject self) {
+            return new ValuesIter(((PyDictionaryViewKeys) self).dvDict.getMap().keySet());
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ne___doc)
@@ -784,16 +787,16 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedType(name = "dict_items")
-    public class PyDictionaryViewItems extends BaseDictionaryView {
+    public static class PyDictionaryViewItems extends BaseDictionaryView {
         public final PyType TYPE = PyType.fromClass(PyDictionaryViewItems.class);
 
         public PyDictionaryViewItems(PyDictionary dvDict) {
             super(dvDict);
         }
 
-        @ExposedMethod(doc = BuiltinDocs.set___iter___doc)
-        public final PyObject dict_items___iter__() {
-            return new ItemsIter(dvDict.getMap().entrySet());
+        @ExposedSlot(SlotFunc.ITER)
+        public static PyObject dict_items___iter__(PyObject self) {
+            return new ItemsIter(((PyDictionaryViewItems) self).dvDict.getMap().entrySet());
         }
 
         @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.set___ne___doc)
