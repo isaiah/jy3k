@@ -7,11 +7,15 @@ import org.python.annotations.ModuleInit;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyException;
 import org.python.core.PyLong;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyUnicode;
+
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
 
 @ExposedModule(name = "pyexpat")
 public class ExpatModule {
@@ -155,5 +159,12 @@ public class ExpatModule {
         }
         errorModule.__setitem__("messages", messages);
         errorModule.__setitem__("codes", codes);
+    }
+
+    private static final String FORM_ERR = "XML declaration not well-formed: line %d, column %d";
+
+    public static void FormError(XMLStreamException exception) {
+        Location location = exception.getLocation();
+        throw new PyException(ExpatError, String.format(FORM_ERR, location.getLineNumber(), location.getColumnNumber()));
     }
 }
