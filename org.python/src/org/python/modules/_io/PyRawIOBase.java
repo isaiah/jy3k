@@ -4,6 +4,7 @@ package org.python.modules._io;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.JavaIO;
 import org.python.core.Py;
 import org.python.core.PyBUF;
 import org.python.core.PyBuffer;
@@ -24,7 +25,7 @@ import java.io.OutputStream;
  * the CPython version.
  */
 @ExposedType(name = "_io._RawIOBase", base = PyIOBase.class)
-public class PyRawIOBase extends PyIOBase {
+public class PyRawIOBase extends PyIOBase implements JavaIO {
 
     public static final PyType TYPE = PyType.fromClass(PyRawIOBase.class);
 

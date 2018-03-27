@@ -5,6 +5,7 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedType;
+import org.python.core.JavaIO;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyList;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExposedType(name = "_io.BytesIO")
-public class PyBytesIO extends PyBufferedIOBase {
+public class PyBytesIO extends PyBufferedIOBase implements JavaIO {
     public static final PyType TYPE = PyType.fromClass(PyBytesIO.class);
 
     private final ByteList buf;

@@ -526,6 +526,9 @@ public class PyLong extends PyObject {
                     || c == Serializable.class) {
                 return getValue();
             }
+            if (c == Boolean.TYPE || c == Boolean.class) {
+                return Boolean.valueOf(getLong(Byte.MIN_VALUE, 0xFF) > 0);
+            }
         } catch (PyException e) {
             return Py.NoConversion;
         }
