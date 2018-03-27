@@ -1,6 +1,8 @@
 package org.python.modules.parser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.python.annotations.ModuleInit;
 import org.python.antlr.PythonLexer;
@@ -70,7 +72,7 @@ public class ParserModule {
     }
 
     private static PythonParser setupParser(String s) {
-        ANTLRInputStream input = new ANTLRInputStream(s);
+        CharStream input = CharStreams.fromString(s);
         PythonLexer lexer = new PythonLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         return new PythonParser(tokens);
