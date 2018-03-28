@@ -1,0 +1,17 @@
+test.test_bufio
+test.test_call
+test.test_compare
+test.test_contains
+test.test_decorators
+test.test_dictcomps
+test.test_exception_variations
+test.test_future
+test.test_future3
+test.test_future4
+test.test_future5
+test.test_funcattrs
+test.test_metaclass
+test.test_pkg
+test.test_struct
+test.test_syntax
+test.test_unary

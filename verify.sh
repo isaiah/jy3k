@@ -1,0 +1,1 @@
+java -cp "dist/jylang-dev.jar:dist/Lib/__pycache__:lib/asm-6.0.jar:lib/asm-tree-6.0.jar:lib/asm-analysis-6.0.jar:lib/asm-util-6.0.jar:lib/asm-commons-6.0.jar" org.objectweb.asm.util.CheckClassAdapter $1

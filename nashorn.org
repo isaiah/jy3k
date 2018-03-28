@@ -1,0 +1,137 @@
+* Similarity between Python and JavaScript
+** The `__proto__` of a javascript function is actually equivalent of python class's type
+   We might be able to use the same mechanism to initiate the TYPE statically
+
+[[https://wiki.openjdk.java.net/display/Nashorn/Nashorn%2Bextensions][Nashorn extension]]
+
+* Nasgen tool doesn't need to generate an anonymous class of ScriptFunction
+  but simply generate an instance that carries the metadata need for dynamic linking
+  which makes the class generator simplier
+  
+** Nashorn builtin ScriptFunction
+It's a wrap around a ScriptFunctionData object and a PropertyMap
+The ScriptFunctionData includes the method handle for the target java method, which a ScriptFunction is invoked,
+it delegates to the data object. This could speed up 
+
+
+* Java interop
+** jdk.dynalink has a builtin BeansLinker that handles linking to bare Java objects
+In order to use that we have to remove the restriction that requires everything exposed in Python world be
+an instance of PyObject, this reveals a lot of possibilities, it will reduce the overhead of java interop.
+Since all the boxing is no longer necessary. The linker will do all the heavy lifting of method resolution
+and type conversion. But this is going to be a hell ot of work, one possible way is to reduce PyObject to a
+flag interface and modify the BeansLinker to implement such a interface in order to keep the signatures
+compatible.nnnn
+
+
+** There are two main cases of java interop
+*** Method and field resolution of original java objects
+This can be solved once the builtin classes doesn't require arguments and return values to be PyObject, by
+using the BeansLinker.
+
+*** subclassing java classes from Python
+For this purpose, it's needs the ProxyMaker to generate java bytecode on the fly.
+The code are already there, but have to figure out a way to incoroperate invokedynamic, I assume the logic
+could be simplified a lot, as there is no need to box the output anymore.
+
+* Roadmap
+** Script mode
+If we change the implementation of _socket module and others that calls java directly, then we basically
+can create a "script mode" that doesn't require java interop, which could improve the startup time.
+** Generate a hidden class for the type
+With a real class to back the type of the builtin class, we could speed up the lookup a lot.
+** Check how we can utilise the LOAD_METHOD & CALL_METHOD pattern
+Introduced in CPython 3.7, the idea is to improve method invocation by save the descriptor creation step
+** Use a "Runtime" that's implemented in Python to execute the slot methods (magic method) e.g. "__add__"
+Current this is implemented in Java and the compiler emits `invokevirtual` call to `PyObject`. That's why
+the Derived.java classes are generated to faciliate the method lookup of class that derived from builtin
+types. CPython as specific bytecode i.e. BINARY_ADD, a + b, that resort to b.__iadd__(a) if a.__add__ is
+not found. With a python implementation this could take advantage of the `invokedynamic`. This could also
+benefit the two step initialization.
+
+* CPython compiling
+** Synchronise the compiler with CPython Python/compile.c
+*** generate bytecode
+*** assemble: create code object
+*** make_closure: create function object
+
+* Jylang compiler internals
+** compile_function:
+*** Module.codeConstant will generate a java method and return the CodeConstant object
+*** The code constant is then called with .get(code) on the method emitter (Code)
+*** The method emitter will generate a static field get instruction to place the PyTableCode object on stack
+*** A PyFunction is object is created
+* Problem stack
+
+These are the problems that I'm working on, it's a kind of stack because I found one problem and then get distracted by another problem
+
+** Implement socket module in java
+** test.support.cleanup_threading(*threading_info) hangs
+
+When working with specs ie test.test_socket that uses threads, the test runner will try to clean up the spawned threads before returning. This hangs on JVM
+because the weakrefs are not cleaneda, 
+
+DONE: disabled the logic in test.support.threading_cleanup, it doesn't cause leak, but the last thread cannot be cleaned up, because the method handles still hold a reference, better if we can find a solution though
+
+** _imp.acquire_lock blocked
+
+The callback placed by importlib._bootstrap in the weakref tries to acquire the import lock, which is locked by the main thread
+
+** Unicode characters are not read correctly, trying to fix the _io.BytesIO implementation
+
+DONE: the customized logic in importlib._bootstrap_external was checking bytecode path too early
+
+
+
+** Remove all *Derived.java classes, use dynamic resolution at runtime for all callsites.
+** After replaced __next__ with InvokeByName, it turns out to be too slow, because of constant relinking
+** Try to resolve __next__ and __iter__ methodhandle and put them in the type slots, like cpython does
+
+* Problem removing *Derived.java 
+
+When invoke a method from a builtin type, it's always possible that the method
+is been overriden, it is less a problem when invoked from python, since the
+linker will link the correct method handle, but when invoked from java, it
+requires the *Derived class to do the method lookup at runtime.
+
+This is potentially fixable, if we generate the *Derived class when a builtin
+type is subclassed, we just have to treak the initialization process to use
+the proper constructor (in type.__new__), since the constructor is unknown at
+compile time, we should use reflection to create the object, probably even can
+return the constructor from the linker directly.
+
+PyMethodDescr has a very special logic when invoking, it binds to the first argumetn and then invoke
+with the rest arguments, this makes it difficult to link dynamically, might have to modify the logic
+in PyBuiltinMethod.findCallMethod to treat the extra "self" argument specially #gofromhere
+
+* Improve the import machinery
+** How does it work
+
+It loops through the sys.path, for each entry it first check sys.path_importer_cache to get a loader,
+it uses the loader.find_spec (if exist) to check if existing loader can handle the path
+
+* JRuby method invocation mechanism, invoke ruby method from java, including native method
+
+** Problem
+ It's not safe to invoke builtin method directly with invokevirtual/invokestatic!
+
+** Solution
+ A (caching) callsite that always try to be optimistic and invoke the builtin method if
+ the type is correct, else use slow path to retrieve the real method handle and cache it
+
+
+** Experiment
+
+Implement attribute access with invokedynamic, check how nashorn links it
+
+Problem with Binary operation is less important, since they are cached by the type
+
+* Thing to do next
+
+** Lazy initialization of builtin types, using ClassValue
+
+** Implement callsite mechanism to replace the *Derived classes
+
+** Replace method call with one step invokedynamic __call__(methodname), instead of current
+ two steps __getattr__, then __call__
+** Replace attribute access and index access with indy
