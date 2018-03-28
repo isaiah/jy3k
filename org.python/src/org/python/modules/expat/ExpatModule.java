@@ -165,7 +165,14 @@ public class ExpatModule {
 
     public static void FormError(XMLStreamException exception) {
         Location location = exception.getLocation();
-        PyException e =  new PyException(ExpatError, String.format(FORM_ERR, location.getLineNumber(), location.getColumnNumber()));
+//        PyException e =  new PyException(ExpatError, String.format(FORM_ERR, location.getLineNumber(), location.getColumnNumber()));
+        PyException e =  new PyException(ExpatError, exception.getMessage());
+        throw e;
+    }
+
+    public static void FormError(String message, String errorType, Object relatedInformation, Location location) {
+        PyException e =  new PyException(ExpatError, message);
+        e.value.__setattr__("code", new PyUnicode(errorType));
         throw e;
     }
 }

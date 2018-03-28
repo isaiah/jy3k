@@ -34,6 +34,5 @@
     <dependency org="javax.servlet" name="servlet-api" rev="2.5"/>
     <dependency org="com.jcraft" name="jzlib" rev="1.1.3"/>
     <dependency org="org.apache.commons" name="commons-compress" rev="1.9"/>
-    <dependency org="xerces" name="xercesImpl" rev="2.11.0"/>
   </dependencies>
 </ivy-module>

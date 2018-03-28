@@ -17,6 +17,7 @@ import org.python.core.PyUnicode;
 
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -119,6 +120,7 @@ public class PyXMLParser extends PyObject {
     @ExposedSet
     @ExposedGet
     public PyObject ProcessingInstructionHandler;
+
     @ExposedSet
     @ExposedGet
     public PyObject UnparsedEntityDeclHandler;
@@ -136,12 +138,26 @@ public class PyXMLParser extends PyObject {
         super(TYPE);
         inputFactory = XMLInputFactory.newInstance();
         UseForeignDTD(false);
+        inputFactory.setProperty("http://apache.org/xml/features/allow-java-encodings", true);
+        inputFactory.setXMLReporter((message, errorType, relatedInformation, location) -> {
+            if (errorType.equals("EncodingDeclInvalid")) {
+                return;
+            }
+            ExpatModule.FormError(message, errorType, relatedInformation, location);
+        });
     }
 
     public PyXMLParser(PyType subtype) {
         super(subtype);
         inputFactory = XMLInputFactory.newInstance();
         UseForeignDTD(false);
+        inputFactory.setProperty("http://apache.org/xml/features/allow-java-encodings", true);
+        inputFactory.setXMLReporter((message, errorType, relatedInformation, location) -> {
+            if (errorType.equals("EncodingDeclInvalid")) {
+                return;
+            }
+            ExpatModule.FormError(message, errorType, relatedInformation, location);
+        });
     }
 
     @ExposedMethod

@@ -1,2 +1,2 @@
 all:
-	ant && jython -m test.test_pyexpat
+	ant && /home/isaiah/codes/jylang/dist/bin/jython -m test.test_pyexpat
