@@ -194,6 +194,23 @@
             <classpath refid="default.classpath"/>
         </java>
     </target>
+    <target name="compile-patch" depends="init,antlr_gen,brand-version">
+        <javac destdir="${compile.dir}"
+               srcdir="${jaxp.patch.src.dir}"
+               target="${jdk.target.version}"
+               source="${jdk.source.version}"
+               debug="${debug}"
+               deprecation="false"
+               nowarn="false"
+               memoryMaximumSize="1024m"
+               fork="true"
+               includeantruntime="false"
+               encoding="UTF-8">
+            <compilerarg line="${compiler.override.option}"/>
+        </javac>
+      </target>
+
+
 
     <target name="compile" depends="init,antlr_gen,brand-version">
         <javac destdir="${compile.dir}"
@@ -349,6 +366,7 @@
           manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
+            <fileset dir="${output.dir}/patches"/>
             <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**"/>
         </jar>
     </target>

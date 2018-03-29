@@ -171,8 +171,10 @@ public class ExpatModule {
     }
 
     public static void FormError(String message, String errorType, Object relatedInformation, Location location) {
-        PyException e =  new PyException(ExpatError, message);
-        e.value.__setattr__("code", new PyUnicode(errorType));
+//        PyObject value = new PyObject();
+//        value.__setattr__("message", new PyUnicode(message));
+//        value.__setattr__("code", new PyUnicode(errorType));
+        PyException e =  new PyException(ExpatError, errorType);
         throw e;
     }
 }
