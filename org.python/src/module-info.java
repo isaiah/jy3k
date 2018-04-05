@@ -18,6 +18,8 @@ module org.python {
     requires jdk.dynalink;
     requires java.scripting;
     requires java.management;
+    requires java.xml;
+    requires java.desktop;
 
     exports org.python;
     exports org.python.core;

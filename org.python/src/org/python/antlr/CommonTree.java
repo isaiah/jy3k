@@ -1,6 +1,7 @@
 package org.python.antlr;
 
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -32,6 +33,10 @@ public class CommonTree implements TerminalNode {
     @Override
     public ParseTree getChild(int i) {
         return null;
+    }
+
+    @Override
+    public void setParent(RuleContext ruleContext) {
     }
 
     @Override
