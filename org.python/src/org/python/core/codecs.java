@@ -6,15 +6,12 @@
  */
 package org.python.core;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.python.bootstrap.Import;
-import org.python.core.util.StringUtil;
 import org.python.modules._codecs;
 
 /**
@@ -312,7 +309,7 @@ public class codecs {
     private static PyException wrong_exception_type(PyObject exc) {
         PyObject excClass = exc.__getattr__("__class__");
         PyObject className = excClass.__getattr__("__name__");
-        return new PyException(Py.TypeError, "Don't know how to handle " + className
+        return Py.TypeError("Don't know how to handle " + className
                 + " in error callback");
     }
 
@@ -370,24 +367,38 @@ public class codecs {
     public static PyObject surrogateescape_errors(PyObject[] args, String[] kws) {
         ArgParser ap = new ArgParser("surrogateescape_errors", args, kws, "exc");
         PyObject exc = ap.getPyObject(0);
-        if (!Py.isInstance(exc, Py.UnicodeDecodeError)) {
-            throw wrong_exception_type(exc);
-        }
+
         int start = exc.__getattr__("start").asInt();
         int end = exc.__getattr__("end").asInt();
         String object = exc.__getattr__("object").toString();
         StringBuilder replacement = new StringBuilder();
-        surrogateescape_internal(start, end, object, replacement);
+        if (Py.isInstance(exc, Py.UnicodeEncodeError)) {
+            surrogateescapeEncodeInternal(start, end, object, replacement);
+        } else if(Py.isInstance(exc, Py.UnicodeDecodeError)) {
+            surrogateescapeDecodeInternal(start, end, object, replacement);
+        } else {
+            throw wrong_exception_type(exc);
+        }
         return new PyTuple(new PyUnicode(replacement), exc.__getattr__("end"));
     }
 
-    private static void surrogateescape_internal(int start, int end, String object, StringBuilder replacement) {
+    private static void surrogateescapeEncodeInternal(int start, int end, String object, StringBuilder replacement) {
         for (int i = start; i < end; i++) {
             char ch = object.charAt(i);
             if (ch < 128) {
                 break;
             }
             replacement.appendCodePoint(ch + '\udc00');
+        }
+    }
+
+    private static void surrogateescapeDecodeInternal(int start, int end, String object, StringBuilder replacement) {
+        for (int i = start; i < end; i++) {
+            char ch = object.charAt(i);
+            if (ch < 0xDC00 || ch > 0xDCFF) {
+                break;
+            }
+            replacement.appendCodePoint(ch - '\udc00');
         }
     }
 
