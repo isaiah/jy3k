@@ -4,7 +4,6 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
-import org.python.core.Abstract;
 import org.python.core.ArgParser;
 import org.python.core.BufferProtocol;
 import org.python.core.JavaIO;
@@ -15,20 +14,24 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.NotationDeclaration;
-import javax.xml.stream.events.StartElement;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.SequenceInputStream;
 import java.util.List;
 
-import static javax.xml.stream.XMLStreamConstants.*;
+import static javax.xml.stream.XMLStreamConstants.CDATA;
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.COMMENT;
+import static javax.xml.stream.XMLStreamConstants.DTD;
+import static javax.xml.stream.XMLStreamConstants.END_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.SPACE;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 @ExposedType(name = "pyexpat.xmlparser")
 public class PyXMLParser extends PyObject {
@@ -160,20 +163,31 @@ public class PyXMLParser extends PyObject {
         });
     }
 
+    private InputStream bufferedInput;
+
     @ExposedMethod
     public final PyObject Parse(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("Parse", args, keywords, "data", "isfinal");
         PyObject data = ap.getPyObject(0);
         boolean isFinal = ap.getBoolean(1, false);
         try {
+            byte[] bytes;
             if (data instanceof BufferProtocol) {
-                InputStream input = new ByteArrayInputStream(Py.unwrapBuffer(data));
-                xmlReader = inputFactory.createXMLStreamReader(input);
-
+                bytes = Py.unwrapBuffer(data);
             } else if (data instanceof PyUnicode) {
-                xmlReader = inputFactory.createXMLStreamReader(new StringReader(((PyUnicode) data).getString()));
+                bytes = ((PyUnicode) data).getString().getBytes();
+            } else {
+                bytes = new byte[0];
             }
-            parse();
+            if (bufferedInput == null) {
+                bufferedInput = new ByteArrayInputStream(bytes);
+            } else {
+                bufferedInput = new SequenceInputStream(bufferedInput, new ByteArrayInputStream(bytes));
+            }
+            if (isFinal) {
+                xmlReader = inputFactory.createXMLStreamReader(bufferedInput);
+                parse();
+            }
         } catch (XMLStreamException e) {
             ExpatModule.FormError(e);
         }
@@ -183,7 +197,7 @@ public class PyXMLParser extends PyObject {
     @ExposedMethod
     public final PyObject ParseFile(PyObject file) {
         if (xmlReader != null) {
-            throw new PyException(ExpatModule.ExpatError, ExpatModule.XML_ERROR_FINISHED);
+            throw new PyException(ExpatModule.ExpatError, ExpatModule.XMLError.XML_ERROR_FINISHED.getMessage());
         }
         if (file instanceof JavaIO) {
             try {
@@ -235,11 +249,13 @@ public class PyXMLParser extends PyObject {
             buffer = new StringBuilder();
         }
     }
+
     private StringBuilder buffer = new StringBuilder();
+
     private void parse() throws XMLStreamException {
         while (xmlReader.hasNext()) {
             int next = xmlReader.next();
-            switch(next) {
+            switch (next) {
                 case START_DOCUMENT:
                     break;
                 case END_DOCUMENT:
@@ -254,7 +270,7 @@ public class PyXMLParser extends PyObject {
                 case DTD:
                     if (ExternalEntityRefHandler != null) {
                         List<NotationDeclaration> l = (List<NotationDeclaration>) xmlReader.getProperty("javax.xml.stream.notations");
-                        for (NotationDeclaration decl: l) {
+                        for (NotationDeclaration decl : l) {
                             ExternalEntityRefHandler.__call__(Py.None, Py.None, new PyUnicode(decl.getSystemId()), new PyUnicode(decl.getPublicId()));
                         }
                     }
