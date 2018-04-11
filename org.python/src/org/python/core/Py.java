@@ -2619,7 +2619,7 @@ public final class Py {
         int n = 10;
         if (!(iterable instanceof PyGenerator)) {
             try {
-                n = iterable.__len__();
+                n = Abstract.PyObject_Size(iterable, Py.getThreadState());
             } catch (PyException pye) {
                 // ok
             }

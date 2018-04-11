@@ -30,7 +30,9 @@ public class Abstract {
     private static final InvokeByName str = new InvokeByName("__str__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName trunc = new InvokeByName("__trunc__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName contains = new InvokeByName("__contains__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
-
+    private final static InvokeByName pos = new InvokeByName("__pos__", PyObject.class, PyObject.class, ThreadState.class);
+    private final static InvokeByName neg = new InvokeByName("__neg__", PyObject.class, PyObject.class, ThreadState.class);
+    private final static InvokeByName invert = new InvokeByName("__invert__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName getitem = new InvokeByName("__getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 //    private static final InvokeByName getattribute = new InvokeByName("__getattribute__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 //    private static final InvokeByName getattr = new InvokeByName("__getattr__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
@@ -99,6 +101,24 @@ public class Abstract {
         }
     }
 
+    public static int PyObject_Size(PyObject self, ThreadState ts) {
+        PyType tp = self.getType();
+        if (tp.sqLen != null) {
+            try {
+                return (int) tp.sqLen.invokeExact(self);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        try {
+            Object lenFunc = len.getGetter().invokeExact((PyObject) self.getType());
+            PyObject ret = (PyObject) len.getInvoker().invokeExact(lenFunc, ts, self);
+            return ret.asInt();
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
+    }
+
     // called from generated code, is easier to have the threadstate in the end
     public static boolean PyObject_IsTrue(PyObject self, ThreadState ts) {
         if (self == Py.True) {
@@ -152,15 +172,15 @@ public class Abstract {
     }
 
     public static PyObject PyNumber_Positive(ThreadState ts, PyObject obj) {
-        return unaryOp(ts, "__pos__", "+", obj);
+        return unaryOp(ts, pos, "+", obj);
     }
 
     public static PyObject PyNumber_Negative(ThreadState ts, PyObject obj) {
-        return unaryOp(ts, "__neg__", "-", obj);
+        return unaryOp(ts, neg, "-", obj);
     }
 
     public static PyObject PyNumber_Invert(ThreadState ts, PyObject obj) {
-        return unaryOp(ts, "__invert__", "~", obj);
+        return unaryOp(ts, invert, "~", obj);
     }
 
     /**
@@ -400,12 +420,11 @@ public class Abstract {
         }
     }
 
-    public static PyObject unaryOp(ThreadState ts, String name, String sign, PyObject arg) {
-        InvokeByName pos = new InvokeByName(name, PyObject.class, PyObject.class, ThreadState.class);
+    public static PyObject unaryOp(ThreadState ts, InvokeByName op, String sign, PyObject arg) {
         Object func = null;
         try {
-            func = pos.getGetter().invokeExact(arg);
-            return (PyObject) pos.getInvoker().invokeExact(func, ts);
+            func = op.getGetter().invokeExact(arg);
+            return (PyObject) op.getInvoker().invokeExact(func, ts);
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 throw Py.TypeError(String.format("bad operand type for unary %s: '%.200s'", sign,

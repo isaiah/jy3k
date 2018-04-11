@@ -490,6 +490,9 @@ public class PyUnicode extends PySequence implements Iterable {
         if (idx < 0) {
             idx += string.length();
         }
+        if (idx < 0) {
+            throw Py.IndexError(String.format("string index out of range"));
+        }
         int codepoint = string.codePointAt(string.offsetByCodePoints(0, idx));
         return new PyUnicode(new String(Character.toChars(codepoint)));
     }
