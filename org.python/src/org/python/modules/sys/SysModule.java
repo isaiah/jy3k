@@ -116,6 +116,11 @@ public class SysModule {
         throw new PyException(Py.SystemExit, status);
     }
 
+    @ExposedFunction
+    public static int getrecursionlimit() {
+        return 100;
+    }
+
     // Java API
     public static void setObject(String name, PyObject value) {
         PyObject sysdict = Py.getSystemState().sysdict;
