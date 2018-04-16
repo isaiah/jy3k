@@ -477,19 +477,18 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         return dict_setdefault(key, failobj);
     }
 
-    @ExposedMethod(defaults = "Py.None", doc = BuiltinDocs.dict_setdefault_doc)
+    @ExposedMethod(defaults = "null", doc = BuiltinDocs.dict_setdefault_doc)
     public final PyObject dict_setdefault(PyObject key, PyObject failobj) {
         PyObject oldValue = getMap().putIfAbsent(key, failobj);
         return oldValue == null ? failobj : oldValue;
     }
 
     // XXX: needs __doc__ but CPython does not define setifabsent
-    @ExposedMethod(defaults = "Py.None")
-    public final PyObject dict_setifabsent(PyObject key, PyObject failobj) {
-        PyObject oldValue = getMap().putIfAbsent(key, failobj);
-        return oldValue == null ? Py.None : oldValue;
-    }
-
+//    @ExposedMethod(defaults = "Py.None")
+//    public final PyObject dict_setifabsent(PyObject key, PyObject failobj) {
+//        PyObject oldValue = getMap().putIfAbsent(key, failobj);
+//        return oldValue == null ? Py.None : oldValue;
+//    }
 
     /**
      * Return a value based on key
