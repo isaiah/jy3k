@@ -8,11 +8,12 @@ public abstract class PyOverridableNew extends PyNewWrapper {
 
     @Override
     public PyObject new_impl(boolean init, PyType subtype, PyObject[] args, String[] keywords) {
-        if (for_type == subtype) {
-            return createOfType(init, args, keywords);
-        } else {
-            return createOfSubtype(subtype);
-        }
+        return createOfType(init, args, keywords);
+//        if (for_type == subtype) {
+//            return createOfType(init, args, keywords);
+//        } else {
+//            return createOfSubtype(subtype);
+//        }
     }
 
     /**
