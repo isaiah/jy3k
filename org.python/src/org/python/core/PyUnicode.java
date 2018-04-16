@@ -529,6 +529,7 @@ public class PyUnicode extends PySequence implements Iterable {
         }
         return createInstance(buffer.toString());
     }
+
     @Override
     protected PyObject repeat(int count) {
         return repeat(this, count);
@@ -684,14 +685,6 @@ public class PyUnicode extends PySequence implements Iterable {
         }
         String other = Encoding.asUTF16StringOrError(o);
         return ((PyUnicode) self).getString().indexOf(other) >= 0;
-    }
-
-    @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.str___mul___doc)
-    final PyObject str___mul__(PyObject o) {
-        if (!o.isIndex()) {
-            return null;
-        }
-        return repeat(o.asIndex(Py.OverflowError));
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.str___rmul___doc)
