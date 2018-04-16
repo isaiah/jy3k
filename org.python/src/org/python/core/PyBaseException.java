@@ -55,16 +55,26 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @ExposedNew
+    public static PyObject BaseException_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        PyBaseException self = new PyBaseException(subtype);
+        if (args.length == 0) {
+            self.args = new PyTuple();
+        } else {
+            self.args = args[0];
+            if (args.length == 1) {
+                self.message = args[0];
+            }
+        }
+
+        self.__context__ = Py.None;
+        self.__suppress_context__ = false;
+        return self;
+    }
+
     @ExposedMethod(doc = BuiltinDocs.BaseException___init___doc)
     public final void BaseException___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser(getType().getName(), args, keywords, "args");
         ap.noKeywords();
-        this.args = ap.getList(0);
-        if (args.length == 1) {
-            message = args[0];
-        }
-        __context__ = Py.None;
-        __suppress_context__ = false;
     }
 
     public PyObject with_traceback(PyObject tb) {
