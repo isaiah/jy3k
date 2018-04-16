@@ -28,7 +28,7 @@ import java.util.function.Function;
  * of the class {@code PyObject} or one of its subclasses.
  */
 @ExposedType(name = "object", doc = BuiltinDocs.object_doc)
-public class PyObject implements Serializable {
+public class PyObject implements Serializable, Slotted {
     public static final PyType TYPE = PyType.fromClass(PyObject.class);
     private static final String UNORDERABLE_ERROR_MSG = "unorderable types: %s() %s %s()";
     private static final InvokeByName add = new InvokeByName("__add__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
@@ -2706,5 +2706,18 @@ public class PyObject implements Serializable {
         }
 
     }
+
+    @Override
+    public PyObject getSlot(int index) {
+        return slots[index];
+    }
+
+    @Override
+    public void setSlot(int index,PyObject value) {
+        slots[index]=value;
+    }
+
+    protected PyObject[]slots = new PyObject[0];
+
 }
 
