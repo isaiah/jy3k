@@ -39,3 +39,4 @@ target
 profile.txt
 tags
 *.jar
+lib-python/
