@@ -61,7 +61,7 @@ public enum SlotFunc {
             type.sqLen = mh;
         }
     },
-    REPEAT {
+    REPEAT("__mul__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.sqRepeat = mh;
