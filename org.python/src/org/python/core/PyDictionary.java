@@ -137,6 +137,11 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     }
 
     @ExposedNew
+    public static PyObject dict_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        PyDictionary self = new PyDictionary(subtype);
+        return self;
+    }
+
     @ExposedMethod(doc = BuiltinDocs.dict___init___doc)
     public final void dict___init__(PyObject[] args, String[] keywords) {
         updateCommon(args, keywords, "dict");

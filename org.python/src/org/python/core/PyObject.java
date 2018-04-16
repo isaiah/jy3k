@@ -2222,32 +2222,38 @@ public class PyObject implements Serializable, Slotted {
         return f.__call__(arg1, args, keywords);
     }
 
+    protected PyObject dict;
     /**
-     * xxx implements where meaningful
      *
      * @return internal object per instance dict or null
      */
     public PyObject fastGetDict() {
+        if (objtype.needs_userdict) {
+            return dict;
+        }
         return null;
     }
 
     /**
-     * xxx implements where meaningful
      *
      * @return internal object __dict__ or null
      */
     public PyObject getDict() {
-        return null;
+        return fastGetDict();
     }
 
     public void setDict(PyObject newDict) {
-        // fallback if setDict not implemented in subclass
-        throw Py.TypeError("can't set attribute '__dict__' of instance of " + getType().fastGetName());
+        if (!objtype.needs_userdict) {
+            throw Py.TypeError("can't set attribute '__dict__' of instance of " + getType().fastGetName());
+        }
+        dict = newDict;
     }
 
     public void delDict() {
-        // fallback to error
-        throw Py.TypeError("can't delete attribute '__dict__' of instance of '" + getType().fastGetName() + "'");
+        if (!objtype.needs_userdict) {
+            throw Py.TypeError("can't delete attribute '__dict__' of instance of '" + getType().fastGetName() + "'");
+        }
+        dict = objtype.instDict();
     }
 
     public boolean implementsDescrGet() {

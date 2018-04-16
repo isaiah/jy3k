@@ -389,6 +389,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             if (type.numSlots > 0) {
                 obj.slots = new PyObject[type.numSlots];
             }
+            if (((PyNewWrapper) new_).for_type != type) {
+                obj.dict = type.instDict();
+            }
         } else {
             int n = args.length;
             PyObject[] typePrepended = new PyObject[n + 1];
