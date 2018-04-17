@@ -17,6 +17,7 @@ import org.python.modules.sys.SysModule;
  */
 public class BuiltinModule {
     private static final InvokeByName abs = new InvokeByName("__abs__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
+    private static final InvokeByName prepare = new InvokeByName("__prepare__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
 
     public static void fillWithBuiltins(PyObject dict) {
         /* newstyle */
@@ -954,12 +955,18 @@ public class BuiltinModule {
             newArgs = new PyObject[keywords.length + 2];
             System.arraycopy(args, bases.length, newArgs, 2, keywords.length);
         }
-        PyObject prepare = metaclass.__findattr__("__prepare__");
         PyObject basesArray = new PyTuple(bases);
         newArgs[0] = className;
         newArgs[1] = basesArray;
-        PyObject ns = prepare.__call__(newArgs, keywords);
+        PyObject ns;
         ThreadState state = Py.getThreadState();
+        try {
+            Object prepareFunc = prepare.getGetter().invokeExact(metaclass);
+            ns = (PyObject) prepare.getInvoker().invokeExact(prepareFunc, state, newArgs, keywords);
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
+        }
+
         PyObject cell = Py.runCode(state, func.__code__, func.__globals__, ns, (PyTuple) func.__closure__);
         PyObject cls;
         boolean isWide = keywords.length > 0;

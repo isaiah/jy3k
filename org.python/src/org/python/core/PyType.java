@@ -123,12 +123,14 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     public MethodHandle iternext;
     public MethodHandle getattro;
     public MethodHandle mqSubscript;
+    public MethodHandle mqAssSubscript;
     public MethodHandle nbBool; // Z(Lorg.python.PyObject;)
     public MethodHandle nbDivmod;
     public MethodHandle sqContains;
     public MethodHandle sqRepeat;
     public MethodHandle sqLen; // J(Lorg.python.PyObject;)
     public MethodHandle sqItem;
+    public MethodHandle sqAssItem;
     public MethodHandle str;
     public boolean isIterator;
 

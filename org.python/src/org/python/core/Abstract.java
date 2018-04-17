@@ -34,6 +34,7 @@ public class Abstract {
     private final static InvokeByName neg = new InvokeByName("__neg__", PyObject.class, PyObject.class, ThreadState.class);
     private final static InvokeByName invert = new InvokeByName("__invert__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName getitem = new InvokeByName("__getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName setitem = new InvokeByName("__setitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
 //    private static final InvokeByName getattribute = new InvokeByName("__getattribute__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
 //    private static final InvokeByName getattr = new InvokeByName("__getattr__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     /**
@@ -44,6 +45,20 @@ public class Abstract {
      */
     public static boolean PySequence_Contains(PyObject seq, PyObject ob) {
         return PySequence_Contains(ob, seq, Py.getThreadState());
+    }
+
+    public static PyObject PySequence_SetItem(PyObject o, int key, PyObject value) {
+        PyType tp = o.getType();
+        try {
+            if (key < 0) {
+                int len = (int) tp.sqLen.invokeExact(o);
+                key += len;
+            }
+            tp.sqAssItem.invokeExact(o, key, value);
+        } catch (Throwable e) {
+            throw Py.JavaError(e);
+        }
+        return Py.None;
     }
 
     public static PyObject PySequence_GetItem(PyObject o, int keyValue) {
@@ -379,6 +394,32 @@ public class Abstract {
             throw e;
         } catch (Throwable t) {
             throw Py.JavaError(t);
+        }
+    }
+
+    public static void PyObject_SetItem(ThreadState ts, PyObject o, PyObject key, PyObject value) {
+        PyType tp = o.getType();
+        if (tp.mqAssSubscript != null) {
+            try {
+                tp.mqAssSubscript.invokeExact(o, key, value);
+            } catch (Throwable t) {
+                throw Py.JavaError(t);
+            }
+            return;
+        }
+        if (tp.sqAssItem != null) {
+            if (key.isIndex()) {
+                PySequence_SetItem(o, key.asIndex(), value);
+                return;
+            }
+            throw Py.TypeErrorFmt("Sequence index must be integer, not '%s'", key);
+        }
+        try {
+            Object func = setitem.getGetter().invokeExact(tp);
+            PyObject _ignore = (PyObject) setitem.getInvoker().invokeExact(func, ts, o, key, value);
+            return;
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
         }
     }
 

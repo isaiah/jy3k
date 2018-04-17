@@ -371,9 +371,9 @@ public class PyList extends PySequenceList implements List {
         seq___delitem__(index);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.list___setitem___doc)
-    public final synchronized void list___setitem__(PyObject o, PyObject def) {
-        seq___setitem__(o, def);
+    @ExposedSlot(SlotFunc.SETITEM)
+    public static synchronized void list___setitem__(PyObject self, PyObject o, PyObject def) {
+        ((PyList) self).seq___setitem__(o, def);
     }
 
     @ExposedSlot(SlotFunc.SQ_ITEM)

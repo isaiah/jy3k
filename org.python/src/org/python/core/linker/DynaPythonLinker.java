@@ -36,8 +36,10 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                             MethodType.methodType(PyObject.class, ThreadState.class, PyObject.class, PyObject.class));
     static final MethodHandle SETATTR = MH.findVirtual(LOOKUP, PyObject.class, "__setattr__",
             MethodType.methodType(void.class, String.class, PyObject.class));
-    static final MethodHandle SETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__setitem__",
-            MethodType.methodType(void.class, PyObject.class, PyObject.class));
+//    static final MethodHandle SETITEM = MH.findVirtual(LOOKUP, PyObject.class, "__setitem__",
+//            MethodType.methodType(void.class, PyObject.class, PyObject.class));
+    static final MethodHandle SETITEM = MH.findStatic(LOOKUP, Abstract.class, "PyObject_SetItem",
+            MethodType.methodType(void.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
 
     @Override
     public GuardedInvocation getGuardedInvocation(LinkRequest linkRequest, LinkerServices linkerServices) throws Exception {
@@ -63,7 +65,7 @@ public class DynaPythonLinker implements TypeBasedGuardingDynamicLinker {
                     mh = SETATTR;
                     mh = MethodHandles.insertArguments(mh, 1, name);
                 } else if (namespace == StandardNamespace.ELEMENT) {
-                     mh = SETITEM;
+                    mh = MethodHandles.insertArguments(SETITEM, 0, Py.getThreadState());
                 }
                 guard = Guards.getIdentityGuard(self);
                 break;

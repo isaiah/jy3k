@@ -41,6 +41,12 @@ public enum SlotFunc {
             type.mqSubscript = mh;
         }
     },
+    SETITEM("__setitem__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.mqAssSubscript = mh;
+        }
+    },
     ITER("__iter__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {
@@ -71,6 +77,12 @@ public enum SlotFunc {
         @Override
         public void assign(PyType type, MethodHandle mh) {
             type.sqItem = mh;
+        }
+    },
+    SQ_ASS_ITEM() {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.sqAssItem = mh;
         }
     },
     STR("__str__") {

@@ -210,12 +210,12 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
 
     @Override
     public void __setitem__(PyObject key, PyObject value) {
-        dict___setitem__(key, value);
+        dict___setitem__(this, key, value);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___setitem___doc)
-    public final void dict___setitem__(PyObject key, PyObject value) {
-        getMap().put(key, value);
+    @ExposedSlot(SlotFunc.SETITEM)
+    public static void dict___setitem__(PyObject self, PyObject key, PyObject value) {
+        ((PyDictionary) self).getMap().put(key, value);
     }
 
     @Override
@@ -388,13 +388,13 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             }
         }
         for (int i = 0; i < keywords.length; i++) {
-            dict___setitem__(Py.newUnicode(keywords[i]), args[nargs + i]);
+            dict___setitem__(this, Py.newUnicode(keywords[i]), args[nargs + i]);
         }
     }
 
     private void merge(Map<Object, Object> other) {
         for (Entry<Object, Object> entry : other.entrySet()) {
-            dict___setitem__(Py.java2py(entry.getKey()), Py.java2py(entry.getValue()));
+            dict___setitem__(this, Py.java2py(entry.getKey()), Py.java2py(entry.getValue()));
         }
     }
 
@@ -440,7 +440,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         try {
             for (; ; ) {
                 pair = PyObject.getIter(PyObject.iterNext(pairs));
-                dict___setitem__(PyObject.iterNext(pair), PyObject.iterNext(pair));
+                dict___setitem__(this, PyObject.iterNext(pair), PyObject.iterNext(pair));
                 try {
                     PyObject.iterNext(pair);
                     throw Py.ValueError(String.format("dictionary update sequence element #%d "
