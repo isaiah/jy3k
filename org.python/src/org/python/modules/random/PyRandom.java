@@ -11,6 +11,7 @@ import java.util.Random;
 import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -57,6 +58,10 @@ public class PyRandom extends PyObject {
     }
 
     @ExposedNew
+    public static PyObject Random_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyRandom(subtype);
+    }
+
     @ExposedMethod
     public final void Random___init__(PyObject[] args, String[] keywords) {}
 

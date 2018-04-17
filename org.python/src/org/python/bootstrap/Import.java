@@ -1,6 +1,7 @@
 package org.python.bootstrap;
 
 import org.python.Version;
+import org.python.core.Abstract;
 import org.python.core.BytecodeLoader;
 import org.python.core.CompareOp;
 import org.python.core.CompileMode;
@@ -141,7 +142,7 @@ public class Import {
                 value = spec.__findattr__("initializing");
             }
             if (value != null) {
-                boolean initializing = value.isTrue();
+                boolean initializing = Abstract.PyObject_IsTrue(value, Py.getThreadState());
                 if (initializing) {
 //                    aquireLock(interp);
                     try {

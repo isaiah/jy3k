@@ -366,7 +366,6 @@
           manifest="${meta.inf.dir}/MANIFEST.MF">
             <fileset dir="${exposed.dir}"/>
             <fileset dir="${compile.dir}"/>
-            <fileset dir="${output.dir}/patches"/>
             <fileset dir="${dist.dir}" includes="Lib/**" excludes="Lib/test/**"/>
         </jar>
     </target>
