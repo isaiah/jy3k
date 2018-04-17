@@ -398,7 +398,11 @@ public class Abstract {
     }
 
     public static void PyMapping_SetItemString(PyObject o, final String key, final PyObject value) {
-        PyObject_SetItem(Py.getThreadState(), o, new PyUnicode(key), value);
+        if (o instanceof PyStringMap) {
+            o.__setitem__(key, value);
+        } else {
+            PyObject_SetItem(Py.getThreadState(), o, new PyUnicode(key), value);
+        }
     }
 
     public static void PyObject_SetItem(ThreadState ts, PyObject o, PyObject key, PyObject value) {
@@ -428,6 +432,9 @@ public class Abstract {
     }
 
     public static PyObject PyMapping_GetItemString(PyObject o, final String key) {
+        if (o instanceof PyStringMap) {
+            return o.__finditem__(key);
+        }
         return PyObject_GetItem(Py.getThreadState(), o, new PyUnicode(key));
 
     }

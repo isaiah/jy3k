@@ -346,7 +346,11 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     private PyObject doGetglobal(String index) {
         try {
-            return Abstract.PyMapping_GetItemString(f_globals, index);//f_globals.__finditem__(index);
+            PyObject ret = Abstract.PyMapping_GetItemString(f_globals, index);//f_globals.__finditem__(index);
+            if (ret == null) {
+                return Abstract.PyMapping_GetItemString(f_builtins, index);
+            }
+            return ret;
         } catch (PyException e) {
             if (e.match(Py.KeyError)) {
                 try {

@@ -57,7 +57,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     public PyStringMap(PyObject elements[]) {
         this(elements.length);
         for (int i = 0; i < elements.length; i += 2) {
-            stringmap___setitem__(elements[i], elements[i + 1]);
+            stringmap___setitem__(this, elements[i], elements[i + 1]);
         }
     }
 
@@ -168,15 +168,16 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
 
     @Override
     public void __setitem__(PyObject key, PyObject value) {
-        stringmap___setitem__(key, value);
+        stringmap___setitem__(this, key, value);
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___setitem___doc)
-    public final void stringmap___setitem__(PyObject key, PyObject value) {
+    @ExposedSlot(SlotFunc.SETITEM)
+    public static void stringmap___setitem__(PyObject self, PyObject key, PyObject value) {
+        Map<Object, PyObject> table = ((PyStringMap) self).table;
         if (value == null) {
             table.remove(pyToKey(key));
         } else if (key instanceof PyUnicode) {
-            __setitem__(((PyUnicode)key).internedString(), value);
+            ((PyStringMap) self).__setitem__(((PyUnicode)key).internedString(), value);
         } else {
             table.put(key, value);
         }
@@ -379,7 +380,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         try {
             for (; ; ) {
                 pair = PyObject.getIter(PyObject.iterNext(pairs));
-                stringmap___setitem__(PyObject.iterNext(pair), PyObject.iterNext(pair));
+                stringmap___setitem__(this, PyObject.iterNext(pair), PyObject.iterNext(pair));
                 try {
                     PyObject.iterNext(pair);
                     throw Py.ValueError(String.format("dictionary update sequence element #%d "
