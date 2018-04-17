@@ -397,6 +397,10 @@ public class Abstract {
         }
     }
 
+    public static void PyMapping_SetItemString(PyObject o, final String key, final PyObject value) {
+        PyObject_SetItem(Py.getThreadState(), o, new PyUnicode(key), value);
+    }
+
     public static void PyObject_SetItem(ThreadState ts, PyObject o, PyObject key, PyObject value) {
         PyType tp = o.getType();
         if (tp.mqAssSubscript != null) {
@@ -421,6 +425,11 @@ public class Abstract {
         } catch (Throwable throwable) {
             throw Py.JavaError(throwable);
         }
+    }
+
+    public static PyObject PyMapping_GetItemString(PyObject o, final String key) {
+        return PyObject_GetItem(Py.getThreadState(), o, new PyUnicode(key));
+
     }
 
     public static PyObject PyObject_GetItem(ThreadState ts, PyObject o, PyObject key) {

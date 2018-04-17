@@ -214,7 +214,9 @@ public class PyFrame extends PyObject implements Traverseproc {
             if (f_fastlocals != null) {
                 for (i = 0; i < f_fastlocals.length; i++) {
                     PyObject o = f_fastlocals[i];
-                    if (o != null) setlocal(f_code.co_varnames[i], o);//f_locals.__setitem__(f_code.co_varnames[i], o);
+                    if (o != null) {
+                        Abstract.PyMapping_SetItemString(f_locals, f_code.co_varnames[i], o);
+                    }
                 }
                 if (!f_code.co_flags.isFlagSet(CodeFlag.CO_OPTIMIZED)) {
                     f_fastlocals = null;
@@ -224,15 +226,13 @@ public class PyFrame extends PyObject implements Traverseproc {
             for (i = 0; i < f_ncells; i++, j++) {
                 PyObject v = f_env[j].ob_ref;
                 if (v != null) {
-                    setlocal(f_code.co_cellvars[i], v);
-//                    f_locals.__setitem__(f_code.co_cellvars[i], v);
+                    Abstract.PyMapping_SetItemString(f_locals, f_code.co_cellvars[i], v);
                 }
             }
             for (i = 0; i < f_nfreevars; i++, j++) {
                 PyObject v = f_env[j].ob_ref;
                 if (v != null) {
-                    setlocal(f_code.co_freevars[i], v);
-//                    f_locals.__setitem__(f_code.co_freevars[i], v);
+                    Abstract.PyMapping_SetItemString(f_locals, f_code.co_freevars[i], v);
                 }
             }
         }
@@ -295,7 +295,7 @@ public class PyFrame extends PyObject implements Traverseproc {
 
         String name = f_code.co_varnames[index];
         if (f_locals != null) {
-            PyObject ret = f_locals.__finditem__(name);
+            PyObject ret = Abstract._PyObject_GetAttrId(f_locals, name);//f_locals.__finditem__(name);
             if (ret != null) {
                 return ret;
             }
@@ -304,12 +304,8 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public void setname(PyObject value, int index) {
-        String name = f_code.co_names[index];
-        if (f_locals != null && f_locals != f_globals) {
-            Abstract.PyObject_SetItem(Py.getThreadState(), f_locals, new PyUnicode(name), value);
-        } else {
-            Abstract.PyObject_SetItem(Py.getThreadState(), f_globals, new PyUnicode(name), value);
-        }
+        PyObject mapping = f_locals != null && f_locals != f_globals ? f_locals : f_globals;
+        Abstract.PyMapping_SetItemString(mapping, f_code.co_names[index], value);
     }
 
     public PyObject getname(int index) {
@@ -322,11 +318,14 @@ public class PyFrame extends PyObject implements Traverseproc {
         if (f_locals == null || f_locals == f_globals) {
             return getglobal(index);
         }
-        ret = f_locals.__finditem__(index);
-        if (ret != null) {
-            return ret;
+        try {
+            return Abstract.PyMapping_GetItemString(f_locals, index);//f_locals.__finditem__(index);
+        } catch (PyException e) {
+            if (e.match(Py.KeyError)) {
+                return getglobal(index);
+            }
+            throw e;
         }
-        return getglobal(index);
     }
 
     public PyObject loadbuildclass() {
@@ -346,12 +345,18 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     private PyObject doGetglobal(String index) {
-        PyObject ret = f_globals.__finditem__(index);
-        if (ret != null) {
-            return ret;
+        try {
+            return Abstract.PyMapping_GetItemString(f_globals, index);//f_globals.__finditem__(index);
+        } catch (PyException e) {
+            if (e.match(Py.KeyError)) {
+                try {
+                    return Abstract.PyMapping_GetItemString(f_builtins, index);
+                } catch (PyException e1) {
+                    return null;
+                }
+            }
+            throw e;
         }
-
-        return f_builtins.__finditem__(index);
     }
 
     public void setlocal(int index, PyObject value) {
@@ -372,7 +377,7 @@ public class PyFrame extends PyObject implements Traverseproc {
 
     public void setlocal(String index, PyObject value) {
         if (f_locals != null) {
-            Abstract.PyObject_SetItem(Py.getThreadState(), f_locals, new PyUnicode(index), value);
+            Abstract.PyMapping_SetItemString(f_locals, index, value);
         } else {
             throw Py.SystemError(String.format("no locals found when storing '%s'", value));
         }
@@ -384,7 +389,7 @@ public class PyFrame extends PyObject implements Traverseproc {
     }
 
     public void setglobal(String index, PyObject value) {
-        Abstract.PyObject_SetItem(Py.getThreadState(), f_globals, new PyUnicode(index), value);
+        Abstract.PyMapping_SetItemString(f_globals, index, value);
     }
 
     public void dellocal(int index) {
