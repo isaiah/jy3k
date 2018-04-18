@@ -112,7 +112,10 @@ public class PyLong extends PyObject {
     private static PyObject longSubtypeNew(PyNewWrapper new_, boolean init, PyType subtype,
             PyObject[] args, String[] keywords) {
         PyObject tmp = int___new__(new_, init, TYPE, args, keywords);
-        return new PyLongDerived(subtype, ((PyLong)tmp).getValue());
+        PyObject ret = new PyLong(subtype, ((PyLong)tmp).getValue());
+        ret.dict = subtype.instDict();
+        ret.slots = new PyObject[subtype.getNumSlots()];
+        return ret;
     }
 
     /**

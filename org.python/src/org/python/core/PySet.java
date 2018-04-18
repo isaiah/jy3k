@@ -47,6 +47,10 @@ public class PySet extends BaseSet {
     }
 
     @ExposedNew
+    public static PyObject set_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PySet(subtype);
+    }
+
     @ExposedMethod(doc = BuiltinDocs.set___init___doc)
     public final void set___init__(PyObject[] args, String[] kwds) {
         if (args.length == 0) {

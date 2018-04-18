@@ -67,13 +67,13 @@ public class PyFloat extends PyObject {
             if (new_.for_type == subtype) {
                 return ZERO;
             }
-            return new PyFloatDerived(subtype, 0.0);
+            return new PyFloat(subtype, 0.0);
         }
         PyObject floatObject = Abstract.PyNumber_Float(Py.getThreadState(), x);
         if (new_.for_type == subtype) {
             return floatObject;
         }
-        return new PyFloatDerived(subtype, ((PyFloat) floatObject).getValue());
+        return new PyFloat(subtype, ((PyFloat) floatObject).getValue());
     }
 
     @ExposedGet(name = "real", doc = BuiltinDocs.float_real_doc)

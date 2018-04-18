@@ -148,10 +148,13 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
         this(globals, defaults, kw_defaults, code, doc, closure_cells);
         __annotations__ = annotations;
     }
-
     public PyFunction(PyObject globals, PyObject[] defaults, PyDictionary kw_defaults, PyCode code, PyObject doc,
                       PyObject[] closure_cells) {
-        super(TYPE);
+         this(TYPE, globals, defaults, kw_defaults, code, doc, closure_cells);
+    }
+    public PyFunction(PyType subtype, PyObject globals, PyObject[] defaults, PyDictionary kw_defaults, PyCode code, PyObject doc,
+                      PyObject[] closure_cells) {
+        super(subtype);
         __globals__ = globals;
         __name__ = code.co_name;
         __doc__ = doc != null ? doc : Py.None;
@@ -232,7 +235,7 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
             }
         }
 
-        PyFunction function = new PyFunction(globals,
+        PyFunction function = new PyFunction(subtype, globals,
                                              defaults == Py.None
                                              ? null : ((PyTuple)defaults).getArray(),
                                              kw_defaults == Py.None

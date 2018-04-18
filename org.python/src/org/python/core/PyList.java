@@ -118,7 +118,11 @@ public class PyList extends PySequenceList implements List {
     }
 
     @ExposedNew
-//    @ExposedMethod(doc = BuiltinDocs.list___init___doc)
+    public static PyObject list_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyList(subtype);
+    }
+
+    @ExposedMethod(doc = BuiltinDocs.list___init___doc)
     public final void list___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("list", args, kwds, new String[]{"sequence"}, 0);
         PyObject seq = ap.getPyObject(0, null);

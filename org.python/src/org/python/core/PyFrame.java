@@ -107,7 +107,7 @@ public class PyFrame extends PyObject implements Traverseproc {
         f_code = code;
         f_locals = locals;
         f_globals = globals;
-        PyObject builtins = f_globals.__finditem__("__builtins__");
+        PyObject builtins = Abstract.PyMapping_GetItemString(f_globals, "__builtins__");
         if (builtins != null) {
             if (builtins instanceof PyModule) {
                 builtins = builtins.getDict();

@@ -253,12 +253,12 @@ public class PyUnicode extends PySequence implements Iterable {
             return Abstract.PyObject_Str(ts, x);
         } else {
             if (x == null) {
-                return new PyUnicodeDerived(subtype, Py.EmptyUnicode);
+                return new PyUnicode(subtype, Py.EmptyUnicode);
             }
             if (!(x instanceof PyUnicode)) {
                 x = Abstract.PyObject_Str(ts, x);
             }
-            return new PyUnicodeDerived(subtype, x);
+            return new PyUnicode(subtype, x);
         }
     }
 

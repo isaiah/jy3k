@@ -100,12 +100,12 @@ public class PyTuple extends PySequenceList implements List {
                 return S;
             }
             return fromArrayNoCopy(Py.make_array(S));
-        } else {
-            if (S == null) {
-                return new PyTupleDerived(subtype, Py.EmptyObjects);
-            }
-            return new PyTupleDerived(subtype, Py.make_array(S));
         }
+        PyObject[] data = S == null ? Py.EmptyObjects : Py.make_array(S);
+        PyTuple ret = new PyTuple(subtype, data);
+        ret.slots = new PyObject[subtype.getNumSlots()];
+        ret.dict = subtype.instDict();
+        return ret;
     }
 
     final static boolean checkExact(PyObject pyobj) {
