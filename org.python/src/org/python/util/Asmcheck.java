@@ -12,8 +12,8 @@ public class Asmcheck {
     public static void main(String[] args) throws XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setXMLReporter((message, errorType, relatedInformation, location) -> {
-            System.out.println(message);
-            System.out.println(errorType);
+            System.out.println("message:" + message);
+            System.out.println("error key:"+ errorType);
         });
         XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader("<a>"));
         while (reader.hasNext()) {

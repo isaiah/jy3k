@@ -279,6 +279,10 @@ public class Abstract {
         return StreamSupport.stream(iterator, false);
     }
 
+    public static boolean _PyObject_IsAbstract(PyObject callable) {
+        return PyObject_IsTrue(_PyObject_GetAttrId(callable, "__isabstractmethod__"), Py.getThreadState());
+    }
+
     public static class PyObjectSpliterator implements Spliterator<PyObject> {
         private PyObject iter;
 

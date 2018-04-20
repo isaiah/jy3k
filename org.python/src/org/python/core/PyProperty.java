@@ -37,6 +37,10 @@ public class PyProperty extends PyObject implements Traverseproc {
     }
 
     @ExposedNew
+    public static PyObject property_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyProperty(subtype);
+    }
+
     @ExposedMethod(doc = BuiltinDocs.property___init___doc)
     public void property___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("property", args, keywords,
@@ -61,6 +65,11 @@ public class PyProperty extends PyObject implements Traverseproc {
             }
             docFromGetter = true;
         }
+    }
+
+    @ExposedGet(name = "__isabstractmethod__")
+    public boolean isabstractmethod() {
+        return Abstract._PyObject_IsAbstract(fget);
     }
 
     @Override

@@ -25,7 +25,11 @@ public class PyStaticMethod extends PyObject implements Traverseproc {
     }
 
     public PyStaticMethod(PyObject callable) {
-        super(TYPE);
+        this(TYPE, callable);
+    }
+
+    public PyStaticMethod(PyType subtype, PyObject callable) {
+        super(subtype);
         this.callable = callable;
         this.dict = new PyDictionary();
     }
@@ -39,7 +43,7 @@ public class PyStaticMethod extends PyObject implements Traverseproc {
         if (args.length != 1) {
             throw Py.TypeError("staticmethod expected 1 argument, got " + args.length);
         }
-        return new PyStaticMethod(args[0]);
+        return new PyStaticMethod(subtype, args[0]);
     }
 
     public PyObject __get__(PyObject obj, PyObject type) {
@@ -54,6 +58,11 @@ public class PyStaticMethod extends PyObject implements Traverseproc {
     @ExposedMethod
     public void __setattribute__(PyObject name, PyObject value) {
         dict.put(name, value);
+    }
+
+    @ExposedGet(name = "__isabstractmethod__")
+    public boolean isabstractmethod() {
+        return Abstract._PyObject_IsAbstract(callable);
     }
 
     /* Traverseproc implementation */

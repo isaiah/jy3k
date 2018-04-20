@@ -22,9 +22,6 @@ public class PyClassMethod extends PyObject implements Traverseproc {
 
     public PyClassMethod(PyType subtype, PyObject callable) {
         super(subtype);
-        if (!callable.isCallable()) {
-            throw Py.TypeError("'" + callable.getType().fastGetName() + "' object is not callable");
-        }
         this.callable = callable;
     }
 
@@ -56,6 +53,10 @@ public class PyClassMethod extends PyObject implements Traverseproc {
         return new PyMethod(callable, type, type.getType());
     }
 
+    @ExposedGet(name = "__isabstractmethod__")
+    public boolean isabstractmethod() {
+        return Abstract._PyObject_IsAbstract(callable);
+    }
 
     /* Traverseproc implementation */
     @Override
