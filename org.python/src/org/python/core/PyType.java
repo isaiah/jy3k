@@ -2016,7 +2016,10 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     @ExposedGet(name = "__abstractmethods__")
     public PyObject getAbstractmethods() {
-        PyObject result = dict.__finditem__("__abstractmethods__");
+        PyObject result = null;
+        if (this != TYPE) {
+            result = dict.__finditem__("__abstractmethods__");
+        }
         if (result == null) {
             noAttributeError("__abstractmethods__");
         }
