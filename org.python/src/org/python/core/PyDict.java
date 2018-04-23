@@ -13,4 +13,6 @@ public interface PyDict {
     void update(PyObject o);
 
     Map<? extends Object, PyObject> getMap();
+
+    PyObject copy();
 }

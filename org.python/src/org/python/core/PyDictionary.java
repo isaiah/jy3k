@@ -338,6 +338,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
     /**
      * Return a shallow copy of the dictionary.
      */
+    @Override
     public PyDictionary copy() {
         return dict_copy();
     }

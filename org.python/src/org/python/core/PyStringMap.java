@@ -305,6 +305,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     /**
      * Return a shallow copy of the dictionary.
      */
+    @Override
     public PyStringMap copy() {
         return stringmap_copy();
     }
