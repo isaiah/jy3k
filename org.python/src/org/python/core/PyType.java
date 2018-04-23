@@ -163,58 +163,58 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     @ExposedNew
-    public static final PyObject type___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    public static final PyObject type___new__(PyNewWrapper new_, boolean init, PyType metatype,
                                         PyObject[] args, String[] keywords) {
         // Special case: type(x) should return x.getType()
-        if (args.length == 1 && keywords.length == 0) {
-            PyObject obj = args[0];
-            PyType objType = obj.getType();
+        if (metatype == TYPE) {
+            if (args.length == 1 && keywords.length == 0) {
+                PyObject obj = args[0];
+                PyType objType = obj.getType();
 
-            // special case for PyStringMap so that it types as a dict
+                // special case for PyStringMap so that it types as a dict
 //            PyType psmType = PyType.fromClass(PyStringMap.class);
-            if (obj instanceof PyStringMap) {
-                return PyDictionary.TYPE;
+                if (obj instanceof PyStringMap) {
+                    return PyDictionary.TYPE;
+                }
+                return objType;
             }
-            return objType;
-        }
-        // If that didn't trigger, we need 3 arguments. but ArgParser below may give a msg
-        // saying type() needs exactly 3.
-        if (args.length != 3) {
-            throw Py.TypeError("type() takes 1 or 3 arguments");
+            // If that didn't trigger, we need 3 arguments. but ArgParser below may give a msg
+            // saying type() needs exactly 3.
+            if (args.length != 3) {
+                throw Py.TypeError("type() takes 1 or 3 arguments");
+            }
         }
 
-        ArgParser ap = new ArgParser("type()", args, keywords, "name", "bases", "dict");
-        String name = ap.getString(0);
-        PyTuple bases = (PyTuple)ap.getPyObjectByType(1, PyTuple.TYPE);
-        PyObject dict = ap.getPyObject(2);
-        if (!(dict instanceof PyDict)) {
-            throw Py.TypeError("type(): argument 3 must be dict, not " + dict.getType());
-        }
-        return newType(new_, subtype, name, bases, dict);
+        return newType(new_, metatype, args, keywords);
     }
 
     @ExposedMethod(doc = BuiltinDocs.type___init___doc)
     public final void type___init__(PyObject[] args, String[] kwds) {
-        if (kwds.length > 0) {
+        int argLen = args.length - kwds.length;
+        if (kwds.length > 0 && argLen == 1) {
             throw Py.TypeError("type.__init__() takes no keyword arguments");
         }
 
-        if (args.length != 1 && args.length != 3) {
+        if (argLen != 1 && argLen != 3) {
             throw Py.TypeError("type.__init__() takes 1 or 3 arguments");
         }
         object___init__(Py.EmptyObjects, Py.NoKeywords);
     }
 
-    public static PyObject newType(PyNewWrapper new_, PyType metatype, String name, PyTuple bases,
-                                   PyObject dict) {
+    public static PyObject newType(PyNewWrapper new_, PyType metatype, PyObject[] args, String[] keywords) {
+        String name = args[0].asString();
+        PyTuple bases = (PyTuple)args[1];
+        PyObject dict = args[2];
+        if (!(dict instanceof PyDict)) {
+            throw Py.TypeError("type(): argument 3 must be dict, not " + dict.getType());
+        }
         PyObject[] tmpBases = bases.getArray();
         PyType winner = findMostDerivedMetatype(tmpBases, metatype);
 
         if (winner != metatype) {
             PyObject winnerNew = winner.lookup("__new__");
             if (winnerNew != null && winnerNew != new_) {
-                return invokeNew(winnerNew, winner, false,
-                                 new PyObject[] {new PyBytes(name), bases, dict}, Py.NoKeywords);
+                return invokeNew(winnerNew, winner, false, args, keywords);
             }
             metatype = winner;
         }
@@ -228,18 +228,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         PyType type;
         type = new PyType(metatype);
-//        if (new_.for_type == metatype) {
-//            // XXX: set metatype
-//            type = new PyType();
-//        } else {
-//            type = new PyTypeDerived(metatype);
-//        }
-
-        if (dict instanceof PyStringMap) {
-            dict = ((PyStringMap)dict).copy();
-        } else {
-            dict = ((PyDictionary)dict).copy();
-        }
+        dict = ((PyDict)dict).copy();
 
         type.name = name;
         type.bases = tmpBases.length == 0 ? new PyObject[] {PyObject.TYPE} : tmpBases;
@@ -262,6 +251,26 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         List<Class<?>> interfaces = new ArrayList<>();
         Class<?> baseProxyClass = getJavaLayout(type.bases, interfaces);
         type.setupProxy(baseProxyClass, interfaces);
+        /* special-case __new__: if it's a plain function. make it a static function */
+        PyObject tmp = dict.__finditem__("__new__");
+        if (tmp instanceof PyFunction) {
+            tmp = new PyStaticMethod(tmp);
+            dict.__setitem__("__new__", tmp);
+        }
+
+        /* Special-case __init_subclass__ and __class_getitem__: if they are plain functions, make them class methods */
+        tmp = dict.__finditem__("__init_subclass__");
+        if (tmp instanceof PyFunction) {
+            tmp = new PyClassMethod(tmp);
+            dict.__setitem__("__init_subclass__", tmp);
+        }
+
+        tmp = dict.__finditem__("__class__getitem__");
+        if (tmp instanceof PyFunction) {
+            tmp = new PyClassMethod(tmp);
+            dict.__setitem__("__class_getitem__", tmp);
+        }
+
 
         PyType base = type.base = best_base(type.bases);
         if (!base.isBaseType) {
@@ -292,7 +301,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         }
 
         setNames(type);
-        initSubclass(type, dict);
+        PyObject[] kws = new PyObject[keywords.length];
+        System.arraycopy(args, args.length - keywords.length, kws, 0, kws.length);
+        initSubclass(type, kws, keywords);
 
         return type;
     }
@@ -910,10 +921,11 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         return true;
     }
 
-    private static boolean initSubclass(PyType type, PyObject kwargs) {
+    private static boolean initSubclass(PyType type, PyObject[] args, String[] keywords) {
         PyObject func = type.super_lookup(type, "__init_subclass__");
         if (func != null) {
-            func.__call__(kwargs);
+            func = func.__get__(type, type);
+            func.__call__(args, keywords);
         }
         return true;
     }

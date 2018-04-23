@@ -246,7 +246,7 @@ public class PyObject implements Serializable, Slotted {
     }
 
     @ExposedClassMethod
-    public final static PyObject __init_class__(PyType cls) {
+    public final static PyObject __init_subclass__(PyType cls) {
         return Py.None;
     }
 

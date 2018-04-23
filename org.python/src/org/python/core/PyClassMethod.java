@@ -20,6 +20,10 @@ public class PyClassMethod extends PyObject implements Traverseproc {
         super(subtype);
     }
 
+    public PyClassMethod(PyObject callable) {
+        this(TYPE, callable);
+    }
+
     public PyClassMethod(PyType subtype, PyObject callable) {
         super(subtype);
         this.callable = callable;
