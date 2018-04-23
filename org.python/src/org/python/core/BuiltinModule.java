@@ -953,7 +953,7 @@ public class BuiltinModule {
         } else {
             metaclass = Py.findMetaclass(bases);
             newArgs = new PyObject[keywords.length + 2];
-            System.arraycopy(args, bases.length, newArgs, 2, keywords.length);
+            System.arraycopy(args, bases.length + 2, newArgs, 2, keywords.length);
         }
         PyObject basesArray = new PyTuple(bases);
         newArgs[0] = className;
