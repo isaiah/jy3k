@@ -10,14 +10,19 @@ import org.python.core.PyTableCode;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.python.compiler.Symtable.Flag.*;
-import static org.python.util.CodegenUtils.*;
+import static org.python.compiler.Symtable.Flag.CELL;
+import static org.python.compiler.Symtable.Flag.DEF_FREE_CLASS;
+import static org.python.compiler.Symtable.Flag.FREE;
+import static org.python.compiler.Symtable.Flag.SENTINAL;
+import static org.python.util.CodegenUtils.ci;
+import static org.python.util.CodegenUtils.p;
+import static org.python.util.CodegenUtils.sig;
 
 class CompileUnit {
     final PySTEntryObject ste;
@@ -108,7 +113,7 @@ class CompileUnit {
 
     private static Map<String, Integer> dictbytype(Map<String, EnumSet<Symtable.Flag>> src, Symtable.Flag scopeType, Symtable.Flag flag, int offset) {
         List<String> sortedKeys = src.keySet().stream().sorted().collect(Collectors.toList());
-        Map<String, Integer> dest = new HashMap<>();
+        Map<String, Integer> dest = new LinkedHashMap<>();
         int i = offset;
         for (String k : sortedKeys) {
             EnumSet<Symtable.Flag> v = src.get(k);
