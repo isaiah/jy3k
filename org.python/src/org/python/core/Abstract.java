@@ -4,6 +4,7 @@ package org.python.core;
 
 import org.python.core.linker.InvokeByName;
 import org.python.core.stringlib.Encoding;
+import org.python.modules._abc.PyABCData;
 
 import java.util.Objects;
 import java.util.Spliterator;
@@ -290,6 +291,10 @@ public class Abstract {
         }
     }
 
+    public static void _PyObject_SetAttrId(PyObject self, String attr, PyObject data) {
+        self.__setattr__(attr, data);
+    }
+
     public static class PyObjectSpliterator implements Spliterator<PyObject> {
         private PyObject iter;
 
@@ -408,6 +413,13 @@ public class Abstract {
         }
     }
 
+    public static PyObject PyMapping_Items(PyObject o) {
+        if (PyDictionary.checkExact(o)) {
+            return ((PyDictionary) o).dict_items();
+        }
+        return methodOutputAsList(o, "items");
+    }
+
     public static void PyMapping_SetItemString(PyObject o, final String key, final PyObject value) {
         if (o instanceof PyStringMap) {
             o.__setitem__(key, value);
@@ -502,5 +514,9 @@ public class Abstract {
         } catch (Throwable t) {
             throw Py.JavaError(t);
         }
+    }
+
+    private static PyObject methodOutputAsList(PyObject o, String meth) {
+        return o.invoke(meth);
     }
 }

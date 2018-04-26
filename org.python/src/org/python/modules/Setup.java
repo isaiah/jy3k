@@ -25,6 +25,7 @@ public class Setup {
     // modules by editing the Jython registry file.  See the property
     // python.modules.builtin for details.
     public static String[] builtinModules = {
+            "_abc:org.python.modules._abc.ABCModule",
             "_ast:org.python.antlr.ast.AstModule",
             "_blake2:org.python.modules._blake2._blake2module",
             "_bytecodetools",

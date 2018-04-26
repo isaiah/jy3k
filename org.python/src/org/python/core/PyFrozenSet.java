@@ -3,6 +3,7 @@ package org.python.core;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
@@ -15,7 +16,11 @@ public class PyFrozenSet extends BaseSet {
     public static final PyType TYPE = PyType.fromClass(PyFrozenSet.class);
 
     public PyFrozenSet() {
-        super(TYPE, new HashSet<PyObject>());
+        super(TYPE, new HashSet<>());
+    }
+
+    public PyFrozenSet(Set<PyObject> data) {
+        super(TYPE, data);
     }
 
     public PyFrozenSet(PyObject data) {
@@ -23,32 +28,17 @@ public class PyFrozenSet extends BaseSet {
     }
 
     public PyFrozenSet(PyType type, PyObject data) {
-        super(type, _update(new HashSet<PyObject>(), data));
+        super(type, _update(new HashSet<>(), data));
     }
 
     @ExposedNew
-    public static PyObject frozenset___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    public static PyObject frozenset_new(PyNewWrapper new_, boolean init, PyType subtype,
                                              PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("frozenset", args, keywords, new String[] {"iterable"}, 0);
         PyObject iterable = ap.getPyObject(0, null);
         PyFrozenSet fset = null;
 
-        if (new_.for_type == subtype) {
-            if (iterable == null) {
-                fset = Py.EmptyFrozenSet;
-            } else if (iterable.getType() == TYPE) {
-                fset = (PyFrozenSet)iterable;
-            } else {
-                fset = new PyFrozenSet(iterable);
-                if (fset.__len__() == 0) {
-                    fset = Py.EmptyFrozenSet;
-                }
-            }
-        } else {
-            fset = new PyFrozenSetDerived(subtype, iterable);
-        }
-
-        return fset;
+        return new PyFrozenSet(subtype, iterable);
     }
 
 

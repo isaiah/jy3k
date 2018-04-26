@@ -15,6 +15,7 @@ import org.python.expose.MethodType;
 
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,6 +23,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.python.core.CompareOp.EQ;
 
@@ -130,6 +134,10 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         for (int i = 0; i < elements.length; i += 2) {
             map.put(elements[i], elements[i + 1]);
         }
+    }
+
+    public static boolean checkExact(PyObject o) {
+        return o instanceof PyDictionary && o.getType() == TYPE;
     }
 
     public static PyDictionary fromKV(String[] keys, PyObject[] values) {
@@ -879,7 +887,10 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
             return dict_view_toString();
         }
     }
-    
+
+    public Set<PyObject> filter(Predicate<Map.Entry<PyObject, PyObject>> predicate, Function<Entry<PyObject, PyObject>, PyObject> mapper) {
+        return internalMap.entrySet().stream().filter(predicate).map(mapper).collect(Collectors.toSet());
+    }
     /*
      * The following methods implement the java.util.Map interface which allows PyDictionary to be
      * passed to java methods that take java.util.Map as a parameter. Basically, the Map methods are
