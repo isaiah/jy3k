@@ -280,7 +280,14 @@ public class Abstract {
     }
 
     public static boolean _PyObject_IsAbstract(PyObject callable) {
-        return PyObject_IsTrue(_PyObject_GetAttrId(callable, "__isabstractmethod__"), Py.getThreadState());
+        try {
+            return PyObject_IsTrue(_PyObject_GetAttrId(callable, "__isabstractmethod__"), Py.getThreadState());
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                return false;
+            }
+            throw e;
+        }
     }
 
     public static class PyObjectSpliterator implements Spliterator<PyObject> {

@@ -154,7 +154,7 @@ public class PyObject implements Serializable, Slotted {
     }
 
     @ExposedNew
-    static final PyObject object___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    static final PyObject object_new(PyNewWrapper new_, boolean init, PyType subtype,
                                          PyObject[] args, String[] keywords) {
         // don't allow arguments if the default object.__init__() is about to be called
         PyObject[] where = new PyObject[1];
@@ -171,7 +171,7 @@ public class PyObject implements Serializable, Slotted {
                     + "methods %s", subtype.fastGetName(), methods));
         }
 
-        return new_.for_type == subtype ? new PyObject() : new PyObjectDerived(subtype);
+        return new_.for_type == subtype ? new PyObject(subtype) : new PyObjectDerived(subtype);
     }
 
     // tp_richcompare

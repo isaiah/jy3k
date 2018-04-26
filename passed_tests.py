@@ -1,3 +1,4 @@
+test.test_abc
 test.test_bufio
 test.test_call
 test.test_compare

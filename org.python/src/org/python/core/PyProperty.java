@@ -69,7 +69,9 @@ public class PyProperty extends PyObject implements Traverseproc {
 
     @ExposedGet(name = "__isabstractmethod__")
     public boolean isabstractmethod() {
-        return Abstract._PyObject_IsAbstract(fget);
+        return fget != null && Abstract._PyObject_IsAbstract(fget) ||
+                fset != null && Abstract._PyObject_IsAbstract(fset) ||
+                fdel != null && Abstract._PyObject_IsAbstract(fdel);
     }
 
     @Override
@@ -169,7 +171,12 @@ public class PyProperty extends PyObject implements Traverseproc {
             doc = this.doc != null ? this.doc : Py.None;
         }
 
-        return getType().__call__(get, set, del, doc);
+        PyProperty props = new PyProperty(getType());
+        props.fget = get;
+        props.fset = set;
+        props.fdel = del;
+        props.doc = doc;
+        return props;
     }
 
 
