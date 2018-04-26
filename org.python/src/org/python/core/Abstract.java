@@ -6,6 +6,7 @@ import org.python.core.linker.InvokeByName;
 import org.python.core.stringlib.Encoding;
 import org.python.modules._abc.PyABCData;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -64,6 +65,9 @@ public class Abstract {
 
     public static PyObject PySequence_GetItem(PyObject o, int keyValue) {
         PyType tp = o.getType();
+        if (tp.sqItem == null) {
+            return PyObject_GetItem(Py.getThreadState(), o, new PyLong(keyValue));
+        }
         try {
             if (keyValue < 0) {
                 int len = (int) tp.sqLen.invokeExact(o);
@@ -413,11 +417,11 @@ public class Abstract {
         }
     }
 
-    public static PyObject PyMapping_Items(PyObject o) {
+    public static Stream<PyObject> PyMapping_Items(PyObject o) {
         if (PyDictionary.checkExact(o)) {
-            return ((PyDictionary) o).dict_items();
+            return _PySequence_Stream(((PyDictionary) o).dict_items());
         }
-        return methodOutputAsList(o, "items");
+        return methodOutputAsStream(o, "items");
     }
 
     public static void PyMapping_SetItemString(PyObject o, final String key, final PyObject value) {
@@ -516,7 +520,15 @@ public class Abstract {
         }
     }
 
-    private static PyObject methodOutputAsList(PyObject o, String meth) {
-        return o.invoke(meth);
+    private static Stream<PyObject> methodOutputAsStream(PyObject o, String meth) {
+        InvokeByName m = new InvokeByName(meth, PyObject.class, PyObject.class, ThreadState.class);
+        PyType tp = o.getType();
+        try {
+            Object func = m.getGetter().invokeExact(o);
+            PyObject ret = (PyObject) m.getInvoker().invokeExact(func, Py.getThreadState());
+            return _PySequence_Stream(ret);
+        } catch (Throwable throwable) {
+            throw Py.JavaError(throwable);
+        }
     }
 }

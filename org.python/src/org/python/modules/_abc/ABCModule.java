@@ -8,12 +8,15 @@ import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFrozenSet;
 import org.python.core.PyObject;
+import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ExposedModule(name = "_abc")
 public class ABCModule {
@@ -92,11 +95,19 @@ public class ABCModule {
         Set<PyObject> abstracts;
         if (PyDictionary.checkExact(ns)) {
             abstracts = ((PyDictionary) ns).filter(e -> Abstract._PyObject_IsAbstract(e.getValue()), Map.Entry::getKey);
+        } else if (ns instanceof PyStringMap) {
+            abstracts = ((PyStringMap) ns).filter(e -> Abstract._PyObject_IsAbstract(e.getValue()), e -> {
+                Object key = e.getKey();
+                if (key instanceof PyObject) {
+                    return (PyObject) key;
+                }
+                return new PyUnicode(key.toString());
+            });
         } else {
-            PyObject items = Abstract.PyMapping_Items(self);
-            for (int i = 0; i < Abstract.PyObject_Size(self, Py.getThreadState()); i++) {
-            }
-            abstracts = new HashSet<>();
+            abstracts = Abstract.PyMapping_Items(ns).filter(obj -> {
+                PyObject value = Abstract.PySequence_GetItem(obj, 1);
+                return Abstract._PyObject_IsAbstract(value);
+            }).map(obj -> Abstract.PySequence_GetItem(obj, 0)).collect(Collectors.toSet());
         }
         Abstract._PyObject_SetAttrId(self, "__abstractmethods__", new PyFrozenSet(abstracts));
     }

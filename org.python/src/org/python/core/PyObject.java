@@ -352,13 +352,13 @@ public class PyObject implements Serializable, Slotted {
     // occurs during regression testing.  XXX: more detail for this comment
     // is needed.
     @ExposedMethod(names = "__str__", doc = BuiltinDocs.object___str___doc)
-    public final PyUnicode object__str__() {
+    public PyUnicode __str__() {
 //        return __repr__();
         return new PyUnicode(toString());
     }
 
     @ExposedMethod(names = "__repr__", doc = BuiltinDocs.object___repr___doc)
-    public final PyUnicode object___repr__() {
+    public PyUnicode __repr__() {
         return new PyUnicode(toString());
     }
 

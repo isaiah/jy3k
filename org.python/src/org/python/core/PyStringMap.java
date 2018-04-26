@@ -18,6 +18,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Special fast dict implementation for __dict__ instances. Allows interned String keys in addition
@@ -681,4 +684,9 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
     public boolean refersDirectlyTo(PyObject ob) {
         return ob != null && (table.containsKey(ob) || table.containsValue(ob));
     }
+
+    public Set<PyObject> filter(Predicate<Entry<Object, PyObject>> predicate, Function<Entry<Object, PyObject>, PyObject> mapper) {
+        return table.entrySet().stream().filter(predicate).map(mapper).collect(Collectors.toSet());
+    }
+
 }
