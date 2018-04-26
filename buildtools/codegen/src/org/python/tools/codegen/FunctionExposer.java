@@ -52,7 +52,11 @@ public class FunctionExposer extends MethodExposer {
     @Override
     public String[] getNames() {
         if (slot == null) {
-            return super.getNames();
+            if(asNames.length == 0) {
+                return new String[] {methodName};
+            }
+            return asNames;
+
         }
         if (slot.hasName()) {
             return new String[]{slot.getName()};
