@@ -51,6 +51,7 @@ public class Setup {
             "_operator:org.python.modules.operator",
 //            "_pickle",
             "_posixsubprocess",
+            "_queue:org.python.modules._queue.QueueModule",
             "_random:org.python.modules.random.RandomModule",
             "_sha3:org.python.modules._sha3._sha3module",
             "_signal",
