@@ -43,7 +43,7 @@ public class _sre {
             120, 121, 122, 123, 124, 125, 126, 127};
 
     @ExposedConst
-    public static final int MAGIC = 20140917;
+    public static final int MAGIC = 20171005;
 
     @ExposedConst
     public static final int MAXREPEAT = Character.MAX_VALUE;
