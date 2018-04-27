@@ -29,6 +29,7 @@ _compat_pickle.py
 _dummy_thread.py
 _LWPCookieJar.py
 _MozillaCookieJar.py
+_py_abc.py
 _pydecimal.py
 _pyio.py
 _strptime.py
