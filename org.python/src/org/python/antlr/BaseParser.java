@@ -37,15 +37,6 @@ public class BaseParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PythonParser parser = new PythonParser(tokens);
         parser.removeErrorListeners();
-//        parser.addErrorListener(new BaseErrorListener() {
-//            @Override
-//            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-//                List<String> stack = ((PythonParser) recognizer).getRuleInvocationStack();
-//                System.out.println(stack);
-//                System.out.println(e);
-//                super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-//            }
-//        });
         parser.setErrorHandler(new BailErrorStrategy());
         return parser;
     }

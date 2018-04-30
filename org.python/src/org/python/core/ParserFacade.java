@@ -246,7 +246,8 @@ public class ParserFacade {
             if (cause instanceof InputMismatchException) {
                 return true;
             } else if (cause instanceof NoViableAltException) {
-                return ((NoViableAltException) cause).getOffendingToken().getType() == Lexer.EOF;
+                int type = ((NoViableAltException) cause).getOffendingToken().getType();
+                return type == Lexer.EOF || type == PythonParser.DEDENT;
             }
             return false;
         } catch (IOException e) {
