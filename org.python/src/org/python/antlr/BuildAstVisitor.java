@@ -813,8 +813,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 kwdefaults.add((expr) visit(tfpdkvContext.test()));
             }
         }
-        if (ctx.vararg != null) {
-            vararg = (arg) visit(ctx.vararg);
+        if (ctx.STAR() != null) {
+            vararg = ctx.vararg != null ? (arg) visit(ctx.vararg) :
+                    new arg(ctx.STAR().getSymbol(), "", null);
         }
         for (PythonParser.TdefparameterContext tdefparameterContext : ctx.args) {
             arg param = (arg) visit(tdefparameterContext.tfpdef());
@@ -858,6 +859,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 if (ctx.kw.isEmpty()) {
                     throw Py.SyntaxError("named arguments must follow bare *");
                 }
+                vararg = new arg(ctx.STAR().getSymbol(), null, null);
             } else {
                 vararg = (arg) visit(ctx.vararg);
             }

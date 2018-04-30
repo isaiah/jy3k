@@ -35,6 +35,7 @@ public class Abstract {
     private final static InvokeByName pos = new InvokeByName("__pos__", PyObject.class, PyObject.class, ThreadState.class);
     private final static InvokeByName neg = new InvokeByName("__neg__", PyObject.class, PyObject.class, ThreadState.class);
     private final static InvokeByName invert = new InvokeByName("__invert__", PyObject.class, PyObject.class, ThreadState.class);
+    private static final InvokeByName classGetItem = new InvokeByName("__class_getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName getitem = new InvokeByName("__getitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName setitem = new InvokeByName("__setitem__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class);
 //    private static final InvokeByName getattribute = new InvokeByName("__getattribute__", PyType.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
@@ -480,6 +481,10 @@ public class Abstract {
             return PySequence_GetItem(o, keyval);
         }
         try {
+            if (o instanceof PyType) {
+                Object func = classGetItem.getGetter().invokeExact((PyType) o);
+                return (PyObject) classGetItem.getInvoker().invokeExact(func, ts, key);
+            }
             Object func = getitem.getGetter().invokeExact(tp);
             return (PyObject) getitem.getInvoker().invokeExact(func, ts, o, key);
         } catch (Throwable throwable) {
@@ -487,18 +492,18 @@ public class Abstract {
         }
     }
 
-    public static PyObject PyObject_Call(ThreadState ts, PyObject callable, PyObject... args) {
+    public static PyObject PyObject_Call(ThreadState ts, PyObject callable, PyObject[] args, String[] keywords) {
         PyType tp = callable.getType();
         if (tp.call != null) {
             try {
-                return (PyObject) tp.call.invokeExact(callable, args, Py.NoKeywords);
+                return (PyObject) tp.call.invokeExact(callable, args, keywords);
             } catch (Throwable throwable) {
                 throw Py.JavaError(throwable);
             }
         }
         try {
             Object func = call.getGetter().invokeExact(callable);
-            return (PyObject) call.getInvoker().invokeExact(func, ts, args, Py.NoKeywords);
+            return (PyObject) call.getInvoker().invokeExact(func, ts, args, keywords);
         } catch (Throwable throwable) {
             throw Py.JavaError(throwable);
         }

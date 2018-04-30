@@ -180,7 +180,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             }
             // If that didn't trigger, we need 3 arguments. but ArgParser below may give a msg
             // saying type() needs exactly 3.
-            if (args.length != 3) {
+            if (args.length - keywords.length != 3) {
                 throw Py.TypeError("type() takes 1 or 3 arguments");
             }
         }
@@ -265,7 +265,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             dict.__setitem__("__init_subclass__", tmp);
         }
 
-        tmp = dict.__finditem__("__class__getitem__");
+        tmp = dict.__finditem__("__class_getitem__");
         if (tmp instanceof PyFunction) {
             tmp = new PyClassMethod(tmp);
             dict.__setitem__("__class_getitem__", tmp);

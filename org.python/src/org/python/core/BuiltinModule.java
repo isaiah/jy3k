@@ -976,7 +976,8 @@ public class BuiltinModule {
                 System.arraycopy(newArgs, 0, newArgs2, 0, 2);
                 newArgs2[2] = ns;
                 System.arraycopy(newArgs, 2, newArgs2, 3, newArgs.length - 2);
-                cls = metaclass.__call__(newArgs2, keywords);
+                cls = Abstract.PyObject_Call(state, metaclass, newArgs2, keywords);
+//                cls = metaclass.__call__(newArgs2, keywords);
             } else {
                 cls = metaclass.__call__(className, basesArray, ns);
             }

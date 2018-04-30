@@ -1,32 +1,25 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.compiler;
 
-import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Str;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
-import org.python.core.CodeBootstrap;
-import org.python.core.CodeLoader;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
-import org.python.core.PyFrame;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyRunnable;
-import org.python.core.PyRunnableBootstrap;
 import org.python.core.PyTableCode;
 import org.python.core.PyUnicode;
-import org.python.core.ThreadState;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.python.util.CodegenUtils.*;
+import static org.python.util.CodegenUtils.ci;
+import static org.python.util.CodegenUtils.p;
+import static org.python.util.CodegenUtils.sig;
 
 class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
 
