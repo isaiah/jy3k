@@ -12,6 +12,10 @@ import org.python.core.stringlib.IntegerFormatter;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The builtin module. All builtin functions are defined here
  */
@@ -913,10 +917,12 @@ public class BuiltinModule {
     }
 
     public static PyObject buildClass(PyObject[] args, String[] keywords) {
+        ThreadState state = Py.getThreadState();
         PyFunction func = (PyFunction) args[0];
         PyObject className = args[1];
-        PyObject[] bases = new PyObject[args.length - keywords.length - 2];
-        System.arraycopy(args, 2, bases, 0, bases.length);
+        PyObject[] originBases = new PyObject[args.length - keywords.length - 2];
+        System.arraycopy(args, 2, originBases, 0, originBases.length);
+        PyObject[] bases = updateBases(state, originBases);
         PyObject metaclass = null;
         int index = -1;
         for (int i = 0; i < keywords.length; i++) {
@@ -959,7 +965,6 @@ public class BuiltinModule {
         newArgs[0] = className;
         newArgs[1] = basesArray;
         PyObject ns;
-        ThreadState state = Py.getThreadState();
         try {
             Object prepareFunc = prepare.getGetter().invokeExact(metaclass);
             ns = (PyObject) prepare.getInvoker().invokeExact(prepareFunc, state, newArgs, keywords);
@@ -968,6 +973,9 @@ public class BuiltinModule {
         }
 
         PyObject cell = Py.runCode(state, func.__code__, func.__globals__, ns, (PyTuple) func.__closure__);
+        if (bases != originBases) {
+            Abstract.PyMapping_SetItemString(ns, "__orig_bases__", new PyTuple(originBases));
+        }
         PyObject cls;
         boolean isWide = keywords.length > 0;
         try {
@@ -979,7 +987,8 @@ public class BuiltinModule {
                 cls = Abstract.PyObject_Call(state, metaclass, newArgs2, keywords);
 //                cls = metaclass.__call__(newArgs2, keywords);
             } else {
-                cls = metaclass.__call__(className, basesArray, ns);
+                cls = Abstract.PyObject_Call(state, metaclass, new PyObject[]{className, basesArray, ns}, keywords);
+//                cls = metaclass.__call__(className, basesArray, ns);
             }
         } catch (PyException pye) {
             if (!pye.match(Py.TypeError)) {
@@ -1002,6 +1011,38 @@ public class BuiltinModule {
             }
         }
         return cls;
+    }
+
+    private static PyObject[] updateBases(ThreadState ts, PyObject[] bases) {
+        List<PyObject> newBases = new ArrayList<>(bases.length);
+        for (int i = 0; i < bases.length; i++) {
+            PyObject base = bases[i];
+            if (base instanceof PyType) {
+                if (newBases.isEmpty()) {
+                    continue;
+                }
+                newBases.add(base);
+            }
+            PyObject meth = Abstract._PyObject_GetAttrId(base, "__mro_entries__");
+            if (meth == null) {
+                if (newBases.isEmpty()) {
+                    continue;
+                }
+                newBases.add(base);
+            }
+            PyObject newBase = Abstract.PyObject_Call(ts, meth, new PyObject[] {new PyTuple(bases)}, Py.NoKeywords);
+            if (!(newBase instanceof PyTuple)) {
+                throw Py.TypeError("__mro_entries__ must return a tuple");
+            }
+            if (newBases.isEmpty()) {
+                newBases.addAll(Arrays.asList(bases).subList(0, i));
+            }
+            newBases.addAll(((PyTuple) newBase).getList());
+        }
+        if (newBases.isEmpty()) {
+            return bases;
+        }
+        return newBases.toArray(new PyObject[0]);
     }
 
     /**

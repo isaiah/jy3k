@@ -2533,10 +2533,7 @@ public final class Py {
                 metaclass = meta;
             }
         }
-        if (metaclass == null) {
-            metaclass = PyType.TYPE;
-        }
-        return metaclass;
+        return metaclass == null ? PyType.TYPE : metaclass;
     }
 
     private static boolean abstractIsSubClass(PyObject derived, PyObject cls) {

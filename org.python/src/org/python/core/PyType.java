@@ -163,7 +163,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     @ExposedNew
-    public static final PyObject type___new__(PyNewWrapper new_, boolean init, PyType metatype,
+    public static final PyObject type_new(PyNewWrapper new_, boolean init, PyType metatype,
                                         PyObject[] args, String[] keywords) {
         // Special case: type(x) should return x.getType()
         if (metatype == TYPE) {
@@ -406,14 +406,15 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 obj.dict = type.instDict();
             }
         } else {
+            ThreadState ts = Py.getThreadState();
             int n = args.length;
             PyObject[] typePrepended = new PyObject[n + 1];
             System.arraycopy(args, 0, typePrepended, 1, n);
             typePrepended[0] = type;
             try {
                 Object descrgetfunc = get.getGetter().invokeExact(new_);
-                new_ = (PyObject) get.getInvoker().invokeExact(descrgetfunc, Py.getThreadState(), Py.None, (PyObject) type);
-                obj = new_.__call__(typePrepended, keywords);
+                new_ = (PyObject) get.getInvoker().invokeExact(descrgetfunc, ts, Py.None, (PyObject) type);
+                obj = Abstract.PyObject_Call(ts, new_, typePrepended, keywords);
             } catch (Throwable throwable) {
                 throw Py.JavaError(throwable);
             }
@@ -921,13 +922,11 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         return true;
     }
 
-    private static boolean initSubclass(PyType type, PyObject[] args, String[] keywords) {
-        PyObject func = type.super_lookup(type, "__init_subclass__");
-        if (func != null) {
-            func = func.__get__(type, type);
-            func.__call__(args, keywords);
-        }
-        return true;
+    private static void initSubclass(PyType type, PyObject[] args, String[] keywords) {
+        ThreadState state = Py.getThreadState();
+        PyObject sup = Abstract.PyObject_Call(state, PySuper.TYPE, new PyObject[] {type, type}, Py.NoKeywords);
+        PyObject func = Abstract._PyObject_GetAttrId(sup, "__init_subclass__");
+        Abstract.PyObject_Call(state, func, args, keywords);
     }
 
     private void mro_internal() {
@@ -1298,7 +1297,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             throw Py.TypeError(String.format("cannot create '%.100s' instances", self.name));
         }
 
-        PyObject obj = invokeNew(new_, self, true, args, keywords);
+        PyObject obj = invokeNew(new_, self, false, args, keywords);
         // When the call was type(something) or the returned object is not an instance of
         // type, it won't be initialized
         if ((self == TYPE && args.length == 1 && keywords.length == 0)

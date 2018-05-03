@@ -474,8 +474,8 @@ public class PyTuple extends PySequenceList implements List {
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.tuple_index_doc)
     public final int tuple_index(PyObject value, PyObject start, PyObject stop) {
-        int startInt = start == null ? 0 : PySlice.calculateSliceIndex(start);
-        int stopInt = stop == null ? size() : PySlice.calculateSliceIndex(stop);
+        int startInt = start == null || start == Py.None ? 0 : PySlice.calculateSliceIndex(start);
+        int stopInt = stop == null || stop == Py.None ? size() : PySlice.calculateSliceIndex(stop);
         return tuple_index(value, startInt, stopInt);
     }
 
