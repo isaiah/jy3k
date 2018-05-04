@@ -18,16 +18,36 @@ import time
 import csv
 import zipimport
 
+def print_signature(out, obj, meth):
+    if meth == '__text_signature__':
+        sig = getattr(obj, meth)
+        if sig is None:
+            return
+        bdname = '%s_sig' % obj.__name__
+    else:
+        attr = getattr(obj, meth)
+        if not callable(attr):
+            return
+
+        sig = getattr(attr, "__text_signature__", None)
+        if sig is None:
+            return
+        bdname = '%s_%s_sig' % (obj.__name__, meth)
+    lines = sig.split("\n")
+    outstring = '\\n" + \n        "'.join(format(line) for line in lines)
+    print('    public final static String %s = ' % bdname, file=out)
+    print('        "%s";\n' % outstring, file=outfile)
+
+
 def print_doc(out, obj, meth):
     if meth == '__doc__':
         doc = getattr(obj, meth)
         bdname = '%s_doc' % obj.__name__
     else:
-        if meth == '__abstractmethods__':
-            # getattr(type,'__abstractmethods__') would fail
-            doc = ""
-        else:
-            doc = getattr(obj, meth).__doc__
+        attr = getattr(obj, meth)
+        if not callable(attr):
+            return
+        doc = attr.__doc__
         bdname = '%s_%s_doc' % (obj.__name__, meth)
 
     if doc is None:
@@ -120,6 +140,8 @@ print('public class BuiltinDocs {\n', file=outfile)
 for obj in types_list: 
     print('    // Docs for %s' % obj, file=outfile)
     for meth in dir(obj):
-        print_doc(outfile, obj, meth)
+        if meth != '__abstractmethods__':
+            print_doc(outfile, obj, meth)
+            print_signature(outfile, obj, meth)
 
 print('}', file=outfile)
