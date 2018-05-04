@@ -83,12 +83,12 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.antlr.base.slice;', file=self.file)
             print('import org.python.antlr.base.stmt;', file=self.file)
             print('import org.python.core.ArgParser;', file=self.file)
-            print('import org.python.core.AstList;', file=self.file)
             print('import org.python.core.Py;', file=self.file)
             print('import org.python.core.PyObject;', file=self.file)
             print('import org.python.core.PyUnicode;', file=self.file)
             print('import org.python.core.PyStringMap;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
+            print('import org.python.core.PyList;', file=self.file)
             print('import org.python.core.Visitproc;', file=self.file)
             print('import org.python.annotations.ExposedGet;', file=self.file)
             print('import org.python.annotations.ExposedMethod;', file=self.file)
@@ -632,7 +632,7 @@ class JavaVisitor(EmitVisitor):
         self.emit('@ExposedGet(name = "%s")' % field.name, depth)
         self.emit("public PyObject get%s() {" % self.processFieldName(field.name), depth)
         if field.seq:
-            self.emit("return new AstList(%s, AstAdapters.%sAdapter);" % (field.name, field.type), depth+1)
+            self.emit("return new PyList(%s);" % field.name, depth+1)
         else:
             if str(field.type) == 'identifier':
                 self.emit("if (%s == null) return Py.None;" % field.name, depth+1)

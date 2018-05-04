@@ -12,12 +12,12 @@ import org.python.antlr.base.mod;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.core.ArgParser;
-import org.python.core.AstList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyList;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -40,7 +40,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     }
     @ExposedGet(name = "body")
     public PyObject getBody() {
-        return new AstList(body, AstAdapters.stmtAdapter);
+        return new PyList(body);
     }
     @ExposedSet(name = "body")
     public void setBody(PyObject body) {
@@ -56,7 +56,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     }
     @ExposedGet(name = "handlers")
     public PyObject getHandlers() {
-        return new AstList(handlers, AstAdapters.excepthandlerAdapter);
+        return new PyList(handlers);
     }
     @ExposedSet(name = "handlers")
     public void setHandlers(PyObject handlers) {
@@ -72,7 +72,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     }
     @ExposedGet(name = "orelse")
     public PyObject getOrelse() {
-        return new AstList(orelse, AstAdapters.stmtAdapter);
+        return new PyList(orelse);
     }
     @ExposedSet(name = "orelse")
     public void setOrelse(PyObject orelse) {
@@ -88,7 +88,7 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     }
     @ExposedGet(name = "finalbody")
     public PyObject getFinalbody() {
-        return new AstList(finalbody, AstAdapters.stmtAdapter);
+        return new PyList(finalbody);
     }
     @ExposedSet(name = "finalbody")
     public void setFinalbody(PyObject finalbody) {

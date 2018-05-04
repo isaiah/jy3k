@@ -12,12 +12,12 @@ import org.python.antlr.base.mod;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.core.ArgParser;
-import org.python.core.AstList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyList;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -56,7 +56,7 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     }
     @ExposedGet(name = "ops")
     public PyObject getOps() {
-        return new AstList(ops, AstAdapters.cmpopAdapter);
+        return new PyList(ops);
     }
     @ExposedSet(name = "ops")
     public void setOps(PyObject ops) {
@@ -72,7 +72,7 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     }
     @ExposedGet(name = "comparators")
     public PyObject getComparators() {
-        return new AstList(comparators, AstAdapters.exprAdapter);
+        return new PyList(comparators);
     }
     @ExposedSet(name = "comparators")
     public void setComparators(PyObject comparators) {

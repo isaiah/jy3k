@@ -12,12 +12,12 @@ import org.python.antlr.base.mod;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.core.ArgParser;
-import org.python.core.AstList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyList;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -56,7 +56,7 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
     }
     @ExposedGet(name = "values")
     public PyObject getValues() {
-        return new AstList(values, AstAdapters.exprAdapter);
+        return new PyList(values);
     }
     @ExposedSet(name = "values")
     public void setValues(PyObject values) {

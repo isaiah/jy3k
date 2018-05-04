@@ -12,12 +12,12 @@ import org.python.antlr.base.mod;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.core.ArgParser;
-import org.python.core.AstList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyList;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -57,7 +57,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
     @ExposedGet(name = "bases")
     public PyObject getBases() {
-        return new AstList(bases, AstAdapters.exprAdapter);
+        return new PyList(bases);
     }
     @ExposedSet(name = "bases")
     public void setBases(PyObject bases) {
@@ -73,7 +73,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
     @ExposedGet(name = "keywords")
     public PyObject getKeywords() {
-        return new AstList(keywords, AstAdapters.keywordAdapter);
+        return new PyList(keywords);
     }
     @ExposedSet(name = "keywords")
     public void setKeywords(PyObject keywords) {
@@ -89,7 +89,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
     @ExposedGet(name = "body")
     public PyObject getBody() {
-        return new AstList(body, AstAdapters.stmtAdapter);
+        return new PyList(body);
     }
     @ExposedSet(name = "body")
     public void setBody(PyObject body) {
@@ -105,7 +105,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
     @ExposedGet(name = "decorator_list")
     public PyObject getDecorator_list() {
-        return new AstList(decorator_list, AstAdapters.exprAdapter);
+        return new PyList(decorator_list);
     }
     @ExposedSet(name = "decorator_list")
     public void setDecorator_list(PyObject decorator_list) {

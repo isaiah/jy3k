@@ -1,16 +1,57 @@
 package org.python.antlr.ast;
 
-import org.python.antlr.base.*;
-import org.python.antlr.op.*;
-import org.python.core.AstList;
+import org.python.annotations.ExposedModule;
+import org.python.annotations.ModuleInit;
+import org.python.antlr.AST;
+import org.python.antlr.base.boolop;
+import org.python.antlr.base.cmpop;
+import org.python.antlr.base.excepthandler;
+import org.python.antlr.base.expr;
+import org.python.antlr.base.expr_context;
+import org.python.antlr.base.mod;
+import org.python.antlr.base.operator;
+import org.python.antlr.base.slice;
+import org.python.antlr.base.stmt;
+import org.python.antlr.base.unaryop;
+import org.python.antlr.op.Add;
+import org.python.antlr.op.And;
+import org.python.antlr.op.AugLoad;
+import org.python.antlr.op.AugStore;
+import org.python.antlr.op.BitAnd;
+import org.python.antlr.op.BitOr;
+import org.python.antlr.op.BitXor;
+import org.python.antlr.op.Del;
+import org.python.antlr.op.Div;
+import org.python.antlr.op.Eq;
+import org.python.antlr.op.FloorDiv;
+import org.python.antlr.op.Gt;
+import org.python.antlr.op.GtE;
+import org.python.antlr.op.In;
+import org.python.antlr.op.Invert;
+import org.python.antlr.op.Is;
+import org.python.antlr.op.IsNot;
+import org.python.antlr.op.LShift;
+import org.python.antlr.op.Load;
+import org.python.antlr.op.Lt;
+import org.python.antlr.op.LtE;
+import org.python.antlr.op.MatMult;
+import org.python.antlr.op.Mod;
+import org.python.antlr.op.Mult;
+import org.python.antlr.op.Not;
+import org.python.antlr.op.NotEq;
+import org.python.antlr.op.NotIn;
+import org.python.antlr.op.Or;
+import org.python.antlr.op.Param;
+import org.python.antlr.op.Pow;
+import org.python.antlr.op.RShift;
+import org.python.antlr.op.Store;
+import org.python.antlr.op.Sub;
+import org.python.antlr.op.UAdd;
+import org.python.antlr.op.USub;
 import org.python.core.CompilerFlags;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
-
-import org.python.antlr.AST;
 import org.python.core.PyUnicode;
-import org.python.annotations.ExposedModule;
-import org.python.annotations.ModuleInit;
 
 @ExposedModule(name = "_ast")
 public class AstModule {
@@ -21,8 +62,6 @@ public class AstModule {
     public static void classDictInit(PyObject dict) {
         dict.__setitem__("__version__", new PyUnicode("62047"));
         dict.__setitem__("PyCF_ONLY_AST", new PyLong(CompilerFlags.PyCF_ONLY_AST));
-
-        dict.__setitem__("astlist", AstList.TYPE);
 
         dict.__setitem__("AST", AST.TYPE);
         dict.__setitem__("Module", Module.TYPE);

@@ -12,12 +12,12 @@ import org.python.antlr.base.mod;
 import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.core.ArgParser;
-import org.python.core.AstList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyList;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
@@ -40,7 +40,7 @@ public class arguments extends PythonTree {
     }
     @ExposedGet(name = "args")
     public PyObject getArgs() {
-        return new AstList(args, AstAdapters.argAdapter);
+        return new PyList(args);
     }
     @ExposedSet(name = "args")
     public void setArgs(PyObject args) {
@@ -72,7 +72,7 @@ public class arguments extends PythonTree {
     }
     @ExposedGet(name = "kwonlyargs")
     public PyObject getKwonlyargs() {
-        return new AstList(kwonlyargs, AstAdapters.argAdapter);
+        return new PyList(kwonlyargs);
     }
     @ExposedSet(name = "kwonlyargs")
     public void setKwonlyargs(PyObject kwonlyargs) {
@@ -88,7 +88,7 @@ public class arguments extends PythonTree {
     }
     @ExposedGet(name = "kw_defaults")
     public PyObject getKw_defaults() {
-        return new AstList(kw_defaults, AstAdapters.exprAdapter);
+        return new PyList(kw_defaults);
     }
     @ExposedSet(name = "kw_defaults")
     public void setKw_defaults(PyObject kw_defaults) {
@@ -120,7 +120,7 @@ public class arguments extends PythonTree {
     }
     @ExposedGet(name = "defaults")
     public PyObject getDefaults() {
-        return new AstList(defaults, AstAdapters.exprAdapter);
+        return new PyList(defaults);
     }
     @ExposedSet(name = "defaults")
     public void setDefaults(PyObject defaults) {
