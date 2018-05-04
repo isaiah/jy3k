@@ -12,9 +12,6 @@ import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedType;
 import org.python.internal.regex.Matcher;
 
-/**
- * Created by isaiah on 3/24/17.
- */
 @ExposedType(name = "_sre.SRE_Match", doc = "The match result")
 public class PySRE_Match extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PySRE_Match.class);
@@ -107,7 +104,7 @@ public class PySRE_Match extends PyObject {
     @ExposedMethod
     public PyObject SRE_Match_span(PyObject[] args, String[] keywords) {
         int index = getIndex(args);
-        return new PyTuple(new PyLong(matcher.start()), new PyLong(matcher.end()));
+        return new PyTuple(new PyLong(matcher.start(index)), new PyLong(matcher.end(index)));
     }
 
     @Override

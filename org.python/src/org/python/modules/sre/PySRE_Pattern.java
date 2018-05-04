@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Created by isaiah on 3/24/17.
- */
 @ExposedType(name = "_sre.SRE_Pattern")
 public class PySRE_Pattern extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PySRE_Pattern.class);
