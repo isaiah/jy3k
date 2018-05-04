@@ -784,7 +784,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.typedargslist() != null) {
             return visit(ctx.typedargslist());
         }
-        return super.visitParameters(ctx);
+        return new arguments();
     }
 
     @Override
