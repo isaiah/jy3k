@@ -52,7 +52,7 @@ public class repeat extends PyIterator {
 
         PyObject object = ap.getPyObject(0);
         if (args.length == 1) {
-            new repeat(subType, object);
+            return new repeat(subType, object);
         }
         int times = ap.getInt(1);
         return new repeat(subType, object, times);
