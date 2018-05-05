@@ -74,12 +74,12 @@ public class PyCoroutine extends PyGenerator {
     }
 
     // Simply those attributes are not inherited
-    @ExposedGet(doc = BuiltinDocs.coroutine___name___doc)
+    @ExposedGet
     final String __name__() {
         return getName();
     }
 
-    @ExposedGet(doc = BuiltinDocs.coroutine___qualname___doc)
+    @ExposedGet
     final String __qualname__() {
         return getQualname();
     }

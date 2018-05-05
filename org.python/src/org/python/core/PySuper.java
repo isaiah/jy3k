@@ -16,13 +16,13 @@ public class PySuper extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PySuper.class);
 
-    @ExposedGet(name = "__thisclass__", doc = BuiltinDocs.super___thisclass___doc)
+    @ExposedGet(name = "__thisclass__")
     protected PyType superType;
 
-    @ExposedGet(name = "__self__", doc = BuiltinDocs.super___self___doc)
+    @ExposedGet(name = "__self__")
     protected PyObject obj;
 
-    @ExposedGet(name = "__self_class__", doc = BuiltinDocs.super___self_class___doc)
+    @ExposedGet(name = "__self_class__")
     protected PyType objType;
 
     public PySuper() {

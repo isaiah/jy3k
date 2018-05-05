@@ -104,7 +104,7 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         }
     }
 
-    @ExposedGet(doc = format_doc)
+    @ExposedGet
     public String format() {
         checkNotReleased();
         return format;
@@ -115,7 +115,7 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         return backing.getLen();
     }
 
-    @ExposedGet(doc = BuiltinDocs.memoryview_itemsize_doc)
+    @ExposedGet
     public int itemsize() {
         checkNotReleased();
         switch(format) {
@@ -145,7 +145,7 @@ public class PyMemoryView extends PySequence implements BufferProtocol, Traverse
         }
     }
 
-    @ExposedGet(doc = shape_doc)
+    @ExposedGet
     public PyObject shape() {
         checkNotReleased();
         if (shape == null) {

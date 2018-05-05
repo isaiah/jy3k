@@ -784,7 +784,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.typedargslist() != null) {
             return visit(ctx.typedargslist());
         }
-        return new arguments();
+        java.util.List<expr> emptykw = new ArrayList<>(0);
+        java.util.List<arg> emptyargs = new ArrayList<>(0);
+        return new arguments(ctx.start, emptyargs, null, emptyargs, emptykw, null, emptykw);
     }
 
     @Override
@@ -1270,23 +1272,27 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 //        byte[] bytes = org.python.core.imp.compileSource(module, src);
 //        byte[] bytes = org.python.bootstrap.Import.compileSource(module, new FileInputStream(src), module);
 
-        byte[] bytes = compileSource(module, new FileInputStream(src), module);
-        BuildAstVisitor v = new BuildAstVisitor("<string>");
+        try {
+            byte[] bytes = compileSource(module, new FileInputStream(src), module);
+            BuildAstVisitor v = new BuildAstVisitor("<string>");
 
-        ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
-        PythonLexer lexer = new PythonLexer(inputStream);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        PythonParser parser = new PythonParser(tokens);
-        ParseTree ctx = parser.file_input();
-        PythonTree ast = v.visit(ctx);
-        new NameMangler().visit(ast);
-        new ClassClosureGenerator().visit(ast);
-        new Lower("/tmp/foo.py").visit(ast);
-        new AnnotationsCreator().visit(ast);
-        System.out.println(ast.toStringTree());
-        FileOutputStream out = new FileOutputStream("/tmp/foo.class");
-        out.write(bytes);
-        out.close();
+            ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
+            PythonLexer lexer = new PythonLexer(inputStream);
+            TokenStream tokens = new CommonTokenStream(lexer);
+            PythonParser parser = new PythonParser(tokens);
+            ParseTree ctx = parser.file_input();
+            PythonTree ast = v.visit(ctx);
+            new NameMangler().visit(ast);
+            new ClassClosureGenerator().visit(ast);
+            new Lower("/tmp/foo.py").visit(ast);
+            new AnnotationsCreator().visit(ast);
+            System.out.println(ast.toStringTree());
+            FileOutputStream out = new FileOutputStream("/tmp/foo.class");
+            out.write(bytes);
+            out.close();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     private static byte[] compileSource(String name, InputStream fp, String filename) {

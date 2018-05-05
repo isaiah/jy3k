@@ -113,6 +113,12 @@ public interface VisitorIF<R> {
     public boolean enterAnonymousFunction(AnonymousFunction node);
     public R visitAnonymousFunction(AnonymousFunction node);
     public void leaveAnonymousFunction(AnonymousFunction node);
+    public boolean enterIter(Iter node);
+    public R visitIter(Iter node);
+    public void leaveIter(Iter node);
+    public boolean enterIterNext(IterNext node);
+    public R visitIterNext(IterNext node);
+    public void leaveIterNext(IterNext node);
     public boolean enterIfExp(IfExp node);
     public R visitIfExp(IfExp node);
     public void leaveIfExp(IfExp node);

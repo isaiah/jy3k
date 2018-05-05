@@ -39,6 +39,8 @@ import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Interactive;
+import org.python.antlr.ast.Iter;
+import org.python.antlr.ast.IterNext;
 import org.python.antlr.ast.JoinedStr;
 import org.python.antlr.ast.List;
 import org.python.antlr.ast.Name;
@@ -906,6 +908,20 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         popException();
 
         code.goto_(exitLabels.peek());
+        return null;
+    }
+
+    @Override
+    public Object visitIter(Iter node) {
+        visit(node.getInternalValue());
+        code.invokestatic(p(PyObject.class), "getIter", sig(PyObject.class, PyObject.class));
+        return null;
+    }
+
+    @Override
+    public Object visitIterNext(IterNext node) {
+        visit(node.getInternalValue());
+        code.invokestatic(p(PyObject.class), "iterNext", sig(PyObject.class, PyObject.class));
         return null;
     }
 

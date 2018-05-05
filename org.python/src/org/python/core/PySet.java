@@ -198,7 +198,7 @@ public class PySet extends BaseSet {
         return set___hash__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.set___hash___doc)
+    @ExposedMethod
     public final int set___hash__() {
         throw Py.TypeError("set objects are unhashable");
     }

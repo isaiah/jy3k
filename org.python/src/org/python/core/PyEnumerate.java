@@ -3,7 +3,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 /**
  * The Python builtin enumerate type.
@@ -30,13 +32,9 @@ public class PyEnumerate extends PyIterator {
         sit = PyObject.getIter(seq);
     }
 
-    public PyEnumerate(PyObject seq, PyObject start) {
-        this(TYPE, seq, start);
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.enumerate___iter___doc)
-    public final PyObject enumerate___iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject enumerate___iter__(PyObject self) {
+        return self;
     }
 
     @ExposedNew
@@ -49,27 +47,25 @@ public class PyEnumerate extends PyIterator {
             throw Py.TypeError("an integer is required");
         }
 
-        if (new_.for_type == subtype) {
-            return new PyEnumerate(seq, start);
-        } else {
-            return new PyEnumerateDerived(subtype, seq, start);
-        }
+        return new PyEnumerate(subtype, seq, start);
+
     }
 
-    @ExposedMethod(doc = BuiltinDocs.enumerate___next___doc)
-    public final PyObject enumerate___next__() {
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject enumerate___next__(PyObject enumerate) {
+        PyEnumerate self = (PyEnumerate) enumerate;
         PyObject nextItem;
 
-        nextItem = PyObject.iterNext(sit);
+        nextItem = PyObject.iterNext(self.sit);
         if (nextItem == null) {
-            if (sit instanceof PyIterator && ((PyIterator)sit).stopException != null) {
-                throw ((PyIterator)sit).stopException;
+            if (self.sit instanceof PyIterator && ((PyIterator)self.sit).stopException != null) {
+                throw ((PyIterator)self.sit).stopException;
             }
             throw Py.StopIteration();
         }
 
-        PyObject next = new PyTuple(index, nextItem);
-        index = index._add(Py.getThreadState(), Py.newInteger(1));
+        PyObject next = new PyTuple(self.index, nextItem);
+        self.index = self.index._add(Py.getThreadState(), Py.newInteger(1));
 
         return next;
     }

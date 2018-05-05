@@ -606,7 +606,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap, Traversepro
         return false;
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___hash___doc)
+    @ExposedMethod
     final int dict___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }

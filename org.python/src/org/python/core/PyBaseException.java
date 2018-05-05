@@ -20,7 +20,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     private PyObject message = Py.EmptyByte;
 
     /** Exception's arguments. */
-    @ExposedGet(doc = BuiltinDocs.BaseException_args_doc)
+    @ExposedGet
     public PyObject args = Py.EmptyTuple;
 
     /** Exception's underlying dictionary, lazily created. */
@@ -29,17 +29,17 @@ public class PyBaseException extends PyObject implements Traverseproc {
     /** The reference to the wrapping PyException instance */
     protected PyException wrapper;
 
-    @ExposedGet(doc = BuiltinDocs.BaseException___cause___doc)
+    @ExposedGet
     public PyObject __cause__;
 
-    @ExposedGet(doc = BuiltinDocs.BaseException___suppress_context___doc)
+    @ExposedGet
     @ExposedSet
     public boolean __suppress_context__;
 
-    @ExposedGet(doc = BuiltinDocs.BaseException___context___doc)
+    @ExposedGet
     public PyObject __context__;
 
-    @ExposedGet(doc = BuiltinDocs.BaseException___traceback___doc)
+    @ExposedGet
     public PyObject __traceback__;
 
     public PyBaseException() {
@@ -151,7 +151,7 @@ public class PyBaseException extends PyObject implements Traverseproc {
     }
 
     @Override
-    @ExposedGet(name = "__dict__", doc = BuiltinDocs.BaseException___dict___doc)
+    @ExposedGet(name = "__dict__")
     public PyObject getDict() {
         ensureDict();
         return __dict__;

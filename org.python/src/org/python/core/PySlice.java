@@ -14,13 +14,13 @@ public class PySlice extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PySlice.class);
 
-    @ExposedGet(doc = BuiltinDocs.slice_start_doc)
+    @ExposedGet
     public PyObject start = Py.None;
 
-    @ExposedGet(doc = BuiltinDocs.slice_stop_doc)
+    @ExposedGet
     public PyObject stop = Py.None;
 
-    @ExposedGet(doc = BuiltinDocs.slice_step_doc)
+    @ExposedGet
     public PyObject step = Py.None;
 
     public PySlice() {
@@ -80,7 +80,7 @@ public class PySlice extends PyObject implements Traverseproc {
         return slice___hash__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.slice___hash___doc)
+    @ExposedMethod
     final int slice___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }

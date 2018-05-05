@@ -32,10 +32,10 @@ public class PyComplex extends PyObject {
             Double.POSITIVE_INFINITY);
     public static final PyComplex NaN = new PyComplex(Double.NaN, Double.NaN);
 
-    @ExposedGet(doc = BuiltinDocs.complex_real_doc)
+    @ExposedGet
     public double real;
 
-    @ExposedGet(doc = BuiltinDocs.complex_imag_doc)
+    @ExposedGet
     public double imag;
 
     public PyComplex(PyType subtype, double r, double i) {

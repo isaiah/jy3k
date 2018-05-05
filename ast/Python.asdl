@@ -66,6 +66,10 @@ module Python
          | Lambda(arguments args, expr body)
          -- AnonymousFunction is a proper lambda, doesn't exist in code
          | AnonymousFunction(identifier name, arguments args, stmt* body)
+         -- Iter and IterNext are used to lower for stmt, in order to trigger
+         -- native function directly instead of a name lookup
+         | Iter(expr value)
+         | IterNext(expr value)
          | IfExp(expr test, expr body, expr orelse)
          | Dict(expr* keys, expr* values)
          | Set(expr* elts)

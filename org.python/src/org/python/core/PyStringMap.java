@@ -502,7 +502,7 @@ public class PyStringMap extends PyObject implements Traverseproc, PyDict {
         return stringmap___hash__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.dict___hash___doc)
+    @ExposedMethod
     final int stringmap___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }

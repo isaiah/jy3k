@@ -40,7 +40,7 @@ public class PyClassMethodDescr extends PyMethodDescr {
 
     @Override
     @ExposedGet(name = "__doc__")
-    public String getDoc() {
+    public PyObject getDoc() {
         return super.getDoc();
     }
 }

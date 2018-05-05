@@ -35,11 +35,11 @@ public class PyMethod extends PyObject implements DynLinkable, InvocationHandler
     public PyObject im_class;
 
     /** The function (or other callable) implementing a method */
-    @ExposedGet(doc = BuiltinDocs.method___func___doc)
+    @ExposedGet
     public PyObject __func__;
 
     /** The instance to which a method is bound; None for unbound methods */
-    @ExposedGet(doc = BuiltinDocs.method___self___doc)
+    @ExposedGet
     public PyObject __self__;
 
     public PyMethod(PyObject function, PyObject self, PyObject type) {
@@ -285,7 +285,7 @@ public class PyMethod extends PyObject implements DynLinkable, InvocationHandler
 
     @ExposedGet(name = "__doc__")
     public PyObject getDoc() {
-        return __func__.__getattr__("__doc__");
+        return Abstract._PyObject_GetAttrId(__func__, "__doc__");
     }
 
     // FIXME this should work, but it has a dependency on our descriptor mechanism!

@@ -45,8 +45,14 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
     }
 
     @ExposedGet(name = "__doc__")
-    public String getDoc() {
-        return meth.getDoc();
+    public PyObject getDoc() {
+        return PyType.getBuiltinDoc(dtype.fastGetName() + "_" + name + "_doc");
+//        return meth.getDoc();
+    }
+
+    @ExposedGet(name = "__text_signature__")
+    public PyObject textSignature() {
+        return PyType.getBuiltinDoc(dtype.fastGetName() + "_" + name + "_sig");
     }
 
     public int getMaxargs() {

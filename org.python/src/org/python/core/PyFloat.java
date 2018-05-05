@@ -76,12 +76,12 @@ public class PyFloat extends PyObject {
         return new PyFloat(subtype, ((PyFloat) floatObject).getValue());
     }
 
-    @ExposedGet(name = "real", doc = BuiltinDocs.float_real_doc)
+    @ExposedGet(name = "real")
     public PyObject getReal() {
         return float___float__();
     }
 
-    @ExposedGet(name = "imag", doc = BuiltinDocs.float_imag_doc)
+    @ExposedGet(name = "imag")
     public PyObject getImag() {
         return ZERO;
     }
@@ -907,7 +907,7 @@ public class PyFloat extends PyObject {
         }
     }
 
-    @ExposedClassMethod(doc = BuiltinDocs.float___setformat___doc)
+    @ExposedClassMethod
     public static void float___setformat__(PyType type, String typestr, String format) {
         Format new_format = null;
         if (!"double".equals(typestr) && !"float".equals(typestr)) {

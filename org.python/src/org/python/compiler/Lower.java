@@ -22,6 +22,8 @@ import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.If;
+import org.python.antlr.ast.Iter;
+import org.python.antlr.ast.IterNext;
 import org.python.antlr.ast.Lambda;
 import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Name;
@@ -150,14 +152,12 @@ public class Lower extends Visitor {
     public Object visitFor(For node) {
         traverse(node);
         String tmp = "(tmp)" + counter++;
-        Name storeTmp = new Name(node, tmp, expr_contextType.Store);
-        Name iter = new Name(node, "iter", expr_contextType.Load);
-        Call callIter = new Call(node, iter, Arrays.asList(node.getInternalIter()), null);
-        Assign setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
-        Name loadTmp = new Name(node, tmp, expr_contextType.Load);
-        Name next = new Name(node, "next", expr_contextType.Load);
-        Call callNext = new Call(node, next, Arrays.asList(loadTmp), null);
-        Assign setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
+        expr storeTmp = new Name(node, tmp, expr_contextType.Store);
+        expr callIter = new Iter(node, node.getInternalIter());
+        stmt setTmp = new Assign(node, Arrays.asList(storeTmp), callIter);
+        expr loadTmp = new Name(node, tmp, expr_contextType.Load);
+        expr callNext = new IterNext(node, loadTmp);
+        stmt setElt = new Assign(node, Arrays.asList(node.getInternalTarget()), callNext);
         stmt _breakFor = new ExitFor(node);
         excepthandler handler = new ExceptHandler(node, new Name(node, "StopIteration", expr_contextType.Load),
                 null, Arrays.asList(_breakFor));

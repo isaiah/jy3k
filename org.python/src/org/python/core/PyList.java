@@ -61,9 +61,12 @@ public class PyList extends PySequenceList implements List {
 
     public PyList(PyType type, Collection c) {
         super(type);
-        list = new ArrayList<PyObject>(c.size());
-        for (Object o : c) {
-            add(o);
+        int size = c != null ? c.size() : 0;
+        list = new ArrayList<>(size);
+        if (size > 0) {
+            for (Object o : c) {
+                add(o);
+            }
         }
     }
 
@@ -867,7 +870,7 @@ public class PyList extends PySequenceList implements List {
         return list___hash__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.list___hash___doc)
+    @ExposedMethod
     public final synchronized int list___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }

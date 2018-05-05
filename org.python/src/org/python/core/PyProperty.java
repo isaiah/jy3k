@@ -12,13 +12,13 @@ public class PyProperty extends PyObject implements Traverseproc {
 
     public static final PyType TYPE = PyType.fromClass(PyProperty.class);
 
-    @ExposedGet(doc = BuiltinDocs.property_fget_doc)
+    @ExposedGet
     protected PyObject fget;
 
-    @ExposedGet(doc = BuiltinDocs.property_fset_doc)
+    @ExposedGet
     protected PyObject fset;
 
-    @ExposedGet(doc = BuiltinDocs.property_fdel_doc)
+    @ExposedGet
     protected PyObject fdel;
 
     /** Whether this property's __doc__ was copied from its getter. */

@@ -28,6 +28,7 @@ import java.lang.invoke.MethodType;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,19 +62,29 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     protected PyObject qualname;
 
-    /** __base__, the direct base type or null. */
+    /**
+     * __base__, the direct base type or null.
+     */
     protected PyType base;
 
-    /** __bases__, the base classes. */
+    /**
+     * __bases__, the base classes.
+     */
     protected PyObject[] bases = new PyObject[0];
 
-    /** The real, internal __dict__. */
+    /**
+     * The real, internal __dict__.
+     */
     protected PyObject dict;
 
-    /** __mro__, the method resolution. order */
+    /**
+     * __mro__, the method resolution. order
+     */
     protected PyObject[] mro;
 
-    /** __flags__, the type's options. */
+    /**
+     * __flags__, the type's options.
+     */
     private long tp_flags;
 
     /**
@@ -82,42 +93,66 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     protected Class<?> underlying_class;
 
-    /** Whether it's a builtin type. */
+    /**
+     * Whether it's a builtin type.
+     */
     protected boolean builtin;
 
-    /** Whether new instances of this type can be instantiated */
+    /**
+     * Whether new instances of this type can be instantiated
+     */
     protected boolean instantiable = true;
 
-    /** Whether this type implements descriptor __get/set/delete__ methods. */
+    /**
+     * Whether this type implements descriptor __get/set/delete__ methods.
+     */
     boolean hasGet;
     boolean hasSet;
     boolean hasDelete;
 
-    /** Whether this type allows subclassing. */
+    /**
+     * Whether this type allows subclassing.
+     */
     private boolean isBaseType = true;
 
-    /** To be used as the key to access the strings in BuiltinDocs.java */
+    /**
+     * To be used as the key to access the strings in BuiltinDocs.java
+     */
     protected String docKey;
 
-    /** Whether this type has a __dict__. */
+    /**
+     * Whether this type has a __dict__.
+     */
     protected boolean needs_userdict;
 
-    /** Whether this type has a __weakref__ slot (however all types are weakrefable). */
+    /**
+     * Whether this type has a __weakref__ slot (however all types are weakrefable).
+     */
     protected boolean needs_weakref;
 
-    /** Whether finalization is required for this type's instances (implements __del__). */
+    /**
+     * Whether finalization is required for this type's instances (implements __del__).
+     */
     protected boolean needs_finalizer;
 
-    /** Whether this type's __getattribute__ is object.__getattribute__. */
+    /**
+     * Whether this type's __getattribute__ is object.__getattribute__.
+     */
     private volatile boolean usesObjectGetattribute;
 
-    /** MethodCacheEntry version tag. */
+    /**
+     * MethodCacheEntry version tag.
+     */
     private volatile Object versionTag = new Object();
 
-    /** The number of __slots__ defined. */
+    /**
+     * The number of __slots__ defined.
+     */
     private int numSlots;
 
-    /** type slots */
+    /**
+     * type slots
+     */
     public MethodHandle call;
     public MethodHandle iter;
     public MethodHandle iternext;
@@ -137,14 +172,20 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     private transient ReferenceQueue<PyType> subclasses_refq = new ReferenceQueue<PyType>();
     private Set<WeakReference<PyType>> subclasses = new HashSet<>();
 
-    /** Global mro cache. */
+    /**
+     * Global mro cache.
+     */
     private static final MethodCache methodCache = new MethodCache();
 
-    /** Mapping of Java classes to their PyTypes. */
+    /**
+     * Mapping of Java classes to their PyTypes.
+     */
     private static Map<Class<?>, PyType> class_to_type;
     private static Set<PyType> exposedTypes;
 
-    /** Mapping of Java classes to their TypeBuilders. */
+    /**
+     * Mapping of Java classes to their TypeBuilders.
+     */
     private static Map<Class<?>, TypeBuilder> classToBuilder;
 
     protected PyType(PyType subtype) {
@@ -164,7 +205,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     @ExposedNew
     public static final PyObject type_new(PyNewWrapper new_, boolean init, PyType metatype,
-                                        PyObject[] args, String[] keywords) {
+                                          PyObject[] args, String[] keywords) {
         // Special case: type(x) should return x.getType()
         if (metatype == TYPE) {
             if (args.length == 1 && keywords.length == 0) {
@@ -203,7 +244,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     public static PyObject newType(PyNewWrapper new_, PyType metatype, PyObject[] args, String[] keywords) {
         String name = args[0].asString();
-        PyTuple bases = (PyTuple)args[1];
+        PyTuple bases = (PyTuple) args[1];
         PyObject dict = args[2];
         if (!(dict instanceof PyDict)) {
             throw Py.TypeError("type(): argument 3 must be dict, not " + dict.getType());
@@ -228,10 +269,10 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         PyType type;
         type = new PyType(metatype);
-        dict = ((PyDict)dict).copy();
+        dict = ((PyDict) dict).copy();
 
         type.name = name;
-        type.bases = tmpBases.length == 0 ? new PyObject[] {PyObject.TYPE} : tmpBases;
+        type.bases = tmpBases.length == 0 ? new PyObject[]{PyObject.TYPE} : tmpBases;
         type.dict = dict;
         type.qualname = dict.__finditem__("__qualname__");
         if (type.qualname != null) {
@@ -275,7 +316,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         PyType base = type.base = best_base(type.bases);
         if (!base.isBaseType) {
             throw Py.TypeError(String.format("type '%.100s' is not an acceptable base type",
-                                             base.name));
+                    base.name));
         }
         type.getattro = base.getattro;
 
@@ -285,7 +326,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         for (PyObject cur : type.bases) {
             if (cur instanceof PyType)
-                ((PyType)cur).attachSubclass(type);
+                ((PyType) cur).attachSubclass(type);
         }
         if (type.getattro == null) {
             type.getattro = GEN_GETATTR;
@@ -363,14 +404,14 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
             // Secondary bases may provide weakrefs or dict
             if (bases.length > 1
-                && ((mayAddDict && !wantDict) || (mayAddWeak && !wantWeak))) {
+                    && ((mayAddDict && !wantDict) || (mayAddWeak && !wantWeak))) {
                 for (PyObject base : bases) {
                     if (base == this.base) {
                         // Skip primary base
                         continue;
                     }
 
-                    PyType baseType = (PyType)base;
+                    PyType baseType = (PyType) base;
                     if (mayAddDict && !wantDict && baseType.needs_userdict) {
                         wantDict = true;
                     }
@@ -444,7 +485,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         @Override
         public void invokeSet(PyObject obj, Object value) {
-            obj.setDict((PyObject)value);
+            obj.setDict((PyObject) value);
         }
 
         @Override
@@ -473,23 +514,23 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     private void createWeakrefSlot() {
         String doc = "list of weak references to the object (if defined)";
         dict.__setitem__("__weakref__", new PyDataDescr(this, "__weakref__", PyObject.class, doc) {
-                private static final String writeMsg =
-                        "attribute '%s' of '%s' objects is not writable";
+            private static final String writeMsg =
+                    "attribute '%s' of '%s' objects is not writable";
 
-                private void notWritable(PyObject obj) {
-                    throw Py.AttributeError(String.format(writeMsg, "__weakref__",
-                                                          obj.getType().fastGetName()));
-                }
+            private void notWritable(PyObject obj) {
+                throw Py.AttributeError(String.format(writeMsg, "__weakref__",
+                        obj.getType().fastGetName()));
+            }
 
-                @Override
-                public boolean implementsDescrGet() {
-                    return true;
-                }
+            @Override
+            public boolean implementsDescrGet() {
+                return true;
+            }
 
-                @Override
-                public Object invokeGet(PyObject obj) {
-                    PyList weakrefs = WeakrefModule.getweakrefs(obj);
-                    switch (weakrefs.size()) {
+            @Override
+            public Object invokeGet(PyObject obj) {
+                PyList weakrefs = WeakrefModule.getweakrefs(obj);
+                switch (weakrefs.size()) {
                     case 0:
                         return Py.None;
                     case 1:
@@ -497,30 +538,30 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                     default:
                         return weakrefs;
 
-                    }
                 }
+            }
 
-                @Override
-                public boolean implementsDescrSet() {
-                    return true;
-                }
+            @Override
+            public boolean implementsDescrSet() {
+                return true;
+            }
 
-                @Override
-                public void invokeSet(PyObject obj, Object value) {
-                    // XXX: Maybe have PyDataDescr do notWritable() for us
-                    notWritable(obj);
-                }
+            @Override
+            public void invokeSet(PyObject obj, Object value) {
+                // XXX: Maybe have PyDataDescr do notWritable() for us
+                notWritable(obj);
+            }
 
-                @Override
-                public boolean implementsDescrDelete() {
-                    return true;
-                }
+            @Override
+            public boolean implementsDescrDelete() {
+                return true;
+            }
 
-                @Override
-                public void invokeDelete(PyObject obj) {
-                    notWritable(obj);
-                }
-            });
+            @Override
+            public void invokeDelete(PyObject obj) {
+                notWritable(obj);
+            }
+        });
         needs_weakref = true;
     }
 
@@ -607,7 +648,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     protected void init(Class<?> forClass, Set<PyJavaType> needsInners) {
         underlying_class = forClass;
         if (underlying_class == PyObject.class) {
-            mro = new PyType[] {this};
+            mro = new PyType[]{this};
         } else {
             Class<?> baseClass;
             if (!BootstrapTypesSingleton.getInstance().contains(underlying_class)) {
@@ -632,17 +673,17 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             getattro = GEN_GETATTR;
         }
         docKey = builder.getDoc();
-        if (dict.__finditem__("__doc__") == null) {
-            PyObject docObj;
-            if (docKey != null) {
-                docObj = new PyUnicode(docKey, true);
-                dict.__setitem__("__doc__", docObj);
-            } else {
-                if (Py.None != null) {
-                    dict.__setitem__("__doc__", Py.None);
-                }
-            }
-        }
+//        if (dict.__finditem__("__doc__") == null) {
+//            PyObject docObj;
+//            if (docKey != null) {
+//                docObj = new PyUnicode(docKey, true);
+//                dict.__setitem__("__doc__", docObj);
+//            } else {
+//                if (Py.None != null) {
+//                    dict.__setitem__("__doc__", Py.None);
+//                }
+//            }
+//        }
         setIsBaseType(builder.getIsBaseType());
         needs_userdict = dict.__finditem__("__dict__") != null;
         instantiable = dict.__finditem__("__new__") != null;
@@ -658,10 +699,10 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         mro = new PyType[base.mro.length + 1];
         System.arraycopy(base.mro, 0, mro, 1, base.mro.length);
         mro[0] = this;
-        bases = new PyObject[] {base};
+        bases = new PyObject[]{base};
     }
 
-    
+
     /**
      * Determine if this type is a descriptor, and if so what kind.
      */
@@ -706,9 +747,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     public void compatibleForAssignment(PyType other, String attribute) {
         if (!getLayout().equals(other.getLayout()) || needs_userdict != other.needs_userdict
-            || needs_finalizer != other.needs_finalizer) {
+                || needs_finalizer != other.needs_finalizer) {
             throw Py.TypeError(String.format("%s assignment: '%s' object layout differs from '%s'",
-                                             attribute, other.fastGetName(), fastGetName()));
+                    attribute, other.fastGetName(), fastGetName()));
         }
     }
 
@@ -729,7 +770,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      * Get the most parent Java proxy Class from bases, tallying any encountered Java
      * interfaces.
      *
-     * @param bases array of base Jython classes
+     * @param bases      array of base Jython classes
      * @param interfaces List for collecting interfaces to
      * @return base Java proxy Class
      * @raises Py.TypeError if multiple Java inheritance was attempted
@@ -741,7 +782,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             if (!(base instanceof PyType)) {
                 continue;
             }
-            Class<?> proxy = ((PyType)base).getProxyType();
+            Class<?> proxy = ((PyType) base).getProxyType();
             if (proxy == null) {
                 continue;
             }
@@ -763,7 +804,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      * Setup the javaProxy for this type.
      *
      * @param baseProxyClass this type's base proxyClass
-     * @param interfaces a list of Java interfaces in bases
+     * @param interfaces     a list of Java interfaces in bases
      */
     private void setupProxy(Class<?> baseProxyClass, List<Class<?>> interfaces) {
         if (baseProxyClass == null && interfaces.size() == 0) {
@@ -777,8 +818,8 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             proxyName = module.toString() + "$" + proxyName;
         }
         Class<?> proxyClass = MakeProxies.makeProxy(baseProxyClass, interfaces, name, proxyName,
-                                                    dict);
-        JyAttribute.setAttr(this, JyAttribute.JAVA_PROXY_ATTR, proxyClass); 
+                dict);
+        JyAttribute.setAttr(this, JyAttribute.JAVA_PROXY_ATTR, proxyClass);
 
         PyType proxyType = PyType.fromClass(proxyClass, false);
         List<PyObject> cleanedBases = new ArrayList<>();
@@ -788,7 +829,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 cleanedBases.add(base);
                 continue;
             }
-            Class<?> proxy = ((PyType)base).getProxyType();
+            Class<?> proxy = ((PyType) base).getProxyType();
             if (proxy == null) {
                 // non-proxy types go straight into our lookup
                 cleanedBases.add(base);
@@ -826,10 +867,18 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         int hash1 = object___hash__();
         int hash2 = other.object___hash__();
         switch (op) {
-            case EQ: return hash1 == hash2 ? Py.True : Py.False;
-            case NE: return hash1 != hash2 ? Py.True : Py.False;
-            default: return Py.NotImplemented;
+            case EQ:
+                return hash1 == hash2 ? Py.True : Py.False;
+            case NE:
+                return hash1 != hash2 ? Py.True : Py.False;
+            default:
+                return Py.NotImplemented;
         }
+    }
+
+    @ExposedGet(name = "__doc__")
+    public PyObject getDoc() {
+        return getBuiltinDoc(name + "_doc");
     }
 
     @ExposedGet(name = "__base__")
@@ -837,6 +886,21 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (base == null)
             return Py.None;
         return base;
+    }
+
+    static PyObject getBuiltinDoc(String fieldName) {
+        try {
+            Field docField =  BuiltinDocs.class.getField(fieldName);
+            String doc = (String) docField.get(null);
+            return doc == null ? Py.None : new PyUnicode(doc);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return Py.None;
+        }
+    }
+
+    @ExposedGet(name = "__text_signature__")
+    public PyObject textSignature() {
+        return getBuiltinDoc(name + "_sig");
     }
 
     @ExposedGet(name = "__bases__")
@@ -854,13 +918,13 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (!(newBasesTuple instanceof PyTuple)) {
             throw Py.TypeError("bases must be a tuple");
         }
-        PyObject[] newBases = ((PyTuple)newBasesTuple).getArray();
+        PyObject[] newBases = ((PyTuple) newBasesTuple).getArray();
         if (newBases.length == 0) {
             throw Py.TypeError("can only assign non-empty tuple to __bases__, not "
-                               + newBasesTuple);
+                    + newBasesTuple);
         }
         for (int i = 0; i < newBases.length; i++) {
-            if (((PyType)newBases[i]).isSubType(this)) {
+            if (((PyType) newBases[i]).isSubType(this)) {
                 throw Py.TypeError("a __bases__ item causes an inheritance cycle");
             }
         }
@@ -877,18 +941,18 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             mro_subclasses(savedSubMros);
             for (PyObject saved : savedBases) {
                 if (saved instanceof PyType) {
-                    ((PyType)saved).detachSubclass(this);
+                    ((PyType) saved).detachSubclass(this);
                 }
             }
             for (PyObject newb : newBases) {
                 if (newb instanceof PyType) {
-                    ((PyType)newb).attachSubclass(this);
+                    ((PyType) newb).attachSubclass(this);
                 }
             }
         } catch (PyException t) {
-            for (Iterator<Object> it = savedSubMros.iterator(); it.hasNext();) {
-                PyType subtype = (PyType)it.next();
-                PyObject[] subtypeSavedMro = (PyObject[])it.next();
+            for (Iterator<Object> it = savedSubMros.iterator(); it.hasNext(); ) {
+                PyType subtype = (PyType) it.next();
+                PyObject[] subtypeSavedMro = (PyObject[]) it.next();
                 subtype.mro = subtypeSavedMro;
             }
             bases = savedBases;
@@ -912,8 +976,8 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      * Call __set_name__ on all descriptors in a newly generated type
      */
     private static boolean setNames(PyType type) {
-        Map<? extends PyObject, PyObject> namesToSet = new HashMap(((PyDict)type.dict).getMap());
-        for (Map.Entry<? extends PyObject, PyObject> entry: namesToSet.entrySet()) {
+        Map<? extends PyObject, PyObject> namesToSet = new HashMap(((PyDict) type.dict).getMap());
+        for (Map.Entry<? extends PyObject, PyObject> entry : namesToSet.entrySet()) {
             PyObject func = entry.getValue().__findattr__("__set_name__");
             if (func != null) {
                 func.__call__(type, entry.getKey());
@@ -924,7 +988,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     private static void initSubclass(PyType type, PyObject[] args, String[] keywords) {
         ThreadState state = Py.getThreadState();
-        PyObject sup = Abstract.PyObject_Call(state, PySuper.TYPE, new PyObject[] {type, type}, Py.NoKeywords);
+        PyObject sup = Abstract.PyObject_Call(state, PySuper.TYPE, new PyObject[]{type, type}, Py.NoKeywords);
         PyObject func = Abstract._PyObject_GetAttrId(sup, "__init_subclass__");
         Abstract.PyObject_Call(state, func, args, keywords);
     }
@@ -943,12 +1007,12 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             for (PyObject cls : result) {
                 if (!(cls instanceof PyType)) {
                     throw Py.TypeError(String.format("mro() returned a non-class ('%.500s')",
-                                                     cls.getType().fastGetName()));
+                            cls.getType().fastGetName()));
                 }
-                PyType t = (PyType)cls;
+                PyType t = (PyType) cls;
                 if (!solid.isSubType(solid_base(t))) {
                     throw Py.TypeError(String.format("mro() returned base with unsuitable layout "
-                                                     + "('%.500s')", t.fastGetName()));
+                            + "('%.500s')", t.fastGetName()));
                 }
             }
             mro = result;
@@ -1054,7 +1118,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (o == Py.None || o == null) {
             return new PyList(computeMro());
         }
-        return new PyList(((PyType)o).computeMro());
+        return new PyList(((PyType) o).computeMro());
     }
 
     PyObject[] computeMro() {
@@ -1064,7 +1128,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 if (bases[j] == cur) {
                     PyObject name = cur.__findattr__("__name__");
                     throw Py.TypeError("duplicate base class " +
-                                       (name == null ? "?" : name.toString()));
+                            (name == null ? "?" : name.toString()));
                 }
             }
         }
@@ -1072,7 +1136,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         MROMergeState[] toMerge = new MROMergeState[bases.length + 1];
         for (int i = 0; i < bases.length; i++) {
             toMerge[i] = new MROMergeState();
-            toMerge[i].mro = ((PyType)bases[i]).mro;
+            toMerge[i].mro = ((PyType) bases[i]).mro;
         }
         toMerge[bases.length] = new MROMergeState();
         toMerge[bases.length].mro = bases;
@@ -1085,8 +1149,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     PyObject[] computeMro(MROMergeState[] toMerge, List<PyObject> mro) {
         boolean addedProxy = false;
         PyType proxyAsType = !JyAttribute.hasAttr(this, JyAttribute.JAVA_PROXY_ATTR) ?
-            null : PyType.fromClass(((Class<?>)JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR)), false);
-        scan : for (int i = 0; i < toMerge.length; i++) {
+                null : PyType.fromClass(((Class<?>) JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR)), false);
+        scan:
+        for (int i = 0; i < toMerge.length; i++) {
             if (toMerge[i].isMerged()) {
                 continue scan;
             }
@@ -1100,9 +1165,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             if (!addedProxy && !(this instanceof PyJavaType) && candidate instanceof PyJavaType
                     && JyAttribute.hasAttr(candidate, JyAttribute.JAVA_PROXY_ATTR)
                     && PyProxy.class.isAssignableFrom(
-                        ((Class<?>)JyAttribute.getAttr(candidate, JyAttribute.JAVA_PROXY_ATTR)))
+                    ((Class<?>) JyAttribute.getAttr(candidate, JyAttribute.JAVA_PROXY_ATTR)))
                     && JyAttribute.getAttr(candidate, JyAttribute.JAVA_PROXY_ATTR) !=
-                        JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR)) {
+                    JyAttribute.getAttr(this, JyAttribute.JAVA_PROXY_ATTR)) {
                 // If this is a subclass of a Python class that subclasses a Java class, slip the
                 // proxy for this class in before the proxy class in the superclass' mro.
                 // This exposes the methods from the proxy generated for this class in addition to
@@ -1136,7 +1201,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 + "order (MRO) for bases ");
         Set<PyObject> set = new HashSet<>();
         for (MROMergeState mergee : toMerge) {
-            if(!mergee.isMerged()) {
+            if (!mergee.isMerged()) {
                 set.add(mergee.mro[0]);
             }
         }
@@ -1148,7 +1213,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             } else {
                 msg.append(", ");
             }
-            msg.append(name == null ? "?" : name.toString() + new PyList(((PyType)unmerged).bases));
+            msg.append(name == null ? "?" : name.toString() + new PyList(((PyType) unmerged).bases));
         }
         throw Py.TypeError(msg.toString());
     }
@@ -1202,15 +1267,15 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             if (!(base instanceof PyType)) {
                 throw Py.TypeError("bases must be types");
             }
-            candidate = solid_base((PyType)base);
+            candidate = solid_base((PyType) base);
             if (winner == null) {
                 winner = candidate;
-                best = (PyType)base;
+                best = (PyType) base;
             } else if (winner.isSubType(candidate)) {
                 continue;
             } else if (candidate.isSubType(winner)) {
                 winner = candidate;
-                best = (PyType)base;
+                best = (PyType) base;
             } else {
                 throw Py.TypeError("multiple bases have instance lay-out conflict");
             }
@@ -1253,7 +1318,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 continue;
             }
             throw Py.TypeError("metaclass conflict: the metaclass of a derived class must be a "
-                               + "(non-strict) subclass of the metaclasses of all its bases");
+                    + "(non-strict) subclass of the metaclasses of all its bases");
         }
         return winner;
     }
@@ -1334,25 +1399,25 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     /**
      * Attribute lookup for name through mro objects' dicts. Lookups are cached.
-     *
+     * <p>
      * Returns where in the mro the attribute was found at where[0].
      *
-     * @param name attribute name (must be interned)
+     * @param name  attribute name (must be interned)
      * @param where Where in the mro the attribute was found is written to index 0
      * @return found object or null
      */
     public PyObject lookup_where(String name, PyObject[] where) {
-    	if (methodCache == null) System.out.println("method cache is null");
+        if (methodCache == null) System.out.println("method cache is null");
         return methodCache.lookup_where(this, name, where);
     }
 
     /**
      * Attribute lookup for name through mro objects' dicts. This isn't cached, and should
      * generally only be used during the bootstrapping of a type.
-     *
+     * <p>
      * Returns where in the mro the attribute was found at where[0].
      *
-     * @param name attribute name (must be interned)
+     * @param name  attribute name (must be interned)
      * @param where Where in the mro the attribute was found is written to index 0
      * @return found object or null
      */
@@ -1395,8 +1460,8 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 // So break out of this infinite loop by ignoring this entry for super purposes.
                 // The use of super__ parallels the workaround seen in PyReflectedFunction
                 // Fixes http://bugs.jython.org/issue1540
-                if(!name.startsWith("super__")) {
-                     lookupName = "super__" + name;
+                if (!name.startsWith("super__")) {
+                    lookupName = "super__" + name;
                 } else {
                     lookupName = name;
                 }
@@ -1423,7 +1488,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (class_to_type.containsKey(forClass)) {
             if (!BootstrapTypesSingleton.getInstance().remove(forClass)) {
                 Py.writeWarning("init", "Bootstrapping class not in BootstrapTypesSingleton.getInstance()[class="
-                                + forClass + "]");
+                        + forClass + "]");
             }
             // The types in BootstrapTypesSingleton.getInstance() are initialized before their builders are assigned,
             // so do the work of addFromClass & fillFromClass after the fact
@@ -1443,7 +1508,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     static boolean hasBuilder(Class<?> c) {
         return classToBuilder != null && classToBuilder.containsKey(c);
     }
-    
+
     private static TypeBuilder getBuilder(Class<?> c) {
         if (classToBuilder == null) {
             // PyType itself has yet to be initialized.  This should be a bootstrap type, so it'll
@@ -1464,7 +1529,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         } catch (ClassNotFoundException e) {
             // Well, this is certainly surprising.
             throw new RuntimeException("Got ClassNotFound calling Class.forName on an already "
-                + " found class.", e);
+                    + " found class.", e);
         } catch (ExceptionInInitializerError e) {
             throw Py.JavaError(e);
         } catch (SecurityException e) {
@@ -1474,9 +1539,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (builder == null && exc != null) {
             Py.writeComment("type",
                     "Unable to initialize " + c.getName() + ", a PyObject subclass, due to a " +
-                    "security exception, and no type builder could be found for it. If it's an " +
-                    "exposed type, it may not work properly.  Security exception: " +
-                    exc.getMessage());
+                            "security exception, and no type builder could be found for it. If it's an " +
+                            "exposed type, it may not work properly.  Security exception: " +
+                            exc.getMessage());
         }
         return builder;
     }
@@ -1554,7 +1619,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             if (exposedTypes == null) {
                 exposedTypes = new HashSet<>();
             }
-            exposedTypes.add(result) ;
+            exposedTypes.add(result);
         }
 
         return result;
@@ -1648,7 +1713,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     public void __setattr__(String name, PyObject value) {
-         type___setattr__(name, value);
+        type___setattr__(name, value);
     }
 
     /**
@@ -1710,10 +1775,10 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             }
         } else if (name == "__getattribute__") {
             traverse_hierarchy(false, new OnType() {
-                    public boolean onType(PyType type) {
-                        return (type.usesObjectGetattribute = false);
-                    }
-                });
+                public boolean onType(PyType type) {
+                    return (type.usesObjectGetattribute = false);
+                }
+            });
         }
     }
 
@@ -1788,11 +1853,11 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     protected void invalidateMethodCache() {
         traverse_hierarchy(false, new OnType() {
-                public boolean onType(PyType type) {
-                    type.versionTag = new Object();
-                    return false;
-                }
-            });
+            public boolean onType(PyType type) {
+                type.versionTag = new Object();
+                return false;
+            }
+        });
     }
 
     /* Routines to do a method lookup in the type without looking in the
@@ -1936,10 +2001,10 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         // guarded by __setattr__ to prevent modification of builtins
         if (!(name instanceof PyUnicode)) {
             throw Py.TypeError(String.format("can only assign string to %s.__name__, not '%s'",
-                                             this.name, name.getType().fastGetName()));
+                    this.name, name.getType().fastGetName()));
         }
         String nameStr = name.toString();
-        if (nameStr.indexOf((char)0) > -1) {
+        if (nameStr.indexOf((char) 0) > -1) {
             throw Py.ValueError("__name__ must not contain null bytes");
         }
         setName(nameStr);
@@ -1972,24 +2037,12 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     public void setDict(PyObject newDict) {
         // Analogous to CPython's descrobject:getset_set
         throw Py.AttributeError(String.format("attribute '__dict__' of '%s' objects is not "
-                                              + "writable", getType().fastGetName()));
+                + "writable", getType().fastGetName()));
     }
 
     @ExposedDelete(name = "__dict__")
     public void delDict() {
         setDict(null);
-    }
-
-    /**
-     * Equivalent of CPython's typeobject.c::type_get_doc; handles __doc__ descriptors.
-     */
-    @ExposedGet(name = "__doc__")
-    public PyObject getDoc() {
-        PyObject doc = dict.__finditem__("__doc__");
-        if (doc == null) {
-            return Py.None;
-        }
-        return doc.__get__(null, this);
     }
 
     boolean getUsesObjectGetattribute() {
@@ -2002,7 +2055,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
     public Object __tojava__(Class<?> c) {
         if (underlying_class != null && (c == Object.class || c == Class.class ||
-                                         c == Serializable.class)) {
+                c == Serializable.class)) {
             return underlying_class;
         }
         return super.__tojava__(c);
@@ -2047,7 +2100,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 ? tp_flags | Py.TPFLAGS_IS_ABSTRACT
                 : tp_flags & ~Py.TPFLAGS_IS_ABSTRACT;
     }
-    
+
     public int getNumSlots() {
         return numSlots;
     }
@@ -2076,7 +2129,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     public void noAttributeError(String name) {
         throw Py.AttributeError(String.format("type object '%.50s' has no attribute '%.400s'",
-                                              fastGetName(), name));
+                fastGetName(), name));
     }
 
     //XXX: consider pulling this out into a generally accessible place
@@ -2095,7 +2148,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         String msg = "__slots__ must be identifiers";
         if (identifier.length() == 0
-            || (!Character.isLetter(identifier.charAt(0)) && identifier.charAt(0) != '_')) {
+                || (!Character.isLetter(identifier.charAt(0)) && identifier.charAt(0) != '_')) {
             throw Py.TypeError(msg);
         }
         for (char c : identifier.toCharArray()) {
@@ -2106,7 +2159,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         return identifier;
     }
 
-    /** Used when serializing this type. */
+    /**
+     * Used when serializing this type.
+     */
     protected Object writeReplace() {
         return new TypeResolver(underlying_class, getModule().toString(), getName());
     }
@@ -2152,7 +2207,9 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     static class MROMergeState {
 
-        /** The mro of the base type we're representing. */
+        /**
+         * The mro of the base type we're representing.
+         */
         public PyObject[] mro;
 
         /**
@@ -2212,10 +2269,14 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
      */
     static class MethodCache {
 
-        /** The fixed size cache. */
+        /**
+         * The fixed size cache.
+         */
         private final AtomicReferenceArray<MethodCacheEntry> table;
 
-        /** Size of the cache exponent (2 ** SIZE_EXP). */
+        /**
+         * Size of the cache exponent (2 ** SIZE_EXP).
+         */
         public static final int SIZE_EXP = 11;
 
         public MethodCache() {
@@ -2250,7 +2311,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                 // we'll cache a bad entry. Bad entries and CAS failures aren't a concern
                 // as subsequent lookups will sort themselves out
                 table.compareAndSet(index, entry, new MethodCacheEntry(versionTag, name, where[0],
-                                                                       value));
+                        value));
             }
             return value;
         }
@@ -2264,7 +2325,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         /**
          * Determine if name is cacheable.
-         *
+         * <p>
          * Since the cache can keep references to names alive longer than usual, it avoids
          * caching unusually large strings.
          */
@@ -2274,13 +2335,19 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
 
         static class MethodCacheEntry extends WeakReference<PyObject> {
 
-            /** Version of the entry, a PyType.versionTag. */
+            /**
+             * Version of the entry, a PyType.versionTag.
+             */
             private final Object version;
 
-            /** The name of the attribute. */
+            /**
+             * The name of the attribute.
+             */
             private final String name;
 
-            /** Where in the mro the value was found. */
+            /**
+             * Where in the mro the value was found.
+             */
             private final WeakReference<PyObject> where;
 
             static final MethodCacheEntry EMPTY = new MethodCacheEntry();
@@ -2321,7 +2388,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             }
         }
         //bases cannot be null
-        for (PyObject ob: bases) {
+        for (PyObject ob : bases) {
             if (ob != null) {
                 retVal = visit.visit(ob, arg);
                 if (retVal != 0) {
@@ -2336,7 +2403,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             }
         }
         if (mro != null) {
-            for (PyObject ob: mro) {
+            for (PyObject ob : mro) {
                 retVal = visit.visit(ob, arg);
                 if (retVal != 0) {
                     return retVal;
@@ -2355,13 +2422,13 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             return false;
         }
         //bases cannot be null
-        for (PyObject obj: bases) {
+        for (PyObject obj : bases) {
             if (obj == ob) {
                 return true;
             }
         }
         if (mro != null) {
-            for (PyObject obj: mro) {
+            for (PyObject obj : mro) {
                 if (obj == ob) {
                     return true;
                 }

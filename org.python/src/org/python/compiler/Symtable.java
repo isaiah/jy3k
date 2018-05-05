@@ -197,16 +197,14 @@ public class Symtable extends Visitor {
     }
 
     private void visitAnnotations(arguments a, expr returns) {
-        if (a != null) {
-            visitArgannotations(a.getInternalArgs());
-            if (a.getInternalVararg() != null && a.getInternalVararg().getInternalAnnotation() != null) {
-                visit(a.getInternalVararg().getInternalAnnotation());
-            }
-            if (a.getInternalKwarg() != null && a.getInternalKwarg().getInternalAnnotation() != null) {
-                visit(a.getInternalKwarg().getInternalAnnotation());
-            }
-            visitArgannotations(a.getInternalKwonlyargs());
+        visitArgannotations(a.getInternalArgs());
+        if (a.getInternalVararg() != null && a.getInternalVararg().getInternalAnnotation() != null) {
+            visit(a.getInternalVararg().getInternalAnnotation());
         }
+        if (a.getInternalKwarg() != null && a.getInternalKwarg().getInternalAnnotation() != null) {
+            visit(a.getInternalKwarg().getInternalAnnotation());
+        }
+        visitArgannotations(a.getInternalKwonlyargs());
         if (returns != null) {
             visit(returns);
         }

@@ -80,6 +80,7 @@ public class AstModule {
         dict.__setitem__("ClassDef", ClassDef.TYPE);
         dict.__setitem__("Compare", Compare.TYPE);
         dict.__setitem__("Continue", Continue.TYPE);
+        dict.__setitem__("Constant", Constant.TYPE);
         dict.__setitem__("Delete", Delete.TYPE);
         dict.__setitem__("Dict", Dict.TYPE);
         dict.__setitem__("Ellipsis", Ellipsis.TYPE);
@@ -105,6 +106,7 @@ public class AstModule {
         dict.__setitem__("ListComp", ListComp.TYPE);
         dict.__setitem__("Module", Module.TYPE);
         dict.__setitem__("Name", Name.TYPE);
+        dict.__setitem__("NameConstant", NameConstant.TYPE);
         dict.__setitem__("Num", Num.TYPE);
         dict.__setitem__("Pass", Pass.TYPE);
         dict.__setitem__("Raise", Raise.TYPE);
@@ -122,6 +124,7 @@ public class AstModule {
         dict.__setitem__("With", With.TYPE);
         dict.__setitem__("Yield", Yield.TYPE);
         dict.__setitem__("alias", alias.TYPE);
+        dict.__setitem__("arg", arg.TYPE);
         dict.__setitem__("arguments", arguments.TYPE);
         dict.__setitem__("comprehension", comprehension.TYPE);
         dict.__setitem__("excepthandler", excepthandler.TYPE);

@@ -404,22 +404,22 @@ public class PyLong extends PyObject {
         return new PyBytes(result);
     }
 
-    @ExposedGet(name = "real", doc = BuiltinDocs.int_real_doc)
+    @ExposedGet(name = "real")
     public PyObject getReal() {
         return int___int__();
     }
 
-    @ExposedGet(name = "imag", doc = BuiltinDocs.int_imag_doc)
+    @ExposedGet(name = "imag")
     public PyObject getImag() {
         return Py.newLong(0);
     }
 
-    @ExposedGet(name = "numerator", doc = BuiltinDocs.int_numerator_doc)
+    @ExposedGet(name = "numerator")
     public PyObject getNumerator() {
         return int___int__();
     }
 
-    @ExposedGet(name = "denominator", doc = BuiltinDocs.int_denominator_doc)
+    @ExposedGet(name = "denominator")
     public PyObject getDenominator() {
         return Py.newLong(1);
     }

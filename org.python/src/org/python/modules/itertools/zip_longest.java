@@ -3,19 +3,20 @@ package org.python.modules.itertools;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
-import org.python.core.BuiltinDocs;
+import org.python.annotations.SlotFunc;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import java.util.Arrays;
 
-@ExposedType(name = "itertools.zip_longest", base = PyObject.class,
-    doc = BuiltinDocs.itertools_zip_longest_doc)
+@ExposedType(name = "itertools.zip_longest")
 public class zip_longest extends PyObject {
     public static final PyType TYPE = PyType.fromClass(zip_longest.class);
 
@@ -43,6 +44,10 @@ public class zip_longest extends PyObject {
      * is true. After which iteration is stopped.
      */
     @ExposedNew
+    public static PyObject zip_longest_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new zip_longest(subtype);
+    }
+
     @ExposedMethod
     final void zip_longest___init__(PyObject[] args, String[] kwds) {
 
@@ -61,8 +66,9 @@ public class zip_longest extends PyObject {
     }
 
     private void zip_longest___init__(final PyObject[] iterables, final PyObject fillvalue) {
-        this.iterators = new PyObject[iterables.length];
-        exhausted = new boolean[iterables.length];
+        unexhausted = iterables.length;
+        this.iterators = new PyObject[unexhausted];
+        exhausted = new boolean[unexhausted];
         Arrays.fill(exhausted, false);
         for (int i = 0; i < iterables.length; i++) {
             iterators[i] = getIter(iterables[i]);
@@ -70,35 +76,36 @@ public class zip_longest extends PyObject {
         this.fillvalue = fillvalue;
     }
 
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject __iter__(PyObject self) {
+        return self;
     }
 
-    @ExposedMethod(names = "__next__")
-    public PyObject zip_longest___next__() {
-        if (unexhausted == 0) {
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject zip_longest___next__(PyObject obj) {
+        zip_longest self = (zip_longest) obj;
+        if (self.unexhausted == 0) {
             throw Py.StopIteration();
         }
-        PyObject item[] = new PyObject[iterators.length];
-        for (int i = 0; i < iterators.length; i++) {
-            if (exhausted[i]) {
-                item[i] = fillvalue;
+        PyObject item[] = new PyObject[self.iterators.length];
+        for (int i = 0; i < self.iterators.length; i++) {
+            if (self.exhausted[i]) {
+                item[i] = self.fillvalue;
             } else {
                 try {
-                    item[i] = iterNext(iterators[i]);
+                    item[i] = iterNext(self.iterators[i]);
                 } catch (PyException e) {
                     if (e.match(Py.StopIteration)) {
-                        unexhausted--;
-                        exhausted[i] = true;
-                        item[i] = fillvalue;
+                        self.unexhausted--;
+                        self.exhausted[i] = true;
+                        item[i] = self.fillvalue;
                     } else {
                         throw e;
                     }
                 }
             }
         }
-        if (unexhausted == 0) {
+        if (self.unexhausted == 0) {
             throw Py.StopIteration();
         }
         return new PyTuple(item);

@@ -1314,7 +1314,7 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         return bytearray___hash__();
     }
 
-    @ExposedMethod(doc = BuiltinDocs.bytearray___hash___doc)
+    @ExposedMethod
     public final int bytearray___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }

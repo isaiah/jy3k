@@ -507,6 +507,32 @@ public abstract class VisitorBase<R> implements VisitorIF<R> {
     public void leaveAnonymousFunction(AnonymousFunction node) {
     }
 
+    public R visitIter(Iter node) {
+        R ret = unhandled_node(node);
+        traverse(node);
+        return ret;
+    }
+
+    public boolean enterIter(Iter node) {
+        return true;
+    }
+
+    public void leaveIter(Iter node) {
+    }
+
+    public R visitIterNext(IterNext node) {
+        R ret = unhandled_node(node);
+        traverse(node);
+        return ret;
+    }
+
+    public boolean enterIterNext(IterNext node) {
+        return true;
+    }
+
+    public void leaveIterNext(IterNext node) {
+    }
+
     public R visitIfExp(IfExp node) {
         R ret = unhandled_node(node);
         traverse(node);
