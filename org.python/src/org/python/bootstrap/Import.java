@@ -290,9 +290,9 @@ public class Import {
         }
         module = new PyModule(name, null);
         PyModule builtins = (PyModule)modules.__finditem__("builtins");
-        PyObject __dict__ = module.__getattr__("__dict__");
-        __dict__.__setitem__("__builtins__", builtins);
-        __dict__.__setitem__("__package__", Py.None);
+        PyObject dict = Abstract._PyObject_GetAttrId(module, "__dict__");//module.__getattr__("__dict__");
+        dict.__setitem__("__builtins__", builtins);
+        dict.__setitem__("__package__", Py.None);
         modules.__setitem__(name, module);
         return module;
     }

@@ -46,6 +46,7 @@ org/python/core/PyMap.class
 org/python/core/PyMemoryView.class
 org/python/core/PyMethod.class
 org/python/core/PyMethodDescr.class
+org/python/core/PyMethodWrapper.class
 org/python/core/PyModule.class
 org/python/core/PyModuleDef.class
 org/python/core/PyNone.class
@@ -70,6 +71,7 @@ org/python/core/PyTupleIterator.class
 org/python/core/PyType.class
 org/python/core/PyUnicode.class
 org/python/core/PyUnicodeIterator.class
+org/python/core/PyWrapperDescr.class
 org/python/core/PyRange.class
 org/python/core/PyXRangeIter.class
 org/python/core/PyZip.class

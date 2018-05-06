@@ -19,6 +19,8 @@ import java.lang.invoke.MethodType;
  */
 @ExposedType(name = "method_descriptor", base = PyObject.class, isBaseType = false)
 public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverseproc {
+    public static final PyType TYPE = PyType.fromClass(PyMethodDescr.class);
+
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
     public static final MethodHandle CHECK_CALLER_TYPE = MH.findStatic(LOOKUP, PyMethodDescr.class, "checkCallerType", MethodType.methodType(PyObject.class, PyType.class, PyObject.class));

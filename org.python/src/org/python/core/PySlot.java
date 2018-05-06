@@ -7,6 +7,7 @@ import org.python.annotations.ExposedType;
 @Untraversable
 @ExposedType(name = "member_descriptor", base = PyObject.class, isBaseType = false)
 public class PySlot extends PyDescriptor {
+    public static final PyType TYPE = PyType.fromClass(PySlot.class);
 
     private int index;
 

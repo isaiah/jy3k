@@ -3,6 +3,7 @@ package org.python.core;
 
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
 
 @Untraversable
