@@ -14,8 +14,8 @@ import java.lang.invoke.SwitchPoint;
 
 public abstract class PyNewWrapper extends PyBuiltinMethod implements Traverseproc {
     MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
-    MethodHandle NEW_IMPL = MH.findVirtual(MethodHandles.lookup(), PyNewWrapper.class, "new_impl",
-            MethodType.methodType(PyObject.class, boolean.class, PyType.class, PyObject[].class, String[].class));
+//    MethodHandle NEW_IMPL = MH.findVirtual(MethodHandles.lookup(), PyNewWrapper.class, "new_impl",
+//            MethodType.methodType(PyObject.class, boolean.class, PyType.class, PyObject[].class, String[].class));
 
     MethodHandle WIDE_CALL = MH.findVirtual(MethodHandles.lookup(), PyNewWrapper.class, "__call__",
             MethodType.methodType(PyObject.class, PyObject[].class, String[].class));

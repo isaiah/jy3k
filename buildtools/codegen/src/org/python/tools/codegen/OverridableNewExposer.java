@@ -26,7 +26,7 @@ public class OverridableNewExposer extends Exposer {
     protected void generate() {
         generateConstructor();
         generateOfType();
-        generateOfSubtype();
+//        generateOfSubtype();
     }
 
     private void generateConstructor() {
@@ -57,14 +57,14 @@ public class OverridableNewExposer extends Exposer {
         endMethod(ARETURN);
     }
 
-    private void generateOfSubtype() {
-        startMethod("createOfSubtype", PYOBJ, PYTYPE);
-        instantiate(subtype, new Instantiator(PYTYPE) {
-
-            public void pushArgs() {
-                mv.visitVarInsn(ALOAD, 1);
-            }
-        });
-        endMethod(ARETURN);
-    }
+//    private void generateOfSubtype() {
+//        startMethod("createOfSubtype", PYOBJ, PYTYPE);
+//        instantiate(subtype, new Instantiator(PYTYPE) {
+//
+//            public void pushArgs() {
+//                mv.visitVarInsn(ALOAD, 1);
+//            }
+//        });
+//        endMethod(ARETURN);
+//    }
 }

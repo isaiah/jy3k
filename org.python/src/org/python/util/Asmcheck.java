@@ -1,5 +1,9 @@
 package org.python.util;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyType;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -18,6 +22,28 @@ public class Asmcheck {
         XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader("<a>"));
         while (reader.hasNext()) {
             reader.next();
+        }
+    }
+
+    public void test() {
+        Foo foo = new Foo(Str::str_new);
+    }
+
+    interface Bar {
+        PyObject _new(PyType tp, PyObject[] args, String[] keywords);
+    }
+
+    class Foo {
+        private Bar bar;
+
+        public Foo(Bar b) {
+            bar = b;
+        }
+    }
+
+    static class Str {
+        public static PyObject str_new(PyType tp, PyObject[] args, String[] kw) {
+            return Py.One;
         }
     }
 }

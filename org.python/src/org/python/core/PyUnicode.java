@@ -214,6 +214,7 @@ public class PyUnicode extends PySequence implements Iterable {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
     final static PyObject str_new(PyNewWrapper new_, boolean init, PyType subtype,
                                   PyObject[] args, String[] keywords) {
         ArgParser ap =

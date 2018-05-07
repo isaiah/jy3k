@@ -5,7 +5,9 @@ import java.io.Serializable;
 
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 @Untraversable
 @ExposedType(name = "builtin_function_or_method", isBaseType = false)
@@ -51,6 +53,7 @@ public abstract class PyBuiltinCallable extends PyObject {
     @ExposedGet(name = "__call__")
     public PyObject makeCall() {
         return this;
+//        return new PyMethodWrapper("__call__", this);
     }
 
     @ExposedGet(name = "__self__")

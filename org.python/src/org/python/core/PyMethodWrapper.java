@@ -12,14 +12,17 @@ public class PyMethodWrapper extends PyDescriptor {
     public static final PyType TYPE = PyType.fromClass(PyMethodWrapper.class);
 
     @ExposedGet(name = "__self__")
-    private PyObject self;
+    final private PyObject self;
 
-    public PyMethodWrapper(PyType subtype, String name, PyType dtype) {
-        super(subtype, name, dtype);
+    public PyMethodWrapper(String name, PyObject self) {
+        this.name = name;
+        this.self = self;
+        setType(TYPE);
     }
 
     @ExposedSlot(SlotFunc.CALL)
     public static PyObject call(PyObject descr, PyObject[] args, String[] keywords) {
+        PyMethodWrapper self = (PyMethodWrapper) descr;
         return Py.None;
     }
 

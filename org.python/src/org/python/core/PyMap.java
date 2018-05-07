@@ -9,7 +9,7 @@ import org.python.annotations.SlotFunc;
 /**
  * The type behind builtins.map
  */
-@ExposedType(name = "map", doc = BuiltinDocs.builtins_map_doc)
+@ExposedType(name = "map")
 public class PyMap extends PyObject {
     public static final PyType TYPE = PyType.fromClass(PyMap.class);
 
@@ -22,7 +22,8 @@ public class PyMap extends PyObject {
     }
 
     @ExposedNew
-    public static PyObject map___new__(PyNewWrapper new_, boolean init, PyType subtype,
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject map_new(PyNewWrapper new_, boolean init, PyType subtype,
                                                 PyObject[] argstar, String[] keywords) {
         if (argstar.length < 2) {
             throw Py.TypeError("map requires at least two arguments");

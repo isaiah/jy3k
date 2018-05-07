@@ -167,6 +167,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     public MethodHandle sqItem;
     public MethodHandle sqAssItem;
     public MethodHandle str;
+    public MethodHandle tpNew;
     public boolean isIterator;
 
     private transient ReferenceQueue<PyType> subclasses_refq = new ReferenceQueue<PyType>();
@@ -204,6 +205,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
     public static final PyObject type_new(PyNewWrapper new_, boolean init, PyType metatype,
                                           PyObject[] args, String[] keywords) {
         // Special case: type(x) should return x.getType()
@@ -439,7 +441,15 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
                                       String[] keywords) {
         PyObject obj;
         if (new_ instanceof PyNewWrapper) {
-            obj = ((PyNewWrapper) new_).new_impl(init, type, args, keywords);
+            if (type.tpNew != null) {
+                try {
+                    obj = (PyObject) type.tpNew.invokeExact((PyNewWrapper) new_, init, type, args, keywords);
+                } catch (Throwable t) {
+                    throw Py.JavaError(t);
+                }
+            } else {
+                obj = ((PyNewWrapper) new_).new_impl(init, type, args, keywords);
+            }
             if (type.numSlots > 0) {
                 obj.slots = new PyObject[type.numSlots];
             }

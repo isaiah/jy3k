@@ -8,7 +8,9 @@ import jnr.constants.platform.SocketOption;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyByteArray;
@@ -86,6 +88,11 @@ public class PySocket extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject socket_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PySocket(subtype);
+    }
+
     @ExposedMethod
     public void socket___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("socket", args, keywords, "family", "type", "proto", "fileno");
@@ -135,7 +142,7 @@ public class PySocket extends PyObject {
 
     }
 
-    @ExposedMethod()
+    @ExposedMethod
     public final PyObject bind(PyObject address) {
         bindAddr = getsockaddrarg(address);
         NetworkChannel channel = (NetworkChannel) fd.ch;
