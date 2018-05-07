@@ -11,7 +11,9 @@ public class PyWrapperDescr extends PyDescriptor {
     private SlotFunc wrapped;
 
     public PyWrapperDescr(PyType subtype, String name, PyType dtype) {
-        super(subtype, name, dtype);
+        setType(subtype);
+        this.name = name;
+        this.dtype = dtype;
     }
 
     @ExposedSlot(SlotFunc.CALL)

@@ -1,9 +1,12 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -30,6 +33,12 @@ public class starmap extends PyIterator {
         starmap___init__(callable, iterator);
     }
 
+    @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject startmap_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new starmap(subtype);
+    }
+
     /**
      * Create an iterator whose <code>next()</code> method returns the result
      * of calling the function (first argument) with a tuple of arguments
@@ -38,7 +47,6 @@ public class starmap extends PyIterator {
      * @param starargs
      *            [0] = callable function, [1] = iterable with argument tuples
      */
-    @ExposedNew
     @ExposedMethod
     final void starmap___init__(PyObject[] starargs, String[] kwds) {
         if (starargs.length != 2) {

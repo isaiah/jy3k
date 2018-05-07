@@ -18,12 +18,15 @@ import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 
 @ExposedType(name = "_ast.mod", base = AST.class)
 public abstract class mod extends PythonTree {

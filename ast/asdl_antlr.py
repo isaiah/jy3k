@@ -89,12 +89,15 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.core.PyStringMap;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
             print('import org.python.core.PyList;', file=self.file)
+            print('import org.python.core.PyNewWrapper;', file=self.file)
             print('import org.python.core.Visitproc;', file=self.file)
             print('import org.python.annotations.ExposedGet;', file=self.file)
             print('import org.python.annotations.ExposedMethod;', file=self.file)
             print('import org.python.annotations.ExposedNew;', file=self.file)
             print('import org.python.annotations.ExposedSet;', file=self.file)
             print('import org.python.annotations.ExposedType;', file=self.file)
+            print('import org.python.annotations.ExposedSlot;', file=self.file)
+            print('import org.python.annotations.SlotFunc;', file=self.file)
 
         if useDataOutput:
             print('import java.io.DataOutputStream;', file=self.file)
@@ -195,11 +198,15 @@ class JavaVisitor(EmitVisitor):
             self.emit('import org.python.core.PyObject;', depth)
             self.emit('import org.python.core.PyUnicode;', depth)
             self.emit('import org.python.core.PyType;', depth)
+            self.emit('import org.python.core.PyNewWrapper;', depth)
             self.emit('import org.python.annotations.ExposedGet;', depth)
             self.emit('import org.python.annotations.ExposedMethod;', depth)
             self.emit('import org.python.annotations.ExposedNew;', depth)
             self.emit('import org.python.annotations.ExposedSet;', depth)
             self.emit('import org.python.annotations.ExposedType;', depth)
+            self.emit('import org.python.annotations.ExposedSlot;', depth)
+            self.emit('import org.python.annotations.SlotFunc;', depth)
+
             self.emit('', 0)
 
             self.emit('@ExposedType(name = "_ast.%s", base = %s.class)' % (type.name, name), depth)
@@ -218,6 +225,12 @@ class JavaVisitor(EmitVisitor):
 
 
             self.emit("@ExposedNew", depth + 1)
+            self.emit("@ExposedSlot(SlotFunc.NEW)", depth+1)
+            self.emit("public static PyObject %s_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {" % type.name, depth+1)
+            self.emit("return new %s(subtype);" % type.name, depth + 2)
+            self.emit("}", depth+1)
+
+
             self.emit("@ExposedMethod", depth + 1)
             self.emit("public void %s___init__(PyObject[] args, String[] keywords) {}" % type.name, depth + 1)
             self.emit('', 0)
@@ -545,7 +558,12 @@ class JavaVisitor(EmitVisitor):
             fnames.extend(['"lineno"', '"col_offset"'])
         fpargs = ", ".join(fnames)
         self.emit("@ExposedNew", depth)
-        self.emit("@ExposedMethod", depth)
+        self.emit("@ExposedSlot(SlotFunc.NEW)", depth)
+        self.emit("public static PyObject %s_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {" % clsname, depth)
+        self.emit("return new %s(subtype);" % clsname, depth + 1)
+        self.emit("}", depth)
+
+        self.emit('@ExposedMethod(names={"__init__"})', depth)
         self.emit("public void %s___init__(PyObject[] args, String[] keywords) {" % clsname, depth)
         self.emit('ArgParser ap = new ArgParser("%s", args, keywords, new String[]' % clsname, depth + 1)
         self.emit('{%s}, %s, true);' % (fpargs, len(fields)), depth + 2)

@@ -18,12 +18,15 @@ import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -94,7 +97,12 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
         super(TYPE);
     }
     @ExposedNew
-    @ExposedMethod
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject Call_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
+    args, String[] keywords) {
+        return new Call(subtype);
+    }
+    @ExposedMethod(names={"__init__"})
     public void Call___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("Call", args, keywords, new String[]
             {"func", "args", "keywords", "lineno", "col_offset"}, 3, true);

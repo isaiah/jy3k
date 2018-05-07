@@ -3,10 +3,13 @@ package org.python.modules._io;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
@@ -52,7 +55,13 @@ public class PyStringIO extends PyTextIOWrapper {
     }
 
     @ExposedNew
-    public void __init__(PyObject[] args, String[] keywords) {
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject StringIO_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyStringIO(subtype);
+    }
+
+    @ExposedMethod(names = {"__init__"})
+    public void init(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("StringIO", args, keywords, "initial_value", "newline");
         PyObject initValue = ap.getPyObject(0, null);
         PyObject newlineObj = ap.getPyObject(1, null);

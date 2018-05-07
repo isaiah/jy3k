@@ -1,19 +1,22 @@
 package org.python.modules.bz2;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyByteArray;
 import org.python.core.PyBytes;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.annotations.ExposedGet;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 @ExposedType(name = "bz2.BZ2Decompressor")
 public class PyBZ2Decompressor extends PyObject {
@@ -38,6 +41,11 @@ public class PyBZ2Decompressor extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject BZ2Decompressor_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyBZ2Decompressor(subtype);
+    }
+
     @ExposedMethod
     final void BZ2Decompressor___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("bz2decompressor", args, kwds,

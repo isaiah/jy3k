@@ -6,10 +6,13 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -59,8 +62,13 @@ public class PyDefaultDict extends PyDictionary implements Traverseproc {
         getMap().putAll(map);
     }
 
-    @ExposedMethod
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject defaultdict_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyDefaultDict(subtype);
+    }
+
+    @ExposedMethod
     final void defaultdict___init__(PyObject[] args, String[] kwds) {
         int nargs = args.length - kwds.length;
         if (nargs != 0) {

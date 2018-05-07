@@ -2,8 +2,11 @@ package org.python.modules._io;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
@@ -32,6 +35,11 @@ public class PyIncrementalNewlineDecoder extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject IncrementalNewlineDecoder_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyIncrementalNewlineDecoder(subtype);
+    }
+
     @ExposedMethod
     public void __init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("__init__", args, keywords, "decoder", "translate", "errors");

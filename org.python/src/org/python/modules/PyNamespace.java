@@ -1,8 +1,11 @@
 package org.python.modules;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
@@ -40,6 +43,11 @@ public class PyNamespace extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject SimpleNamespace_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyNamespace(subtype);
+    }
+
     @ExposedMethod(doc = BuiltinDocs.SimpleNamespace___init___doc)
     final void SimpleNamespace___init__(PyObject[] args, String[] kwds) {
         if (args.length > kwds.length) {

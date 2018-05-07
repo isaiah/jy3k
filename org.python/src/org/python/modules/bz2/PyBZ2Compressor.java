@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyBytes;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Untraversable;
@@ -34,6 +37,12 @@ public class PyBZ2Compressor extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject BZ2Compressor_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyBZ2Compressor(subtype);
+    }
+
+    @ExposedMethod(names = {"__init__"})
     final void BZ2Compressor___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("bz2compressor", args, kwds,
                 new String[] { "compresslevel" }, 0);

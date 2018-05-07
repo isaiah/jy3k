@@ -1,9 +1,12 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -32,6 +35,11 @@ public class combinationsWithReplacement extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject combinations_with_replacement_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new combinationsWithReplacement(subtype);
+    }
+
     @ExposedMethod
     final void combinationsWithReplacement___init__(PyObject[] args, String[] kwds) {
         if (args.length > 2) {

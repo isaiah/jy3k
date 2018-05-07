@@ -1,18 +1,20 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
+import org.python.core.PyRange;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
-import org.python.core.PyRange;
-import org.python.core.Visitproc;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.groupby", base = PyObject.class, doc = BuiltinDocs.itertools_groupby_doc)
 public class groupby extends PyIterator {
@@ -37,12 +39,17 @@ public class groupby extends PyIterator {
         groupby___init__(iterable, keyfunc);
     }
 
+    @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject groupby_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new groupby(subtype);
+    }
+
     /**
      * Creates an iterator that returns the items of the iterable for which
      * <code>predicate(item)</code> is <code>true</code>. If <code>predicate</code> is null
      * (None) return the items that are true.
      */
-    @ExposedNew
     @ExposedMethod
     final void groupby___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("groupby", args, kwds, "iterable", "key");

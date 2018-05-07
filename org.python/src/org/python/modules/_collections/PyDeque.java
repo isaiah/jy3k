@@ -7,6 +7,7 @@ import org.python.core.ArgParser;
 import org.python.core.BuiltinModule;
 import org.python.core.CompareOp;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -62,6 +63,11 @@ public class PyDeque extends PyObject implements Traverseproc {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject deque_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyDeque(subtype);
+    }
+
     @ExposedMethod
     public synchronized final void deque___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("deque", args, kwds, new String[] {"iterable", "maxlen",}, 0);

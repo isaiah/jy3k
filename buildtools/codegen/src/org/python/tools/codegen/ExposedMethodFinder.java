@@ -88,17 +88,10 @@ public abstract class ExposedMethodFinder extends MethodVisitor implements PyTyp
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
         if(desc.equals(EXPOSED_NEW.getDescriptor())) {
-            if((access & ACC_STATIC) != 0) {
-                newExp = new NewExposer(onType, access, methodName, methodDesc, exceptions);
-            } else {
-                newExp = new OverridableNewExposer(onType,
-                                                   Type.getType("L" + onType.getInternalName()
-                                                           + "Derived;"),
-                                                   access,
-                                                   methodName,
-                                                   methodDesc,
-                                                   exceptions);
+            if((access & ACC_STATIC) == 0) {
+                throwInvalid("@ExposedNew can't be applied to non-static methods");
             }
+            newExp = new NewExposer(onType, access, methodName, methodDesc, exceptions);
         } else if(desc.equals(EXPOSED_METHOD.getDescriptor())) {
             methVisitor = new ExposedMethodVisitor();
             return methVisitor;

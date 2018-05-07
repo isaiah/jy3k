@@ -1,9 +1,12 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.PyIterator;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Visitproc;
@@ -30,12 +33,17 @@ public class filterfalse extends PyObject {
         filterfalse___init__(predicate, iterable);
     }
 
+    @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject filterfalse_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new filterfalse(subtype);
+    }
+
     /**
      * Creates an iterator that returns the items of the iterable for which
      * <code>predicate(item)</code> is <code>false</code>. If <code>predicate</code> is null
      * (None) return the items that are false.
      */
-    @ExposedNew
     @ExposedMethod
     final void filterfalse___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("filter", args, kwds, new String[] {"predicate", "iterable"}, 2);

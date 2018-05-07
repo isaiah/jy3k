@@ -1,16 +1,18 @@
 package org.python.core;
 
-import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import org.python.core.buffer.BaseBuffer;
-import org.python.core.buffer.SimpleWritableBuffer;
 import org.python.annotations.ExposedClassMethod;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
+import org.python.core.buffer.BaseBuffer;
+import org.python.core.buffer.SimpleWritableBuffer;
 import org.python.expose.MethodType;
+
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Implementation of Python <code>bytearray</code> with a Java API that includes equivalents to most
@@ -761,6 +763,12 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
         // XXX consider moving to SequenceIndexDelegate.java or somewhere else generic, even Py
     }
 
+    @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject bytearray_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyByteArray(subtype);
+    }
+
     /**
      * Initialise a mutable <code>bytearray</code> object from various arguments. This single
      * initialisation must support:
@@ -786,7 +794,6 @@ public class PyByteArray extends BaseBytes implements BufferProtocol {
      * @throws PyException (TypeError) for non-iterable,
      * @throws PyException (ValueError) if iterables do not yield byte [0..255] values.
      */
-    @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.bytearray___init___doc)
     public final synchronized void bytearray___init__(PyObject[] args, String[] kwds) {
 

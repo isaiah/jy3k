@@ -3,7 +3,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.bootstrap.Import;
 
 /**
@@ -24,6 +26,10 @@ public class PyFastSequenceIter extends PyObject {
         index = 0;
     }
 
+    public PyFastSequenceIter(PyType subtype) {
+        super(subtype);
+    }
+
     public PyFastSequenceIter(PySequence seq) {
         super(TYPE);
         this.seq = seq;
@@ -31,6 +37,12 @@ public class PyFastSequenceIter extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject fastsequenceiterator_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyFastSequenceIter(subtype);
+    }
+
+    @ExposedMethod(names = {"__init__"})
     public void __init__(PyObject seq) {
         if (seq == Py.None) {
             this.seq = null;

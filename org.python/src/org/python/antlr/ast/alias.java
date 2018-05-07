@@ -18,12 +18,15 @@ import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,7 +82,12 @@ public class alias extends PythonTree {
         super(TYPE);
     }
     @ExposedNew
-    @ExposedMethod
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject alias_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
+    args, String[] keywords) {
+        return new alias(subtype);
+    }
+    @ExposedMethod(names={"__init__"})
     public void alias___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("alias", args, keywords, new String[]
             {"name", "asname"}, 2, true);

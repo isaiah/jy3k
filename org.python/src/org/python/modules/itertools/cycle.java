@@ -2,13 +2,16 @@ package org.python.modules.itertools;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -43,6 +46,11 @@ public class cycle extends PyObject {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject cycle_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new cycle(subtype);
+    }
+
     @ExposedMethod
     final void cycle___init__(final PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("cycle", args, kwds, new String[]{"iterable"}, 1);

@@ -8,11 +8,14 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyType;
+import org.python.core.PyNewWrapper;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 
 @ExposedType(name = "_ast.AugLoad", base = expr_context.class)
 public class AugLoad extends PythonTree {
@@ -25,6 +28,11 @@ public class AugLoad extends PythonTree {
         super(subType);
     }
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject AugLoad_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
+    args, String[] keywords) {
+        return new AugLoad(subtype);
+    }
     @ExposedMethod
     public void AugLoad___init__(PyObject[] args, String[] keywords) {}
 

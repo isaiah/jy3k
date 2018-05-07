@@ -1,9 +1,12 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyIterator;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
@@ -34,6 +37,11 @@ public class product extends PyIterator {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject product_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new product(subtype);
+    }
+
     @ExposedMethod
     final void product___init__(PyObject[] args, String[] kws) {
         final int repeat;

@@ -1,9 +1,12 @@
 /* Copyright (c) Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.PyIterator;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Visitproc;
@@ -34,6 +37,11 @@ public class dropwhile extends PyObject {
      * equals true. After which every remaining item of the iterable is returned.
      */
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject dropwhile_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new dropwhile(subtype);
+    }
+
     @ExposedMethod
     final void dropwhile___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("dropwhile", args, kwds, new String[]{"predicate", "iterable"}, 2);

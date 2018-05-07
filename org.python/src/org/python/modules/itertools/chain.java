@@ -1,10 +1,13 @@
 /* Copyright (c) 2012 Jython Developers */
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyIter;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.annotations.ExposedClassMethod;
@@ -43,6 +46,11 @@ public class chain extends PyObject {
      * Creates an iterator that iterates over a <i>chain</i> of iterables.
      */
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject chain_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new chain(subtype);
+    }
+
     @ExposedMethod
     final void chain___init__(final PyObject[] args, String[] kwds) {
         source = new PyIter(Arrays.asList(args));

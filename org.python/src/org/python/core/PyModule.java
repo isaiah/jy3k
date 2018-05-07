@@ -6,7 +6,9 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 /**
  * The Python Module object.
@@ -51,6 +53,11 @@ public class PyModule extends PyObject implements Traverseproc {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject module_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PyModule(subtype);
+    }
+
     @ExposedMethod
     final void module___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("__init__", args, keywords, new String[] {"name", "doc"});

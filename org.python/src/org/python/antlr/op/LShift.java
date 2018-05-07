@@ -8,11 +8,14 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyType;
+import org.python.core.PyNewWrapper;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
 import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 
 @ExposedType(name = "_ast.LShift", base = operator.class)
 public class LShift extends PythonTree {
@@ -25,6 +28,11 @@ public class LShift extends PythonTree {
         super(subType);
     }
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject LShift_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
+    args, String[] keywords) {
+        return new LShift(subtype);
+    }
     @ExposedMethod
     public void LShift___init__(PyObject[] args, String[] keywords) {}
 

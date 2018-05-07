@@ -1,17 +1,19 @@
 package org.python.modules.itertools;
 
+import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.core.ArgParser;
 import org.python.core.BuiltinDocs;
 import org.python.core.Py;
-import org.python.core.PyLong;
 import org.python.core.PyIterator;
+import org.python.core.PyLong;
+import org.python.core.PyNewWrapper;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyType;
-import org.python.core.Visitproc;
-import org.python.annotations.ExposedMethod;
-import org.python.annotations.ExposedNew;
-import org.python.annotations.ExposedType;
 
 @ExposedType(name = "itertools.islice", base = PyObject.class, doc = BuiltinDocs.itertools_islice_doc)
 public class islice extends PyIterator {
@@ -44,6 +46,11 @@ public class islice extends PyIterator {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject islice_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new islice(subtype);
+    }
+
     @ExposedMethod
     final void islice___init__(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("islice", args, kwds, new String[] {

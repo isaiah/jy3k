@@ -33,8 +33,13 @@ public class PySuper extends PyObject implements Traverseproc {
         super(subType);
     }
 
-    @ExposedMethod
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject super_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {
+        return new PySuper(subtype);
+    }
+
+    @ExposedMethod
     public void super___init__(PyObject[] args, String[] keywords) {
         PyType type;
         PyObject obj = null;
