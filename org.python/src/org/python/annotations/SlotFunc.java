@@ -16,6 +16,11 @@ public enum SlotFunc {
         public void assign(PyType type, MethodHandle mh) {
             type.call = mh;
         }
+
+        @Override
+        public boolean isWide() {
+            return true;
+        }
     },
     CONTAINS("__contains__") {
         @Override
@@ -114,6 +119,10 @@ public enum SlotFunc {
 
     public boolean hasName() {
         return name != null;
+    }
+
+    public boolean isWide() {
+        return false;
     }
 
     public abstract void assign(PyType type, MethodHandle mh);

@@ -16,4 +16,12 @@ public class TypeSlot {
     public void assign(PyType pyType) {
         type.assign(pyType, mh);
     }
+
+    public void assign(PyType pyType, PyObject dict) {
+        type.assign(pyType, mh);
+        if (type.hasName()) {
+            PyBuiltinMethod method = new PyBuiltinMethod(type.getName(), mh, type.isWide());
+            dict.__setitem__(type.getName(), new PyWrapperDescr(pyType, method));
+        }
+    }
 }

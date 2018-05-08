@@ -73,7 +73,7 @@ public class Import {
         spec = globals.__getitem__("__spec__");
         if (pkg != null) {
             if (spec != null && spec != Py.None) {
-                parent = spec.__getattr__("parent");
+                parent = Abstract._PyObject_GetAttrId(spec, "parent");
             }
             boolean equal = pkg.do_richCompareBool(parent, CompareOp.EQ);
             if (!equal) {
@@ -81,7 +81,7 @@ public class Import {
 //                throw Py.ImportError("__package__ != __spec__.parent");
             }
         } else if (spec != null && spec != Py.None) {
-            pkg = spec.__getattr__("parent");
+            pkg = Abstract._PyObject_GetAttrId(spec, "parent");
         } else {
             // TODO should be a ImportWarning
 //            throw Py.ImportError("can't resolve packge from __spec__ or __package__, falling back on __name__ and __path__");
@@ -137,7 +137,7 @@ public class Import {
         PyObject mod = interp.modules.__finditem__(absName);
         if (mod != null && mod != Py.None) {
             PyObject value = null;
-            PyObject spec = mod.__getattr__("__spec__");
+            PyObject spec = Abstract._PyObject_GetAttrId(mod, "__spec__");
             if (spec != null) {
                 value = spec.__findattr__("initializing");
             }
@@ -272,9 +272,9 @@ public class Import {
         if (builtins instanceof PyDict) {
             importFunc = builtins.__getitem__("__import__");
         } else {
-            importFunc = builtins.__getattr__("__import__");
+            importFunc = Abstract._PyObject_GetAttrId(builtins, "__import__");
         }
-        PyObject r = importFunc.__call__(moduleName, globals, new PyList(), new PyLong(0));
+        PyObject r = importFunc.__call__(moduleName, globals, new PyList(), Py.Zero);
         return r;
     }
 
@@ -290,7 +290,7 @@ public class Import {
         }
         module = new PyModule(name, null);
         PyModule builtins = (PyModule)modules.__finditem__("builtins");
-        PyObject dict = Abstract._PyObject_GetAttrId(module, "__dict__");//module.__getattr__("__dict__");
+        PyObject dict = Abstract._PyObject_GetAttrId(module, "__dict__");
         dict.__setitem__("__builtins__", builtins);
         dict.__setitem__("__package__", Py.None);
         modules.__setitem__(name, module);
@@ -425,7 +425,7 @@ public class Import {
         if (x != null) {
             return x;
         }
-        PyObject pkgname = v.__getattr__("__name__");
+        PyObject pkgname = Abstract._PyObject_GetAttrId(v, "__name__");
         PyObject fullmodname = new PyUnicode(((PyUnicode) pkgname).getString() +
                 "." + name);
         x = Py.getSystemState().modules.__finditem__(fullmodname);
@@ -457,7 +457,7 @@ public class Import {
             if (skipLeadingUnderscore && ((PyUnicode) name).getString().startsWith("_")) {
                 continue;
             }
-            PyObject value = v.__getattr__((PyUnicode) name);
+            PyObject value = Abstract._PyObject_GetAttrId(v, ((PyUnicode) name).getString());
             locals.__setitem__(name, value);
         }
     }

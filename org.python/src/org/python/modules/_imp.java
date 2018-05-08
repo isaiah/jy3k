@@ -3,6 +3,7 @@ package org.python.modules;
 
 import org.python.Version;
 import org.python.bootstrap.Import;
+import org.python.core.Abstract;
 import org.python.core.BytecodeLoader;
 import org.python.core.Py;
 import org.python.core.PyBytes;
@@ -38,7 +39,7 @@ public class _imp {
         if (spec instanceof PyModuleDef) {
             modName = ((PyModuleDef) spec).name;
         } else {
-            PyObject name = spec.__getattr__("name");
+            PyObject name = Abstract._PyObject_GetAttrId(spec, "name");
             modName = PyObject.asName(name);
         }
         for (String newmodule : Setup.builtinModules) {

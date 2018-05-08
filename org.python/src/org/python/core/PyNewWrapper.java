@@ -4,6 +4,9 @@ import jdk.dynalink.CallSiteDescriptor;
 import jdk.dynalink.linker.GuardedInvocation;
 import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.support.Guards;
+import org.python.annotations.ExposedGet;
+import org.python.annotations.ExposedSlot;
+import org.python.annotations.SlotFunc;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -75,6 +78,12 @@ public abstract class PyNewWrapper extends PyBuiltinMethod implements Traversepr
 
     public PyObject __call__(PyObject[] args) {
         return __call__(args, Py.NoKeywords);
+    }
+
+    @ExposedSlot(SlotFunc.CALL)
+    public static PyObject call(PyObject obj, PyObject[] args, String[] keywords) {
+        PyNewWrapper self = (PyNewWrapper) obj;
+        return self.__call__(args, keywords);
     }
 
     public PyObject __call__(PyObject[] args, String[] keywords) {

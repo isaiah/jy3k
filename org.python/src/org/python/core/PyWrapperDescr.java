@@ -1,25 +1,32 @@
 package org.python.core;
 
+import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
 import org.python.annotations.SlotFunc;
 
 @ExposedType(name = "wrapper_descriptor")
-public class PyWrapperDescr extends PyDescriptor {
+public class PyWrapperDescr extends PyMethodDescr {
     public static final PyType TYPE = PyType.fromClass(PyWrapperDescr.class);
 
-    private SlotFunc wrapped;
+    public PyWrapperDescr(PyType dtype, PyBuiltinMethod method) {
+        super(dtype, method);
+    }
 
-    public PyWrapperDescr(PyType subtype, String name, PyType dtype) {
-        setType(subtype);
-        this.name = name;
-        this.dtype = dtype;
+    @Override
+    @ExposedMethod(defaults = "null")
+    public PyObject __get__(PyObject obj, PyObject type) {
+        if (obj != Py.None && obj != null) {
+            checkGetterType(obj.getType());
+            return new PyMethodWrapper(this, obj);
+        }
+        return this;
     }
 
     @ExposedSlot(SlotFunc.CALL)
-    public static PyObject call(PyObject descr, PyObject[] args, String[] keywords) {
-        PyWrapperDescr self = (PyWrapperDescr) descr;
-        return Py.None;
+    public static PyObject call(PyObject obj, PyObject[] args, String[] keywords) {
+        PyWrapperDescr self = (PyWrapperDescr) obj;
+        return self.__call__(args, keywords);
     }
 
     @Override

@@ -2155,12 +2155,12 @@ public class PyObject implements Serializable, Slotted {
      * @return the result of calling the method name with args and keywords.
      **/
     public PyObject invoke(String name, PyObject[] args, String... keywords) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__(args, keywords);
     }
 
     public PyObject invoke(String name, PyObject... args) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__(args);
     }
 
@@ -2174,7 +2174,7 @@ public class PyObject implements Serializable, Slotted {
      * @return the result of calling the method name with no args
      **/
     public PyObject invoke(String name) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__();
     }
 
@@ -2187,7 +2187,7 @@ public class PyObject implements Serializable, Slotted {
      * @return the result of calling the method name with arg1
      **/
     public PyObject invoke(String name, PyObject arg1) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__(arg1);
     }
 
@@ -2201,7 +2201,7 @@ public class PyObject implements Serializable, Slotted {
      * @return the result of calling the method name with arg1 and arg2
      **/
     public PyObject invoke(String name, PyObject arg1, PyObject arg2) {
-        PyObject f = __getattr__(name);
+        PyObject f = Abstract._PyObject_GetAttrId(this, name);
         return f.__call__(arg1, arg2);
     }
 

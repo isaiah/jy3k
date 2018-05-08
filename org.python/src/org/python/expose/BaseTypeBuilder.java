@@ -59,13 +59,14 @@ public class BaseTypeBuilder implements TypeBuilder {
             descr.setType(type);
             dict.__setitem__(descr.getName(), descr);
         }
+
+        for (TypeSlot slot: typeSlots) {
+            slot.assign(type, dict);
+        }
+
         if (newWrapper != null) {
             dict.__setitem__("__new__", newWrapper);
             newWrapper.setWrappedType(type);
-        }
-        for (TypeSlot slot: typeSlots) {
-            slot.assign(type);
-            // XXX the slot wrapper could be constructed and insert to the dict here
         }
         return dict;
     }

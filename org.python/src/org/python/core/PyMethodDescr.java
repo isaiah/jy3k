@@ -6,7 +6,9 @@ import jdk.dynalink.linker.LinkRequest;
 import jdk.dynalink.linker.support.Guards;
 import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.internal.lookup.MethodHandleFactory;
 import org.python.internal.lookup.MethodHandleFunctionality;
 
@@ -23,7 +25,7 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
 
     static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     static final MethodHandleFunctionality MH = MethodHandleFactory.getFunctionality();
-    public static final MethodHandle CHECK_CALLER_TYPE = MH.findStatic(LOOKUP, PyMethodDescr.class, "checkCallerType", MethodType.methodType(PyObject.class, PyType.class, PyObject.class));
+    public static final MethodHandle CHECK_CALLER_TYPE = MH.findStatic(LOOKUP, PyMethodDescr.class, "checkCallerType", MethodType.methodType(PyObject.class, String.class, PyType.class, PyObject.class));
     public static final MethodHandle REMOVE_SELF = MH.findStatic(LOOKUP, PyMethodDescr.class, "removeSelf", MethodType.methodType(PyObject[].class, PyObject[].class));
 
     static MethodHandle SELF_GETTER = MethodHandles.arrayElementGetter(PyObject[].class);
@@ -31,7 +33,6 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
         SELF_GETTER = MethodHandles.insertArguments(SELF_GETTER, 1, 0);
     }
     protected int minargs, maxargs;
-    protected PyBuiltinMethod meth;
 
     public PyMethodDescr(PyType t, PyBuiltinMethod func) {
         name = func.info.getName();
@@ -80,7 +81,7 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
 
     @Override
     public PyObject __call__(PyObject[] args, String[] kwargs) {
-        return method_descriptor___call__(args, kwargs);
+        return method_descriptor___call__(this, args, kwargs);
     }
 
     @Override
@@ -93,15 +94,29 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
         return this;
     }
 
-    @ExposedMethod
-    final PyObject method_descriptor___call__(PyObject[] args, String[] kwargs) {
-        checkReceiver(args);
-        checkCallerType(dtype, args[0]);
+//    @ExposedMethod
+//    final PyObject method_descriptor___call__(PyObject[] args, String[] kwargs) {
+//        checkReceiver(args);
+//        checkCallerType(dtype, args[0]);
+//        PyObject[] actualArgs = new PyObject[args.length - 1];
+//        System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
+//        return meth.bind(args[0]).invoke(actualArgs, kwargs);
+//    }
+    @ExposedSlot(SlotFunc.CALL)
+    public final static PyObject method_descriptor___call__(PyObject obj, PyObject[] args, String[] kwargs) {
+        PyDescriptor self;
+        if (obj instanceof PyDescriptor) {
+            self = (PyDescriptor) obj;
+
+            self.checkReceiver(args);
+            checkCallerType(self.name, self.dtype, args[0]);
+        } else {
+            self = ((PyMethodWrapper) obj).getDescr();
+        }
         PyObject[] actualArgs = new PyObject[args.length - 1];
         System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
-        return meth.bind(args[0]).invoke(actualArgs, kwargs);
+        return self.meth.bind(args[0]).invoke(actualArgs, kwargs);
     }
-
     /**
      * Return the name this descriptor is exposed as.
      *
@@ -148,7 +163,7 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
             argOffset++;
         }
 
-        MethodHandle checker = MethodHandles.insertArguments(CHECK_CALLER_TYPE, 0, dtype);
+        MethodHandle checker = MethodHandles.insertArguments(CHECK_CALLER_TYPE, 0, this.getClass().getCanonicalName(), dtype);
         checker = MethodHandles.explicitCastArguments(checker, MethodType.methodType(methodType.parameterType(0), PyObject.class));
         mh = MethodHandles.filterArguments(mh, 0, checker);
         int paramCount = methodType.parameterCount() - argOffset;

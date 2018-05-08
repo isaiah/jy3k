@@ -49,6 +49,11 @@ public class PyBuiltinMethod extends PyBuiltinCallable implements DynLinkable, E
         this.self = self;
     }
 
+    // construct slot method
+    public PyBuiltinMethod(String name, MethodHandle mh, boolean isWide) {
+        super(new PyBuiltinMethodData(name, null, mh, null, true, isWide, true, null));
+    }
+
     public PyBuiltinMethod(String name, String defaultVals, MethodHandle mh, String doc, boolean isStatic, boolean isWide, boolean needsSelf) {
         super(new PyBuiltinMethodData(name, defaultVals, mh, doc, isStatic, isWide, needsSelf, null));
     }

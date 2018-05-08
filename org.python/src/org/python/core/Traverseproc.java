@@ -367,7 +367,6 @@ package org.python.core;
  *   PyNotImplemented                - no refs, untraversable<br>
  *   PyObject                        - no refs (objtype is special case)<br>
  *     PyIdentityTuple               - Traverseproc<br>
- *   PyOverridableNew                - no refs, abstract class<br>
  *   PyProperty                      - Traverseproc<br>
  *   PyReflectedConstructor          - no refs, untraversable<br>
  *   PyReflectedField                - no refs, untraversable<br>

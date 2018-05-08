@@ -111,7 +111,7 @@ public class PyBuiltinMethodData {
                 target.invokeExact(self, args, keywords);
                 return Py.None;
             }
-            return (PyObject) target.invokeExact(self, args, keywords);
+            return (PyObject) target.invokeExact((PyObject) self, args, keywords);
         } catch (PyException e) {
             throw e;
         } catch (Throwable throwable) {
@@ -247,7 +247,7 @@ public class PyBuiltinMethodData {
     }
 
     private void getDefaults() {
-        if ("".equals(defaultVals)) {
+        if (defaultVals == null || "".equals(defaultVals)) {
             defaults = new Object[0];
             return;
         }

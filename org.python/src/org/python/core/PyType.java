@@ -1905,7 +1905,8 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             // this is wrong, because it's a class method, not an instance method, the receiver must be bound to the method
             // Object callfunc = _call.getGetter().invokeExact((PyObject) this);
             PyObject callfunc = _PyObject_LookupSpecial(this, "__call__");
-            if (callfunc != null && callfunc instanceof DynLinkable) {
+            if (callfunc != null) {
+                assert(callfunc instanceof DynLinkable) : String.format("type %s is not callable", this);
                 return ((DynLinkable) callfunc).findCallMethod(desc, linkRequest);
             }
             return new GuardedInvocation(call);

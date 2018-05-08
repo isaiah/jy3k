@@ -28,10 +28,8 @@ public class FunctionExposer extends MethodExposer {
         if ((access & ACC_STATIC) == 0) {
             throwInvalid("@ExposedFunction can't be applied to non-static methods");
         }
-        if (isWide(args)) {
-            if (defaults.length > 0) {
-                throwInvalid("Can't have defaults on a method that takes PyObject[], String[]");
-            }
+        if (defaults.length > 0 && isWide(args)) {
+            throwInvalid("Can't have defaults on a method that takes PyObject[], String[]");
         }
     }
 

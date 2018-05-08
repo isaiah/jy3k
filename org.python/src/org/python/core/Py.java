@@ -2101,7 +2101,7 @@ public final class Py {
         PyUnicode clsname = new PyUnicode(name);
         PyObject basesArray = new PyTuple(bases);
         try {
-            return metaclass.__call__(clsname, basesArray, dict);
+            return Abstract.PyObject_Call(Py.getThreadState(), metaclass, new PyObject[]{clsname, basesArray, dict}, Py.NoKeywords);
         } catch (PyException pye) {
             if (!pye.match(TypeError)) {
                 throw pye;

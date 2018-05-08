@@ -2,6 +2,7 @@ package org.python.util;
 
 import org.python.antlr.base.mod;
 import org.python.bootstrap.Import;
+import org.python.core.Abstract;
 import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.ParserFacade;
@@ -111,7 +112,7 @@ public class PythonInterpreter implements AutoCloseable, Closeable {
         PyObject loader = dict.__getitem__("__loader__");
 
         if (loader == null || loader == Py.None) {
-            loader = interp.importlib.__getattr__("BuiltinImporter");
+            loader = Abstract._PyObject_GetAttrId(interp.importlib, "BuiltinImporter");
             if (loader == null) {
                 // FIXME throw Py.FatalError
                 throw new RuntimeException("Failed to retrieve BuiltinImporter");

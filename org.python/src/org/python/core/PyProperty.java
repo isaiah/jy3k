@@ -121,30 +121,18 @@ public class PyProperty extends PyObject implements Traverseproc {
         fdel.__call__(obj);
     }
 
-    public PyObject getter(PyObject getter) {
-        return property_getter(getter);
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.property_getter_doc)
-    final PyObject property_getter(PyObject getter) {
+    @ExposedMethod
+    final PyObject getter(PyObject getter) {
         return propertyCopy(getter, null, null);
     }
 
-    public PyObject setter(PyObject setter) {
-        return property_setter(setter);
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.property_setter_doc)
-    final PyObject property_setter(PyObject setter) {
+    @ExposedMethod
+    final PyObject setter(PyObject setter) {
         return propertyCopy(null, setter, null);
     }
 
-    public PyObject deleter(PyObject deleter) {
-        return property_deleter(deleter);
-    }
-
-    @ExposedMethod(doc = BuiltinDocs.property_deleter_doc)
-    final PyObject property_deleter(PyObject deleter) {
+    @ExposedMethod
+    final PyObject deleter(PyObject deleter) {
         return propertyCopy(null, null, deleter);
     }
 
