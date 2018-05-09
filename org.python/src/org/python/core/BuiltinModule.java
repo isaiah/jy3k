@@ -476,8 +476,8 @@ public class BuiltinModule {
         }
     }
 
-    public static PyLong hash(PyObject o) {
-        return o.__hash__();
+    public static PyObject hash(PyObject o) {
+        return new PyLong(Abstract.PyObject_Hash(o));
     }
 
     public static PyUnicode hex(PyObject o) {

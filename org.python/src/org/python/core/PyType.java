@@ -167,6 +167,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     public MethodHandle sqItem;
     public MethodHandle sqAssItem;
     public MethodHandle str;
+    public MethodHandle tpHash;
     public MethodHandle tpNew;
     public boolean isIterator;
 
@@ -874,8 +875,8 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         }
 
         // Compare hashes
-        int hash1 = object___hash__();
-        int hash2 = other.object___hash__();
+        int hash1 = Abstract.PyObject_Hash(this);
+        int hash2 = Abstract.PyObject_Hash(other);
         switch (op) {
             case EQ:
                 return hash1 == hash2 ? Py.True : Py.False;

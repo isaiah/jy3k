@@ -52,6 +52,12 @@ public enum SlotFunc {
             type.mqAssSubscript = mh;
         }
     },
+    HASH("__hash__") {
+        @Override
+        public void assign(PyType type, MethodHandle mh) {
+            type.tpHash = mh;
+        }
+    },
     ITER("__iter__") {
         @Override
         public void assign(PyType type, MethodHandle mh) {

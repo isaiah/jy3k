@@ -867,12 +867,23 @@ public class PyList extends PySequenceList implements List {
     }
 
     public int hashCode() {
-        return list___hash__();
+        return list___hash__(this);
     }
 
-    @ExposedMethod
-    public final synchronized int list___hash__() {
-        throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
+    @ExposedSlot(SlotFunc.HASH)
+    public final static int list___hash__(PyObject self) {
+        /** FIXME
+         * This is wrong, it should use the Abstract version, when calling into python,
+         * the threadstate have to be provided, because it relies on the ts object to do house keeping
+         * e.g. inject exception to the stack etc
+         *
+         * But in the early process of bootstrapping, when hashCode is required to insert certain types
+         * into maps, the threadstate map is not available
+         *
+         * Check JRuby see how they grantee the availability of ThreadState
+         */
+        throw Py.TypeErrorFmt("not hashable: '%s'", self);
+//        return Abstract.PyObject_Hash(self);
     }
 
     @Override

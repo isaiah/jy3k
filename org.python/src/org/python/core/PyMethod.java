@@ -232,11 +232,13 @@ public class PyMethod extends PyObject implements DynLinkable, InvocationHandler
     @ExposedMethod(doc = BuiltinDocs.method___call___doc)
     final PyObject method___call__(ThreadState state, PyObject[] args, String[] keywords) {
         PyObject self = checkSelf(null, args);
-        if (self == null) {
-            return __func__.__call__(state, args, keywords);
-        } else {
-            return __func__.__call__(state, self, args, keywords);
+        if (self != null) {
+            PyObject[] tmp = new PyObject[args.length + 1];
+            tmp[0] = self;
+            System.arraycopy(args, 0, tmp, 1, args.length);
+            args = tmp;
         }
+        return Abstract.PyObject_Call(state, __func__, args, keywords);
     }
 
     public GuardedInvocation findCallMethod(final CallSiteDescriptor desc, LinkRequest request) {

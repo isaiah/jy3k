@@ -18,12 +18,16 @@ import java.util.stream.StreamSupport;
  * Abstract Object Interface
  */
 public class Abstract {
+    /* The ThreadState parameter after the receiver is mandatory, because all python functions require that,
+       to be able to link both native and python function, always provide this when potentially calling into python
+     */
     private static final InvokeByName bool = new InvokeByName("__bool__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName call = new InvokeByName("__call__", PyObject.class, PyObject.class, ThreadState.class, PyObject[].class, String[].class);
     private static final InvokeByName divmod = new InvokeByName("__divmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName rdivmod = new InvokeByName("__rdivmod__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
     private static final InvokeByName float$ = new InvokeByName("__float__", PyObject.class, PyObject.class, ThreadState.class);
     private static final InvokeByName format = new InvokeByName("__format__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class, PyObject.class);
+    private static final InvokeByName hash = new InvokeByName("__hash__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName int$ = new InvokeByName("__int__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName index = new InvokeByName("__index__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
     private static final InvokeByName len = new InvokeByName("__len__", PyObject.class, PyObject.class, ThreadState.class, PyObject.class);
@@ -489,6 +493,29 @@ public class Abstract {
             return (PyObject) getitem.getInvoker().invokeExact(func, ts, o, key);
         } catch (Throwable throwable) {
             throw Py.JavaError(throwable);
+        }
+    }
+
+    public static int PyObject_Hash(PyObject v) {
+        PyType tp = v.getType();
+        if (tp.tpHash != null) {
+            try {
+                return (int) tp.tpHash.invokeExact(v);
+            } catch (Throwable throwable) {
+                throw Py.JavaError(throwable);
+            }
+        }
+        try {
+            Object func = hash.getGetter().invokeExact((PyObject) tp);
+            PyObject ret = (PyObject) hash.getInvoker().invokeExact(func, Py.getThreadState(), v);
+            return ret.asInt();
+        } catch (PyException e) {
+            if (e.match(Py.AttributeError)) {
+                throw Py.TypeErrorFmt("unhashable type: '%s'", v);
+            }
+            throw e;
+        } catch (Throwable t) {
+            throw Py.JavaError(t);
         }
     }
 

@@ -742,7 +742,9 @@ public class PyFunction extends PyObject implements DynLinkable, InvocationHandl
         if (t != null && t instanceof PyException) {
             ((PyException) t).tracebackHere(ts.frame);
         }
-        ts.frame = ts.frame.f_back;
+        if (ts.frame != null) {
+            ts.frame = ts.frame.f_back;
+        }
         return v;
     }
 

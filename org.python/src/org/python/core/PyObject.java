@@ -384,7 +384,8 @@ public class PyObject implements Serializable, Slotted {
 
     @Override
     public int hashCode() {
-        return object___hash__();
+//        return Abstract.PyObject_Hash(this);
+        return object___hash__(this);
     }
 
     /**
@@ -443,9 +444,9 @@ public class PyObject implements Serializable, Slotted {
     protected final void finalize() throws Throwable {
     }
 
-    @ExposedMethod(doc = BuiltinDocs.object___hash___doc)
-    final int object___hash__() {
-        return System.identityHashCode(this);
+    @ExposedSlot(SlotFunc.HASH)
+    final static int object___hash__(PyObject self) {
+        return System.identityHashCode(self);
     }
 
     /**
