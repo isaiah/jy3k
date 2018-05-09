@@ -222,8 +222,7 @@ public class codecs {
         if (!isUnicodeError(exc)) {
             throw wrong_exception_type(exc);
         }
-        PyObject end = exc.__getattr__("end");
-        return new PyTuple(Py.EmptyUnicode, end);
+        return new PyTuple(Py.EmptyUnicode, Abstract._PyObject_GetAttrId(exc, "end"));
     }
 
     private static boolean isUnicodeError(PyObject exc) {
@@ -254,12 +253,13 @@ public class codecs {
         if (!Py.isInstance(exc, Py.UnicodeEncodeError)) {
             throw wrong_exception_type(exc);
         }
-        int start = exc.__getattr__("start").asInt();
-        int end = exc.__getattr__("end").asInt();
-        String object = exc.__getattr__("object").toString();
+
+        int start = Abstract._PyObject_GetAttrId(exc, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(exc, "end").asInt();
+        String object = Abstract._PyObject_GetAttrId(exc, "object").toString();
         StringBuilder replacement = new StringBuilder();
         xmlcharrefreplace_internal(start, end, object, replacement);
-        return new PyTuple(Py.java2py(replacement.toString()), exc.__getattr__("end"));
+        return new PyTuple(Py.java2py(replacement.toString()), Abstract._PyObject_GetAttrId(exc, "end"));
     }
 
     public static StringBuilder xmlcharrefreplace(int start, int end, String toReplace) {
@@ -307,8 +307,8 @@ public class codecs {
     }
 
     private static PyException wrong_exception_type(PyObject exc) {
-        PyObject excClass = exc.__getattr__("__class__");
-        PyObject className = excClass.__getattr__("__name__");
+        PyObject excClass = Abstract._PyObject_GetAttrId(exc, "__class__");
+        PyObject className = Abstract._PyObject_GetAttrId(exc, "__name__");
         return Py.TypeError("Don't know how to handle " + className
                 + " in error callback");
     }
@@ -324,12 +324,13 @@ public class codecs {
         if (!Py.isInstance(exc, Py.UnicodeEncodeError)) {
             throw wrong_exception_type(exc);
         }
-        int start = exc.__getattr__("start").asInt();
-        int end = exc.__getattr__("end").asInt();
-        String object = exc.__getattr__("object").toString();
+
+        int start = Abstract._PyObject_GetAttrId(exc, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(exc, "end").asInt();
+        String object = Abstract._PyObject_GetAttrId(exc, "object").toString();
         StringBuilder replacement = new StringBuilder();
         backslashreplace_internal(start, end, object, replacement);
-        return new PyTuple(Py.java2py(replacement.toString()), exc.__getattr__("end"));
+        return new PyTuple(Py.java2py(replacement.toString()), Abstract._PyObject_GetAttrId(exc, "end"));
     }
 
     public static StringBuilder backslashreplace(int start, int end, String toReplace) {
@@ -368,9 +369,9 @@ public class codecs {
         ArgParser ap = new ArgParser("surrogateescape_errors", args, kws, "exc");
         PyObject exc = ap.getPyObject(0);
 
-        int start = exc.__getattr__("start").asInt();
-        int end = exc.__getattr__("end").asInt();
-        String object = exc.__getattr__("object").toString();
+        int start = Abstract._PyObject_GetAttrId(exc, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(exc, "end").asInt();
+        String object = Abstract._PyObject_GetAttrId(exc, "object").toString();
         StringBuilder replacement = new StringBuilder();
         if (Py.isInstance(exc, Py.UnicodeEncodeError)) {
             surrogateescapeEncodeInternal(start, end, object, replacement);
@@ -379,7 +380,7 @@ public class codecs {
         } else {
             throw wrong_exception_type(exc);
         }
-        return new PyTuple(new PyUnicode(replacement), exc.__getattr__("end"));
+        return new PyTuple(new PyUnicode(replacement), Abstract._PyObject_GetAttrId(exc, "end"));
     }
 
     private static void surrogateescapeEncodeInternal(int start, int end, String object, StringBuilder replacement) {
@@ -405,10 +406,10 @@ public class codecs {
     public static PyObject surrogatepass_errors(PyObject[] args, String[] kws) {
         ArgParser ap = new ArgParser("surrogatepass_errors", args, kws, "exc");
         PyObject exc = ap.getPyObject(0);
-        int start = exc.__getattr__("start").asInt();
-        int end = exc.__getattr__("end").asInt();
-        String object = exc.__getattr__("object").toString();
-        String encoding = exc.__getattr__("encoding").toString();
+        int start = Abstract._PyObject_GetAttrId(exc, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(exc, "end").asInt();
+        String object = Abstract._PyObject_GetAttrId(exc, "object").toString();
+        String encoding = Abstract._PyObject_GetAttrId(exc, "encoding").toString();
         // TODO handle UnsupportedCharsetException
         Charset charset = Charset.forName(encoding);
         PyObject buf;
@@ -419,7 +420,7 @@ public class codecs {
         } else {
             throw wrong_exception_type(exc);
         }
-        return new PyTuple(buf, exc.__getattr__("end"));
+        return new PyTuple(buf, Abstract._PyObject_GetAttrId(exc, "end"));
     }
 
     private final static Charset UTF_32LE = Charset.forName("utf-32le");

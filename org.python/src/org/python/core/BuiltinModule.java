@@ -907,7 +907,7 @@ public class BuiltinModule {
 
     public static PyObject vars1(PyObject o) {
         try {
-            return o.__getattr__("__dict__");
+            return Abstract._PyObject_GetAttrId(o, "__dict__");
         } catch (PyException e) {
             if (e.match(Py.AttributeError)) {
                 throw Py.TypeError("vars() argument must have __dict__ attribute");

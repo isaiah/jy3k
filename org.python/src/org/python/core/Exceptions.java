@@ -2,6 +2,7 @@
 package org.python.core;
 
 import jdk.dynalink.linker.support.Lookup;
+import org.python.antlr.ast.Attribute;
 import org.python.modules.zipimport.ZipImportModule;
 
 import java.io.File;
@@ -202,11 +203,11 @@ public class Exceptions {
     }
 
     public static PyObject ImportError__str__(PyObject self) {
-        PyObject msg = self.__getattr__("msg");
+        PyObject msg = Abstract._PyObject_GetAttrId(self, "msg");
         PyUnicode str = (PyUnicode) Abstract.PyObject_Str(Py.getThreadState(), msg);
 
-        PyObject name = self.__findattr__("name");
-        PyObject path = self.__findattr__("path");
+        PyObject name = Abstract._PyObject_GetAttrId(self, "name");
+        PyObject path = Abstract._PyObject_GetAttrId(self, "path");
         boolean haveName = name instanceof PyUnicode;
         boolean havePath = path instanceof PyLong;
         if (!haveName && !havePath) {
@@ -291,7 +292,7 @@ public class Exceptions {
     }
 
     public static PyObject SyntaxError__str__(PyObject self) {
-        PyObject msg = self.__getattr__("msg");
+        PyObject msg = Abstract._PyObject_GetAttrId(self, "msg");
         PyUnicode str = (PyUnicode) Abstract.PyObject_Str(Py.getThreadState(), msg);
 
         PyObject filename = self.__findattr__("filename");
@@ -458,7 +459,7 @@ public class Exceptions {
                                                   String[] kwargs) {
         PyBaseException.TYPE.invoke("__init__", self, args, kwargs);
         UnicodeError__init__(self, args, kwargs, PyObject.TYPE);
-        PyObject object = self.__getattr__("object");
+        PyObject object = Abstract._PyObject_GetAttrId(self, "object");
         if (!Py.isInstance(object, PyBytes.TYPE)) {
             if (!(object instanceof BufferProtocol)) {
                 throw Py.TypeError(String.format("argument 2 must be a buffer, not %s",
@@ -474,13 +475,13 @@ public class Exceptions {
     }
 
     public static PyObject UnicodeDecodeError__str__(PyObject self) {
-        int start = self.__getattr__("start").asInt();
-        int end = self.__getattr__("end").asInt();
+        int start = Abstract._PyObject_GetAttrId(self, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(self, "end").asInt();
         // Get reason and encoding as strings, which they might not be if they've been
         // modified after we were contructed
-        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("reason"));
-        PyObject encoding = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("encoding"));
-        PyObject object = getString(self.__getattr__("object"), "object");
+        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), Abstract._PyObject_GetAttrId(self, "reason"));
+        PyObject encoding = Abstract.PyObject_Str(Py.getThreadState(), Abstract._PyObject_GetAttrId(self, "encoding"));
+        PyObject object = getString(Abstract._PyObject_GetAttrId(self, "object"), "object");
 
         String result;
         if (start < object.__len__() && end == (start + 1)) {
@@ -508,14 +509,14 @@ public class Exceptions {
     }
 
     public static PyObject UnicodeEncodeError__str__(PyObject self) {
-        int start = self.__getattr__("start").asInt();
-        int end = self.__getattr__("end").asInt();
+        int start = Abstract._PyObject_GetAttrId(self, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(self, "end").asInt();
         // Get reason and encoding as strings, which they might not be if they've been
         // modified after we were contructed
         ThreadState ts = Py.getThreadState();
-        PyObject reason = Abstract.PyObject_Str(ts, self.__getattr__("reason"));
-        PyObject encoding = Abstract.PyObject_Str(ts, self.__getattr__("encoding"));
-        PyObject object = getUnicode(self.__getattr__("object"), "object");
+        PyObject reason = Abstract.PyObject_Str(ts, Abstract._PyObject_GetAttrId(self, "reason"));
+        PyObject encoding = Abstract.PyObject_Str(ts, Abstract._PyObject_GetAttrId(self, "encoding"));
+        PyObject object = getUnicode(Abstract._PyObject_GetAttrId(self, "object"), "object");
 
         String result;
         if (start < object.__len__() && end == (start + 1)) {
@@ -559,12 +560,12 @@ public class Exceptions {
     }
 
     public static PyObject UnicodeTranslateError__str__(PyObject self) {
-        int start = self.__getattr__("start").asInt();
-        int end = self.__getattr__("end").asInt();
+        int start = Abstract._PyObject_GetAttrId(self, "start").asInt();
+        int end = Abstract._PyObject_GetAttrId(self, "end").asInt();
         // Get reason as a string, which it might not be if it's been modified after we
         // were contructed
-        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), self.__getattr__("reason"));
-        PyObject object = getUnicode(self.__getattr__("object"), "object");
+        PyObject reason = Abstract.PyObject_Str(Py.getThreadState(), Abstract._PyObject_GetAttrId(self, "reason"));
+        PyObject object = getUnicode(Abstract._PyObject_GetAttrId(self, "object"), "object");
 
         String result;
         if (start < object.__len__() && end == (start + 1)) {
@@ -595,12 +596,12 @@ public class Exceptions {
      * @return an the start position
      */
     public static int getStart(PyObject self, boolean unicode) {
-        int start = self.__getattr__("start").asInt();
+        int start = Abstract._PyObject_GetAttrId(self, "start").asInt();
         PyObject object;
         if (unicode) {
-            object = getUnicode(self.__getattr__("object"), "object");
+            object = getUnicode(Abstract._PyObject_GetAttrId(self, "object"), "object");
         } else {
-            object = getString(self.__getattr__("object"), "object");
+            object = getString(Abstract._PyObject_GetAttrId(self, "object"), "object");
         }
         if (start < 0) {
             start = 0;
@@ -620,12 +621,12 @@ public class Exceptions {
      * @return an the end position
      */
     public static int getEnd(PyObject self, boolean unicode) {
-        int end = self.__getattr__("end").asInt();
+        int end = Abstract._PyObject_GetAttrId(self, "end").asInt();
         PyObject object;
         if (unicode) {
-            object = getUnicode(self.__getattr__("object"), "object");
+            object = getUnicode(Abstract._PyObject_GetAttrId(self, "object"), "object");
         } else {
-            object = getString(self.__getattr__("object"), "object");
+            object = getString(Abstract._PyObject_GetAttrId(self, "object"), "object");
         }
         if (end < 1) {
             end = 1;

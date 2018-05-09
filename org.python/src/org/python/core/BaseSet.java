@@ -280,7 +280,7 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
             big = this;
         }
 
-        PyObject common = BuiltinModule.filter(big.__getattr__("__contains__"), little);
+        PyObject common = BuiltinModule.filter(Abstract._PyObject_GetAttrId(big, "__contains__"), little);
         return BaseSet.makeNewSet(getType(), common);
     }
     

@@ -110,12 +110,13 @@ public class PyMethodDescr extends PyDescriptor implements DynLinkable, Traverse
 
             self.checkReceiver(args);
             checkCallerType(self.name, self.dtype, args[0]);
+            PyObject[] actualArgs = new PyObject[args.length - 1];
+            System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
+            return self.meth.bind(args[0]).invoke(actualArgs, kwargs);
         } else {
             self = ((PyMethodWrapper) obj).getDescr();
+            return self.meth.bind(self).invoke(args, kwargs);
         }
-        PyObject[] actualArgs = new PyObject[args.length - 1];
-        System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
-        return self.meth.bind(args[0]).invoke(actualArgs, kwargs);
     }
     /**
      * Return the name this descriptor is exposed as.
