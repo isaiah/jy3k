@@ -22,7 +22,7 @@ public class PyMethodWrapper extends PyObject implements DynLinkable {
     public static final PyType TYPE = PyType.fromClass(PyMethodWrapper.class);
 
     @ExposedGet(name = "__self__")
-    final private PyObject self;
+    protected PyObject self;
 
     private PyDescriptor descr;
 

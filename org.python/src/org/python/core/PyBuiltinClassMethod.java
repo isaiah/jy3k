@@ -9,6 +9,7 @@ public class PyBuiltinClassMethod extends PyBuiltinMethod {
         super(self, info);
     }
 
+    @Override
     public PyMethodDescr makeDescriptor(PyType t) {
         return new PyClassMethodDescr(t, this);
     }

@@ -12,6 +12,8 @@ import org.python.annotations.SlotFunc;
 @Untraversable
 @ExposedType(name = "builtin_function_or_method", isBaseType = false)
 public abstract class PyBuiltinCallable extends PyObject {
+    /* Bootstrap type, cannot initial type statically */
+    // public static final PyType TYPE = PyType.fromClass(PyBuiltinCallable.class);
 
     public PyBuiltinMethodData info;
 
@@ -32,7 +34,7 @@ public abstract class PyBuiltinCallable extends PyObject {
             if (!info.isStatic) {
                 self = self.getType();
             }
-            PyObject name = self.__getattr__("__name__");
+            PyObject name = Abstract._PyObject_GetAttrId(self, "__name__");
             if (name != null) {
                 qualname = name + "." + info.getName();
             }
@@ -50,15 +52,22 @@ public abstract class PyBuiltinCallable extends PyObject {
         return info.getModule() == null ? Py.None : new PyUnicode(info.getModule());
     }
 
-    @ExposedGet(name = "__call__")
-    public PyObject makeCall() {
-        return this;
-//        return new PyMethodWrapper("__call__", this);
-    }
-
     @ExposedGet(name = "__self__")
     public PyObject getSelf() {
         return Py.None;
+    }
+
+    @ExposedGet(name = "__text_signature__")
+    public PyObject textSignature() {
+        if (getSelf() != Py.None) {
+            return PyType.getBuiltinDoc(getSelf().getType().fastGetName() + "_" + info.name + "_sig");
+        }
+        return PyType.getBuiltinDoc("builtins_" + info.name + "_sig");
+    }
+
+    @ExposedSlot(SlotFunc.CALL)
+    public static PyObject call(PyObject meth, PyObject[] args, String[] keywords) {
+        return meth.__call__(args, keywords);
     }
 
     /** pickle support **/

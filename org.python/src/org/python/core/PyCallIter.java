@@ -1,7 +1,9 @@
 package org.python.core;
 
 import org.python.annotations.ExposedMethod;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 
 @ExposedType(name = "callable_iterator")
 public class PyCallIter extends PyIterator {
@@ -19,21 +21,22 @@ public class PyCallIter extends PyIterator {
         this.sentinel = sentinel;
     }
 
-    @ExposedMethod
-    public PyObject __iter__() {
-        return this;
+    @ExposedSlot(SlotFunc.ITER)
+    public static PyObject __iter__(PyObject self) {
+        return self;
     }
 
-    @ExposedMethod
-    public PyObject callable_iterator___next__() {
-        if (callable == null) {
+    @ExposedSlot(SlotFunc.ITER_NEXT)
+    public static PyObject callable_iterator___next__(PyObject obj) {
+        PyCallIter self = (PyCallIter) obj;
+        if (self.callable == null) {
             throw Py.StopIteration();
         }
 
         PyObject result;
-        result = callable.__call__();
-        if (result == null || sentinel.richCompare(result, CompareOp.EQ).isTrue()) {
-            callable = null;
+        result = Abstract.PyObject_Call(Py.getThreadState(), self.callable, Py.EmptyObjects, Py.NoKeywords);
+        if (result == null || self.sentinel.richCompare(result, CompareOp.EQ).isTrue()) {
+            self.callable = null;
             throw Py.StopIteration();
         }
         return result;

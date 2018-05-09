@@ -2,13 +2,14 @@ package org.python.core;
 
 import org.python.bootstrap.QuadFunction;
 import org.python.bootstrap.TriFunction;
+import org.python.expose.ExposeAsSuperclass;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Untraversable
-public class PyBuiltinFunction extends PyBuiltinCallable {
+public class PyBuiltinFunction extends PyBuiltinCallable implements ExposeAsSuperclass {
     private Supplier<PyObject> call;
     private Function<PyObject, PyObject> func;
     private BiFunction<PyObject, PyObject, PyObject> biFunc;

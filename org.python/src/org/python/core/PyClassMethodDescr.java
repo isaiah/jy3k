@@ -5,6 +5,9 @@ import org.python.annotations.ExposedGet;
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
+
+import java.util.Arrays;
 
 @Untraversable
 @ExposedType(name = "classmethod_descriptor", isBaseType = false)
@@ -37,6 +40,12 @@ public class PyClassMethodDescr extends PyMethodDescr {
         }
         checkGetterType((PyType)type);
         return meth.bind(type);
+    }
+
+    @ExposedSlot(SlotFunc.CALL)
+    public static PyObject call(PyObject obj, PyObject[] args, String[] keywords) {
+        PyClassMethodDescr self = (PyClassMethodDescr) obj;
+        return Abstract.PyObject_Call(Py.getThreadState(), self.meth.bind(args[0]), Arrays.copyOfRange(args, 1, args.length), keywords);
     }
 
     @Override
