@@ -115,10 +115,27 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         this.decorator_list = AstAdapters.py2exprList(decorator_list);
     }
 
+    private String docstring;
+    public String getInternalDocstring() {
+        return docstring;
+    }
+    public void setInternalDocstring(String docstring) {
+        this.docstring = docstring;
+    }
+    @ExposedGet(name = "docstring")
+    public PyObject getDocstring() {
+        return AstAdapters.string2py(docstring);
+    }
+    @ExposedSet(name = "docstring")
+    public void setDocstring(PyObject docstring) {
+        this.docstring = AstAdapters.py2string(docstring);
+    }
+
 
     private final static PyUnicode[] fields =
     new PyUnicode[] {new PyUnicode("name"), new PyUnicode("bases"), new PyUnicode("keywords"), new
-                      PyUnicode("body"), new PyUnicode("decorator_list")};
+                      PyUnicode("body"), new PyUnicode("decorator_list"), new
+                      PyUnicode("docstring")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -139,19 +156,20 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     @ExposedMethod(names={"__init__"})
     public void ClassDef___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("ClassDef", args, keywords, new String[]
-            {"name", "bases", "keywords", "body", "decorator_list", "lineno", "col_offset"}, 5,
-              true);
+            {"name", "bases", "keywords", "body", "decorator_list", "docstring", "lineno",
+              "col_offset"}, 6, true);
         setName(ap.getPyObject(0, Py.None));
         setBases(ap.getPyObject(1, Py.None));
         setKeywords(ap.getPyObject(2, Py.None));
         setBody(ap.getPyObject(3, Py.None));
         setDecorator_list(ap.getPyObject(4, Py.None));
-        int lin = ap.getInt(5, -1);
+        setDocstring(ap.getPyObject(5, Py.None));
+        int lin = ap.getInt(6, -1);
         if (lin != -1) {
             setLineno(lin);
         }
 
-        int col = ap.getInt(6, -1);
+        int col = ap.getInt(7, -1);
         if (col != -1) {
             setLineno(col);
         }
@@ -159,13 +177,14 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
 
     public ClassDef(PyObject name, PyObject bases, PyObject keywords, PyObject body, PyObject
-    decorator_list) {
+    decorator_list, PyObject docstring) {
         super(TYPE);
         setName(name);
         setBases(bases);
         setKeywords(keywords);
         setBody(body);
         setDecorator_list(decorator_list);
+        setDocstring(docstring);
     }
 
     // called from derived class
@@ -174,7 +193,7 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     }
 
     public ClassDef(Token token, String name, java.util.List<expr> bases, java.util.List<keyword>
-    keywords, java.util.List<stmt> body, java.util.List<expr> decorator_list) {
+    keywords, java.util.List<stmt> body, java.util.List<expr> decorator_list, String docstring) {
         super(TYPE, token);
         this.name = name;
         this.bases = bases;
@@ -212,11 +231,12 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
             if (t != null)
                 t.setParent(this);
         }
+        this.docstring = docstring;
     }
 
     public ClassDef(PythonTree tree, String name, java.util.List<expr> bases,
     java.util.List<keyword> keywords, java.util.List<stmt> body, java.util.List<expr>
-    decorator_list) {
+    decorator_list, String docstring) {
         super(TYPE, tree);
         this.name = name;
         this.bases = bases;
@@ -254,11 +274,12 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
             if (t != null)
                 t.setParent(this);
         }
+        this.docstring = docstring;
     }
 
     public ClassDef copy() {
         return new ClassDef(this.getToken(), this.name, this.bases, this.keywords, this.body,
-        this.decorator_list);
+        this.decorator_list, this.docstring);
     }
 
     @ExposedGet(name = "repr")
@@ -283,6 +304,9 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
         sb.append(",");
         sb.append("decorator_list=");
         sb.append(dumpThis(decorator_list));
+        sb.append(",");
+        sb.append("docstring=");
+        sb.append(dumpThis(docstring));
         sb.append(",");
         sb.append(")");
         return sb.toString();

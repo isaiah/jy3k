@@ -109,16 +109,12 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     boolean hasGet;
     boolean hasSet;
     boolean hasDelete;
+    public String tpDoc;
 
     /**
      * Whether this type allows subclassing.
      */
     private boolean isBaseType = true;
-
-    /**
-     * To be used as the key to access the strings in BuiltinDocs.java
-     */
-    protected String docKey;
 
     /**
      * Whether this type has a __dict__.
@@ -589,7 +585,6 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             dict.__setitem__("__new__", new PyStaticMethod(new_));
         }
 
-        ensureDoc(dict);
         ensureModule(dict);
 
         // Calculate method resolution order
@@ -606,17 +601,6 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         }
         if (!needs_weakref && base.needs_weakref) {
             needs_weakref = true;
-        }
-    }
-
-    /**
-     * Ensure dict contains a __doc__.
-     *
-     * @param dict a PyObject mapping
-     */
-    public static void ensureDoc(PyObject dict) {
-        if (dict.__finditem__("__doc__") == null) {
-            dict.__setitem__("__doc__", Py.None);
         }
     }
 
@@ -683,18 +667,7 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         if (getattro == null) {
             getattro = GEN_GETATTR;
         }
-        docKey = builder.getDoc();
-//        if (dict.__finditem__("__doc__") == null) {
-//            PyObject docObj;
-//            if (docKey != null) {
-//                docObj = new PyUnicode(docKey, true);
-//                dict.__setitem__("__doc__", docObj);
-//            } else {
-//                if (Py.None != null) {
-//                    dict.__setitem__("__doc__", Py.None);
-//                }
-//            }
-//        }
+
         setIsBaseType(builder.getIsBaseType());
         needs_userdict = dict.__finditem__("__dict__") != null;
         instantiable = dict.__finditem__("__new__") != null;
@@ -888,8 +861,24 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
     }
 
     @ExposedGet(name = "__doc__")
-    public PyObject getDoc() {
-        return getBuiltinDoc(name + "_doc");
+    public PyObject getDocument() {
+        if (builtin && tpDoc != null) {
+            return new PyUnicode(tpDoc);
+        }
+        PyObject result = dict.__finditem__("__doc__");
+        if (result == null) {
+            return Py.None;
+        }
+        if (result.getType().implementsDescrGet()) {
+            result = result.__get__(null, this);
+        }
+        return result;
+    }
+
+    @ExposedSet(name = "__doc__")
+    public void setDocument(PyObject document) {
+        checkSetSpecialTypeAttr(document, "__doc__");
+        dict.__setitem__("__dic__", document);
     }
 
     @ExposedGet(name = "__base__")
@@ -899,14 +888,17 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
         return base;
     }
 
-    static PyObject getBuiltinDoc(String fieldName) {
+    public static String getBuiltinDocstring(String fieldName) {
         try {
             Field docField =  BuiltinDocs.class.getField(fieldName);
-            String doc = (String) docField.get(null);
-            return doc == null ? Py.None : new PyUnicode(doc);
+            return (String) docField.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            return Py.None;
+            return null;
         }
+    }
+    public static PyObject getBuiltinDoc(String fieldName) {
+        String doc = getBuiltinDocstring(fieldName);
+        return doc == null ? Py.None : new PyUnicode(doc);
     }
 
     @ExposedGet(name = "__text_signature__")
@@ -972,6 +964,12 @@ public class PyType extends PyObject implements DynLinkable, Serializable, Trave
             throw t;
         }
         postSetattr("__getattribute__");
+    }
+
+    private void checkSetSpecialTypeAttr(PyObject value, String name) {
+        if (builtin) {
+            throw Py.TypeError(String.format("cann't set %s.%s", fastGetName(), name));
+        }
     }
 
     private void setIsBaseType(boolean isBaseType) {

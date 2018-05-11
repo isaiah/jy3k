@@ -424,16 +424,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitModule(org.python.antlr.ast.Module suite) {
         java.util.List<stmt> body = suite.getInternalBody();
-        int docstring = getDocStr(body);
-        if (docstring == 0) {
+        if (suite.getInternalDocstring() != null) {
             loadFrame();
-            visit(((Expr) body.get(0)).getInternalValue());
+            module.unicodeConstant(suite.getInternalDocstring()).get(code);
             nameop("__doc__", expr_contextType.Store);
         }
-        int size = body.size();
-        for (int i = docstring + 1; i < size; i++) {
-            visit(body.get(i));
-        }
+        compileBody(body);
         return null;
     }
 
@@ -458,7 +454,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
-        return compileFunction(name, decs, node.getInternalArgs(), body, node);
+        return compileFunction(name, decs, node.getInternalArgs(), node.getInternalDocstring(), body, node);
     }
 
     @Override
@@ -466,7 +462,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         String name = node.getInternalName();
         java.util.List<expr> decs = node.getInternalDecorator_list();
         java.util.List<stmt> body = node.getInternalBody();
-        return compileFunction(name, decs, node.getInternalArgs(), body, node);
+        return compileFunction(name, decs, node.getInternalArgs(), node.getInternalDocstring(), body, node);
     }
 
     private void compileBody(java.util.List<stmt> stmts) {
@@ -490,11 +486,18 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadFrame();
         code.dup();
         code.dup();
+        code.dup();
         nameop("__name__", expr_contextType.Load);
         nameop("__module__", expr_contextType.Store);
         assert u.qualname != null: "class qualname is null";
         module.unicodeConstant(u.qualname).get(code); // TODO check how to handle constants in the better way
         nameop("__qualname__", expr_contextType.Store);
+        if (node.getInternalDocstring() != null) {
+            module.unicodeConstant(node.getInternalDocstring()).get(code);
+        } else {
+            getNone();
+        }
+        nameop("__doc__", expr_contextType.Store);
         compileBody(node.getInternalBody());
 
         if (u.ste.needsClassClosure) {
@@ -1038,7 +1041,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAnonymousFunction(AnonymousFunction node) {
-        return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalArgs(), node.getInternalBody(), node);
+        return compileFunction(node.getInternalName(), Arrays.asList(), node.getInternalArgs(), null, node.getInternalBody(), node);
     }
 
     @Override
@@ -1706,16 +1709,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
     }
 
-    public int getDocStr(java.util.List<stmt> suite) {
-        if (suite.size() > 0) {
-            stmt stmt = suite.get(0);
-            if (stmt instanceof Expr && ((Expr) stmt).getInternalValue() instanceof Str) {
-                return 0;
-            }
-        }
-        return -1;
-    }
-
     public boolean makeClosure(CompileUnit innerUnit) {
         int n = innerUnit.freevars.size();
 
@@ -1742,7 +1735,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return true;
     }
 
-    private Object compileFunction(String internalName, java.util.List<expr> decos, arguments args, java.util.List<stmt> body, PythonTree node) {
+    private Object compileFunction(String internalName, java.util.List<expr> decos, arguments args, String docstring, java.util.List<stmt> body, PythonTree node) {
         boolean anonymous = node instanceof expr;
 
         if (!anonymous) {
@@ -1776,10 +1769,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         enterScope(internalName, CompilerScope.FUNCTION, node, node.getLineno());
         String qualname = u.qualname;
 
-        int docstring = getDocStr(body);
-        for (int i = docstring + 1; i < body.size(); i++) {
-            visit(body.get(i));
-        }
+        body.stream().forEach(this::visit);
         // blindly appending `return None`, asm will eliminate it
         if (ste.coroutine || ste.generator) {
             setLastI(-1);
@@ -1797,8 +1787,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         CompileUnit innerUnit = u;
         exitScope();
 
-        if (docstring == 0) {
-            visit(((Expr) body.get(0)).getInternalValue());
+        if (docstring != null) {
+            module.unicodeConstant(docstring).get(code);
         } else {
             code.aconst_null();
         }

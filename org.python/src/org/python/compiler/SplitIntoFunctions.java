@@ -59,7 +59,7 @@ public class SplitIntoFunctions extends Visitor {
     }
 
     private FunctionDef createFunctionDef(SplitNode node) {
-        FunctionDef func = new FunctionDef(node.getToken(), node.getInternalName(), null, node.getInternalBody(), null, null);
+        FunctionDef func = new FunctionDef(node.getToken(), node.getInternalName(), null, node.getInternalBody(), null, null, null);
         nodeScopes.put(func, nodeScopes.remove(node));
         return func;
     }

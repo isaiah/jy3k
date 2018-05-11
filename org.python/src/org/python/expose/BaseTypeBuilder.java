@@ -7,6 +7,7 @@ import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyType;
+import org.python.core.PyUnicode;
 import org.python.core.TypeSlot;
 
 public class BaseTypeBuilder implements TypeBuilder {
@@ -68,6 +69,7 @@ public class BaseTypeBuilder implements TypeBuilder {
             dict.__setitem__("__new__", newWrapper);
             newWrapper.setWrappedType(type);
         }
+        type.tpDoc = PyType.getBuiltinDocstring(name + "_doc");
         return dict;
     }
 

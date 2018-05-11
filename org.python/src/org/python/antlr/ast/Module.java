@@ -50,9 +50,25 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         this.body = AstAdapters.py2stmtList(body);
     }
 
+    private String docstring;
+    public String getInternalDocstring() {
+        return docstring;
+    }
+    public void setInternalDocstring(String docstring) {
+        this.docstring = docstring;
+    }
+    @ExposedGet(name = "docstring")
+    public PyObject getDocstring() {
+        return AstAdapters.string2py(docstring);
+    }
+    @ExposedSet(name = "docstring")
+    public void setDocstring(PyObject docstring) {
+        this.docstring = AstAdapters.py2string(docstring);
+    }
+
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("body")};
+    new PyUnicode[] {new PyUnicode("body"), new PyUnicode("docstring")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -72,13 +88,15 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
     @ExposedMethod(names={"__init__"})
     public void Module___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("Module", args, keywords, new String[]
-            {"body"}, 1, true);
+            {"body", "docstring"}, 2, true);
         setBody(ap.getPyObject(0, Py.None));
+        setDocstring(ap.getPyObject(1, Py.None));
     }
 
-    public Module(PyObject body) {
+    public Module(PyObject body, PyObject docstring) {
         super(TYPE);
         setBody(body);
+        setDocstring(docstring);
     }
 
     // called from derived class
@@ -86,7 +104,7 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         super(subtype);
     }
 
-    public Module(Token token, java.util.List<stmt> body) {
+    public Module(Token token, java.util.List<stmt> body, String docstring) {
         super(TYPE, token);
         this.body = body;
         if (body == null) {
@@ -96,9 +114,10 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
             PythonTree t = this.body.get(i);
             addChild(t, i, this.body);
         }
+        this.docstring = docstring;
     }
 
-    public Module(PythonTree tree, java.util.List<stmt> body) {
+    public Module(PythonTree tree, java.util.List<stmt> body, String docstring) {
         super(TYPE, tree);
         this.body = body;
         if (body == null) {
@@ -108,10 +127,11 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
             PythonTree t = this.body.get(i);
             addChild(t, i, this.body);
         }
+        this.docstring = docstring;
     }
 
     public Module copy() {
-        return new Module(this.getToken(), this.body);
+        return new Module(this.getToken(), this.body, this.docstring);
     }
 
     @ExposedGet(name = "repr")
@@ -124,6 +144,9 @@ public static final PyType TYPE = PyType.fromClass(Module.class);
         StringBuffer sb = new StringBuffer("Module(");
         sb.append("body=");
         sb.append(dumpThis(body));
+        sb.append(",");
+        sb.append("docstring=");
+        sb.append(dumpThis(docstring));
         sb.append(",");
         sb.append(")");
         return sb.toString();

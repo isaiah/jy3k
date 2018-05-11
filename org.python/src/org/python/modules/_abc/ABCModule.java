@@ -3,7 +3,7 @@ package org.python.modules._abc;
 import org.python.annotations.ExposedFunction;
 import org.python.annotations.ExposedModule;
 import org.python.core.Abstract;
-import org.python.core.Call;
+import org.python.core.Caller;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -15,8 +15,6 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.PyUnicode;
 
-import javax.swing.table.AbstractTableModel;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,13 +71,13 @@ public class ABCModule {
                     return Py.False;
                 }
             }
-            return Call._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subclass);
+            return Caller._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subclass);
         }
-        PyObject result = Call._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subclass);
+        PyObject result = Caller._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subclass);
         if (Abstract.PyObject_IsTrue(Py.getThreadState(), result)) {
             return result;
         }
-        return Call._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subtype);
+        return Caller._PyOBject_CallMethodIdObjArgs(self, "__subclasscheck__", handler, subtype);
     }
 
     @ExposedFunction
@@ -103,7 +101,7 @@ public class ABCModule {
             }
         }
         /* 3. Check the subclass hook */
-        PyObject ok = Call._PyOBject_CallMethodIdObjArgs(self, "__subclasshook__", () -> Py.NotImplemented, subclass);
+        PyObject ok = Caller._PyOBject_CallMethodIdObjArgs(self, "__subclasshook__", () -> Py.NotImplemented, subclass);
         if (ok == Py.True) {
             impl.abcCache.add(subclass);
             return ok;
@@ -132,7 +130,7 @@ public class ABCModule {
         }
 
         /* 6. Check if it's subclass of a subclass (recursive). */
-        PyObject subclasses = Call.PyObject_CallMethod(self, "__subclasses__");
+        PyObject subclasses = Caller.PyObject_CallMethod(self, "__subclasses__");
         if (!(subclasses instanceof PyList)) {
             throw Py.TypeError("__subclasses__ must return a list");
         }

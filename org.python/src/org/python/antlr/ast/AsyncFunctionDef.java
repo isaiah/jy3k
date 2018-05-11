@@ -115,10 +115,27 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         this.returns = AstAdapters.py2expr(returns);
     }
 
+    private String docstring;
+    public String getInternalDocstring() {
+        return docstring;
+    }
+    public void setInternalDocstring(String docstring) {
+        this.docstring = docstring;
+    }
+    @ExposedGet(name = "docstring")
+    public PyObject getDocstring() {
+        return AstAdapters.string2py(docstring);
+    }
+    @ExposedSet(name = "docstring")
+    public void setDocstring(PyObject docstring) {
+        this.docstring = AstAdapters.py2string(docstring);
+    }
+
 
     private final static PyUnicode[] fields =
     new PyUnicode[] {new PyUnicode("name"), new PyUnicode("args"), new PyUnicode("body"), new
-                      PyUnicode("decorator_list"), new PyUnicode("returns")};
+                      PyUnicode("decorator_list"), new PyUnicode("returns"), new
+                      PyUnicode("docstring")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -139,18 +156,20 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     @ExposedMethod(names={"__init__"})
     public void AsyncFunctionDef___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("AsyncFunctionDef", args, keywords, new String[]
-            {"name", "args", "body", "decorator_list", "returns", "lineno", "col_offset"}, 5, true);
+            {"name", "args", "body", "decorator_list", "returns", "docstring", "lineno",
+              "col_offset"}, 6, true);
         setName(ap.getPyObject(0, Py.None));
         setArgs(ap.getPyObject(1, Py.None));
         setBody(ap.getPyObject(2, Py.None));
         setDecorator_list(ap.getPyObject(3, Py.None));
         setReturns(ap.getPyObject(4, Py.None));
-        int lin = ap.getInt(5, -1);
+        setDocstring(ap.getPyObject(5, Py.None));
+        int lin = ap.getInt(6, -1);
         if (lin != -1) {
             setLineno(lin);
         }
 
-        int col = ap.getInt(6, -1);
+        int col = ap.getInt(7, -1);
         if (col != -1) {
             setLineno(col);
         }
@@ -158,13 +177,14 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     }
 
     public AsyncFunctionDef(PyObject name, PyObject args, PyObject body, PyObject decorator_list,
-    PyObject returns) {
+    PyObject returns, PyObject docstring) {
         super(TYPE);
         setName(name);
         setArgs(args);
         setBody(body);
         setDecorator_list(decorator_list);
         setReturns(returns);
+        setDocstring(docstring);
     }
 
     // called from derived class
@@ -173,7 +193,7 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
     }
 
     public AsyncFunctionDef(Token token, String name, arguments args, java.util.List<stmt> body,
-    java.util.List<expr> decorator_list, expr returns) {
+    java.util.List<expr> decorator_list, expr returns, String docstring) {
         super(TYPE, token);
         this.name = name;
         this.args = args;
@@ -199,10 +219,11 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         this.returns = returns;
         if (this.returns != null)
             this.returns.setParent(this);
+        this.docstring = docstring;
     }
 
     public AsyncFunctionDef(PythonTree tree, String name, arguments args, java.util.List<stmt>
-    body, java.util.List<expr> decorator_list, expr returns) {
+    body, java.util.List<expr> decorator_list, expr returns, String docstring) {
         super(TYPE, tree);
         this.name = name;
         this.args = args;
@@ -228,11 +249,12 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         this.returns = returns;
         if (this.returns != null)
             this.returns.setParent(this);
+        this.docstring = docstring;
     }
 
     public AsyncFunctionDef copy() {
         return new AsyncFunctionDef(this.getToken(), this.name, this.args, this.body,
-        this.decorator_list, this.returns);
+        this.decorator_list, this.returns, this.docstring);
     }
 
     @ExposedGet(name = "repr")
@@ -257,6 +279,9 @@ public static final PyType TYPE = PyType.fromClass(AsyncFunctionDef.class);
         sb.append(",");
         sb.append("returns=");
         sb.append(dumpThis(returns));
+        sb.append(",");
+        sb.append("docstring=");
+        sb.append(dumpThis(docstring));
         sb.append(",");
         sb.append(")");
         return sb.toString();

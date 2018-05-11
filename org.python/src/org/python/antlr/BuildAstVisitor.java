@@ -135,9 +135,9 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitFile_input(PythonParser.File_inputContext ctx) {
-        java.util.List<stmt> stmts = new ArrayList<>();
-        ctx.stmt().stream().forEach(stmtContext -> stmts.addAll(visit_Stmt(stmtContext)));
-        return new Module(ctx.getStart(), stmts);
+        java.util.List<stmt> stmts = ctx.stmt().stream().flatMap(stmtContext -> visit_Stmt(stmtContext).stream()).collect(Collectors.toList());
+        SuiteResult result = docstringFromStmts(stmts);
+        return new Module(ctx.getStart(), result.stmts, result.docstring);
     }
 
     @Override
@@ -770,13 +770,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.test() != null) {
             anno = (expr) visit(ctx.test());
         }
-        return new FunctionDef(ctx.getStart(), ctx.NAME().getText(), args, visit_Suite(ctx.suite()), decoratorList, anno);
+        SuiteResult suite = visit_SuiteWithDocstring(ctx.suite());
+        return new FunctionDef(ctx.getStart(), ctx.NAME().getText(), args, suite.stmts, decoratorList, anno, suite.docstring);
     }
 
     private PythonTree visit_Class_def(PythonParser.ClassdefContext ctx, java.util.List<expr> decoratorList) {
         ArglistResult arglistResult = visit_Arglist(ctx.arglist());
+        SuiteResult suite = visit_SuiteWithDocstring(ctx.suite());
         return new ClassDef(ctx.getStart(), ctx.NAME().getText(),
-                arglistResult.args, arglistResult.keywords, visit_Suite(ctx.suite()), decoratorList);
+                arglistResult.args, arglistResult.keywords, suite.stmts, decoratorList, suite.docstring);
     }
 
     @Override
@@ -1033,6 +1035,24 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return stmts;
     }
 
+    private SuiteResult docstringFromStmts(java.util.List<stmt> stmts) {
+        SuiteResult ret = new SuiteResult();
+        ret.stmts = stmts;
+        if (stmts.size() > 0) {
+            stmt s = stmts.get(0);
+            if (s instanceof Expr && ((Expr) s).getInternalValue() instanceof Str) {
+                ret.docstring = ((Str) ((Expr) s).getInternalValue()).getInternalS();
+                ret.stmts = stmts.subList(1, stmts.size());
+            }
+        }
+        return ret;
+    }
+
+    private SuiteResult visit_SuiteWithDocstring(PythonParser.SuiteContext ctx) {
+        java.util.List<stmt> stmts = visit_Suite(ctx);
+        return docstringFromStmts(stmts);
+    }
+
     private java.util.List<stmt> visit_Suite(PythonParser.SuiteContext ctx) {
         if (ctx == null) return null;
         if (ctx.simple_stmt() != null) {
@@ -1041,6 +1061,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         return ctx.stmt().stream()
                 .flatMap(stmtContext -> visit_Stmt(stmtContext).stream())
                 .collect(Collectors.toList());
+    }
+
+    class SuiteResult {
+        String docstring;
+         java.util.List<stmt> stmts;
     }
 
     class Testlist_compResult {

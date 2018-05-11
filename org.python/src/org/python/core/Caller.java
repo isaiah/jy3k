@@ -2,7 +2,7 @@ package org.python.core;
 
 import java.util.function.Supplier;
 
-public class Call {
+public class Caller {
 
     public static PyObject _PyOBject_CallMethodIdObjArgs(PyObject self, String methodId, Supplier<PyObject> noAttrHandler, PyObject... args) {
         try {

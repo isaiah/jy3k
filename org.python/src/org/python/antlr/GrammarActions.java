@@ -248,7 +248,7 @@ public class GrammarActions {
 
     stmt makeAsyncFuncdef(Token t, FunctionDef func, java.util.List<expr> decoratorList) {
         return new AsyncFunctionDef(t, func.getInternalName(), func.getInternalArgs(),
-                func.getInternalBody(), decoratorList, func.getInternalReturns());
+                func.getInternalBody(), decoratorList, func.getInternalReturns(), func.getInternalDocstring());
     }
 
     List<expr> makeAssignTargets(expr lhs, List rhs) {
