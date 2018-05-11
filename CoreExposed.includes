@@ -86,7 +86,7 @@ org/python/core/generator/PyGenerator.class
 org/python/importlib/JavaImporter.class
 org/python/importlib/PyClasspathLoader.class
 org/python/importlib/PyClasspathFinder.class
-org/python/modules/_abc/PyABCDataType.class
+org/python/modules/_abc/PyABCData.class
 org/python/modules/_struct/PyStruct.class
 org/python/modules/_socket/PySocket.class
 org/python/modules/PyNamespace.class
