@@ -15,6 +15,7 @@ import org.python.annotations.ExposedType;
 @Untraversable
 @ExposedType(name = "getset_descriptor", base = PyObject.class, isBaseType = false)
 public abstract class PyDataDescr extends PyDescriptor {
+    public static final PyType TYPE = PyType.fromClass(PyDataDescr.class);
 
     protected Class ofType;
 
@@ -30,6 +31,7 @@ public abstract class PyDataDescr extends PyDescriptor {
      */
     public PyDataDescr(PyType onType, String name, Class ofType, String doc) {
         this(name, ofType, doc);
+        objtype = TYPE;
         setType(onType);
     }
 

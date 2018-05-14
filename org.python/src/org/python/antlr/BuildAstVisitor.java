@@ -1145,7 +1145,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 }
             }
         }
-        ret.add(new comprehension(ctx.getStart(), target, iter, ifs));
+        ret.add(new comprehension(ctx.getStart(), target, iter, ifs, ctx.ASYNC() == null ? 0 : 1));
         return ret;
     }
 

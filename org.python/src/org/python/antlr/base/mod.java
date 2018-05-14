@@ -16,6 +16,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
+import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
 import org.python.core.PyNewWrapper;
@@ -27,6 +28,7 @@ import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ExposedSlot;
 import org.python.annotations.SlotFunc;
+import java.util.Objects;
 
 @ExposedType(name = "_ast.mod", base = AST.class)
 public abstract class mod extends PythonTree {
@@ -52,4 +54,20 @@ public abstract class mod extends PythonTree {
         super(subtype, node);
     }
 
+    @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
+    public static PyObject mod_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
+    args, String[] keywords) {
+        return new mod(subtype) {
+            public String toString() {
+                return String.format("<_ast.mod object at 0x%X>", Objects.hashCode(this));
+            }
+            public String toStringTree() {
+                return toString();
+            }
+            public mod copy() {
+                return null;
+            }
+        };
+    }
 }

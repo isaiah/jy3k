@@ -352,7 +352,7 @@ public class ArgParser {
         return ret;
     }
 
-    private PyObject getOptionalArg(int pos) {
+    public PyObject getOptionalArg(int pos) {
         int kws_start = this.args.length - this.kws.length;
         if (pos < kws_start) {
             return this.args[pos];

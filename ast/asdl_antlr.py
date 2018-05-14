@@ -87,6 +87,7 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.core.PyObject;', file=self.file)
             print('import org.python.core.PyUnicode;', file=self.file)
             print('import org.python.core.PyStringMap;', file=self.file)
+            print('import org.python.core.PyLong;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
             print('import org.python.core.PyList;', file=self.file)
             print('import org.python.core.PyNewWrapper;', file=self.file)
@@ -98,6 +99,7 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.annotations.ExposedType;', file=self.file)
             print('import org.python.annotations.ExposedSlot;', file=self.file)
             print('import org.python.annotations.SlotFunc;', file=self.file)
+            print('import java.util.Objects;', file=self.file)
 
         if useDataOutput:
             print('import java.io.DataOutputStream;', file=self.file)
@@ -311,6 +313,23 @@ class JavaVisitor(EmitVisitor):
         self.emit("}", depth+1)
         self.emit("", 0)
 
+        self.emit("@ExposedNew", depth+1)
+        self.emit("@ExposedSlot(SlotFunc.NEW)", depth+1)
+        self.emit("public static PyObject %s_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {" % name, depth+1)
+        self.emit("return new %s(subtype) {" % name, depth + 2)
+        self.emit("public String toString() {", depth + 3)
+        self.emit(f"return String.format(\"<_ast.{name} object at 0x%X>\", Objects.hashCode(this));", depth + 4)
+        self.emit("}", depth + 3)
+        self.emit("public String toStringTree() {", depth + 3)
+        self.emit("return toString();", depth + 4)
+        self.emit("}", depth + 3)
+        self.emit("public %s copy() {" % name,  depth + 3)
+        self.emit("return null;", depth + 4)
+        self.emit("}", depth + 3)
+        self.emit("};", depth + 2)
+        self.emit("}", depth+1)
+
+
         self.emit("}", depth)
         self.close()
         for t in sum.types:
@@ -364,34 +383,26 @@ class JavaVisitor(EmitVisitor):
 
         if str(name) in ('stmt', 'expr', 'excepthandler'):
             # The lineno property
-            self.emit("private int lineno = -1;", depth + 1)
             self.emit('@ExposedGet(name = "lineno")', depth + 1)
             self.emit("public int getLineno() {", depth + 1)
-            self.emit("if (lineno != -1) {", depth + 2);
-            self.emit("return lineno;", depth + 3);
-            self.emit("}", depth + 2)
-            self.emit('return getLine();', depth + 2)
+            self.emit('return super.getLineno();', depth + 2)
             self.emit("}", depth + 1)
             self.emit("", 0)
             self.emit('@ExposedSet(name = "lineno")', depth + 1)
             self.emit("public void setLineno(int num) {", depth + 1)
-            self.emit("lineno = num;", depth + 2);
+            self.emit("lineno = new PyLong(num);", depth + 2);
             self.emit("}", depth + 1)
             self.emit("", 0)
 
             # The col_offset property
-            self.emit("private int col_offset = -1;", depth + 1)
             self.emit('@ExposedGet(name = "col_offset")', depth + 1)
             self.emit("public int getCol_offset() {", depth + 1)
-            self.emit("if (col_offset != -1) {", depth + 2);
-            self.emit("return col_offset;", depth + 3);
-            self.emit("}", depth + 2)
-            self.emit('return getCharPositionInLine();', depth + 2)
+            self.emit('return super.getCol_offset();', depth + 2)
             self.emit("}", depth + 1)
             self.emit("", 0)
             self.emit('@ExposedSet(name = "col_offset")', depth + 1)
             self.emit("public void setCol_offset(int num) {", depth + 1)
-            self.emit("col_offset = num;", depth + 2);
+            self.emit("col_offset = new PyLong(num);", depth + 2);
             self.emit("}", depth + 1)
             self.emit("", 0)
 
@@ -573,15 +584,15 @@ class JavaVisitor(EmitVisitor):
                 str(i)), depth+1)
             i += 1
         if str(name) in ('stmt', 'expr', 'excepthandler'):
-            self.emit("int lin = ap.getInt(%s, -1);" % str(i), depth + 1) 
-            self.emit("if (lin != -1) {", depth + 1) 
-            self.emit("setLineno(lin);", depth + 2) 
+            self.emit("PyObject lin = ap.getOptionalArg(%s);" % str(i), depth + 1) 
+            self.emit("if (lin != null) {", depth + 1) 
+            self.emit("lineno = lin;", depth + 2) 
             self.emit("}", depth + 1)
             self.emit("", 0)
 
-            self.emit("int col = ap.getInt(%s, -1);" % str(i+1), depth + 1) 
-            self.emit("if (col != -1) {", depth + 1) 
-            self.emit("setLineno(col);", depth + 2) 
+            self.emit("PyObject col = ap.getOptionalArg(%s);" % str(i+1), depth + 1) 
+            self.emit("if (col != null) {", depth + 1) 
+            self.emit("col_offset = col;", depth + 2) 
             self.emit("}", depth + 1)
             self.emit("", 0)
 

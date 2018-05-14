@@ -16,6 +16,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
+import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
 import org.python.core.PyNewWrapper;
@@ -27,6 +28,7 @@ import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ExposedSlot;
 import org.python.annotations.SlotFunc;
+import java.util.Objects;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,9 +84,26 @@ public class comprehension extends PythonTree {
         this.ifs = AstAdapters.py2exprList(ifs);
     }
 
+    private Integer is_async;
+    public Integer getInternalIs_async() {
+        return is_async;
+    }
+    public void setInternalIs_async(Integer is_async) {
+        this.is_async = is_async;
+    }
+    @ExposedGet(name = "is_async")
+    public PyObject getIs_async() {
+        return Py.newInteger(is_async);
+    }
+    @ExposedSet(name = "is_async")
+    public void setIs_async(PyObject is_async) {
+        this.is_async = AstAdapters.py2int(is_async);
+    }
+
 
     private final static PyUnicode[] fields =
-    new PyUnicode[] {new PyUnicode("target"), new PyUnicode("iter"), new PyUnicode("ifs")};
+    new PyUnicode[] {new PyUnicode("target"), new PyUnicode("iter"), new PyUnicode("ifs"), new
+                      PyUnicode("is_async")};
     @ExposedGet(name = "_fields")
     public PyUnicode[] get_fields() { return fields; }
 
@@ -104,17 +123,19 @@ public class comprehension extends PythonTree {
     @ExposedMethod(names={"__init__"})
     public void comprehension___init__(PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("comprehension", args, keywords, new String[]
-            {"target", "iter", "ifs"}, 3, true);
+            {"target", "iter", "ifs", "is_async"}, 4, true);
         setTarget(ap.getPyObject(0, Py.None));
         setIter(ap.getPyObject(1, Py.None));
         setIfs(ap.getPyObject(2, Py.None));
+        setIs_async(ap.getPyObject(3, Py.None));
     }
 
-    public comprehension(PyObject target, PyObject iter, PyObject ifs) {
+    public comprehension(PyObject target, PyObject iter, PyObject ifs, PyObject is_async) {
         super(TYPE);
         setTarget(target);
         setIter(iter);
         setIfs(ifs);
+        setIs_async(is_async);
     }
 
     // called from derived class
@@ -122,7 +143,8 @@ public class comprehension extends PythonTree {
         super(subtype);
     }
 
-    public comprehension(Token token, expr target, expr iter, java.util.List<expr> ifs) {
+    public comprehension(Token token, expr target, expr iter, java.util.List<expr> ifs, Integer
+    is_async) {
         super(TYPE, token);
         this.target = target;
         if (this.target != null)
@@ -139,9 +161,11 @@ public class comprehension extends PythonTree {
             if (t != null)
                 t.setParent(this);
         }
+        this.is_async = is_async;
     }
 
-    public comprehension(PythonTree tree, expr target, expr iter, java.util.List<expr> ifs) {
+    public comprehension(PythonTree tree, expr target, expr iter, java.util.List<expr> ifs, Integer
+    is_async) {
         super(TYPE, tree);
         this.target = target;
         if (this.target != null)
@@ -158,10 +182,11 @@ public class comprehension extends PythonTree {
             if (t != null)
                 t.setParent(this);
         }
+        this.is_async = is_async;
     }
 
     public comprehension copy() {
-        return new comprehension(this.getToken(), this.target, this.iter, this.ifs);
+        return new comprehension(this.getToken(), this.target, this.iter, this.ifs, this.is_async);
     }
 
     @ExposedGet(name = "repr")
@@ -180,6 +205,9 @@ public class comprehension extends PythonTree {
         sb.append(",");
         sb.append("ifs=");
         sb.append(dumpThis(ifs));
+        sb.append(",");
+        sb.append("is_async=");
+        sb.append(dumpThis(is_async));
         sb.append(",");
         sb.append(")");
         return sb.toString();

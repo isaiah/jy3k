@@ -2,13 +2,12 @@ package org.python.antlr;
 
 import org.antlr.v4.runtime.Token;
 import org.python.antlr.ast.Block;
-import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Name;
-import org.python.antlr.ast.Return;
-import org.python.antlr.ast.Try;
 import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
+import org.python.core.Py;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
@@ -67,13 +66,8 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public int getLine() {
         return node.getLine();
     }
-    public int getLineno() { return node.getLine(); }
 
     public int getCharPositionInLine() {
-        return node.getCharPositionInLine();
-    }
-
-    public int getCol_offset() {
         return node.getCharPositionInLine();
     }
 
@@ -214,6 +208,33 @@ public abstract class PythonTree extends AST implements Traverseproc {
             return other;
         }
         throw new RuntimeException("Only support statement: " + this);
+    }
+
+    protected PyObject lineno, col_offset;
+    public int getLineno() {
+        if (lineno == null) {
+            if (getToken() == null) {
+                throw Py.TypeErrorFmt("required field \"lineno\" missing from %s", this);
+            }
+            return getLine();
+        }
+        if (!(lineno instanceof PyLong)) {
+            throw Py.ValueError("invalid integer value: " + lineno);
+        }
+        return lineno.asInt();
+    }
+
+    public int getCol_offset() {
+        if (col_offset == null) {
+            if (getToken() == null) {
+                throw Py.TypeErrorFmt("required field \"coloffset\" missing from %s", this);
+            }
+            return getCharPositionInLine();
+        }
+        if (!(col_offset instanceof PyLong)) {
+            throw Py.ValueError("invalid integer value: " + col_offset);
+        }
+        return col_offset.asInt();
     }
 
     public <R> boolean enter(VisitorIF<R> visitor) {

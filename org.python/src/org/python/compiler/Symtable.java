@@ -51,6 +51,7 @@ import org.python.antlr.ast.arguments;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.base.expr;
 import org.python.antlr.base.stmt;
+import org.python.core.Py;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PySyntaxError;
@@ -563,6 +564,9 @@ public class Symtable extends Visitor {
 
     @Override
     public Object visitYieldFrom(YieldFrom node) {
+        if (node.getInternalValue() == null) {
+            throw Py.ValueError("field value is required");
+        }
         visit(node.getInternalValue());
         cur.generator = true;
         return null;

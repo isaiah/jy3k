@@ -290,10 +290,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visit(PythonTree node) {
-        int lineno = node.getLineno();
         if (node instanceof stmt) {
+            int lineno = node.getLineno();
             setline(lineno);
         } else if (node instanceof expr) {
+            int lineno = node.getLineno();
             if (lineno > u.co_lineno) {
                 u.co_lineno = lineno;
                 setline(lineno);
@@ -834,7 +835,11 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         loadFrame();
         code.ldc(node.getInternalModule());
         loadStrings(code, aliases.stream().map(a -> a.getInternalName()).collect(Collectors.toList()));
-        code.iconst(node.getInternalLevel());
+        Integer lvl = node.getInternalLevel();
+        if (lvl == null) {
+            lvl = 0;
+        }
+        code.iconst(lvl);
         code.invokestatic(p(org.python.bootstrap.Import.class), "importName",
                 sig(PyObject.class, PyFrame.class, String.class, String[].class, Integer.TYPE));
         if (aliases == null || aliases.size() == 0) {

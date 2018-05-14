@@ -16,6 +16,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.core.PyStringMap;
+import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
 import org.python.core.PyNewWrapper;
@@ -27,6 +28,7 @@ import org.python.annotations.ExposedSet;
 import org.python.annotations.ExposedType;
 import org.python.annotations.ExposedSlot;
 import org.python.annotations.SlotFunc;
+import java.util.Objects;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,14 +94,14 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
             {"targets", "value", "lineno", "col_offset"}, 2, true);
         setTargets(ap.getPyObject(0, Py.None));
         setValue(ap.getPyObject(1, Py.None));
-        int lin = ap.getInt(2, -1);
-        if (lin != -1) {
-            setLineno(lin);
+        PyObject lin = ap.getOptionalArg(2);
+        if (lin != null) {
+            lineno = lin;
         }
 
-        int col = ap.getInt(3, -1);
-        if (col != -1) {
-            setLineno(col);
+        PyObject col = ap.getOptionalArg(3);
+        if (col != null) {
+            col_offset = col;
         }
 
     }
@@ -219,32 +221,24 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
         }
     }
 
-    private int lineno = -1;
     @ExposedGet(name = "lineno")
     public int getLineno() {
-        if (lineno != -1) {
-            return lineno;
-        }
-        return getLine();
+        return super.getLineno();
     }
 
     @ExposedSet(name = "lineno")
     public void setLineno(int num) {
-        lineno = num;
+        lineno = new PyLong(num);
     }
 
-    private int col_offset = -1;
     @ExposedGet(name = "col_offset")
     public int getCol_offset() {
-        if (col_offset != -1) {
-            return col_offset;
-        }
-        return getCharPositionInLine();
+        return super.getCol_offset();
     }
 
     @ExposedSet(name = "col_offset")
     public void setCol_offset(int num) {
-        col_offset = num;
+        col_offset = new PyLong(num);
     }
 
 }
