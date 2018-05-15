@@ -525,7 +525,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     public PythonTree visitAsync_stmt(PythonParser.Async_stmtContext ctx) {
         if (ctx.funcdef() != null) {
             FunctionDef func = (FunctionDef) visit(ctx.funcdef());
-            return actions.makeAsyncFuncdef(ctx.getStart(), func, Arrays.asList());
+            return actions.makeAsyncFuncdef(ctx.funcdef().getStart(), func, Arrays.asList());
         }
         if (ctx.for_stmt() != null) {
             return actions.makeAsyncFor(ctx.getStart(), (For) visit(ctx.for_stmt()));
@@ -773,7 +773,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     private PythonTree visit_Async_funcdef(PythonParser.Async_funcdefContext ctx, java.util.List<expr> decoratorList) {
         FunctionDef func = (FunctionDef) visit(ctx.funcdef());
-        return actions.makeAsyncFuncdef(ctx.getStart(), func, decoratorList);
+        return actions.makeAsyncFuncdef(ctx.funcdef().getStart(), func, decoratorList);
     }
 
     private PythonTree visit_Funcdef(PythonParser.FuncdefContext ctx, java.util.List<expr> decoratorList) {

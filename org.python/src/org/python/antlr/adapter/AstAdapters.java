@@ -332,23 +332,7 @@ public class AstAdapters {
         return obj.toString();
     }
 
-    public static PyUnicode constant2py(String c) {
-        return new PyUnicode(c);
-    }
-
-    public static PyUnicode string2py(String c) {
-        return new PyUnicode(c);
-    }
-
-    public static String py2constant(PyObject obj) {
-        return obj.toString();
-    }
-
-    public static PyUnicode singleton2py(String s) {
-        return new PyUnicode(s);
-    }
-
-    public static String py2singleton(PyObject obj) {
-        return obj.toString();
+    public static PyObject string2py(String c) {
+        return c == null ? Py.None : new PyUnicode(c);
     }
 }
