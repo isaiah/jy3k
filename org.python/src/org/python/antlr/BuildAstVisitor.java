@@ -269,8 +269,10 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitLambdef(PythonParser.LambdefContext ctx) {
-        arguments args = null;
-        if (ctx.varargslist() != null) {
+        arguments args;
+        if (ctx.varargslist() == null) {
+            args = new arguments(ctx.getStart(), java.util.List.of(), null, java.util.List.of(), java.util.List.of(), null, java.util.List.of());
+        } else {
             args = (arguments) visit(ctx.varargslist());
         }
         return new Lambda(ctx.getStart(), args, (expr) visit(ctx.test()));
