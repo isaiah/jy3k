@@ -10,6 +10,7 @@ import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
@@ -281,6 +282,8 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
 
     /* Singletons */
     private final Constant None = new SingletonConstant("None", ci(PyObject.class));
+    private final Constant True = new SingletonConstant("True", ci(PyBoolean.class));
+    private final Constant False = new SingletonConstant("False", ci(PyBoolean.class));
     private final Constant EmptyByte = new SingletonConstant("EmptyByte", ci(PyBytes.class));
     private final Constant EmptyUnicode = new SingletonConstant("EmptyUnicode", ci(PyUnicode.class));
     private final Constant EmptyFrozenset = new SingletonConstant("EmptyFrozenset", ci(PyFrozenSet.class));
@@ -316,6 +319,12 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     Constant constant(PyObject n) {
         if (n == Py.None) {
             return None;
+        }
+        if (n == Py.True) {
+            return True;
+        }
+        if (n == Py.False) {
+            return False;
         }
         if (n instanceof PyLong) {
             return longConstant(n.asLong());
