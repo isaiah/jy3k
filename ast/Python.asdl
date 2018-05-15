@@ -95,6 +95,8 @@ module Python
          | Bytes(bytes s)
          | NameConstant(singleton value)
          | Ellipsis
+         -- Singlton that flags loading of sys.exc_info
+         | ExcInfo
          | Constant(constant value)
 
          -- the following expression can appear in assignment context
