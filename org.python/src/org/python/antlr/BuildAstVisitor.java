@@ -863,7 +863,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 if (ctx.kw.isEmpty()) {
                     throw Py.SyntaxError("named arguments must follow bare *");
                 }
-                vararg = new arg(ctx.STAR().getSymbol(), null, null);
+                vararg = new arg(ctx.STAR().getSymbol(), "", null);
             } else {
                 vararg = (arg) visit(ctx.vararg);
             }

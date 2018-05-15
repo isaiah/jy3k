@@ -155,7 +155,7 @@ public final class Py {
     /**
      * A frozenset with zero elements
      **/
-    public final static PyFrozenSet EmptyFrozenSet = new PyFrozenSet();
+    public final static PyFrozenSet EmptyFrozenset = new PyFrozenSet();
     /**
      * A tuple with zero elements
      **/
@@ -184,6 +184,7 @@ public final class Py {
      * A zero-length Python Unicode string
      **/
     public final static PyUnicode EmptyUnicode = new PyUnicode("");
+
     /**
      * A Python string containing '\n'
      **/
@@ -2627,28 +2628,6 @@ public final class Py {
             objs.add(item);
         }
         return objs.toArray(Py.EmptyObjects);
-    }
-}
-
-class FixedFileWrapper extends StdoutWrapper {
-
-    private PyObject file;
-
-    public FixedFileWrapper(PyObject file) {
-        name = "fixed file";
-        this.file = file;
-
-        if (file.getJavaProxy() != null) {
-            Object tojava = file.__tojava__(OutputStream.class);
-            if (tojava != null && tojava != Py.NoConversion) {
-                this.file = new PyTextIOWrapper((OutputStream) tojava);
-            }
-        }
-    }
-
-    @Override
-    protected PyObject myFile() {
-        return file;
     }
 }
 

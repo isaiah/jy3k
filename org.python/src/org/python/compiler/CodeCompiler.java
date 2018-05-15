@@ -21,6 +21,7 @@ import org.python.antlr.ast.Bytes;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
+import org.python.antlr.ast.Constant;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
@@ -601,6 +602,17 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
             visit(node.getInternalValue());
             node.getInternalTarget().leave(this);
             code.pop();
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitConstant(Constant node) {
+        PyObject value = node.getInternalValue();
+        if (value instanceof expr) {
+            visit((expr) value);
+        } else {
+            module.constant(value).get(code);
         }
         return null;
     }

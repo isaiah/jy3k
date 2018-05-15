@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-public abstract class BaseSet extends PyObject implements Set, Traverseproc {
+public abstract class BaseSet extends PyObject implements Set<PyObject>, Traverseproc {
 
     /** The underlying Set. */
     protected Set<PyObject> _set;
@@ -403,14 +403,12 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
      */
     protected static BaseSet makeNewSet(PyType type, PyObject iterable) {
         BaseSet so;
-        if (type == PySet.TYPE) {
-            so = new PySet(iterable);
-        } else if (type == PyFrozenSet.TYPE) {
-            so = new PyFrozenSet(iterable);
+        if (type == PyFrozenSet.TYPE) {
+            so = new PyFrozenSet(type, iterable);
         } else if (Py.isSubClass(type, PySet.TYPE)) {
-            so = new PySet(iterable);
+            so = new PySet(type, iterable);
         } else {
-            so = new PyFrozenSet(iterable);
+            so = new PySet(type, iterable);
         }
         return so;
     }
@@ -427,8 +425,8 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
         return _set.isEmpty();
     }
 
-    public boolean add(Object o) {
-        return _set.add(Py.java2py(o));
+    public boolean add(PyObject o) {
+        return _set.add(o);
     }
 
     public boolean contains(Object o) {
@@ -437,14 +435,6 @@ public abstract class BaseSet extends PyObject implements Set, Traverseproc {
 
     public boolean remove(Object o) {
         return _set.remove(Py.java2py(o));
-    }
-
-    public boolean addAll(Collection c) {
-        boolean added = false;
-        for (Object object : c) {
-            added |= add(object);
-        }
-        return added;
     }
 
     public boolean containsAll(Collection c) {

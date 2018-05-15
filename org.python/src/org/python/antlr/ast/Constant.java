@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.AST;
+import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.PythonTree;
 import org.python.antlr.adapter.AstAdapters;
 import org.python.antlr.base.excepthandler;
@@ -36,20 +37,20 @@ import java.util.ArrayList;
 @ExposedType(name = "_ast.Constant", base = expr.class)
 public class Constant extends expr {
 public static final PyType TYPE = PyType.fromClass(Constant.class);
-    private String value;
-    public String getInternalValue() {
+    private PyObject value;
+    public PyObject getInternalValue() {
         return value;
     }
-    public void setInternalValue(String value) {
+    public void setInternalValue(PyObject value) {
         this.value = value;
     }
     @ExposedGet(name = "value")
     public PyObject getValue() {
-        return AstAdapters.constant2py(value);
+        return value;
     }
     @ExposedSet(name = "value")
     public void setValue(PyObject value) {
-        this.value = AstAdapters.py2constant(value);
+        this.value = value;
     }
 
 
@@ -99,12 +100,12 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
         super(subtype);
     }
 
-    public Constant(Token token, String value) {
+    public Constant(Token token, PyObject value) {
         super(TYPE, token);
         this.value = value;
     }
 
-    public Constant(PythonTree tree, String value) {
+    public Constant(PythonTree tree, PyObject value) {
         super(TYPE, tree);
         this.value = value;
     }

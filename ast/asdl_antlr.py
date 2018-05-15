@@ -75,6 +75,7 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.antlr.v4.runtime.Token;', file=self.file)
             print('import org.antlr.v4.runtime.tree.TerminalNode;', file=self.file)
             print('import org.python.antlr.AST;', file=self.file)
+            print('import org.python.antlr.ast.VisitorIF;', file=self.file)
             print('import org.python.antlr.PythonTree;', file=self.file)
             print('import org.python.antlr.adapter.AstAdapters;', file=self.file)
             print('import org.python.antlr.base.excepthandler;', file=self.file)
@@ -329,6 +330,9 @@ class JavaVisitor(EmitVisitor):
         self.emit("};", depth + 2)
         self.emit("}", depth+1)
 
+        self.emit("public <R> R accept(VisitorIF<R> visitor) {", depth +1)
+        self.emit(f"throw Py.TypeError(String.format(\"expected some sort of {name}, but got %s\", this));", depth+2);
+        self.emit("}", depth+1)
 
         self.emit("}", depth)
         self.close()
@@ -673,6 +677,8 @@ class JavaVisitor(EmitVisitor):
                 self.emit("return Py.False;", depth+1)
             elif str(field.type) == 'int':
                 self.emit("return Py.newInteger(%s);" % field.name, depth+1)
+            elif str(field.type) == 'constant':
+                self.emit("return %s;" % field.name, depth+1)
             elif is_simple(field.typedef) or str(field.type) in self.bltinnames:
                 self.emit("return AstAdapters.%s2py(%s);" % (str(field.type), field.name), depth+1)
             else:
@@ -684,6 +690,8 @@ class JavaVisitor(EmitVisitor):
         if field.seq:
             #self.emit("this.%s = new %s(" % (field.name, self.javaType(field)), depth+1)
             self.emit("this.%s = AstAdapters.py2%sList(%s);" % (field.name, str(field.type), field.name), depth+1)
+        elif str(field.type) in ('constant', 'object'):
+            self.emit("this.%s = %s;" % (field.name, field.name), depth+1)
         else:
             self.emit("this.%s = AstAdapters.py2%s(%s);" % (field.name, str(field.type), field.name), depth+1)
         self.emit("}", depth)
@@ -694,10 +702,10 @@ class JavaVisitor(EmitVisitor):
         'bool' : 'Boolean',
         'bytes' : 'String',
         'identifier' : 'String',
-        'constant' : 'String',
+        'constant' : 'PyObject',
         'singleton' : 'String',
         'string' : 'String',
-        'object' : 'Object', # was PyObject
+        'object' : 'PyObject', # was PyObject
 
         #Below are for enums
         'boolop' : 'boolopType',

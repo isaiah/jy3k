@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.AST;
+import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.PythonTree;
 import org.python.antlr.adapter.AstAdapters;
 import org.python.antlr.base.excepthandler;
@@ -36,11 +37,11 @@ import java.util.ArrayList;
 @ExposedType(name = "_ast.Num", base = expr.class)
 public class Num extends expr {
 public static final PyType TYPE = PyType.fromClass(Num.class);
-    private Object n;
-    public Object getInternalN() {
+    private PyObject n;
+    public PyObject getInternalN() {
         return n;
     }
-    public void setInternalN(Object n) {
+    public void setInternalN(PyObject n) {
         this.n = n;
     }
     @ExposedGet(name = "n")
@@ -49,7 +50,7 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     }
     @ExposedSet(name = "n")
     public void setN(PyObject n) {
-        this.n = AstAdapters.py2object(n);
+        this.n = n;
     }
 
 
@@ -99,12 +100,12 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
         super(subtype);
     }
 
-    public Num(Token token, Object n) {
+    public Num(Token token, PyObject n) {
         super(TYPE, token);
         this.n = n;
     }
 
-    public Num(PythonTree tree, Object n) {
+    public Num(PythonTree tree, PyObject n) {
         super(TYPE, tree);
         this.n = n;
     }

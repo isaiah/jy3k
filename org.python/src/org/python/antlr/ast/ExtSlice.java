@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.python.antlr.AST;
+import org.python.antlr.ast.VisitorIF;
 import org.python.antlr.PythonTree;
 import org.python.antlr.adapter.AstAdapters;
 import org.python.antlr.base.excepthandler;

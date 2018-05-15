@@ -14,11 +14,13 @@ import org.python.core.PyBytes;
 import org.python.core.PyComplex;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
+import org.python.core.PyFrozenSet;
 import org.python.core.PyFunctionTable;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyRunnable;
 import org.python.core.PyTableCode;
+import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import java.io.IOException;
@@ -27,12 +29,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.python.util.CodegenUtils.ci;
 import static org.python.util.CodegenUtils.p;
 import static org.python.util.CodegenUtils.sig;
 
-class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
+class PyFloatConstant extends AbstractConstant {
 
     private static final double ZERO = 0.0;
 
@@ -44,7 +47,7 @@ class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void put(Code c) {
+    public void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(Double.valueOf(value));
         c.invokestatic(p(Py.class), "newFloat", sig(PyFloat.class, Double.TYPE));
@@ -68,8 +71,37 @@ class PyFloatConstant extends Constant implements ClassConstants, Opcodes {
     }
 }
 
+class FrozensetConstant extends AbstractConstant {
 
-class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
+    final PyFrozenSet value;
+
+    FrozensetConstant(PyFrozenSet value) {
+        super(String.format("_frozenset$%X", Objects.hash(value)));
+        this.value = value;
+    }
+
+    @Override
+    public void put(Code c) {
+        module.classfile.addField(name, ci(PyObject.class), access);
+        int n = value.size();
+        int i = 0;
+        c.new_(p(PyFrozenSet.class));
+        c.dup();
+        c.iconst(n);
+        c.anewarray(p(PyObject.class));
+        for (PyObject s : value) {
+            c.dup();
+            c.ldc(i++);
+            module.constant(s).get(c);
+            c.aastore();
+        }
+        c.invokespecial(p(PyFrozenSet.class), "<init>", sig(Void.TYPE, PyObject[].class));
+        c.putstatic(module.classfile.name, name, ci(PyObject.class));
+    }
+}
+
+
+class PyComplexConstant extends AbstractConstant {
 
     final double value;
 
@@ -79,7 +111,7 @@ class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void put(Code c) {
+    public void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(Double.valueOf(value));
         c.invokestatic(p(Py.class), "newImaginary", sig(PyComplex.class, Double.TYPE));
@@ -104,7 +136,7 @@ class PyComplexConstant extends Constant implements ClassConstants, Opcodes {
 }
 
 
-class PyStringConstant extends Constant implements ClassConstants, Opcodes {
+class PyStringConstant extends AbstractConstant {
 
     final String value;
 
@@ -114,7 +146,7 @@ class PyStringConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void put(Code c) {
+    public void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(value);
         c.invokestatic(p(PyBytes.class), "fromInterned", sig(PyBytes.class, String.class));
@@ -137,7 +169,7 @@ class PyStringConstant extends Constant implements ClassConstants, Opcodes {
 }
 
 
-class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
+class PyUnicodeConstant extends AbstractConstant {
     final String value;
 
     PyUnicodeConstant(String value) {
@@ -147,7 +179,7 @@ class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void put(Code c) {
+    public void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.ldc(value);
         c.invokestatic(p(PyUnicode.class), "fromInterned", sig(PyUnicode.class, String.class));
@@ -170,7 +202,7 @@ class PyUnicodeConstant extends Constant implements ClassConstants, Opcodes {
 }
 
 
-class PyLongConstant extends Constant implements ClassConstants, Opcodes {
+class PyLongConstant extends AbstractConstant {
 
     final long value;
 
@@ -180,7 +212,7 @@ class PyLongConstant extends Constant implements ClassConstants, Opcodes {
     }
 
     @Override
-    void put(Code c) {
+    public void put(Code c) {
         module.classfile.addField(name, ci(PyObject.class), access);
         c.lconst(value);
         c.invokestatic(p(Py.class), "newLong", sig(PyLong.class, long.class));
@@ -247,29 +279,30 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         this(name, name + ".py", true, -1);
     }
 
+    /* Singletons */
+    private final Constant None = new SingletonConstant("None", ci(PyObject.class));
+    private final Constant EmptyByte = new SingletonConstant("EmptyByte", ci(PyBytes.class));
+    private final Constant EmptyUnicode = new SingletonConstant("EmptyUnicode", ci(PyUnicode.class));
+    private final Constant EmptyFrozenset = new SingletonConstant("EmptyFrozenset", ci(PyFrozenSet.class));
+    private final Constant EmptyTuple = new SingletonConstant("EmptyTuple", ci(PyTuple.class));
+
     private Constant findConstant(Constant c) {
         Constant ret = constants.get(c);
         if (ret != null) {
             return ret;
         }
         ret = c;
-        c.module = this;
+        c.setModule(this);
         // More sophisticated name mappings might be nice
-        c.name = "_" + constants.size();
+        c.setName("_" + constants.size());
         constants.put(ret, ret);
         return ret;
     }
 
     Constant constant(expr node) {
         if (node instanceof Num) {
-            PyObject n = (PyObject) ((Num) node).getInternalN();
-            if (n instanceof PyLong) {
-                return longConstant(n.asLong());
-            } else if (n instanceof PyFloat) {
-                return floatConstant(((PyFloat) n).getValue());
-            } else if (n instanceof PyComplex) {
-                return complexConstant(((PyComplex)n).imag);
-            }
+            PyObject n = ((Num) node).getInternalN();
+            return constant(n);
         } else if (node instanceof Str) {
             String s = ((Str) node).getInternalS();
             return unicodeConstant(s);
@@ -280,6 +313,35 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         throw new RuntimeException("unexpected constant: " + node.toString());
     }
 
+    Constant constant(PyObject n) {
+        if (n == Py.None) {
+            return None;
+        }
+        if (n instanceof PyLong) {
+            return longConstant(n.asLong());
+        }
+        if (n instanceof PyFloat) {
+            return floatConstant(((PyFloat) n).getValue());
+        }
+        if (n instanceof PyComplex) {
+            return complexConstant(((PyComplex)n).imag);
+        }
+        if (n instanceof PyUnicode) {
+            return unicodeConstant(((PyUnicode) n).getString());
+        }
+        if (n instanceof PyBytes) {
+            return stringConstant(((PyBytes) n).getString());
+        }
+        if (n instanceof PyFrozenSet) {
+            if (((PyFrozenSet) n).isEmpty()) {
+                return EmptyFrozenset;
+            }
+            return findConstant(new FrozensetConstant((PyFrozenSet) n));
+        }
+        throw Py.TypeErrorFmt("got an invalid type in Constant: %s", n);
+    }
+
+
     Constant floatConstant(double value) {
         return findConstant(new PyFloatConstant(value));
     }
@@ -289,10 +351,16 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     }
 
     Constant stringConstant(String value) {
+        if ("".equals(value)) {
+            return EmptyByte;
+        }
         return findConstant(new PyStringConstant(value));
     }
 
     Constant unicodeConstant(String value) {
+        if ("".equals(value)) {
+            return EmptyUnicode;
+        }
         return findConstant(new PyUnicodeConstant(value));
     }
 

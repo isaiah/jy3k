@@ -7,6 +7,7 @@ import org.python.annotations.ExposedType;
 import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,6 +39,9 @@ public class PySet extends BaseSet {
         super(TYPE, _update(Collections.synchronizedSet(new HashSet<>()), data));
     }
 
+    public PySet(PyType subtype, PyObject data) {
+        super(subtype, _update(Collections.synchronizedSet(new HashSet<>()), data));
+    }
     public PySet(Set backing_set, PyObject data) {
         super(TYPE, _update(backing_set, data));
     }
@@ -192,6 +196,11 @@ public class PySet extends BaseSet {
         }
         _set.removeAll(((BaseSet)other)._set);
         return this;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends PyObject> collection) {
+        return _set.addAll(collection);
     }
 
     public int hashCode() {

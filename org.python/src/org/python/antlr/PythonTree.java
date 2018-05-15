@@ -238,15 +238,15 @@ public abstract class PythonTree extends AST implements Traverseproc {
     }
 
     public <R> boolean enter(VisitorIF<R> visitor) {
-        throw new RuntimeException("not a node");
+        throw new RuntimeException("not a node" + this);
     }
 
     public <R> void leave(VisitorIF<R> visitor) {
-        throw new RuntimeException("not a node");
+        throw new RuntimeException("not a node" + this);
     }
 
     public <R> R accept(VisitorIF<R> visitor) {
-        throw new RuntimeException("not a node");
+        throw new RuntimeException("not a node" + this);
     }
 
     public <R> void traverse(VisitorIF<R> visitor) {
