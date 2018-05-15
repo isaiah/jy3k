@@ -2,7 +2,9 @@ package org.python.core;
 
 import org.python.annotations.ExposedMethod;
 import org.python.annotations.ExposedNew;
+import org.python.annotations.ExposedSlot;
 import org.python.annotations.ExposedType;
+import org.python.annotations.SlotFunc;
 import org.python.expose.MethodType;
 
 import java.util.Collection;
@@ -36,14 +38,20 @@ public class PyFrozenSet extends BaseSet {
     }
 
     @ExposedNew
+    @ExposedSlot(SlotFunc.NEW)
     public static PyObject frozenset_new(PyNewWrapper new_, boolean init, PyType subtype,
                                              PyObject[] args, String[] keywords) {
         ArgParser ap = new ArgParser("frozenset", args, keywords, new String[] {"iterable"}, 0);
         PyObject iterable = ap.getPyObject(0, null);
-        if (iterable == null || iterable instanceof PyFrozenSet) {
+        if (iterable == null) {
+            return Py.EmptyFrozenset;
+        }
+
+        if (iterable instanceof PyFrozenSet) {
             /* frozenset(f) is idempotent */
             return iterable;
         }
+
         return new PyFrozenSet(subtype, iterable);
     }
 

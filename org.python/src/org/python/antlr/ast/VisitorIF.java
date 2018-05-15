@@ -176,6 +176,9 @@ public interface VisitorIF<R> {
     public boolean enterEllipsis(Ellipsis node);
     public R visitEllipsis(Ellipsis node);
     public void leaveEllipsis(Ellipsis node);
+    public boolean enterExcInfo(ExcInfo node);
+    public R visitExcInfo(ExcInfo node);
+    public void leaveExcInfo(ExcInfo node);
     public boolean enterConstant(Constant node);
     public R visitConstant(Constant node);
     public void leaveConstant(Constant node);

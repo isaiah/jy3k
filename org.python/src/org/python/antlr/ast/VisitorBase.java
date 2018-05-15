@@ -786,6 +786,19 @@ public abstract class VisitorBase<R> implements VisitorIF<R> {
     public void leaveEllipsis(Ellipsis node) {
     }
 
+    public R visitExcInfo(ExcInfo node) {
+        R ret = unhandled_node(node);
+        traverse(node);
+        return ret;
+    }
+
+    public boolean enterExcInfo(ExcInfo node) {
+        return true;
+    }
+
+    public void leaveExcInfo(ExcInfo node) {
+    }
+
     public R visitConstant(Constant node) {
         R ret = unhandled_node(node);
         traverse(node);

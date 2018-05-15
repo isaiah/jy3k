@@ -26,6 +26,7 @@ import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Ellipsis;
+import org.python.antlr.ast.ExcInfo;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.ExitFor;
 import org.python.antlr.ast.Expr;
@@ -227,18 +228,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     public void getNone() {
         code.getstatic(p(Py.class), "None", ci(PyObject.class));
-    }
-
-    public void getExcInfo() {
-        loadThreadState();
-        code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
-        code.dup();
-        code.getfield(p(PyException.class), "type", ci(PyObject.class));
-        code.swap();
-        code.dup();
-        code.getfield(p(PyException.class), "value", ci(PyObject.class));
-        code.swap();
-        code.getfield(p(PyException.class), "traceback", ci(PyTraceback.class));
     }
 
     public void loadFrame() {
@@ -636,7 +625,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
         // Do test
         expr test = node.getInternalTest();
-        if (test instanceof NameConstant && ((NameConstant) test).getInternalValue().equals("True")) {
+        if (test instanceof NameConstant && Abstract.PyObject_IsTrue(Py.getThreadState(), ((NameConstant) test).getInternalValue())) {
             // optimisation for while True loop
             code.goto_(start_loop);
         } else {
@@ -1322,7 +1311,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
                 case 1:
                     expr arg = values.get(0);
                     visit(arg);
-                    if (arg instanceof NameConstant && ((NameConstant) arg).getInternalValue().equals(EXCINFO.symbolName())) {
+                    if (arg instanceof ExcInfo) {
                         // special case for sys.excinfo hack, used by desugared "With" stmt
                         code.invokevirtual(p(PyObject.class), "__call__",
                                 sig(PyObject.class, ThreadState.class, PyObject.class, PyObject.class, PyObject.class));
@@ -1417,16 +1406,22 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     @Override
+    public Object visitExcInfo(ExcInfo node) {
+        loadThreadState();
+        code.invokevirtual(p(ThreadState.class), "getexc", sig(PyException.class));
+        code.dup();
+        code.getfield(p(PyException.class), "type", ci(PyObject.class));
+        code.swap();
+        code.dup();
+        code.getfield(p(PyException.class), "value", ci(PyObject.class));
+        code.swap();
+        code.getfield(p(PyException.class), "traceback", ci(PyTraceback.class));
+        return null;
+    }
+
+    @Override
     public Object visitNameConstant(NameConstant node) {
-        String name = node.getInternalValue();
-        if (name.equals("None")) {
-            getNone();
-        } else if (name.equals(EXCINFO.symbolName())) {
-            getExcInfo();
-        } else {
-            loadFrame();
-            emitGetGlobal(name);
-        }
+        module.constant(node.getValue()).get(code);
         return null;
     }
 

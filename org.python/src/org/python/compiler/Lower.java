@@ -15,6 +15,7 @@ import org.python.antlr.ast.Call;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.DictComp;
+import org.python.antlr.ast.ExcInfo;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.ExitFor;
 import org.python.antlr.ast.Expr;
@@ -192,10 +193,10 @@ public class Lower extends Visitor {
             enterStmt = new Assign(node, Arrays.asList(item.getInternalOptional_vars()), enter);
         }
         Attribute getExit = new Attribute(node, getMgr, "__exit__", expr_contextType.Load);
-        expr none = new NameConstant(node, "None");
+        expr none = new NameConstant(node, Py.None);
         Expr _exit = new Expr(node, new Call(node, getExit, Arrays.asList(none, none, none), null));
         // This is a hint for the code generator, equals *sys.exc_info()
-        expr excinfo = new NameConstant(node, EXCINFO.symbolName());
+        expr excinfo = new ExcInfo(node);
         expr _exitWithExcinfo = new Call(node, getExit, Arrays.asList(excinfo), null);
         expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
         stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);
@@ -282,11 +283,11 @@ public class Lower extends Visitor {
             enterStmt = new Assign(node, Arrays.asList(item.getInternalOptional_vars()), enter);
         }
         Attribute getExit = new Attribute(node, getMgr, "__aexit__", expr_contextType.Load);
-        expr none = new NameConstant(node, "None");
+        expr none = new NameConstant(node, Py.None);
         expr aexit = new Await(node, new Call(node, getExit, Arrays.asList(none, none, none), null));
         Expr _exit = new Expr(node, aexit);
         // This is a hint for the code generator, equals *sys.exc_info()
-        expr excinfo = new NameConstant(node, EXCINFO.symbolName());
+        expr excinfo = new ExcInfo(node);
         expr _exitWithExcinfo = new Await(node, new Call(node, getExit, Arrays.asList(excinfo), null));
         expr ifTest = new UnaryOp(node, unaryopType.Not, _exitWithExcinfo);
         stmt ifStmt = new If(node, ifTest, Arrays.asList(new Raise(node, null, null)), null);

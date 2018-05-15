@@ -108,8 +108,8 @@ import org.python.antlr.ast.operatorType;
   }
 
   private CommonToken commonToken(int type, String text) {
-    int stop = this.getCharIndex() - 1;
-    int start = text.isEmpty() ? stop : stop - text.length() + 1;
+    int stop = this.getCharIndex();
+    int start = text.isEmpty() ? stop : stop - text.length();
     return new CommonToken(this._tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, start, stop);
   }
 

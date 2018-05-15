@@ -670,14 +670,12 @@ class JavaVisitor(EmitVisitor):
             if str(field.type) == 'identifier':
                 self.emit("if (%s == null) return Py.None;" % field.name, depth+1)
                 self.emit("return new PyUnicode(%s);" % field.name, depth+1)
-            elif str(field.type) == 'object':
-                self.emit("return (PyObject)%s;" % field.name, depth+1)
             elif str(field.type) == 'bool':
                 self.emit("if (%s) return Py.True;" % field.name, depth+1)
                 self.emit("return Py.False;", depth+1)
             elif str(field.type) == 'int':
                 self.emit("return Py.newInteger(%s);" % field.name, depth+1)
-            elif str(field.type) == 'constant':
+            elif str(field.type) in ('constant', 'object', 'singleton'):
                 self.emit("return %s;" % field.name, depth+1)
             elif is_simple(field.typedef) or str(field.type) in self.bltinnames:
                 self.emit("return AstAdapters.%s2py(%s);" % (str(field.type), field.name), depth+1)
@@ -690,7 +688,7 @@ class JavaVisitor(EmitVisitor):
         if field.seq:
             #self.emit("this.%s = new %s(" % (field.name, self.javaType(field)), depth+1)
             self.emit("this.%s = AstAdapters.py2%sList(%s);" % (field.name, str(field.type), field.name), depth+1)
-        elif str(field.type) in ('constant', 'object'):
+        elif str(field.type) in ('constant', 'object', 'singleton'):
             self.emit("this.%s = %s;" % (field.name, field.name), depth+1)
         else:
             self.emit("this.%s = AstAdapters.py2%s(%s);" % (field.name, str(field.type), field.name), depth+1)
@@ -703,7 +701,7 @@ class JavaVisitor(EmitVisitor):
         'bytes' : 'String',
         'identifier' : 'String',
         'constant' : 'PyObject',
-        'singleton' : 'String',
+        'singleton' : 'PyObject',
         'string' : 'String',
         'object' : 'PyObject', # was PyObject
 

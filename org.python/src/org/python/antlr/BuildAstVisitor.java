@@ -2,6 +2,7 @@ package org.python.antlr;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -301,7 +302,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         } else {
             expr elt = (expr) visit(ctx.test(0));
             if (ctx.comp_for() != null) {
-                return new GeneratorExp(ctx.getStart(), elt, visit_Comp_for(ctx.comp_for()));
+                return new GeneratorExp(ctx.comp_for().getStart(), elt, visit_Comp_for(ctx.comp_for()));
             }
             return elt;
         }
@@ -612,6 +613,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
 
     @Override
     public PythonTree visitDictorsetmaker(PythonParser.DictorsetmakerContext ctx) {
+        /* The start token of a dict is the brace '{' */
+        Token start = ctx.getParent().getStart();
         java.util.List<comprehension> comps = null;
         if (ctx.comp_for() != null) {
             comps = visit_Comp_for(ctx.comp_for());
@@ -622,7 +625,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
                 /** Dict comprehension */
                 expr key = (expr) visit(ctx.test(0));
                 expr val = (expr) visit(ctx.test(1));
-                return new DictComp(ctx.getStart(), key, val, comps);
+                return new DictComp(start, key, val, comps);
             }
             /** Dict */
             java.util.List<expr> keys = new ArrayList<>();
@@ -636,12 +639,12 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             for (PythonParser.ExprContext exprContext : ctx.dicts) {
                 vals.add((expr) visit(exprContext));
             }
-            return new Dict(ctx.getStart(), keys, vals);
+            return new Dict(start, keys, vals);
         }
         if (ctx.comp_for() != null) {
             /** Set comprehension */
             expr elt = (expr) visit(ctx.test(0));
-            return new SetComp(ctx.getStart(), elt, comps);
+            return new SetComp(start, elt, comps);
         }
         /** Set */
         java.util.List<expr> elts = new ArrayList<>();
@@ -651,7 +654,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         for (PythonParser.Star_exprContext star_exprContext : ctx.star_expr()) {
             elts.add((expr) visit(star_exprContext));
         }
-        return new Set(ctx.getStart(), elts);
+        return new Set(start, elts);
     }
 
     @Override
@@ -660,11 +663,18 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         if (ctx.OPEN_PAREN() != null) {
             if (ctx.yield_expr() != null) {
                 return visit(ctx.yield_expr());
-            } else if (ctx.testlist_comp() == null || !ctx.testlist_comp().COMMA().isEmpty()) {
-                return new Tuple(ctx.getStart(), testlistCompResult.exprs, exprContextType);
             }
+            /* Empty tuple */
+            if (ctx.testlist_comp() == null) {
+                return new Tuple(ctx.getStart(), Arrays.asList(), exprContextType);
+            }
+            /* tuple */
+            if (!ctx.testlist_comp().COMMA().isEmpty()) {
+                return new Tuple(ctx.testlist_comp().getStart(), testlistCompResult.exprs, exprContextType);
+            }
+            /* GenExp */
             if (testlistCompResult.comps != null) {
-                return new GeneratorExp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+                return new GeneratorExp(ctx.testlist_comp().getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
             expr e = testlistCompResult.exprs.get(0);
             if (e instanceof Name) {
@@ -673,7 +683,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return e;
         } else if (ctx.OPEN_BRACK() != null) {
             if (testlistCompResult.comps != null) {
-                return new ListComp(ctx.getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
+                return new ListComp(ctx.testlist_comp().getStart(), testlistCompResult.exprs.get(0), testlistCompResult.comps);
             }
             return new List(ctx.getStart(), testlistCompResult.exprs, exprContextType);
         } else if (ctx.OPEN_BRACE() != null) {
@@ -690,11 +700,11 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
         } else if (ctx.ellipsis != null) {
             return new Ellipsis(ctx.ellipsis);
         } else if (ctx.TRUE() != null) {
-            return new NameConstant(ctx.TRUE().getSymbol(), ctx.getText());
+            return new NameConstant(ctx.getStart(), Py.True);
         } else if (ctx.FALSE() != null) {
-            return new NameConstant(ctx.FALSE().getSymbol(), ctx.getText());
+            return new NameConstant(ctx.getStart(), Py.False);
         } else if (ctx.NONE() != null) {
-            return new NameConstant(ctx.NONE().getSymbol(), ctx.getText());
+            return new NameConstant(ctx.getStart(), Py.None);
         } else if (ctx.str() != null) {
             return actions.parsestrplus(ctx.str());
         }

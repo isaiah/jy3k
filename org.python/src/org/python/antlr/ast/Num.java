@@ -46,7 +46,7 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     }
     @ExposedGet(name = "n")
     public PyObject getN() {
-        return (PyObject)n;
+        return n;
     }
     @ExposedSet(name = "n")
     public void setN(PyObject n) {
