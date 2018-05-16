@@ -218,10 +218,10 @@ public class GrammarActions {
         for (int i = last; i>=0; i--) {
             withitem current = items.get(i);
             if (i != last) {
-                body = new ArrayList<stmt>();
+                body = new ArrayList<>();
                 body.add(result);
             }
-            result = new AsyncWith(current.getToken(), Arrays.asList(current), body);
+            result = new AsyncWith(t, Arrays.asList(current), body);
         }
         return result;
     }
@@ -232,10 +232,10 @@ public class GrammarActions {
         for (int i = last; i>=0; i--) {
             withitem current = items.get(i);
             if (i != last) {
-                body = new ArrayList<stmt>();
+                body = new ArrayList<>();
                 body.add(result);
             }
-            result = new With(current.getToken(), Arrays.asList(current), body);
+            result = new With(t, Arrays.asList(current), body);
         }
         return result;
     }

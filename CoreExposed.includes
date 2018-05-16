@@ -266,6 +266,7 @@ org/python/antlr/ast/Tuple.class
 org/python/antlr/ast/UnaryOp.class
 org/python/antlr/ast/While.class
 org/python/antlr/ast/With.class
+org/python/antlr/ast/withitem.class
 org/python/antlr/ast/Yield.class
 org/python/antlr/base/boolop.class
 org/python/antlr/base/cmpop.class

@@ -1,6 +1,8 @@
 package org.python.antlr;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
@@ -341,14 +343,15 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
     @Override
     public PythonTree visitAtom_expr(PythonParser.Atom_exprContext ctx) {
         expr left = (expr) visit(ctx.atom());
+        Token start = ctx.atom().getStart();
         for (PythonParser.TrailerContext trailerCtx : ctx.trailer()) {
             if (trailerCtx.OPEN_PAREN() != null) {
                 ArglistResult arglistResult = visit_Arglist(trailerCtx.arglist());
-                left = new Call(ctx.getStart(), left, arglistResult.args, arglistResult.keywords);
+                left = new Call(start, left, arglistResult.args, arglistResult.keywords);
             } else if (trailerCtx.OPEN_BRACK() != null) {
-                left = new Subscript(ctx.getStart(), left, visit_Subscriptlist(trailerCtx.subscriptlist()), exprContextType);
+                left = new Subscript(start, left, visit_Subscriptlist(trailerCtx.subscriptlist()), exprContextType);
             } else if (trailerCtx.DOT() != null) {
-                left = new Attribute(ctx.getStart(), left, trailerCtx.attr().getText(), exprContextType);
+                left = new Attribute(start, left, trailerCtx.attr().getText(), exprContextType);
             }
         }
         if (ctx.AWAIT() != null) {
@@ -528,12 +531,12 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             return actions.makeAsyncFuncdef(ctx.funcdef().getStart(), func, Arrays.asList());
         }
         if (ctx.for_stmt() != null) {
-            return actions.makeAsyncFor(ctx.getStart(), (For) visit(ctx.for_stmt()));
+            return actions.makeAsyncFor(ctx.for_stmt().getStart(), (For) visit(ctx.for_stmt()));
         }
         java.util.List<withitem> items = ctx.with_stmt().with_item().stream()
                 .map(with_itemContext -> (withitem) visit(with_itemContext))
                 .collect(Collectors.toList());
-        return actions.makeAsyncWith(ctx.getStart(), items, visit_Suite(ctx.with_stmt().suite()));
+        return actions.makeAsyncWith(ctx.with_stmt().getStart(), items, visit_Suite(ctx.with_stmt().suite()));
     }
 
     @Override
@@ -1313,7 +1316,7 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             byte[] bytes = compileSource(module, new FileInputStream(src), module);
             BuildAstVisitor v = new BuildAstVisitor("<string>");
 
-            ANTLRInputStream inputStream = new ANTLRInputStream(new FileInputStream(src));
+            CharStream inputStream = CharStreams.fromStream(new FileInputStream(src));
             PythonLexer lexer = new PythonLexer(inputStream);
             TokenStream tokens = new CommonTokenStream(lexer);
             PythonParser parser = new PythonParser(tokens);
