@@ -952,8 +952,13 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitBoolOp(BoolOp node) {
         Label end = new Label();
+        int size = node.getInternalValues().size();
+        if (size < 2) {
+            throw Py.ValueError("BoolOp with less than 2 values");
+        }
+        node.getInternalValues().forEach(CodeCompiler::requiresLoadContext);
         visit(node.getInternalValues().get(0));
-        for (int i = 1; i < node.getInternalValues().size(); i++) {
+        for (int i = 1; i < size; i++) {
             code.dup();
             getBool();
             switch (node.getInternalOp()) {
@@ -1660,7 +1665,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         return null;
     }
 
-    public void loadList(Code code, java.util.List<? extends PythonTree> nodes) {
+    public void loadList(Code code, java.util.List<? extends expr> nodes) {
         final int n = nodes.size();
         code.new_(p(ArrayList.class));
         code.dup();
@@ -1671,7 +1676,8 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         }
         for (int i = 0; i < n; i++) {
             code.dup();
-            PythonTree node = nodes.get(i);
+            expr node = nodes.get(i);
+            requiresLoadContext(node);
             visit(node);
             if (node instanceof Starred) {
                 code.invokestatic(p(Py.class), "addAll", sig(Boolean.TYPE, java.util.List.class, PyObject.class));
@@ -1683,10 +1689,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     }
 
     public void loadArray(Code code, java.util.List<? extends PythonTree> nodes) {
-        loadArray(code, nodes, null, 0);
+        loadArray(code, nodes, Arrays.asList(), 0);
     }
 
     public void loadArray(Code code, java.util.List<? extends PythonTree> nodes, java.util.List<? extends PythonTree> moreNodes, int enqueued) {
+        nodes.forEach(CodeCompiler::requiresLoadContext);
+        moreNodes.forEach(CodeCompiler::requiresLoadContext);
         int n = enqueued;
 
         if (nodes != null) {
@@ -2357,12 +2365,12 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         op.invoke(code);
     }
 
-    public static void requiresLoadContext(expr e) {
+    public static void requiresLoadContext(PythonTree e) {
         if (e instanceof Context && ((Context) e).getContext() != expr_contextType.Load) {
             throw Py.ValueError("expression must have Load context but has Store instead");
         }
     }
-    public static void requiresStoreContext(expr e) {
+    public static void requiresStoreContext(PythonTree e) {
         if (e instanceof Context && ((Context) e).getContext() != expr_contextType.Store) {
             throw Py.ValueError(String.format("expression must have Store context but has %s instead", ((Context) e).getContext()));
         }
