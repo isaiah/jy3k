@@ -284,6 +284,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
     private final Constant None = new SingletonConstant("None", ci(PyObject.class));
     private final Constant True = new SingletonConstant("True", ci(PyBoolean.class));
     private final Constant False = new SingletonConstant("False", ci(PyBoolean.class));
+    private final Constant Ellipsis = new SingletonConstant("Ellipsis", ci(PyObject.class));
     private final Constant EmptyByte = new SingletonConstant("EmptyByte", ci(PyBytes.class));
     private final Constant EmptyUnicode = new SingletonConstant("EmptyUnicode", ci(PyUnicode.class));
     private final Constant EmptyFrozenset = new SingletonConstant("EmptyFrozenset", ci(PyFrozenSet.class));
@@ -325,6 +326,9 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
         }
         if (n == Py.False) {
             return False;
+        }
+        if (n == Py.Ellipsis) {
+            return Ellipsis;
         }
         if (n instanceof PyLong) {
             return longConstant(n.asLong());

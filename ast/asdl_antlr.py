@@ -672,7 +672,12 @@ class JavaVisitor(EmitVisitor):
         self.emit('@ExposedGet(name = "%s")' % field.name, depth)
         self.emit("public PyObject get%s() {" % self.processFieldName(field.name), depth)
         if field.seq:
-            self.emit("return new PyList(%s);" % field.name, depth+1)
+            if field.type in ('cmpop'):
+                self.emit("""return new PyList(%s.stream().map(
+                        org.python.antlr.Operator::getImpl).collect(
+                        java.util.stream.Collectors.toSet()));""" % field.name, depth+1)
+            else:
+                self.emit("return new PyList(%s);" % field.name, depth+1)
         else:
             if str(field.type) == 'identifier':
                 self.emit("if (%s == null) return Py.None;" % field.name, depth+1)

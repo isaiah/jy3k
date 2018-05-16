@@ -63,7 +63,11 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     }
     @ExposedGet(name = "ops")
     public PyObject getOps() {
-        return new PyList(ops);
+        return new PyList(ops.stream().map(
+                       
+        org.python.antlr.Operator::getImpl).collect(
+                       
+        java.util.stream.Collectors.toSet()));
     }
     @ExposedSet(name = "ops")
     public void setOps(PyObject ops) {
