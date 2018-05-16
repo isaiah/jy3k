@@ -4,6 +4,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.python.Version;
 import org.python.bootstrap.Import;
+import org.python.core.PySystemState;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -69,9 +71,10 @@ public class JycompileAntTask extends MatchingTask {
         } else if (toCompile.size() == 1) {
             log("Compiling 1 file");
         }
-//        Properties props = new Properties();
-//        props.setProperty(PySystemState.PYTHON_CACHEDIR_SKIP, "true");
-//        PySystemState.initialize(System.getProperties(), props);
+        /* Initialize a basic system state, this is required to use dynalink in compiler */
+        Properties props = new Properties();
+        props.setProperty(PySystemState.PYTHON_CACHEDIR_SKIP, "true");
+        PySystemState.initialize(System.getProperties(), props);
         for (File src : toCompile) {
             try {
                 String name = getModuleName(src);
