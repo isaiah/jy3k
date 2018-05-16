@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.cmpop;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.cmpopType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class Lt extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject Lt_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args,
     String[] keywords) {
-        return new Lt(subtype);
+        return cmpopType.Lt.getImpl();
     }
     @ExposedMethod
     public void Lt___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class Lt extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject Lt___int__() {
-        return Py.newInteger(3);
-    }
-
     @Override
     public String toStringTree() {
-        return Lt.class.toString();
+        return "Lt";
     }
 }

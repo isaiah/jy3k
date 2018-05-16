@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.expr_context;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.expr_contextType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class Del extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject Del_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new Del(subtype);
+        return expr_contextType.Del.getImpl();
     }
     @ExposedMethod
     public void Del___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class Del extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject Del___int__() {
-        return Py.newInteger(3);
-    }
-
     @Override
     public String toStringTree() {
-        return Del.class.toString();
+        return "Del";
     }
 }

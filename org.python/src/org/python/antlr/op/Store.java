@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.expr_context;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.expr_contextType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class Store extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject Store_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new Store(subtype);
+        return expr_contextType.Store.getImpl();
     }
     @ExposedMethod
     public void Store___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class Store extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject Store___int__() {
-        return Py.newInteger(2);
-    }
-
     @Override
     public String toStringTree() {
-        return Store.class.toString();
+        return "Store";
     }
 }

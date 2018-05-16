@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.operator;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.operatorType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class Mod extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject Mod_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new Mod(subtype);
+        return operatorType.Mod.getImpl();
     }
     @ExposedMethod
     public void Mod___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class Mod extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject Mod___int__() {
-        return Py.newInteger(6);
-    }
-
     @Override
     public String toStringTree() {
-        return Mod.class.toString();
+        return "Mod";
     }
 }

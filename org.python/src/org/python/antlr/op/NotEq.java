@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.cmpop;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.cmpopType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class NotEq extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject NotEq_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new NotEq(subtype);
+        return cmpopType.NotEq.getImpl();
     }
     @ExposedMethod
     public void NotEq___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class NotEq extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject NotEq___int__() {
-        return Py.newInteger(2);
-    }
-
     @Override
     public String toStringTree() {
-        return NotEq.class.toString();
+        return "NotEq";
     }
 }

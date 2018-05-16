@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.unaryop;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.unaryopType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class UAdd extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject UAdd_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new UAdd(subtype);
+        return unaryopType.UAdd.getImpl();
     }
     @ExposedMethod
     public void UAdd___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class UAdd extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject UAdd___int__() {
-        return Py.newInteger(3);
-    }
-
     @Override
     public String toStringTree() {
-        return UAdd.class.toString();
+        return "UAdd";
     }
 }

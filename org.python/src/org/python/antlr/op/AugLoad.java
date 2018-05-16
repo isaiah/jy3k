@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.expr_context;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.expr_contextType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class AugLoad extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject AugLoad_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new AugLoad(subtype);
+        return expr_contextType.AugLoad.getImpl();
     }
     @ExposedMethod
     public void AugLoad___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class AugLoad extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject AugLoad___int__() {
-        return Py.newInteger(4);
-    }
-
     @Override
     public String toStringTree() {
-        return AugLoad.class.toString();
+        return "AugLoad";
     }
 }

@@ -4,6 +4,7 @@ package org.python.antlr.op;
 import org.python.antlr.AST;
 import org.python.antlr.base.boolop;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.boolopType;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
@@ -31,7 +32,7 @@ public class And extends PythonTree {
     @ExposedSlot(SlotFunc.NEW)
     public static PyObject And_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[]
     args, String[] keywords) {
-        return new And(subtype);
+        return boolopType.And.getImpl();
     }
     @ExposedMethod
     public void And___init__(PyObject[] args, String[] keywords) {}
@@ -44,13 +45,8 @@ public class And extends PythonTree {
     @ExposedGet(name = "_attributes")
     public PyObject get_attributes() { return Py.EmptyTuple; }
 
-    @ExposedMethod
-    public final PyObject And___int__() {
-        return Py.newInteger(1);
-    }
-
     @Override
     public String toStringTree() {
-        return And.class.toString();
+        return "And";
     }
 }

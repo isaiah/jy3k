@@ -178,16 +178,27 @@ class JavaVisitor(EmitVisitor):
 
     def simple_sum(self, sum, name, depth):
         self.open("ast", "%sType" % name, refersToPythonTree=0)
-        self.emit('import org.python.antlr.AST;', depth)
+        self.emit('import org.python.antlr.Operator;', depth)
+        self.emit('import org.python.core.Py;', depth)
+        self.emit('import org.python.core.PyObject;', depth)
         self.emit('', 0)
 
-        self.emit("public enum %(name)sType {" % locals(), depth)
-        self.emit("UNDEFINED,", depth + 1)
+        self.emit("public enum %(name)sType implements Operator {" % locals(), depth)
+        self.emit("UNDEFINED(Py.None),", depth + 1)
         for i in range(len(sum.types) - 1):
             type = sum.types[i]
-            self.emit("%s," % type.name, depth + 1)
-        self.emit("%s;" % sum.types[len(sum.types) - 1].name, depth + 1)
+            self.emit("%s(new org.python.antlr.op.%s())," % (type.name, type.name), depth + 1)
+        type_name = sum.types[len(sum.types) - 1].name
+        self.emit("%s(new org.python.antlr.op.%s());" % (type_name, type_name), depth + 1)
 
+        self.emit("private final PyObject impl;", depth+1)
+
+        self.emit("%sType(PyObject value) {" % name, depth+1)
+        self.emit("this.impl = value;", depth+2)
+        self.emit("}", depth+1)
+        self.emit("public PyObject getImpl() {", depth+1)
+        self.emit("return impl;", depth+2)
+        self.emit("}", depth+1)
         self.emit("}", depth)
         self.close()
 
@@ -198,6 +209,7 @@ class JavaVisitor(EmitVisitor):
             self.emit('import org.python.antlr.AST;', depth)
             self.emit('import org.python.antlr.base.%s;' % name, depth)
             self.emit('import org.python.antlr.PythonTree;', depth)
+            self.emit('import org.python.antlr.ast.%sType;' % name, depth)
             self.emit('import org.python.core.Py;', depth)
             self.emit('import org.python.core.PyObject;', depth)
             self.emit('import org.python.core.PyUnicode;', depth)
@@ -231,7 +243,7 @@ class JavaVisitor(EmitVisitor):
             self.emit("@ExposedNew", depth + 1)
             self.emit("@ExposedSlot(SlotFunc.NEW)", depth+1)
             self.emit("public static PyObject %s_new(PyNewWrapper _new, boolean init, PyType subtype, PyObject[] args, String[] keywords) {" % type.name, depth+1)
-            self.emit("return new %s(subtype);" % type.name, depth + 2)
+            self.emit("return %sType.%s.getImpl();" % (name, type.name), depth + 2)
             self.emit("}", depth+1)
 
 
@@ -241,16 +253,10 @@ class JavaVisitor(EmitVisitor):
 
             self.attributes(type, name, depth);
 
-            self.emit('@ExposedMethod', depth + 1)
-            self.emit("public final PyObject %s___int__() {" % type.name, depth + 1)
-            self.emit('return Py.newInteger(%s);' % str(i + 1), depth + 2)
-            self.emit("}", depth + 1)
-            self.emit('', 0)
-
             # The toStringTree() method
             self.emit("@Override", depth+1)
             self.emit("public String toStringTree() {", depth + 1)
-            self.emit("return %s.class.toString();" % type.name, depth + 2)
+            self.emit("return \"%s\";" % type.name, depth + 2)
             self.emit("}", depth + 1)
 
             self.emit("}", depth)
