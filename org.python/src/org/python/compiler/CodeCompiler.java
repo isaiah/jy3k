@@ -22,6 +22,7 @@ import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Constant;
+import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
@@ -572,6 +573,9 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
     @Override
     public Object visitAssign(Assign node) {
         java.util.List<expr> targets = node.getInternalTargets();
+        if (targets.isEmpty()) {
+            throw Py.ValueError("empty targets on Assign");
+        }
         for (expr e : targets) {
             e.enter(this);
         }
@@ -762,6 +766,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
          * succeeded, the message portion should not be processed. Otherwise, the message will be
          * processed.
          */
+        requiresLoadContext(node.getInternalTest());
         visit(node.getInternalTest());
         getBool();
 
@@ -769,8 +774,10 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         code.ifne(end_of_assert);
 
         /* Visit the message part of the assertion, or pass Py.None */
-        if (node.getInternalMsg() != null) {
-            visit(node.getInternalMsg());
+        expr msg = node.getInternalMsg();
+        if (msg != null) {
+            requiresLoadContext(msg);
+            visit(msg);
             code.invokestatic(p(Py.class), "AssertionError",
                     sig(PyException.class, PyObject.class));
         } else {
@@ -1461,6 +1468,7 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
 
     @Override
     public Object visitAttribute(Attribute node) {
+        requiresLoadContext(node.getInternalValue());
         visit(node.getInternalValue());
         expr_contextType ctx = node.getInternalCtx();
 
@@ -2349,6 +2357,16 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants {
         op.invoke(code);
     }
 
+    public static void requiresLoadContext(expr e) {
+        if (e instanceof Context && ((Context) e).getContext() != expr_contextType.Load) {
+            throw Py.ValueError("expression must have Load context but has Store instead");
+        }
+    }
+    public static void requiresStoreContext(expr e) {
+        if (e instanceof Context && ((Context) e).getContext() != expr_contextType.Store) {
+            throw Py.ValueError(String.format("expression must have Store context but has %s instead", ((Context) e).getContext()));
+        }
+    }
     @Override
     protected Object unhandled_node(PythonTree node) {
         throw new RuntimeException("Unhandled node " + node);

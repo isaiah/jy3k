@@ -477,6 +477,8 @@ public class Lower extends Visitor {
     public Object visitAugAssign(AugAssign node) {
         traverse(node);
         expr left = node.getInternalTarget().copy();
+        CodeCompiler.requiresStoreContext(left);
+        CodeCompiler.requiresLoadContext(node.getInternalValue());
         ((Context) left).setContext(expr_contextType.Load);
         BinOp binOp = new BinOp(node, left, node.getInternalOp(), node.getInternalValue());
         binOp.setInplace(true);

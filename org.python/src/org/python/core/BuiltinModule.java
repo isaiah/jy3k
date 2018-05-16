@@ -251,9 +251,8 @@ public class BuiltinModule {
 
         if (cflags.only_ast) {
             return ast;
-        } else {
-            return Py.compile_flags(ast, filename, kind, cflags);
         }
+        return Py.compile_flags(ast, filename, kind, cflags);
     }
 
     /**

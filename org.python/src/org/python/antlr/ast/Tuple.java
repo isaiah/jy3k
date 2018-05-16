@@ -220,6 +220,10 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
         this.ctx = c;
     }
 
+    public expr_contextType getContext() {
+        return this.ctx;
+    }
+
     @ExposedGet(name = "lineno")
     public int getLineno() {
         return super.getLineno();

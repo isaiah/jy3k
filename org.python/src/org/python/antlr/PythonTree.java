@@ -199,7 +199,7 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public int getLineno() {
         if (lineno == null) {
             if (getToken() == null) {
-                throw Py.TypeErrorFmt("required field \"lineno\" missing from %s", this);
+                throw Py.AttributeError(String.format("'%s' object has no attribute 'lineno'", getType().fastGetName()));
             }
             return getLine();
         }
@@ -212,7 +212,7 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public int getCol_offset() {
         if (col_offset == null) {
             if (getToken() == null) {
-                throw Py.TypeErrorFmt("required field \"coloffset\" missing from %s", this);
+                throw Py.AttributeError(String.format("'%s' object has no attribute 'col_offset'", getType().fastGetName()));
             }
             return getCharPositionInLine();
         }

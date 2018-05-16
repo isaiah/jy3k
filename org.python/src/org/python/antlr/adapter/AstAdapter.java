@@ -22,6 +22,9 @@ public class AstAdapter {
         List<T> list = new ArrayList<>();
         if (iter != Py.None) {
             for(Object o : iter.asIterable()) {
+                if (o == Py.None) {
+                    throw Py.ValueError("None is not allowed");
+                }
                 list.add(py2ast((PyObject)o));
             }
         }

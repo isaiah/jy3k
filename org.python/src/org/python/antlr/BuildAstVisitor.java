@@ -182,8 +182,8 @@ public class BuildAstVisitor extends PythonBaseVisitor<PythonTree> {
             }
             expr target = (expr) visit(ctx.testlist_star_expr(0));
 
-            recursiveSetContextType(target, expr_contextType.AugStore);
-            ((Context) target).setContext(expr_contextType.AugStore);
+            recursiveSetContextType(target, expr_contextType.Store);
+            ((Context) target).setContext(expr_contextType.Store);
             return new AugAssign(ctx.getStart(), target, ctx.augassign().op, value);
         }
         if (ctx.annassign() != null) {

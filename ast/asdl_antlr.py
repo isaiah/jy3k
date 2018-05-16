@@ -392,6 +392,11 @@ class JavaVisitor(EmitVisitor):
             self.emit("}", depth + 1)
             self.emit("", 0)
 
+            self.emit("public expr_contextType getContext() {", depth + 1)
+            self.emit('return this.ctx;', depth + 2)
+            self.emit("}", depth + 1)
+            self.emit("", 0)
+
         if str(name) in ('stmt', 'expr', 'excepthandler'):
             # The lineno property
             self.emit('@ExposedGet(name = "lineno")', depth + 1)
