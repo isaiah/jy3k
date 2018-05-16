@@ -38,11 +38,11 @@ public class IsNot extends PythonTree {
 
     private final static PyUnicode[] fields = new PyUnicode[0];
     @ExposedGet(name = "_fields")
-    public PyUnicode[] get_fields() { return fields; }
+    public PyObject get_fields() { return Py.EmptyTuple; }
 
     private final static PyUnicode[] attributes = new PyUnicode[0];
     @ExposedGet(name = "_attributes")
-    public PyUnicode[] get_attributes() { return attributes; }
+    public PyObject get_attributes() { return Py.EmptyTuple; }
 
     @ExposedMethod
     public final PyObject IsNot___int__() {

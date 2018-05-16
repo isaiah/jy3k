@@ -2,10 +2,22 @@
 package org.python.antlr.ast;
 
 import org.python.antlr.AST;
+import org.python.core.Py;
+import org.python.core.PyObject;
 
 public enum operatorType {
-    UNDEFINED,
-    Add,
+    UNDEFINED {
+        @Override
+        PyObject createImpl() {
+            return Py.None;
+        }
+    },
+    Add {
+        @Override
+        PyObject createImpl() {
+            return new org.python.antlr.op.Add();
+        }
+    },
     Sub,
     Mult,
     MatMult,
@@ -18,4 +30,15 @@ public enum operatorType {
     BitXor,
     BitAnd,
     FloorDiv;
+
+    private PyObject impl;
+
+    public PyObject getImpl() {
+        if (impl == null) {
+            impl = createImpl();
+        }
+        return impl;
+    }
+
+    abstract PyObject createImpl();
 }

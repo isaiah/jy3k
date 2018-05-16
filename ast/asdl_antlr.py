@@ -87,6 +87,7 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.core.Py;', file=self.file)
             print('import org.python.core.PyObject;', file=self.file)
             print('import org.python.core.PyUnicode;', file=self.file)
+            print('import org.python.core.PyTuple;', file=self.file)
             print('import org.python.core.PyStringMap;', file=self.file)
             print('import org.python.core.PyLong;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
@@ -265,12 +266,12 @@ class JavaVisitor(EmitVisitor):
             self.emit("private final static PyUnicode[] fields =", depth + 1)
             self.emit("new PyUnicode[] {%s};" % ", ".join(field_list), depth+1)
             self.emit('@ExposedGet(name = "_fields")', depth + 1)
-            self.emit("public PyUnicode[] get_fields() { return fields; }", depth+1)
+            self.emit("public PyObject get_fields() { return new PyTuple(fields); }", depth+1)
             self.emit("", 0)
         else:
             self.emit("private final static PyUnicode[] fields = new PyUnicode[0];", depth+1)
             self.emit('@ExposedGet(name = "_fields")', depth + 1)
-            self.emit("public PyUnicode[] get_fields() { return fields; }", depth+1)
+            self.emit("public PyObject get_fields() { return Py.EmptyTuple; }", depth+1)
             self.emit("", 0)
 
         if str(name) in ('stmt', 'expr', 'excepthandler'):
@@ -278,12 +279,12 @@ class JavaVisitor(EmitVisitor):
             self.emit("private final static PyUnicode[] attributes =", depth + 1)
             self.emit("new PyUnicode[] {%s};" % ", ".join(att_list), depth + 1)
             self.emit('@ExposedGet(name = "_attributes")', depth + 1)
-            self.emit("public PyUnicode[] get_attributes() { return attributes; }", depth + 1)
+            self.emit("public PyObject get_attributes() { return new PyTuple(attributes); }", depth + 1)
             self.emit("", 0)
         else:
             self.emit("private final static PyUnicode[] attributes = new PyUnicode[0];", depth+1)
             self.emit('@ExposedGet(name = "_attributes")', depth + 1)
-            self.emit("public PyUnicode[] get_attributes() { return attributes; }", depth+1)
+            self.emit("public PyObject get_attributes() { return Py.EmptyTuple; }", depth+1)
             self.emit("", 0)
    
     def sum_with_constructor(self, sum, name, depth):

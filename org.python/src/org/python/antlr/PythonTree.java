@@ -128,21 +128,6 @@ public abstract class PythonTree extends AST implements Traverseproc {
         return sb.toString();
     }
 
-    @Override
-    public String toString() {
-        if (isNil()) {
-            return "None";
-        }
-        if ( getAntlrType()==Token.INVALID_TYPE) {
-            return "<errornode>";
-        }
-        if ( getToken()==null ) {
-            return null;
-        }
-
-        return getToken().getText() + "(" + this.getLine() + "," + this.getCharPositionInLine() + ")";
-    }
-
     public void replaceField(expr value, expr newValue) {}
 
     public abstract String toStringTree();

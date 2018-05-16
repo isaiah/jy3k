@@ -16,6 +16,7 @@ import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
+import org.python.core.PyTuple;
 import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
@@ -106,11 +107,11 @@ public class comprehension extends PythonTree {
     new PyUnicode[] {new PyUnicode("target"), new PyUnicode("iter"), new PyUnicode("ifs"), new
                       PyUnicode("is_async")};
     @ExposedGet(name = "_fields")
-    public PyUnicode[] get_fields() { return fields; }
+    public PyObject get_fields() { return new PyTuple(fields); }
 
     private final static PyUnicode[] attributes = new PyUnicode[0];
     @ExposedGet(name = "_attributes")
-    public PyUnicode[] get_attributes() { return attributes; }
+    public PyObject get_attributes() { return Py.EmptyTuple; }
 
     public comprehension() {
         super(TYPE);

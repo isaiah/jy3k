@@ -16,6 +16,7 @@ import org.python.core.ArgParser;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyUnicode;
+import org.python.core.PyTuple;
 import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
@@ -57,12 +58,12 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
     private final static PyUnicode[] fields =
     new PyUnicode[] {new PyUnicode("values")};
     @ExposedGet(name = "_fields")
-    public PyUnicode[] get_fields() { return fields; }
+    public PyObject get_fields() { return new PyTuple(fields); }
 
     private final static PyUnicode[] attributes =
     new PyUnicode[] {new PyUnicode("lineno"), new PyUnicode("col_offset")};
     @ExposedGet(name = "_attributes")
-    public PyUnicode[] get_attributes() { return attributes; }
+    public PyObject get_attributes() { return new PyTuple(attributes); }
 
     public JoinedStr() {
         super(TYPE);
