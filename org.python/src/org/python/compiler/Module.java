@@ -511,26 +511,32 @@ public class Module implements Opcodes, ClassConstants, CompilationContext {
             cflags = new CompilerFlags();
         }
 
-        new NameMangler().visit(node);
+        CompilationPhase.NAME_MANGLING_PHASE.apply(module, node, filename);
+//        new NameMangler().visit(node);
         /** create class closure if necessary */
-        ClassClosureGenerator classClosure = new ClassClosureGenerator();
-        classClosure.visit(node);
-        new Lower(filename).visit(node);
-        new AnnotationsCreator().visit(node);
+        CompilationPhase.CLASS_CLOSURE_MARK_PHASE.apply(module, node, filename);
+//        ClassClosureGenerator classClosure = new ClassClosureGenerator();
+//        classClosure.visit(node);
+        CompilationPhase.LOWERING_PHASE.apply(module, node, filename);
+//        new Lower(filename).visit(node);
+        CompilationPhase.ANNOTATION_PHASE.apply(module, node, filename);
+//        new AnnotationsCreator().visit(node);
         /** split long functions into small SplitNode fragments */
 //        new Splitter().visit(node);
 
         module.futures.preprocessFutures(node, cflags, filename);
         /** create symbol table */
-        module.st = Symtable.buildObject(node, filename, 0);
+        CompilationPhase.SYMBOL_ASSIGNMENT_PHASE.apply(module, node, filename);
+//        module.st = Symtable.buildObject(node, filename, 0);
         /** convert SplitNode to function definitions */
 //        new SplitIntoFunctions(module.scopes).visit(node);
 
-        CodeCompiler compiler = new CodeCompiler(module);
-        CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
-        compiler.parse(node, null, cflags, false);
-        compiler.exitScope();
-        module.mainCode = code;
+        CompilationPhase.BYTECODE_GENERATION_PHASE.apply(module, node, filename);
+//        CodeCompiler compiler = new CodeCompiler(module);
+//        CompileUnit code = compiler.enterScope("<module>", CompilerScope.MODULE, node, 0);
+//        compiler.parse(node, null, cflags, false);
+//        compiler.exitScope();
+//        module.mainCode = code;
         module.write(ostream);
     }
 

@@ -1,6 +1,7 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import org.python.internal.runtime.Timing;
 import org.python.io.util.FilenoUtil;
 import org.python.io.util.SelectorPool;
 
@@ -31,8 +32,11 @@ public class ThreadState {
 
     public Runnable onDelete;
 
+    public Timing _timing;
+
     public ThreadState(PySystemState systemState) {
         this.systemState = systemState;
+        _timing = new Timing();
     }
 
     /**

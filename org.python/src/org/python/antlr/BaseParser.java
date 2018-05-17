@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.python.antlr.base.mod;
+import org.python.core.Py;
+import org.python.internal.runtime.Timing;
 
 public class BaseParser {
 
@@ -51,10 +53,15 @@ public class BaseParser {
     }
 
     public mod parseModule() {
-        mod tree = null;
+        long startTime = System.nanoTime();
         PythonParser parser = setupParser(false);
         PythonParser.File_inputContext r = parser.file_input();
-        tree = (mod) new BuildAstVisitor(filename).visit(r);
+        long parseEndTime = System.nanoTime();
+        mod tree =  (mod) new BuildAstVisitor(filename).visit(r);
+        long endTime = System.nanoTime();
+        Timing timing = Py.getThreadState()._timing;
+        timing.accumulateTime("Generate CST", parseEndTime - startTime);
+        timing.accumulateTime("Convert CST to AST", endTime - parseEndTime);
         return tree;
     }
 }
