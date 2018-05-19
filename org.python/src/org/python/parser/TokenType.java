@@ -2,6 +2,8 @@ package org.python.parser;
 
 import org.python.antlr.ast.BinOp;
 
+import javax.net.ssl.SSLProtocolException;
+
 import static org.python.parser.TokenKind.BINARY;
 import static org.python.parser.TokenKind.BRACKET;
 import static org.python.parser.TokenKind.LITERAL;
@@ -66,7 +68,14 @@ public enum TokenType {
     COMMENT(SPECIAL, null),
     NL(SPECIAL, null),
     ENCODING(SPECIAL, null),
-    N_TOKENS(SPECIAL, null)
+    N_TOKENS(SPECIAL, null),
+    /* Meta Grammar */
+    MSTART(SPECIAL, null),
+    RULE(SPECIAL, null),
+    RHS(SPECIAL, null),
+    ALT(SPECIAL, null),
+    ITEM(SPECIAL, null),
+    ATOM(SPECIAL, null)
     ;
     /**
 #define ENDMARKER       0
