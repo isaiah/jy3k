@@ -170,17 +170,17 @@ public class ParserGenerator {
         private NFAGrammar() {
             nfas = new ArrayList<>();
             ll = new ArrayList<>();
-            addLabel(ENDMARKER, "EMPTY");
+            addLabel(ENDMARKER.ordinal(), "EMPTY");
         }
 
-        int addLabel(TokenType type, String str) {
-            return Grammar.addLabel(ll, type.ordinal(), str);
+        int addLabel(int type, String str) {
+            return Grammar.addLabel(ll, type, str);
         }
 
         NFA addNFA(String name) {
             NFA nf = new NFA(name);
             nfas.add(nf);
-            addLabel(NAME, name);
+            addLabel(NAME.ordinal(), name);
             return nf;
         }
 
@@ -253,7 +253,7 @@ public class ParserGenerator {
             int cur = 0;
             Node node = n.nchild(cur++);
             IntTuple p1 = new IntTuple();
-            if (n.type() == LSQB) {
+            if (n.type() == LSQB.ordinal()) {
                 REQN(n.nch(), 3);
                 node = n.nchild(cur++);
                 REQ(node, RHS);
@@ -272,7 +272,7 @@ public class ParserGenerator {
                 }
                 node = n.nchild(cur++);
                 nf.addNFAArc(p.b, p.a, EMPTY);
-                if (n.type() == STAR) {
+                if (n.type() == STAR.ordinal()) {
                     p.b = p.a;
                 } else {
                     REQ(node, PLUS);
@@ -284,14 +284,14 @@ public class ParserGenerator {
             REQN(n.nch(), 1);
             int cur = 0;
             Node node = n.nchild(cur++);
-            if (n.type() == LPAR) {
+            if (n.type() == LPAR.ordinal()) {
                 REQN(n.nch(), 3);
                 node = n.nchild(cur++);
                 REQ(node, RHS);
                 compileRHS(ll, nf, node, p);
                 node = n.nchild(cur++);
                 REQ(node, RPAR);
-            } if (n.type() == NAME || n.type() == STRING) {
+            } if (n.type() == NAME.ordinal() || n.type() == STRING.ordinal()) {
                 p.a = nf.addState();
                 p.b = nf.addState();
                 nf.addNFAArc(p.a, p.b, addLabel(n.type(), n.str()));
@@ -518,14 +518,9 @@ public class ParserGenerator {
             return g;
         }
 
-        // XXX
-        static String PyGrammar_LabelRepr(Grammar.Label label) {
-            return "";
-        }
-
         /** Fake C macros */
         void REQ(Node n, TokenType type) {
-            assert n.type() == type;
+            assert n.type() == type.ordinal();
         }
         void REQN(int n, int count) {
             assert n > count: String.format("metacompile: less than %d children", count);
@@ -548,11 +543,20 @@ public class ParserGenerator {
     static NFAGrammar metacompile(Node n) {
         NFAGrammar gr = new NFAGrammar();
         for (Node node : n.children()) {
-            if (node.type() != NEWLINE) {
+            if (node.type() != NEWLINE.ordinal()) {
                 gr.compileRule(node);
             }
         }
         return gr;
+    }
+
+    static Grammar.DFA PyGrammar_FindDFA(Grammar g, int type) {
+        return g.dfas.get(NT_OFFSET - type);
+    }
+
+    // XXX
+    static String PyGrammar_LabelRepr(Grammar.Label label) {
+        return "";
     }
 
 }

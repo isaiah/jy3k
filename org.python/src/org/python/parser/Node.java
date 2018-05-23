@@ -7,14 +7,15 @@ import java.util.List;
  * Parse tree node
  */
 public class Node {
-    private TokenType type;
+    private int type;
     private String str;
     private int lineno;
     private int colOffset;
     private final List<Node> children;
 
-    public Node(TokenType type) {
+    public Node(int type) {
         this.type = type;
+        this.lineno = 0;
         this.children = new ArrayList<>();
     }
 
@@ -37,7 +38,7 @@ public class Node {
         return lineno;
     }
 
-    public TokenType type() {
+    public int type() {
         return type;
     }
 

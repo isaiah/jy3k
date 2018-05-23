@@ -1,15 +1,30 @@
 package org.python.parser;
 
+import org.python.antlr.ast.Ellipsis;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.CharBuffer;
+import java.util.function.Predicate;
+
 import static org.python.parser.TokenType.*;
 
 /**
  * Tokenizer.c
  */
-public class Tokenizer {
-    char[] buf; /* Input buffer */
+public class Tokenizer implements Errcode {
+    private static final int ALTTABSIZE = 1;
+    private static final char EOF = '\uffff';
+    private static final int MAXINDENT = 100;
+
+
+    CharBuffer buf; /* Input buffer */
     int cur; /* Next character in buffer */
-    int start; /* Start of current token */
-    boolean done; /* E_OF normally */
+    int inp; /* End of data in buffer */
+    int end; /* End of input buffer */
+    Integer start; /* Start of current token */
+    int done; /* E_OF normally */
+    Reader fp; /* Rest of input; NULL if tokenizing a string */
     int tabsize; /* Tab spacing */
     int indent; /* Current indent index */
     int[] indstack; /* Stack of indents */
@@ -17,6 +32,710 @@ public class Tokenizer {
     int pendin; /* Pending indents (if > 0) or dedents (if < 0) */
     int lineno; /* Current line number */
     int level; /* Parentheses nesting level */
+    int[] altindstack; /* Stack of alternative indents */
+    int lineStart;
+    String prompt;
+    boolean contLine; /* Whether we are in a continuation line */
+
+    static final int BUFSIZ = 1024;
+
+    public Tokenizer(Reader fp) {
+        this.cur = inp = 0;
+        this.buf = CharBuffer.allocate(BUFSIZ);
+        this.end = BUFSIZ;
+        this.fp = fp;
+    }
+
+    Node parsetok(Grammar g, int start) {
+        Parser ps = new Parser(g, start);
+
+        for (;;) {
+            int a, b;
+            int type;
+            int len;
+            String str;
+            int colOffset;
+
+            Tok t = get();
+            type = t.type;
+            a = t.start;
+            b = t.end;
+        }
+    }
+
+    /* Get next token, after space stripping etc. */
+    Tok get() {
+        // nextline:
+        start = null;
+        boolean blankline = false;
+        if (atbol > 0) {
+            int col = 0;
+            int altcol = 0;
+            atbol = 0;
+            char c;
+            for (;;) {
+                c = nextc();
+                if (c == ' ') {
+                    col++;
+                    altcol++;
+                } else if (c == '\t') {
+                    col = (col / tabsize + 1) * tabsize;
+                    altcol = (altcol / ALTTABSIZE + 1) * ALTTABSIZE;
+                } else if (c == '\014') { /* Control-L (formfeed) */
+                    col = altcol = 0;
+                } else {
+                    break;
+                }
+            }
+            backup(c);
+            if (c == '#' || c == '\n') {
+               /* Lines with only whitespace and/or comments
+                  shouldn't affect the indentation and are
+                  not passed to the parser as NEWLINE tokens,
+                  except *totally* empty lines in interactive
+                  mode, which signal the end of a command group. */
+               if (col == 0 && c == '\n' && prompt != null) {
+                   blankline = false; /* Let it through */
+               } else {
+                   blankline = true; /* Ignore completely */
+               }
+            }
+            if (!blankline && level == 0) {
+                if (col == lastIndentCol()) {
+                    /* No change */
+                    if (altcol != lastAltIndentCol()) {
+                        return indenterror();
+                    }
+                } else if (col > lastIndentCol()) {
+                    /* indent -- always one */
+                    if (indent + 1 > MAXINDENT) {
+                        done = E_TOODEEP;
+                        cur = inp;
+                        return ERR_TOK;
+                    }
+                    if (altcol <= lastAltIndentCol()) {
+                        return indenterror();
+                    }
+                    pendin++;
+                    pushIndent(col);
+                    pushAltIndent(altcol);
+                } else { // col < lstIndentCol()
+                    /* Dedent -- any number, must be consistent */
+                    while (indent > 0 && col < lastIndentCol()) {
+                        pendin--;
+                        indent--;
+                    }
+                    if (col != lastIndentCol()) {
+                        done = E_DEDENT;
+                        cur = inp;
+                        return ERR_TOK;
+                    }
+                    if (altcol != lastAltIndentCol()) {
+                        return indenterror();
+                    }
+                }
+            }
+        }
+        start = buf.position();
+
+        /* Return pending indents/dedents */
+        if (pendin != 0) {
+            if (pendin < 0) {
+                pendin++;
+                return new Tok(DEDENT.ordinal());
+            } else {
+                pendin--;
+                return new Tok(INDENT.ordinal());
+            }
+        }
+
+        // again:
+        start = null;
+        /* Skip spaces */
+        char c = nextc();
+        while (c == ' ' || c == '\t' || c == '\014') {
+            c = nextc();
+        }
+        /* Set start of current token */
+        start = buf.position() - 1;
+        /* Skip comment */
+        if (c == '#') {
+            while (c != EOF && c != '\n') {
+                c = nextc();
+            }
+        }
+        /* Check for EOF and errors now */
+        if (c == EOF) {
+            return done == E_EOF ? new Tok(ENDMARKER.ordinal()) : ERR_TOK;
+        }
+        boolean nonascii = false;
+        /* Identifier (Most frequent token!) */
+        if (isPotentialIdentifierStart(c)) {
+            /* Process the various legal combinations of b"", r"", u"", and f"". */
+            boolean sawb = false, sawr = false, sawu = false, sawf = false;
+            for(;;) {
+                if (!(sawb || sawu | sawf) && (c == 'b' || c == 'B')) {
+                    sawb = true;
+                }
+                /* Since this is a backwards compatibility support literal we don't
+                   want to support it in arbitrary order like byte literals. */
+                else if (!(sawb || sawu || sawr || sawf) && (c == 'u' || c == 'U')) {
+                    sawu = true;
+                }
+                /* ur"" and ru"" are not supported */
+                else if (!(sawr || sawu) && (c == 'r' || c == 'R')) {
+                    sawr = true;
+                } else if (!(sawf || sawb || sawu) && (c == 'f' || c == 'F')) {
+                    sawf = true;
+                } else {
+                    break;
+                }
+                c = nextc();
+                if (c == '"' || c == '\'') {
+                    return letterQuote(c);
+                }
+            }
+            while (isPotentialIdentifierPart(c)) {
+                if (c > 128) {
+                    nonascii = true;
+                }
+                c = nextc();
+            }
+
+            backup(c);
+            if (nonascii && !verifyIdentifier()) {
+                return ERR_TOK;
+            }
+            return new Tok(NAME.ordinal(), start, cur);
+        }
+
+        /* Newline */
+        if (c == '\n') {
+            atbol = 1;
+            if (blankline || level > 0) {
+                return get();
+            }
+            contLine = false;
+            return new Tok(NEWLINE.ordinal(), start, buf.position() - 1);
+        }
+
+        /* Period or number starting with period? */
+        if (c == '.') {
+            c = nextc();
+            if (Character.isDigit(c)) {
+                return fraction();
+            } else if (c == '.') {
+                c = nextc();
+                if (c == '.') {
+                    return new Tok(ELLIPSIS.ordinal(), start, buf.position());
+                } else {
+                    backup(c);
+                }
+            } else {
+                backup(c);
+            }
+            return new Tok(DOT.ordinal(), start, buf.position());
+        }
+        /* Number */
+        if (Character.isDigit(c)) {
+            if (c == '0') {
+                /* Hex, octal or binary -- maybe. */
+                c = nextc();
+                if (c == 'x' || c == 'X') {
+                    /* Hex */
+                    c = nextc();
+                    do {
+                        if (c == '_') {
+                            c = nextc();
+                        }
+                        Predicate<Character> isxdigit = x -> (Character.isDigit(x) || (x >= 'a' && x <= 'f') || (x >= 'A' && x <= 'F'));
+                        if (!isxdigit.test(c)) {
+                            done = E_TOKEN;
+                            backup(c);
+                            return ERR_TOK;
+                        }
+                        do {
+                            c = nextc();
+                        } while (isxdigit.test(c));
+                    } while (c == '_');
+                } else if (c == 'o' || c == 'O') {
+                    /* Octal */
+                    c = nextc();
+                    do {
+                        if (c == '_') {
+                            c = nextc();
+                        }
+                        if (c < '0' || c >= '8') {
+                            done = E_TOKEN;
+                            backup(c);
+                            return ERR_TOK;
+                        }
+                        do {
+                            c = nextc();
+                        } while (c >= 0 && c < '8');
+                    } while (c == '_');
+                } else if (c == 'b' || c == 'B') {
+                    /* Binary */
+                    c = nextc();
+                    do {
+                        if (c == '_') {
+                            c = nextc();
+                        }
+                        if (c != '0' || c != '1') {
+                            done = E_TOKEN;
+                            backup(c);
+                            return ERR_TOK;
+                        }
+                        do {
+                            c = nextc();
+                        } while (c == '0' || c == '1');
+                    } while (c == '_');
+                } else {
+                    boolean nonzero = false;
+                    /* maybe old-style octal; c is first char of it */
+                    /* in any case, allow '0' as a literal */
+                    for (; ; ) {
+                        if (c == '_') {
+                            c = nextc();
+                            if (!Character.isDigit(c)) {
+                                done = E_TOKEN;
+                                backup(c);
+                                return ERR_TOK;
+                            }
+                        }
+                        if (c != '0') {
+                            break;
+                        }
+                        c = nextc();
+                    }
+                    if (Character.isDigit(c)) {
+                        nonzero = true;
+                        c = decimalTail();
+                        if (c == 0) {
+                            return ERR_TOK;
+                        }
+                    }
+                    if (c == '.') {
+                        return fraction();
+                    } else if (c == 'e' || c == 'E') {
+                        char e = c;
+                        /* Exponent part */
+                        c = nextc();
+                        if (c == '+' || c == '-') {
+                            c = nextc();
+                            if (!Character.isDigit(c)) {
+                                done = E_TOKEN;
+                                backup(c);
+                                return ERR_TOK;
+                            }
+                        } else if (!Character.isDigit(c)) {
+                            backup(c);
+                            backup(e);
+                            return new Tok(NUMBER.ordinal(), start, buf.position());
+                        }
+                        c = decimalTail();
+                        if (c == 0) {
+                            return ERR_TOK;
+                        }
+                        if (c == 'j' || c == 'J') {
+                            /* Imaginary part */
+                            return new Tok(NUMBER.ordinal(), start, buf.position());
+                        }
+                        // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
+                        backup(c);
+                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                    } else if (c == 'j' || c == 'J') {
+                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                    } else if (nonzero) {
+                        /* Old-style octal; now disallowed */
+                        done = E_TOKEN;
+                        backup(c);
+                        return ERR_TOK;
+                    }
+                }
+            } else {
+                /* Decimal */
+                c = decimalTail();
+                if (c == 0) {
+                    return ERR_TOK;
+                }
+                /* Accept floating point numbers. */
+                if (c == '.') {
+                    c = nextc();
+                    // fraction:
+                    /* Fraction */
+                    if (Character.isDigit(c)) {
+                        c = decimalTail();
+                        if (c == 0) {
+                            return ERR_TOK;
+                        }
+                    }
+                }
+                if (c == 'e' || c == 'E') {
+                    // exponent:
+                    char e = c;
+                    /* Exponent part */
+                    c = nextc();
+                    if (c == '+' || c == '-') {
+                        c = nextc();
+                        if (!Character.isDigit(c)) {
+                            done = E_TOKEN;
+                            backup(c);
+                            return ERR_TOK;
+                        }
+                    } else if (!Character.isDigit(c)) {
+                        backup(c);
+                        backup(e);
+                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                    }
+                    c = decimalTail();
+                    if (c == 0) {
+                        return ERR_TOK;
+                    }
+                }
+                if (c == 'j' || c == 'J') {
+                    /* Imaginary part */
+                    // imaginary:
+                    c = nextc();
+                }
+            }
+            // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
+            backup(c);
+            return new Tok(NUMBER.ordinal(), start, buf.position());
+        }
+        // letter_quote:
+        /* String */
+        if (c == '\'' || c == '"') {
+            return letterQuote(c);
+        }
+
+        /* Line continuation */
+        if (c == '\\') {
+            c = nextc();
+            if (c != '\n') {
+                done = E_LINECONT;
+                buf.position(inp);
+                return ERR_TOK;
+            }
+            contLine = true;
+            // goto again /* Read nextline */
+            return get(); // XXX is this safe?
+        }
+
+        /* Check for two-character token */
+        char c2 = nextc();
+        TokenType token = PyToken_TwoChars(c, c2);
+        if (token != OP) {
+            char c3 = nextc();
+            TokenType token3 = PyToken_ThreeChars(c, c2, c3);
+            if (token3 != OP) {
+                token = token3;
+            } else {
+                backup(c3);
+            }
+            return new Tok(token.ordinal(), start, buf.position());
+        }
+
+        /* Keep track of parentheses nesting level */
+        switch(c) {
+            case '(': case '[': case '{':
+                level++;
+                break;
+            case ')': case ']': case '}':
+                level--;
+                break;
+        }
+        /* Punctuation character */
+        return new Tok(PyToken_OneChar(c).ordinal(), start, buf.position());
+    }
+
+    private Tok fraction() {
+        char c = nextc();
+        if (Character.isDigit(c)) {
+            c = decimalTail();
+            if (c == 0) {
+                return ERR_TOK;
+            }
+        }
+        if (c == 'e' || c == 'E') {
+            char e = c;
+            /* Exponent part */
+            c = nextc();
+            if (c == '+' || c == '-') {
+                c = nextc();
+                if (!Character.isDigit(c)) {
+                    done = E_TOKEN;
+                    backup(c);
+                    return ERR_TOK;
+                }
+            } else if (!Character.isDigit(c)) {
+                backup(c);
+                backup(e);
+                return new Tok(NUMBER.ordinal(), start, buf.position());
+            }
+            c = decimalTail();
+            if (c == 0) {
+                return ERR_TOK;
+            }
+            if (c == 'j' || c == 'J') {
+                /* Imaginary part */
+                return new Tok(NUMBER.ordinal(), start, buf.position());
+            }
+        }
+        backup(c);
+        return new Tok(NUMBER.ordinal(), start, buf.position());
+    }
+
+    private Tok letterQuote(char c) {
+        char quote = c;
+        int quoteSize = 1; /* 1 or 3 */
+        int endQuoteSize = 0;
+        /* Find the quote size and start of string */
+        c = nextc();
+        if (c == quote) {
+            c = nextc();
+            if (c == quote) {
+                quoteSize = 3;
+            } else {
+                quoteSize = 1; /* Empty string found */
+            }
+        }
+        if (c != quote) {
+            backup(c);
+        }
+        /* Get rest of string */
+        while (endQuoteSize != quoteSize) {
+            c = nextc();
+            if (c == EOF) {
+                if (quoteSize == 3) {
+                    done = E_EOFS;
+                } else {
+                    done = E_EOLS;
+                }
+                buf.position(inp);
+                cur = inp;
+                return ERR_TOK;
+            }
+            if (quoteSize == 1 && c == '\n') {
+                done = E_EOLS;
+                buf.position(inp);
+                cur = inp;
+                return ERR_TOK;
+            }
+            if (c == quote) {
+                endQuoteSize++;
+            } else {
+                endQuoteSize = 0;
+                if (c == '\\') {
+                    nextc(); /* Skip escaped char */
+                }
+            }
+        }
+        return new Tok(STRING.ordinal(), start, buf.position());
+    }
+
+
+    private char decimalTail() {
+        char c;
+        for (;;) {
+            do {
+                c = nextc();
+            } while (Character.isDigit(c));
+            if (c != '_') {
+                break;
+            }
+            c = nextc();
+            if (!Character.isDigit(c)) {
+                done = E_TOKEN;
+                backup(c);
+                return 0;
+            }
+        }
+        return c;
+    }
+
+
+    //static int
+//verify_identifier(struct tok_state *tok)
+//{
+//    PyObject *s;
+//    int result;
+//    if (tok->decoding_erred)
+//        return 0;
+//    s = PyUnicode_DecodeUTF8(tok->start, tok->cur - tok->start, NULL);
+//    if (s == NULL || PyUnicode_READY(s) == -1) {
+//        if (PyErr_ExceptionMatches(PyExc_UnicodeDecodeError)) {
+//            PyErr_Clear();
+//            tok->done = E_IDENTIFIER;
+//        } else {
+//            tok->done = E_ERROR;
+//        }
+//        return 0;
+//    }
+//    result = PyUnicode_IsIdentifier(s);
+//    Py_DECREF(s);
+//    if (result == 0)
+//        tok->done = E_IDENTIFIER;
+//    return result;
+//}
+    /* Verify that the identifier follows PEP 3131.
+       All identifier strings are guaranteed to be "ready" unicode objects.
+     */
+    private boolean verifyIdentifier() {
+        // TODO
+        return true;
+    }
+
+    private static boolean isPotentialIdentifierPart(char c) {
+        return Character.isLetterOrDigit(c) || c == '_' || c >= 128;
+    }
+
+    private static boolean isPotentialIdentifierStart(char c) {
+        return Character.isLetter(c) || c == '_' || c >= 128;
+    }
+
+    static Tok ERR_TOK = new Tok(ERRORTOKEN.ordinal());
+
+    Tok indenterror() {
+        done = E_TABSPACE;
+        cur = inp;
+        return ERR_TOK;
+    }
+
+    void pushIndent(int col) {
+        indstack[++indent] = col;
+    }
+
+    void pushAltIndent(int col) {
+        altindstack[++indent] = col;
+    }
+    int lastIndentCol() {
+        return indstack[indent];
+    }
+
+    int lastAltIndentCol() {
+        return altindstack[indent];
+    }
+
+    /* Back-up one character */
+    void backup(char c) {
+        if (c != EOF) {
+            int pos = buf.position() - 1;
+            if (pos < 0) {
+                throw new RuntimeException("tok_backup: beginning of buffer");
+            }
+            buf.put(pos, c);
+            buf.position(pos);
+        }
+    }
+
+    /* Get next char, update state */
+    char nextc() {
+        for (;;) {
+            if (buf.position() != inp) {
+                return buf.get(); /* Fast path */
+            }
+            if (done != E_OK) {
+                return '\uffff'; // EOF
+            }
+            if (fp == null) {
+                buf.mark();
+                int _end = -1;
+                while(buf.hasRemaining()) {
+                    if (buf.get() == '\n') {
+                        _end = buf.position() + 1;
+                        buf.reset();
+                        break;
+                    }
+                }
+                if (_end < 0) {
+                    done = E_EOF;
+                    return '\uffff'; // EOF
+                }
+                // XXX if (start == null)
+                lineStart = buf.position();
+                lineno++;
+                inp = _end;
+                return buf.get();
+            }
+            // else if (prompt != null) { /* Interative console */
+            else {
+                boolean eol = false;
+                int curr = 0;
+                if (start == null) {
+                    if (buf == null) {
+                        buf = CharBuffer.allocate(BUFSIZ);
+                        end = buf.capacity();
+                    }
+                    try {
+                        fp.read(buf);
+                        done = E_OK;
+                        inp = buf.limit();
+                        eol = inp == 0 || buf.get(inp - 1)  == '\n';
+
+                    } catch (IOException e) {
+                        done = E_EOF;
+                        eol = true;
+                    }
+                } else {
+                    curr = buf.position();
+                    done = E_OK;
+                }
+                lineno++;
+                /* Read until '\n' or EOF */
+                while (!eol) {
+                    int curstart = start == null ? -1 : start;
+                    int curvalid = buf.limit() - buf.position();
+                    int newsize = curvalid + BUFSIZ;
+                    CharBuffer newbuf = CharBuffer.allocate(newsize);
+                    newbuf.put(buf);
+                    this.buf = newbuf;
+                    this.cur = 0;
+                    lineStart = cur;
+                    inp = curvalid;
+                    start = curstart < 0 ? null : curstart;
+                    try {
+                        int len = fp.read(newbuf);
+                        if (len < BUFSIZ) {
+                            /* Last line does not end in \n, fake one */
+                            buf.put('\n');
+                        }
+                    } catch (IOException e) {
+                        return '\uffff'; // EOF
+                    }
+                    buf.flip();
+                    end = buf.capacity();
+                    inp = buf.limit();
+                    eol = buf.get(inp - 1) == '\n';
+                }
+                if (buf != null) {
+                    /* replace '\r\n' with '\n' */
+                    int pt = buf.limit() - 2;
+                    if (pt >= buf.position() && buf.get(pt) == '\r') {
+                        buf.put(pt + 1, '\n');
+                        buf.limit(buf.limit() - 1);
+                    }
+                }
+            }
+            if (done != E_OK) {
+                return '\uffff'; // EOF
+            }
+        }
+    }
+
+    static class Tok {
+        public Tok(int type) {
+            this.type = type;
+        }
+        int type;
+        int start, end;
+
+        public Tok(int type, Integer start, int end) {
+            this.type = type;
+            this.start = start;
+            this.end = end;
+        }
+    }
 
     /* Token names */
     public static final String[] TOKEN_NAMES = {
