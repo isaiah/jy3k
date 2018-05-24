@@ -1,7 +1,10 @@
 package org.python.parser;
 
+import org.antlr.v4.runtime.Token;
 import org.python.antlr.ast.Ellipsis;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -27,12 +30,12 @@ public class Tokenizer implements Errcode {
     Reader fp; /* Rest of input; NULL if tokenizing a string */
     int tabsize; /* Tab spacing */
     int indent; /* Current indent index */
-    int[] indstack; /* Stack of indents */
+    int[] indstack = new int[MAXINDENT]; /* Stack of indents */
     int atbol; /* Nonzero if at begin of new line */
     int pendin; /* Pending indents (if > 0) or dedents (if < 0) */
     int lineno; /* Current line number */
     int level; /* Parentheses nesting level */
-    int[] altindstack; /* Stack of alternative indents */
+    int[] altindstack = new int[MAXINDENT]; /* Stack of alternative indents */
     int lineStart;
     String prompt;
     boolean contLine; /* Whether we are in a continuation line */
@@ -46,21 +49,70 @@ public class Tokenizer implements Errcode {
         this.fp = fp;
     }
 
+    public static Tokenizer fromFile(Reader fp) {
+        Tokenizer tok = new Tokenizer(fp);
+        return tok;
+    }
+
     Node parsetok(Grammar g, int start) {
         Parser ps = new Parser(g, start);
 
+        boolean started = false;
         for (;;) {
-            int a, b;
             int type;
             int len;
-            String str;
+            char[] str;
             int colOffset;
 
             Tok t = get();
             type = t.type;
-            a = t.start;
-            b = t.end;
+            if (t == ERR_TOK) {
+                // err_ret->error = done;
+                break;
+
+            }
+            if (type == ENDMARKER.ordinal() && started) {
+                type = NEWLINE.ordinal();
+                started = false;
+                /* Add the right number of dedent tokens,
+                   except if a certain flag is given -- codeop.py uses this. */
+//                if (tok->indent &&
+//                    !(*flags & PyPARSE_DONT_IMPLY_DEDENT))
+//                {
+//                    tok->pendin = -tok->indent;
+//                    tok->indent = 0;
+//                }
+
+                if (indent > 0) { // && flags & PyPARSE_DONT_IMPLY_DEDENT) {
+                    pendin = - indent;
+                    indent = 0;
+                }
+            } else {
+                started = true;
+            }
+            len = t.length();
+            str = new char[len + 1];
+            // rewind and load the char[]
+            buf.position(t.start);
+            buf.get(str);
+            if (t.start >= lineStart) {
+                colOffset = t.start - lineStart;
+            } else {
+                colOffset = -1;
+            }
+
+            int error = ps.addToken(type, new String(str), lineno, colOffset);
+            if (error != E_OK) {
+                break;
+            }
         }
+
+        Node n = ps.tree;
+        ps.tree = null;
+        // #ifndef PGEN
+        // TODO extra logic for non pgen parser
+        // #endif
+        return n;
     }
 
     /* Get next token, after space stripping etc. */
@@ -635,9 +687,9 @@ public class Tokenizer implements Errcode {
             if (buf.position() != inp) {
                 return buf.get(); /* Fast path */
             }
-            if (done != E_OK) {
-                return '\uffff'; // EOF
-            }
+//            if (done != E_OK) {
+//                return EOF;
+//            }
             if (fp == null) {
                 buf.mark();
                 int _end = -1;
@@ -669,16 +721,19 @@ public class Tokenizer implements Errcode {
                     }
                     try {
                         fp.read(buf);
+                        buf.flip();
                         done = E_OK;
                         inp = buf.limit();
-                        eol = inp == 0 || buf.get(inp - 1)  == '\n';
-
+                        eol = inp == buf.position() || buf.get(inp - 1)  == '\n';
                     } catch (IOException e) {
                         done = E_EOF;
                         eol = true;
                     }
                 } else {
-                    curr = buf.position();
+                    if (decodingFEOF(fp)) {
+                        done = E_EOF;
+                        eol = true;
+                    }
                     done = E_OK;
                 }
                 lineno++;
@@ -723,6 +778,19 @@ public class Tokenizer implements Errcode {
         }
     }
 
+    // Check if file has reached EOF
+    private boolean decodingFEOF(Reader fp) {
+        assert fp.markSupported(): "Must support mark";
+        try {
+            fp.mark(1);
+            fp.read();
+            fp.reset();
+        } catch (IOException e) {
+            return true;
+        }
+        return false;
+    }
+
     static class Tok {
         public Tok(int type) {
             this.type = type;
@@ -734,6 +802,10 @@ public class Tokenizer implements Errcode {
             this.type = type;
             this.start = start;
             this.end = end;
+        }
+
+        public int length() {
+            return end - start;
         }
     }
 
@@ -1007,6 +1079,4 @@ public class Tokenizer implements Errcode {
         }
         return OP;
     }
-
-
 }

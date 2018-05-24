@@ -19,7 +19,7 @@ public class Node {
         this.children = new ArrayList<>();
     }
 
-    public void addChildren(TokenType type, String str, int lineno, int colOffset) {
+    public void addChildren(int type, String str, int lineno, int colOffset) {
     }
 
     public int nch() {

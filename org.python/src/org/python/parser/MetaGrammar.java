@@ -133,5 +133,5 @@ public class MetaGrammar {
             new Grammar.Label(7, null),
             new Grammar.Label(8, null)
     };
-    final static Grammar PARSER_GRAMMAR = new Grammar(dfas, labels);
+    final static Grammar PARSER_GRAMMAR = new Grammar(dfas, labels, 256);
 }

@@ -30,8 +30,8 @@ public class ParserGenerator {
     static final int EMPTY = 0;
 
     public static void main(String[] args) throws IOException {
-        String filename = args[0];
-        String grammarinit = args[1];
+        String filename = "grammar/Grammar";
+        String grammarinit = "/tmp/foo.java";
         Grammar g = getgrammar(filename);
         File fp = new File(grammarinit);
         Writer f = new FileWriter(fp);
@@ -551,7 +551,10 @@ public class ParserGenerator {
     }
 
     static Grammar.DFA PyGrammar_FindDFA(Grammar g, int type) {
-        return g.dfas.get(NT_OFFSET - type);
+        Grammar.DFA d;
+        d =  g.dfas.get(type - NT_OFFSET);
+        assert (((Grammar.DFA) d).type == type);
+        return d;
     }
 
     // XXX

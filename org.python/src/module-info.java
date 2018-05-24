@@ -16,6 +16,7 @@ module org.python {
 
     requires java.prefs;
     requires jdk.dynalink;
+    requires java.logging;
     requires java.scripting;
     requires java.management;
     requires java.xml;

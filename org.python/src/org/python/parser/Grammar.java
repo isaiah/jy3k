@@ -6,6 +6,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 
+import static org.python.parser.ParserGenerator.EMPTY;
 import static org.python.parser.TokenType.NAME;
 import static org.python.parser.TokenType.OP;
 import static org.python.parser.TokenType.STRING;
@@ -23,9 +24,10 @@ public class Grammar {
         dfas = new ArrayList<>();
     }
 
-    public Grammar(DFA[] dfas, Label[] labels) {
+    public Grammar(DFA[] dfas, Label[] labels, int start) {
         this.dfas = Arrays.asList(dfas);
         this.ll = Arrays.asList(labels);
+        this.start = start;
     }
 
     static int addLabel(List<Label> ll, int type, String str) {
@@ -90,8 +92,16 @@ public class Grammar {
     static class State {
         final List<Arc> arcs;
 
+        /* Optional accelerator */
+        int lower; /* Lowest label index */
+        int upper; /* Highest label index */
+        int[] accel; /* Accelerator */
+        boolean accept; /* accepting state */
+
         private State() {
             arcs = new ArrayList<>();
+            this.lower = this.upper = 0;
+            this.accept = false;
         }
 
         public State(Arc[] arcs) {
@@ -249,7 +259,67 @@ public class Grammar {
         return type >= NT_OFFSET;
     }
 
+    void PyGrammar_AddAccelerators() {
+        dfas.forEach(this::fixdfa);
+        accel = true;
+    }
+
+    private void fixdfa(DFA d) {
+        d.states.forEach(this::fixstate);
+    }
+
+    private void fixstate(State s) {
+        int nl = ll.size();
+        int[] accel = new int[nl];
+        Arrays.fill(accel, -1);
+        for (Arc a : s.arcs) {
+            int lbl = a.lbl;
+            Label l = ll.get(lbl);
+            int type = l.type;
+            if (a.arrow >= (1 << 7)) {
+                System.out.println("XXX too many states!\n");
+                continue;
+            }
+            if (isNonTerminal(type)) {
+                DFA d1 = PyGrammar_FindDFA(type);
+                if (type - NT_OFFSET >= (1 << 7)) {
+                    System.out.println("XXX too high nonterminal number!");
+                    continue;
+                }
+                for (int ibit = 0; ibit < nl; ibit++) {
+                    if (d1.first.get(ibit)) {
+                        if (accel[ibit] != -1) {
+                            System.out.println("XXX ambiguity!");
+                        }
+                        accel[ibit] = a.arrow | (1 << 7) | ((type - NT_OFFSET) << 8);
+                    }
+                }
+            } else if (lbl == EMPTY) {
+                s.accept = true;
+            } else if (lbl >= 0 && lbl < nl) {
+                accel[lbl] = a.arrow;
+            }
+        }
+        while (nl > 0 && accel[nl - 1] == -1) {
+            nl--;
+        }
+        int k = 0;
+        while ( k < nl && accel[k] == -1) {
+            k++;
+        }
+
+        if (k < nl) {
+            s.accel = new int[nl - k];
+            s.lower = k;
+            s.upper = nl;
+            for (int i = 0; k < nl; i++, k++) {
+                s.accel[i] = accel[k];
+            }
+        }
+    }
+
     final List<DFA> dfas;
     List<Label> ll;
     int start; /* Start symbol of this grammar */
+    boolean accel; /* Set if accelerators present */
 }

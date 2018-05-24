@@ -30,6 +30,7 @@ package org.python.antlr;
 import java.io.*;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 
 //This is the same as ANTLRReaderStream except it does not close the Reader.
 //Used for interactive mode where we may need to parse twice.
