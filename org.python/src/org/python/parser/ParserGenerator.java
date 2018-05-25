@@ -146,10 +146,12 @@ public class ParserGenerator {
         final List<NFAState> states;
         int start, finish;
 
+        static int TYP = NT_OFFSET;
+
         private NFA(String name) {
             this.name = name;
             this.start = this.finish = -1;
-            this.type = NT_OFFSET+1;
+            this.type = TYP++;
             states = new ArrayList<>();
         }
 
@@ -211,13 +213,16 @@ public class ParserGenerator {
             Node node = n.nchild(cur++);
             REQ(node, ALT);
             compileAlt(ll, nf, node, p);
+            if (cur >= n.nch()) {
+                return;
+            }
             int a = p.a;
             int b = p.b;
             p.a = nf.addState();
             p.b = nf.addState();
-            nf.addNFAArc(a, p.a, EMPTY);
+            nf.addNFAArc(p.a, a, EMPTY);
             nf.addNFAArc(b, p.b, EMPTY);
-            while (cur < nf.states.size()) {
+            while (cur < n.nch()) {
                 node = n.nchild(cur++);
                 REQ(node, VBAR);
 
@@ -527,7 +532,8 @@ public class ParserGenerator {
         }
     }
 
-    /* This acts like the int *pa, int *pb in C, it passes parameter, and receives return value*/
+    /* Poorman's pointer:
+     This acts like the int *pa, int *pb in C, it passes parameter, and receives return value*/
     static class IntTuple {
         int a, b;
         public IntTuple() {

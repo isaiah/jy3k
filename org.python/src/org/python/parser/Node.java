@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Parse tree node
  */
-public class Node {
+public class Node implements Errcode {
     private int type;
     private String str;
     private int lineno;
@@ -19,7 +19,21 @@ public class Node {
         this.children = new ArrayList<>();
     }
 
-    public void addChildren(int type, String str, int lineno, int colOffset) {
+    public Node(int type, String str, int lineno, int colOffset) {
+        this.type = type;
+        this.str = str;
+        this.lineno = lineno;
+        this.colOffset = colOffset;
+        this.children = new ArrayList<>();
+    }
+
+    public boolean addChildren(int type, String str, int lineno, int colOffset) {
+        if (children.size() == Integer.MAX_VALUE) {
+            return false;
+        }
+        Node n = new Node(type, str, lineno, colOffset);
+        children.add(n);
+        return true;
     }
 
     public int nch() {

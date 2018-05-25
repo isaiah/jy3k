@@ -1,9 +1,5 @@
 package org.python.parser;
 
-import org.python.antlr.ast.BinOp;
-
-import javax.net.ssl.SSLProtocolException;
-
 import static org.python.parser.TokenKind.BINARY;
 import static org.python.parser.TokenKind.BRACKET;
 import static org.python.parser.TokenKind.LITERAL;

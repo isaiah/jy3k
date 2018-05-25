@@ -22,7 +22,7 @@ public class Tokenizer implements Errcode {
 
 
     CharBuffer buf; /* Input buffer */
-    int cur; /* Next character in buffer */
+//    int cur; /* Next character in buffer */
     int inp; /* End of data in buffer */
     int end; /* End of input buffer */
     Integer start; /* Start of current token */
@@ -43,7 +43,7 @@ public class Tokenizer implements Errcode {
     static final int BUFSIZ = 1024;
 
     public Tokenizer(Reader fp) {
-        this.cur = inp = 0;
+        inp = 0;
         this.buf = CharBuffer.allocate(BUFSIZ);
         this.end = BUFSIZ;
         this.fp = fp;
@@ -162,7 +162,6 @@ public class Tokenizer implements Errcode {
                     /* indent -- always one */
                     if (indent + 1 > MAXINDENT) {
                         done = E_TOODEEP;
-                        cur = inp;
                         return ERR_TOK;
                     }
                     if (altcol <= lastAltIndentCol()) {
@@ -179,7 +178,6 @@ public class Tokenizer implements Errcode {
                     }
                     if (col != lastIndentCol()) {
                         done = E_DEDENT;
-                        cur = inp;
                         return ERR_TOK;
                     }
                     if (altcol != lastAltIndentCol()) {
@@ -258,7 +256,7 @@ public class Tokenizer implements Errcode {
             if (nonascii && !verifyIdentifier()) {
                 return ERR_TOK;
             }
-            return new Tok(NAME.ordinal(), start, cur);
+            return new Tok(NAME.ordinal(), start, buf.position() - 1);
         }
 
         /* Newline */
@@ -565,13 +563,11 @@ public class Tokenizer implements Errcode {
                     done = E_EOLS;
                 }
                 buf.position(inp);
-                cur = inp;
                 return ERR_TOK;
             }
             if (quoteSize == 1 && c == '\n') {
                 done = E_EOLS;
                 buf.position(inp);
-                cur = inp;
                 return ERR_TOK;
             }
             if (c == quote) {
@@ -648,9 +644,12 @@ public class Tokenizer implements Errcode {
 
     static Tok ERR_TOK = new Tok(ERRORTOKEN.ordinal());
 
+    Tok newtok(TokenType tt) {
+        return new Tok(tt.ordinal(), start, buf.position() - 1);
+    }
+
     Tok indenterror() {
         done = E_TABSPACE;
-        cur = inp;
         return ERR_TOK;
     }
 
@@ -713,7 +712,6 @@ public class Tokenizer implements Errcode {
             // else if (prompt != null) { /* Interative console */
             else {
                 boolean eol = false;
-                int curr = 0;
                 if (start == null) {
                     if (buf == null) {
                         buf = CharBuffer.allocate(BUFSIZ);
@@ -745,8 +743,7 @@ public class Tokenizer implements Errcode {
                     CharBuffer newbuf = CharBuffer.allocate(newsize);
                     newbuf.put(buf);
                     this.buf = newbuf;
-                    this.cur = 0;
-                    lineStart = cur;
+                    lineStart = buf.position(); // = tok->cur
                     inp = curvalid;
                     start = curstart < 0 ? null : curstart;
                     try {
