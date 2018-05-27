@@ -172,7 +172,7 @@ public class ParserGenerator {
         private NFAGrammar() {
             nfas = new ArrayList<>();
             ll = new ArrayList<>();
-            addLabel(ENDMARKER.ordinal(), "EMPTY");
+            addLabel(ENDMARKER, "EMPTY");
         }
 
         int addLabel(int type, String str) {
@@ -182,7 +182,7 @@ public class ParserGenerator {
         NFA addNFA(String name) {
             NFA nf = new NFA(name);
             nfas.add(nf);
-            addLabel(NAME.ordinal(), name);
+            addLabel(NAME, name);
             return nf;
         }
 
@@ -203,6 +203,8 @@ public class ParserGenerator {
             /* This is translated from C, hopefully we can refactor in the end */
             nf.start = tuple.a;
             nf.finish = tuple.b;
+            node = n.nchild(cur++);
+            REQ(node, NEWLINE);
         }
 
         void compileRHS(List<Grammar.Label> ll, NFA nf, Node n, IntTuple p) {
@@ -241,8 +243,8 @@ public class ParserGenerator {
             int cur = 0;
             Node node = n.nchild(cur++);
             REQ(node, ITEM);
-            compileItem(ll, nf, n, p);
-            while (cur < nf.states.size()) {
+            compileItem(ll, nf, node, p);
+            while (cur < n.nch()) {
                 node = n.nchild(cur++);
                 REQ(node, ITEM);
                 IntTuple p1 = new IntTuple();
@@ -258,7 +260,7 @@ public class ParserGenerator {
             int cur = 0;
             Node node = n.nchild(cur++);
             IntTuple p1 = new IntTuple();
-            if (n.type() == LSQB.ordinal()) {
+            if (node.type() == LSQB) {
                 REQN(n.nch(), 3);
                 node = n.nchild(cur++);
                 REQ(node, RHS);
@@ -277,7 +279,7 @@ public class ParserGenerator {
                 }
                 node = n.nchild(cur++);
                 nf.addNFAArc(p.b, p.a, EMPTY);
-                if (n.type() == STAR.ordinal()) {
+                if (node.type() == STAR) {
                     p.b = p.a;
                 } else {
                     REQ(node, PLUS);
@@ -289,17 +291,18 @@ public class ParserGenerator {
             REQN(n.nch(), 1);
             int cur = 0;
             Node node = n.nchild(cur++);
-            if (n.type() == LPAR.ordinal()) {
-                REQN(n.nch(), 3);
+            int i = n.nch();
+            if (node.type() == LPAR) {
+                REQN(i, 3);
                 node = n.nchild(cur++);
                 REQ(node, RHS);
                 compileRHS(ll, nf, node, p);
                 node = n.nchild(cur++);
                 REQ(node, RPAR);
-            } if (n.type() == NAME.ordinal() || n.type() == STRING.ordinal()) {
+            } else if (node.type() == NAME || node.type() == STRING) {
                 p.a = nf.addState();
                 p.b = nf.addState();
-                nf.addNFAArc(p.a, p.b, addLabel(n.type(), n.str()));
+                nf.addNFAArc(p.a, p.b, addLabel(node.type(), node.str()));
             } else {
                 REQ(node, NAME);
             }
@@ -524,11 +527,11 @@ public class ParserGenerator {
         }
 
         /** Fake C macros */
-        void REQ(Node n, TokenType type) {
-            assert n.type() == type.ordinal();
+        void REQ(Node n, int type) {
+            assert n.type() == type: String.format("metacompile: required type %d, got %d", type, n.type());
         }
         void REQN(int n, int count) {
-            assert n > count: String.format("metacompile: less than %d children", count);
+            assert n >= count: String.format("metacompile: less than %d children, got %d", count, n);
         }
     }
 
@@ -549,7 +552,7 @@ public class ParserGenerator {
     static NFAGrammar metacompile(Node n) {
         NFAGrammar gr = new NFAGrammar();
         for (Node node : n.children()) {
-            if (node.type() != NEWLINE.ordinal()) {
+            if (node.type() != NEWLINE) {
                 gr.compileRule(node);
             }
         }

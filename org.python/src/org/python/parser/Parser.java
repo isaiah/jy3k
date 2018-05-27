@@ -132,9 +132,9 @@ public class Parser implements Errcode {
         Grammar g = grammar;
         int n = g.ll.size();
         int i = n;
-        if (type == NAME.ordinal()) {
+        if (type == NAME) {
             for (Grammar.Label l : g.ll) {
-                if (l.type != NAME.ordinal() || l.str == null || !l.str.equals(str)) {
+                if (l.type != NAME || l.str == null || !l.str.equals(str)) {
                     i--;
                     continue;
                 }
@@ -143,13 +143,13 @@ public class Parser implements Errcode {
                 return g.ll.size() - i;
             }
         }
-        i = n;
+        i = 0;
         for (Grammar.Label l : g.ll) {
             if (l.type == type && l.str == null) {
                 System.out.println("it's a token we know");
-                return n - i;
+                return i;
             }
-            i--;
+            i++;
         }
         logger.info("Illegal token");
         return -1;

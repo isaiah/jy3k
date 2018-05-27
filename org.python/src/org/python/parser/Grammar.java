@@ -141,7 +141,7 @@ public class Grammar {
     }
 
     private void translatelabel(Label lb) {
-        if (lb.type == NAME.ordinal()) {
+        if (lb.type == NAME) {
             for (DFA dfa : dfas) {
                 if (lb.str.equals(dfa.name)) {
                     lb.type = dfa.type;
@@ -159,35 +159,35 @@ public class Grammar {
             System.out.println(String.format("Cannot translate NAME label '%s'", lb.str));
             return;
         }
-        if (lb.type == STRING.ordinal()) {
+        if (lb.type == STRING) {
             if (Character.isAlphabetic(lb.str.charAt(1)) || lb.str.charAt(1) == '_') {
                 /* Label is a keyword */
-                lb.type = NAME.ordinal();
+                lb.type = NAME;
                 String src = lb.str.substring(1);
                 int p = src.indexOf('\'');
                 int nameLen = p >= 0 ? p : src.length();
                 lb.str = src;
             } else if (lb.str.charAt(2) == lb.str.charAt(0)) {
-                TokenType type = PyToken_OneChar(lb.str.charAt(1));
+                int type = PyToken_OneChar(lb.str.charAt(1));
                 if (type != OP) {
-                    lb.type = type.ordinal();
+                    lb.type = type;
                     lb.str = null;
                 } else {
                     System.out.println(String.format("Unknown OP label %s", lb.str));
                 }
             } else if (lb.str.charAt(3) == lb.str.charAt(0)) { //&& lb.str[2]
-                TokenType type = PyToken_TwoChars(lb.str.charAt(1), lb.str.charAt(2));
+                int type = PyToken_TwoChars(lb.str.charAt(1), lb.str.charAt(2));
                 if (type != OP) {
-                    lb.type = type.ordinal();
+                    lb.type = type;
                     lb.str = null;
                 } else {
                     System.out.println(String.format("Unknown OP label %s", lb.str));
                 }
             } else if (lb.str.charAt(4) == lb.str.charAt(0)) {
-                TokenType type = PyToken_ThreeChars(lb.str.charAt(1), lb.str.charAt(2), lb.str.charAt(3));
+                int type = PyToken_ThreeChars(lb.str.charAt(1), lb.str.charAt(2), lb.str.charAt(3));
                 if (type != OP) {
                     lb.str = null;
-                    lb.type = type.ordinal();
+                    lb.type = type;
                 } else {
                     System.out.println(String.format("Unknown OP label %s", lb.str));
                 }

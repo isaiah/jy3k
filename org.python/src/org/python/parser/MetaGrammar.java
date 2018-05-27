@@ -114,7 +114,7 @@ public class MetaGrammar {
     };
     static Grammar.Label[] labels = new Grammar.Label[]{
             new Grammar.Label(0, "EMPTY"),
-            new Grammar.Label(256, ""),
+            new Grammar.Label(256, null),
             new Grammar.Label(257, null),
             new Grammar.Label(4, null),
             new Grammar.Label(0, null),

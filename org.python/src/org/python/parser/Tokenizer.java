@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
 import java.util.function.Predicate;
 
@@ -71,8 +73,8 @@ public class Tokenizer implements Errcode {
                 break;
 
             }
-            if (type == ENDMARKER.ordinal() && started) {
-                type = NEWLINE.ordinal();
+            if (type == ENDMARKER && started) {
+                type = NEWLINE;
                 started = false;
                 /* Add the right number of dedent tokens,
                    except if a certain flag is given -- codeop.py uses this. */
@@ -91,7 +93,7 @@ public class Tokenizer implements Errcode {
                 started = true;
             }
             len = t.length();
-            str = new char[len + 1];
+            str = new char[len];
             // rewind and load the char[]
             buf.position(t.start);
             buf.get(str);
@@ -192,10 +194,10 @@ public class Tokenizer implements Errcode {
         if (pendin != 0) {
             if (pendin < 0) {
                 pendin++;
-                return new Tok(DEDENT.ordinal());
+                return new Tok(DEDENT);
             } else {
                 pendin--;
-                return new Tok(INDENT.ordinal());
+                return new Tok(INDENT);
             }
         }
 
@@ -216,7 +218,7 @@ public class Tokenizer implements Errcode {
         }
         /* Check for EOF and errors now */
         if (c == EOF) {
-            return done == E_EOF ? new Tok(ENDMARKER.ordinal()) : ERR_TOK;
+            return done == E_EOF ? new Tok(ENDMARKER) : ERR_TOK;
         }
         boolean nonascii = false;
         /* Identifier (Most frequent token!) */
@@ -256,7 +258,7 @@ public class Tokenizer implements Errcode {
             if (nonascii && !verifyIdentifier()) {
                 return ERR_TOK;
             }
-            return new Tok(NAME.ordinal(), start, buf.position() - 1);
+            return new Tok(NAME, start, buf.position());
         }
 
         /* Newline */
@@ -266,7 +268,7 @@ public class Tokenizer implements Errcode {
                 return get();
             }
             contLine = false;
-            return new Tok(NEWLINE.ordinal(), start, buf.position() - 1);
+            return new Tok(NEWLINE, start, buf.position());
         }
 
         /* Period or number starting with period? */
@@ -277,14 +279,14 @@ public class Tokenizer implements Errcode {
             } else if (c == '.') {
                 c = nextc();
                 if (c == '.') {
-                    return new Tok(ELLIPSIS.ordinal(), start, buf.position());
+                    return new Tok(ELLIPSIS, start, buf.position());
                 } else {
                     backup(c);
                 }
             } else {
                 backup(c);
             }
-            return new Tok(DOT.ordinal(), start, buf.position());
+            return new Tok(DOT, start, buf.position());
         }
         /* Number */
         if (Character.isDigit(c)) {
@@ -381,7 +383,7 @@ public class Tokenizer implements Errcode {
                         } else if (!Character.isDigit(c)) {
                             backup(c);
                             backup(e);
-                            return new Tok(NUMBER.ordinal(), start, buf.position());
+                            return new Tok(NUMBER, start, buf.position());
                         }
                         c = decimalTail();
                         if (c == 0) {
@@ -389,13 +391,13 @@ public class Tokenizer implements Errcode {
                         }
                         if (c == 'j' || c == 'J') {
                             /* Imaginary part */
-                            return new Tok(NUMBER.ordinal(), start, buf.position());
+                            return new Tok(NUMBER, start, buf.position());
                         }
                         // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
                         backup(c);
-                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                        return new Tok(NUMBER, start, buf.position());
                     } else if (c == 'j' || c == 'J') {
-                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                        return new Tok(NUMBER, start, buf.position());
                     } else if (nonzero) {
                         /* Old-style octal; now disallowed */
                         done = E_TOKEN;
@@ -436,7 +438,7 @@ public class Tokenizer implements Errcode {
                     } else if (!Character.isDigit(c)) {
                         backup(c);
                         backup(e);
-                        return new Tok(NUMBER.ordinal(), start, buf.position());
+                        return new Tok(NUMBER, start, buf.position());
                     }
                     c = decimalTail();
                     if (c == 0) {
@@ -451,7 +453,7 @@ public class Tokenizer implements Errcode {
             }
             // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
             backup(c);
-            return new Tok(NUMBER.ordinal(), start, buf.position());
+            return new Tok(NUMBER, start, buf.position());
         }
         // letter_quote:
         /* String */
@@ -474,17 +476,18 @@ public class Tokenizer implements Errcode {
 
         /* Check for two-character token */
         char c2 = nextc();
-        TokenType token = PyToken_TwoChars(c, c2);
+        int token = PyToken_TwoChars(c, c2);
         if (token != OP) {
             char c3 = nextc();
-            TokenType token3 = PyToken_ThreeChars(c, c2, c3);
+            int token3 = PyToken_ThreeChars(c, c2, c3);
             if (token3 != OP) {
                 token = token3;
             } else {
                 backup(c3);
             }
-            return new Tok(token.ordinal(), start, buf.position());
+            return new Tok(token, start, buf.position());
         }
+        backup(c2);
 
         /* Keep track of parentheses nesting level */
         switch(c) {
@@ -496,7 +499,7 @@ public class Tokenizer implements Errcode {
                 break;
         }
         /* Punctuation character */
-        return new Tok(PyToken_OneChar(c).ordinal(), start, buf.position());
+        return newtok(PyToken_OneChar(c));
     }
 
     private Tok fraction() {
@@ -521,7 +524,7 @@ public class Tokenizer implements Errcode {
             } else if (!Character.isDigit(c)) {
                 backup(c);
                 backup(e);
-                return new Tok(NUMBER.ordinal(), start, buf.position());
+                return new Tok(NUMBER, start, buf.position());
             }
             c = decimalTail();
             if (c == 0) {
@@ -529,11 +532,11 @@ public class Tokenizer implements Errcode {
             }
             if (c == 'j' || c == 'J') {
                 /* Imaginary part */
-                return new Tok(NUMBER.ordinal(), start, buf.position());
+                return new Tok(NUMBER, start, buf.position());
             }
         }
         backup(c);
-        return new Tok(NUMBER.ordinal(), start, buf.position());
+        return new Tok(NUMBER, start, buf.position());
     }
 
     private Tok letterQuote(char c) {
@@ -579,7 +582,7 @@ public class Tokenizer implements Errcode {
                 }
             }
         }
-        return new Tok(STRING.ordinal(), start, buf.position());
+        return new Tok(STRING, start, buf.position());
     }
 
 
@@ -642,10 +645,10 @@ public class Tokenizer implements Errcode {
         return Character.isLetter(c) || c == '_' || c >= 128;
     }
 
-    static Tok ERR_TOK = new Tok(ERRORTOKEN.ordinal());
+    static Tok ERR_TOK = new Tok(ERRORTOKEN);
 
-    Tok newtok(TokenType tt) {
-        return new Tok(tt.ordinal(), start, buf.position() - 1);
+    Tok newtok(int tt) {
+        return new Tok(tt, start, buf.position());
     }
 
     Tok indenterror() {
@@ -735,6 +738,7 @@ public class Tokenizer implements Errcode {
                     done = E_OK;
                 }
                 lineno++;
+                System.out.println("lineno: " + lineno);
                 /* Read until '\n' or EOF */
                 while (!eol) {
                     int curstart = start == null ? -1 : start;
@@ -751,14 +755,30 @@ public class Tokenizer implements Errcode {
                         if (len < BUFSIZ) {
                             /* Last line does not end in \n, fake one */
                             buf.put('\n');
+//                            eol = true;
+//                            continue;
                         }
                     } catch (IOException e) {
                         return '\uffff'; // EOF
                     }
                     buf.flip();
                     end = buf.capacity();
+                    buf.mark();
                     inp = buf.limit();
                     eol = buf.get(inp - 1) == '\n';
+//                    try {
+//                        for (;;) {
+//                            char c = buf.get();
+//                            if (c == '\n') {
+//                                break;
+//                            }
+//                        }
+//                        inp = buf.position();
+//                        eol = true;
+//                    } catch (BufferUnderflowException e) {
+//                        buf.reset();
+//                        eol = false;
+//                    }
                 }
                 if (buf != null) {
                     /* replace '\r\n' with '\n' */
@@ -871,7 +891,7 @@ public class Tokenizer implements Errcode {
     };
 
     /* Return the token corresponding to a single character */
-    static TokenType PyToken_OneChar(char c) {
+    static int PyToken_OneChar(char c) {
         switch (c) {
             case '(':
                 return LPAR;
@@ -925,7 +945,7 @@ public class Tokenizer implements Errcode {
     }
 
 
-    static TokenType PyToken_TwoChars(char c1, char c2) {
+    static int PyToken_TwoChars(char c1, char c2) {
         switch (c1) {
             case '=':
                 switch (c2) {
@@ -1021,7 +1041,7 @@ public class Tokenizer implements Errcode {
         return OP;
     }
 
-    static TokenType PyToken_ThreeChars(int c1, int c2, int c3) {
+    static int PyToken_ThreeChars(int c1, int c2, int c3) {
         switch (c1) {
             case '<':
                 switch (c2) {
