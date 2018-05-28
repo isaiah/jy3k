@@ -258,7 +258,7 @@ public class Tokenizer implements Errcode {
             if (nonascii && !verifyIdentifier()) {
                 return ERR_TOK;
             }
-            return new Tok(NAME, start, buf.position());
+            return newtok(NAME);
         }
 
         /* Newline */
@@ -268,7 +268,7 @@ public class Tokenizer implements Errcode {
                 return get();
             }
             contLine = false;
-            return new Tok(NEWLINE, start, buf.position());
+            return newtok(NEWLINE);
         }
 
         /* Period or number starting with period? */
@@ -279,14 +279,14 @@ public class Tokenizer implements Errcode {
             } else if (c == '.') {
                 c = nextc();
                 if (c == '.') {
-                    return new Tok(ELLIPSIS, start, buf.position());
+                    return newtok(ELLIPSIS);
                 } else {
                     backup(c);
                 }
             } else {
                 backup(c);
             }
-            return new Tok(DOT, start, buf.position());
+            return newtok(DOT);
         }
         /* Number */
         if (Character.isDigit(c)) {
@@ -383,7 +383,7 @@ public class Tokenizer implements Errcode {
                         } else if (!Character.isDigit(c)) {
                             backup(c);
                             backup(e);
-                            return new Tok(NUMBER, start, buf.position());
+                            return newtok(NUMBER);
                         }
                         c = decimalTail();
                         if (c == 0) {
@@ -391,13 +391,13 @@ public class Tokenizer implements Errcode {
                         }
                         if (c == 'j' || c == 'J') {
                             /* Imaginary part */
-                            return new Tok(NUMBER, start, buf.position());
+                            return newtok(NUMBER);
                         }
                         // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
                         backup(c);
-                        return new Tok(NUMBER, start, buf.position());
+                        return newtok(NUMBER);
                     } else if (c == 'j' || c == 'J') {
-                        return new Tok(NUMBER, start, buf.position());
+                        return newtok(NUMBER);
                     } else if (nonzero) {
                         /* Old-style octal; now disallowed */
                         done = E_TOKEN;
@@ -438,7 +438,7 @@ public class Tokenizer implements Errcode {
                     } else if (!Character.isDigit(c)) {
                         backup(c);
                         backup(e);
-                        return new Tok(NUMBER, start, buf.position());
+                        return newtok(NUMBER);
                     }
                     c = decimalTail();
                     if (c == 0) {
@@ -453,7 +453,7 @@ public class Tokenizer implements Errcode {
             }
             // XXX there is an extra block in C, don't think it's necessary, but it's why the brackets are not the same
             backup(c);
-            return new Tok(NUMBER, start, buf.position());
+            return newtok(NUMBER);
         }
         // letter_quote:
         /* String */
@@ -485,7 +485,7 @@ public class Tokenizer implements Errcode {
             } else {
                 backup(c3);
             }
-            return new Tok(token, start, buf.position());
+            return newtok(token);
         }
         backup(c2);
 
@@ -524,7 +524,7 @@ public class Tokenizer implements Errcode {
             } else if (!Character.isDigit(c)) {
                 backup(c);
                 backup(e);
-                return new Tok(NUMBER, start, buf.position());
+                return newtok(NUMBER);
             }
             c = decimalTail();
             if (c == 0) {
@@ -532,11 +532,11 @@ public class Tokenizer implements Errcode {
             }
             if (c == 'j' || c == 'J') {
                 /* Imaginary part */
-                return new Tok(NUMBER, start, buf.position());
+                return newtok(NUMBER);
             }
         }
         backup(c);
-        return new Tok(NUMBER, start, buf.position());
+        return newtok(NUMBER);
     }
 
     private Tok letterQuote(char c) {
@@ -582,7 +582,7 @@ public class Tokenizer implements Errcode {
                 }
             }
         }
-        return new Tok(STRING, start, buf.position());
+        return newtok(STRING);
     }
 
 
@@ -647,7 +647,12 @@ public class Tokenizer implements Errcode {
 
     static Tok ERR_TOK = new Tok(ERRORTOKEN);
 
+    int x = 0;
     Tok newtok(int tt) {
+        if (start < x) {
+            System.out.println(String.format("buf is reversing old: %d, new: %d", x, start));
+        }
+        x = start;
         return new Tok(tt, start, buf.position());
     }
 
@@ -689,9 +694,9 @@ public class Tokenizer implements Errcode {
             if (buf.position() != inp) {
                 return buf.get(); /* Fast path */
             }
-//            if (done != E_OK) {
-//                return EOF;
-//            }
+            if (done == E_EOF) {
+                return EOF;
+            }
             if (fp == null) {
                 buf.mark();
                 int _end = -1;
@@ -718,17 +723,30 @@ public class Tokenizer implements Errcode {
                 if (start == null) {
                     if (buf == null) {
                         buf = CharBuffer.allocate(BUFSIZ);
-                        end = buf.capacity();
                     }
                     try {
-                        fp.read(buf);
-                        buf.flip();
-                        done = E_OK;
-                        inp = buf.limit();
-                        eol = inp == buf.position() || buf.get(inp - 1)  == '\n';
+                        end = fp.read(buf);
+                        if (end == 0) {
+                            return EOF;
+                        }
+                        if (end < buf.capacity()) {
+                            done = E_EOF;
+                            eol = true;
+                            buf.put('\n');
+                            buf.flip();
+                            inp = buf.limit();
+                        } else {
+                            done = E_OK;
+                            buf.flip();
+                            inp = buf.limit();
+                            eol = inp == buf.position() || buf.get(inp - 1)  == '\n';
+                        }
+
                     } catch (IOException e) {
-                        done = E_EOF;
-                        eol = true;
+                        System.out.println("====== done====== ");
+                        throw new RuntimeException("done");
+//                        done = E_EOF;
+//                        eol = true;
                     }
                 } else {
                     if (decodingFEOF(fp)) {

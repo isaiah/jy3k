@@ -120,9 +120,9 @@ public class ParserGenerator {
         int label;
         int arrow;
 
-        public NFAArc(int label, int arrow) {
-            this.label = label;
+        public NFAArc(int arrow, int label) {
             this.arrow = arrow;
+            this.label = label;
         }
     }
 
@@ -345,6 +345,12 @@ public class ParserGenerator {
         static class SSArc {
             private BitSet bitset;
             private int arrow, label;
+
+            public SSArc(BitSet bitset, int arrow, int label) {
+                this.bitset = bitset;
+                this.arrow = arrow;
+                this.label = label;
+            }
         }
 
         static class SSState {
@@ -385,32 +391,29 @@ public class ParserGenerator {
                     }
                     NFAState st = nf.states.get(ibit);
                     /* For all non-empty arcs from this state... */
-                    for (int iarc = 0; iarc < st.nfaArcs.size(); iarc++) {
-                        NFAArc ar = st.nfaArcs.get(iarc);
+//                    for (int iarc = 0; iarc < st.nfaArcs.size(); iarc++) {
+                    non_empty:
+                    for (NFAArc ar : st.nfaArcs) {
                         if (ar.label == EMPTY) {
                             continue;
                         }
                         /* Look up in list of arcs from this state */
-                        for (int jarc = 0; jarc < yy.arcs.size(); ++jarc) {
-                            SSArc zz = yy.arcs.get(jarc);
+                        for (SSArc zz : yy.arcs) {
                             if (ar.label == zz.label) {
                                 /* Add destination */
                                 addClosure(zz.bitset, nf, ar.arrow);
-                                break;
+                                continue non_empty;
                             }
                         }
-                        SSArc zz = new SSArc();
-                        zz.label = ar.label;
-                        zz.bitset = new BitSet(nbits);
-                        zz.arrow = -1;
+                        SSArc zz = new SSArc(new BitSet(nbits), -1, ar.label);
+                        yy.arcs.add(zz);
+                        /* Add destination */
                         addClosure(zz.bitset, nf, ar.arrow);
                     }
                 }
-
                 /* Now look up all the arrow states */
                 all_arrow:
-                for (int jarc = 0; jarc < yy.arcs.size(); jarc++) {
-                    SSArc zz = yy.arcs.get(jarc);
+                for (SSArc zz : yy.arcs) {
                     for (int jstate = 0; jstate < ssStates.size(); jstate++) {
                         if (zz.bitset.equals(ssStates.get(jstate).ss)) {
                             zz.arrow = jstate;
@@ -420,12 +423,13 @@ public class ParserGenerator {
 
                     zz.arrow = ssStates.size();
                     yy = new SSState(zz.bitset, yy.ss.get(nf.finish));
+                    ssStates.add(yy);
                 }
             }
 
-            // if debug: printndfa("before minimizing")
+            // if debug: printssdfa("before minimizing")
             simplify(ssStates);
-            // if debug: printndfa("after minimizing")
+            // if debug: printssdfa("after minimizing")
             convert(d, ssStates);
         }
 
@@ -450,12 +454,13 @@ public class ParserGenerator {
         }
 
         static void renamestates(List<SSState> states, int from, int to) {
+            System.out.println(String.format("Rename state %d to %d.", from, to));
+            assert to < states.size() : "non sense arrow";
             for (SSState st : states) {
                 if (st.deleted) {
                     continue;
                 }
-                for (int i = 0; i < st.arcs.size(); i++) {
-                    SSArc ar = st.arcs.get(i);
+                for (SSArc ar : st.arcs) {
                     if (ar.arrow == from) {
                         ar.arrow = to;
                     }
@@ -487,8 +492,9 @@ public class ParserGenerator {
         }
 
         /* PART FOUR -- GENERATE PASRING TABLES */
+
+        /* Convert the DFA into a grammar that can be used by our parser */
         static void convert(Grammar.DFA d, List<SSState> states){
-            SSArc zz;
             for (SSState yy : states) {
                 if (yy.deleted) {
                     continue;
@@ -500,14 +506,15 @@ public class ParserGenerator {
                 if (yy.deleted) {
                     continue;
                 }
-                for (int i = 0; i < yy.arcs.size(); i++) {
-                    zz = yy.arcs.get(i);
+                for (SSArc zz : yy.arcs) {
+                    assert zz.arrow >= 0: "no arrow should be initial value";
                     d.addarc(yy.rename, states.get(zz.arrow).rename, zz.label);
                 }
                 if (yy.finish) {
                     d.addarc(yy.rename, yy.rename, 0);
                 }
             }
+            d.initial = 0;
         }
 
         /* PART FIVE -- GLUE IT ALL TOGETHER */

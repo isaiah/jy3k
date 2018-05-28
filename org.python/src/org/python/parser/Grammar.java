@@ -79,11 +79,12 @@ public class Grammar {
 
         public int addstate() {
             states.add(new State());
+//            return states.size() - 1;
             return states.size();
         }
 
         public void addarc(int from, int to, int label) {
-            State s = states.get(from);
+            State s = states.get(from - 1);
             Arc arc = new Arc(label, to);
             s.arcs.add(arc);
         }
@@ -195,7 +196,7 @@ public class Grammar {
                 System.out.println(String.format("Cannot translate STRING label %s", lb.str));
             }
         } else {
-            System.out.println(String.format("Cannot translate label '%s'", lb));
+            System.out.println(String.format("Cannot translate label '%s'", lb.str));
         }
     }
 
