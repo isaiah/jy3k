@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.python.parser.ParserGenerator.EMPTY;
 import static org.python.parser.TokenType.NAME;
@@ -46,7 +45,7 @@ public class Grammar {
     static int findLabel(List<Label> ll, int type, String str) {
         for (int i = 0; i < ll.size(); i++) {
             Label label = ll.get(i);
-            if (label.type == type && label.str.equals(str)) {
+            if (label.type == type) { //&& label.str.equals(str)) {
                 return i;
             }
         }
@@ -203,7 +202,7 @@ public class Grammar {
     /* Computation of FIRST sets */
     void addfirstsets() {
         for (DFA dfa : dfas) {
-            if (dfa.first != null) {
+            if (dfa.first == null) {
                 calcfirstset(dfa);
             }
         }
@@ -228,7 +227,7 @@ public class Grammar {
                 }
             }
             if (j >= symbols.size()) { /* New label */
-                symbols.add((int) a.lbl);
+                symbols.add(a.lbl);
                 int type = ll.get(a.lbl).type;
                 if (isNonTerminal(type)) {
                     DFA d1 = PyGrammar_FindDFA(type);
