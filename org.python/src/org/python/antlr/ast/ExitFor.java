@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -77,6 +78,10 @@ public static final PyType TYPE = PyType.fromClass(ExitFor.class);
     // called from derived class
     public ExitFor(PyType subtype) {
         super(subtype);
+    }
+
+    public ExitFor(Node token) {
+        super(TYPE, token);
     }
 
     public ExitFor(Token token) {

@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -181,6 +182,53 @@ public class arguments extends PythonTree {
     // called from derived class
     public arguments(PyType subtype) {
         super(subtype);
+    }
+
+    public arguments(Node token, java.util.List<arg> args, arg vararg, java.util.List<arg>
+    kwonlyargs, java.util.List<expr> kw_defaults, arg kwarg, java.util.List<expr> defaults) {
+        super(TYPE, token);
+        this.args = args;
+        if (args == null) {
+            this.args = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.vararg = vararg;
+        if (this.vararg != null)
+            this.vararg.setParent(this);
+        this.kwonlyargs = kwonlyargs;
+        if (kwonlyargs == null) {
+            this.kwonlyargs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.kwonlyargs.size(); i++) {
+            PythonTree t = this.kwonlyargs.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.kw_defaults = kw_defaults;
+        if (kw_defaults == null) {
+            this.kw_defaults = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.kw_defaults.size(); i++) {
+            PythonTree t = this.kw_defaults.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.kwarg = kwarg;
+        if (this.kwarg != null)
+            this.kwarg.setParent(this);
+        this.defaults = defaults;
+        if (defaults == null) {
+            this.defaults = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.defaults.size(); i++) {
+            PythonTree t = this.defaults.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public arguments(Token token, java.util.List<arg> args, arg vararg, java.util.List<arg>

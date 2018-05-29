@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,27 @@ public static final PyType TYPE = PyType.fromClass(AsyncWith.class);
     // called from derived class
     public AsyncWith(PyType subtype) {
         super(subtype);
+    }
+
+    public AsyncWith(Node token, java.util.List<withitem> items, java.util.List<stmt> body) {
+        super(TYPE, token);
+        this.items = items;
+        if (items == null) {
+            this.items = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.items.size(); i++) {
+            PythonTree t = this.items.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
     }
 
     public AsyncWith(Token token, java.util.List<withitem> items, java.util.List<stmt> body) {

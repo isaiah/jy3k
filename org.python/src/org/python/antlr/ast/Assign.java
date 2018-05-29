@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,22 @@ public static final PyType TYPE = PyType.fromClass(Assign.class);
     // called from derived class
     public Assign(PyType subtype) {
         super(subtype);
+    }
+
+    public Assign(Node token, java.util.List<expr> targets, expr value) {
+        super(TYPE, token);
+        this.targets = targets;
+        if (targets == null) {
+            this.targets = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.targets.size(); i++) {
+            PythonTree t = this.targets.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Assign(Token token, java.util.List<expr> targets, expr value) {

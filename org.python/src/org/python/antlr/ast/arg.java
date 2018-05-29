@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -107,6 +108,14 @@ public class arg extends PythonTree {
     // called from derived class
     public arg(PyType subtype) {
         super(subtype);
+    }
+
+    public arg(Node token, String arg, expr annotation) {
+        super(TYPE, token);
+        this.arg = arg;
+        this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
     }
 
     public arg(Token token, String arg, expr annotation) {

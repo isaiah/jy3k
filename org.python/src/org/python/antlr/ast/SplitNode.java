@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -136,6 +137,22 @@ public static final PyType TYPE = PyType.fromClass(SplitNode.class);
     // called from derived class
     public SplitNode(PyType subtype) {
         super(subtype);
+    }
+
+    public SplitNode(Node token, String name, java.util.List<stmt> body, stmt funcdef) {
+        super(TYPE, token);
+        this.name = name;
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
+        this.funcdef = funcdef;
+        if (this.funcdef != null)
+            this.funcdef.setParent(this);
     }
 
     public SplitNode(Token token, String name, java.util.List<stmt> body, stmt funcdef) {

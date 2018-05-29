@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,16 @@ public static final PyType TYPE = PyType.fromClass(Raise.class);
     // called from derived class
     public Raise(PyType subtype) {
         super(subtype);
+    }
+
+    public Raise(Node token, expr exc, expr cause) {
+        super(TYPE, token);
+        this.exc = exc;
+        if (this.exc != null)
+            this.exc.setParent(this);
+        this.cause = cause;
+        if (this.cause != null)
+            this.cause.setParent(this);
     }
 
     public Raise(Token token, expr exc, expr cause) {

@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -135,6 +136,17 @@ public static final PyType TYPE = PyType.fromClass(BinOp.class);
     // called from derived class
     public BinOp(PyType subtype) {
         super(subtype);
+    }
+
+    public BinOp(Node token, expr left, operatorType op, expr right) {
+        super(TYPE, token);
+        this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
+        this.op = op;
+        this.right = right;
+        if (this.right != null)
+            this.right.setParent(this);
     }
 
     public BinOp(Token token, expr left, operatorType op, expr right) {

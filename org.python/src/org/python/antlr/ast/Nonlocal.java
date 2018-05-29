@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -99,6 +100,14 @@ public static final PyType TYPE = PyType.fromClass(Nonlocal.class);
     // called from derived class
     public Nonlocal(PyType subtype) {
         super(subtype);
+    }
+
+    public Nonlocal(Node token, java.util.List<String> names) {
+        super(TYPE, token);
+        this.names = names;
+        if (names == null) {
+            this.names = new ArrayList<>(0);
+        }
     }
 
     public Nonlocal(Token token, java.util.List<String> names) {

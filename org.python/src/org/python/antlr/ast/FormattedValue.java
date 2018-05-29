@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -136,6 +137,17 @@ public static final PyType TYPE = PyType.fromClass(FormattedValue.class);
     // called from derived class
     public FormattedValue(PyType subtype) {
         super(subtype);
+    }
+
+    public FormattedValue(Node token, expr value, Integer conversion, expr format_spec) {
+        super(TYPE, token);
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
+        this.conversion = conversion;
+        this.format_spec = format_spec;
+        if (this.format_spec != null)
+            this.format_spec.setParent(this);
     }
 
     public FormattedValue(Token token, expr value, Integer conversion, expr format_spec) {

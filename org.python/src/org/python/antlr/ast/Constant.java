@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -99,6 +100,11 @@ public static final PyType TYPE = PyType.fromClass(Constant.class);
     // called from derived class
     public Constant(PyType subtype) {
         super(subtype);
+    }
+
+    public Constant(Node token, PyObject value) {
+        super(TYPE, token);
+        this.value = value;
     }
 
     public Constant(Token token, PyObject value) {

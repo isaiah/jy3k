@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -106,6 +107,16 @@ public class withitem extends PythonTree {
     // called from derived class
     public withitem(PyType subtype) {
         super(subtype);
+    }
+
+    public withitem(Node token, expr context_expr, expr optional_vars) {
+        super(TYPE, token);
+        this.context_expr = context_expr;
+        if (this.context_expr != null)
+            this.context_expr.setParent(this);
+        this.optional_vars = optional_vars;
+        if (this.optional_vars != null)
+            this.optional_vars.setParent(this);
     }
 
     public withitem(Token token, expr context_expr, expr optional_vars) {

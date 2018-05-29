@@ -122,7 +122,7 @@ public class Parser implements Errcode {
         Node n = stack.peek().parent;
         n.addChildren(type, null, lineno, colOffset);
         stack.peek().state = newstate;
-        pushstack(d, n.nchild(n.nch() - 1));
+        pushstack(d, n.child(n.nch() - 1));
         return true;
     }
 

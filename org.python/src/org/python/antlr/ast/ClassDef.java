@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -194,6 +195,48 @@ public static final PyType TYPE = PyType.fromClass(ClassDef.class);
     // called from derived class
     public ClassDef(PyType subtype) {
         super(subtype);
+    }
+
+    public ClassDef(Node token, String name, java.util.List<expr> bases, java.util.List<keyword>
+    keywords, java.util.List<stmt> body, java.util.List<expr> decorator_list, String docstring) {
+        super(TYPE, token);
+        this.name = name;
+        this.bases = bases;
+        if (bases == null) {
+            this.bases = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.bases.size(); i++) {
+            PythonTree t = this.bases.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.keywords = keywords;
+        if (keywords == null) {
+            this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
+        this.decorator_list = decorator_list;
+        if (decorator_list == null) {
+            this.decorator_list = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.docstring = docstring;
     }
 
     public ClassDef(Token token, String name, java.util.List<expr> bases, java.util.List<keyword>

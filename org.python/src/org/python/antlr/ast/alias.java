@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -108,6 +109,12 @@ public class alias extends PythonTree {
     // called from derived class
     public alias(PyType subtype) {
         super(subtype);
+    }
+
+    public alias(Node token, String name, String asname) {
+        super(TYPE, token);
+        this.name = name;
+        this.asname = asname;
     }
 
     public alias(Token token, String name, String asname) {

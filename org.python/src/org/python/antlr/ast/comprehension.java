@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -143,6 +144,27 @@ public class comprehension extends PythonTree {
     // called from derived class
     public comprehension(PyType subtype) {
         super(subtype);
+    }
+
+    public comprehension(Node token, expr target, expr iter, java.util.List<expr> ifs, Integer
+    is_async) {
+        super(TYPE, token);
+        this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
+        this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
+        this.ifs = ifs;
+        if (ifs == null) {
+            this.ifs = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.ifs.size(); i++) {
+            PythonTree t = this.ifs.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.is_async = is_async;
     }
 
     public comprehension(Token token, expr target, expr iter, java.util.List<expr> ifs, Integer

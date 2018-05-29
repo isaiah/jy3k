@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -99,6 +100,11 @@ public static final PyType TYPE = PyType.fromClass(Num.class);
     // called from derived class
     public Num(PyType subtype) {
         super(subtype);
+    }
+
+    public Num(Node token, PyObject n) {
+        super(TYPE, token);
+        this.n = n;
     }
 
     public Num(Token token, PyObject n) {

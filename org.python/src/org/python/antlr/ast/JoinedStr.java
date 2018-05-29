@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -99,6 +100,19 @@ public static final PyType TYPE = PyType.fromClass(JoinedStr.class);
     // called from derived class
     public JoinedStr(PyType subtype) {
         super(subtype);
+    }
+
+    public JoinedStr(Node token, java.util.List<expr> values) {
+        super(TYPE, token);
+        this.values = values;
+        if (values == null) {
+            this.values = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.values.size(); i++) {
+            PythonTree t = this.values.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public JoinedStr(Token token, java.util.List<expr> values) {

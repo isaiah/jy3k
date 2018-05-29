@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,22 @@ public static final PyType TYPE = PyType.fromClass(SetComp.class);
     // called from derived class
     public SetComp(PyType subtype) {
         super(subtype);
+    }
+
+    public SetComp(Node token, expr elt, java.util.List<comprehension> generators) {
+        super(TYPE, token);
+        this.elt = elt;
+        if (this.elt != null)
+            this.elt.setParent(this);
+        this.generators = generators;
+        if (generators == null) {
+            this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public SetComp(Token token, expr elt, java.util.List<comprehension> generators) {

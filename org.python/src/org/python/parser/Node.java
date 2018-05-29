@@ -36,11 +36,18 @@ public class Node implements Errcode {
         return true;
     }
 
+    public boolean unary() {
+        return nch() == 1;
+    }
+
     public int nch() {
         return children.size();
     }
 
-    public Node nchild(int n) {
+    public Node child(int n) {
+        if (n >= nch()) {
+            return null;
+        }
         return children.get(n);
     }
 
@@ -50,6 +57,10 @@ public class Node implements Errcode {
 
     public int lineno() {
         return lineno;
+    }
+
+    public int coloffset() {
+        return colOffset;
     }
 
     public int type() {

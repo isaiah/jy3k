@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -135,6 +136,17 @@ public static final PyType TYPE = PyType.fromClass(AugAssign.class);
     // called from derived class
     public AugAssign(PyType subtype) {
         super(subtype);
+    }
+
+    public AugAssign(Node token, expr target, operatorType op, expr value) {
+        super(TYPE, token);
+        this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
+        this.op = op;
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public AugAssign(Token token, expr target, operatorType op, expr value) {

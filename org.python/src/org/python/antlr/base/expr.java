@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -54,6 +55,9 @@ public abstract class expr extends PythonTree {
         super(subtype, token);
     }
 
+    public expr(PyType subtype, Node node) {
+        super(subtype, node);
+    }
     public expr(PyType subtype, PythonTree node) {
         super(subtype, node);
     }

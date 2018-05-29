@@ -92,6 +92,7 @@ class EmitVisitor(asdl.VisitorBase):
             print('import org.python.core.PyLong;', file=self.file)
             print('import org.python.core.PyType;', file=self.file)
             print('import org.python.core.PyList;', file=self.file)
+            print('import org.python.parser.Node;', file=self.file)
             print('import org.python.core.PyNewWrapper;', file=self.file)
             print('import org.python.core.Visitproc;', file=self.file)
             print('import org.python.annotations.ExposedGet;', file=self.file)
@@ -626,6 +627,15 @@ class JavaVisitor(EmitVisitor):
         self.emit("// called from derived class", depth)
         self.emit("public %s(PyType subtype) {" % clsname, depth)
         self.emit("super(subtype);", depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
+        node = asdl.Field('Node', 'token')
+        node.typedef = False
+        fpargs = ", ".join([self.fieldDef(f) for f in [node] + fields])
+        self.emit("public %s(%s) {" % (clsname, fpargs), depth)
+        self.emit("super(TYPE, token);", depth+1)
+        self.javaConstructorHelper(fields, depth)
         self.emit("}", depth)
         self.emit("", 0)
 

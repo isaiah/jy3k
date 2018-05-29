@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -136,6 +137,22 @@ public static final PyType TYPE = PyType.fromClass(ExceptHandler.class);
     // called from derived class
     public ExceptHandler(PyType subtype) {
         super(subtype);
+    }
+
+    public ExceptHandler(Node token, expr type, String name, java.util.List<stmt> body) {
+        super(TYPE, token);
+        this.type = type;
+        if (this.type != null)
+            this.type.setParent(this);
+        this.name = name;
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
     }
 
     public ExceptHandler(Token token, expr type, String name, java.util.List<stmt> body) {

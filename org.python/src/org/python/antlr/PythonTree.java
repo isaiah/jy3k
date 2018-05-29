@@ -12,6 +12,7 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.Traverseproc;
 import org.python.core.Visitproc;
+import org.python.parser.Node;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 public abstract class PythonTree extends AST implements Traverseproc {
     private Token node;
+    private Node n;
 
     private List<stmt> block;
 
@@ -36,6 +38,11 @@ public abstract class PythonTree extends AST implements Traverseproc {
     public PythonTree(PyType subtype, Token t) {
         super(subtype);
         node = t;
+    }
+
+    public PythonTree(PyType subtype, Node n) {
+        super(subtype);
+        this.n = n;
     }
 
     public PythonTree(PyType subtype, PythonTree tree) {

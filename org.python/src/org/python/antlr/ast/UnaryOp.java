@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,14 @@ public static final PyType TYPE = PyType.fromClass(UnaryOp.class);
     // called from derived class
     public UnaryOp(PyType subtype) {
         super(subtype);
+    }
+
+    public UnaryOp(Node token, unaryopType op, expr operand) {
+        super(TYPE, token);
+        this.op = op;
+        this.operand = operand;
+        if (this.operand != null)
+            this.operand.setParent(this);
     }
 
     public UnaryOp(Token token, unaryopType op, expr operand) {

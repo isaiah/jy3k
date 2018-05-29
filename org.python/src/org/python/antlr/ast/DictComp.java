@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -135,6 +136,25 @@ public static final PyType TYPE = PyType.fromClass(DictComp.class);
     // called from derived class
     public DictComp(PyType subtype) {
         super(subtype);
+    }
+
+    public DictComp(Node token, expr key, expr value, java.util.List<comprehension> generators) {
+        super(TYPE, token);
+        this.key = key;
+        if (this.key != null)
+            this.key.setParent(this);
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
+        this.generators = generators;
+        if (generators == null) {
+            this.generators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.generators.size(); i++) {
+            PythonTree t = this.generators.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public DictComp(Token token, expr key, expr value, java.util.List<comprehension> generators) {

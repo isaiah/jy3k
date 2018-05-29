@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -88,6 +89,19 @@ public static final PyType TYPE = PyType.fromClass(ExtSlice.class);
     // called from derived class
     public ExtSlice(PyType subtype) {
         super(subtype);
+    }
+
+    public ExtSlice(Node token, java.util.List<slice> dims) {
+        super(TYPE, token);
+        this.dims = dims;
+        if (dims == null) {
+            this.dims = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.dims.size(); i++) {
+            PythonTree t = this.dims.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public ExtSlice(Token token, java.util.List<slice> dims) {

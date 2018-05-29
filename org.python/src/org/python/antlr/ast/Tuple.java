@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,20 @@ public static final PyType TYPE = PyType.fromClass(Tuple.class);
     // called from derived class
     public Tuple(PyType subtype) {
         super(subtype);
+    }
+
+    public Tuple(Node token, java.util.List<expr> elts, expr_contextType ctx) {
+        super(TYPE, token);
+        this.elts = elts;
+        if (elts == null) {
+            this.elts = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.elts.size(); i++) {
+            PythonTree t = this.elts.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.ctx = ctx;
     }
 
     public Tuple(Token token, java.util.List<expr> elts, expr_contextType ctx) {

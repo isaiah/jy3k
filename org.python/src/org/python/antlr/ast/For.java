@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -154,6 +155,33 @@ public static final PyType TYPE = PyType.fromClass(For.class);
     // called from derived class
     public For(PyType subtype) {
         super(subtype);
+    }
+
+    public For(Node token, expr target, expr iter, java.util.List<stmt> body, java.util.List<stmt>
+    orelse) {
+        super(TYPE, token);
+        this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
+        this.iter = iter;
+        if (this.iter != null)
+            this.iter.setParent(this);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
+        this.orelse = orelse;
+        if (orelse == null) {
+            this.orelse = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
+        }
     }
 
     public For(Token token, expr target, expr iter, java.util.List<stmt> body, java.util.List<stmt>

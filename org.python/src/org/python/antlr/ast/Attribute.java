@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -136,6 +137,15 @@ public static final PyType TYPE = PyType.fromClass(Attribute.class);
     // called from derived class
     public Attribute(PyType subtype) {
         super(subtype);
+    }
+
+    public Attribute(Node token, expr value, String attr, expr_contextType ctx) {
+        super(TYPE, token);
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
+        this.attr = attr;
+        this.ctx = ctx;
     }
 
     public Attribute(Token token, expr value, String attr, expr_contextType ctx) {

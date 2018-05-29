@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -136,6 +137,21 @@ public static final PyType TYPE = PyType.fromClass(ImportFrom.class);
     // called from derived class
     public ImportFrom(PyType subtype) {
         super(subtype);
+    }
+
+    public ImportFrom(Node token, String module, java.util.List<alias> names, Integer level) {
+        super(TYPE, token);
+        this.module = module;
+        this.names = names;
+        if (names == null) {
+            this.names = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.names.size(); i++) {
+            PythonTree t = this.names.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.level = level;
     }
 
     public ImportFrom(Token token, String module, java.util.List<alias> names, Integer level) {

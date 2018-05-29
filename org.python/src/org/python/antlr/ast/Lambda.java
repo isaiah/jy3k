@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,16 @@ public static final PyType TYPE = PyType.fromClass(Lambda.class);
     // called from derived class
     public Lambda(PyType subtype) {
         super(subtype);
+    }
+
+    public Lambda(Node token, arguments args, expr body) {
+        super(TYPE, token);
+        this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
+        this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Lambda(Token token, arguments args, expr body) {

@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -135,6 +136,32 @@ public static final PyType TYPE = PyType.fromClass(Call.class);
     // called from derived class
     public Call(PyType subtype) {
         super(subtype);
+    }
+
+    public Call(Node token, expr func, java.util.List<expr> args, java.util.List<keyword> keywords)
+    {
+        super(TYPE, token);
+        this.func = func;
+        if (this.func != null)
+            this.func.setParent(this);
+        this.args = args;
+        if (args == null) {
+            this.args = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.args.size(); i++) {
+            PythonTree t = this.args.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.keywords = keywords;
+        if (keywords == null) {
+            this.keywords = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keywords.size(); i++) {
+            PythonTree t = this.keywords.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public Call(Token token, expr func, java.util.List<expr> args, java.util.List<keyword>

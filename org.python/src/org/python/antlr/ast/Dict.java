@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,28 @@ public static final PyType TYPE = PyType.fromClass(Dict.class);
     // called from derived class
     public Dict(PyType subtype) {
         super(subtype);
+    }
+
+    public Dict(Node token, java.util.List<expr> keys, java.util.List<expr> values) {
+        super(TYPE, token);
+        this.keys = keys;
+        if (keys == null) {
+            this.keys = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.keys.size(); i++) {
+            PythonTree t = this.keys.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.values = values;
+        if (values == null) {
+            this.values = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.values.size(); i++) {
+            PythonTree t = this.values.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public Dict(Token token, java.util.List<expr> keys, java.util.List<expr> values) {

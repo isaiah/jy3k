@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -194,6 +195,36 @@ public static final PyType TYPE = PyType.fromClass(FunctionDef.class);
     // called from derived class
     public FunctionDef(PyType subtype) {
         super(subtype);
+    }
+
+    public FunctionDef(Node token, String name, arguments args, java.util.List<stmt> body,
+    java.util.List<expr> decorator_list, expr returns, String docstring) {
+        super(TYPE, token);
+        this.name = name;
+        this.args = args;
+        if (this.args != null)
+            this.args.setParent(this);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
+        this.decorator_list = decorator_list;
+        if (decorator_list == null) {
+            this.decorator_list = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.decorator_list.size(); i++) {
+            PythonTree t = this.decorator_list.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.returns = returns;
+        if (this.returns != null)
+            this.returns.setParent(this);
+        this.docstring = docstring;
     }
 
     public FunctionDef(Token token, String name, arguments args, java.util.List<stmt> body,

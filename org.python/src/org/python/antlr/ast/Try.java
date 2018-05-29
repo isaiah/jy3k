@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -154,6 +155,44 @@ public static final PyType TYPE = PyType.fromClass(Try.class);
     // called from derived class
     public Try(PyType subtype) {
         super(subtype);
+    }
+
+    public Try(Node token, java.util.List<stmt> body, java.util.List<excepthandler> handlers,
+    java.util.List<stmt> orelse, java.util.List<stmt> finalbody) {
+        super(TYPE, token);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
+        this.handlers = handlers;
+        if (handlers == null) {
+            this.handlers = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.handlers.size(); i++) {
+            PythonTree t = this.handlers.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
+        this.orelse = orelse;
+        if (orelse == null) {
+            this.orelse = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.orelse.size(); i++) {
+            PythonTree t = this.orelse.get(i);
+            addChild(t, i, this.orelse);
+        }
+        this.finalbody = finalbody;
+        if (finalbody == null) {
+            this.finalbody = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.finalbody.size(); i++) {
+            PythonTree t = this.finalbody.get(i);
+            addChild(t, i, this.finalbody);
+        }
     }
 
     public Try(Token token, java.util.List<stmt> body, java.util.List<excepthandler> handlers,

@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -139,6 +140,24 @@ public static final PyType TYPE = PyType.fromClass(Compare.class);
     // called from derived class
     public Compare(PyType subtype) {
         super(subtype);
+    }
+
+    public Compare(Node token, expr left, java.util.List<cmpopType> ops, java.util.List<expr>
+    comparators) {
+        super(TYPE, token);
+        this.left = left;
+        if (this.left != null)
+            this.left.setParent(this);
+        this.ops = ops;
+        this.comparators = comparators;
+        if (comparators == null) {
+            this.comparators = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.comparators.size(); i++) {
+            PythonTree t = this.comparators.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public Compare(Token token, expr left, java.util.List<cmpopType> ops, java.util.List<expr>

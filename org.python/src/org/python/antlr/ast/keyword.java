@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -107,6 +108,14 @@ public class keyword extends PythonTree {
     // called from derived class
     public keyword(PyType subtype) {
         super(subtype);
+    }
+
+    public keyword(Node token, String arg, expr value) {
+        super(TYPE, token);
+        this.arg = arg;
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public keyword(Token token, String arg, expr value) {

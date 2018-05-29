@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -88,6 +89,13 @@ public static final PyType TYPE = PyType.fromClass(Expression.class);
     // called from derived class
     public Expression(PyType subtype) {
         super(subtype);
+    }
+
+    public Expression(Node token, expr body) {
+        super(TYPE, token);
+        this.body = body;
+        if (this.body != null)
+            this.body.setParent(this);
     }
 
     public Expression(Token token, expr body) {

@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -117,6 +118,20 @@ public static final PyType TYPE = PyType.fromClass(BoolOp.class);
     // called from derived class
     public BoolOp(PyType subtype) {
         super(subtype);
+    }
+
+    public BoolOp(Node token, boolopType op, java.util.List<expr> values) {
+        super(TYPE, token);
+        this.op = op;
+        this.values = values;
+        if (values == null) {
+            this.values = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.values.size(); i++) {
+            PythonTree t = this.values.get(i);
+            if (t != null)
+                t.setParent(this);
+        }
     }
 
     public BoolOp(Token token, boolopType op, java.util.List<expr> values) {

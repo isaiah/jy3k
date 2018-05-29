@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -88,6 +89,18 @@ public static final PyType TYPE = PyType.fromClass(Interactive.class);
     // called from derived class
     public Interactive(PyType subtype) {
         super(subtype);
+    }
+
+    public Interactive(Node token, java.util.List<stmt> body) {
+        super(TYPE, token);
+        this.body = body;
+        if (body == null) {
+            this.body = new ArrayList<>(0);
+        }
+        for(int i = 0; i < this.body.size(); i++) {
+            PythonTree t = this.body.get(i);
+            addChild(t, i, this.body);
+        }
     }
 
     public Interactive(Token token, java.util.List<stmt> body) {

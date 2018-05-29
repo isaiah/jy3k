@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -124,6 +125,19 @@ public static final PyType TYPE = PyType.fromClass(Slice.class);
     // called from derived class
     public Slice(PyType subtype) {
         super(subtype);
+    }
+
+    public Slice(Node token, expr lower, expr upper, expr step) {
+        super(TYPE, token);
+        this.lower = lower;
+        if (this.lower != null)
+            this.lower.setParent(this);
+        this.upper = upper;
+        if (this.upper != null)
+            this.upper.setParent(this);
+        this.step = step;
+        if (this.step != null)
+            this.step.setParent(this);
     }
 
     public Slice(Token token, expr lower, expr upper, expr step) {

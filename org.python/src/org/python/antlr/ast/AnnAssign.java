@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -154,6 +155,20 @@ public static final PyType TYPE = PyType.fromClass(AnnAssign.class);
     // called from derived class
     public AnnAssign(PyType subtype) {
         super(subtype);
+    }
+
+    public AnnAssign(Node token, expr target, expr annotation, expr value, Integer simple) {
+        super(TYPE, token);
+        this.target = target;
+        if (this.target != null)
+            this.target.setParent(this);
+        this.annotation = annotation;
+        if (this.annotation != null)
+            this.annotation.setParent(this);
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
+        this.simple = simple;
     }
 
     public AnnAssign(Token token, expr target, expr annotation, expr value, Integer simple) {

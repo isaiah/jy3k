@@ -21,6 +21,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyLong;
 import org.python.core.PyType;
 import org.python.core.PyList;
+import org.python.parser.Node;
 import org.python.core.PyNewWrapper;
 import org.python.core.Visitproc;
 import org.python.annotations.ExposedGet;
@@ -88,6 +89,13 @@ public static final PyType TYPE = PyType.fromClass(Index.class);
     // called from derived class
     public Index(PyType subtype) {
         super(subtype);
+    }
+
+    public Index(Node token, expr value) {
+        super(TYPE, token);
+        this.value = value;
+        if (this.value != null)
+            this.value.setParent(this);
     }
 
     public Index(Token token, expr value) {
