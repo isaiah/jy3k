@@ -53,6 +53,10 @@ public abstract class mod extends PythonTree {
         super(subtype, token);
     }
 
+    public mod(PyType subtype, Node token) {
+        super(subtype, token);
+    }
+
     public mod(PyType subtype, PythonTree node) {
         super(subtype, node);
     }

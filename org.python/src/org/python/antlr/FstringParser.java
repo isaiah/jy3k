@@ -9,6 +9,7 @@ import org.python.antlr.base.expr;
 import org.python.antlr.base.mod;
 import org.python.core.*;
 import org.python.core.stringlib.Encoding;
+import org.python.parser.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,13 @@ import java.util.regex.Pattern;
  */
 public class FstringParser {
     private Token token;
+    private Node n;
     private String lastStr;
     private List<expr> exprList = new ArrayList<>();
+
+    public FstringParser(Node n) {
+        this.n = n;
+    }
 
     public FstringParser(Token t) {
         token = t;

@@ -203,6 +203,10 @@ public abstract class PythonTree extends AST implements Traverseproc {
     }
 
     protected PyObject lineno, col_offset;
+    public void setNode(Node n) {
+        this.n = n;
+    }
+
     public int getLineno() {
         if (lineno == null) {
             if (getToken() == null) {

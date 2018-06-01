@@ -10,6 +10,7 @@ import org.python.antlr.base.stmt;
 import org.python.core.*;
 import org.python.core.stringlib.Encoding;
 import org.python.core.util.StringUtil;
+import org.python.parser.Node;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -284,8 +285,17 @@ public class GrammarActions {
         return keywords;
     }
 
+    public PyObject makeFloat(String s) {
+        return Py.newFloat(Double.valueOf(s));
+    }
+
     PyObject makeFloat(TerminalNode t) {
         return Py.newFloat(Double.valueOf(t.getText().replaceAll("_", "")));
+    }
+
+
+    public PyObject makeComplex(String s) {
+        return Py.newImaginary(Double.valueOf(s.substring(0, s.length() - 1)));
     }
 
     PyObject makeComplex(TerminalNode t) {
@@ -298,8 +308,50 @@ public class GrammarActions {
         return new PyLong(new BigInteger(t.getText().substring(2).replaceAll("_", ""), radix));
     }
 
+    public PyObject makeInt(String s, int radix) {
+        return new PyLong(new BigInteger(s, radix));
+    }
+
     PyObject makeDecimal(TerminalNode t) {
         return new PyLong(new BigInteger(t.getText().replaceAll("_", ""), 10));
+    }
+
+    public expr parsestrplus(Node n) {
+        boolean bytesmode = false;
+        StringBuilder bytesStr = new StringBuilder();
+        FstringParser state = new FstringParser(n.child(0));
+        int i = 0;
+        for (Node last : n.children()) {
+            boolean this_bytesmode = false;
+            ParseStrResult ret = parsestr(last);
+            this_bytesmode = ret.bytesmode;
+            /* Check that we're not mixing bytes with unicode. */
+            if (i++ != 0 && bytesmode != this_bytesmode) {
+                // TODO ast error "cannot mix bytes and nonbytes literals"
+                throw Py.SyntaxError("cannot mix bytes and nonbytes literals");
+            }
+            bytesmode = this_bytesmode;
+            if (ret.fstr != null) {
+                assert(ret.s == null && !bytesmode);
+                /* This is an f-string. Parse and concatenate it. */
+                state.concatFstring(ret.fstr, ret.fstrlen, 0, ret.rawmode);
+            } else {
+                /* A string or byte string. */
+                if (bytesmode) {
+                    /* For bytes, concat as we go. */
+                    bytesStr.append(ret.s);
+                } else {
+                    /* This is a regular string. Concatenate it. */
+                    state.concat(ret.s);
+                }
+            }
+        }
+
+        if (bytesmode) {
+            return new Bytes(n.child(0), bytesStr.toString());
+        }
+
+        return state.finish();
     }
 
     expr parsestrplus(List<PythonParser.StrContext> s) {
@@ -346,6 +398,78 @@ public class GrammarActions {
         String s;
         String fstr;
         int fstrlen;
+    }
+
+    ParseStrResult parsestr(Node t) {
+         int len;
+        String s = t.str();
+        int start = 0;
+        char quoteChar = s.charAt(start);
+        ParseStrResult ret = new ParseStrResult();
+        boolean fmode = false;
+        ret.bytesmode = false;
+        ret.rawmode = false;
+        if (Character.isAlphabetic(quoteChar)) {
+            while (!ret.bytesmode || !ret.rawmode) {
+                if (quoteChar == 'b' || quoteChar == 'B') {
+                    quoteChar = s.charAt(++start);
+                    ret.bytesmode = true;
+                } else if (quoteChar == 'u' || quoteChar == 'U') {
+                    quoteChar = s.charAt(++start);
+                } else if (quoteChar == 'r' || quoteChar == 'R') {
+                    quoteChar = s.charAt(++start);
+                    ret.rawmode = true;
+                } else if (quoteChar == 'f' || quoteChar == 'F') {
+                    quoteChar = s.charAt(++start);
+                    fmode = true;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (fmode && ret.bytesmode) {
+            throw new RuntimeException("f with b mode");
+        }
+        if (quoteChar != '\'' && quoteChar != '"') {
+            throw new RuntimeException("parsestr error: " + quoteChar);
+        }
+        // skip the leading quote char
+        start++;
+        len = s.length();
+        if (s.charAt(--len) != quoteChar) {
+            throw new RuntimeException("invalid str");
+        }
+        if (s.length() > 4 && s.charAt(start) == quoteChar && s.charAt(start + 1) == quoteChar) {
+            /* A triple quoted string. We've already skipped one quote at
+            the start and one at the end of the string. Now skip the
+            two at the start. */
+            start += 2;
+            /* And check that the last two match. */
+            if (s.charAt(--len) != quoteChar || s.charAt(--len) != quoteChar) {
+                throw new RuntimeException("invalid triple quote str");
+            }
+        }
+
+        if (fmode) {
+            /* Just return the bytes. The caller will parse the resulting string. */
+            ret.fstr = s.substring(start, len);
+            ret.fstrlen = len;
+            return ret;
+        }
+        // Not an f-string
+        // avoid invoking escape decoding routines if possible
+        ret.rawmode = ret.rawmode || s.indexOf('\\') == -1;
+        ret.s = s.substring(start, len);
+        if (ret.bytesmode) {
+            // TODO disallow non-ASCII characters.
+            if (!ret.rawmode) {
+                ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", false);
+            }
+        } else if (!ret.rawmode) {
+            ret.s = Encoding.decode_UnicodeEscape(ret.s, 0, len - start, "strict", true);
+        }
+        return ret;
     }
 
     ParseStrResult parsestr(PythonParser.StrContext t) {

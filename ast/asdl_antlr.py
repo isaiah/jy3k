@@ -317,6 +317,12 @@ class JavaVisitor(EmitVisitor):
         self.emit("}", depth+1)
         self.emit("", 0)
 
+        self.emit("public %(name)s(PyType subtype, Node token) {" % locals(), depth+1)
+        self.emit("super(subtype, token);", depth+2)
+        self.emit("}", depth+1)
+        self.emit("", 0)
+
+
         self.emit("public %(name)s(PyType subtype, PythonTree node) {" % locals(), depth+1)
         self.emit("super(subtype, node);", depth+2)
         self.emit("}", depth+1)

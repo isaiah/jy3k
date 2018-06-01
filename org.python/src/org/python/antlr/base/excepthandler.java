@@ -54,6 +54,10 @@ public abstract class excepthandler extends PythonTree {
         super(subtype, token);
     }
 
+    public excepthandler(PyType subtype, Node token) {
+        super(subtype, token);
+    }
+
     public excepthandler(PyType subtype, PythonTree node) {
         super(subtype, node);
     }

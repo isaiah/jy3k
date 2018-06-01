@@ -55,9 +55,10 @@ public abstract class expr extends PythonTree {
         super(subtype, token);
     }
 
-    public expr(PyType subtype, Node node) {
-        super(subtype, node);
+    public expr(PyType subtype, Node token) {
+        super(subtype, token);
     }
+
     public expr(PyType subtype, PythonTree node) {
         super(subtype, node);
     }

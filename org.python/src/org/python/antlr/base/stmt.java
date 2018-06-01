@@ -55,6 +55,10 @@ public abstract class stmt extends PythonTree {
         super(subtype, token);
     }
 
+    public stmt(PyType subtype, Node token) {
+        super(subtype, token);
+    }
+
     public stmt(PyType subtype, PythonTree node) {
         super(subtype, node);
     }

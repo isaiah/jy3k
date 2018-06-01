@@ -53,6 +53,10 @@ public abstract class slice extends PythonTree {
         super(subtype, token);
     }
 
+    public slice(PyType subtype, Node token) {
+        super(subtype, token);
+    }
+
     public slice(PyType subtype, PythonTree node) {
         super(subtype, node);
     }
