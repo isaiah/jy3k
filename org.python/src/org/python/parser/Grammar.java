@@ -166,7 +166,7 @@ public class Grammar {
                 String src = lb.str.substring(1);
                 int p = src.indexOf('\'');
                 int nameLen = p >= 0 ? p : src.length();
-                lb.str = src;
+                lb.str = src.substring(0, nameLen);
             } else if (lb.str.charAt(2) == lb.str.charAt(0)) {
                 int type = PyToken_OneChar(lb.str.charAt(1));
                 if (type != OP) {

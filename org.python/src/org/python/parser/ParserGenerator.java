@@ -65,7 +65,7 @@ public class ParserGenerator {
         fp.write("public class GramInit {\n");
         printdfas(g, fp);
         printlabels(g, fp);
-        fp.write("static final Grammar _PyParser_Grammar = new Grammar(\n");
+        fp.write("public static final Grammar _PyParser_Grammar = new Grammar(\n");
         fp.write("  dfas,\n");
         fp.write("  labels,\n");
         fp.write(String.format("  %d);\n", g.start));
@@ -79,10 +79,10 @@ public class ParserGenerator {
         printstates(g, fp);
         fp.write("public static final DFA[] dfas = {\n");
         int i = 0;
+        int n = bytesize(g.ll.size());
         for (Grammar.DFA d : g.dfas) {
             fp.write(String.format("new DFA(%d, \"%s\", %d, states_%d,\n", d.type, d.name, d.initial, i++));
             fp.write("      \"");
-            int n = bytesize(g.ll.size());
             byte[] arr = d.first.toByteArray();
             for (int j = 0; j < n; j++) {
                 byte b = j < arr.length ? arr[j] : 0;
