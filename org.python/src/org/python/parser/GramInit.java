@@ -3590,7 +3590,7 @@ new Label(340, null),
 new Label(1, "yield'"),
 new Label(342, null),
 };
-static final Grammar _PyParser_Grammar = new Grammar(
+public static final Grammar _PyParser_Grammar = new Grammar(
   dfas,
   labels,
   256);

@@ -24,6 +24,7 @@ import org.python.antlr.ast.DictComp;
 import org.python.antlr.ast.Ellipsis;
 import org.python.antlr.ast.ExceptHandler;
 import org.python.antlr.ast.Expr;
+import org.python.antlr.ast.Expression;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FormattedValue;
 import org.python.antlr.ast.FunctionDef;
@@ -34,6 +35,7 @@ import org.python.antlr.ast.IfExp;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
+import org.python.antlr.ast.Interactive;
 import org.python.antlr.ast.JoinedStr;
 import org.python.antlr.ast.Lambda;
 import org.python.antlr.ast.ListComp;
@@ -95,9 +97,8 @@ public class Ast {
      * @param filename
      * @return
      */
-    mod PyAST_FromNodeObject(final Node n, EnumSet flags, String filename) {
+    public static mod PyAST_FromNodeObject(Node n, EnumSet flags, String filename) {
         compiling c = new compiling(filename);
-        mod res = null;
         int i, j, k, num;
         k = 0;
         List<stmt> stmts;
@@ -116,11 +117,49 @@ public class Ast {
                     num = num_stmts(ch);
                     if (num == 1) {
                         s = ast_for_stmt(c, ch);
+                        stmts.set(k++, s);
+                    } else {
+                        ch = ch.child(0);
+                        REQ(ch, SIMPLE_STMT);
+                        for (j = 0; j < num; j++) {
+                            s = ast_for_stmt(c, ch.child(j*2));
+                            stmts.set(k++, s);
+                        }
                     }
                 }
+                return new org.python.antlr.ast.Module(n, stmts, docstring_from_stmts(stmts));
+            case EVAL_INPUT:
+                expr testlistAst;
+                testlistAst = ast_for_testlist(c, n.child(0));
+                return new Expression(n, testlistAst);
+            case SINGLE_INPUT:
+                if (n.child(0).type() == NEWLINE) {
+                    stmts = new ArrayList<>(1);
+                    stmts.set(0, new Pass(n));
+                    return new Interactive(n, stmts);
+                }
+                n = n.child(0);
+                num = num_stmts(n);
+                stmts = new ArrayList<>(num);
+                if (num == 1) {
+                    s = ast_for_stmt(c, n);
+                    stmts.set(0, s);
+                } else {
+                    /* Only a simple_stmt can contain multiple statements. */
+                    REQ(n, SIMPLE_STMT);
+                    for (i = 0; i < n.nch(); i+=2) {
+                        if (n.child(i).type() == NEWLINE) {
+                            break;
+                        }
+                        s = ast_for_stmt(c, n.child(i));
+                        stmts.set(i/2, s);
+                    }
+                }
+                return new Interactive(n, stmts);
+            default:
+                throw Py.SystemError(String.format("invalid node %d for PyAST_FromNode", n.type()));
 
         }
-        return null;
     }
 
     /* num_stmts() returns number of contained statements.

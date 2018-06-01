@@ -320,6 +320,6 @@ public class Grammar {
 
     final List<DFA> dfas;
     List<Label> ll;
-    int start; /* Start symbol of this grammar */
+    public int start; /* Start symbol of this grammar */
     boolean accel; /* Set if accelerators present */
 }
