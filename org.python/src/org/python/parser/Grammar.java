@@ -1,10 +1,15 @@
 package org.python.parser;
 
+import org.antlr.v4.runtime.CharStreams;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.python.parser.ParserGenerator.DEBUG;
 import static org.python.parser.ParserGenerator.EMPTY;
@@ -78,7 +83,12 @@ public class Grammar {
             this.name = name;
             this.initial = initial;
             this.states = Arrays.asList(states);
-            this.first = BitSet.valueOf(first.getBytes());
+            char[] chars = first.toCharArray();
+            byte[] bytes = new byte[chars.length];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte) chars[i];
+            }
+            this.first = BitSet.valueOf(bytes);
         }
 
 
@@ -302,6 +312,14 @@ public class Grammar {
         return type >= NT_OFFSET;
     }
 
+    /* The parser as originally conceived had disappointing performance.
+       This module does some precomputation that speeds up the selection
+       of a DFA based upon a token, turning a search through an array
+       into a simple indexing operation.  The parser now cannot work
+       without the accelerators installed.  Note that the accelerators
+       are installed dynamically when the parser is initialized, they
+       are not part of the static data structure written on graminit.[ch]
+       by the parser generator. */
     void PyGrammar_AddAccelerators() {
         dfas.forEach(this::fixdfa);
         accel = true;
@@ -313,6 +331,7 @@ public class Grammar {
 
     private void fixstate(State s) {
         int nl = ll.size();
+        s.accept = false;
         int[] accel = new int[nl];
         Arrays.fill(accel, -1);
         for (Arc a : s.arcs) {
@@ -346,8 +365,8 @@ public class Grammar {
         while (nl > 0 && accel[nl - 1] == -1) {
             nl--;
         }
-        int k = 0;
-        while ( k < nl && accel[k] == -1) {
+        int k;
+        for (k = 0; k < nl && accel[k] == -1;) {
             k++;
         }
 
@@ -355,9 +374,10 @@ public class Grammar {
             s.accel = new int[nl - k];
             s.lower = k;
             s.upper = nl;
-            for (int i = 0; k < nl; i++, k++) {
-                s.accel[i] = accel[k];
-            }
+            System.arraycopy(accel, k, s.accel, 0, s.accel.length);
+            //for (int i = 0; k < nl; i++, k++) {
+            //    s.accel[i] = accel[k];
+            //}
         }
     }
 
