@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Objects;
 
+import static org.python.parser.ParserGenerator.DEBUG;
 import static org.python.parser.ParserGenerator.EMPTY;
+import static org.python.parser.ParserGenerator.PyGrammar_LabelRepr;
 import static org.python.parser.TokenType.NAME;
 import static org.python.parser.TokenType.OP;
 import static org.python.parser.TokenType.STRING;
@@ -39,6 +42,9 @@ public class Grammar {
 
         Label label = new Label(type, str);
         ll.add(label);
+        if (DEBUG) {
+            System.out.printf("Label @ %8X, %d: %s\n", Objects.hashCode(ll), ll.size(), PyGrammar_LabelRepr(label));
+        }
         return ll.size() - 1;
     }
 
@@ -137,13 +143,19 @@ public class Grammar {
     }
 
     public void translatelabels() {
-        ll.forEach(this::translatelabel);
+        ll.stream().skip(1).forEach(this::translatelabel);
     }
 
     private void translatelabel(Label lb) {
+        if (DEBUG) {
+            System.out.printf("Translating label %s ...\n", PyGrammar_LabelRepr(lb));
+        }
         if (lb.type == NAME) {
             for (DFA dfa : dfas) {
                 if (lb.str.equals(dfa.name)) {
+                    if (DEBUG) {
+                        System.out.printf("Label %s is non-terminal %d.\n", lb.str, dfa.type);
+                    }
                     lb.type = dfa.type;
                     lb.str = null;
                     return;
@@ -151,6 +163,9 @@ public class Grammar {
             }
             for (int i = 0; i < TOKEN_NAMES.length; i++) {
                 if (lb.str.equals(TOKEN_NAMES[i])) {
+                    if (DEBUG) {
+                        System.out.printf("Label %s is terminal %d.\n", lb.str, i);
+                    }
                     lb.type = i;
                     lb.str = null;
                     return;
@@ -162,6 +177,9 @@ public class Grammar {
         if (lb.type == STRING) {
             if (Character.isAlphabetic(lb.str.charAt(1)) || lb.str.charAt(1) == '_') {
                 /* Label is a keyword */
+                if (DEBUG) {
+                    System.out.printf("Label %s is a keyword\n", lb.str);
+                }
                 lb.type = NAME;
                 String src = lb.str.substring(1);
                 int p = src.indexOf('\'');
@@ -201,6 +219,9 @@ public class Grammar {
 
     /* Computation of FIRST sets */
     void addfirstsets() {
+        if (DEBUG) {
+            System.out.println("Adding FIRST sets ...");
+        }
         for (DFA dfa : dfas) {
             if (dfa.first == null) {
                 calcfirstset(dfa);
@@ -208,20 +229,34 @@ public class Grammar {
         }
     }
 
-    static BitSet DUMMY = new BitSet(1);
+    static final BitSet DUMMY = new BitSet(1);
 
     void calcfirstset(DFA d) {
+        int i, j;
+
+        DFA d1;
+        Arc a;
+
+        // if DEBUG
+        System.out.printf("Calculate FIRST set for '%s'\n", d.name);
+        if (d.first == DUMMY) {
+            System.err.printf("Left-recursion for '%s'\n", d.name);
+            return;
+        }
+        if (d.first != null) {
+            System.err.printf("Re-calculating FIRST set for '%s' ???\n", d.name);
+        }
         d.first = DUMMY;
-        Label l0 = ll.get(0);
+
         int nbits = ll.size();
         BitSet result = new BitSet(nbits);
         List<Integer> symbols = new ArrayList<>();
         symbols.add(findLabel(ll, d.type, null));
+
         State s = d.states.get(d.initial);
-        for (int i = 0; i < s.arcs.size(); i++) {
-            Arc a = s.arcs.get(i);
-            int j = 0;
-            for (; j < symbols.size(); j++) {
+        for (i = 0; i < s.arcs.size(); i++) {
+            a = s.arcs.get(i);
+            for (j = 0; j < symbols.size(); j++) {
                 if (symbols.get(j) == a.lbl) {
                     break;
                 }
@@ -230,7 +265,7 @@ public class Grammar {
                 symbols.add(a.lbl);
                 int type = ll.get(a.lbl).type;
                 if (isNonTerminal(type)) {
-                    DFA d1 = PyGrammar_FindDFA(type);
+                    d1 = PyGrammar_FindDFA(type);
                     if (d1.first == DUMMY) {
                         System.err.println(String.format("Left-recursion below '%s'", d.name));
                     } else {
@@ -240,22 +275,30 @@ public class Grammar {
                         result.or(d1.first);
                     }
 
-                } else { // ISTERMINAL
+                } else if (isTerminal(type)) {
                     result.set(a.lbl);
                 }
             }
         }
         d.first = result;
+        // if DEBUG
+        System.out.printf("FIRST set for '%s': {", d.name);
+        for (i = 0; i < nbits; i++) {
+            if (result.get(i)) {
+                System.out.printf(" %s", PyGrammar_LabelRepr(ll.get(i)));
+            }
+        }
+        System.out.println(" }");
     }
 
     DFA PyGrammar_FindDFA(int type) {
         return dfas.get(type - NT_OFFSET);
     }
 
-    boolean isTerminal(int type) {
+    static boolean isTerminal(int type) {
         return type < NT_OFFSET;
     }
-    boolean isNonTerminal(int type) {
+    static boolean isNonTerminal(int type) {
         return type >= NT_OFFSET;
     }
 

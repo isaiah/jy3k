@@ -13,6 +13,8 @@
 */
 package org.python.parser;
 
+import org.python.core.Py;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,10 +25,12 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static org.python.parser.Grammar.isNonTerminal;
 import static org.python.parser.TokenType.*;
 
 /* pgen.c */
 public class ParserGenerator {
+    static final boolean DEBUG = true;
     static final int NT_OFFSET = 256;
     static final int EMPTY = 0;
 
@@ -209,7 +213,7 @@ public class ParserGenerator {
             return nf;
         }
 
-        void compileRule(Node n) {
+        void compileRule(final Node n) {
             REQ(n, RULE);
             REQN(n.nch(), 4);
             int cur = 0;
@@ -220,8 +224,7 @@ public class ParserGenerator {
             REQ(node, COLON);
             node = n.child(cur++);
             REQ(node, RHS);
-            IntTuple tuple = new IntTuple(nf.start, nf.finish);
-            compileRHS(ll, nf, node, tuple);
+            IntTuple tuple = compileRHS(ll, nf, node);
             /* Value is modified in compileRHS */
             /* This is translated from C, hopefully we can refactor in the end */
             nf.start = tuple.a;
@@ -230,16 +233,17 @@ public class ParserGenerator {
             REQ(node, NEWLINE);
         }
 
-        void compileRHS(List<Grammar.Label> ll, NFA nf, Node n, IntTuple p) {
+        IntTuple compileRHS(List<Grammar.Label> ll, NFA nf, Node n) {
+            IntTuple p;
             REQ(n, RHS);
             int i = n.nch();
             REQN(i, 1);
             int cur = 0;
             Node node = n.child(cur++);
             REQ(node, ALT);
-            compileAlt(ll, nf, node, p);
-            if (cur >= n.nch()) {
-                return;
+            p = compileAlt(ll, nf, node);
+            if (--i <= 0) {
+                return p;
             }
             int a = p.a;
             int b = p.b;
@@ -247,58 +251,62 @@ public class ParserGenerator {
             p.b = nf.addState();
             nf.addNFAArc(p.a, a, EMPTY);
             nf.addNFAArc(b, p.b, EMPTY);
-            while (cur < n.nch()) {
+            while (--i >= 0) {
                 node = n.child(cur++);
                 REQ(node, VBAR);
+                --i;
 
                 node = n.child(cur++);
                 REQ(node, ALT);
-                IntTuple p1 = new IntTuple(a, b);
-                compileAlt(ll, nf, node, p1);
+                IntTuple p1 = compileAlt(ll, nf, node);
                 nf.addNFAArc(p.a, p1.a, EMPTY);
                 nf.addNFAArc(p.b, p1.b, EMPTY);
             }
+            return p;
         }
 
-        void compileAlt(List<Grammar.Label> ll, NFA nf, Node n, IntTuple p) {
+        IntTuple compileAlt(List<Grammar.Label> ll, NFA nf, Node n) {
+            IntTuple p;
             REQ(n, ALT);
-            REQN(n.nch(), 1);
+            int i = n.nch();
+            REQN(i, 1);
             int cur = 0;
             Node node = n.child(cur++);
             REQ(node, ITEM);
-            compileItem(ll, nf, node, p);
-            while (cur < n.nch()) {
+            p = compileItem(ll, nf, node);
+            --i;
+            while (--i >= 0) {
                 node = n.child(cur++);
                 REQ(node, ITEM);
-                IntTuple p1 = new IntTuple();
-                compileItem(ll, nf, node, p1);
+                IntTuple p1 = compileItem(ll, nf, node);
                 nf.addNFAArc(p.b, p1.a, EMPTY);
                 p.b = p1.b;
             }
+            return p;
         }
 
-        void compileItem(List<Grammar.Label> ll, NFA nf, Node n, IntTuple p) {
+        IntTuple compileItem(List<Grammar.Label> ll, NFA nf, Node n) {
             REQ(n, ITEM);
-            REQN(n.nch(), 1);
+            int i = n.nch();
+            REQN(i, 1);
             int cur = 0;
             Node node = n.child(cur++);
-            IntTuple p1 = new IntTuple();
+            IntTuple p;
             if (node.type() == LSQB) {
-                REQN(n.nch(), 3);
+                REQN(i, 3);
                 node = n.child(cur++);
                 REQ(node, RHS);
-                p.a = nf.addState();;
-                p.b = nf.addState();;
+                p = new IntTuple(nf.addState(), nf.addState());
                 nf.addNFAArc(p.a, p.b, EMPTY);
-                compileRHS(ll, nf, node, p1);
+                IntTuple p1 = compileRHS(ll, nf, node);
                 nf.addNFAArc(p.a, p1.a, EMPTY);
                 nf.addNFAArc(p1.b, p.b, EMPTY);
                 node = n.child(cur++);
                 REQ(node, RSQB);
             } else {
-                compileAtom(ll, nf, node, p);
-                if (cur >= n.nch()) {
-                    return;
+                p = compileAtom(ll, nf, node);
+                if (--i <= 0) {
+                    return p;
                 }
                 node = n.child(cur++);
                 nf.addNFAArc(p.b, p.a, EMPTY);
@@ -308,27 +316,30 @@ public class ParserGenerator {
                     REQ(node, PLUS);
                 }
             }
+            return p;
         }
 
-        void compileAtom(List<Grammar.Label> ll, NFA nf, Node n, IntTuple p) {
+        IntTuple compileAtom(List<Grammar.Label> ll, NFA nf, Node n) {
             REQN(n.nch(), 1);
             int cur = 0;
             Node node = n.child(cur++);
             int i = n.nch();
+            IntTuple p;
             if (node.type() == LPAR) {
                 REQN(i, 3);
                 node = n.child(cur++);
                 REQ(node, RHS);
-                compileRHS(ll, nf, node, p);
+                p = compileRHS(ll, nf, node);
                 node = n.child(cur++);
                 REQ(node, RPAR);
             } else if (node.type() == NAME || node.type() == STRING) {
-                p.a = nf.addState();
-                p.b = nf.addState();
+                p = new IntTuple(nf.addState(), nf.addState());
                 nf.addNFAArc(p.a, p.b, addLabel(node.type(), node.str()));
             } else {
+                p = null;
                 REQ(node, NAME);
             }
+            return p;
         }
 
         static void dumpstate(List<Grammar.Label> ll, NFA nf, int istate) {
@@ -450,10 +461,45 @@ public class ParserGenerator {
                 }
             }
 
-            // if debug: printssdfa("before minimizing")
+            if (DEBUG) {
+                printssdfa(ssStates, nbits, ll, "before minimizing");
+            }
+
             simplify(ssStates);
-            // if debug: printssdfa("after minimizing")
+
+            if (DEBUG) {
+                printssdfa(ssStates, nbits, ll, "after minimizing");
+            }
+
             convert(d, ssStates);
+            ssStates.clear();
+        }
+
+        static void printssdfa(List<SSState> states, int nbits, List<Grammar.Label> ll, String msg) {
+            System.out.printf("Subset DFA %s\n", msg);
+            for (int i = 0; i < states.size(); i++) {
+                SSState yy = states.get(i);
+                if (yy.deleted) {
+                    continue;
+                }
+                System.out.printf(" Subset %d", i);
+
+                if (yy.finish) {
+                    System.out.print(" (finish)");
+                }
+                System.out.print(" { ");
+
+                for (int ibit = 0; ibit < nbits; ibit++) {
+                    if (yy.ss.get(ibit)) {
+                        System.out.printf("%d ", ibit);
+                    }
+                }
+                System.out.println("}");
+
+                for (SSArc zz : yy.arcs) {
+                    System.out.printf("  Arc to state %d, label %s\n", zz.arrow, PyGrammar_LabelRepr(ll.get(zz.label)));
+                }
+            }
         }
 
         /* PART THREE -- SIMPLITY DFA */
@@ -477,8 +523,9 @@ public class ParserGenerator {
         }
 
         static void renamestates(List<SSState> states, int from, int to) {
-            System.out.println(String.format("Rename state %d to %d.", from, to));
-            assert to < states.size() : "non sense arrow";
+            if (DEBUG) {
+                System.out.println(String.format("Rename state %d to %d.", from, to));
+            }
             for (SSState st : states) {
                 if (st.deleted) {
                     continue;
@@ -548,8 +595,14 @@ public class ParserGenerator {
             }
 
             Grammar g = new Grammar(nfas.get(0).type);
+            /* XXX first rule must be start rule */
             g.ll = ll;
             for (NFA nf : nfas) {
+                if (DEBUG) {
+                    System.out.printf("Dump of NFA for '%s' ...\n", nf.name);
+                    dumpNFA(ll, nf);
+                    System.out.printf("Making DFA for '%s' ...\n", nf.name);
+                }
                 Grammar.DFA d = g.adddfa(nf.type, nf.name);
                 makeDFA(nf, d);
             }
@@ -569,9 +622,6 @@ public class ParserGenerator {
      This acts like the int *pa, int *pb in C, it passes parameter, and receives return value*/
     static class IntTuple {
         int a, b;
-        public IntTuple() {
-            this.a = this.b = 0;
-        }
 
         public IntTuple(int a, int b) {
             this.a = a;
@@ -580,8 +630,13 @@ public class ParserGenerator {
     }
 
     static NFAGrammar metacompile(Node n) {
+        if (DEBUG) {
+            System.out.println("Compiling (meta-) parse tre into NFA grammar");
+        }
         NFAGrammar gr = new NFAGrammar();
-        for (Node node : n.children()) {
+        REQ(n, MSTART);
+
+        for (Node node : n.children()) { /* Last child is ENDMARKER */
             if (node.type() != NEWLINE) {
                 gr.compileRule(node);
             }
@@ -597,8 +652,27 @@ public class ParserGenerator {
     }
 
     // XXX
-    static String PyGrammar_LabelRepr(Grammar.Label label) {
-        return "";
+    static String PyGrammar_LabelRepr(Grammar.Label lb) {
+        StringBuilder buf = new StringBuilder(100);
+        if (lb.type == ENDMARKER) {
+            return "EMPTY";
+        } else if (isNonTerminal(lb.type)) {
+            if (lb.str == null) {
+                buf.append(String.format("NT%d", lb.type));
+                return buf.toString();
+            } else {
+                return lb.str;
+            }
+        } else if (lb.type < N_TOKENS) {
+            if (lb.str == null) {
+                return Tokenizer.TOKEN_NAMES[lb.type];
+            } else {
+                buf.append(String.format("%.32s(%.32s)", Tokenizer.TOKEN_NAMES[lb.type], lb.str));
+                return buf.toString();
+            }
+        } else {
+            throw Py.RuntimeError("invalid label");
+        }
     }
 
 }

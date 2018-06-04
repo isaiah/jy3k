@@ -1,14 +1,7 @@
 package org.python.parser;
 
-import org.antlr.v4.runtime.Token;
-import org.python.antlr.ast.Ellipsis;
-
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
 import java.util.function.Predicate;
 
