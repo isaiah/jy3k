@@ -90,7 +90,7 @@ public class Grammar {
 
         public void addarc(int from, int to, int label) {
             State s = states.get(from - 1);
-            Arc arc = new Arc(label, to);
+            Arc arc = new Arc(label, to - 1);
             s.arcs.add(arc);
         }
     }
