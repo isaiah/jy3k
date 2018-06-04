@@ -224,11 +224,9 @@ public class ParserGenerator {
             REQ(node, COLON);
             node = n.child(cur++);
             REQ(node, RHS);
-            IntTuple tuple = compileRHS(ll, nf, node);
-            /* Value is modified in compileRHS */
-            /* This is translated from C, hopefully we can refactor in the end */
-            nf.start = tuple.a;
-            nf.finish = tuple.b;
+            IntTuple p = compileRHS(ll, nf, node);
+            nf.start = p.a;
+            nf.finish = p.b;
             node = n.child(cur++);
             REQ(node, NEWLINE);
         }
@@ -260,7 +258,7 @@ public class ParserGenerator {
                 REQ(node, ALT);
                 IntTuple p1 = compileAlt(ll, nf, node);
                 nf.addNFAArc(p.a, p1.a, EMPTY);
-                nf.addNFAArc(p.b, p1.b, EMPTY);
+                nf.addNFAArc(p1.b, p.b, EMPTY);
             }
             return p;
         }
@@ -419,8 +417,9 @@ public class ParserGenerator {
             for (int istate = 0; istate < ssStates.size(); istate++) {
                 yy = ssStates.get(istate);
                 ss = yy.ss;
+                /* For all its states... */
                 for (int ibit = 0; ibit < nf.states.size(); ++ibit) {
-                    if (ss.get(ibit)) {
+                    if (!ss.get(ibit)) {
                         continue;
                     }
                     NFAState st = nf.states.get(ibit);
@@ -456,7 +455,7 @@ public class ParserGenerator {
                     }
 
                     zz.arrow = ssStates.size();
-                    yy = new SSState(zz.bitset, yy.ss.get(nf.finish));
+                    yy = new SSState(zz.bitset, zz.bitset.get(nf.finish));
                     ssStates.add(yy);
                 }
             }
