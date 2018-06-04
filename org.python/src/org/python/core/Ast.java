@@ -78,6 +78,7 @@ import org.python.antlr.base.stmt;
 import org.python.parser.Node;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -101,14 +102,14 @@ public class Ast {
         compiling c = new compiling(filename);
         int i, j, k, num;
         k = 0;
-        List<stmt> stmts;
+        stmt[] stmts;
         stmt s;
         Node ch;
 
         switch(n.type()) {
             case FILE_INPUT:
-                stmts = new ArrayList<>(num_stmts(n));
-                for (i = 0; i < n.nch(); i++) {
+                stmts = new stmt[num_stmts(n)];
+                for (i = 0; i < n.nch(); i++) { /* skip the ENDMARKER */
                     ch = n.child(i);
                     if (ch.type() == NEWLINE) {
                         continue;
@@ -117,33 +118,34 @@ public class Ast {
                     num = num_stmts(ch);
                     if (num == 1) {
                         s = ast_for_stmt(c, ch);
-                        stmts.set(k++, s);
+                        stmts[k++] = s;
                     } else {
                         ch = ch.child(0);
                         REQ(ch, SIMPLE_STMT);
                         for (j = 0; j < num; j++) {
                             s = ast_for_stmt(c, ch.child(j*2));
-                            stmts.set(k++, s);
+                            stmts[k++] = s;
                         }
                     }
                 }
-                return new org.python.antlr.ast.Module(n, stmts, docstring_from_stmts(stmts));
+                BodyWithDocstring ret = docstring_from_stmts(asList(stmts));
+                return new org.python.antlr.ast.Module(n, ret.stmts, ret.docstring);
             case EVAL_INPUT:
                 expr testlistAst;
                 testlistAst = ast_for_testlist(c, n.child(0));
                 return new Expression(n, testlistAst);
             case SINGLE_INPUT:
                 if (n.child(0).type() == NEWLINE) {
-                    stmts = new ArrayList<>(1);
-                    stmts.set(0, new Pass(n));
-                    return new Interactive(n, stmts);
+                    stmts = new stmt[1];
+                    stmts[0] = new Pass(n);
+                    return new Interactive(n, asList(stmts));
                 }
                 n = n.child(0);
                 num = num_stmts(n);
-                stmts = new ArrayList<>(num);
+                stmts = new stmt[num];
                 if (num == 1) {
                     s = ast_for_stmt(c, n);
-                    stmts.set(0, s);
+                    stmts[0] = s;
                 } else {
                     /* Only a simple_stmt can contain multiple statements. */
                     REQ(n, SIMPLE_STMT);
@@ -152,10 +154,10 @@ public class Ast {
                             break;
                         }
                         s = ast_for_stmt(c, n.child(i));
-                        stmts.set(i/2, s);
+                        stmts[i/2] = s;
                     }
                 }
-                return new Interactive(n, stmts);
+                return new Interactive(n, asList(stmts));
             default:
                 throw Py.SystemError(String.format("invalid node %d for PyAST_FromNode", n.type()));
 
@@ -277,15 +279,18 @@ public class Ast {
     }
 
     static class BodyWithDocstring {
-        List<stmt> stmts;
-        String docstring;
+        final List<stmt> stmts;
+        final String docstring;
+
+        public BodyWithDocstring(List<stmt> stmts, String doc) {
+            this.stmts = stmts;
+            this.docstring = doc;
+        }
     }
 
     static BodyWithDocstring ast_for_body(compiling c, Node n) {
-        BodyWithDocstring ret = new BodyWithDocstring();
-        ret.stmts = ast_for_suite(c, n);
-        ret.docstring = docstring_from_stmts(ret.stmts);
-        return ret;
+        List<stmt> stmts = ast_for_suite(c, n);
+        return docstring_from_stmts(stmts);
     }
 
     static stmt ast_for_if_stmt(compiling c, Node n) {
@@ -320,7 +325,7 @@ public class Ast {
             boolean has_else = false;
             expr expression;
             List<stmt> suite;
-            List<stmt> orelse = null;
+            stmt[] orelse = null;
             n_elif = n.nch() - 4;
             /* must reference the child n_elif+1 since 'else' token is third,
                not fourth, child from the end. */
@@ -332,26 +337,26 @@ public class Ast {
 
             if (has_else) {
                 List<stmt> suite2;
-                orelse = new ArrayList<>(1);
+                orelse = new stmt[1];
                 expression = ast_for_expr(c, n.child(n.nch() - 6));
                 suite = ast_for_suite(c, n.child(n.nch() - 4));
                 suite2 = ast_for_suite(c, n.child(n.nch() - 1));
-                orelse.set(0, new If(n.child(n.nch() - 6), expression, suite, suite2));
+                orelse[0] = new If(n.child(n.nch() - 6), expression, suite, suite2);
                 n_elif--;
             }
 
             for (i = 0; i < n_elif; i++) {
                 int off = 5 + (n_elif - i - 1) * 4;
-                List<stmt> newobj = new ArrayList<>(1);
+                stmt[] newobj = new stmt[1];
                 expression = ast_for_expr(c, n.child(off));
                 suite = ast_for_suite(c, n.child(off + 2));
-                newobj.set(0, new If(n.child(off), expression, suite, orelse));
+                newobj[0] = new If(n.child(off), expression, suite, asList(orelse));
                 orelse = newobj;
             }
 
             expression = ast_for_expr(c, n.child(1));
             suite = ast_for_suite(c, n.child(3));
-            return new If(n, expression, suite, orelse);
+            return new If(n, expression, suite, asList(orelse));
         }
         throw Py.SystemError(String.format("unexpected token in 'if' statement: %s", s));
     }
@@ -438,7 +443,7 @@ public class Ast {
         int nch = n.nch();
         int n_except = (nch - 3) / 3;
         List<stmt> body, orelse = null, _finally = null;
-        List<excepthandler> handlers = null;
+        excepthandler[] handlers = null;
         REQ(n, TRY_STMT);
 
         body = ast_for_suite(c, n.child(2));
@@ -466,14 +471,14 @@ public class Ast {
         if (n_except > 0) {
             int i;
             /* process except statements to create a try ... except */
-            handlers = new ArrayList<>(n_except);
+            handlers = new excepthandler[n_except];
 
             for (i = 0; i < n_except; i++) {
                 excepthandler e = ast_for_except_clause(c, n.child(3 + i * 3), n.child(5 + i * 3));
-                handlers.set(i, e);
+                handlers[i] = e;
             }
         }
-        return new Try(n, body, handlers, orelse, _finally);
+        return new Try(n, body, asList(handlers), orelse, _finally);
     }
 
     /* with_item: test['as' expr] */
@@ -492,23 +497,23 @@ public class Ast {
     static stmt ast_for_with_stmt(compiling c, Node n, boolean isAsync) {
         /* with_stmt: 'with' with_item (',' with_item)* ':' suite */
         int i, nItems;
-        List<withitem> items;
+        withitem[] items;
         List<stmt> body;
 
         REQ(n, WITH_STMT);
 
         nItems = (n.nch() - 2) / 2;
-        items = new ArrayList<>(nItems);
+        items = new withitem[nItems];
 
         for (i = 1; i < n.nch(); i+=2) {
             withitem item = ast_for_with_item(c, n.child(i));
-            items.set((i-1)/2, item);
+            items[(i-1)/2] = item;
         }
         body = ast_for_suite(c, n.child(n.nch() - 1));
         if (isAsync) {
-            return new AsyncWith(n, items, body);
+            return new AsyncWith(n, asList(items), body);
         }
-        return new With(n, items, body);
+        return new With(n, asList(items), body);
     }
 
     static stmt ast_for_classdef(compiling c, Node n, List<expr> decoratorSeq) {
@@ -675,19 +680,19 @@ public class Ast {
                        'import' ('*' | '(' import_as_names ')' | import_as_names)
         */
         int i;
-        List<alias> aliases;
+        alias[] aliases;
 
         REQ(n, IMPORT_STMT);
         n = n.child(0);
         if (n.type() == IMPORT_NAME) {
             n = n.child(1);
             REQ(n, DOTTED_AS_NAMES);
-            aliases = new ArrayList<>((n.nch() + 1) / 2);
+            aliases = new alias[(n.nch() + 1) / 2];
             for (i = 0; i < n.nch(); i+=2) {
                 alias import_alias = alias_for_import_name(c, n.child(i), true);
-                aliases.set(i/2, import_alias);
+                aliases[i/2] = import_alias;
             }
-            return new Import(n, aliases);
+            return new Import(n, asList(aliases));
         } else if (n.type() == IMPORT_FROM) {
             int n_children;
             int idx, ndots = 0;
@@ -733,22 +738,22 @@ public class Ast {
                     throw ast_error(c, n, "unexpected node-type in from-import");
             }
 
-            aliases = new ArrayList<>((n_children + 1) / 2);
+            aliases = new alias[(n_children + 1) / 2];
 
             /* handle "from ... import *" special b/c there's no children */
             if (n.type() == STAR) {
                 alias import_alias = alias_for_import_name(c, n, true);
-                aliases.set(0, import_alias);
+                aliases[0] = import_alias;
             } else {
                 for (i = 0; i < n.nch(); i+=2) {
                     alias import_alias = alias_for_import_name(c, n.child(i), true);
-                    aliases.set(i/2, import_alias);
+                    aliases[i/2] = import_alias;
                 }
             }
             if (mod != null) {
                 modname = mod.getInternalName();
             }
-            return new ImportFrom(n, modname, aliases, ndots);
+            return new ImportFrom(n, modname, asList(aliases), ndots);
         }
         throw Py.SystemError(String.format("unknown import statement: starts with command '%s'", n.child(0).str()));
     }
@@ -756,29 +761,29 @@ public class Ast {
     static stmt ast_for_global_stmt(compiling c, Node n) {
         /* global_stmt: 'global' NAME (',' NAME)* */
         String name;
-        List<String> s;
+        String[] s;
         int i;
         REQ(n, GLOBAL_STMT);
-        s = new ArrayList<>(n.nch() / 2);
+        s = new String[n.nch() / 2];
         for (i = 1; i < n.nch(); i+=2) {
             name = n.child(i).str();
-            s.set(i/2, name);
+            s[i/2] = name;
         }
-        return new Global(n, s);
+        return new Global(n, asList(s));
     }
 
     static stmt ast_for_nonlocal_stmt(compiling c, Node n) {
         /* nonlocal_stmt: 'nonlocal' NAME (',' NAME)* */
         String name;
-        List<String> s;
+        String[] s;
         int i;
         REQ(n, NONLOCAL_STMT);
-        s = new ArrayList<>(n.nch() / 2);
+        s = new String[n.nch() / 2];
         for (i = 1; i < n.nch(); i+=2) {
             name = n.child(i).str();
-            s.set(i/2, name);
+            s[i/2] = name;
         }
-        return new Nonlocal(n, s);
+        return new Nonlocal(n, asList(s));
     }
 
     static stmt ast_for_assert_stmt(compiling c, Node n) {
@@ -797,7 +802,7 @@ public class Ast {
 
     static List<stmt> ast_for_suite(compiling c, Node n) {
         /* suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT */
-        List<stmt> seq;
+        stmt[] seq;
         stmt s;
         int i, total, num, end, pos = 0;
         Node ch;
@@ -805,7 +810,7 @@ public class Ast {
         REQ(n, SUITE);
 
         total = num_stmts(n);
-        seq = new ArrayList<>(total);
+        seq = new stmt[total];
 
         if (n.child(0).type() == SIMPLE_STMT) {
             n = n.child(0);
@@ -820,7 +825,7 @@ public class Ast {
             for (i = 0; i < end; i += 2) {
                 ch = n.child(i);
                 s = ast_for_stmt(c, ch);
-                seq.set(pos++, s);
+                seq[pos++] = s;
             }
         } else {
             for (i = 2; i < n.nch() - 1; i++) {
@@ -831,7 +836,7 @@ public class Ast {
                 if  (num == 1) {
                     /* small_stmt or compound_stmt with only one child */
                     s = ast_for_stmt(c, ch);
-                    seq.set(pos++, s);
+                    seq[pos++] = s;
                 } else {
                     int j;
                     ch = ch.child(0);
@@ -843,25 +848,25 @@ public class Ast {
                             break;
                         }
                         s = ast_for_stmt(c, ch.child(j));
-                        seq.set(pos++, s);
+                        seq[pos++] = s;
                     }
                 }
             }
         }
-        return seq;
+        return asList(seq);
     }
 
-    static String docstring_from_stmts(List<stmt> stmts) {
-        if (!stmts.isEmpty()) {
-            stmt s = stmts.get(0);
-            /* If first statement is a literal string, it's the doc string. */
-            if (s instanceof Expr && ((Expr) s).getInternalValue() instanceof Str) {
-                String doc = ((Str) ((Expr) s).getInternalValue()).getInternalS();
-                stmts.remove(0);
-                return doc;
-            }
+    static BodyWithDocstring docstring_from_stmts(List<stmt> stmts) {
+        if (stmts.isEmpty()) {
+            return new BodyWithDocstring(stmts, null);
         }
-        return null;
+        stmt s = stmts.get(0);
+        /* If first statement is a literal string, it's the doc string. */
+        if (s instanceof Expr && ((Expr) s).getInternalValue() instanceof Str) {
+            String doc = ((Str) ((Expr) s).getInternalValue()).getInternalS();
+//                stmts.remove(0);
+            return new BodyWithDocstring(stmts.subList(1, stmts.size()-1), doc);
+        }
     }
 
     /* Create AST for argument list. */
@@ -889,8 +894,8 @@ public class Ast {
         int i, j, k, nposargs = 0, nkwonlyargs = 0;
         int nposdefaults = 0;
         boolean foundDefault = false;
-        List<arg> posargs, kwonlyargs;
-        List<expr> posdefaults, kwdefaults;
+        arg[] posargs, kwonlyargs;
+        expr[] posdefaults, kwdefaults;
         arg vararg = null, kwarg = null;
         arg arg;
         Node ch;
@@ -928,13 +933,13 @@ public class Ast {
             if (ch.type() == DOUBLESTAR) break;
             if (ch.type() == TFPDEF || ch.type() == VFPDEF) nkwonlyargs++;
         }
-        posargs = nposargs > 0 ? new ArrayList<>(nposargs) : null;
-        kwonlyargs = nkwonlyargs > 0 ? new ArrayList<>(nkwonlyargs) : null;
-        posdefaults = nposdefaults > 0 ? new ArrayList<>(nposdefaults) : null;
+        posargs = nposargs > 0 ? new arg[nposargs] : null;
+        kwonlyargs = nkwonlyargs > 0 ? new arg[nkwonlyargs] : null;
+        posdefaults = nposdefaults > 0 ? new expr[nposdefaults] : null;
         /* The length of kwonlyargs and kwdefaults are same
           since we set NULL as default for keyword only argument w/o default
           - we have sequence data structure, but no dictionary */
-        kwdefaults = nkwonlyargs > 0 ? new ArrayList<>(nkwonlyargs) : null;
+        kwdefaults = nkwonlyargs > 0 ? new expr[nkwonlyargs] : null;
         /* tfpdef: NAME [':' test]
            vfpdef: NAME
         */
@@ -949,14 +954,14 @@ public class Ast {
                     if (i + 1 < n.nch() && n.child(i + 1).type() == EQUAL) {
                         expr expression = ast_for_expr(c, n.child(i+2));
                         assert posdefaults != null;
-                        posdefaults.set(j++, expression);
+                        posdefaults[j++] = expression;
                         i+=2;
                         foundDefault = true;
                     } else if (foundDefault) {
                         throw ast_error(c, ch, "non-default argument follows default argument");
                     }
                     arg = ast_for_arg(c, ch);
-                    posargs.set(k++, arg);
+                    posargs[k++] = arg;
                     i+=2; /* the name and the comma */
                     break;
                 case STAR:
@@ -992,7 +997,7 @@ public class Ast {
                     throw Py.SystemError(String.format("unexpected node in varargslist: %d @ %d", ch.type(), i));
             }
         }
-        return new arguments(n, posargs, vararg, kwonlyargs, kwdefaults, kwarg, posdefaults);
+        return new arguments(n, asList(posargs), vararg, asList(kwonlyargs), asList(kwdefaults), kwarg, asList(posdefaults));
     }
 
     static operatorType ast_for_augassign(compiling c, Node n) {
@@ -1087,18 +1092,18 @@ public class Ast {
         /* testlist: test (',' test)* [',']
            testlist_star_expr: test|star_expr (',' test|star_expr)* [',']
         */
-        List<expr> seq;
+        expr[] seq;
         expr expression;
         int i;
         assert n.type() == TESTLIST || n.type() == TESTLIST_STAR_EXPR || n.type() == TESTLIST_COMP;
-        seq = new ArrayList<>((n.nch() + 1) / 2);
+        seq = new expr[(n.nch() + 1) / 2];
         for (i = 0; i < n.nch(); i+=2) {
             Node ch = n.child(i);
             assert ch.type() == TEST || ch.type() == TEST_NOCOND || ch.type() == STAR_EXPR;
             expression = ast_for_expr(c, ch);
-            seq.set(i / 2, expression);
+            seq[i / 2] = expression;
         }
-        return seq;
+        return asList(seq);
     }
 
     static arg ast_for_arg(compiling c, Node n) {
@@ -1123,7 +1128,7 @@ public class Ast {
                          ^^^
        start pointing here
     */
-    static int handle_keywordonly_args(compiling c, Node n, int start, List<arg> kwonlyargs, List<expr> kwdefaults) {
+    static int handle_keywordonly_args(compiling c, Node n, int start, arg[] kwonlyargs, expr[] kwdefaults) {
         String argname;
         Node ch;
         expr expression, annotation;
@@ -1141,10 +1146,10 @@ public class Ast {
                 case TFPDEF:
                     if (i +1 < n.nch() && n.child(i+1).type() == EQUAL) {
                         expression = ast_for_expr(c, n.child(i+2));
-                        kwdefaults.set(j, expression);
+                        kwdefaults[j] = expression;
                         i+=2; /* '=' and test */
                     } else { /* setting null if no default value exists */
-                        kwdefaults.set(j, null);
+                        kwdefaults[j] = null;
 
                     }
                     if (n.nch() == 3) {
@@ -1159,7 +1164,7 @@ public class Ast {
                         return -1;
                     }
                     arg = new arg(ch, argname, annotation);
-                    kwonlyargs.set(j++, arg);
+                    kwonlyargs[j++] = arg;
                     i+=2; /* the name and the comma */
                     break;
                 case DOUBLESTAR:
@@ -1218,18 +1223,18 @@ public class Ast {
     }
 
     static List<expr> ast_for_decorators(compiling c, Node n) {
-        List<expr> decoratorSeq;
+        expr[] decoratorSeq;
         expr d;
         int i;
 
         REQ(n, DECORATORS);
 
-        decoratorSeq = new ArrayList<>(n.nch());
+        decoratorSeq = new expr[n.nch()];
         for (i = 0; i < n.nch(); i++) {
             d = ast_for_decorator(c, n.child(i));
-            decoratorSeq.set(i, d);
+            decoratorSeq[i] = d;
         }
-        return decoratorSeq;
+        return asList(decoratorSeq);
     }
 
     static stmt ast_for_funcdef_impl(compiling c, Node n, List<expr> decoratorSeq, boolean isAsync) {
@@ -1312,16 +1317,16 @@ public class Ast {
     static expr ast_for_lambdef(compiling c, Node n) {
          /* lambdef: 'lambda' [varargslist] ':' test
            lambdef_nocond: 'lambda' [varargslist] ':' test_nocond */
-         arguments args;
-         expr expression;
-         if (n.nch() == 3) {
-             args = new arguments(null, null, null, null, null, null);
-             expression = ast_for_expr(c, n.child(2));
-         } else {
-             args = ast_for_arguments(c, n.child(1));
-             expression = ast_for_expr(c, n.child(3));
-         }
-         return new Lambda(n, args, expression);
+        arguments args;
+        expr expression;
+        if (n.nch() == 3) {
+            args = new arguments(null, null, null, null, null, null);
+            expression = ast_for_expr(c, n.child(2));
+        } else {
+            args = ast_for_arguments(c, n.child(1));
+            expression = ast_for_expr(c, n.child(3));
+        }
+        return new Lambda(n, args, expression);
     }
 
     static expr ast_for_ifexpr(compiling c, Node n) {
@@ -1335,17 +1340,17 @@ public class Ast {
     }
 
     static List<expr> ast_for_exprlist(compiling c, Node n, expr_contextType context) {
-        List<expr> seq;
+        expr[] seq;
         int i;
         expr e;
         REQ(n, EXPRLIST);
-        seq = new ArrayList<>((n.nch() + 1) / 2);
+        seq = new expr[(n.nch() + 1) / 2];
         for (i = 0; i < n.nch(); i+=2) {
             e = ast_for_expr(c, n.child(i));
-            seq.set(i / 2, e);
+            seq[i / 2] = e;
             set_context(c, e, context, n.child(i));
         }
-        return seq;
+        return asList(seq);
     }
 
     enum Comp {
@@ -1354,10 +1359,10 @@ public class Ast {
 
     static List<comprehension> ast_for_comprehension(compiling c, Node n) {
         int i, n_fors;
-        List<comprehension> comps;
+        comprehension[] comps;
 
         n_fors = count_comp_fors(c, n);
-        comps = new ArrayList<>(n_fors);
+        comps = new comprehension[n_fors];
         for (i = 0; i < n_fors; i++) {
             comprehension comp;
             List<expr> t;
@@ -1389,17 +1394,17 @@ public class Ast {
             }
             if (sync_n.nch() == 5) {
                 int j, n_ifs;
-                List<expr> ifs;
+                expr[] ifs;
                 n = sync_n.child(4);
                 n_ifs = count_comp_ifs(c, n);
-                ifs = new ArrayList<>(n_ifs);
+                ifs = new expr[n_ifs];
                 for (j = 0; j < n_ifs; j++) {
                     REQ(n, COMP_ITER);
                     n = n.child(0);
                     REQ(n, COMP_IF);
 
                     expression = ast_for_expr(c, n.child(1));
-                    ifs.set(j, expression);
+                    ifs[j] = expression;
                     if (n.nch() == 3) {
                         n = n.child(2);
                     }
@@ -1409,11 +1414,11 @@ public class Ast {
                 if (n.type() == COMP_ITER) {
                     n = n.child(2);
                 }
-                comp.setInternalIfs(ifs);
+                comp.setInternalIfs(asList(ifs));
             }
-            comps.set(i, comp);
+            comps[i] = comp;
         }
-        return comps;
+        return asList(comps);
     }
 
     /* Set the context ctx for expr_ty e, recursively traversing e.
@@ -1575,19 +1580,19 @@ public class Ast {
 
     static expr ast_for_dictdisplay(compiling c, Node n) {
         int i, j, size;
-        List<expr> keys;
-        List<expr> values;
+        expr[] keys;
+        expr[] values;
         size = (n.nch() + 1) / 2; /* +1 in case no trailing comma */
-        keys = new ArrayList<>(size);
-        values = new ArrayList<>(size);
+        keys = new expr[size];
+        values = new expr[size];
         for (i = 0, j= 0; i < n.nch(); i++) {
             dictelement del = ast_for_dictelement(c, n, i);
-            keys.set(j, del.key);
-            values.set(j, del.value);
+            keys[j] = del.key;
+            values[j] = del.value;
             i = del.i;
             j++;
         }
-        return new Dict(n, keys, values);
+        return new Dict(n, asList(keys), asList(values));
     }
 
     static class dictelement {
@@ -1668,15 +1673,15 @@ public class Ast {
     static expr ast_for_setdisplay(compiling c, Node n) {
         int i;
         int size;
-        List<expr> elts;
+        expr[] elts;
         assert n.type() == DICTORSETMAKER;
         size = (n.nch() + 1) / 2; /* +1 in case no trailing comma */
-        elts = new ArrayList<>(size);
+        elts = new expr[size];
         for (i = 0; i < n.nch(); i+=2) {
             expr expression = ast_for_expr(c, n.child(i));
-            elts.set(i / 2, expression);
+            elts[i/2]  =expression;
         }
-        return new Set(n, elts);
+        return new Set(n, asList(elts));
     }
 
     static expr ast_for_atom(compiling c, Node n) {
@@ -1926,23 +1931,23 @@ public class Ast {
                 slice slc;
                 expr e;
                 int simple = 1;
-                List<slice> slices;
-                List<expr> elts;
-                slices = new ArrayList<>((n.nch() + 1) / 2);
+                slice[] slices;
+                expr[] elts;
+                slices = new slice[(n.nch() + 1) / 2];
                 for (j = 0; j < n.nch(); j+=2) {
                     slc = ast_for_slice(c, n.child(j));
                     if (slc instanceof Index) {
                         simple = 0;
                     }
-                    slices.set(j / 2, slc);
+                    slices[j/2] = slc;
                 }
                 /* extract Index values and put them in a Tuple */
-                elts = new ArrayList<>(slices.size());
-                for (j = 0; j < slices.size(); j++) {
-                    slc = slices.get(j);
-                    elts.set(j, ((Index) slc).getInternalValue());
+                elts = new expr[slices.length];
+                for (j = 0; j < slices.length; j++) {
+                    slc = slices[j];
+                    elts[j] = ((Index) slc).getInternalValue();
                 }
-                e = new Tuple(n, elts, Load);
+                e = new Tuple(n, asList(elts), Load);
                 return new Subscript(n, left_expr, new Index(n, e), Load);
         }
     }
@@ -2037,7 +2042,7 @@ public class Ast {
            atom_expr: ['await'] atom trailer*
            yield_expr: 'yield' [yield_arg]
         */
-        List<expr> seq;
+        expr[] seq;
         int i;
         loop:
         for (;;) {
@@ -2056,16 +2061,16 @@ public class Ast {
                         n = n.child(0);
                         continue loop;
                     }
-                    seq = new ArrayList<>((n.nch() + 1) / 2);
+                    seq = new expr[(n.nch() + 1) / 2];
                     for (i = 0; i < n.nch(); i+=2) {
                         expr e = ast_for_expr(c, n.child(i));
-                        seq.set(i / 2, e);
+                        seq[i/2] = e;
                     }
                     if (n.child(1).str().equals("and")) {
-                        return new BoolOp(n, boolopType.And, seq);
+                        return new BoolOp(n, boolopType.And, asList(seq));
                     }
                     assert(n.child(1).str().equals("or"));
-                    return new BoolOp(n, boolopType.Or, seq);
+                    return new BoolOp(n, boolopType.Or, asList(seq));
                 case NOT_TEST:
                     if (n.unary()) {
                         n = n.child(0);
@@ -2078,16 +2083,16 @@ public class Ast {
                         n = n.child(0);
                         continue loop;
                     }
-                    List<cmpopType> ops = new ArrayList<>(n.nch() / 2);
-                    List<expr> cmps = new ArrayList<>(n.nch() / 2);
+                    cmpopType[] ops = new cmpopType[n.nch() / 2];
+                    expr[] cmps = new expr[n.nch() / 2];
                     for (i = 1; i < n.nch(); i+=2) {
                         cmpopType newoperator = ast_for_comp_op(c, n.child(i));
                         expression = ast_for_expr(c, n.child(i+1));
-                        ops.set(i/2, newoperator);
-                        cmps.set(i/2, expression);
+                        ops[i/2] = newoperator;
+                        cmps[i/2] = expression;
                     }
                     expression = ast_for_expr(c, n.child(0));
-                    return new Compare(n, expression, ops, cmps);
+                    return new Compare(n, expression, asList(ops), asList(cmps));
                 case STAR_EXPR:
                     return ast_for_starred(c, n);
                 /* The next five cases all handle BinOps.  The main body of code
@@ -2147,8 +2152,8 @@ public class Ast {
         */
         int i, nargs, nkeywords;
         int ndoublestars;
-        List<expr> args;
-        List<keyword> keywords;
+        expr[] args;
+        keyword[] keywords;
 
         REQ(n, ARGLIST);
         nargs = 0;
@@ -2175,8 +2180,8 @@ public class Ast {
             }
         }
 
-        args = new ArrayList<>(nargs);
-        keywords = new ArrayList<>(nkeywords);
+        args = new expr[nargs];
+        keywords = new keyword[nkeywords];
         nargs = 0; /* positional argumetns + iterable argument unpacking */
         nkeywords = 0; /* keyword argumetns + keyword argument unpacking */
         ndoublestars = 0; /* just keyword argument unpacking */
@@ -2195,7 +2200,7 @@ public class Ast {
                         throw ast_error(c, chch, "positional argument follows keyword argument");
                     }
                     e = ast_for_expr(c, chch);
-                    args.set(nargs++, e);
+                    args[nargs++] = e;
                 } else if (chch.type() == STAR) {
                     /* an iterable argument unpacking */
                     expr starred;
@@ -2204,19 +2209,19 @@ public class Ast {
                     }
                     e = ast_for_expr(c, ch.child(1));
                     starred = new Starred(chch, e, Load);
-                    args.set(nargs++, starred);
+                    args[nargs++] = starred;
                 } else if (chch.type() == DOUBLESTAR) {
                     /* a keyword argument unpacking */
                     keyword kw;
                     i++;
                     e = ast_for_expr(c, ch.child(1));
                     kw = new keyword(ch, null, e);
-                    keywords.set(nkeywords++, kw);
+                    keywords[nkeywords++] = kw;
                     ndoublestars++;
                 } else if (ch.child(1).type() == COMP_FOR) {
                     /* the lone generator expression */
                     e = ast_for_genexp(c, ch);
-                    args.set(nargs++, e);
+                    args[nargs++] = e;
                 } else {
                     /* a keyword argument */
                     keyword kw;
@@ -2239,18 +2244,18 @@ public class Ast {
 
                     key = ((Name)e).getInternalId();
                     for (k = 0; k < nkeywords; k++) {
-                        tmp = keywords.get(k).getInternalArg();
+                        tmp = keywords[k].getInternalArg();
                         if (tmp != null && key.equals(tmp)) {
                             throw ast_error(c, chch, "keyword argument repeated");
                         }
                     }
                     e = ast_for_expr(c, ch.child(2));
                     kw = new keyword(ch.child(2), key, e);
-                    keywords.set(nkeywords++, kw);
+                    keywords[nkeywords++] = kw;
                 }
             }
         }
-        return new Call(func, func, args, keywords);
+        return new Call(func, func, asList(args), asList(keywords));
     }
 
     static expr ast_for_testlist(compiling c, Node n) {
@@ -2356,14 +2361,14 @@ public class Ast {
             return new AnnAssign(n, expr1, expr2, expr3, simple);
         } else {
             int i;
-            List<expr> targets;
+            expr[] targets;
             Node value;
             expr expression;
 
             /* a normal assignment */
             REQ(n.child(1), EQUAL);
-            targets = new ArrayList<>(n.nch() / 2);
-            for (i = 0; i < n.nch(); i+=2) {
+            targets = new expr[n.nch() / 2];
+            for (i = 0; i < n.nch() - 2; i+=2) {
                 expr e;
                 Node ch = n.child(i);
                 if (ch.type() == YIELD_EXPR) {
@@ -2373,7 +2378,7 @@ public class Ast {
 
                 /* set context to assign */
                 set_context(c, e, expr_contextType.Store, n.child(i));
-                targets.set(i/2, e);
+                targets[i/2] = e;
             }
             value = n.child(n.nch() - 1);
             if (value.type() == TESTLIST_STAR_EXPR) {
@@ -2381,7 +2386,7 @@ public class Ast {
             } else {
                 expression = ast_for_expr(c, value);
             }
-            return new Assign(n, targets, expression);
+            return new Assign(n, asList(targets), expression);
         }
     }
 
@@ -2425,5 +2430,12 @@ public class Ast {
             this.filename = filename;
             this.nomalize = null;
         }
+    }
+
+    private static <T> List<T> asList(T[] elts) {
+        if (elts == null) {
+            return List.of();
+        }
+        return List.of(elts);
     }
 }
