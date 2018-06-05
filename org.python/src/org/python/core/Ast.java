@@ -504,7 +504,7 @@ public class Ast {
         nItems = (n.nch() - 2) / 2;
         items = new withitem[nItems];
 
-        for (i = 1; i < n.nch(); i+=2) {
+        for (i = 1; i < n.nch() - 2; i+=2) {
             withitem item = ast_for_with_item(c, n.child(i));
             items[(i-1)/2] = item;
         }
@@ -1806,6 +1806,9 @@ public class Ast {
         char lastChar = s.charAt(s.length() - 1);
         boolean imflag = lastChar == 'j' || lastChar == 'J';
         if (s.charAt(0) == '0') {
+            if (s.length() == 1) {
+                return Py.Zero;
+            }
             char ch = s.charAt(1);
             switch (ch) {
                 case 'x':
@@ -1818,7 +1821,7 @@ public class Ast {
                 case 'O':
                     return actions.makeInt(s.substring(2), 8);
                 default:
-                    return actions.makeInt(s.substring(1), 8);
+                    return actions.makeInt(s.substring(1), 10);
             }
         }
         if (imflag) {
@@ -2152,7 +2155,7 @@ public class Ast {
         }
     }
 
-    static expr ast_for_call(compiling c, Node n, expr func, boolean allowgen) {
+    static expr ast_for_call(compiling c, final Node n, expr func, boolean allowgen) {
         /*
           arglist: argument (',' argument)*  [',']
           argument: ( test [comp_for] | '*' test | test '=' test | '**' test )
@@ -2178,7 +2181,7 @@ public class Ast {
                     if (n.nch() > 1) {
                         throw ast_error(c, ch, "Generator expression must be parenthesized");
                     }
-                } else if (n.child(0).type() == STAR) {
+                } else if (ch.child(0).type() == STAR) {
                     nargs++;
                 } else {
                     /* TYPE(CHILD(ch, 0)) == DOUBLESTAR or keyword argument */
