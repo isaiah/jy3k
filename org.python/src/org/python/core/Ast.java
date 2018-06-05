@@ -828,7 +828,7 @@ public class Ast {
         } else {
             for (i = 2; i < n.nch() - 1; i++) {
                 ch = n.child(i);
-                REQ(n, STMT);
+                REQ(ch, STMT);
 
                 num = num_stmts(ch);
                 if  (num == 1) {
@@ -2233,7 +2233,7 @@ public class Ast {
                      */
                     if (e instanceof Lambda) {
                         throw ast_error(c, chch, "lambda cannot contain assignment");
-                    } else if (e instanceof Name) {
+                    } else if (!(e instanceof Name)) {
                         throw ast_error(c, chch, "keyword can't be an expression");
                     } else if (forbiddenName(c, ((Name)e).getInternalId(), ch, true)) {
                         return null;

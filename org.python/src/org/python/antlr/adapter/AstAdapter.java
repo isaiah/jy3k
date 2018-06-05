@@ -20,7 +20,7 @@ public class AstAdapter {
 
     public <T extends PythonTree> List<T> iter2ast(PyObject iter) {
         List<T> list = new ArrayList<>();
-        if (iter != Py.None) {
+        if (iter != null && iter != Py.None) {
             for(Object o : iter.asIterable()) {
                 if (o == Py.None) {
                     throw Py.ValueError("None is not allowed");
