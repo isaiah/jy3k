@@ -77,8 +77,12 @@ import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.parser.Node;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.python.antlr.ast.expr_contextType.Load;
 import static org.python.parser.GramInit.*;
@@ -1582,14 +1586,13 @@ public class Ast {
         size = (n.nch() + 1) / 2; /* +1 in case no trailing comma */
         keys = new expr[size];
         values = new expr[size];
-        for (i = 0, j= 0; i < n.nch(); i++) {
+        for (i = 0, j= 0; i < n.nch(); i++, j++) {
             dictelement del = ast_for_dictelement(c, n, i);
             keys[j] = del.key;
             values[j] = del.value;
             i = del.i;
-            j++;
         }
-        return new Dict(n, asList(keys), asList(values));
+        return new Dict(n, asListNoNull(keys), asListNoNull(values));
     }
 
     static class dictelement {
@@ -2429,10 +2432,17 @@ public class Ast {
         }
     }
 
+    private static <T> List<T> asListNoNull(T[] elts) {
+        if (elts == null) {
+            return List.of();
+        }
+        return Stream.of(elts).takeWhile(x-> !Objects.isNull(x)).collect(Collectors.toList());
+    }
+
     private static <T> List<T> asList(T[] elts) {
         if (elts == null) {
             return List.of();
         }
-        return List.of(elts);
+        return Arrays.asList(elts);
     }
 }
