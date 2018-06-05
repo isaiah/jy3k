@@ -167,6 +167,7 @@ public class Tokenizer implements Errcode {
                         return indenterror();
                     }
                     pendin++;
+                    indent++;
                     pushIndent(col);
                     pushAltIndent(altcol);
                 } else { // col < lstIndentCol()
@@ -666,11 +667,11 @@ public class Tokenizer implements Errcode {
     }
 
     void pushIndent(int col) {
-        indstack[++indent] = col;
+        indstack[indent] = col;
     }
 
     void pushAltIndent(int col) {
-        altindstack[++indent] = col;
+        altindstack[indent] = col;
     }
     int lastIndentCol() {
         return indstack[indent];
