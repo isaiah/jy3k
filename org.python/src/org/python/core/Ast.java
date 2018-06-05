@@ -554,7 +554,7 @@ public class Ast {
         return new ClassDef(n, classname, call.getInternalArgs(), call.getInternalKeywords(), s.stmts, decoratorSeq, s.docstring);
     }
 
-    static stmt ast_for_del_stmt(compiling c, Node n) {
+    static stmt ast_for_del_stmt(compiling c, final Node n) {
         List<expr> exprList;
         /* del_stmt: 'del' exprlist */
         REQ(n, DEL_STMT);
@@ -562,7 +562,7 @@ public class Ast {
         return new Delete(n, exprList);
     }
 
-    static stmt ast_for_flow_stmt(compiling c, Node n) {
+    static stmt ast_for_flow_stmt(compiling c, final Node n) {
         /*
           flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt
                      | yield_stmt
@@ -594,11 +594,11 @@ public class Ast {
             case RAISE_STMT:
                 if (ch.unary()) {
                     return new Raise(n, null, null);
-                } else if (n.nch() >= 2) {
+                } else if (ch.nch() >= 2) {
 
                     expr cause = null;
                     expression = ast_for_expr(c, ch.child(1));
-                    if (n.nch() == 4) {
+                    if (ch.nch() == 4) {
                         cause = ast_for_expr(c, ch.child(3));
                     }
                     return new Raise(n, expression, cause);
