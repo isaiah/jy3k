@@ -77,8 +77,6 @@ import org.python.antlr.base.slice;
 import org.python.antlr.base.stmt;
 import org.python.parser.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -857,16 +855,15 @@ public class Ast {
     }
 
     static BodyWithDocstring docstring_from_stmts(List<stmt> stmts) {
-        if (stmts.isEmpty()) {
-            return new BodyWithDocstring(stmts, null);
+        if (!stmts.isEmpty()) {
+            stmt s = stmts.get(0);
+            /* If first statement is a literal string, it's the doc string. */
+            if (s instanceof Expr && ((Expr) s).getInternalValue() instanceof Str) {
+                String doc = ((Str) ((Expr) s).getInternalValue()).getInternalS();
+                return new BodyWithDocstring(stmts.subList(1, stmts.size()), doc);
+            }
         }
-        stmt s = stmts.get(0);
-        /* If first statement is a literal string, it's the doc string. */
-        if (s instanceof Expr && ((Expr) s).getInternalValue() instanceof Str) {
-            String doc = ((Str) ((Expr) s).getInternalValue()).getInternalS();
-//                stmts.remove(0);
-            return new BodyWithDocstring(stmts.subList(1, stmts.size()-1), doc);
-        }
+        return new BodyWithDocstring(stmts, null);
     }
 
     /* Create AST for argument list. */

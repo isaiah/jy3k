@@ -11,9 +11,15 @@ import org.python.core.stringlib.Encoding;
 import org.python.core.stringlib.IntegerFormatter;
 import org.python.modules._io._io;
 import org.python.modules.sys.SysModule;
+import org.python.parser.GramInit;
+import org.python.parser.Node;
+import org.python.parser.Parser;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -111,6 +117,7 @@ public class BuiltinModule {
         dict.__setitem__("vars", PyBuiltinFunction.named("vars", BuiltinDocs.builtins_vars_doc)
                 .with(BuiltinModule::vars0)
                 .with(BuiltinModule::vars1));
+        dict.__setitem__("compile2", PyBuiltinFunction.named("compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::cp));
         dict.__setitem__("compile", PyBuiltinFunction.named("compile", BuiltinDocs.builtins_compile_doc).wide(BuiltinModule::compile));
         dict.__setitem__("open", PyBuiltinFunction.named("open", BuiltinDocs.builtins_open_doc).wide(_io::open));
         dict.__setitem__("reversed", PyBuiltinFunction.named("reversed", BuiltinDocs.builtins_reversed_doc)
@@ -197,6 +204,22 @@ public class BuiltinModule {
             throw Py.ValueError("chr() arg not in range(0x110000)");
         }
         return new PyUnicode(String.valueOf(Character.toChars((int) i)));
+    }
+
+    /* These definitions must match corresponding definitions in graminit.java,
+     * There's code in compile.c that checks athat they are the same.
+     */
+    public static final int PY_SINGLE_INPUT = 256;
+    public static final int PY_FILE_INPUT = 257;
+    public static final int PY_EVAL_INPUT = 258;
+
+    public static PyObject cp(PyObject[] args, String[] kwds) {
+        PyObject source = args[0];
+        byte[] bytes = Py.unwrapBuffer(source);
+        Node n = Parser.ParseFile(
+                Paths.get(new String(bytes)).toFile(), new String(bytes), GramInit._PyParser_Grammar, PY_FILE_INPUT);
+        mod m = Ast.PyAST_FromNodeObject(n, null, new String(bytes));
+        return m;
     }
 
     public static PyObject compile(PyObject args[], String kwds[]) {

@@ -9,6 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Logger;
 
+import static org.python.parser.ParserGenerator.DEBUG;
 import static org.python.parser.ParserGenerator.NT_OFFSET;
 import static org.python.parser.ParserGenerator.PyGrammar_FindDFA;
 import static org.python.parser.TokenType.NAME;
@@ -67,7 +68,7 @@ public class Parser implements Errcode {
             if (s.lower <= ilabel && ilabel < s.upper) {
                 int x = s.accel[ilabel - s.lower];
                 if (x != -1) {
-                    if ((x & (1 << 7)) > 0) {
+                    if ((x & (1 << 7)) != 0) {
                         /* Push non-terminal */
                         int nt = (x >> 8) + NT_OFFSET;
                         int arrow = x & ((1 << 7) - 1);
@@ -102,6 +103,7 @@ public class Parser implements Errcode {
                 }
                 continue;
             }
+            logger.info(" Error.\n");
             /* Stuck, report syntax error */
             // return the current type
             return E_SYNTAX;
