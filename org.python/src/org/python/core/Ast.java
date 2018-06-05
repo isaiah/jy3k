@@ -80,9 +80,6 @@ import org.python.parser.Node;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.python.antlr.ast.expr_contextType.Load;
 import static org.python.parser.GramInit.*;
@@ -925,7 +922,7 @@ public class Ast {
             }
             if (ch.type() == DOUBLESTAR) break;
             if (ch.type() == VFPDEF || ch.type() == TFPDEF) nposargs++;
-            if (ch.type() == EQEQUAL) nposdefaults++;
+            if (ch.type() == EQUAL) nposdefaults++;
         }
         /* count the number of keyword only args &
            defaults for keyword only args */
@@ -1592,7 +1589,17 @@ public class Ast {
             values[j] = del.value;
             i = del.i;
         }
-        return new Dict(n, asListNoNull(keys), asListNoNull(values));
+        expr[] nk, nv;
+        if (j == size) {
+            nk = keys;
+            nv = values;
+        } else {
+            nk = new expr[j];
+            nv = new expr[j];
+            System.arraycopy(keys, 0, nk, 0, j);
+            System.arraycopy(values, 0, nv, 0, j);
+        }
+        return new Dict(n, asList(nk), asList(nv));
     }
 
     static class dictelement {
@@ -2430,13 +2437,6 @@ public class Ast {
             this.filename = filename;
             this.nomalize = null;
         }
-    }
-
-    private static <T> List<T> asListNoNull(T[] elts) {
-        if (elts == null) {
-            return List.of();
-        }
-        return Stream.of(elts).takeWhile(x-> !Objects.isNull(x)).collect(Collectors.toList());
     }
 
     private static <T> List<T> asList(T[] elts) {
