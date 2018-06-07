@@ -1,5 +1,6 @@
 package org.python.parser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -22,7 +23,7 @@ public class Tokenizer implements Errcode {
     int end; /* End of input buffer */
     Integer start; /* Start of current token */
     int done; /* E_OF normally */
-    Reader fp; /* Rest of input; NULL if tokenizing a string */
+    BufferedReader fp; /* Rest of input; NULL if tokenizing a string */
     int tabsize; /* Tab spacing */
     int indent; /* Current indent index */
     int[] indstack = new int[MAXINDENT]; /* Stack of indents */
@@ -38,10 +39,11 @@ public class Tokenizer implements Errcode {
     static final int BUFSIZ = 1024;
 
     public Tokenizer(Reader fp) {
-        inp = 0;
-        this.buf = CharBuffer.allocate(BUFSIZ);
+        this.inp = 0;
+        this.buf = null;
         this.end = BUFSIZ;
-        this.fp = fp;
+        this.done = E_OK;
+        this.fp = new BufferedReader(fp);
     }
 
     public static Tokenizer fromFile(Reader fp) {
@@ -186,7 +188,7 @@ public class Tokenizer implements Errcode {
                 }
             }
         }
-        start = buf.position();
+//        start = buf == null ? 0 : buf.position();
 
         /* Return pending indents/dedents */
         if (pendin != 0) {
@@ -217,6 +219,7 @@ public class Tokenizer implements Errcode {
             }
             /* Check for EOF and errors now */
             if (c == EOF) {
+                assert done == E_EOF: "EOF without E_EOF";
                 return done == E_EOF ? new Tok(ENDMARKER) : ERR_TOK;
             }
             boolean nonascii = false;
@@ -688,15 +691,70 @@ public class Tokenizer implements Errcode {
             if (pos < 0) {
                 throw new RuntimeException("tok_backup: beginning of buffer");
             }
-            buf.put(pos, c);
+//            buf.put(pos, c);
             buf.position(pos);
         }
     }
 
-    /* Get next char, update state */
     char nextc() {
+        for(;;) {
+            if (buf != null && buf.hasRemaining()) {
+                return buf.get(); /* Fast path */
+            }
+            if (done != E_OK) {
+                return EOF;
+            }
+            if (fp == null) {
+                return EOF; // TODO
+            }
+            if (prompt != null) {
+                return EOF;
+            }
+            if (start == null) {
+                try {
+                    String line = fp.readLine();
+                    if (line == null) {
+                        done = E_EOF;
+                        return EOF;
+                    }
+                    lineno++;
+                    buf = CharBuffer.wrap(line + "\n");
+                    done = E_OK;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else { /* start != null */
+                int size = buf.limit() - start;
+                try {
+                    String line = fp.readLine();
+                    if (line == null) {
+                        done = E_EOF;
+                        return EOF;
+                    }
+                    lineno++;
+                    CharBuffer newBuf = CharBuffer.allocate(size + line.length() + 1);
+                    buf.position(start);
+                    buf.read(newBuf);
+                    newBuf.put(line);
+                    newBuf.put('\n');
+                    newBuf.flip();
+                    newBuf.position(size);
+                    lineStart = 0;
+                    start = 0;
+                    buf = newBuf;
+                    done = E_OK;
+                } catch (IOException e) {
+                    done = E_EOF;
+                    return EOF;
+                }
+            }
+        }
+    }
+
+    /* Get next char, update state */
+    char nextc1() {
         for (;;) {
-            if (buf.position() != inp) {
+            if (buf.hasRemaining()) {
                 return buf.get(); /* Fast path */
             }
             if (done == E_EOF) {
@@ -757,22 +815,22 @@ public class Tokenizer implements Errcode {
                     if (decodingFEOF(fp)) {
                         done = E_EOF;
                         eol = true;
+                    } else {
+                        done = E_OK;
                     }
-                    done = E_OK;
                 }
                 lineno++;
-                System.out.println("lineno: " + lineno);
                 /* Read until '\n' or EOF */
                 while (!eol) {
                     int curstart = start == null ? -1 : start;
-                    int curvalid = buf.limit() - buf.position();
+                    int curvalid = buf.limit();
                     int newsize = curvalid + BUFSIZ;
                     CharBuffer newbuf = CharBuffer.allocate(newsize);
+                    buf.position(0);
                     newbuf.put(buf);
                     this.buf = newbuf;
-                    lineStart = buf.position(); // = tok->cur
-                    inp = curvalid;
-                    start = curstart < 0 ? null : curstart;
+                    lineStart = inp;
+//                    start = curstart < 0 ? null : curstart;
                     try {
                         int len = fp.read(newbuf);
                         if (len < BUFSIZ) {
@@ -783,19 +841,21 @@ public class Tokenizer implements Errcode {
                         return '\uffff'; // EOF
                     }
                     buf.flip();
+                    if (curstart > 0) {
+                        buf.position(curstart);
+                    }
                     end = buf.capacity();
-                    buf.mark();
                     inp = buf.limit();
                     eol = buf.get(inp - 1) == '\n';
                 }
-                if (buf != null) {
-                    /* replace '\r\n' with '\n' */
-                    int pt = buf.limit() - 2;
-                    if (pt >= buf.position() && buf.get(pt) == '\r') {
-                        buf.put(pt + 1, '\n');
-                        buf.limit(buf.limit() - 1);
-                    }
-                }
+//                if (buf != null) {
+//                    /* replace '\r\n' with '\n' */
+//                    int pt = buf.limit() - 2;
+//                    if (pt >= buf.position() && buf.get(pt) == '\r') {
+//                        buf.put(pt + 1, '\n');
+//                        buf.limit(buf.limit() - 1);
+//                    }
+//                }
             }
             if (done != E_OK) {
                 return '\uffff'; // EOF
