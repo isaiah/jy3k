@@ -108,7 +108,7 @@ public class Ast {
         switch(n.type()) {
             case FILE_INPUT:
                 stmts = new stmt[num_stmts(n)];
-                for (i = 0; i < n.nch(); i++) { /* skip the ENDMARKER */
+                for (i = 0; i < n.nch() - 1; i++) { /* skip the ENDMARKER */
                     ch = n.child(i);
                     if (ch.type() == NEWLINE) {
                         continue;
@@ -1821,7 +1821,7 @@ public class Ast {
                 case 'O':
                     return actions.makeInt(s.substring(2), 8);
                 default:
-                    return actions.makeInt(s.substring(1), 10);
+                    break;
             }
         }
         if (imflag) {
